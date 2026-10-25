@@ -7,15 +7,16 @@
  * contrast raises the bar: 7:1 for text, 4.5:1 for icons and borders.
  */
 
-import { contrast, deltaE, hexByte, hexToOklch, linToSrgb, pyRound, srgbToLin } from './oklch.mjs';
+import { contrast, deltaE, hexByte, hexToOklch, hexToRgb, linToSrgb, parseHex, pyRound, srgbToLin } from './oklch.mjs';
 import { MODES } from './semantics.mjs';
 
 /** Composite an 8-digit hex over an opaque ground; a 6-digit hex is returned as is. */
 export function composite(hex, ground) {
   if (hex.length < 9) return hex.slice(0, 7);
-  const a = parseInt(hex.slice(7, 9), 16) / 255;
-  const ch = (h, i) => parseInt(h.slice(i, i + 2), 16);
-  return `#${[1, 3, 5].map((i) => hexByte(pyRound(ch(hex, i) * a + ch(ground, i) * (1 - a)))).join('')}`;
+  const fg = parseHex(hex);
+  const bg = parseHex(ground);
+  const a = fg.a / 255;
+  return `#${['r', 'g', 'b'].map((c) => hexByte(pyRound(fg[c] * a + bg[c] * (1 - a)))).join('')}`;
 }
 
 const icBar = (bar) => (bar >= 4.5 ? 7 : 4.5);
@@ -70,7 +71,7 @@ const PROTAN = [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216],
 const DEUTAN = [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]];
 
 function simulate(hex, M) {
-  const c = [1, 3, 5].map((i) => srgbToLin(parseInt(hex.slice(i, i + 2), 16) / 255));
+  const c = hexToRgb(hex).map(srgbToLin);
   const o = M.map((row) => Math.max(0, Math.min(1, row[0] * c[0] + row[1] * c[1] + row[2] * c[2])));
   return `#${o.map((v) => hexByte(pyRound(Math.max(0, Math.min(1, linToSrgb(v))) * 255))).join('')}`;
 }

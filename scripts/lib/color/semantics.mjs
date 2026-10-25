@@ -17,15 +17,19 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { REPO_ROOT } from '../corpus.mjs';
 
 import { hexToOklch } from './oklch.mjs';
 import { withAlpha } from './plans.mjs';
+import { STEPS } from './ramps.mjs';
 
 export const MODES = ['light', 'dark', 'light_ic', 'dark_ic'];
 
 /** The vendored Atlassian reference tokens, in their published order. */
-export function loadAtlassian() {
-  return JSON.parse(readFileSync(new URL('./atlassian-tokens.json', import.meta.url), 'utf8')).tokens;
+export function loadAtlassian({ root = REPO_ROOT } = {}) {
+  return JSON.parse(readFileSync(join(root, 'scripts/lib/color/atlassian-tokens.json'), 'utf8')).tokens;
 }
 
 // Rovo is Atlassian's AI layer: out of scope until the AI hue is decided.
@@ -159,7 +163,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     "Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% " +
     '(pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a ' +
     'non-color cue (a Lagoon bar or a check).';
-  const OV = {
+  const overrides = {
     'color.border.focused': [H('lagoon', 700), H('lagoon', 300), H('lagoon', 800), H('lagoon', 300),
       'Two steps darker than Atlassian (500): 5.0:1 on white, and 3:1 on the hovered and selected grounds it sits on. Drawn with a 2px offset, never inset on a fill.'],
     'color.interaction.hovered': [NA(8), DA(8), null, null, 'PLUS state-layer ruling (2026-10-24): hover overlay 8%. Atlassian uses 16%. Only for fills that cannot change (avatars, images).'],
@@ -173,23 +177,23 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     'color.background.selected': [NA(10), DA(10), NA(12), DA(12), SEL_WHY],
     'color.background.selected.hovered': [NA(12), DA(12), NA(16), DA(16), SEL_WHY],
     'color.background.selected.pressed': [NA(14), DA(14), NA(24), DA(24), `${SEL_WHY} Atlassian presses to 31%.`],
-    'color.background.selected.bold.pressed': [H('lagoon', 850), H('lagoon', 250), null, null, 'Set below from brand.bold (decision 17).'],
+    'color.background.selected.bold.pressed': [H('lagoon', 850), H('lagoon', 250), null, null, 'Set below from brand.bold: checked controls are Lagoon.'],
     'color.text.selected': [N(1000), D(1000), N(1100), D(1100), SEL_WHY],
     'color.icon.selected': [N(1000), D(1000), N(1100), D(1100), SEL_WHY],
     'color.link': [H('lagoon', 800), H('lagoon', 300), H('lagoon', 1000), H('lagoon', 100),
-      'Decision 15 (applied, reversible): one step darker than Atlassian (700) so links keep 4.5:1 on selected and hovered rows. Links in running text are underlined at rest.'],
+      'One step darker than Atlassian (700) so links keep 4.5:1 on selected and hovered rows. Links in running text are underlined at rest.'],
     'color.link.pressed': [H('lagoon', 900), H('lagoon', 250), H('lagoon', 1100), H('lagoon', 200), 'Follows color.link.'],
-    'color.text.brand': [H('lagoon', 800), H('lagoon', 300), H('lagoon', 1000), H('lagoon', 100), 'Follows color.link (decision 15).'],
+    'color.text.brand': [H('lagoon', 800), H('lagoon', 300), H('lagoon', 1000), H('lagoon', 100), 'Follows color.link.'],
     // headroom on the grounds these actually sit on (hovered rows, selected rows, overlays)
     'color.text.subtlest': [N(750), D(750), N(900), D(900),
       'One half-step darker than Atlassian (700) so meta text keeps 4.5:1 on hovered and selected rows and on dark overlays. icon.subtlest stays on 700.'],
     'color.border.input': [N(600), D(700), N(800), D(800),
       'One step darker than Atlassian (500) so a field edge keeps 3:1 on hovered grounds and overlays.'],
   };
-  OV['color.border'] = [LINE(), DLINE(), NA(49), DA(50),
+  overrides['color.border'] = [LINE(), DLINE(), NA(49), DA(50),
     'The line alpha (slot 300) is set per plan: Notion draws dividers at about 7% warm ink, claude.ai at 8-12%. Increased contrast: 49%, which clears 3:1.'];
-  OV['color.text.warning.inverse'] = [N(1100), null, N(0), null, 'Full ink, since step 1000 on warning.bold.pressed is 4.4:1 in Plan A.'];
-  OV['color.icon.warning.inverse'] = [N(1100), null, N(0), null, 'Full ink, as text.warning.inverse.'];
+  overrides['color.text.warning.inverse'] = [N(1100), null, N(0), null, 'Full ink, since step 1000 on warning.bold.pressed is 4.4:1 in Plan A.'];
+  overrides['color.icon.warning.inverse'] = [N(1100), null, N(0), null, 'Full ink, as text.warning.inverse.'];
 
   const ADDITIONS = [ // [name, light, dark, light IC, dark IC, use, why]
     ['color.interaction.dragged', NA(16), DA(16), null, null, 'Overlay on an item while it is dragged.', 'PLUS addition: the 16% step of the state-layer ruling.'],
@@ -208,8 +212,8 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     const base = (i) => resolve(t, x[KEYS[i]]); // lazy: only resolved where no override applies
     let why = null;
     const vals = [];
-    if (name in OV) {
-      const o = OV[name];
+    if (name in overrides) {
+      const o = overrides[name];
       why = o[4];
       for (let i = 0; i < 4; i++) {
         if (o[i]) vals.push(o[i]);
@@ -246,12 +250,12 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
   for (const [n, l, d, li, di, use, why] of ADDITIONS) rows.push(mk(n, l, d, li, di, use, why));
-  const R = {};
-  for (const r of rows) R[r.name] = r;
+  const byName = {};
+  for (const r of rows) byName[r.name] = r;
 
-  const setm = (name, mode, [refName, hex]) => {
-    R[name][`${mode}_ref`] = refName;
-    R[name][mode] = hex;
+  const setMode = (name, mode, [refName, hex]) => {
+    byName[name][`${mode}_ref`] = refName;
+    byName[name][mode] = hex;
   };
 
   // ---- accents: tag text, dark IC fills, gray fixes ----
@@ -260,58 +264,58 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   for (const f of HUES) {
     const a = `color.background.accent.${f}`;
     if (f === 'gray') {
-      setm('color.text.accent.gray', 'light', N(900));
-      setm('color.text.accent.gray', 'light_ic', N(1100));
-      setm('color.text.accent.gray', 'dark', D(900));
-      setm('color.text.accent.gray', 'dark_ic', D(1100));
-      R['color.text.accent.gray'].deviation = TAG_WHY;
+      setMode('color.text.accent.gray', 'light', N(900));
+      setMode('color.text.accent.gray', 'light_ic', N(1100));
+      setMode('color.text.accent.gray', 'dark', D(900));
+      setMode('color.text.accent.gray', 'dark_ic', D(1100));
+      byName['color.text.accent.gray'].deviation = TAG_WHY;
       for (const [suf, mode, v] of [
         ['.subtler', 'dark', D(350)], ['.subtler', 'dark_ic', D(350)], ['.subtler.hovered', 'light', N(350)], ['.subtler.hovered', 'light_ic', N(350)],
         ['.subtler.pressed', 'light', N(400)], ['.subtler.pressed', 'light_ic', N(400)], ['.subtler.pressed', 'dark', D(500)],
         ['.subtle', 'dark_ic', D(300)], ['.subtle.hovered', 'dark_ic', D(350)], ['.subtle.pressed', 'dark_ic', D(400)],
         ['.bolder', 'light_ic', N(900)], ['.bolder.hovered', 'light_ic', N(1000)], ['.bolder.pressed', 'light_ic', N(1100)],
       ]) {
-        setm(a + suf, mode, v);
-        R[a + suf].deviation = R[a + suf].deviation || IC_WHY;
+        setMode(a + suf, mode, v);
+        byName[a + suf].deviation = byName[a + suf].deviation || IC_WHY;
       }
-      setm('color.icon.accent.gray', 'dark', D(800));
+      setMode('color.icon.accent.gray', 'dark', D(800));
       continue;
     }
-    setm(`color.text.accent.${f}`, 'light', H(f, 850));
-    setm(`color.text.accent.${f}`, 'light_ic', H(f, 1000));
-    setm(`color.text.accent.${f}`, 'dark', H(f, 250));
-    setm(`color.text.accent.${f}`, 'dark_ic', H(f, 100));
-    const x = R[`color.text.accent.${f}`];
+    setMode(`color.text.accent.${f}`, 'light', H(f, 850));
+    setMode(`color.text.accent.${f}`, 'light_ic', H(f, 1000));
+    setMode(`color.text.accent.${f}`, 'dark', H(f, 250));
+    setMode(`color.text.accent.${f}`, 'dark_ic', H(f, 100));
+    const x = byName[`color.text.accent.${f}`];
     x.deviation = x.deviation ? `${x.deviation} ${TAG_WHY}` : TAG_WHY;
     for (const [suf, st] of [['.subtle', 900], ['.subtle.hovered', 1000], ['.subtle.pressed', 1100], ['.bolder', 300], ['.bolder.hovered', 250], ['.bolder.pressed', 200]]) {
-      setm(a + suf, 'dark_ic', H(f, st));
-      R[a + suf].deviation = R[a + suf].deviation || IC_WHY;
+      setMode(a + suf, 'dark_ic', H(f, st));
+      byName[a + suf].deviation = byName[a + suf].deviation || IC_WHY;
     }
   }
 
-  // ---- decision 17: checked controls and the selected edge are Lagoon; highlight selection stays neutral ----
+  // ---- checked controls and the selected edge are Lagoon; highlight selection stays neutral ----
   const SB_WHY =
-    'Decision 17: checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, ' +
+    'Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, ' +
     'the same steps as brand.bold; highlight fills and selected text stay neutral ink.';
   for (const suf of ['', '.hovered', '.pressed']) {
     for (const mode of MODES) {
-      const b = R[`color.background.brand.bold${suf}`];
-      setm(`color.background.selected.bold${suf}`, mode, [b[`${mode}_ref`], b[mode]]);
+      const b = byName[`color.background.brand.bold${suf}`];
+      setMode(`color.background.selected.bold${suf}`, mode, [b[`${mode}_ref`], b[mode]]);
     }
-    R[`color.background.selected.bold${suf}`].deviation = SB_WHY;
+    byName[`color.background.selected.bold${suf}`].deviation = SB_WHY;
   }
   for (const mode of MODES) {
-    const b = R['color.background.brand.bold'];
-    setm('color.border.selected', mode, [b[`${mode}_ref`], b[mode]]);
+    const b = byName['color.background.brand.bold'];
+    setMode('color.border.selected', mode, [b[`${mode}_ref`], b[mode]]);
   }
-  R['color.border.selected'].deviation = SB_WHY;
+  byName['color.border.selected'].deviation = SB_WHY;
 
   // ---- semantic-role IC gaps ----
   for (const [role, f] of Object.entries(ROLE_FAM)) {
-    if (`color.background.${role}.subtle` in R) setm(`color.background.${role}.subtle`, 'dark_ic', H(f, 900));
+    if (`color.background.${role}.subtle` in byName) setMode(`color.background.${role}.subtle`, 'dark_ic', H(f, 900));
   }
-  setm('color.background.neutral.bold.pressed', 'light_ic', N(900));
-  setm('color.icon.danger', 'light_ic', H('red', 800));
+  setMode('color.background.neutral.bold.pressed', 'light_ic', N(900));
+  setMode('color.icon.danger', 'light_ic', H('red', 800));
 
   // ---- charts: categorical order chosen for color-vision deficiency (protan and deutan) in both plans ----
   const CH_WHY =
@@ -319,18 +323,17 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     'simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.';
   const CAT = { 1: ['blue', 600, 400], 2: ['yellow', 600, 400], 3: ['magenta', 600, 400], 4: ['brown', 600, 400],
     5: ['blue', 800, 300], 6: ['purple', 700, 300], 7: ['green', 600, 400], 8: ['orange', 700, 400] };
-  const STEPS_ = [100, 200, 250, 300, 400, 500, 600, 700, 800, 850, 900, 1000, 1100];
-  const nxt = (st, k) => STEPS_[Math.max(0, Math.min(STEPS_.length - 1, STEPS_.indexOf(st) + k))];
+  const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];
   for (const [i, [f, l, d]] of Object.entries(CAT)) {
     for (const [suf, dl] of [['', 0], ['.hovered', 1]]) {
       const n = `color.chart.categorical.${i}${suf}`;
       const ls = nxt(l, dl);
       const ds = nxt(d, -dl);
-      setm(n, 'light', H(f, ls));
-      setm(n, 'dark', H(f, ds));
-      setm(n, 'light_ic', H(f, nxt(ls, 3)));
-      setm(n, 'dark_ic', H(f, nxt(ds, -1)));
-      R[n].deviation = CH_WHY;
+      setMode(n, 'light', H(f, ls));
+      setMode(n, 'dark', H(f, ds));
+      setMode(n, 'light_ic', H(f, nxt(ls, 3)));
+      setMode(n, 'dark_ic', H(f, nxt(ds, -1)));
+      byName[n].deviation = CH_WHY;
     }
   }
 
@@ -338,10 +341,10 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   const clampIndex = (steps, i) => Math.max(0, Math.min(steps.length - 1, i));
 
   // ---- no state may collapse: hovered and pressed step further when a mode maps them onto the same primitive ----
-  for (const n of Object.keys(R)) {
-    if (n.endsWith('.hovered') || n.endsWith('.pressed') || !(`${n}.hovered` in R) || !(`${n}.pressed` in R)) continue;
+  for (const n of Object.keys(byName)) {
+    if (n.endsWith('.hovered') || n.endsWith('.pressed') || !(`${n}.hovered` in byName) || !(`${n}.pressed` in byName)) continue;
     for (const mode of MODES) {
-      const [b, h, p] = [R[n], R[`${n}.hovered`], R[`${n}.pressed`]];
+      const [b, h, p] = [byName[n], byName[`${n}.hovered`], byName[`${n}.pressed`]];
       // by reference, so every plan maps alike
       if (new Set([b[`${mode}_ref`], h[`${mode}_ref`], p[`${mode}_ref`]]).size === 3) continue;
       const [f0, s0] = famStep(b[`${mode}_ref`]);
@@ -362,10 +365,10 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
   // pairs with a hovered state but no pressed one (charts): hovered steps one further when it lands on its base
-  for (const n of Object.keys(R)) {
-    if (n.endsWith('.hovered') || !(`${n}.hovered` in R) || `${n}.pressed` in R) continue;
+  for (const n of Object.keys(byName)) {
+    if (n.endsWith('.hovered') || !(`${n}.hovered` in byName) || `${n}.pressed` in byName) continue;
     for (const mode of MODES) {
-      const [b, h] = [R[n], R[`${n}.hovered`]];
+      const [b, h] = [byName[n], byName[`${n}.hovered`]];
       if (b[`${mode}_ref`] !== h[`${mode}_ref`]) continue;
       const [f0, s0] = famStep(b[`${mode}_ref`]);
       if (!f0 || !(f0 in pal)) continue;
@@ -375,7 +378,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
 
-  // ---- SMART subjects: a product layer aliasing the non-role accents (decision 9). Each subject takes an
+  // ---- SMART subjects: a product layer aliasing the non-role accents. Each subject takes an
   // accent no semantic role uses, so a subject tag never reads as information, success, warning, danger or discovery.
   const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
   const SMART_MAP = [
@@ -391,12 +394,12 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   ];
   for (const [subject, fam] of Object.entries(SMART)) {
     for (const [tn, src, use] of SMART_MAP) {
-      const r0 = R[src.replace('{f}', fam)];
+      const r0 = byName[src.replace('{f}', fam)];
       const n = tn.replace('{s}', subject);
       const r = { ...r0, name: n, atl_light: '—', atl_dark: '—', use: `${use} Aliases the ${fam} accent.`,
         deviation: `PLUS product layer: SMART ${subject} is the ${fam} accent.` };
       rows.push(r);
-      R[n] = r;
+      byName[n] = r;
     }
   }
 
@@ -430,10 +433,10 @@ function shadows(pal) {
   const ow = 'Light geometry comes from the plan: Plan A Notion popovers, Plan B claude.ai menus.';
   const raisedD = `0px 0px 0px 1px ${a(PA, 10)}, 0px 1px 1px ${a(K, 50)}, 0px 0px 1px ${a(K, 50)}`;
   const overlayD = `0px 0px 0px 1px ${a(PA, 12)}, 0px 8px 12px ${a(K, 36)}, 0px 0px 1px 1px ${a(K, 50)}`;
-  const CARD = ' Cards rest on surface.raised with this ring (decision 18); a clickable card moves to shadow.overlay on hover.';
+  const CARD = ' Cards rest on surface.raised with this ring; a clickable card moves to shadow.overlay on hover.';
   const SHADOWS = [
     ['elevation.shadow.raised', raisedL, raisedD, 'Box shadow of a raised card. Pair with elevation.surface.raised.', `${rw}${CARD} In dark, the ring is paper at 10%, so cards keep an edge.`],
-    ['elevation.shadow.overlay', overlayL, overlayD, 'Box shadow of anything over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay.', `${ow} Modals join this level (decision 3 of iteration 2).`],
+    ['elevation.shadow.overlay', overlayL, overlayD, 'Box shadow of anything over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay.', `${ow} Modals join this level.`],
     ['elevation.shadow.overflow', `0px 0px 8px ${a(I, 16)}, 0px 0px 1px ${a(I, 12)}`, `0px 0px 12px ${a(K, 56)}, 0px 0px 1px ${a(K, 50)}`,
       "Shadow where content scrolls under other content, such as a table's sticky column.", null],
     ['elevation.shadow.overflow.spread', a(I, 16), a(K, 56), 'Fallback for overflow when a box shadow is not feasible; pair with .perimeter.', null],

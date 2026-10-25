@@ -21,11 +21,12 @@
  * plan is `check:color-tokens`.
  */
 
+import { REPO_ROOT } from './lib/corpus.mjs';
 import { buildAllPlans } from './lib/color/build.mjs';
-import { colorChecks, planParity } from './lib/color/checks.mjs';
+import { colorFailures } from './lib/color/failures.mjs';
 import { main } from './lib/findings.mjs';
 
-const REMEDY =
+export const REMEDY =
   '  -> A failure names a semantic token and the plan it failed in. Fix the plan\n' +
   '     (scripts/lib/color/plans/) when a primitive moved, or the mapping in\n' +
   '     scripts/lib/color/semantics.mjs when a role needs another step — in every\n' +
@@ -33,23 +34,10 @@ const REMEDY =
   '     `npm run generate:color-tokens`.';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
-export function colorFailures() {
-  const plans = buildAllPlans();
-  const found = [];
-  for (const [key, { semantics }] of Object.entries(plans)) {
-    for (const [check, failures] of Object.entries(colorChecks(semantics))) {
-      for (const failure of failures) found.push({ message: `${check}, Plan ${key}: ${failure}` });
-    }
-  }
-  const semantics = Object.fromEntries(Object.entries(plans).map(([key, p]) => [key, p.semantics]));
-  for (const failure of planParity(semantics)) found.push({ message: `plan parity: ${failure}` });
-  return found;
-}
+export const run = ({ repoRoot = REPO_ROOT } = {}) => colorFailures({ root: repoRoot });
 
-export const run = () => colorFailures();
-
-export const summary = () => {
-  const plans = buildAllPlans();
+export const summary = ({ repoRoot = REPO_ROOT } = {}) => {
+  const plans = buildAllPlans({ root: repoRoot });
   const tokens = Object.values(plans)[0].semantics.rows.length;
   return `${Object.keys(plans).length} plans x ${tokens} tokens x 4 modes pass every check, and map identically`;
 };

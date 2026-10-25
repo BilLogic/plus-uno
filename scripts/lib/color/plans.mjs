@@ -9,6 +9,9 @@
  */
 
 import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+import { REPO_ROOT } from '../corpus.mjs';
 
 import { hexByte, hexToOklch, pyRound } from './oklch.mjs';
 import { SHAPE, ramp } from './ramps.mjs';
@@ -28,10 +31,15 @@ const PALETTE_ORDER = [
   'neutral', 'darkNeutral', 'neutralAlpha', 'darkNeutralAlpha', 'lagoon', 'brown', 'shadow', 'blackAlpha',
 ];
 
-/** @param {string} key  'A' or 'B' */
-export function loadPlan(key) {
-  const url = new URL(`./plans/plan-${key.toLowerCase()}.json`, import.meta.url);
-  return JSON.parse(readFileSync(url, 'utf8'));
+/** Where a plan file lives, repo-relative. */
+export const planFile = (key) => `scripts/lib/color/plans/plan-${key.toLowerCase()}.json`;
+
+/**
+ * @param {string} key  'A' or 'B'
+ * @param {{root?: string}} [options]
+ */
+export function loadPlan(key, { root = REPO_ROOT } = {}) {
+  return JSON.parse(readFileSync(join(root, planFile(key)), 'utf8'));
 }
 
 /** `#rrggbb` plus an alpha byte for opacity `a` (0-1). */

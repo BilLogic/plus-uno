@@ -13,7 +13,7 @@
  * with the mode.
  */
 
-import { pyRound } from './oklch.mjs';
+import { parseHex, pyRound } from './oklch.mjs';
 import { dsName } from './emit.mjs';
 
 const MODES = [['Light', 'light'], ['Dark', 'dark'], ['Light IC', 'light_ic'], ['Dark IC', 'dark_ic']];
@@ -29,10 +29,9 @@ function scopes(name) {
 }
 
 export function rgba(hex) {
-  const h = hex.replace(/^#/, '');
-  const a = h.length === 8 ? parseInt(h.slice(6, 8), 16) / 255 : 1;
-  const ch = (i) => pyRound(parseInt(h.slice(i, i + 2), 16) / 255, 4);
-  return { r: ch(0), g: ch(2), b: ch(4), a: pyRound(a, 4) };
+  const { r, g, b, a } = parseHex(hex);
+  const ch = (v) => pyRound(v / 255, 4);
+  return { r: ch(r), g: ch(g), b: ch(b), a: pyRound(a === null ? 1 : a / 255, 4) };
 }
 
 /**
@@ -73,7 +72,7 @@ export function figmaSpec(plan, { rows, shadows, opacity, palette }) {
     if (sh.name.split('.').length - 1 > 2) continue; // overflow.spread / .perimeter are the colors already inside overflow
     const base = sh.name.replaceAll('.', '/');
     const perMode = Object.fromEntries(
-      MODES.map(([label, k]) => [label, (sh[k] ?? sh[k.startsWith('light') ? 'light' : 'dark']).split(',').map((l) => l.trim())]),
+      MODES.map(([label, k]) => [label, sh[k].split(',').map((l) => l.trim())]),
     );
     const layers = [];
     for (let i = 0; i < perMode.Light.length; i++) {

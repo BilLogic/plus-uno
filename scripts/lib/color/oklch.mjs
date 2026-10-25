@@ -42,9 +42,19 @@ export const hexByte = (n) => n.toString(16).padStart(2, '0');
 export const srgbToLin = (c) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
 export const linToSrgb = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055);
 
-export const hexToRgb = (hex) => {
+/**
+ * The channels of `#rrggbb` or `#rrggbbaa` as 0-255 integers; `a` is null without
+ * an alpha byte. The one hex reader of the color generator.
+ */
+export function parseHex(hex) {
   const h = hex.replace(/^#/, '');
-  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
+  const byte = (i) => parseInt(h.slice(i, i + 2), 16);
+  return { r: byte(0), g: byte(2), b: byte(4), a: h.length === 8 ? byte(6) : null };
+}
+
+export const hexToRgb = (hex) => {
+  const { r, g, b } = parseHex(hex);
+  return [r / 255, g / 255, b / 255];
 };
 
 export const rgbToHex = (rgb) =>

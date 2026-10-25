@@ -33,9 +33,9 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { renderPlan } from './lib/color/build.mjs';
+import { colorFailures } from './lib/color/failures.mjs';
 import { ACTIVE_PLAN, PLAN_KEYS } from './lib/color/plans.mjs';
 import { isEntry, main } from './lib/findings.mjs';
-import { colorFailures } from './check-color-system.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SELF = 'scripts/generate-color-tokens.mjs';
@@ -71,12 +71,6 @@ if (isEntry(import.meta.url)) {
   if (process.argv.includes('--check')) {
     main(import.meta.url, 'check:color-tokens', { run, summary });
   } else {
-    const failures = colorFailures();
-    if (failures.length) {
-      console.error(`✗ refusing to write: ${failures.length} color check failure(s)`);
-      for (const f of failures) console.error(`  ${f.message}`);
-      process.exit(1);
-    }
     const plan = argValue('--plan') ?? ACTIVE_PLAN;
     if (!PLAN_KEYS.includes(plan)) {
       console.error(`✗ unknown plan ${plan}; plans are ${PLAN_KEYS.join(', ')}`);
@@ -85,6 +79,12 @@ if (isEntry(import.meta.url)) {
     const out = argValue('--out');
     if (plan !== ACTIVE_PLAN && !out) {
       console.error(`✗ Plan ${plan} is not the active plan; pass --out <dir> to render it outside the token directory`);
+      process.exit(1);
+    }
+    const failures = colorFailures();
+    if (failures.length) {
+      console.error(`✗ refusing to write: ${failures.length} color check failure(s)`);
+      for (const f of failures) console.error(`  ${f.message}`);
       process.exit(1);
     }
     const dir = out ? resolve(out) : join(ROOT, COLOR_TOKEN_DIR);
