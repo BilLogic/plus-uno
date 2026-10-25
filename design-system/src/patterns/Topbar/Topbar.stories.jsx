@@ -2,8 +2,10 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Sidebar } from '@/components';
-import { SurfaceContainer, Topbar } from '@/patterns';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { Frame, Topbar } from '@/patterns';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -156,7 +158,7 @@ export const Floating = {
     },
 };
 
-/** Without `onToggle`, and outside a surface container, there is no toggle. */
+/** Without `onToggle`, and outside a Frame, there is no toggle. */
 export const NoSidebar = {
     args: { onToggle: undefined },
     play: async ({ canvasElement }) => {
@@ -214,30 +216,42 @@ export const Loading = {
 
 /* ------------------------------------------------------- in the frame */
 
-const Frame = (args) => (
-    <div style={{ height: '100vh' }}>
-        <SurfaceContainer
-            topbar={<Topbar breadcrumbs={args.breadcrumbs} user={args.user} />}
-            sidebar={<Sidebar user="tutor" activeTabId="home" />}
-        />
-    </div>
-);
+const TopbarInFrame = (args) => <InAppFrame breadcrumbs={args.breadcrumbs} user={args.user} />;
 
 /**
- * Inside the surface container there is one toggle, and the frame drives it:
+ * In every color mode the topbar has no fill of its own: it is transparent on
+ * the frame's sunken backdrop, in the frame's text color. (Breadcrumb and
+ * UserAvatar keep their own colors and are not checked here.)
+ */
+export const ColorModes = {
+    parameters: { layout: 'fullscreen', docs: { disable: true } },
+    render: TopbarInFrame,
+    play: async ({ canvasElement }) => {
+        const frame = canvasElement.querySelector('.plus-frame');
+        const bar = frame.querySelector('.plus-topbar');
+        await inEveryColorMode(async (mode) => {
+            await expect(getComputedStyle(bar).backgroundColor, `${mode}: no fill of its own`).toBe('rgba(0, 0, 0, 0)');
+            await expect(getComputedStyle(frame).backgroundColor, `${mode}: on the sunken frame`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(getComputedStyle(bar).color, `${mode}: in the frame's text color`).toBe(tokenColor(canvasElement, '--ds-text'));
+        });
+    },
+};
+
+/**
+ * Inside the Frame there is one toggle, and the frame drives it:
  * docked shows angles-left and a sidebar-wide start, a peek shows angles-left
  * with the breadcrumb beside the toggle, closed shows bars.
  */
-export const InSurfaceContainer = {
+export const InFrame = {
     parameters: { layout: 'fullscreen' },
-    render: Frame,
+    render: TopbarInFrame,
     play: async ({ canvasElement }) => withTestViewport(1024, 800, async () => {
         const canvas = within(canvasElement);
-        const frame = canvasElement.querySelector('.plus-surface-container');
+        const frame = canvasElement.querySelector('.plus-frame');
         const toggles = () => canvas.getAllByRole('button', { name: /sidebar$/i });
         const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
         const breadcrumb = () => canvas.getByRole('navigation', { name: /breadcrumb/i });
-        const surface = frame.querySelector('.plus-surface-container__surface');
+        const surface = frame.querySelector('.plus-frame__surface');
 
         await expect(toggles(), 'one toggle, not two').toHaveLength(1);
         const [toggle] = toggles();
@@ -277,12 +291,12 @@ export const InSurfaceContainer = {
  * area (the home-redesign prototype's reveal does), which makes it a stacking
  * context. A peeked sidebar must still sit under the toggle.
  */
-export const InSurfaceContainerWithTransformedStart = {
+export const InFrameWithTransformedStart = {
     parameters: { layout: 'fullscreen' },
     render: (args) => (
         <div className="topbar-story-transformed-start" style={{ height: '100vh' }}>
             <style>{'.topbar-story-transformed-start .plus-topbar__start { transform: translateY(0); }'}</style>
-            <SurfaceContainer
+            <Frame
                 topbar={<Topbar breadcrumbs={args.breadcrumbs} user={args.user} />}
                 sidebar={<Sidebar user="tutor" activeTabId="home" />}
             />

@@ -99,11 +99,10 @@ const RING_INSIDE = {
   'outline-offset': 'calc(-1 * var(--size-element-stroke-lg))',
 };
 
-/** RING_INSIDE on the new color tokens: the ring is `color.border.focused`. */
-const DS_RING_INSIDE = {
-  ...RING_INSIDE,
-  outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
-};
+/** The rings on the new color tokens: `color.border.focused`, outside or inside the box. */
+const DS_RING = 'var(--size-element-stroke-lg) solid var(--ds-border-focused)';
+const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: DS_RING };
+const DS_RING_INSIDE = { ...RING_INSIDE, outline: DS_RING };
 
 const layer = (token) => `var(${token})`;
 
@@ -111,25 +110,38 @@ const layer = (token) => `var(${token})`;
 
 const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
 
-test('SidebarTab: hover 08, pressed 12, selected 16, selected + hover the 08 layer over 16, focus a ring with no fill', () => {
+/**
+ * The frame chain's navigation is on the new color tokens: hover and press move
+ * up the neutral subtle steps, selection is the neutral selected fill (its
+ * hovered and pressed steps above it) with a leading bar, and focus is the
+ * focused ring 2px outside the row, with no fill.
+ */
+test('SidebarTab: neutral hover and press, neutral selection with its own steps, focus a ring outside with no fill', () => {
   expectRule(TAB, '.plus-sidebar-tab:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
-    'background-color': layer('--color-on-surface-state-08'),
+    'background-color': layer('--ds-background-neutral-subtle-hovered'),
   });
   expectRule(TAB, '.plus-sidebar-tab:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
-    'background-color': layer('--color-on-surface-state-12'),
+    'background-color': layer('--ds-background-neutral-subtle-pressed'),
+  });
+  expectRule(TAB, '.plus-sidebar-tab--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(TAB, '.plus-sidebar-tab--selected', {
+    'background-color': layer('--ds-background-selected'),
+    'box-shadow': `inset var(--size-element-stroke-lg) 0 0 ${layer('--ds-border-selected')}`,
+    color: layer('--ds-text-selected'),
   });
   expectRule(TAB, '.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled)', {
-    'background-image': `linear-gradient(${layer('--color-on-surface-state-08')}, ${layer('--color-on-surface-state-08')})`,
+    'background-color': layer('--ds-background-selected-hovered'),
   });
-  expectRule(TAB, '.plus-sidebar-tab--hover', { 'background-color': layer('--color-primary-state-08') });
-  expectRule(TAB, '.plus-sidebar-tab--selected', { 'background-color': layer('--color-primary-state-16') });
+  expectRule(TAB, '.plus-sidebar-tab--selected:active:not(.plus-sidebar-tab--disabled)', {
+    'background-color': layer('--ds-background-selected-pressed'),
+  });
   expectNoFill(TAB, '.plus-sidebar-tab--focus');
-  expectRule(TAB, '.plus-sidebar-tab--focus', RING_INSIDE);
-  expectRule(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)', RING_INSIDE);
+  expectRule(TAB, '.plus-sidebar-tab--focus', DS_RING_OUTSIDE);
+  expectRule(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)', DS_RING_OUTSIDE);
   expectNoFill(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)');
 });
 
-test('Sidebar: an open-tab parent hovers at 08', () => {
+test('Sidebar: an open-tab parent hovers on the neutral subtle hovered step', () => {
   const decls = [];
   sheet('patterns/Sidebar/Sidebar.scss').walkRules((rule) => {
     if (/:hover/.test(rule.selector)) {
@@ -137,7 +149,7 @@ test('Sidebar: an open-tab parent hovers at 08', () => {
     }
   });
   assert.ok(decls.length > 0, 'Sidebar.scss has no hover fill');
-  for (const value of decls) assert.equal(value, layer('--color-on-surface-state-08'));
+  for (const value of decls) assert.equal(value, layer('--ds-background-neutral-subtle-hovered'));
 });
 
 /* ─── Button ─────────────────────────────────────────────────────────────── */
@@ -287,9 +299,9 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
  * THE FOCUS GAP. Button, Checkbox, Radio and Switch draw the same keyboard ring: 2px
  * of the focus-ring role, 2px off the control's edge. The Radio's ring was an
  * inverse-primary halo touching its border, and on a checked radio the two
- * merged into one thick primary edge that did not read as focus.
+ * merged into one thick primary edge that did not read as focus. The ring is
+ * DS_RING_OUTSIDE, defined with the SidebarTab rules above.
  */
-const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
 
 for (const [name, file, selector, ring] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],

@@ -141,7 +141,7 @@ const infoGlyph = <i className="fa-solid fa-circle-info plus-home-new__glyph" ar
  * "after" for review; the Home pages beside it are the "before", and nothing
  * here imports their components.
  *
- * - The frame is PageLayout on the SurfaceContainer pattern: the topbar, the
+ * - The frame is PageLayout on the Frame pattern: the topbar, the
  *   tutor sidebar with Home selected, and the surface's 12-column content grid.
  * - Four flat Sections are the grid's children, one per row, so the DOM order
  *   is the visual order: the page header (h1) with the badge callout, Next

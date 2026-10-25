@@ -15,7 +15,7 @@ A pattern never renders your content for you. It answers exactly one question �
 
 - **The shell owns the frame.** Surface color, radius, elevation, border, padding, and gap come from design tokens and cannot drift. You choose from token-backed scales (`sm` / `md` / `lg`), never raw values.
 - **You own the slots.** `header`, `footer`, `actions`, `toolbar`, `pagination`, `emptyState`, and `children` accept any node. Fill them with core components (Button, Badge, Input…) or your own composition.
-- **Patterns nest by layer.** Surface container → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
+- **Patterns nest by layer.** Frame → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
 
 </div>
 
@@ -40,10 +40,10 @@ A pattern never renders your content for you. It answers exactly one question �
     </thead>
     <tbody>
         {[
-            ['Surfaces', 'Surface', '--color-surface (or any container level)', '0 (prop up to 5)'],
-            ['Surface container (app frame)', 'SurfaceContainer', '--surface-sunken frame; the surface inside is --surface-default and carries the content grid', '0'],
-            ['Sidebar (side navigation)', 'PatternSidebar', 'none: it sits on the Surface container frame (--surface-sunken), or --surface-overlay when floating', '0'],
-            ['Section', 'PatternSection', 'no-fill (or --color-surface-container-low)', '0'],
+            ['Surfaces', 'Surface', '--ds-surface (or the sunken, raised or overlay level)', 'the level\'s own shadow: none, raised or overlay'],
+            ['Frame (app frame)', 'Frame', '--ds-surface-sunken frame; the surface inside is --ds-surface and carries the content grid', '0'],
+            ['Sidebar (side navigation)', 'PatternSidebar', 'none: it sits on the Frame (--ds-surface-sunken), or --ds-surface-overlay when floating', '0'],
+            ['Section', 'PatternSection', 'no-fill (or the --ds-surface-container well)', '0'],
             ['Card', 'PatternCard', '--surface-raised on a 1px --color-outline-variant border', '0 at rest; Light/2 while a clickable card is hovered or dragged'],
             ['Table', 'PatternTable', 'no-fill (container owns the background)', '0'],
             ['Modal', 'PatternModal', '--surface-overlay (white), over a scrim', 'Light/4'],
@@ -78,9 +78,9 @@ A pattern never renders your content for you. It answers exactly one question �
 Patterns are *shells*; core components are *finished furniture*. `PatternCard` gives you a tokenized frame with three slots, while the core `Card` component ships title/media/links/actions behavior. Reach for a pattern when you are composing something the core component does not cover — and never rebuild the frame by hand with raw divs and hex codes.
 
 ```jsx
-import { SurfaceContainer, PatternSection, PatternCard, PatternTable } from '@';
+import { Frame, PatternSection, PatternCard, PatternTable } from '@';
 
-<SurfaceContainer topbar={<Breadcrumb items={...} />} sidebar={<Sidebar />}>
+<Frame topbar={<Breadcrumb items={...} />} sidebar={<Sidebar />}>
     <PatternSection title="Team" actions={<Button text="Add" />}>
         <PatternCard>
             <PatternTable toolbar={...} pagination={...}>
@@ -89,7 +89,7 @@ import { SurfaceContainer, PatternSection, PatternCard, PatternTable } from '@';
             </PatternTable>
         </PatternCard>
     </PatternSection>
-</SurfaceContainer>
+</Frame>
 ```
 
 </div>

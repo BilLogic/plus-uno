@@ -106,7 +106,7 @@ export const Overview = {
 };
 
 /**
- * The page sits in the SurfaceContainer frame: a 32 topbar the avatar fits in,
+ * The page sits in `Frame`: a 32 topbar the avatar fits in,
  * the toggle at (8, 8), and the sidebar docked from 1024 and closed below.
  */
 export const Frame = {
@@ -116,8 +116,8 @@ export const Frame = {
         const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
         const check = async (width, docked) => {
             await setTestViewport(width, 900);
-            const frame = canvasElement.querySelector('.plus-surface-container');
-            const topbar = frame.querySelector('.plus-surface-container__topbar');
+            const frame = canvasElement.querySelector('.plus-frame');
+            const topbar = frame.querySelector('.plus-frame__topbar');
             const toggle = canvas.getByRole('button', { name: /sidebar/i });
             const pad = tokenLength(frame, '--surface-container-pad');
             await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);

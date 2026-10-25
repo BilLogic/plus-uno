@@ -17,28 +17,32 @@
     padding: 0 var(--element-pad-x-md);
     border-radius: var(--element-radius-item-md);
     background-color: transparent;
-    color: var(--color-on-surface);
+    color: var(--ds-text-subtle);
     text-align: left;
     text-decoration: none;
     cursor: pointer;
     transition: background-color 0.15s ease;
 
+    // A link row keeps its own color on hover: without this, the link hover
+    // color (`a:hover`) wins over the row's rest color. The selected and
+    // disabled rows restate theirs on hover for the same reason.
     &:hover {
-        color: var(--color-on-surface);
+        color: var(--ds-text-subtle);
         text-decoration: none;
     }
 
     &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-12);
+        background-color: var(--ds-background-neutral-subtle-pressed);
     }
 
+    // The ring sits 2px outside the row, on the frame, never inset on the fill.
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-lg);
     }
 }
 
@@ -49,7 +53,7 @@
     flex-shrink: 0;
     width: var(--icon-md);
     height: var(--icon-md);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
 
     i {
         font-size: var(--icon-md);
@@ -76,7 +80,7 @@
 
 .plus-sidebar-tab__description {
     font: var(--body-small);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 // A description makes the row two lines: it grows past 32 to 40 (2 + 20 + 16 + 2),
@@ -96,51 +100,54 @@
 
 /* ------------------------------------------------------------- states */
 
-// The state steps (foundations/color.md § State layers): hover 08, pressed 12,
-// selected 16, and focus only the ring. Navigation selects at 16, where a dense
-// list selects at 08.
-.plus-sidebar-tab--hover,
+// Selection is neutral, never color alone: the selected fill, the selected
+// text and icon, and a 2px leading bar in the selected border (Lagoon). The
+// bar is an inset shadow, so it follows the row's radius and takes no room.
+// Hover and press on a selected row move up the selected steps.
+.plus-sidebar-tab--hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
 .plus-sidebar-tab--selected {
-    color: var(--color-primary-text);
+    background-color: var(--ds-background-selected);
+    box-shadow: inset var(--size-element-stroke-lg) 0 0 var(--ds-border-selected);
+    color: var(--ds-text-selected);
 
     &:hover {
-        color: var(--color-primary-text);
+        color: var(--ds-text-selected);
     }
 
-    // The navigation exception in color.md: the icon keeps the base primary,
-    // not the darker `-icon` role, so a selected glyph matches its label.
     .plus-sidebar-tab__icon {
-        color: var(--color-primary);
+        color: var(--ds-icon-selected);
     }
 }
 
-.plus-sidebar-tab--hover {
-    background-color: var(--color-primary-state-08);
-}
-
-.plus-sidebar-tab--selected {
-    background-color: var(--color-primary-state-16);
-}
-
-// Selected and hovered is one step above selected: the hover 08 layer over the
-// selected fill, since no token sits above Primary 16.
 .plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled),
 .plus-sidebar-tab-item:hover > .plus-sidebar-tab--selected:not(.plus-sidebar-tab--disabled) {
-    background-image: linear-gradient(var(--color-on-surface-state-08), var(--color-on-surface-state-08));
+    background-color: var(--ds-background-selected-hovered);
+}
+
+.plus-sidebar-tab--selected:active:not(.plus-sidebar-tab--disabled) {
+    background-color: var(--ds-background-selected-pressed);
 }
 
 .plus-sidebar-tab--focus {
-    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-    outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg);
 }
 
-// A solid muted color rather than an opacity, so disabled text still meets AA.
+// The disabled text and icon colors; a disabled row is announced as such
+// (`aria-disabled`) and takes no tab stop.
 .plus-sidebar-tab--disabled {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-disabled);
     cursor: not-allowed;
 
     &:hover {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-disabled);
+    }
+
+    .plus-sidebar-tab__icon {
+        color: var(--ds-icon-disabled);
     }
 }
 
@@ -155,7 +162,7 @@
     min-width: 0;
 
     &:hover > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:hover,

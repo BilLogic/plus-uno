@@ -2,7 +2,7 @@
  * Sidebar pattern (Patterns/Sidebar): the header stays put and the body
  * scrolls. Mirrors the Figma `_Sidebar` and `_Sidebar section`. Every length is
  * an Item, Element or Layout token; the width is the frame's
- * (`--layout-width-sidebar`, set by the Surface container).
+ * (`--layout-width-sidebar`, set by the Frame).
  */
 
 .plus-pattern-sidebar {
@@ -32,6 +32,11 @@
     flex: 1 1 auto;
     gap: var(--element-stack-sm);
     min-height: 0;
+    // Room for a row's focus ring, which sits 2 outside the row (a 2 ring at a
+    // 2 offset): the scroller would clip it otherwise. The negative margin
+    // gives the room back, so every row keeps its place.
+    margin: calc(-2 * var(--size-element-stroke-lg));
+    padding: calc(2 * var(--size-element-stroke-lg));
     overflow-y: auto;
     overscroll-behavior: contain;
 }
@@ -63,7 +68,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     font: var(--heading-xxsmall);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
 }
 
 .plus-pattern-sidebar__divider {
@@ -115,7 +120,7 @@
     }
 
     &:hover > .plus-sidebar-tab-item > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 }
 
@@ -162,7 +167,7 @@
             bottom: calc(-1 * var(--element-stack-sm));
             left: calc(var(--element-pad-x-md) + var(--icon-md) / 2);
             box-sizing: border-box;
-            border-left: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+            border-left: var(--size-element-stroke-sm) solid var(--ds-border);
             pointer-events: none;
         }
     }
@@ -175,17 +180,18 @@
 
     // The last row, "Show N more" when it shows: the line stops at the row's
     // middle and curves (radius 6) into a stub toward the surface. The line sits
-    // half an icon (8) before the surface; the stub stops one focus-ring stroke
-    // (2) short of it, so it never runs into a focused row's ring: 8 - 2 = 6.
+    // half an icon (8) before the surface; a focused row's ring is 2 wide and 2
+    // out from the surface, so the stub stops two strokes (4) short of it and
+    // never runs into the ring: 8 - 4 = 4.
     > .plus-pattern-sidebar__thread-end::before {
         bottom: 50%;
-        width: calc(var(--icon-md) / 2 - var(--size-element-stroke-lg));
-        border-bottom: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+        width: calc(var(--icon-md) / 2 - 2 * var(--size-element-stroke-lg));
+        border-bottom: var(--size-element-stroke-sm) solid var(--ds-border);
         border-bottom-left-radius: var(--element-radius-item-sm);
     }
 }
 
 // "Show N more" reads as a control, not a record: the muted text color.
 .plus-pattern-sidebar__more .plus-sidebar-tab {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
 }
