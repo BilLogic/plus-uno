@@ -6,6 +6,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `Suggestion` — a value the system proposes, as a button that sits in a tag
@@ -193,20 +194,22 @@ export const StateLayers = () => (
 );
 
 StateLayers.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const t = (token) => tokenColor(canvasElement, token);
-    const bg = 'backgroundColor';
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const t = (token) => tokenColor(canvasElement, token);
+        const bg = 'backgroundColor';
 
-    for (const name of ['Add Relationships, suggested', 'Summarize, suggested']) {
-        const el = canvas.getByRole('button', { name });
-        await expect(getComputedStyle(el)[bg], `${name}: rest has no fill`).toBe(CLEAR);
-        await expect(whileForced(el, ':hover', bg), `${name}: hover is background.discovery`)
-            .toBe(t('--ds-background-discovery'));
-        await expect(whileForced(el, ':active', bg), `${name}: pressed is background.discovery.hovered`)
-            .toBe(t('--ds-background-discovery-hovered'));
-        // The box never moves between states.
-        await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
-    }
+        for (const name of ['Add Relationships, suggested', 'Summarize, suggested']) {
+            const el = canvas.getByRole('button', { name });
+            await expect(getComputedStyle(el)[bg], `${name}: rest has no fill`).toBe(CLEAR);
+            await expect(whileForced(el, ':hover', bg), `${name}: hover is background.discovery`)
+                .toBe(t('--ds-background-discovery'));
+            await expect(whileForced(el, ':active', bg), `${name}: pressed is background.discovery.hovered`)
+                .toBe(t('--ds-background-discovery-hovered'));
+            // The box never moves between states.
+            await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
+        }
+    });
 };
 
 /**

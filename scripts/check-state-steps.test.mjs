@@ -101,6 +101,10 @@ const RING_INSIDE = {
 
 const layer = (token) => `var(${token})`;
 
+/** The same rings on the --ds- focus token, for components already moved onto it. */
+const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
+const DS_RING_INSIDE_OUTLINE = 'var(--size-element-stroke-lg) solid var(--ds-border-focused)';
+
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
 
 const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
@@ -206,27 +210,28 @@ const NAV = 'components/navigation/NavTabs/NavTabs.scss';
 const LINK = '.plus-nav-tabs .nav-link';
 const NOT = ':not(.disabled):not(:disabled):not(.active)';
 
-test('NavTabs: hover 08, pressed 12, focus a ring with no fill', () => {
-  expectRule(NAV, `${LINK}:hover${NOT}`, { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(NAV, `${LINK}:active${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+test('NavTabs: neutral subtle hovered and pressed on every tab, focus a ring with no fill', () => {
+  const hovered = layer('--ds-background-neutral-subtle-hovered');
+  const pressed = layer('--ds-background-neutral-subtle-pressed');
+  expectRule(NAV, `${LINK}:hover${NOT}`, { 'background-color': hovered });
+  expectRule(NAV, `${LINK}:active${NOT}`, { 'background-color': pressed });
   expectNoFill(NAV, `${LINK}:focus-visible${NOT}`);
-  expectRule(NAV, `${LINK}:focus-visible${NOT}`, { outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)' });
+  expectRule(NAV, `${LINK}:focus-visible${NOT}`, { outline: DS_RING_INSIDE_OUTLINE });
 
-  expectRule(NAV, `${LINK}.active:hover`, { 'background-color': layer('--color-primary-state-08') });
-  expectRule(NAV, `${LINK}.active:active`, { 'background-color': layer('--color-primary-state-12') });
+  // Selection rests on the bar and the ink, so a selected tab takes the same steps.
+  expectRule(NAV, `${LINK}.active:hover`, { 'background-color': hovered });
+  expectRule(NAV, `${LINK}.active:active`, { 'background-color': pressed });
   expectNoFill(NAV, `${LINK}.active:focus-visible`);
-  expectRule(NAV, `${LINK}.active:focus-visible`, { outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)' });
+  expectRule(NAV, `${LINK}.active:focus-visible`, { outline: DS_RING_INSIDE_OUTLINE });
 
   // The docs canvas's forced states draw the same steps.
   const item = '.plus-nav-tabs .nav-item';
-  expectRule(NAV, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(NAV, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': pressed });
   expectNoFill(NAV, `${item}.pseudo-focus > .nav-link${NOT}`);
-  expectRule(NAV, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': layer('--color-primary-state-12') });
+  expectRule(NAV, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': pressed });
   expectNoFill(NAV, `${item}.pseudo-focus > .nav-link.active`);
 
-  expectRule(NAV, '.plus-nav-tabs .dropdown .dropdown-toggle:active', {
-    'background-color': layer('--color-on-surface-state-12'),
-  });
+  expectRule(NAV, '.plus-nav-tabs .dropdown .dropdown-toggle:active', { 'background-color': pressed });
 });
 
 /* ─── Checkbox, Radio, Switch ────────────────────────────────────────────── */
@@ -391,20 +396,20 @@ test('Pagination: hover 08, pressed 12, current page 16, focus a ring with no fi
 
 /* ─── Tag ────────────────────────────────────────────────────────────────── */
 
-test("Tag: hover 08, pressed 12, selected 16 in the tag's hue; the × the same, focus a ring", () => {
+test("Tag: the accent's hovered, pressed and selected steps; the × on the neutral steps, focus a ring", () => {
   const file = 'components/labels/Tag/Tag.scss';
-  expectRule(file, '.plus-tag--selectable:hover', { 'background-color': layer('--plus-tag-08') });
-  expectRule(file, '.plus-tag--selectable:active', { 'background-color': layer('--plus-tag-12') });
+  expectRule(file, '.plus-tag--selectable:hover', { 'background-color': layer('--plus-tag-hovered') });
+  expectRule(file, '.plus-tag--selectable:active', { 'background-color': layer('--plus-tag-pressed') });
   for (const selected of ['.plus-tag--selected', '.plus-tag--selected:hover', '.plus-tag--selected:active']) {
-    expectRule(file, selected, { 'background-color': layer('--plus-tag-16') });
+    expectRule(file, selected, { 'background-color': layer('--plus-tag-selected') });
   }
-  expectRule(file, '.plus-tag:focus-visible', RING_OUTSIDE);
+  expectRule(file, '.plus-tag:focus-visible', DS_RING_OUTSIDE);
   expectNoFill(file, '.plus-tag:focus-visible');
 
-  expectRule(file, '.plus-tag__remove:hover', { 'background-color': layer('--color-on-surface-variant-state-08') });
-  expectRule(file, '.plus-tag__remove:active', { 'background-color': layer('--color-on-surface-variant-state-12') });
+  expectRule(file, '.plus-tag__remove:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, '.plus-tag__remove:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   for (const remove of ['.plus-tag__remove:focus-visible', '.plus-tag--elevated .plus-tag__remove:focus-visible']) {
-    expectRule(file, remove, RING_OUTSIDE);
+    expectRule(file, remove, DS_RING_OUTSIDE);
     expectNoFill(file, remove);
   }
 });
@@ -466,10 +471,10 @@ test('PatternTable: row states are layered over the cell fill — neutral subtle
 
 /* ─── Suggestion ─────────────────────────────────────────────────────────── */
 
-test('Suggestion: hover 08, pressed 12, focus the ring alone', () => {
+test('Suggestion: discovery on hover, its hovered step pressed, focus the ring alone', () => {
   const file = 'components/labels/Suggestion/Suggestion.scss';
-  expectRule(file, '.plus-suggestion:hover', { 'background-color': layer('--color-mastering-content-state-08') });
-  expectRule(file, '.plus-suggestion:active', { 'background-color': layer('--color-mastering-content-state-12') });
-  expectRule(file, '.plus-suggestion:focus-visible', RING_OUTSIDE);
+  expectRule(file, '.plus-suggestion:hover', { 'background-color': layer('--ds-background-discovery') });
+  expectRule(file, '.plus-suggestion:active', { 'background-color': layer('--ds-background-discovery-hovered') });
+  expectRule(file, '.plus-suggestion:focus-visible', DS_RING_OUTSIDE);
   expectNoFill(file, '.plus-suggestion:focus-visible');
 });

@@ -4,6 +4,7 @@ import { expect, within } from 'storybook/test';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import NavTabs from './NavTabs';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 export default {
     title: 'Components/Navigation/Tabs',
@@ -176,22 +177,27 @@ Overview.parameters = {
  * The selected tab is `text.selected` over the `border.selected` bar, the
  * Lagoon indicator; an unselected tab is `text.subtle` on the 1px
  * `color.border` baseline. Selection rests on the bar and the ink, never on a
- * fill.
+ * fill. Held in every color mode; the tabs' color transition is switched off
+ * first, so each mode is read settled rather than mid-fade.
  */
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const selected = canvas.getByText('Home');
     const other = canvas.getByText('Profile');
+    for (const tab of [selected, other]) tab.style.transition = 'none';
 
-    const s = getComputedStyle(selected);
-    await expect(s.borderBottomColor, 'the selected bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
-    await expect(s.color, 'selected ink').toBe(tokenColor(canvasElement, '--ds-text-selected'));
-    await expect(s.backgroundColor, 'and no fill').toBe('rgba(0, 0, 0, 0)');
+    await inEveryColorMode(async () => {
 
-    const o = getComputedStyle(other);
-    await expect(o.color, 'an unselected tab is subtle').toBe(tokenColor(canvasElement, '--ds-text-subtle'));
-    await expect(o.borderBottomColor, 'on the baseline').toBe(tokenColor(canvasElement, '--ds-border'));
-    await expect(px(o.borderBottomWidth)).toBe(1);
+        const s = getComputedStyle(selected);
+        await expect(s.borderBottomColor, 'the selected bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(s.color, 'selected ink').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+        await expect(s.backgroundColor, 'and no fill').toBe('rgba(0, 0, 0, 0)');
+
+        const o = getComputedStyle(other);
+        await expect(o.color, 'an unselected tab is subtle').toBe(tokenColor(canvasElement, '--ds-text-subtle'));
+        await expect(o.borderBottomColor, 'on the baseline').toBe(tokenColor(canvasElement, '--ds-border'));
+        await expect(px(o.borderBottomWidth)).toBe(1);
+    });
 };
 
 /**

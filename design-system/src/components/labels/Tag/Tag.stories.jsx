@@ -4,6 +4,7 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TAG_SUBJECT_ACCENTS, TagContext } from './Tag';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
@@ -76,32 +77,34 @@ export const Colors = () => (
  * icon color, and the text is the same neutral on every color.
  */
 Colors.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const ink = tokenColor(canvasElement, '--ds-text');
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const ink = tokenColor(canvasElement, '--ds-text');
 
-    for (const color of DRAWN_COLORS) {
-        const tag = canvas.getByTestId(color);
-        const swatch = tag.querySelector('[aria-hidden="true"]');
-        const s = getComputedStyle(tag);
+        for (const color of DRAWN_COLORS) {
+            const tag = canvas.getByTestId(color);
+            const swatch = tag.querySelector('[aria-hidden="true"]');
+            const s = getComputedStyle(tag);
 
-        await expect(px(s.height), `${color} is 22 tall`).toBe(22);
-        await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
-        await expect(s.color, `${color} text is neutral`).toBe(ink);
+            await expect(px(s.height), `${color} is 22 tall`).toBe(22);
+            await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
+            await expect(s.color, `${color} text is neutral`).toBe(ink);
 
-        await expect(s.borderTopColor, `${color} border`)
-            .toBe(tokenColor(canvasElement, `--ds-border-accent-${color}-subtle`));
+            await expect(s.borderTopColor, `${color} border`)
+                .toBe(tokenColor(canvasElement, `--ds-border-accent-${color}-subtle`));
 
-        const hue = tokenColor(canvasElement, `--ds-icon-accent-${color}`);
-        await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
-        await expect(px(getComputedStyle(swatch).width)).toBe(10);
-        await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
-    }
+            const hue = tokenColor(canvasElement, `--ds-icon-accent-${color}`);
+            await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
+            await expect(px(getComputedStyle(swatch).width)).toBe(10);
+            await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
+        }
 
-    // Gray is the one name that is not a hue: a default that drifted into a
-    // color would have every uncolored tag claiming a category nobody gave it.
-    const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
-    const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
-    await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
+        // Gray is the one name that is not a hue: a default that drifted into a
+        // color would have every uncolored tag claiming a category nobody gave it.
+        const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
+        const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
+        await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
+    });
 };
 
 /** The four behaviors, and the states that change a tag's contents. */
@@ -597,53 +600,55 @@ export const StateLayers = () => (
  * subtle steps, and the tag's own ground never moves.
  */
 StateLayers.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const t = (token) => tokenColor(canvasElement, token);
-    const bg = 'backgroundColor';
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const t = (token) => tokenColor(canvasElement, token);
+        const bg = 'backgroundColor';
 
-    const unselected = canvas.getByRole('button', { name: 'Unselected' });
-    await expect(getComputedStyle(unselected)[bg], 'rest is outlined only').toBe(CLEAR);
-    await expect(whileForced(unselected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtlest'));
-    await expect(whileForced(unselected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtlest-pressed'));
+        const unselected = canvas.getByRole('button', { name: 'Unselected' });
+        await expect(getComputedStyle(unselected)[bg], 'rest is outlined only').toBe(CLEAR);
+        await expect(whileForced(unselected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtlest'));
+        await expect(whileForced(unselected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtlest-pressed'));
 
-    const selected = canvas.getByRole('button', { name: 'Selected' });
-    await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
-        .toBe(t('--ds-border-accent-blue'));
-    await expect(getComputedStyle(selected)[bg]).toBe(t('--ds-background-accent-blue-subtler'));
-    await expect(whileForced(selected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtler'));
-    await expect(whileForced(selected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtler'));
+        const selected = canvas.getByRole('button', { name: 'Selected' });
+        await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
+            .toBe(t('--ds-border-accent-blue'));
+        await expect(getComputedStyle(selected)[bg]).toBe(t('--ds-background-accent-blue-subtler'));
+        await expect(whileForced(selected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtler'));
+        await expect(whileForced(selected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtler'));
 
-    const gray = canvas.getByRole('button', { name: 'Gray selected' });
-    await expect(getComputedStyle(gray).borderTopColor).toBe(t('--ds-border-accent-gray'));
-    await expect(getComputedStyle(gray)[bg]).toBe(t('--ds-background-accent-gray-subtler'));
+        const gray = canvas.getByRole('button', { name: 'Gray selected' });
+        await expect(getComputedStyle(gray).borderTopColor).toBe(t('--ds-border-accent-gray'));
+        await expect(getComputedStyle(gray)[bg]).toBe(t('--ds-background-accent-gray-subtler'));
 
-    // A plain link: the tag is the link.
-    const link = canvas.getByRole('link', { name: 'Link' });
-    const linkText = within(link).getByText('Link');
-    await expect(whileForced(link, ':hover', bg)).toBe(t('--ds-background-accent-green-subtlest'));
-    await expect(whileForced(link, ':active', bg)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
-    await expect(getComputedStyle(linkText).textDecorationLine, 'no underline at rest').toBe('none');
-    await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('underline');
-    await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('underline');
+        // A plain link: the tag is the link.
+        const link = canvas.getByRole('link', { name: 'Link' });
+        const linkText = within(link).getByText('Link');
+        await expect(whileForced(link, ':hover', bg)).toBe(t('--ds-background-accent-green-subtlest'));
+        await expect(whileForced(link, ':active', bg)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
+        await expect(getComputedStyle(linkText).textDecorationLine, 'no underline at rest').toBe('none');
+        await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('underline');
+        await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('underline');
 
-    // A split link: the tag lights up for its link half, and the text underlines.
-    const split = canvas.getByTestId('split');
-    const splitLink = canvas.getByRole('link', { name: 'Split link' });
-    const splitText = within(splitLink).getByText('Split link');
-    await expect(whileForced(splitLink, ':hover', bg, split)).toBe(t('--ds-background-accent-green-subtlest'));
-    await expect(whileForced(splitLink, ':active', bg, split)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
-    await expect(getComputedStyle(splitText).textDecorationLine).toBe('none');
-    await expect(whileForced(splitLink, ':hover', 'textDecorationLine', splitText)).toBe('underline');
-    await expect(whileForced(splitLink, ':active', 'textDecorationLine', splitText)).toBe('underline');
-    const splitX = canvas.getByRole('button', { name: 'Remove Split link' });
-    await expect(whileForced(splitX, ':hover', bg, split), 'hovering the × does not light the link')
-        .toBe(CLEAR);
+        // A split link: the tag lights up for its link half, and the text underlines.
+        const split = canvas.getByTestId('split');
+        const splitLink = canvas.getByRole('link', { name: 'Split link' });
+        const splitText = within(splitLink).getByText('Split link');
+        await expect(whileForced(splitLink, ':hover', bg, split)).toBe(t('--ds-background-accent-green-subtlest'));
+        await expect(whileForced(splitLink, ':active', bg, split)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
+        await expect(getComputedStyle(splitText).textDecorationLine).toBe('none');
+        await expect(whileForced(splitLink, ':hover', 'textDecorationLine', splitText)).toBe('underline');
+        await expect(whileForced(splitLink, ':active', 'textDecorationLine', splitText)).toBe('underline');
+        const splitX = canvas.getByRole('button', { name: 'Remove Split link' });
+        await expect(whileForced(splitX, ':hover', bg, split), 'hovering the × does not light the link')
+            .toBe(CLEAR);
 
-    const removable = canvas.getByTestId('removable');
-    await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
-    const x = canvas.getByRole('button', { name: 'Remove Removable' });
-    await expect(whileForced(x, ':hover', bg)).toBe(t('--ds-background-neutral-subtle-hovered'));
-    await expect(whileForced(x, ':active', bg)).toBe(t('--ds-background-neutral-subtle-pressed'));
+        const removable = canvas.getByTestId('removable');
+        await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
+        const x = canvas.getByRole('button', { name: 'Remove Removable' });
+        await expect(whileForced(x, ':hover', bg)).toBe(t('--ds-background-neutral-subtle-hovered'));
+        await expect(whileForced(x, ':active', bg)).toBe(t('--ds-background-neutral-subtle-pressed'));
+    });
 };
 
 /* ---------------------------------------------------------------- removing */

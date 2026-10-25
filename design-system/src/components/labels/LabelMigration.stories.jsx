@@ -7,6 +7,7 @@ import StaticBadgeSmart, { SMART_TAG_COLORS } from '@/components/_internal/Stati
 import TagInput from '@/components/forms-and-inputs/TagInput';
 
 import Tag from './Tag';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * The labels that moved onto Tag: `StaticBadgeSmart`, `CompetencyBadge` and
@@ -77,25 +78,27 @@ export const SmartAreas = () => (
  * a clear border, and nothing to press.
  */
 SmartAreas.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const [type, text, token] of SMART) {
-        const smart = canvas.getByTestId(`smart-${type}`);
-        await expect(smart.textContent, `${type} says its area`).toBe(text);
-        const s = getComputedStyle(smart);
-        const tag = getComputedStyle(canvas.getByTestId(`tag-${type}`));
-        for (const p of ['height', 'borderTopLeftRadius', 'fontSize', 'paddingLeft']) {
-            await expect(s[p], `${type} has a tag's ${p}`).toBe(tag[p]);
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        for (const [type, text, token] of SMART) {
+            const smart = canvas.getByTestId(`smart-${type}`);
+            await expect(smart.textContent, `${type} says its area`).toBe(text);
+            const s = getComputedStyle(smart);
+            const tag = getComputedStyle(canvas.getByTestId(`tag-${type}`));
+            for (const p of ['height', 'borderTopLeftRadius', 'fontSize', 'paddingLeft']) {
+                await expect(s[p], `${type} has a tag's ${p}`).toBe(tag[p]);
+            }
+            await expect(px(s.height), `${type} is 22 tall`).toBe(22);
+            await expect(s.backgroundColor, `${type} is filled in its subject's ground`)
+                .toBe(tokenColor(canvasElement, `--ds-background-smart-${token}`));
+            await expect(s.color, `${type} words are its subject's ink`)
+                .toBe(tokenColor(canvasElement, `--ds-text-smart-${token}`));
+            await expect(s.borderTopColor, `${type} has a clear border`).toBe('rgba(0, 0, 0, 0)');
+            await expect(getComputedStyle(swatchOf(smart)).backgroundColor, `${type} carries its subject on the swatch`)
+                .toBe(tokenColor(canvasElement, `--ds-icon-smart-${token}`));
         }
-        await expect(px(s.height), `${type} is 22 tall`).toBe(22);
-        await expect(s.backgroundColor, `${type} is filled in its subject's ground`)
-            .toBe(tokenColor(canvasElement, `--ds-background-smart-${token}`));
-        await expect(s.color, `${type} words are its subject's ink`)
-            .toBe(tokenColor(canvasElement, `--ds-text-smart-${token}`));
-        await expect(s.borderTopColor, `${type} has a clear border`).toBe('rgba(0, 0, 0, 0)');
-        await expect(getComputedStyle(swatchOf(smart)).backgroundColor, `${type} carries its subject on the swatch`)
-            .toBe(tokenColor(canvasElement, `--ds-icon-smart-${token}`));
-    }
-    await expect(canvas.queryByRole('button')).toBeNull();
+        await expect(canvas.queryByRole('button')).toBeNull();
+    });
 };
 
 export const SmartSizeIsIgnored = () => (
