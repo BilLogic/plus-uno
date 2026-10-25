@@ -128,13 +128,60 @@
     align-items: center;
 }
 
-// The tabs sit 12 in from their parent (Atlassian's nesting indent). The list
+// An open-tab row is two parts side by side, and neither pads the row: the
+// thread column (28: the parent's pad 12 plus its 16 icon), which holds only the
+// guide line, and the surface, a `SidebarTab` filling the rest. The surface pads
+// 8, so a tab's label lands at 36, the parent's label x (12 + 16 + 8). Every
+// state fill and the focus ring are the surface's, never the column's. The list
 // keeps the 4 row gap of every other list.
 .plus-pattern-sidebar__tabs {
-    padding-left: var(--element-pad-x-md);
+    // The same 4 gap between the parent and its first tab as between rows.
+    margin-top: var(--element-stack-sm);
 
     &[hidden] {
         display: none;
+    }
+
+    // The thread hangs from the parent: the first row's line runs up through
+    // the gap above it to the parent row's bottom edge.
+    > li:first-child::before {
+        top: calc(-1 * var(--element-stack-sm));
+    }
+
+    > li {
+        position: relative;
+        padding-left: calc(var(--element-pad-x-md) + var(--icon-md));
+
+        // The thread: a line under the parent icon's center (12 + 8 = 20). A
+        // middle row's runs on through the 4 gap, so the line reads unbroken.
+        // It never changes with the row's state.
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: calc(-1 * var(--element-stack-sm));
+            left: calc(var(--element-pad-x-md) + var(--icon-md) / 2);
+            box-sizing: border-box;
+            border-left: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+            pointer-events: none;
+        }
+    }
+
+    // The surface: pad-x 8, radius 8 (the SidebarTab's own Element/radius-item-md).
+    .plus-sidebar-tab {
+        padding-left: var(--element-pad-x-sm);
+        padding-right: var(--element-pad-x-sm);
+    }
+
+    // The last row, "Show N more" when it shows: the line stops at the row's
+    // middle and curves (radius 6) into a stub toward the surface. The line sits
+    // half an icon (8) before the surface; the stub stops one focus-ring stroke
+    // (2) short of it, so it never runs into a focused row's ring: 8 - 2 = 6.
+    > .plus-pattern-sidebar__thread-end::before {
+        bottom: 50%;
+        width: calc(var(--icon-md) / 2 - var(--size-element-stroke-lg));
+        border-bottom: var(--size-element-stroke-sm) solid var(--color-outline-variant);
+        border-bottom-left-radius: var(--element-radius-item-sm);
     }
 }
 

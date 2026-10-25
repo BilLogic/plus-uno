@@ -32,6 +32,10 @@
         background-color: var(--color-on-surface-state-08);
     }
 
+    &:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--color-on-surface-state-12);
+    }
+
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
         outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
         outline-offset: calc(-1 * var(--size-element-stroke-lg));
@@ -92,9 +96,9 @@
 
 /* ------------------------------------------------------------- states */
 
-// The state steps (foundations/color.md § State layers): hover 08, selected
-// 16, and focus only the ring. Navigation selects at 16, where a dense list
-// selects at 08.
+// The state steps (foundations/color.md § State layers): hover 08, pressed 12,
+// selected 16, and focus only the ring. Navigation selects at 16, where a dense
+// list selects at 08.
 .plus-sidebar-tab--hover,
 .plus-sidebar-tab--selected {
     color: var(--color-primary-text);
@@ -116,6 +120,13 @@
 
 .plus-sidebar-tab--selected {
     background-color: var(--color-primary-state-16);
+}
+
+// Selected and hovered is one step above selected: the hover 08 layer over the
+// selected fill, since no token sits above Primary 16.
+.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled),
+.plus-sidebar-tab-item:hover > .plus-sidebar-tab--selected:not(.plus-sidebar-tab--disabled) {
+    background-image: linear-gradient(var(--color-on-surface-state-08), var(--color-on-surface-state-08));
 }
 
 .plus-sidebar-tab--focus {

@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-16` · `--color-primary-text` · `--element-inline-md` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--size-element-stroke-lg`
+`--body-default` · `--body-small` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-state-08` · `--color-primary-state-16` · `--color-primary-text` · `--element-inline-md` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/navigation/SidebarTab/SidebarTab.scss`. Override these through the token layer, never with a literal.
 

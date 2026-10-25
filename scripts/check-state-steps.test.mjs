@@ -105,9 +105,15 @@ const layer = (token) => `var(${token})`;
 
 const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
 
-test('SidebarTab: hover 08, selected 16, focus a ring with no fill', () => {
+test('SidebarTab: hover 08, pressed 12, selected 16, selected + hover the 08 layer over 16, focus a ring with no fill', () => {
   expectRule(TAB, '.plus-sidebar-tab:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
     'background-color': layer('--color-on-surface-state-08'),
+  });
+  expectRule(TAB, '.plus-sidebar-tab:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
+    'background-color': layer('--color-on-surface-state-12'),
+  });
+  expectRule(TAB, '.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled)', {
+    'background-image': `linear-gradient(${layer('--color-on-surface-state-08')}, ${layer('--color-on-surface-state-08')})`,
   });
   expectRule(TAB, '.plus-sidebar-tab--hover', { 'background-color': layer('--color-primary-state-08') });
   expectRule(TAB, '.plus-sidebar-tab--selected', { 'background-color': layer('--color-primary-state-16') });

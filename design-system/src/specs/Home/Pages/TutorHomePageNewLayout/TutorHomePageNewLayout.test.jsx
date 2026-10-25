@@ -1,11 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-
-// The pages load the chart library, which asks `CSS.supports` on load; jsdom has no such function.
-vi.hoisted(() => {
-    globalThis.CSS = globalThis.CSS || {};
-    if (typeof globalThis.CSS.supports !== 'function') globalThis.CSS.supports = () => false;
-});
+import { describe, expect, it } from 'vitest';
 
 import {
     TutorHomePageNewLayout,

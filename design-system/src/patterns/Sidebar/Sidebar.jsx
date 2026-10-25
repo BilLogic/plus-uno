@@ -4,6 +4,9 @@ import { Button, Count, Divider, SidebarTab } from '@/components';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 
+/** The last row under a parent, "Show N more" when it shows: its thread ends in the elbow. */
+export const THREAD_END = 'plus-pattern-sidebar__thread-end';
+
 /**
  * Sidebar pattern: the foundation side navigation. Mirrors the Figma
  * `_Sidebar`, `_Sidebar section` and `_Sidebar open tab` parts in Patterns ›
@@ -22,9 +25,13 @@ import './Sidebar.scss';
  *   item becomes an accordion: a chevron (a disclosure button, with
  *   `aria-expanded` and `aria-controls`) shows and hides them, and the list opens
  *   on its own when a tab is opened. The label still opens the item's own page.
- *   Each tab is a `SidebarTab` indented 12, with an optional "Live" dot and × on
+ *   Each tab row is a 28 thread column, then a `SidebarTab` surface padded 8,
+ *   so its label lines up with the parent's; it has an optional "Live" dot and × on
  *   hover; Delete or Backspace closes the focused tab. The parent shows "Close
- *   all" on hover. Past 5 tabs a "Show N more" row expands the rest.
+ *   all" on hover. Past 5 tabs a "Show N more" row expands the rest. A thread
+ *   ties the tabs to their parent: a line under the parent's icon runs beside
+ *   every row and ends in a rounded elbow at the last one, "Show N more" when it
+ *   shows (Figma `thread=middle|last`).
  *
  * Content is data: one array of items and one of sections. The pattern draws
  * whatever it is given; which items a role sees is the caller's config. The open
@@ -79,7 +86,7 @@ const PatternSidebar = ({
         }
     }, [openTabs]);
 
-    const tabRow = (item, tab) => {
+    const tabRow = (item, tab, last) => {
         const close = () => onTabClose?.(tab, item);
 
         // Delete and Backspace close the focused tab. Focus moves to the next
@@ -110,7 +117,7 @@ const PatternSidebar = ({
         };
 
         return (
-            <li key={tab.id} className="plus-pattern-sidebar__tab" onKeyDown={onKeyDown}>
+            <li key={tab.id} className={['plus-pattern-sidebar__tab', last && THREAD_END].filter(Boolean).join(' ')} onKeyDown={onKeyDown}>
                 <SidebarTab
                     text={tab.title}
                     leadingVisual={false}
@@ -204,9 +211,9 @@ const PatternSidebar = ({
                     aria-label={`Open ${item.text}`}
                     hidden={!expanded}
                 >
-                    {shown.map((tab) => tabRow(item, tab))}
+                    {shown.map((tab, index) => tabRow(item, tab, more <= 0 && index === shown.length - 1))}
                     {more > 0 ? (
-                        <li className="plus-pattern-sidebar__more">
+                        <li className={`plus-pattern-sidebar__more ${THREAD_END}`}>
                             <SidebarTab
                                 text={all ? 'Show fewer' : `Show ${more} more`}
                                 leadingVisual={false}

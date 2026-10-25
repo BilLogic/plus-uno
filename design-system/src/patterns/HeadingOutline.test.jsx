@@ -1,12 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-
-// The Sidebar pattern loads the components barrel, and with it the chart
-// library, which asks `CSS.supports` on load; jsdom has no such function.
-vi.hoisted(() => {
-    globalThis.CSS = globalThis.CSS || {};
-    if (typeof globalThis.CSS.supports !== 'function') globalThis.CSS.supports = () => false;
-});
+import { describe, expect, it } from 'vitest';
 
 // Module paths rather than the barrels, so the rest stays light.
 import Card from '@/components/layout-and-structure/Card';
