@@ -13,8 +13,10 @@ Component text takes a text style: `font: var(--heading-small)`, `var(--body-def
 - **Headings step one size per nesting level**, and the tag follows the nesting: the page's one `h1` is Heading/large 24, a section's `h2` Heading/medium 20, a subsection's `h3` Heading/small 16. `PatternSection` picks its level from `@/lib/headingLevel`; a page or a dialog is level 1.
 - **Container titles are fixed**: a modal's is Heading/medium 20 and is the dialog's `h1`, named by `aria-labelledby`; a card's, a popup's and a flag's are Heading/xsmall 14, and a card's sits over a Body/default 14 description, tagged one level below its section.
 - **Group labels** are Heading/xxsmall 12 and name a `role="group"` or a table head cell; they are never headings.
-- **Button and tab labels** are Body/default at `--type-weight-medium`, with no separate button style. In Figma a weight change drops a node's text style, so a label carries none and binds Font size/0875, Line height/125, Family/body and Weight/medium instead.
-- **Code is code-only**: `--code` has no Figma text style. A code sample in Figma docs is Source Code Pro bound to Font size/0875 and Line height/125.
+- **Button and Tab group labels** are Body/default at `--type-weight-medium`, with no separate button style.
+- **A Sidebar tab's label is Body/default at regular weight**: a Sidebar tab is a navigation row, not a tab in a Tab group.
+- **Code has no Figma style**: `--code` is code-only.
+- Binding a weighted label or a code sample in Figma: `design-system/guidelines/figma/token-mapping.md` § Text that carries no style.
 
 - **A Jumbotron's title is the page's `h1`**, so a page that has one gives its `Surface` no `title`.
 
