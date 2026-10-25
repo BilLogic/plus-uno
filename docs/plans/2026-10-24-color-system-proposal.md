@@ -313,24 +313,24 @@ Atlassian treats elevation as **paired tokens**: a surface color and its shadow 
 4. **Wells use `elevation.surface.container`**, a translucent fill, so a recessed strip inside a card works on any surface beneath it.
 5. **Z-index follows Atlassian's scale**: card 100, navigation 200, dialog 300, layer 400, blanket 500, modal 510, flag 600, spotlight 700, tooltip 800. `_layout.scss` already uses it.
 
-**Shadows, Plan A (crisp, Atlassian's geometry with a warm ink):**
+**Shadows, Plan A (Notion's geometry, warm ink):**
 
 | Token | For | Light | Dark |
 |---|---|---|---|
-| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *PLUS ruling: cards rest flat on a border; only clickable cards lift, on hover. Replaces elevation-light-2.* | `0px 1px 1px #1f1e1e40, 0px 0px 1px #1f1e1e4f` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
-| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Replaces elevation-light-3, -4 and -5 (open decision: modals join overlay).* | `0px 8px 12px #1f1e1e26, 0px 0px 1px #1f1e1e4f` | `0px 0px 0px 1px #e4e3e21f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
+| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *Plan A: Notion card geometry, a 5% ring plus a very wide 2% blur; the ring is the card edge, so cards need no border.* | `0px 0px 0px 1px #1f1e1e0d, 0px 12px 32px #1f1e1e05` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
+| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Plan A: Notion popover geometry (ring 7%, 0 5px 8px at 3%, 0 20px 24px at 5%).* | `0px 0px 0px 1px #1f1e1e12, 0px 5px 8px #1f1e1e07, 0px 20px 24px #1f1e1e0d` | `0px 0px 0px 1px #e4e3e21f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
 | `elevation.shadow.overflow` | Shadow where content scrolls under other content, such as a table's sticky column. | `0px 0px 8px #1f1e1e29, 0px 0px 1px #1f1e1e1f` | `0px 0px 12px #0a09088f, 0px 0px 1px #0a090880` |
 | `elevation.shadow.overflow.spread` | Fallback for overflow when a box shadow is not feasible; pair with .perimeter. | `#1f1e1e29` | `#0a09088f` |
 | `elevation.shadow.overflow.perimeter` | Fallback for overflow when a box shadow is not feasible; pair with .spread. | `#1f1e1e1f` | `#0a090880` |
 | `opacity.disabled` | Images and whole elements in a disabled state. *Today --color-disabled-opacity is 0.38 (M3); 0.4 is Atlassian's.* | `0.4` | `0.4` |
 | `opacity.loading` | Content under a loading spinner. *New.* | `0.2` | `0.2` |
 
-**Shadows, Plan B (soft, claude.ai's geometry):**
+**Shadows, Plan B (claude.ai's geometry):**
 
 | Token | For | Light | Dark |
 |---|---|---|---|
-| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *Plan B: claude.ai --cds-shadow-sm geometry; cards have no border, so the soft shadow is their edge.* | `0px 1px 2px #1e1e1e0f, 0px 2px 8px #1e1e1e14` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
-| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Plan B: claude.ai --cds-shadow-popover geometry.* | `0px 8px 24px #1e1e1e1f, 0px 2px 6px #1e1e1e14` | `0px 0px 0px 1px #e3e3e31f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
+| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *Plan B: claude.ai card and composer geometry (ring 12%, 0 4px 20px at 7.5%).* | `0px 0px 0px 1px #1e1e1e1f, 0px 4px 20px #1e1e1e13` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
+| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Plan B: claude.ai menu geometry (ring 8%, 0 2px 6px at 8%, 0 8px 24px at 12%).* | `0px 0px 0px 1px #1e1e1e14, 0px 2px 6px #1e1e1e14, 0px 8px 24px #1e1e1e1f` | `0px 0px 0px 1px #e3e3e31f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
 | `elevation.shadow.overflow` | Shadow where content scrolls under other content, such as a table's sticky column. | `0px 0px 8px #1e1e1e29, 0px 0px 1px #1e1e1e1f` | `0px 0px 12px #0a09088f, 0px 0px 1px #0a090880` |
 | `elevation.shadow.overflow.spread` | Fallback for overflow when a box shadow is not feasible; pair with .perimeter. | `#1e1e1e29` | `#0a09088f` |
 | `elevation.shadow.overflow.perimeter` | Fallback for overflow when a box shadow is not feasible; pair with .spread. | `#1e1e1e1f` | `#0a090880` |
@@ -352,16 +352,16 @@ Atlassian went through the same exercise when it moved its products onto elevati
 |---|---|---|---|
 | Surface container (the frame: topbar + docked sidebar) | The backdrop the work sits in. | elevation.surface.sunken (neutral.100 #f9f8f7, Notion's sidebar gray) | elevation.surface.sunken (neutral.100, near claude.ai's #fafafa sidebar) |
 | Topbar | Part of the frame. | Frame fill, no border | Frame fill, no border |
-| Sidebar item: hovered / selected | Navigation state. | background.neutral.subtle.hovered / background.selected (ink at 6%) + text.selected (ink) | Same tokens; neutral selection, as claude.ai (ink at 5%) |
+| Sidebar item: hovered / selected | Navigation state. | background.neutral.subtle.hovered / background.selected (ink at 6%) + text.selected (ink) | Same tokens; selected is ink at 10%, as claude.ai |
 | Sidebar peek (below 1024, floating, no scrim) | A layer over the page. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay (soft) |
-| Surface (the inner box) | Where the work happens; radius --surface-radius. | elevation.surface (white) + color.border hairline | elevation.surface (white), no border: the frame-to-surface step reads by tone alone |
-| Section | Groups content inside the surface. | No fill; color.border divider when needed | No fill; spacing first, color.border divider only in dense lists |
-| Card, at rest | A flat container (ruling 2026-10-24). | elevation.surface (white) + color.border | elevation.surface.raised (white) + elevation.shadow.raised (soft, no border) |
+| Surface (the inner box) | Where the work happens; radius --surface-radius. | elevation.surface (white), no border; the docked sidebar ends in a hairline (Notion: 1px #f0efed inset) | elevation.surface (white), no border; the sidebar ends in color.border (claude.ai: 1px black at 10%) |
+| Section | Groups content inside the surface. | No fill; color.border divider (ink 8%) when needed | No fill; color.border rule (ink 12%), as claude.ai settings rows |
+| Card, at rest | A flat container (ruling 2026-10-24). | elevation.surface.raised + elevation.shadow.raised: a 5% ring and a 2% wide blur, no border (Notion home cards) | elevation.surface.raised + elevation.shadow.raised: a 12% ring and a 7.5% soft drop, no border (claude.ai cards and composer) |
 | Card, clickable: hovered / dragged | Lift on interaction only. | elevation.surface.raised + elevation.shadow.raised / overlay pair | elevation.shadow.overlay on hover (Atlassian allows raised-to-overlay transitions) / overlay pair |
 | Well inside a card (code block, summary strip) | Recessed area. | elevation.surface.container (ink at 3%) | elevation.surface.container (ink at 3%) |
-| Table and Tree | Rows on the surface. | Head: color.border.bold rule; row hovered: background.neutral.subtle.hovered; row selected: background.selected; sticky column: elevation.shadow.overflow | Same tokens; row rules use color.border (lighter) rather than .bold |
+| Table and Tree | Rows on the surface. | Grid lines color.border (Notion tables: warm 7% on every cell edge); head rule color.border.bold; row hovered: background.neutral.subtle.hovered; row selected: background.selected; sticky column: elevation.shadow.overflow | Same tokens; grid lines color.border |
 | Tile | A small selectable card. | background.neutral.subtle, hovered; selected: background.selected + border.selected | Same tokens |
-| Popover: Menu, Popup and flag | Floating layers without a scrim. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay (soft) |
+| Popover: Menu, Popup and flag | Floating layers without a scrim. | elevation.surface.overlay + elevation.shadow.overlay, radius 12 (Notion menus) | elevation.surface.overlay + elevation.shadow.overlay, radius 14 (claude.ai menus) |
 | Popover: Tooltip | A label over anything. | background.neutral.bold + text.inverse | background.neutral.bold + text.inverse |
 | Overlay (scrim) | Dims the page under a modal. | color.blanket | color.blanket |
 | Modal | A layer over the scrim. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay |
@@ -369,62 +369,96 @@ Atlassian went through the same exercise when it moved its products onto elevati
 
 **Two consequences for existing rulings:**
 
-- **Cards.** "Cards are flat at rest" survives in Plan A literally: a white card with a hairline border. Plan B keeps it in spirit: no border, and a soft shadow so faint it reads as an edge rather than a lift.
+- **Cards.** "Cards are flat at rest" holds in spirit: both benchmarks give resting cards no border, only a 1px translucent ring with a faint shadow. In Plan A the shadow is almost invisible (2%), so the card still reads flat. In Plan B it is a soft lift.
 - **Modals.** "Floating layers use light-3, modals use light-4" collapses into a single `overlay` level, as in Atlassian. The blanket under a modal already sets it apart from a menu. This reverses a ruling, so it is open decision 3.
 
 **Name clash to settle.** PLUS calls the frame the "Surface container"; Atlassian's `elevation.surface.container` is a translucent well *inside* a card. Same words, opposite ends of the stack. Open decision 6.
 
 ### 4.6 Plan A and Plan B
 
-Notion and Claude are both calm, low-chroma and monochrome around a single accent, but they draw structure differently. Notion uses warm grays and hairline borders. Claude, as served today, uses pure grays and no borders: tone and soft shadow do the work. The two plans make that choice explicit. Both use Lagoon, the same nine accents, the same token names and the same contrast guarantees.
+**How the plans were fitted.** The plans are fitted to computed styles read from both apps on 2026-10-25, in a signed-in browser, read-only.
 
-**Which Claude.** The first draft of Plan B (Ivory) was fitted to Claude's warm ivory theme, and that theme is v1, now retired (§2.4). claude.ai as served to Bill on 2026-10-25 is v2 with its `color` flag, and its gray ramp is achromatic:
+- **Claude** (claude.ai, color v2):
+  - views: a chat, a project, the artifacts gallery and the new-chat page;
+  - layers: the model menu and the settings modal;
+  - dark: forced on the page for measurement, so its values are approximate.
+- **Notion** (app.notion.com):
+  - views: home, a table database, a doc page and the docked sidebar;
+  - layers: the search modal and a popover.
+  - Notion's dark theme could not be switched on without changing Bill's settings, so it is **unverified**.
 
-- the sidebar is `#fafafa` and the main surface is white;
-- the grays include `#e0e0e0`, `#6b6b6b` and `#0b0b0b`;
-- content has no borders;
-- a selected item is ink at 5%;
-- the primary button is near-black `#191919`, with the clay orange only in the logo;
-- interactive accents use one blue (`#257de0`).
+For each view, the probe recorded:
 
-Plan B is rebuilt on that.
+- backgrounds by area;
+- every border, radius and box shadow;
+- text colors and type.
 
-| | Plan A · Paper (toward Notion) | Plan B · Neutral (toward Claude, 2026) |
+**What the two apps share.** This is the pattern to copy, whichever plan wins.
+
+1. **A white page on a barely-gray docked sidebar.** Notion's sidebar is `#f9f8f7`, ending in a 1px `#f0efed` inset line. Claude's is `#fafafa`, ending in a 1px line of black at 10%.
+2. **Lines, hovers and selections are translucent ink, not opaque grays.**
+   - Notion: dividers and table grids at 7% warm ink (`rgba(42,28,0,.07)`); hover and selected tabs at 4–5%.
+   - Claude: rules and edges at 8–12% black; selected sidebar item at 10%; chips at 5%.
+3. **Cards and floating layers have no border.** Their edge is a 1px translucent ring (`0 0 0 1px`) plus a soft shadow:
+   - Notion home cards: 5% ring, `0 12px 32px` at 2%.
+   - Notion popovers: 7% ring, `0 5px 8px` at 3%, `0 20px 24px` at 5%.
+   - Claude composer and cards: 12% ring, `0 4px 20px` at 7.5%.
+   - Claude menus: 8% ring, `0 2px 6px` at 8%, `0 8px 24px` at 12%.
+
+   This is Atlassian's paired surface-and-shadow model with the ring built into the shadow.
+4. **Text is three or four levels of one ink.**
+   - Notion: `#2c2c2b`, `#5f5e59`, `#7d7a75`, `#a19e99`.
+   - Claude: black at 90%, 60%, 47% and 40%.
+   - Both put tertiary text below 4.5:1 (`#7d7a75` is 4.2:1; black at 47% is about 3.5:1). PLUS's `text.subtlest` stays at 4.85:1 on purpose.
+5. **One saturated accent; categories are pastel tints.**
+   - Notion's primary button is blue `#2783de`; Claude's is near-black, with blue `#257de0` for interaction.
+   - Tags are a hue at 8–13% alpha (Notion) or 12–16% mixed into white (Claude).
+6. **Radii scale with the object.** Controls 6–8px, menus 12–14px, cards 16px. Modals are 12px in Claude and 20px in Notion's search.
+7. **Modals are quiet.**
+   - Claude's settings modal has only an 8% ring and its small card shadow over a black 40% blanket.
+   - Notion's search modal is the one heavy shadow seen: `0 24px 48px` at 24%.
+
+**Where they differ.** This is what the two plans now express:
+
+| | Plan A · Paper (toward Notion) | Plan B · Neutral (toward Claude) |
 |---|---|---|
-| Neutral hue and chroma | 85°, chroma 0.008 at most: a barely warm gray | chroma 0: pure gray |
-| Fit to benchmark | neutral.100 `#f9f8f7` is Notion's sidebar gray, to the hex | neutral.100 `#f8f8f8`, against claude.ai's `#fafafa` sidebar and `#f9f9f9` surface-0 |
-| Frame (Surface container) | sunken neutral.100 | sunken neutral.100 |
-| Surface (inner box) | white, hairline border | white, no border; the frame-to-surface step is tone alone |
-| Cards at rest | white, flat, bordered | white, no border, soft shadow as the edge |
-| Shadows | crisp, short (Atlassian geometry) | soft, diffuse (claude.ai's `--cds-shadow-sm` and `--cds-shadow-popover` geometry) |
-| Selection | neutral: ink at 6%, ink text | neutral: the same tokens |
-| Brand presence | Lagoon on actions, links and focus | the same |
-| Risk | borders add visual noise in dense tables | cards and sections lean on spacing and shadow; harder to keep consistent across hand-built prototypes |
+| Ink temperature | warm: hue 85°, chroma ≤ 0.008; lines tinted brown like Notion's `rgba(42,28,0,…)` | none: chroma 0, black-based alphas like Claude's |
+| Sidebar | `#f9f8f7`, hairline edge | `#f8f8f8`, `color.border` edge |
+| `color.border` (lines, grids, rules) | ink at 8% | ink at 12% |
+| `color.background.selected` | ink at 6% | ink at 10% |
+| `elevation.shadow.raised` (cards) | 5% ring + `0 12px 32px` at 2%: barely there | 12% ring + `0 4px 20px` at 7.5%: a visible soft lift |
+| `elevation.shadow.overlay` (menus, modals) | 7% ring + `0 5px 8px` 3% + `0 20px 24px` 5% | 8% ring + `0 2px 6px` 8% + `0 8px 24px` 12% |
+| Overall | lighter, paper-like, structure from faint warm lines | slightly firmer, cooler, structure from rings and soft shadow |
 
-Both plans now select in neutral, because both benchmarks do (Notion, and Claude at ink 5%), as does Atlassian's FY27 Finesse override. Teal selection stays possible in either plan as a variant (open decision 2).
+In both plans:
+
+- the page is white, cards have no border, and selection is translucent ink;
+- Lagoon marks actions, links and focus;
+- the hue ramps, token names and contrast guarantees are shared. The token map changes only `color.border`, `color.background.selected` and the two shadows, beyond the gray ramp.
 
 **Neutral ramps, light** (0 to 1100):
 
 - Plan A: `#ffffff #f9f8f7 #f3f1ef #e0dedc #bab8b5 #928f8a #827f7b #706d69 #555350 #3f3d3b #2c2b2a #1f1e1e`
 - Plan B: `#ffffff #f8f8f8 #f1f1f1 #dedede #b8b8b8 #8f8f8f #7f7f7f #6d6d6d #535353 #3d3d3d #2b2b2b #1e1e1e`
 
-Dark ramps, OKLCH values and alphas for both plans are in Appendix A.
+Dark ramps, OKLCH values and alphas are in Appendix A. Dark mode in both apps follows Atlassian's rule that surfaces lighten as they rise. Claude's measured approximately:
 
-**Contrast.** The two plans share step contrast, so their thinnest margins are the same:
+- the page is `#191919` and the sidebar `#1f1f1f`;
+- text is white at 93%, 57% and 40%;
+- lines are white at 10%.
 
-- `color.text.brand` on `color.background.brand.subtlest`: 4.60:1;
-- `color.border.input` on white: 3.22–3.23:1;
-- `color.text.subtlest` on the sunken frame: 4.85–4.87:1.
+**Contrast.** Both plans pass every pair; the thinnest margins are shared:
 
-The thin margins of the old Ivory plan (3.02:1 on ivory) are gone.
+- `color.text.brand` on its subtlest tint: 4.60:1;
+- `color.border.input`: about 3.2:1;
+- `color.text.subtlest` on the sunken frame: 4.85:1.
 
-**Recommendation: still Plan A, but closer than before.** The plans now differ in two axes only: warm or pure gray, and borders or shadows.
+**Recommendation: Plan A, with a caveat.** The plans are now close.
 
-- **For Plan A.** PLUS's patterns already lean on borders and flat cards, and tutor dashboards are dense tables where hairlines carry structure.
-- **For Plan B.** It is the cleaner, more current look. It fits the "monochromatic tone for AI" Bill described for both benchmarks. Lagoon stands out more against pure gray.
+- **For Plan A.** Its lighter, warm lines suit dense tutor tables and forms.
+- **For Plan B.** Its firmer card lift reads better on large dashboards.
 
-A hybrid is cheap to try: Plan A's warm gray and borders in tables and forms, with Plan B's soft shadows on cards and overlays. The artifact shows both plans on the same screen.
-
+A cheap hybrid is Plan A's warm ink with Plan B's raised shadow for clickable cards. Bill should compare both on the same screen in the artifact.
 
 ### 4.7 Contrast of the key pairs
 
@@ -811,7 +845,7 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers *Plan A: Notion draws dividers and table grids at about 7% warm ink (#f0efed on white); 8% here. Plan B: claude.ai draws rules and card edges at 8-12% black and dark borders at 10% white.* | ink @8% `#1f1e1e14` / paper @10% `#e4e3e21a` | ink @12% `#1e1e1e1f` / paper @10% `#e3e3e31a` |
 | `color.border.disabled` | Borders of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
 | `color.border.focused` | The focus ring or border of an element that currently has keyboard or input focus. Do not use to indicate selection or hover alone. When an element is both selected and focused, keep its selected treatment and add a separate focus indicator *One step darker than Atlassian (500), for margin: 3.9:1 on white instead of 3.2:1.* | teal.600 `#198f9a` / teal.300 `#70c9d4` | same as A |
 | `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#8f8f8f` / darkNeutral.600 `#828282` |
@@ -852,7 +886,7 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.background.neutral.bold` | A vibrant background option for neutral UI elements, such as announcement banners | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.background.neutral.bold.hovered` | Hovered state of color.background.neutral.bold | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3d3d3d` / darkNeutral.900 `#c0c0c0` |
 | `color.background.neutral.bold.pressed` | Pressed state of color.background.neutral.bold | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
-| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: claude.ai marks the selected sidebar item with black at 10%.* | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | ink @10% `#1e1e1e1a` / paper @10% `#e3e3e31a` |
 | `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
 | `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
 | `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
