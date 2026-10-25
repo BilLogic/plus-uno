@@ -165,10 +165,12 @@ instead.
 
 ## Accessibility
 
-- **The card title is not a heading.** `title` renders through the underlying
-  card title, which is a `div` carrying an `h5` class — visual weight without
-  document structure. If the card starts a section a screen-reader user should
-  be able to jump to, put a real heading in `children` and leave `title` unset.
+- **The card title is a heading.** `title` renders a real heading tagged one
+  level below the section the card sits in: an `h3` in a section, an `h2`
+  straight on a page. Its size stays Heading/xsmall 14 at every level, so a
+  screen-reader user can jump between cards by heading without the type
+  changing. A card that should not appear in the heading outline leaves
+  `title` unset and puts its text in `children`.
 - **`onClick` on the card adds no semantics.** No `role`, no `tabIndex`, no key
   handling — only `cursor: pointer`. Unknown props are spread onto the card
   element, so `role`, `tabIndex` and `onKeyDown` can be added by hand, but a real
