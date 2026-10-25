@@ -465,6 +465,15 @@ export const CHECKS = [
       'the generated color token files in design-system/src/tokens/color/ (palette, semantic, elevation and Bootstrap bridge SCSS plus the Figma spec) against the active plan and the generator. Drift means a hand edit or a plan change that was never regenerated.',
   },
   {
+    name: 'check:legacy-color-list',
+    script: 'node scripts/generate-legacy-color-list.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-legacy-color-list.mjs',
+    guards:
+      'the list of components still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components (scripts/lib/color/legacy-components.mjs). Interns pick their next component from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
+  },
+  {
     name: 'check:atlassian-benchmark',
     script: 'node scripts/check-atlassian-benchmark.mjs',
     pkg: 'root',
