@@ -3,6 +3,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from '@/components/messaging/Modal/Modal';
 import Input from '../Input';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import '../TagInput.scss';
 import Listbox from './Listbox';
 
 /**
@@ -390,4 +392,50 @@ AThousandOptions.play = async ({ canvasElement }) => {
 
     await userEvent.type(input, '99');
     await waitFor(() => expect(body.getByRole('status')).toHaveTextContent('19 results'));
+};
+
+/**
+ * The list's surface is the overlay pair with a `color.border` edge, its
+ * header rule `color.border`, a failed load `text.danger`. A field in the
+ * header keeps its 2px-off focus ring inside the list's clip: the header's
+ * own padding is the ring's room.
+ */
+export const Colors = () => (
+    <div style={stack}>
+        <Listbox
+            aria-label="Topic"
+            options={[{ value: 'a', label: 'Algebra' }, { value: 'b', label: 'Biology' }]}
+            value="a"
+            header={(
+                <div className="plus-tag-input__rename">
+                    <Input label="Name" showLabel={false} size="small" defaultValue="Algebra" />
+                </div>
+            )}
+        />
+        <Listbox aria-label="Failed" options={[]} error="Couldn't load schools. Try again." />
+    </div>
+);
+Colors.parameters = { docs: { disable: true } };
+Colors.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const surface = canvas.getByRole('listbox', { name: 'Topic' }).closest('.plus-listbox');
+    const header = surface.querySelector('.plus-listbox-header');
+    const error = within(canvas.getByRole('listbox', { name: 'Failed' }).closest('.plus-listbox')).getByText(/Couldn't load schools/).closest('.plus-listbox-message');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(surface).backgroundColor, `${mode}: surface`).toBe(token('--ds-surface-overlay'));
+        await expect(getComputedStyle(surface).borderTopColor, `${mode}: edge`).toBe(token('--ds-border'));
+        await expect(getComputedStyle(header).borderBottomColor, `${mode}: header rule`).toBe(token('--ds-border'));
+        await expect(getComputedStyle(error).color, `${mode}: failed load`).toBe(token('--ds-text-danger'));
+    });
+
+    const input = canvas.getByRole('textbox', { name: 'Name' });
+    input.focus();
+    const field = input.closest('.plus-field');
+    const ring = parseFloat(getComputedStyle(field).outlineOffset) + parseFloat(getComputedStyle(field).outlineWidth);
+    const r = field.getBoundingClientRect();
+    const c = surface.getBoundingClientRect();
+    const edge = parseFloat(getComputedStyle(surface).borderTopWidth);
+    await expect(r.left - ring >= c.left + edge && r.right + ring <= c.right - edge && r.top - ring >= c.top + edge,
+        "the list clips the header field's focus ring").toBe(true);
+    input.blur();
 };

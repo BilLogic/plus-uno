@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Count from '@/components/labels/Count/Count';
 import OptionRow from './OptionRow';
 
@@ -125,4 +126,39 @@ LongLabelsTruncate.play = async ({ canvasElement }) => {
     await expect(tip).toHaveTextContent('Eagle Ridge Intermediate School of the Arts and Sciences');
     await userEvent.unhover(label);
     await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryByRole('tooltip')).toBeNull());
+};
+
+/**
+ * The row's colors: hover the neutral subtle step, selection neutral ink with
+ * an `icon.selected` check, a checked mark Lagoon with an `icon.inverse` check,
+ * a lifted row on the overlay surface, and the drop line `border.selected`.
+ */
+export const Colors = () => (
+    <div role="listbox" aria-label="Colors" aria-multiselectable="true" style={frame}>
+        <OptionRow label="Algebra" />
+        <OptionRow label="Biology" highlighted />
+        <OptionRow label="Chemistry" selected description="Grade 9" />
+        <OptionRow label="Physics" check={false} selected leading={<OptionRow.Checkbox checked />} />
+        <OptionRow label="Geometry" dragging />
+        <OptionRow label="History" dropIndicator="before" />
+    </div>
+);
+Colors.parameters = { docs: { disable: true } };
+Colors.play = async ({ canvasElement }) => {
+    const row = (name) => within(canvasElement).getByRole('option', { name: new RegExp(`^${name}`) });
+    const style = (el, pseudo) => getComputedStyle(el, pseudo);
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(style(row('Algebra')).color, `${mode}: row text`).toBe(token('--ds-text'));
+        await expect(style(row('Biology')).backgroundColor, `${mode}: highlighted row`).toBe(token('--ds-background-neutral-subtle-hovered'));
+        await expect(style(row('Chemistry')).backgroundColor, `${mode}: selected row`).toBe(token('--ds-background-selected'));
+        await expect(style(row('Chemistry')).color, `${mode}: selected text`).toBe(token('--ds-text-selected'));
+        await expect(style(row('Chemistry').querySelector('.plus-option-row-description')).color, `${mode}: selected description`).toBe(token('--ds-text-selected'));
+        await expect(style(row('Chemistry').querySelector('.plus-option-row-selected-mark')).color, `${mode}: the check`).toBe(token('--ds-icon-selected'));
+        const mark = row('Physics').querySelector('.plus-option-row-check');
+        await expect(style(mark).backgroundColor, `${mode}: checked mark`).toBe(token('--ds-background-selected-bold'));
+        await expect(style(mark).borderTopColor, `${mode}: checked mark edge`).toBe(token('--ds-border-selected'));
+        await expect(style(mark.querySelector('i')).color, `${mode}: checked mark's check`).toBe(token('--ds-icon-inverse'));
+        await expect(style(row('Geometry')).backgroundColor, `${mode}: lifted row`).toBe(token('--ds-surface-overlay'));
+        await expect(style(row('History'), '::before').backgroundColor, `${mode}: drop line`).toBe(token('--ds-border-selected'));
+    });
 };

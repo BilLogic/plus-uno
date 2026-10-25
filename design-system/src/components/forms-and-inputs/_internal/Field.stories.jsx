@@ -1,7 +1,6 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import { eachColorMode } from '@/storybook-docs/lib/each-color-mode.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Field from './Field';
 
 /**
@@ -113,20 +112,18 @@ States.play = async ({ canvasElement }) => {
     await expect(Number(style('disabled').opacity)).toBeCloseTo(0.4, 2);
 
     // Each state's colors are its tokens, in every color mode.
-    for (const [name] of STATES) within(canvasElement).getByTestId(name).style.transition = 'none';
-    const token = (name) => tokenColor(canvasElement, name);
     const placeholder = getComputedStyle(within(canvasElement).getByRole('textbox', { name: 'default field' }), '::placeholder');
-    await eachColorMode(async ({ label }) => {
-        await expect(style('default').borderTopColor, `${label}: border`).toBe(token('--ds-border-input'));
-        await expect(style('default').backgroundColor, `${label}: fill`).toBe(token('--ds-background-input'));
-        await expect(style('default').color, `${label}: text`).toBe(token('--ds-text'));
-        await expect(placeholder.color, `${label}: placeholder`).toBe(token('--ds-text-subtlest'));
-        await expect(style('hover').backgroundColor, `${label}: hover fill`).toBe(token('--ds-background-input-hovered'));
-        await expect(style('hover').borderTopColor, `${label}: hover border`).toBe(token('--ds-border-input'));
-        await expect(style('focus').outlineColor, `${label}: ring`).toBe(token('--ds-border-focused'));
-        await expect(style('read-only').backgroundColor, `${label}: read-only fill`).toBe(token('--ds-background-neutral'));
-        await expect(style('invalid').borderTopColor, `${label}: invalid border`).toBe(token('--ds-border-danger'));
-        await expect(style('valid').borderTopColor, `${label}: valid border`).toBe(token('--ds-border-success'));
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(style('default').borderTopColor, `${mode}: border`).toBe(token('--ds-border-input'));
+        await expect(style('default').backgroundColor, `${mode}: fill`).toBe(token('--ds-background-input'));
+        await expect(style('default').color, `${mode}: text`).toBe(token('--ds-text'));
+        await expect(placeholder.color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
+        await expect(style('hover').borderTopColor, `${mode}: hover border`).toBe(token('--ds-border-focused'));
+        await expect(style('hover').backgroundColor, `${mode}: hover fill`).toBe(token('--ds-background-input'));
+        await expect(style('focus').outlineColor, `${mode}: ring`).toBe(token('--ds-border-focused'));
+        await expect(style('read-only').backgroundColor, `${mode}: read-only fill`).toBe(token('--ds-background-neutral'));
+        await expect(style('invalid').borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+        await expect(style('valid').borderTopColor, `${mode}: valid border`).toBe(token('--ds-border-success'));
     });
 };
 
@@ -179,11 +176,9 @@ Subtle.play = async ({ canvasElement }) => {
     await expect(px(getComputedStyle(box('focus')).outlineWidth)).toBe(2);
 
     // Hover is the neutral subtle step; editing is the standard field's fill and border.
-    for (const name of ['rest', 'hover', 'focus']) box(name).style.transition = 'none';
-    const token = (name) => tokenColor(canvasElement, name);
-    await eachColorMode(async ({ label }) => {
-        await expect(getComputedStyle(box('hover')).backgroundColor, `${label}: hover fill`).toBe(token('--ds-background-neutral-subtle-hovered'));
-        await expect(getComputedStyle(box('focus')).backgroundColor, `${label}: editing fill`).toBe(token('--ds-background-input'));
-        await expect(getComputedStyle(box('focus')).borderTopColor, `${label}: editing border`).toBe(token('--ds-border-input'));
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box('hover')).backgroundColor, `${mode}: hover fill`).toBe(token('--ds-background-neutral-subtle-hovered'));
+        await expect(getComputedStyle(box('focus')).backgroundColor, `${mode}: editing fill`).toBe(token('--ds-background-input'));
+        await expect(getComputedStyle(box('focus')).borderTopColor, `${mode}: editing border`).toBe(token('--ds-border-input'));
     });
 };

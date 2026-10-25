@@ -9,7 +9,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 **Source:** `design-system/src/components/forms-and-inputs/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive, Colors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select.mdx`
 

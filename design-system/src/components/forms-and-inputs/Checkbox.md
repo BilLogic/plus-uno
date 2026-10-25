@@ -47,7 +47,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-danger` · `--item-height-sm` · `--layout-control-checkbox` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-danger` · `--item-height-sm` · `--layout-control-checkbox` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override these through the token layer, never with a literal.
 

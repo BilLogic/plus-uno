@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
 
 export default {
@@ -248,4 +251,38 @@ Interactive.args = {
     size: 'medium',
     disabled: false,
     readOnly: false,
+};
+
+/**
+ * The calendar's colors: a picked day is the Lagoon checked fill with
+ * `text.inverse`, the days between a range's ends neutral selection, days of
+ * the next and last month `text.subtle`.
+ */
+export const CalendarColors = () => (
+    <Calendar
+        viewDate={new Date(2020, 2, 1)}
+        onViewDateChange={() => {}}
+        rangeStart="2020-03-09"
+        rangeEnd="2020-03-13"
+        onPick={() => {}}
+    />
+);
+CalendarColors.parameters = { docs: { disable: true } };
+CalendarColors.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const picked = canvas.getByRole('button', { name: /March 9, 2020/ });
+    const between = canvas.getByRole('button', { name: /March 11, 2020/ });
+    const plain = canvas.getByRole('button', { name: /March 20, 2020/ });
+    const outside = canvasElement.querySelector('.plus-calendar-day--outside');
+    const month = canvasElement.querySelector('.plus-calendar-month');
+    await expect(picked).toHaveClass('plus-calendar-day--selected');
+    await expect(between).toHaveClass('plus-calendar-day--in-range');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(picked).backgroundColor, `${mode}: picked day`).toBe(token('--ds-background-selected-bold'));
+        await expect(getComputedStyle(picked).color, `${mode}: picked day text`).toBe(token('--ds-text-inverse'));
+        await expect(getComputedStyle(between).backgroundColor, `${mode}: in-range day`).toBe(token('--ds-background-selected'));
+        await expect(getComputedStyle(plain).color, `${mode}: day text`).toBe(token('--ds-text'));
+        await expect(getComputedStyle(outside).color, `${mode}: outside day`).toBe(token('--ds-text-subtle'));
+        await expect(getComputedStyle(month).color, `${mode}: month`).toBe(token('--ds-text'));
+    });
 };

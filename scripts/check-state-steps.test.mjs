@@ -259,7 +259,7 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
   });
   const checked = declarations(sheet(file), `${input}:hover:not(:disabled):checked`);
   assert.equal(checked['background-color'], layer('--ds-background-selected-bold-hovered'), 'a checked radio does not take the hovered step');
-  assert.equal(checked['background-image'], undefined, 'a checked radio replaces its dot image on hover');
+  assert.equal(checked['background-image'], undefined, 'a checked radio redraws its dot on hover; the checked rule draws it');
 });
 
 test('Switch: hover lays the 08 over the track, on or off', () => {
@@ -306,9 +306,9 @@ test('PatternModal: the close button hovers at 08 and presses at 12', () => {
 
 /* ─── Field ──────────────────────────────────────────────────────────────── */
 
-test('Field: hover the input hovered fill, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
+test('Field: hover turns the border border.focused, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
   const file = 'components/forms-and-inputs/_internal/Field.scss';
-  expectRule(file, '.plus-field--hover', { 'background-color': layer('--ds-background-input-hovered') });
+  expectRule(file, '.plus-field--hover', { 'border-color': layer('--ds-border-focused') });
   expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(file, '.plus-field--focus', DS_RING_OUTSIDE);
   expectNoFill(file, '.plus-field--focus');

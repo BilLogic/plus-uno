@@ -11,6 +11,8 @@
  * toolbar's globals, and the Foundations/Color modes story tests it.
  */
 
+import { tokenColor } from './style-probes.js';
+
 export const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
 
 /**
@@ -68,5 +70,25 @@ export const inEveryColorMode = async (check) => {
         }
     } finally {
         saved.forEach(([name, value]) => (value === null ? root.removeAttribute(name) : root.setAttribute(name, value)));
+    }
+};
+
+/**
+ * `inEveryColorMode` for a story that checks computed colors against tokens.
+ * `check` gets the mode label and `token(name)`, the color `name` resolves to
+ * inside `host` in that mode. Transitions are off for the run, so a value
+ * read right after the mode switches is the new one, not a frame of the fade.
+ *
+ * @param {Element} host  the story's canvas
+ * @param {(mode: string, token: (name: string) => string) => (void | Promise<void>)} check
+ */
+export const inEveryColorModeOf = async (host, check) => {
+    const still = document.createElement('style');
+    still.textContent = '*, *::before, *::after { transition: none !important; }';
+    document.head.appendChild(still);
+    try {
+        await inEveryColorMode((mode) => check(mode, (name) => tokenColor(host, name)));
+    } finally {
+        still.remove();
     }
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import InputGroup from './InputGroup';
 
 export default {
@@ -327,6 +328,30 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     for (const addon of canvasElement.querySelectorAll('.plus-input-group-text')) {
         await expect(getComputedStyle(addon).borderTopStyle).toBe('none');
     }
+
+    // An affix is quieter than the value, and the box is the shared field's colors.
+    const affix = price.querySelector('.plus-field-affix');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(affix).color, `${mode}: affix`).toBe(token('--ds-text-subtle'));
+        await expect(getComputedStyle(price).borderTopColor, `${mode}: border`).toBe(token('--ds-border-input'));
+        await expect(getComputedStyle(price).backgroundColor, `${mode}: fill`).toBe(token('--ds-background-input'));
+    });
+
+    // The focus ring sits 2px off the box; nothing around an input group clips it.
+    const input = canvas.getByRole('textbox', { name: 'Invite by email' });
+    input.focus();
+    const field = input.closest('.plus-field');
+    const ring = parseFloat(getComputedStyle(field).outlineOffset) + parseFloat(getComputedStyle(field).outlineWidth);
+    await expect(ring, 'the ring reaches 4px past the box').toBe(4);
+    const r = field.getBoundingClientRect();
+    for (let el = field.parentElement; el && el !== canvasElement.parentElement; el = el.parentElement) {
+        const { overflowX, overflowY } = getComputedStyle(el);
+        if (overflowX === 'visible' && overflowY === 'visible') continue;
+        const c = el.getBoundingClientRect();
+        await expect(r.left - ring >= c.left && r.right + ring <= c.right && r.top - ring >= c.top && r.bottom + ring <= c.bottom,
+            `${el.className || el.tagName} clips the focus ring`).toBe(true);
+    }
+    input.blur();
 
     // Two buttons in Trailing, small and 24 high, and the field stays 32.
     const invite = box('Invite by email');
