@@ -140,7 +140,10 @@ export const COLOR_TOKEN_DIR = `${TOKEN_DIR}/color`;
  * makes it a consumer of the tokens, and reading it as a definition would mint
  * a `--bs-` family nobody styles with.
  */
-export const COLOR_TOKEN_FILES = ['_palette.scss', '_semantic.scss', '_elevation.scss'];
+export const COLOR_PALETTE_FILE = '_palette.scss';
+export const COLOR_SEMANTIC_FILE = '_semantic.scss';
+export const COLOR_ELEVATION_FILE = '_elevation.scss';
+export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_ELEVATION_FILE];
 
 /** The same files, repo-relative, for a check that reads them by path. */
 export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
@@ -165,7 +168,7 @@ export const COLOR_VALUE_PREFIXES = [...COLOR_PREFIXES, '--palette-'];
  * it. `_primitives.scss` says DO NOT USE DIRECTLY in its banner, and the
  * palette is the color equivalent.
  */
-const PRIMITIVE_FILES = new Set(['_primitives.scss', 'color/_palette.scss']);
+const PRIMITIVE_FILES = new Set(['_primitives.scss', `color/${COLOR_PALETTE_FILE}`]);
 
 /**
  * The token stylesheets, sorted by name and read whole.

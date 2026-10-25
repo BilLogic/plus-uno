@@ -139,6 +139,13 @@ plan file in `scripts/lib/color/plans/` and the vendored Atlassian reference in
 another step changes `scripts/lib/color/semantics.mjs`, which every plan shares.
 The generator refuses to write while `check:color-system` fails.
 
+The harness checks that read color (`check:focus-ring`, `check:button-contrast`,
+`check:color-fallbacks`, `check:intent-roles`) accept `--ds-*` beside
+`--color-*`. The two that measure contrast, `check:focus-ring` and
+`check:button-contrast`, measure the LIGHT value only: a token's first
+definition is its light block. Dark and increased-contrast pairs are
+`check:color-system`'s, which holds every plan to them in all four modes.
+
 ## Generated skill surfaces
 
 `skills/<name>/SKILL.md` is canonical, and `skills/` is a discovery path for

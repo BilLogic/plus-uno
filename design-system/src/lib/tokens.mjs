@@ -93,6 +93,16 @@ export function tokenDeclarationPattern(prefix = '--') {
 }
 
 /**
+ * A bare token NAME and nothing else — `--ds-text`, as an annotation lists it —
+ * optionally narrowed to a prefix or a list of them. Anchored at both ends.
+ *
+ * @param {string|string[]} [prefix]
+ */
+export function tokenNamePattern(prefix = '--') {
+  return new RegExp(`^${literal(prefix)}${TOKEN_NAME_TAIL}$`);
+}
+
+/**
  * Every `var(--name` reference, optionally narrowed to a prefix. Group 1 is the
  * token name. It deliberately does not try to match the closing paren: a
  * fallback can itself contain `var()`, and the name is all this needs.

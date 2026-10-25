@@ -2,7 +2,7 @@
   "version": "1.1.0",
   "generated": true,
   "generatedBy": "scripts/generate-token-registry.mjs",
-  "note": "DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (bulk, derived mechanically) and design-system/src/tokens/color/figma-spec.json (the generated --ds- color variables, read by their code syntax). Every token in all three is validated against design-system/src/tokens/*.scss and design-system/src/tokens/color/*.scss. Run `npm run generate:token-registry`.",
+  "note": "DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (bulk, derived mechanically) and design-system/src/tokens/color/figma-spec.json (the generated --ds- color variables, read by their code syntax; the \"color / foundations\" paths come from this spec until the Figma push lands and the snapshot holds them). Every token in all three is validated against design-system/src/tokens/*.scss and design-system/src/tokens/color/*.scss. Run `npm run generate:token-registry`.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "syncCommand": "npm run sync:tokens && npm run generate:tokens",
   "codeTokenRoot": "design-system/src/tokens/",

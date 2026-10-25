@@ -81,11 +81,16 @@ export const EDGE = new RegExp(
  * fill on an edge is a different (pale) color, not a role skipped, and its
  * `-hovered` / `-pressed` steps are states of the fill. `neutral` has no
  * `--ds-border-neutral` role to name, so it is not one of these.
+ *
+ * ONE VOCABULARY. The PLUS intent a theme-map row is keyed by maps to the role
+ * it became under ADR-035: primary is `brand` (Lagoon), info is `information`
+ * (it moved to blue so it stops reading as brand), and danger, success and
+ * warning keep their names. Secondary and tertiary have no role there.
+ * `DS_ROLES` is derived from that map plus the two roles no PLUS intent
+ * became, so the two lists cannot drift apart.
  */
-export const DS_ROLES = ['brand', 'danger', 'success', 'warning', 'information', 'discovery', 'selected'];
-
-/** The PLUS intent a theme-map row is keyed by, to the `--ds-` role it became. */
-export const DS_ROLE_OF = { primary: 'brand', danger: 'danger', success: 'success', warning: 'warning', info: 'information' };
+const DS_ROLE_OF = { primary: 'brand', danger: 'danger', success: 'success', warning: 'warning', info: 'information' };
+const DS_ROLES = [...Object.values(DS_ROLE_OF), 'discovery', 'selected'];
 
 const BASE = new RegExp(
   `var\\(\\s*(--color-(?:${INTENTS.join('|')})|--ds-background-(?:${DS_ROLES.join('|')})-bold)\\s*[,)]`,
@@ -93,7 +98,7 @@ const BASE = new RegExp(
 );
 
 /** The edge role a base stands in for: `--color-danger-border`, `--ds-border-danger`. */
-export function roleOf(token) {
+function roleOf(token) {
   const ds = /^--ds-background-([a-z]+)-bold$/.exec(token);
   return ds ? `--ds-border-${ds[1]}` : `${token}-border`;
 }
@@ -228,15 +233,16 @@ export function themeMapUses(files, root = REPO_ROOT) {
       rows.push({ intent: match[1], slots, line: source.slice(0, match.index).split('\n').length });
     }
     // Either vocabulary names the edge: `--color-danger-border` or `--ds-border-danger`.
-    const ds = (intent) => DS_ROLE_OF[intent];
     const edgeSlots = new Set();
     for (const { intent, slots } of rows) {
+      const role = DS_ROLE_OF[intent];
       slots.forEach((slot, i) => {
-        if (slot === `--color-${intent}-border` || (ds(intent) && slot === `--ds-border-${ds(intent)}`)) edgeSlots.add(i);
+        if (slot === `--color-${intent}-border` || (role && slot === `--ds-border-${role}`)) edgeSlots.add(i);
       });
     }
     for (const { intent, slots, line } of rows) {
-      const bases = [`--color-${intent}`, ...(ds(intent) ? [`--ds-background-${ds(intent)}-bold`] : [])];
+      const role = DS_ROLE_OF[intent];
+      const bases = [`--color-${intent}`, ...(role ? [`--ds-background-${role}-bold`] : [])];
       for (const i of edgeSlots) {
         if (bases.includes(slots[i])) {
           uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: roleOf(slots[i]) });

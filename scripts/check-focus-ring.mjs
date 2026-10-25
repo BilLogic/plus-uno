@@ -49,8 +49,17 @@ import { openRatchet } from './lib/ratchet.mjs';
 const RECORD = 'scripts/baselines/focus-ring.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
-/** The `--ds-*` focus role, generated into the color directory (ADR-035). */
-export const DS_FOCUS_RING = '--ds-border-focused';
+/**
+ * The focus roles a ring resolves through, and how each is known to be
+ * defined. The legacy role is asserted always — 29 call sites resolve through
+ * it — and from its own roles file. The `--ds-*` role (ADR-035) is asserted
+ * once a rule names it, because the generated color set is wired in separately
+ * from this check and a tree no rule has moved onto it yet is not broken.
+ */
+const FOCUS_ROLES = [
+  { token: '--color-focus-ring', file: ROLES_FILE, always: true, defined: ({ roles }) => roles.includes('--color-focus-ring:') },
+  { token: '--ds-border-focused', file: `${COLOR_TOKEN_DIR}/`, always: false, defined: ({ values }) => values.has('--ds-border-focused') },
+];
 
 /*
  * Floors. A resolver that stopped finding stylesheets, or a selector scan that
@@ -107,29 +116,20 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   }
 
   /*
-   * The role must exist. 29 call sites resolve through it, and a `var()` naming a
-   * token nobody defines paints NOTHING — `border-color` falls back to
-   * currentColor, `box-shadow` to no shadow at all. That failure is invisible to
-   * a check that measures token VALUES, so it is asserted directly.
+   * The roles must exist. A `var()` naming a token nobody defines paints
+   * NOTHING — `border-color` falls back to currentColor, `box-shadow` to no
+   * shadow at all. That failure is invisible to a check that measures token
+   * VALUES, so it is asserted directly, once per role in `FOCUS_ROLES`.
    */
-  if (!/--color-focus-ring:/.test(roles)) {
-    found.push({
-      message: `${ROLES_FILE} no longer defines --color-focus-ring, which every fixed focus rule resolves through.`,
-    });
-  }
-
-  /*
-   * The same for the `--ds-*` role, once a rule names it. It is asserted on use
-   * rather than always, because the generated color set is wired in separately
-   * from this check, and a tree no rule has moved onto it yet is not broken.
-   */
-  const dsUses = raw.filter((rule) => rule.tokens.includes(DS_FOCUS_RING));
-  if (dsUses.length && !values.has(DS_FOCUS_RING)) {
-    found.push({
-      message:
-        `${COLOR_TOKEN_DIR}/ no longer defines ${DS_FOCUS_RING}, which ${dsUses.length} focus rule(s) resolve ` +
-        `through (first: ${dsUses[0].file}:${dsUses[0].line}).`,
-    });
+  for (const role of FOCUS_ROLES) {
+    const uses = raw.filter((rule) => rule.tokens.includes(role.token));
+    if ((role.always || uses.length) && !role.defined({ roles, values })) {
+      found.push({
+        message:
+          `${role.file} no longer defines ${role.token}, which ${uses.length} focus rule(s) resolve through` +
+          (uses.length ? ` (first: ${uses[0].file}:${uses[0].line}).` : '.'),
+      });
+    }
   }
 
   /*

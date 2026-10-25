@@ -312,9 +312,9 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-ds-fallbacks.mjs',
-    floors: { MIN_FILES: 1500 },
+    floors: { MIN_FILES: 1300 },
     guards:
-      "no `--ds-*` color token written with a fallback — `var(--ds-text, #172b4d)`, `var(--ds-surface, white)` or `var(--ds-border, var(--color-outline-variant))` alike. The legacy `--color-*` set carries its fallbacks as recorded debt, which check:color-fallbacks can only stop growing; the Atlassian-shaped set (ADR-035) starts with none, so the count starts at zero and every fallback fails. A `--ds-*` token has a value in each of four modes, and a fallback is a fifth, unmoded color that paints only when the token sheet has already failed. Searches what check:color-fallbacks searches, skipping the generated color files that define the tokens.",
+      "no `--ds-*` color token written with a fallback — `var(--ds-text, #172b4d)`, `var(--ds-surface, white)` or `var(--ds-border, var(--color-outline-variant))` alike. The legacy `--color-*` set carries its fallbacks as recorded debt, which check:color-fallbacks can only stop growing; the Atlassian-shaped set (ADR-035) starts with none, so the count starts at zero and every fallback fails. A `--ds-*` token has a value in each of four modes, and a fallback is a fifth, unmoded color that paints only when the token sheet has already failed. Searches what check:color-fallbacks searches, through the same lister and the same capture read over whole files (so a use written across lines counts), skipping the generated color files that define the tokens.",
   },
   {
     name: 'check:size-fallbacks',

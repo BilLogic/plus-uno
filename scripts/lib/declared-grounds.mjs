@@ -79,7 +79,7 @@ import postcssScss from 'postcss-scss';
 import selectorParser from 'postcss-selector-parser';
 
 import { COLOR_PREFIXES } from '../../design-system/src/lib/tokens-node.mjs';
-import { TOKEN_NAME_TAIL, parseColor, resolveToken, varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
+import { parseColor, resolveToken, tokenNamePattern, varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { REPO_ROOT } from './corpus.mjs';
 
 /**
@@ -95,7 +95,7 @@ const BACKGROUND = /^background(-color)?$/;
 /** A `var()` naming a color token of either vocabulary, `--color-*` or `--ds-*`. */
 const COLOR_TOKEN = new RegExp(varReferencePattern(COLOR_PREFIXES).source);
 /** A bare color token name, as a `@grounds` list writes it. */
-const COLOR_NAME = new RegExp(`^(?:${COLOR_PREFIXES.join('|')})${TOKEN_NAME_TAIL}$`);
+const COLOR_NAME = tokenNamePattern(COLOR_PREFIXES);
 
 /** The partial that defines an icon glyph, and the mixin in it. */
 export const GLYPH_PARTIAL = 'design-system/src/styles/_icon-glyph.scss';

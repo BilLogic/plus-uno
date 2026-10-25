@@ -37,6 +37,13 @@ test('a color function, a keyword and a nested var() are all fallbacks', () => {
   assert.deepEqual(found.map((f) => f.token), ['--ds-surface', '--ds-text-subtle', '--ds-border']);
 });
 
+test('a fallback written across lines is found, on the line its var( opens', () => {
+  const found = dsFallbacks(
+    file('.a {\n  color: var(--ds-text);\n  border-color: var(\n    --ds-border,\n    #000\n  );\n}\n'),
+  );
+  assert.deepEqual(found, [{ file: 'a.scss', line: 3, token: '--ds-border' }]);
+});
+
 test('a bare --ds- token, and a --color- token with a fallback, are not findings here', () => {
   // The legacy set's fallbacks are `check:color-fallbacks`' record, not this rule.
   const found = dsFallbacks(

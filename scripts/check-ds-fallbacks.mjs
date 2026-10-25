@@ -17,63 +17,53 @@
  * WHAT COUNTS. Any `var(--ds-…, …)`: a literal (`#fff`, `rgba(…)`, `white`) and
  * a nested `var()` alike. A `var(--ds-x, var(--color-y))` reads as a bridge to
  * the legacy name, and it is the same unmoded fallback one hop later, so it is
- * not an exception either.
+ * not an exception either. A use written across lines counts: the capture is
+ * `fallbackUsages` from `scripts/token-fallbacks.mjs`, the one the fallback
+ * checks share, read over the whole file. Its one blind spot is theirs too — a
+ * fallback nested more than one `var()` deep is not matched.
  *
- * WHERE. What `check:color-fallbacks` searches: `design-system/src`,
- * `.storybook` and `prototypes`, listed through `git ls-files` because agent
- * worktrees live under `.claude/worktrees/`. The generated color files are
- * skipped: they define the tokens, and a definition is not a use.
+ * WHERE. What the fallback checks search, through the same lister
+ * (`searchedSources` in `scripts/lib/fallback-check.mjs`). The generated color
+ * files are skipped: they define the tokens, and a definition is not a use.
  *
  * Run: npm run check:ds-fallbacks
  */
 
-import { execFileSync } from 'node:child_process';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { COLOR_TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
-import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { searchedSources } from './lib/fallback-check.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { fallbackUsages } from './token-fallbacks.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
-const SEARCHED = /\.(scss|css|jsx|tsx|js|mdx|html)$/;
 
 /**
- * The floor, measured 2026-10-25 at 1651 files. A listing that stopped finding
+ * The floor, measured 2026-10-25 at 1421 files. A listing that stopped finding
  * the tree finds no fallback either, which is the one green this must not give.
  */
-export const MIN_FILES = 1500;
+export const MIN_FILES = 1300;
 
 export const REMEDY =
   '  -> Write the token bare: `var(--ds-border-focused)`, not\n' +
   '     `var(--ds-border-focused, #147b84)`. The token has a value in every mode;\n' +
   '     a fallback is one more color that none of them chose.';
 
-/** `var(--ds-name` then, after optional space, a comma: a fallback follows. */
-const WITH_FALLBACK = new RegExp(`${varReferencePattern('--ds-').source}\\s*,`, 'g');
-
 /**
- * Every `var(--ds-*, …)` in the given files, as `{ file, line, token }`.
+ * Every `var(--ds-*, …)` in the given files, as `{ file, line, token }`, on the
+ * line its `var(` opens.
  *
  * @param {{path: string, text: string}[]} files
  */
 export function dsFallbacks(files) {
-  const found = [];
-  for (const { path: file, text } of files) {
-    text.split('\n').forEach((line, i) => {
-      for (const match of line.matchAll(WITH_FALLBACK)) found.push({ file, line: i + 1, token: match[1] });
-    });
-  }
-  return found;
+  return fallbackUsages(files, { prefix: '--ds-', multiline: true })
+    .filter((use) => use.literal !== null)
+    .map(({ path: file, line, token }) => ({ file, line, token }));
 }
 
 const inputs = byRoot((repoRoot) =>
-  execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], { encoding: 'utf8', maxBuffer: 1 << 28 })
-    .split('\0')
-    .filter((rel) => rel && SEARCHED.test(rel) && !rel.startsWith(`${COLOR_TOKEN_DIR}/`))
-    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') })),
+  searchedSources(repoRoot).filter((source) => !source.path.startsWith(`${COLOR_TOKEN_DIR}/`)),
 );
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
@@ -91,7 +81,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 /** The green line, which carries how many `--ds-*` uses were read. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const files = inputs(repoRoot);
-  const uses = files.reduce((n, { text }) => n + [...text.matchAll(varReferencePattern('--ds-'))].length, 0);
+  const uses = fallbackUsages(files, { prefix: '--ds-', multiline: true }).length;
   return `${files.length} files, ${uses} --ds-* use(s); none written with a fallback`;
 }
 

@@ -357,7 +357,7 @@ function build() {
     generatedBy: 'scripts/generate-token-registry.mjs',
     note:
       'DO NOT EDIT BY HAND. Three inputs: design-system/guidelines/figma/token-mapping.md (curated semantics, authoritative), scripts/figma-variables-snapshot.json (bulk, derived mechanically) and ' +
-      `${COLOR_SPEC_PATH} (the generated --ds- color variables, read by their code syntax). ` +
+      `${COLOR_SPEC_PATH} (the generated --ds- color variables, read by their code syntax; the "color / foundations" paths come from this spec until the Figma push lands and the snapshot holds them). ` +
       `Every token in all three is validated against ${TOKEN_DIR}/*.scss and ${COLOR_TOKEN_DIR}/*.scss. Run \`npm run generate:token-registry\`.`,
     ...STATIC,
     variablesSnapshot: 'scripts/figma-variables-snapshot.json',

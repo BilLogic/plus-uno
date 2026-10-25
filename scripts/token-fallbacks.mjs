@@ -148,14 +148,22 @@ const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
  * captures the fallback literal is this check's, because the module
  * deliberately stops at the name.
  *
+ * LINE BY LINE BY DEFAULT, and `multiline` reads the whole file instead, so
+ * `var(--x,\n  #000)` is one use reported on the line its `var(` opens. The
+ * default is what the two ratcheted families were measured and recorded with;
+ * a whole-file read would surface the multi-line fallbacks neither record has
+ * seen, which is a re-measurement of its own and not this option's to do.
+ *
  * @param {{path: string, text: string}[]} files
- * @param {{prefix?: string|string[]}} [options] one prefix or a list of them
+ * @param {{prefix?: string|string[], multiline?: boolean}} [options] one prefix
+ *        or a list of them; and whether a use may span lines
  */
-export function fallbackUsages(files, { prefix = '--color-' } = {}) {
+export function fallbackUsages(files, { prefix = '--color-', multiline = false } = {}) {
   const uses = [];
   const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*${FALLBACK})?\\s*\\)`, 'g');
-  const scan = (path, line, text) => {
+  const scan = (path, first, text) => {
     for (const m of text.matchAll(call)) {
+      const line = first + (text.slice(0, m.index).match(/\n/g)?.length ?? 0);
       const literal = m.groups.literal ? m.groups.literal.trim() : null;
       uses.push({ path, line, token: m[1], literal });
       // A match consumes its nested `var()`, so read that one as well.
@@ -163,7 +171,8 @@ export function fallbackUsages(files, { prefix = '--color-' } = {}) {
     }
   };
   for (const { path, text } of files) {
-    text.split('\n').forEach((line, i) => scan(path, i + 1, line));
+    if (multiline) scan(path, 1, text);
+    else text.split('\n').forEach((line, i) => scan(path, i + 1, line));
   }
   return uses;
 }
