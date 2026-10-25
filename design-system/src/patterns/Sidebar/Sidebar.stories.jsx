@@ -538,7 +538,8 @@ export const Thread = {
                     await expect(box.top + px(line.top) + px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.top + box.height / 2, 0);
                     await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
                     await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-sm'), 0);
-                    await expect(box.left + px(line.left) + px(line.width), 'the stub ends 2 before the surface').toBeCloseTo(box.left + column - 2, 0);
+                    await expect(box.left + px(line.left) + px(line.width), 'the stub stops one focus-ring stroke short of the surface')
+                        .toBeCloseTo(box.left + column - tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
                 } else {
                     await expect(box.top + px(line.top) + px(line.height), 'runs through the gap to the next row').toBeCloseTo(rows[index + 1].getBoundingClientRect().top, 0);
                     await expect(px(line.borderBottomWidth), 'no elbow mid-thread').toBe(0);

@@ -5,7 +5,7 @@ import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 
 /** The last row under a parent, "Show N more" when it shows: its thread ends in the elbow. */
-const THREAD_END = 'plus-pattern-sidebar__thread-end';
+export const THREAD_END = 'plus-pattern-sidebar__thread-end';
 
 /**
  * Sidebar pattern: the foundation side navigation. Mirrors the Figma

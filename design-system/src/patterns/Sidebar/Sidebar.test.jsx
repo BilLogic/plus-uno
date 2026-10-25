@@ -4,18 +4,8 @@
  * class; the stories check it in the browser.
  */
 import { render, fireEvent, within } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-
-// The pattern loads the components barrel, and with it the chart library,
-// which asks `CSS.supports` on load; jsdom has no such function.
-vi.hoisted(() => {
-    globalThis.CSS = globalThis.CSS || {};
-    if (typeof globalThis.CSS.supports !== 'function') globalThis.CSS.supports = () => false;
-});
-
-import PatternSidebar from './Sidebar';
-
-const THREAD_END = 'plus-pattern-sidebar__thread-end';
+import { describe, it, expect } from 'vitest';
+import PatternSidebar, { THREAD_END } from './Sidebar';
 
 const sessions = (count) =>
     Array.from({ length: count }, (_, i) => ({ id: `sessions:s${count - i}`, title: `Session ${count - i}` }));

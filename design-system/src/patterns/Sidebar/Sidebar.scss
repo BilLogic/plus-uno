@@ -173,22 +173,13 @@
         padding-right: var(--element-pad-x-sm);
     }
 
-    // Pressed is state 12, as everywhere a row can be pressed.
-    .plus-sidebar-tab:active:not(.plus-sidebar-tab--disabled):not([aria-current]) {
-        background-color: var(--color-on-surface-state-12);
-    }
-
-    // Selected and hovered is one step above selected: the hover layer over the
-    // selected fill, since no token sits above Primary 16.
-    .plus-sidebar-tab-item:hover > .plus-sidebar-tab[aria-current] {
-        background-image: linear-gradient(var(--color-on-surface-state-08), var(--color-on-surface-state-08));
-    }
-
     // The last row, "Show N more" when it shows: the line stops at the row's
-    // middle and curves (radius 6) into a stub ending at 26, 2 before the surface.
+    // middle and curves (radius 6) into a stub toward the surface. The line sits
+    // half an icon (8) before the surface; the stub stops one focus-ring stroke
+    // (2) short of it, so it never runs into a focused row's ring: 8 - 2 = 6.
     > .plus-pattern-sidebar__thread-end::before {
         bottom: 50%;
-        width: var(--element-radius-item-sm);
+        width: calc(var(--icon-md) / 2 - var(--size-element-stroke-lg));
         border-bottom: var(--size-element-stroke-sm) solid var(--color-outline-variant);
         border-bottom-left-radius: var(--element-radius-item-sm);
     }
