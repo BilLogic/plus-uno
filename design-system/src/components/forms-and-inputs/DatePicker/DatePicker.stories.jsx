@@ -90,7 +90,7 @@ Overview.parameters = {
 
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Small, medium, and large trigger and calendar.
         </p>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
@@ -112,7 +112,7 @@ export const Sizes = () => (
 
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -142,7 +142,7 @@ export const PickDate = () => {
     return (
         <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Single Date</h6>
-            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
                 Click on the input to open the calendar and select a date.
             </p>
             <DatePicker value={date} onChange={setDate} placeholder="Select a date" />
@@ -151,7 +151,7 @@ export const PickDate = () => {
                     style={{
                         marginTop: '16px',
                         padding: '12px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '4px',
                     }}
                 >
@@ -179,7 +179,7 @@ export const PickRange = () => {
     return (
         <div style={{ paddingBottom: '300px', maxWidth: '320px' }}>
             <h6 style={{ marginBottom: '16px' }}>Select a Date Range</h6>
-            <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', marginBottom: '16px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
@@ -188,7 +188,7 @@ export const PickRange = () => {
                     style={{
                         marginTop: '16px',
                         padding: '12px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '4px',
                     }}
                 >

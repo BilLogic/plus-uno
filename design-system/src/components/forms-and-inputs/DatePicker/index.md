@@ -46,7 +46,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant`
+`--ds-icon-subtle` · `--ds-text-subtlest`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

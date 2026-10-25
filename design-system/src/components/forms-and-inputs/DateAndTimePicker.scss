@@ -13,11 +13,11 @@
 
 .plus-datetime-label {
     margin-bottom: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-default);
 
     .plus-datetime-required {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
         margin-left: var(--size-element-gap-xs);
     }
 }
@@ -55,7 +55,7 @@
 }
 
 .plus-datetime-section-label {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-default);
     font-weight: var(--type-weight-medium);
     margin-bottom: var(--size-element-gap-xs);
@@ -69,7 +69,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     cursor: pointer;
 }
 
@@ -100,17 +100,17 @@
     border: 0;
     border-radius: var(--size-element-radius-sm);
     background: transparent;
-    color: var(--color-primary-text);
+    color: var(--ds-text-brand);
     font: inherit;
     font-weight: var(--type-weight-semibold);
     cursor: pointer;
 
     .fa-caret-down {
-        color: var(--color-primary);
+        color: var(--ds-icon-brand);
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: var(--size-element-border);
     }
 
@@ -120,18 +120,18 @@
     }
 
     .plus-field--invalid & {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
 
         .fa-caret-down {
-            color: var(--color-danger);
+            color: var(--ds-icon-danger);
         }
     }
 
     .plus-field--valid & {
-        color: var(--color-success-text);
+        color: var(--ds-text-success);
 
         .fa-caret-down {
-            color: var(--color-success);
+            color: var(--ds-icon-success);
         }
     }
 }
@@ -142,12 +142,12 @@
 
 .plus-datetime-wrapper:has(.plus-datetime-date-input:disabled) .plus-datetime-label,
 .plus-datetime-wrapper:has(.plus-datetime-time-input:disabled) .plus-datetime-label {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 /* Time zone caption — Figma `_Form Caption` under the time: the viewer's zone,
    and the other person's time when theirs differs. */
 .plus-datetime-time-zone {
     font: var(--body-small);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }

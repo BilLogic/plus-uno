@@ -112,7 +112,7 @@ export const Content = () => {
         <div style={docsCol}>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE INPUT GROUP</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Text addon on the left with an icon addon on the right.
                 </p>
                 <InputGroup

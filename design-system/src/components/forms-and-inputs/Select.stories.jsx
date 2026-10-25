@@ -246,7 +246,7 @@ export const Interactive = {
 
         return (
             <div style={{ maxWidth: '400px' }}>
-                <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body3-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.mode === 'multi'
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')

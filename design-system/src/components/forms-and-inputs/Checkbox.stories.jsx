@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { eachColorMode } from '@/storybook-docs/lib/each-color-mode.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Checkbox from './Checkbox';
 
@@ -11,6 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, and the focus ring in `border.focused`.' },
             { date: '2026-10-24', kind: 'changed', summary: 'A checked box keeps its fill and check on hover, under the shadow 08 layer. Keyboard focus is the 2px focus ring 2px off the box; a pointer focus draws none.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled checkbox is a 24 row at every size, its label 14/20.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
@@ -81,9 +83,9 @@ export default {
 const pageWrap = { maxWidth: '600px' };
 const contentVariantCard = {
     padding: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
     borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
+    background: 'var(--ds-surface-container)',
 };
 
 function CheckboxContentDemos() {
@@ -91,7 +93,7 @@ function CheckboxContentDemos() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Longer descriptive copy used in forms and filters.
                 </p>
                 <div style={contentVariantCard}>
@@ -100,7 +102,7 @@ function CheckboxContentDemos() {
             </section>
             <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Required indicator</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Adds a required marker next to the label.
                 </p>
                 <div style={contentVariantCard}>
@@ -277,23 +279,43 @@ KeyboardFocus.play = async ({ canvasElement }) => {
     await waitFor(() => expect(style.outlineStyle).toBe('solid'));
     await expect(px(style.outlineWidth), 'ring width').toBe(2);
     await expect(px(style.outlineOffset), 'ring gap').toBe(2);
-    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+    await eachColorMode(async ({ label }) => {
+        await expect(style.outlineColor, `${label}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+    });
 };
 
-/** Hover on a checked box keeps its fill and check, under the shadow 08 layer. */
-export const HoverStep = () => <Checkbox id="checkbox-hover" label="Checked" defaultChecked />;
+/**
+ * Hover on a checked box keeps its check and steps its Lagoon fill to the
+ * opaque hovered step; an unchecked box takes the input's hovered fill.
+ */
+export const HoverStep = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Checkbox id="checkbox-hover" label="Checked" defaultChecked />
+        <Checkbox id="checkbox-hover-off" label="Unchecked" />
+    </div>
+);
 HoverStep.parameters = { docs: { disable: true } };
 HoverStep.play = async ({ canvasElement }) => {
-    const box = within(canvasElement).getByRole('checkbox', { name: 'Checked' });
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('checkbox', { name: 'Checked' });
+    const off = canvas.getByRole('checkbox', { name: 'Unchecked' });
     box.style.transition = 'none';
+    off.style.transition = 'none';
     const check = () => getComputedStyle(box, '::before');
     const resting = { transform: check().transform };
-    const hovered = withForcedPseudo(box, ':hover', () => {
-        const { backgroundColor, boxShadow } = getComputedStyle(box);
-        return { backgroundColor, boxShadow, transform: check().transform, color: check().backgroundColor };
+    const token = (name) => tokenColor(canvasElement, name);
+    await eachColorMode(async ({ label }) => {
+        await expect(getComputedStyle(box).backgroundColor, `${label}: checked fill`).toBe(token('--ds-background-selected-bold'));
+        await expect(getComputedStyle(off).backgroundColor, `${label}: unchecked fill`).toBe(token('--ds-background-input'));
+        await expect(getComputedStyle(off).borderTopColor, `${label}: unchecked border`).toBe(token('--ds-border-input'));
+        const hovered = withForcedPseudo(box, ':hover', () => {
+            const { backgroundColor } = getComputedStyle(box);
+            return { backgroundColor, transform: check().transform, color: check().backgroundColor };
+        });
+        await expect(hovered.backgroundColor, `${label}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(hovered.transform, 'the check stays drawn at its resting size').toBe(resting.transform);
+        await expect(hovered.color, `${label}: the check keeps its inverse color`).toBe(token('--ds-icon-inverse'));
+        const offHovered = withForcedPseudo(off, ':hover', () => getComputedStyle(off).backgroundColor);
+        await expect(offHovered, `${label}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
     });
-    await expect(hovered.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
-    await expect(hovered.boxShadow, 'the shadow 08 layer').toContain(tokenColor(canvasElement, '--color-shadow-state-08'));
-    await expect(hovered.transform, 'the check stays drawn at its resting size').toBe(resting.transform);
-    await expect(hovered.color, 'the check keeps its on-primary color').toBe(tokenColor(canvasElement, '--color-on-primary'));
 };

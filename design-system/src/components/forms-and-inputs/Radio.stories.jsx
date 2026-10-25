@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { eachColorMode } from '@/storybook-docs/lib/each-color-mode.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Radio from './Radio';
 
@@ -11,6 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, and the focus ring in `border.focused`.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Keyboard focus is the 2px focus-ring role 2px off the radio, replacing the inverse-primary halo. A checked radio keeps its fill and dot on hover.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled radio is a 24 row at every size, its label 14/20.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
@@ -113,7 +115,7 @@ export const Content = () => {
 
     return (
         <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Option labels and a selected value in a named group.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -151,7 +153,7 @@ export const Layout = () => {
 
     return (
         <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Vertical stack is the default layout for a radio group.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -338,11 +340,13 @@ KeyboardFocus.play = async ({ canvasElement }) => {
     await waitFor(() => expect(style.outlineStyle).toBe('solid'));
     await expect(px(style.outlineWidth), 'ring width').toBe(2);
     await expect(px(style.outlineOffset), 'ring gap').toBe(2);
-    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
-    await expect(style.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
+    await eachColorMode(async ({ label }) => {
+        await expect(style.outlineColor, `${label}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(style.backgroundColor, `${label}: the checked fill stays`).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    });
 };
 
-/** Hover lays the 08 layer: over the page when unchecked, over the fill when checked. */
+/** Hover steps the fill: the input's hovered fill when unchecked, the opaque hovered Lagoon step when checked. */
 export const HoverStep = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
         <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked />
@@ -360,8 +364,14 @@ HoverStep.play = async ({ canvasElement }) => {
             return { backgroundColor, backgroundImage };
         });
     };
-    const checked = hovered('Checked');
-    await expect(checked.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
-    await expect(checked.backgroundImage).toContain(tokenColor(canvasElement, '--color-shadow-state-08'));
-    await expect(hovered('Unchecked').backgroundColor).toBe(tokenColor(canvasElement, '--color-primary-state-08'));
+    const token = (name) => tokenColor(canvasElement, name);
+    await eachColorMode(async ({ label }) => {
+        const unchecked = canvas.getByRole('radio', { name: 'Unchecked' });
+        await expect(getComputedStyle(unchecked).backgroundColor, `${label}: unchecked fill`).toBe(token('--ds-background-input'));
+        await expect(getComputedStyle(unchecked).borderTopColor, `${label}: unchecked border`).toBe(token('--ds-border-input'));
+        const checked = hovered('Checked');
+        await expect(checked.backgroundColor, `${label}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(checked.backgroundImage, `${label}: the dot stays`).toContain('url(');
+        await expect(hovered('Unchecked').backgroundColor, `${label}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
+    });
 };

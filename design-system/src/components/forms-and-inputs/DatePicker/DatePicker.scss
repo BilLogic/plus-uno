@@ -19,7 +19,7 @@
     color: inherit;
 
     &::placeholder {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtlest);
         opacity: 1;
     }
 }
@@ -28,7 +28,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     cursor: pointer;
 }
 

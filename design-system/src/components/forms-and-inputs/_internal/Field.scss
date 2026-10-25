@@ -3,12 +3,14 @@
 /**
  * _Field — one look for every text-like field.
  *
- * One 1px border (`--size-element-border`) in outline-variant on one fill
- * (`--color-surface`). Hover turns the border inverse-primary. Focus draws a
- * 2px ring (`--size-element-stroke-lg`) inside the box in the focus-ring
- * color; hover and focus are both blue, so the width is what tells them
- * apart. Figma draws its stroke inside the box, so the border is taken out of
- * the padding here.
+ * One 1px border (`--size-element-border`) in `border.input` on one fill,
+ * `background.input`. Hover steps the fill to `background.input.hovered`.
+ * Focus draws the focus ring, 2px (`--size-element-stroke-lg`) and 2px off
+ * the box onto the surface, in `border.focused`: the ring is never drawn
+ * inset. Invalid is `border.danger` with `text.danger` in the caption,
+ * placeholder `text.subtlest`, helper text `text.subtle`, read-only
+ * `background.neutral`. Figma draws its stroke inside the box, so the border
+ * is taken out of the padding here.
  *
  * A single-line field is one height, 32 (`--item-height-md`, the height a
  * button shares), with its content centered and side padding 12. A button in
@@ -31,7 +33,7 @@
 // The box fades itself; the stack fades only what sits around it, so a
 // disabled field fades once.
 .plus-field-stack--disabled > :not(.plus-field) {
-    opacity: var(--color-disabled-opacity);
+    opacity: var(--ds-opacity-disabled);
 }
 
 .plus-field-label-row {
@@ -42,12 +44,12 @@
 
 .plus-field-label {
     margin-bottom: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-small);
 }
 
 .plus-field-required {
-    color: var(--color-danger-text);
+    color: var(--ds-text-danger);
     margin-left: var(--size-element-gap-xs);
 }
 
@@ -70,12 +72,12 @@
     padding: 0;
     border: 0;
     background: none;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     font: var(--body-small);
     cursor: help;
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: var(--size-element-border);
         border-radius: var(--size-element-radius-sm);
     }
@@ -88,10 +90,10 @@
     gap: var(--size-element-gap-md);
     width: 100%;
     box-sizing: border-box;
-    border: var(--size-element-border) solid var(--color-outline-variant);
+    border: var(--size-element-border) solid var(--ds-border-input);
     border-radius: var(--size-element-radius-sm);
-    background-color: var(--color-surface);
-    color: var(--color-on-surface);
+    background-color: var(--ds-background-input);
+    color: var(--ds-text);
     cursor: text;
     transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
@@ -138,7 +140,7 @@
     flex: 0 0 auto;
     align-items: center;
     gap: var(--size-element-gap-xs);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     white-space: nowrap;
 
     // A button in a slot is the 24 compact button, whatever size it was given.
@@ -182,7 +184,7 @@
     line-height: inherit;
 
     &::placeholder {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtlest);
         opacity: 1;
     }
 
@@ -204,41 +206,42 @@ textarea.plus-field__control {
 
 // ── States ──────────────────────────────────────────────────────────────────
 
-.plus-field:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
+// A subtle field takes its own hover fill, below.
+.plus-field:hover:not(.plus-field--subtle):not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
 .plus-field--hover {
-    border-color: var(--color-inverse-primary);
+    background-color: var(--ds-background-input-hovered);
 }
 
 .plus-field:focus-within,
 .plus-field--focus {
-    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-    outline-offset: calc(var(--size-element-stroke-lg) * -1);
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg);
 }
 
 .plus-field--invalid {
-    border-color: var(--color-danger-border);
+    border-color: var(--ds-border-danger);
 
     &:focus-within {
-        outline-color: var(--color-danger-border);
+        outline-color: var(--ds-border-danger);
     }
 }
 
 .plus-field--valid {
-    border-color: var(--color-success-border);
+    border-color: var(--ds-border-success);
 
     &:focus-within {
-        outline-color: var(--color-success-border);
+        outline-color: var(--ds-border-success);
     }
 }
 
 .plus-field--readonly {
-    background-color: var(--color-surface-variant);
+    background-color: var(--ds-background-neutral);
     cursor: default;
 }
 
 .plus-field--disabled {
-    opacity: var(--color-disabled-opacity);
-    color: var(--color-on-surface-variant);
+    opacity: var(--ds-opacity-disabled);
+    color: var(--ds-text-subtle);
     cursor: not-allowed;
 }
 
@@ -255,7 +258,7 @@ textarea.plus-field__control {
     &:hover:not(.plus-field--disabled):not(.plus-field--readonly),
     &.plus-field--hover {
         border-color: transparent;
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
 
         .plus-field__trailing {
             visibility: visible;
@@ -267,7 +270,7 @@ textarea.plus-field__control {
     &.plus-field--focus,
     &.plus-field--invalid,
     &.plus-field--valid {
-        background-color: var(--color-surface);
+        background-color: var(--ds-background-input);
 
         .plus-field__trailing {
             visibility: visible;
@@ -277,24 +280,24 @@ textarea.plus-field__control {
     // The border comes back under the same 2px ring as the standard field.
     &:focus-within,
     &.plus-field--focus {
-        border-color: var(--color-outline-variant);
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-        outline-offset: calc(var(--size-element-stroke-lg) * -1);
+        border-color: var(--ds-border-input);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-lg);
     }
 
     &.plus-field--invalid {
-        border-color: var(--color-danger-border);
+        border-color: var(--ds-border-danger);
 
         &:focus-within {
-            outline-color: var(--color-danger-border);
+            outline-color: var(--ds-border-danger);
         }
     }
 
     &.plus-field--valid {
-        border-color: var(--color-success-border);
+        border-color: var(--ds-border-success);
 
         &:focus-within {
-            outline-color: var(--color-success-border);
+            outline-color: var(--ds-border-success);
         }
     }
 
@@ -332,32 +335,32 @@ textarea.plus-field__control {
     }
 
     &--help {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
     &--invalid {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
     }
 
     &--success {
-        color: var(--color-success-text);
+        color: var(--ds-text-success);
     }
 }
 
 .plus-field-caption__count {
     flex-shrink: 0;
     margin-left: auto;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font-variant-numeric: tabular-nums;
 
     &--over {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
     }
 }
 
 // "saving…" in Trailing while a subtle field's save runs.
 .plus-field-saving {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font-style: italic;
 }
 

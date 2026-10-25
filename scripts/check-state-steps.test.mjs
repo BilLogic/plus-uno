@@ -233,32 +233,33 @@ test('NavTabs: hover 08, pressed 12, focus a ring with no fill', () => {
 
 const SHADOW_08 = 'linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08))';
 
-test('Checkbox: unchecked hover 08; a checked box keeps its fill under the shadow 08', () => {
+/*
+ * Checkbox and Radio are on the new tokens: an unchecked control hovers to the
+ * input's hovered fill, and a checked one steps its Lagoon fill to the opaque
+ * named hovered step, keeping its mark, rather than laying a layer over it.
+ */
+test('Checkbox: unchecked hover is the input hovered fill; a checked box steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Checkbox.scss';
   const input = '.plus-form-checkbox .form-check-input';
   expectRule(file, `${input}:hover:not(:disabled):not(:indeterminate)`, {
-    'background-color': layer('--color-primary-state-08'),
+    'background-color': layer('--ds-background-input-hovered'),
   });
   for (const checked of [':checked:hover:not(:disabled):not(:indeterminate)', ':indeterminate:hover:not(:disabled)']) {
     const decls = declarations(sheet(file), `${input}${checked}`);
-    assert.equal(decls['background-color'], layer('--color-primary'), `${checked} swaps the fill for a wash`);
-    assert.equal(
-      decls['box-shadow'],
-      'inset 0 0 0 var(--layout-control-checkbox) var(--color-shadow-state-08)',
-      `${checked} lays no shadow 08 over the fill`,
-    );
+    assert.equal(decls['background-color'], layer('--ds-background-selected-bold-hovered'), `${checked} does not take the hovered step`);
+    assert.equal(decls['box-shadow'], undefined, `${checked} still lays a layer over the fill`);
   }
 });
 
-test('Radio: unchecked hover 08; a checked radio keeps its fill under the shadow 08', () => {
+test('Radio: unchecked hover is the input hovered fill; a checked radio steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Radio.scss';
   const input = '.plus-form-radio .form-check-input';
   expectRule(file, `${input}:hover:not(:disabled):not(:checked)`, {
-    'background-color': layer('--color-primary-state-08'),
+    'background-color': layer('--ds-background-input-hovered'),
   });
   const checked = declarations(sheet(file), `${input}:hover:not(:disabled):checked`);
-  assert.equal(checked['background-color'], layer('--color-primary'), 'a checked radio swaps its fill for a wash');
-  assert.ok(checked['background-image'].endsWith(SHADOW_08), 'a checked radio lays no shadow 08 over its fill');
+  assert.equal(checked['background-color'], layer('--ds-background-selected-bold-hovered'), 'a checked radio does not take the hovered step');
+  assert.equal(checked['background-image'], undefined, 'a checked radio replaces its dot image on hover');
 });
 
 test('Switch: hover lays the 08 over the track, on or off', () => {
@@ -280,13 +281,15 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
  * inverse-primary halo touching its border, and on a checked radio the two
  * merged into one thick primary edge that did not read as focus.
  */
-for (const [name, file, selector] of [
-  ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible'],
-  ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible'],
-  ['Switch', 'components/forms-and-inputs/Switch.scss', '.plus-form-switch .form-check-input[type=checkbox]:focus-visible'],
+const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
+
+for (const [name, file, selector, ring] of [
+  ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
+  ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible', DS_RING_OUTSIDE],
+  ['Switch', 'components/forms-and-inputs/Switch.scss', '.plus-form-switch .form-check-input[type=checkbox]:focus-visible', RING_OUTSIDE],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {
-    expectRule(file, selector, RING_OUTSIDE);
+    expectRule(file, selector, ring);
     expectNoFill(file, selector);
     const { 'box-shadow': shadow } = declarations(sheet(file), selector);
     assert.ok(shadow === undefined || shadow === 'none', `${name}: focus also draws a box-shadow ring: ${shadow}`);
@@ -303,11 +306,11 @@ test('PatternModal: the close button hovers at 08 and presses at 12', () => {
 
 /* ─── Field ──────────────────────────────────────────────────────────────── */
 
-test('Field: subtle hover 08, focus a ring, hover border inverse-primary (documented exception)', () => {
+test('Field: hover the input hovered fill, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
   const file = 'components/forms-and-inputs/_internal/Field.scss';
-  expectRule(file, '.plus-field--hover', { 'border-color': layer('--color-inverse-primary') });
-  expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(file, '.plus-field--focus', { outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)' });
+  expectRule(file, '.plus-field--hover', { 'background-color': layer('--ds-background-input-hovered') });
+  expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, '.plus-field--focus', DS_RING_OUTSIDE);
   expectNoFill(file, '.plus-field--focus');
 });
 

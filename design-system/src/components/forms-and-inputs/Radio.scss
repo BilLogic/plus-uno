@@ -43,78 +43,69 @@
         border-radius: var(--size-element-radius-full, 50%) !important;
         position: relative;
 
-        // Override browser's default accent-color with primary color token
-        accent-color: var(--color-primary) !important;
+        // The browser's own accent follows the checked-control fill.
+        accent-color: var(--ds-background-selected-bold) !important;
 
-        // Unchecked state - use outline-variant for border
-        border-color: var(--color-outline-variant) !important;
-        background-color: transparent !important;
+        // Unchecked state: the input's fill and border.
+        border-color: var(--ds-border-input) !important;
+        background-color: var(--ds-background-input) !important;
 
-        // Checked state - use primary color
+        // Checked state: Lagoon, the checked-control fill, edged in `border.selected`.
         &:checked {
-            background-color: var(--color-primary) !important;
-            border-color: var(--color-primary-border) !important;
-            accent-color: var(--color-primary) !important;
+            background-color: var(--ds-background-selected-bold) !important;
+            border-color: var(--ds-border-selected) !important;
+            accent-color: var(--ds-background-selected-bold) !important;
         }
 
         // Focus state, keyboard only: the focus-ring role, 2px wide and 2px off
         // the radio's edge, as Checkbox and Button draw it. The outline follows
         // the round border. A ring touching the edge merged into a checked
-        // radio's primary border and stopped reading as focus.
+        // radio's border and stopped reading as focus.
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring) !important;
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused) !important;
             outline-offset: var(--size-element-stroke-lg);
-            border-color: var(--color-primary-border) !important;
-            accent-color: var(--color-primary) !important;
             box-shadow: none !important;
         }
 
-        // Regular :focus state - update colors but don't show focus ring
+        // Regular :focus state: no focus ring
         &:focus:not(:focus-visible) {
             outline: none !important;
-            border-color: var(--color-primary-border) !important;
-            accent-color: var(--color-primary) !important;
             box-shadow: none !important;
         }
 
-        // Hover state: the 08 layer, over the page when unchecked and over the
-        // primary fill when checked. A checked radio redraws its dot in
-        // on-primary above the layer (half the radius, as Bootstrap's dot
-        // image, with a one-pixel soft edge at 12), so the fill and the dot stay.
+        // Hover state: the input's hovered fill when unchecked; the named
+        // hovered step, opaque, when checked. A checked radio keeps
+        // Bootstrap's dot image, so the dot stays.
         &:hover:not(:disabled):not(:checked) {
-            border-color: var(--color-primary-border) !important;
-            accent-color: var(--color-primary) !important;
-            background-color: var(--color-primary-state-08) !important;
+            border-color: var(--ds-border-input) !important;
+            background-color: var(--ds-background-input-hovered) !important;
         }
 
         &:hover:not(:disabled):checked {
-            border-color: var(--color-primary-border) !important;
-            accent-color: var(--color-primary) !important;
-            background-color: var(--color-primary) !important;
-            background-image:
-                radial-gradient(circle closest-side, var(--color-on-primary) 42%, transparent 58%),
-                linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08)) !important;
+            accent-color: var(--ds-background-selected-bold-hovered) !important;
+            background-color: var(--ds-background-selected-bold-hovered) !important;
         }
 
         // Disabled state
         &:disabled {
-            opacity: var(--color-disabled-opacity);
+            opacity: var(--ds-opacity-disabled);
             cursor: not-allowed;
-            border-color: var(--color-outline-variant) !important;
-            background-color: var(--color-surface-variant) !important;
-            accent-color: var(--color-outline-variant) !important;
+            border-color: var(--ds-border-input) !important;
+            background-color: var(--ds-background-neutral) !important;
+            accent-color: var(--ds-border-input) !important;
         }
 
+        // A disabled checked radio is neutral, its dot still the inverse ink.
         &:disabled:checked {
-            background-color: var(--color-outline-variant) !important;
-            border-color: var(--color-outline-variant) !important;
-            accent-color: var(--color-outline-variant) !important;
+            background-color: var(--ds-background-neutral-bold) !important;
+            border-color: var(--ds-background-neutral-bold) !important;
+            accent-color: var(--ds-background-neutral-bold) !important;
         }
     }
 
     // Label styling
     .form-check-label {
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         cursor: pointer;
         user-select: none;
         flex: 1;
@@ -126,7 +117,7 @@
 // Disabled wrapper state
 .plus-form-radio-disabled {
     .form-check-label {
-        opacity: var(--color-disabled-opacity);
+        opacity: var(--ds-opacity-disabled);
         cursor: not-allowed;
     }
 }

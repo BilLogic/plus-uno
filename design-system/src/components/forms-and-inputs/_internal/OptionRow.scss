@@ -21,7 +21,7 @@
     border: none;
     border-radius: var(--element-radius-item-md);
     background-color: transparent;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-default);
     text-align: left;
     cursor: pointer;
@@ -31,49 +31,50 @@
     /* Hover is the keyboard-highlighted row; Figma draws them as one state. */
     &:hover:not(.is-disabled),
     &.is-highlighted:not(.is-disabled) {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:active:not(.is-disabled) {
-        background-color: var(--color-on-surface-state-12);
+        background-color: var(--ds-background-neutral-subtle-pressed);
     }
 
+    /* Selection is neutral ink; the check in Trailing is its non-color cue. */
     &.is-selected {
-        background-color: var(--color-primary-state-08);
-        color: var(--color-primary-text);
-
-        .plus-option-row-description {
-            color: var(--color-primary-text);
-        }
+        background-color: var(--ds-background-selected);
+        color: var(--ds-text-selected);
 
         &:hover:not(.is-disabled),
         &.is-highlighted:not(.is-disabled) {
-            background-color: var(--color-primary-state-12);
+            background-color: var(--ds-background-selected-hovered);
+        }
+
+        &:active:not(.is-disabled) {
+            background-color: var(--ds-background-selected-pressed);
         }
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: calc(-1 * var(--size-element-stroke-lg));
     }
 
     &.is-disabled {
-        opacity: var(--color-disabled-opacity);
+        opacity: var(--ds-opacity-disabled);
         cursor: not-allowed;
     }
 }
 
 /*
  * Reordering (Figma state=dragging and `drop indicator?`): the lifted row on
- * the overlay role's shadow (Elevation Light/3) with an outline-variant border, and a primary line on the
- * edge where the dragged row lands.
+ * the overlay surface and its shadow with a `color.border` edge, and a Lagoon
+ * line (`border.selected`) on the edge where the dragged row lands.
  */
 .plus-option-row.is-dragging {
     position: relative;
     z-index: 1;
-    background-color: var(--color-surface-overlay);
-    box-shadow: var(--surface-overlay-shadow);
-    outline: var(--size-element-border) solid var(--color-outline-variant);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+    outline: var(--size-element-border) solid var(--ds-border);
     outline-offset: calc(-1 * var(--size-element-border));
     cursor: grabbing;
 }
@@ -88,7 +89,7 @@
         right: 0;
         left: 0;
         height: var(--size-element-stroke-lg);
-        background-color: var(--color-primary-border);
+        background-color: var(--ds-border-selected);
         pointer-events: none;
     }
 }
@@ -103,7 +104,7 @@
 
 .plus-option-row--group {
     min-height: 0;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font: var(--heading-xxsmall);
     cursor: default;
 
@@ -114,7 +115,7 @@
 }
 
 .plus-option-row--create .plus-option-row-leading {
-    color: var(--color-primary-text);
+    color: var(--ds-icon-brand);
 }
 
 .plus-option-row-leading,
@@ -140,7 +141,7 @@
 
 .plus-option-row-trailing {
     gap: var(--size-element-gap-sm);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-option-row-content {
@@ -158,12 +159,12 @@
 }
 
 .plus-option-row-description {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font: var(--body-small);
 }
 
 .plus-option-row-selected-mark {
-    color: var(--color-primary-icon);
+    color: var(--ds-icon-selected);
 }
 
 .plus-option-row-indent {
@@ -179,11 +180,11 @@
     justify-content: center;
     width: var(--plus-option-row-toggle-size);
     height: var(--plus-option-row-toggle-size);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
 }
 
 .plus-option-row-chevron {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
 }
 
 /* A drawn mark, not a form control; sized to match Checkbox and Radio. */
@@ -195,18 +196,18 @@
     width: var(--size-spacing-medium-space-300);
     height: var(--size-spacing-medium-space-300);
     box-sizing: border-box;
-    border: var(--size-element-stroke-md) solid var(--color-outline-variant);
-    background-color: var(--color-surface-container-lowest);
+    border: var(--size-element-stroke-md) solid var(--ds-border-input);
+    background-color: var(--ds-background-input);
     transition: background-color 0.2s, border-color 0.2s;
 
     &--checkbox {
         border-radius: var(--size-element-radius-sm);
 
         // The check and the dash only render on a checked or partly-checked
-        // mark, which is filled with primary.
+        // mark, which is filled with `background.selected.bold`; the check is
+        // its paired `icon.inverse`.
         i {
-            // @grounds: --color-primary
-            color: var(--color-on-primary);
+            color: var(--ds-icon-inverse);
             font-size: var(--icon-sm);
         }
     }
@@ -219,14 +220,14 @@
             width: var(--size-spacing-small-space-100);
             height: var(--size-spacing-small-space-100);
             border-radius: var(--size-element-radius-full);
-            background-color: var(--color-on-primary);
+            background-color: var(--ds-icon-inverse);
         }
     }
 
     &.is-checked,
     &.is-indeterminate {
-        border-color: var(--color-primary-border);
-        background-color: var(--color-primary);
+        border-color: var(--ds-border-selected);
+        background-color: var(--ds-background-selected-bold);
     }
 }
 
