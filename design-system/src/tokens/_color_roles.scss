@@ -85,12 +85,12 @@
        but warning's keeps the base, whose worst ratio is noted beside it. */
 
     /* Primary — border base 4.08 at worst. */
-    --color-primary-icon: var(--color-primary-text);
-    --color-primary-border: var(--color-primary);
+    --color-primary-icon: var(--color-primary-text); // overridden by color/_legacy-aliases.scss
+    --color-primary-border: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /* Secondary — border base 5.44. */
     --color-secondary-icon: var(--color-secondary-text);
-    --color-secondary-border: var(--color-secondary);
+    --color-secondary-border: var(--color-secondary); // overridden by color/_legacy-aliases.scss
 
     /* Tertiary — border base 3.68. Clears 3:1 everywhere; fails 4.5:1 on four
        of the five, which is why the border is a role token and not a license to
@@ -140,7 +140,7 @@
      * without hunting 29 call sites, and so `check:focus-ring` has one name to
      * hold them to.
      */
-    --color-focus-ring: var(--color-primary);
+    --color-focus-ring: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /*
      * THE FOCUS RING ON A COLORED GROUND — Figma `Focus/Focus Ring Inverse`.
@@ -157,7 +157,7 @@
      * Colors/surface) but is not yet in figma-variables-snapshot.json; refresh
      * with `npm run snapshot:figma-variables`.
      */
-    --color-focus-ring-inverse: var(--color-surface);
+    --color-focus-ring-inverse: var(--color-surface); // overridden by color/_legacy-aliases.scss
 
     /*
      * SURFACE ROLES UNDER THEIR FIGMA NAMES — `Surface roles/surface-*`.
@@ -170,7 +170,7 @@
      * overlay roles still need their `--surface-*-shadow` beside them.
      */
     --color-surface-default: var(--color-surface-container-lowest);
-    --color-surface-overlay: var(--color-surface-container-lowest);
+    --color-surface-overlay: var(--color-surface-container-lowest); // overridden by color/_legacy-aliases.scss
     --color-surface-raised: var(--color-surface-container-lowest);
     --color-surface-sunken: var(--color-surface);
 }

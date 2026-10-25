@@ -2,7 +2,7 @@
  * The legacy color tokens (Material roles, `--color-*`, plus the `--surface-*`
  * and `--elevation-light-*` color roles) mapped onto the Atlassian-shaped set,
  * as data. Port of the reference generator's `mapping.py`, the migration map
- * in the color proposal (§4.9).
+ * in the color proposal (`docs/plans/2026-10-24-color-system-proposal.md`).
  *
  * Each row: what it covers as written in the proposal (`today`), a pattern
  * over the CSS name (`match`, null for a row that only describes a second use
@@ -40,7 +40,7 @@ const SMART = '(mastering-content|relationship|technology-tools|advocacy|social-
 export const ROWS = [
   { today: '--color-primary (background)', match: /^--color-primary$/, proposed: 'color.background.brand.bold', note: 'One M3 role splits by property: fill here, edge and link below.' },
   { today: '--color-primary (border / text)', match: null, proposed: 'color.border.brand · color.link', note: 'Same name used as an edge or a link color.' },
-  { today: '--color-primary-text', match: /^--color-primary-text$/, proposed: 'color.text.brand', note: 'Lagoon 800 under decision 15.',
+  { today: '--color-primary-text', match: /^--color-primary-text$/, proposed: 'color.text.brand', note: 'Lagoon 800 for brand text.',
     aliases: { '--color-primary-text': 'color.text.brand' } },
   { today: '--color-primary-border · -icon', match: /^--color-primary-(border|icon)$/, proposed: 'color.border.brand · color.icon.brand', note: '38 border uses today.',
     aliases: { '--color-primary-border': 'color.border.brand', '--color-primary-icon': 'color.icon.brand' } },
@@ -66,7 +66,7 @@ export const ROWS = [
   { today: '--color-{role}-state-*', match: /^--color-(danger|success|warning)(-container)?-state-\d+$/, proposed: 'color.background.{role}.bold.hovered / .pressed', note: 'Opaque named steps replace overlays.' },
   { today: 'SMART families', match: new RegExp(`^--color-(on-)?${SMART}(-[a-z]+)*(-state-\\d+)?$`),
     proposed: 'color.*.smart.{subject}: mastering-content → teal, relationship → magenta, social-emotional → orange, advocacy → lime, technology-tools → brown',
-    note: 'Each subject aliases an accent no role uses (decision 9). The Suggestion chip, today on mastering-content, moves to discovery (decision 24).' },
+    note: 'Each subject aliases an accent no role uses, so a subject never reads as a status. The Suggestion chip, today on mastering-content, moves to discovery, the AI-suggestion role.' },
   { today: '--color-surface (#f9f9fc)', match: /^--color-surface$/, proposed: 'elevation.surface.sunken', note: "Matches today's --surface-sunken alias." },
   { today: '--color-surface (text, 3 uses)', match: null, proposed: 'color.text.inverse', note: 'SessionManagementSnackbar, CloseButton and ListGroup use the surface color as ink on a dark ground.' },
   { today: '--color-surface-container-lowest', match: /^--color-surface-container-lowest$/, proposed: 'elevation.surface · .raised · .overlay', note: '' },
@@ -87,8 +87,7 @@ export const ROWS = [
   { today: '--color-outline-variant (text / track)', match: null, proposed: 'text: color.text.subtlest · track or bar: color.background.neutral · chart grid: color.border',
     note: 'Split by property; as a text color today it would fall to 1.2:1.' },
   { today: '--color-border (local to a spec page)', match: /^--color-border$/, proposed: 'color.border', note: 'Defined inside one spec page, not in the token set.' },
-  { today: '--color-outline-state-12', match: /^--color-outline(-variant)?-state-\d+$/, proposed: 'color.border.bold (hover edge)', note: '',
-    aliases: { '--color-outline-state-12': 'color.border.bold' } },
+  { today: '--color-outline-state-12', match: /^--color-outline(-variant)?-state-\d+$/, proposed: 'color.border.bold (hover edge)', note: 'A state layer: its one use is a scrollbar-thumb fill, so it waits for the sweep.' },
   { today: '--color-scrim', match: /^--color-scrim$/, proposed: 'color.blanket', note: '',
     aliases: { '--color-scrim': 'color.blanket' } },
   { today: '--color-disabled-opacity (0.38)', match: /^--color-disabled-opacity$/, proposed: 'opacity.disabled (0.4) + color.text.disabled · color.background.disabled', note: 'Atlassian value; a visible change.',
@@ -157,7 +156,14 @@ const SKIP = (rel) => rel.startsWith('design-system/src/tokens/color/') || /\.te
  * @param {{root?: string}} [options]
  * @returns {{used: Map<string, number>, unmapped: [string, number][], undefinedNames: string[]}}
  */
+const scanned = new Map();
 export function legacyCoverage({ root = REPO_ROOT } = {}) {
+  if (!scanned.has(root)) scanned.set(root, scan(root));
+  return scanned.get(root);
+}
+
+/** One walk of the scanned trees; `legacyCoverage` memoizes it per root, since a check run reads it twice. */
+function scan(root) {
   const used = new Map();
   const defined = new Set();
   for (const base of SCAN_ROOTS) {

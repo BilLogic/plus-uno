@@ -7,19 +7,19 @@
 :root {
     /* Elevation Light - Material Design 3 */
     /* Elevation 1 - Figma: Elevation Light/1 */
-    --elevation-light-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --elevation-light-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 2 - Figma: Elevation Light/2 */
-    --elevation-light-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+    --elevation-light-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 3 - Figma: Elevation Light/3 */
-    --elevation-light-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+    --elevation-light-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 4 - Figma: Elevation Light/4 */
-    --elevation-light-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
+    --elevation-light-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15); // overridden by color/_legacy-aliases.scss
 
     /* Elevation 5 - Figma: Elevation Light/5 */
-    --elevation-light-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
+    --elevation-light-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15); // overridden by color/_legacy-aliases.scss
 }
 
 
@@ -63,14 +63,14 @@
  */
 :root {
     /** The page itself. Atlassian's `elevation.surface`. */
-    --surface-default: var(--color-surface-container-lowest);
+    --surface-default: var(--color-surface-container-lowest); // overridden by color/_legacy-aliases.scss
 
     /**
      * The ground BEHIND grouped things — the column a set of cards sits in.
      * Atlassian's `sunken`, and the only role whose fill differs from the page
      * in their model too.
      */
-    --surface-sunken: var(--color-surface);
+    --surface-sunken: var(--color-surface); // overridden by color/_legacy-aliases.scss
 
     /**
      * A card. Same fill as the page, by design. A card rests FLAT on its 1px
@@ -82,8 +82,8 @@
      * cards on hover or drag") and `foundations/elevation.md`.
      * `scripts/check-elevation-roles.test.mjs` reads both.
      */
-    --surface-raised: var(--color-surface-container-lowest);
-    --surface-raised-shadow: var(--elevation-light-2);
+    --surface-raised: var(--color-surface-container-lowest); // overridden by color/_legacy-aliases.scss
+    --surface-raised-shadow: var(--elevation-light-2); // overridden by color/_legacy-aliases.scss
 
     /**
      * Every floating layer that sits ON TOP of the UI without a scrim: menus
@@ -97,8 +97,8 @@
      * `elevation.shadow.overlay`; this system keeps the three steps, so no role
      * carries the modal shadow.
      */
-    --surface-overlay: var(--color-surface-container-lowest);
-    --surface-overlay-shadow: var(--elevation-light-3);
+    --surface-overlay: var(--color-surface-container-lowest); // overridden by color/_legacy-aliases.scss
+    --surface-overlay-shadow: var(--elevation-light-3); // overridden by color/_legacy-aliases.scss
 
     /**
      * A neutral well INSIDE a card — a code block, a quiet panel, a summary
