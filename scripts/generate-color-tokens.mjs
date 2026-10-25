@@ -13,8 +13,10 @@
  *
  * WHAT IT WRITES. The active plan (`ACTIVE_PLAN`, Plan A) into
  * `design-system/src/tokens/color/`: `_palette.scss`, `_semantic.scss`,
- * `_elevation.scss`, `_bootstrap-bridge.scss` and `figma-spec.json`. Nothing
- * imports them yet; the token wiring is its own change. The folder sits under
+ * `_elevation.scss`, `_bootstrap-bridge.scss`, `_legacy-aliases.scss` and
+ * `figma-spec.json`. `_legacy-aliases.scss` points each legacy name the
+ * migration map gives one target (`scripts/lib/color/legacy-map.mjs`) at its
+ * `--ds-*` token. The folder sits under
  * the token directory but out of `tokenSources`' flat glob, so today's token
  * checks do not read these files as part of the live token set.
  *

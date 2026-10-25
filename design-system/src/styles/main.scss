@@ -29,6 +29,11 @@
 @use "../tokens/color/palette" as *;
 @use "../tokens/color/semantic" as *;
 @use "../tokens/color/elevation" as *;
+// Legacy names the migration map gives one target, pointed at the `--ds-*`
+// token so untouched components follow the palette and the modes. Must follow
+// the legacy token files above, so the alias wins; names that split by CSS
+// property or by element keep their legacy value until the component sweep.
+@use "../tokens/color/legacy-aliases" as *;
 
 // Shared skeleton/shimmer loading style (Sidebar, prototypes)
 @import "skeleton";
