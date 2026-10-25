@@ -1178,6 +1178,69 @@
       "resolvedValuesByMode": {
         "19378:4": 640
       }
+    },
+    {
+      "id": "VariableID:19627:112779",
+      "name": "Table/pad-x-footer",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "GAP"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--table-pad-x-footer)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:207"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 16
+      }
+    },
+    {
+      "id": "VariableID:19627:117143",
+      "name": "Table/min-width-title",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--table-min-width-title)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:110"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 224
+      }
+    },
+    {
+      "id": "VariableID:19675:183",
+      "name": "Tile/radius-sm",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tile-radius-sm)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19675:182"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 5
+      }
     }
   ]
 }

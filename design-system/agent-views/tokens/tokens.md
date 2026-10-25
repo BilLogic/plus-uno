@@ -241,10 +241,13 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --surface-stack-md
 --surface-stack-sm
 --table-indent
+--table-min-width-title
 --table-pad-x-cell
+--table-pad-x-footer
 --table-pad-y-cell
 --table-radius
 --table-stack
+--tile-radius-sm
 ```
 
 ## Type Scale
@@ -701,6 +704,7 @@ The new primitives (spacing / primitives), named by rem × 100; point semantic t
 ```css
 --radius-0125
 --radius-025
+--radius-03125
 --radius-0375
 --radius-050
 --radius-0625
@@ -732,6 +736,7 @@ The new primitives (spacing / primitives), named by rem × 100; point semantic t
 --space-00625
 --space-0125
 --space-025
+--space-03125
 --space-0375
 --space-050
 --space-0625

@@ -78,6 +78,8 @@
     --table-indent: var(--space-150);
     --table-radius: var(--radius-050);
     --table-stack: var(--space-050);
+    --table-pad-x-footer: var(--space-100);
+    --table-min-width-title: var(--width-1400);
     /* Overlay */
     --overlay-pad-x: var(--space-100);
     --overlay-pad-y: var(--space-400);
@@ -108,6 +110,8 @@
     --popover-max-width-tooltip: var(--width-1500);
     --popover-radius-tooltip: var(--radius-0375);
     --popover-gap-screen: var(--space-050);
+    /* Tile */
+    --tile-radius-sm: var(--radius-03125);
 
     /* color / patterns */
     /* Overlay */
