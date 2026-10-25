@@ -276,3 +276,74 @@ test('a theme-map edge slot holding the base fails the check, with no record to 
     done();
   }
 });
+
+/*
+ * THE `--ds-` VOCABULARY. Atlassian's grammar draws the same line: a role's
+ * bold fill (`--ds-background-danger-bold`) is not its edge, `--ds-border-danger`
+ * is. An edge painted from the fill is the same use in the new words, and is
+ * counted in the same record as a `--color-*` one.
+ */
+test('a --ds- bold fill on an edge is a use, and its role is the --ds-border token', () => {
+  const root = corpus({
+    'design-system/src/a.scss': [
+      '.a { border-color: var(--ds-background-danger-bold); }',
+      '.b { outline: 2px solid var(--ds-background-brand-bold); }',
+      '.c { border: 1px solid var(--color-primary); }',
+    ].join('\n'),
+  });
+  const uses = edgeUses(stylesheets(root), root);
+  assert.deepEqual(
+    uses.map(({ token, role, kind }) => ({ token, role, kind })),
+    [
+      { token: '--ds-background-danger-bold', role: '--ds-border-danger', kind: 'border' },
+      { token: '--ds-background-brand-bold', role: '--ds-border-brand', kind: 'outline' },
+      { token: '--color-primary', role: '--color-primary-border', kind: 'border' },
+    ],
+  );
+});
+
+test('the --ds- border role, a subtle fill, and a neutral bold fill are not uses', () => {
+  const root = corpus({
+    'design-system/src/a.scss': [
+      '.a { border-color: var(--ds-border-danger); }',
+      '.b { border-color: var(--ds-background-danger-subtle); }',
+      '.c { border-color: var(--ds-background-neutral-bold); }',
+      '.d { border-color: var(--ds-background-danger-bold-hovered); }',
+    ].join('\n'),
+  });
+  assert.deepEqual(edgeUses(stylesheets(root), root), []);
+});
+
+const DS_THEME_MAP = (warningEdge) => `$themes: (
+    'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-border-danger'),
+    'warning': ('--ds-background-warning-bold', '--ds-text-warning-inverse', '${warningEdge}'),
+    'primary': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-border-brand')
+);
+`;
+
+test('a theme-map row in --ds- tokens that hands its edge slot the fill is a use', () => {
+  const root = corpus({ 'design-system/src/a.scss': DS_THEME_MAP('--ds-background-warning-bold') });
+  assert.deepEqual(
+    themeMapUses(stylesheets(root), root).map(({ intent, slot, token, role }) => ({ intent, slot, token, role })),
+    [{ intent: 'warning', slot: 3, token: '--ds-background-warning-bold', role: '--ds-border-warning' }],
+  );
+  const fixed = corpus({ 'design-system/src/a.scss': DS_THEME_MAP('--ds-border-warning') });
+  assert.deepEqual(themeMapUses(stylesheets(fixed), fixed), []);
+});
+
+test('a --ds- fill on an edge in a fixture tree is a finding', () => {
+  const { root, done } = policyTree({
+    [`${TOKEN_DIR}/_color_roles.scss`]: ROLES_SCSS,
+    'design-system/src/a.scss': '.a { border-color: var(--ds-background-success-bold); }\n',
+    'scripts/baselines/intent-role-adoption.json': INTENT_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /a\.scss paints an edge from an intent base/.test(message)),
+      `expected a planted --ds- edge-use finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});

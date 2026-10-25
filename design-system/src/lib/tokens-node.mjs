@@ -127,8 +127,48 @@ import { resolveToken, tokenDeclarationPattern } from './tokens.mjs';
  */
 export const TOKEN_DIR = 'design-system/src/tokens';
 
-/** `_primitives.scss` carries a DO NOT USE DIRECTLY banner; callers rank on it. */
-const PRIMITIVES_FILE = '_primitives.scss';
+/**
+ * Where the generated color tokens live (ADR-035): the `--palette-*` ramps, the
+ * `--ds-*` semantic and elevation tokens in four modes, the Bootstrap bridge and
+ * the Figma spec, all written by `npm run generate:color-tokens`.
+ */
+export const COLOR_TOKEN_DIR = `${TOKEN_DIR}/color`;
+
+/**
+ * The stylesheets in `COLOR_TOKEN_DIR` that DEFINE tokens. The Bootstrap bridge
+ * is not one: it points Bootstrap's own `--bs-*` properties at `--ds-*`, which
+ * makes it a consumer of the tokens, and reading it as a definition would mint
+ * a `--bs-` family nobody styles with.
+ */
+export const COLOR_PALETTE_FILE = '_palette.scss';
+export const COLOR_SEMANTIC_FILE = '_semantic.scss';
+export const COLOR_ELEVATION_FILE = '_elevation.scss';
+export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_ELEVATION_FILE];
+
+/** The same files, repo-relative, for a check that reads them by path. */
+export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
+
+/**
+ * The two color vocabularies, while they coexist: the legacy Material roles
+ * (`--color-*`) and the Atlassian-shaped semantic tokens (`--ds-*`). A check
+ * that reads color reads both until the legacy set is retired, and names this
+ * list rather than spelling the pair itself.
+ */
+export const COLOR_PREFIXES = ['--color-', '--ds-'];
+
+/**
+ * What a color VALUE can resolve through: both vocabularies and the ramps the
+ * `--ds-*` tokens alias. A check resolving `--ds-text` has to be able to follow
+ * it to `--palette-neutral-1000`, and a component never names the ramps.
+ */
+export const COLOR_VALUE_PREFIXES = [...COLOR_PREFIXES, '--palette-'];
+
+/**
+ * Files that carry primitives, which a component never names; callers rank on
+ * it. `_primitives.scss` says DO NOT USE DIRECTLY in its banner, and the
+ * palette is the color equivalent.
+ */
+const PRIMITIVE_FILES = new Set(['_primitives.scss', `color/${COLOR_PALETTE_FILE}`]);
 
 /**
  * The token stylesheets, sorted by name and read whole.
@@ -140,7 +180,11 @@ const PRIMITIVES_FILE = '_primitives.scss';
  *
  * FLAT, and the glob is what makes it flat: `tokens/*` matches one segment, so
  * `tokens/source/` — the Figma exports the SCSS is GENERATED from — is not
- * read, and reading both would count every token twice.
+ * read, and reading both would count every token twice. The one directory
+ * read below it is `tokens/color/`, by name and only its `COLOR_TOKEN_FILES`:
+ * the generated color tokens live there because a generator owns the whole
+ * directory, and a token the corpus cannot see is a token no check can.
+ * They come after the flat sheets, so `file` reads `color/_semantic.scss`.
  *
  * FORGIVING, not `strict`. A token directory that is not there comes back
  * empty rather than throwing: every check over this corpus already has a floor
@@ -152,7 +196,10 @@ const PRIMITIVES_FILE = '_primitives.scss';
  * @returns {{path: string, file: string, text: string}[]} `path` root-relative
  */
 export function tokenSources({ root = REPO_ROOT } = {}) {
-  return documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).map((rel) => ({
+  const color = documents(`${COLOR_TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).filter((rel) =>
+    COLOR_TOKEN_FILES.includes(rel.slice(COLOR_TOKEN_DIR.length + 1)),
+  );
+  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color].map((rel) => ({
     path: rel,
     file: rel.slice(TOKEN_DIR.length + 1),
     text: text(rel, { root }),
@@ -183,7 +230,8 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
  *
  * @param {object} [options]
  * @param {string} [options.root]
- * @param {string} [options.prefix] e.g. `--color-`; defaults to every token
+ * @param {string|string[]} [options.prefix] e.g. `--color-`, or a list such
+ *        as `COLOR_PREFIXES`; defaults to every token
  * @param {'first'|'last'} [options.precedence]
  * @returns {Map<string, TokenEntry>}
  */
@@ -208,16 +256,17 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
     }
   }
 
+  const prefixes = Array.isArray(prefix) ? prefix : [prefix];
   const corpus = new Map();
   for (const [name, value] of raw) {
-    if (!name.startsWith(prefix)) continue;
+    if (!prefixes.some((p) => name.startsWith(p))) continue;
     const literal = resolveToken(name, raw);
     corpus.set(name, {
       raw: value,
       value: literal ?? value,
       resolved: literal !== undefined,
       file: files.get(name),
-      primitive: files.get(name) === PRIMITIVES_FILE,
+      primitive: PRIMITIVE_FILES.has(files.get(name)),
       family: familyOf(name),
     });
   }
@@ -238,7 +287,13 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * corpus. Minting a family means adding a row.
  */
 export const FAMILIES = [
-  { family: 'color', prefix: '--color-', what: 'every color value and role' },
+  { family: 'color', prefix: '--color-', what: 'the legacy color values and roles, until the `--ds-` set replaces them' },
+  {
+    family: 'ds',
+    prefix: '--ds-',
+    what: 'the Atlassian-shaped color, elevation and opacity tokens, generated per mode (ADR-035)',
+  },
+  { family: 'palette', prefix: '--palette-', what: 'the color ramps the `--ds-` tokens alias; never named by a component' },
   {
     family: 'surface',
     prefix: '--surface-',

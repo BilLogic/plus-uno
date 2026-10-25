@@ -75,7 +75,56 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
   try {
     const found = messagesOf(run, root);
     assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
-    assert.match(found[0], /no --color-\* tokens found under design-system\/src\/tokens/);
+    assert.match(found[0], /no --color-\* or --ds-\* tokens found under design-system\/src\/tokens/);
+  } finally {
+    done();
+  }
+});
+
+/*
+ * BOTH VOCABULARIES. The `--ds-*` tokens are generated into `tokens/color/`, and
+ * the check reads them beside the legacy `--color-*` set: a disagreeing
+ * fallback on either is a finding, and so is a `--ds-*` name nothing defines.
+ */
+const DS_TREE = (use) => ({
+  'design-system/src/tokens/_colors.scss': ':root { --color-primary: #0472a8; }\n',
+  'design-system/src/tokens/color/_palette.scss': ':root { --palette-teal-700: #147d6a; }\n',
+  'design-system/src/tokens/color/_semantic.scss': ':root { --ds-text-brand: var(--palette-teal-700); }\n',
+  'design-system/src/a.scss': use,
+  'scripts/baselines/color-fallback-baseline.json': BASELINE,
+});
+
+test('a disagreeing --ds- fallback is a finding, its token followed through the palette', () => {
+  const { root, done } = policyTree(
+    DS_TREE('.a { color: var(--ds-text-brand, #000000); border-color: var(--color-primary, #111111); }\n'),
+    { git: true },
+  );
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /--ds-text-brand {2}is #147d6a, fallback says #000000/.test(message)),
+      `expected a --ds- disagreement, got:\n${found.join('\n')}`,
+    );
+    assert.ok(
+      found.some((message) => /--color-primary {2}is #0472a8, fallback says #111111/.test(message)),
+      `expected the legacy disagreement beside it, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('a --ds- name defined nowhere is a finding, and one the color directory defines is not', () => {
+  const { root, done } = policyTree(
+    DS_TREE('.a { color: var(--ds-text-brand); background: var(--ds-text-brnad); }\n'),
+    { git: true },
+  );
+  try {
+    const found = messagesOf(run, root);
+    assert.equal(found.length, 1, `expected one finding, got:\n${found.join('\n')}`);
+    assert.match(found[0], /referenced and never defined/);
+    assert.match(found[0], /--ds-text-brnad/);
+    assert.doesNotMatch(found[0], /--ds-text-brand\b/);
   } finally {
     done();
   }

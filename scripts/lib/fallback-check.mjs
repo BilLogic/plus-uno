@@ -56,8 +56,28 @@ import {
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 /** Which of the tree is searched for USES. Where the tokens are is `TOKEN_DIR`. */
-const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
-const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
+export const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
+export const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
+
+/**
+ * Every searched file under `SEARCH_ROOTS`, read: `{ path, text }`, path
+ * repo-relative. `git ls-files`, not a filesystem walk: this repository keeps
+ * agent worktrees under `.claude/worktrees/`, and a walk finds a whole second
+ * copy of the tree. Exported for `check:ds-fallbacks`, which searches the same
+ * tree for a different rule.
+ *
+ * @param {string} repoRoot
+ * @returns {{path: string, text: string}[]}
+ */
+export function searchedSources(repoRoot) {
+  return execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], {
+    encoding: 'utf8',
+    maxBuffer: 1 << 28,
+  })
+    .split('\0')
+    .filter((rel) => rel && SEARCHED.test(rel))
+    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
+}
 
 /**
  * @typedef {object} Family
@@ -70,8 +90,9 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
  *           for — a name pattern for color, a kind for dimensions.
  * @property {string} [census]   the word before `token(s)` in the green line.
  *           Absent for the family whose whole namespace is its own name.
- * @property {string} prefix     the name `tokenCorpus` narrows to, and the one
- *           `fallbackUsages` scans for. Stated by both families rather than
+ * @property {string|string[]} prefix  the name `tokenCorpus` narrows to, and
+ *           the one `fallbackUsages` scans for — or a list of them, which is
+ *           how the color family reads `--color-*` and `--ds-*` at once. Stated by both families rather than
  *           defaulted: `--color-` used to be the default of two separate
  *           functions, which made the color family's most load-bearing fact
  *           the one thing its descriptor did not say.
@@ -100,15 +121,6 @@ const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
 export function fallbackCheck(family) {
   const { check, label, baseline: BASELINE, noun, absent, census, prefix, normalize, select, reportUndefined, why } =
     family;
-
-  // `git ls-files`, not a filesystem walk: this repository keeps agent worktrees
-  // under `.claude/worktrees/`, and a walk finds a whole second copy of the tree.
-  const tracked = (repoRoot, patterns) =>
-    execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...patterns], { encoding: 'utf8', maxBuffer: 1 << 28 })
-      .split('\0')
-      .filter(Boolean);
-
-  const read = (repoRoot, rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') });
 
   /**
    * The token sources, the corpus and the audit over them — once per repo root.
@@ -140,9 +152,7 @@ export function fallbackCheck(family) {
     );
     const tokens = select ? select(resolved) : resolved;
 
-    const sources = tracked(repoRoot, SEARCH_ROOTS)
-      .filter((f) => SEARCHED.test(f))
-      .map((rel) => read(repoRoot, rel));
+    const sources = searchedSources(repoRoot);
     const audit = fallbackAudit({
       tokens,
       usages: fallbackUsages(sources, { prefix }),
