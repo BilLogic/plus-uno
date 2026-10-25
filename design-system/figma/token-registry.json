@@ -538,6 +538,7 @@
     "spacing / primitives": {
       "Radius/radius-0125": "var(--radius-0125)",
       "Radius/radius-025": "var(--radius-025)",
+      "Radius/radius-03125": "var(--radius-03125)",
       "Radius/radius-0375": "var(--radius-0375)",
       "Radius/radius-050": "var(--radius-050)",
       "Radius/radius-0625": "var(--radius-0625)",
@@ -569,6 +570,7 @@
       "Space/space-00625": "var(--space-00625)",
       "Space/space-0125": "var(--space-0125)",
       "Space/space-025": "var(--space-025)",
+      "Space/space-03125": "var(--space-03125)",
       "Space/space-0375": "var(--space-0375)",
       "Space/space-050": "var(--space-050)",
       "Space/space-0625": "var(--space-0625)",
@@ -726,10 +728,13 @@
       "Surface container/pad": "var(--surface-container-pad)",
       "Surface container/stack": "var(--surface-container-stack)",
       "Table/indent": "var(--table-indent)",
+      "Table/min-width-title": "var(--table-min-width-title)",
       "Table/pad-x-cell": "var(--table-pad-x-cell)",
+      "Table/pad-x-footer": "var(--table-pad-x-footer)",
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
       "Table/radius": "var(--table-radius)",
-      "Table/stack": "var(--table-stack)"
+      "Table/stack": "var(--table-stack)",
+      "Tile/radius-sm": "var(--tile-radius-sm)"
     },
     "color / patterns": {
       "Overlay/scrim": "var(--overlay-scrim)"
@@ -739,8 +744,8 @@
     "scssTokenCount": 759,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 585,
-      "resolved": 558,
+      "total": 592,
+      "resolved": 563,
       "percent": 95,
       "unresolved": [
         {
@@ -959,6 +964,20 @@
           "figmaVariable": "Tree/toggle",
           "tried": [
             "--size-tree-toggle"
+          ]
+        },
+        {
+          "collection": "typography",
+          "figmaVariable": "Family/icon",
+          "tried": [
+            "--type-family-icon"
+          ]
+        },
+        {
+          "collection": "typography",
+          "figmaVariable": "Family/icon-brands",
+          "tried": [
+            "--type-family-icon-brands"
           ]
         },
         {

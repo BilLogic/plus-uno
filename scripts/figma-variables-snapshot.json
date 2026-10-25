@@ -2,13 +2,13 @@
   "note": "Snapshot of every variable in the PLUS Figma library, captured with figma.variables.getLocalVariableCollectionsAsync + getLocalVariablesAsync. Consumed by scripts/generate-token-registry.mjs to validate the Figma-variable -> CSS-token mapping, and held to a capture date by check:figma-snapshots. Refresh with `npm run snapshot:figma-variables`, which prints the probe to run in Figma, and `npm run snapshot:figma-variables -- --write <probe.json>`, which writes this file from what the probe returned.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
-  "capturedAt": "2026-10-24",
-  "totalVariables": 585,
+  "capturedAt": "2026-10-25",
+  "totalVariables": 592,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 341,
+    "FLOAT": 346,
     "BOOLEAN": 9,
-    "STRING": 3
+    "STRING": 5
   },
   "collections": {
     "colors / accent": {
@@ -433,6 +433,8 @@
       "variables": [
         "Family/body",
         "Family/heading",
+        "Family/icon",
+        "Family/icon-brands",
         "Font size/075",
         "Font size/0875",
         "Font size/100",
@@ -458,6 +460,7 @@
       "variables": [
         "Radius/radius-0125",
         "Radius/radius-025",
+        "Radius/radius-03125",
         "Radius/radius-0375",
         "Radius/radius-050",
         "Radius/radius-0625",
@@ -489,6 +492,7 @@
         "Space/space-00625",
         "Space/space-0125",
         "Space/space-025",
+        "Space/space-03125",
         "Space/space-0375",
         "Space/space-050",
         "Space/space-0625",
@@ -664,10 +668,13 @@
         "Surface container/pad",
         "Surface container/stack",
         "Table/indent",
+        "Table/min-width-title",
         "Table/pad-x-cell",
+        "Table/pad-x-footer",
         "Table/pad-y-cell",
         "Table/radius",
-        "Table/stack"
+        "Table/stack",
+        "Tile/radius-sm"
       ]
     },
     "color / patterns": {

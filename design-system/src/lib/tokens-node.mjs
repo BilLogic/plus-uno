@@ -281,7 +281,7 @@ export const FAMILIES = [
   { family: 'layout', prefix: '--layout-', what: 'app-shell measurements' },
   { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
   { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
-  { family: 'table', prefix: '--table-', what: 'table cell pad, tree indent and radius' },
+  { family: 'table', prefix: '--table-', what: 'table cell pad, footer pad-x, tree indent, minimum title width and radius' },
   { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
