@@ -99,6 +99,12 @@ const RING_INSIDE = {
   'outline-offset': 'calc(-1 * var(--size-element-stroke-lg))',
 };
 
+/** RING_INSIDE on the new color tokens: the ring is `color.border.focused`. */
+const DS_RING_INSIDE = {
+  ...RING_INSIDE,
+  outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
+};
+
 const layer = (token) => `var(${token})`;
 
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
@@ -181,10 +187,7 @@ test('Dropdown items: neutral hovered and pressed, selected neutral ink with its
   expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected', { 'background-color': layer('--ds-background-selected') });
   expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:hover', { 'background-color': layer('--ds-background-selected-hovered') });
   expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:active', { 'background-color': layer('--ds-background-selected-pressed') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:focus-visible', {
-    outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
-    'outline-offset': 'calc(-1 * var(--size-element-stroke-lg))',
-  });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item:focus-visible', DS_RING_INSIDE);
   expectNoFill(DROPDOWN, '.pdropdown .dropdown-item:focus-visible');
 });
 

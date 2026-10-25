@@ -35,7 +35,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
 | Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
 | Surface roles/surface-raised | `var(--color-surface-raised)` | A card: flat at rest; a clickable card pairs it with `--surface-raised-shadow` on hover or drag |
-| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Floating layers without a scrim (pair with `--surface-overlay-shadow`) and modals (with `--elevation-light-4`) |
+| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Legacy floating layers not yet on the new tokens (pair with `--surface-overlay-shadow`). Modals, menus, popovers, tooltips and toasts take `elevation.surface.overlay` + `elevation.shadow.overlay` (`--ds-surface-overlay`, `--ds-shadow-overlay`) |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |
@@ -133,9 +133,11 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 |----------------------|----------------|
 | Elevation Light/1 (subtle) | `var(--elevation-light-1)` |
 | Elevation Light/2 (clickable cards on hover or drag) | `var(--elevation-light-2)` |
-| Elevation Light/3 (menus, popovers, tooltips, toasts, listboxes) | `var(--elevation-light-3)` |
-| Elevation Light/4 (modals) | `var(--elevation-light-4)` |
+| Elevation Light/3 (floating layers still on legacy tokens: listboxes, the floating sidebar) | `var(--elevation-light-3)` |
+| Elevation Light/4 (legacy, unused) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
+| Overlay surface (modals, menus, popovers, tooltips, toasts) | `var(--ds-surface-overlay)` |
+| Overlay shadow (modals, menus, popovers, tooltips, toasts) | `var(--ds-shadow-overlay)` |
 
 ## Layout Tokens
 

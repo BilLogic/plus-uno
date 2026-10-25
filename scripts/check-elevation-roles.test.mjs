@@ -55,7 +55,7 @@ const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mappi
  */
 const ROLES = [
   { token: '--surface-raised-shadow', rowMatches: /cards/i },
-  { token: '--surface-overlay-shadow', rowMatches: /popovers/i },
+  { token: '--surface-overlay-shadow', rowMatches: /floating layers/i },
 ];
 
 /** `Elevation Light/4 (modals) | var(--elevation-light-4)` → level per row. */
@@ -104,34 +104,42 @@ for (const role of ROLES) {
   });
 }
 
-test('the row that mentions modals is NOT claimed by a role', () => {
-  // The overlay role deliberately stops short of modals: the table separates
-  // popovers/toasts from modals from dialogs, and `PatternModal.scss` names
-  // Light/4 directly. If someone later points `--surface-overlay-shadow` at
-  // the modal level, that collapses a distinction the system has shipped, and
-  // it should be a decision rather than an edit that slips through.
-  const modalRow = rows.find((r) => /modals/i.test(r.uses));
-  assert.ok(modalRow, 'token-mapping.md no longer has a modal row');
-  for (const role of ROLES) {
-    assert.notEqual(
-      roleLevel(scss, role.token),
-      modalRow.level,
-      `${role.token} now points at the modal level (Light/${modalRow.level}). ` +
-        'Collapsing overlay and modal is a #268 decision, not a re-point.',
-    );
+test('modals and the migrated layers take the overlay pair, not a Light level', () => {
+  // Decision 3 of the color proposal: a modal sits at the overlay level, as
+  // every floating layer does, and the blanket under it is what sets it apart
+  // from a menu. So no Light row may claim a modal or a migrated layer, and
+  // the mapping names the overlay pair for them instead. A Light/4 modal
+  // coming back is a reversal of that decision, not an edit to slip through.
+  const layers = /modals|menus|popovers|tooltips|toasts/i;
+  for (const row of rows) {
+    assert.doesNotMatch(row.uses, layers, `token-mapping.md gives Light/${row.level} to "${row.uses}"; those layers take the overlay pair`);
+  }
+  const mapping = fs.readFileSync(MAPPING, 'utf8');
+  for (const [half, token] of [['surface', '--ds-surface-overlay'], ['shadow', '--ds-shadow-overlay']]) {
+    const row = mapping.split('\n').find((line) => new RegExp(`^\\|\\s*Overlay ${half}\\s*\\(`).test(line.trim()));
+    assert.ok(row, `token-mapping.md has no Overlay ${half} row`);
+    for (const words of [/modals/i, /menus/i, /popovers/i, /tooltips/i, /toasts/i]) {
+      assert.match(row, words, `the Overlay ${half} row no longer names ${words}`);
+    }
+    assert.ok(row.includes(`var(${token})`), `the Overlay ${half} row does not name var(${token})`);
+  }
+  for (const file of ['design-system/src/components/messaging/Modal/Modal.scss', 'design-system/src/patterns/PatternModal/PatternModal.scss']) {
+    const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+    assert.doesNotMatch(source, /--elevation-light-[45]/, `${file} names a modal Light level; modals take the overlay pair`);
   }
 });
 
 /**
  * THE STEP EACH SURFACE TAKES, read from the stylesheets that draw them.
  *
- * `foundations/elevation.md` assigns the levels by component. Every floating
- * layer without a scrim (menus and dropdowns, Popover, Tooltip, Toast and
- * Listbox) takes Light/3 through the overlay role. A modal takes Light/4 on the
- * overlay fill. A card is flat at rest and lifts to Light/2 only while a
- * clickable card is hovered or dragged. Each row is one surface and the shadow
- * its rule must name; a rule that names another level, or a literal shadow,
- * fails.
+ * `foundations/elevation.md` assigns the levels by component. The floating
+ * layers on the new color tokens (menus and dropdowns, Popover, Tooltip, Toast)
+ * and modals take the overlay pair, `--ds-surface-overlay` with
+ * `--ds-shadow-overlay`; the layers still on legacy tokens (Listbox, the
+ * floating sidebar) take Light/3 through the overlay role. A card is on the
+ * raised pair or lifts while a clickable card is hovered or dragged. Each row
+ * is one surface and the shadow its rule must name; a rule that names another
+ * level, or a literal shadow, fails.
  */
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging,', shadow: '--ds-shadow-overlay' },
@@ -205,11 +213,15 @@ test("elevation.md's hierarchy table says the same steps", () => {
     assert.ok(row, `elevation.md's hierarchy table has no row matching ${words}`);
     return Number(/--elevation-light-(\d)/.exec(row)[1]);
   };
-  for (const floating of [/menus/i, /dropdowns/i, /popovers/i, /tooltips/i, /toasts/i, /listboxes/i]) {
-    assert.equal(levelOf(floating), 3, `elevation.md puts ${floating} somewhere other than Light/3`);
+  const rowOf = (words) => hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
+  for (const layer of [/modals/i, /menus/i, /dropdowns/i, /popovers/i, /tooltips/i, /toasts/i]) {
+    const row = rowOf(layer);
+    assert.ok(row, `elevation.md's hierarchy table has no row matching ${layer}`);
+    assert.match(row, /--ds-surface-overlay/, `elevation.md does not put ${layer} on the overlay surface`);
+    assert.match(row, /--ds-shadow-overlay/, `elevation.md does not put ${layer} on the overlay shadow`);
   }
+  assert.equal(levelOf(/listboxes/i), 3, 'elevation.md puts listboxes somewhere other than Light/3');
   assert.equal(levelOf(/clickable cards on hover or drag/i), 2);
-  assert.equal(levelOf(/modals/i), 4);
 });
 
 /**

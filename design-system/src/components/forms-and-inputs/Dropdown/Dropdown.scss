@@ -261,9 +261,10 @@ $dropdown-themes: (
     // Figma's `_Form Checkbox Button`. Unchecked: an input box with an input
     // stroke. Checked: a selected-bold (Lagoon) box, no stroke, with an
     // inverse check. A disabled row dims the box with the rest of the row
-    // (opacity.disabled), so the box keeps its own colors there. The 12px size is a literal because Figma's box is a fixed 12px
-    // frame bound to no size variable; the radius is the radius-50 primitive
-    // because that is the variable Figma binds (no semantic radius is 2px).
+    // (opacity.disabled), so the box keeps its own colors there. The 12px
+    // size is a literal because Figma's box is a fixed 12px frame bound to no
+    // size variable; the radius is the radius-50 primitive because that is
+    // the variable Figma binds (no semantic radius is 2px).
     .pdropdown-checkbox {
         flex-shrink: 0;
         box-sizing: border-box;

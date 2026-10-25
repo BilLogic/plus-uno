@@ -155,6 +155,11 @@
     color: var(--ds-icon);
 }
 
+.plus-modal-close-btn:active {
+    background-color: var(--ds-background-neutral-subtle-pressed);
+    color: var(--ds-icon);
+}
+
 .plus-modal-close-btn:focus-visible {
     outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg);
