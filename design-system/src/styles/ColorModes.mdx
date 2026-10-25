@@ -18,6 +18,14 @@ A mode is an attribute on `<html>`: `data-color-mode` is `light`, `dark` or `aut
 </div>
 
 <div className="sb-ds-doc-section">
+### Bootstrap
+
+Bootstrap is imported as compiled CSS, so a generated bridge points its root `--bs-*` variables at these roles: the body background and text, borders, links, the focus ring, form validation, and the role colors with their `*-rgb` triplets in every mode. The react-bootstrap modal, dropdown, toast and form controls below carry no PLUS styling and still follow the mode.
+
+<Story of={ColorModesStories.BootstrapBridge} />
+</div>
+
+<div className="sb-ds-doc-section">
 
 ## Related
 

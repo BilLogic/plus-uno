@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Dropdown, Form, Modal, Toast } from 'react-bootstrap';
 import { expect } from 'storybook/test';
 
 import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
@@ -30,6 +31,9 @@ import figmaSpec from '../tokens/color/figma-spec.json';
  *   - FromToolbar: the toolbar globals, through the real decorator, put the
  *     right three attributes on <html>, and `applyColorModes` resolves
  *     `data-bs-theme` from the OS under auto.
+ *   - BootstrapBridge: react-bootstrap's Modal, Dropdown, Toast and form
+ *     controls paint the `--ds-*` roles in light and dark, and every `*-rgb`
+ *     triplet the bridge writes is its role's color in all four modes.
  * Each restores the attributes and the emulation when it is done, so the a11y
  * check and later story files see the page as the toolbar left it.
  */
@@ -301,3 +305,129 @@ FromToolbar.play = async () => {
         });
     });
 };
+
+/* --------------------------------------------------------- bootstrap bridge */
+
+/**
+ * react-bootstrap as Bootstrap ships it, with no PLUS styling: the generated
+ * bridge points Bootstrap's root `--bs-*` variables at the `--ds-*` roles, so
+ * these follow the color and contrast modes from the toolbar.
+ */
+export const BootstrapBridge = () => (
+    <div
+        data-testid="bootstrap-bridge"
+        style={{
+            background: 'var(--ds-surface)',
+            color: 'var(--ds-text)',
+            padding: 'var(--size-spacing-medium-space-300)',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
+            gap: 'var(--size-spacing-medium-space-300)',
+            alignItems: 'start',
+        }}
+    >
+        <div className="modal position-static d-block" style={{ height: 'auto' }}>
+            <Modal.Dialog className="m-0">
+                <Modal.Header closeButton>
+                    <Modal.Title as="h2" className="fs-5">Modal</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>The dialog surface, body text and border.</Modal.Body>
+            </Modal.Dialog>
+        </div>
+        <Dropdown.Menu show className="position-static">
+            <Dropdown.ItemText>Dropdown</Dropdown.ItemText>
+            <Dropdown.Item href="#">An item</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item href="#">Another item</Dropdown.Item>
+        </Dropdown.Menu>
+        <Toast>
+            <Toast.Header closeButton={false}>
+                <strong className="me-auto">Toast</strong>
+            </Toast.Header>
+            <Toast.Body>Over the body background at 85%.</Toast.Body>
+        </Toast>
+        <Form>
+            <Form.Group className="mb-3" controlId="bridge-text">
+                <Form.Label>Text input</Form.Label>
+                <Form.Control placeholder="Placeholder" />
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="bridge-select">
+                <Form.Label>Select</Form.Label>
+                <Form.Select defaultValue="one">
+                    <option value="one">One</option>
+                    <option value="two">Two</option>
+                </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="bridge-invalid">
+                <Form.Label>Invalid input</Form.Label>
+                <Form.Control isInvalid defaultValue="Wrong" />
+                <Form.Control.Feedback type="invalid">The danger text role.</Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="bridge-disabled">
+                <Form.Label>Disabled input</Form.Label>
+                <Form.Control disabled defaultValue="Disabled" />
+            </Form.Group>
+            <Form.Check id="bridge-check" label="Checkbox" defaultChecked />
+        </Form>
+    </div>
+);
+
+/** Each `*-rgb` triplet the bridge writes, and the role it must match. */
+const BRIDGE_TRIPLETS = {
+    '--bs-body-bg-rgb': '--ds-surface',
+    '--bs-body-color-rgb': '--ds-text',
+    '--bs-link-color-rgb': '--ds-link',
+    '--bs-link-hover-color-rgb': '--ds-link-pressed',
+    '--bs-primary-rgb': '--ds-background-brand-bold',
+    '--bs-danger-rgb': '--ds-background-danger-bold',
+    '--bs-success-rgb': '--ds-background-success-bold',
+    '--bs-warning-rgb': '--ds-background-warning-bold',
+    '--bs-info-rgb': '--ds-background-information-bold',
+    '--bs-light-rgb': '--ds-surface-sunken',
+    '--bs-dark-rgb': '--ds-background-neutral-bold',
+};
+
+BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
+    const root = canvasElement.querySelector('[data-testid="bootstrap-bridge"]');
+    const probe = document.createElement('span');
+    root.append(probe);
+    /** A CSS color as the browser computes it, so values compare as `rgb(…)` strings. */
+    const resolve = (value) => {
+        probe.style.color = value;
+        return getComputedStyle(probe).color;
+    };
+    const style = (selector) => getComputedStyle(root.querySelector(selector));
+    // Bootstrap transitions a control's border color, so a read right after a
+    // mode switch would land mid-fade.
+    root.querySelectorAll('.form-control, .form-select').forEach((el) => { el.style.transition = 'none'; });
+    const painted = {};
+    try {
+        for (const [mode, [color, contrast]] of Object.entries(SPEC_MODES)) {
+            applyColorModes(color, contrast);
+            for (const [triplet, role] of Object.entries(BRIDGE_TRIPLETS)) {
+                await expect(resolve(`rgb(var(${triplet}))`), `${triplet} in ${mode}`).toBe(resolve(`var(${role})`));
+            }
+        }
+        for (const mode of ['light', 'dark']) {
+            applyColorModes(mode, 'no-preference');
+            const surface = resolve('var(--ds-surface)');
+            const text = resolve('var(--ds-text)');
+            await expect(style('.modal-content').backgroundColor, `Modal surface, ${mode}`).toBe(surface);
+            await expect(style('.modal-body').color, `Modal text, ${mode}`).toBe(text);
+            await expect(style('.dropdown-menu').backgroundColor, `Dropdown surface, ${mode}`).toBe(surface);
+            await expect(style('.dropdown-item').color, `Dropdown item, ${mode}`).toBe(text);
+            await expect(style('.toast').backgroundColor, `Toast, ${mode}`)
+                .toBe(surface.replace('rgb(', 'rgba(').replace(')', ', 0.85)'));
+            await expect(style('#bridge-text').backgroundColor, `input fill, ${mode}`).toBe(surface);
+            await expect(style('#bridge-text').color, `input text, ${mode}`).toBe(text);
+            await expect(style('#bridge-text').borderTopColor, `input border, ${mode}`).toBe(resolve('var(--ds-border)'));
+            await expect(style('#bridge-disabled').backgroundColor, `disabled input, ${mode}`).toBe(resolve('var(--ds-background-neutral)'));
+            await expect(style('.invalid-feedback').color, `invalid feedback, ${mode}`).toBe(resolve('var(--ds-text-danger)'));
+            await expect(document.documentElement.getAttribute('data-bs-theme'), `data-bs-theme, ${mode}`).toBe(mode);
+            painted[mode] = style('.modal-content').backgroundColor;
+        }
+        await expect(painted.dark, 'the modal changes surface between light and dark').not.toBe(painted.light);
+    } finally {
+        probe.remove();
+    }
+});

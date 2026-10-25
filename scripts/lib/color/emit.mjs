@@ -4,7 +4,7 @@
  *   _palette.scss          --palette-* primitives on :root
  *   _semantic.scss         --ds-* color tokens: light, dark, auto, and increased contrast as override-only blocks
  *   _elevation.scss        --ds-shadow-* and --ds-opacity-* per mode
- *   _bootstrap-bridge.scss --bs-* variables pointed at --ds-* so react-bootstrap follows the mode
+ *   _bootstrap-bridge.scss --bs-* variables pointed at --ds-* so react-bootstrap follows the mode, in all four modes
  *
  * Mode selectors: `data-color-mode` is light, dark or auto (no attribute means light);
  * `data-contrast-mode` is more or auto. Alphas are written `rgb(r g b / a)`, which the
@@ -107,26 +107,47 @@ export function emitScss({ rows, shadows, opacity, palette }, header) {
     contrastBlocks(changedShadows('light_ic', 'light'), 'light') +
     contrastBlocks(changedShadows('dark_ic', 'dark'), 'dark');
 
-  // Bootstrap is imported compiled, so bridge its CSS variables; the *-rgb triplets are literal per mode,
-  // so color mode auto needs its own dark block.
-  const by = Object.fromEntries(rows.map((r) => [r.name, r]));
-  const roles = {
-    primary: 'color.background.brand.bold', danger: 'color.background.danger.bold', success: 'color.background.success.bold',
-    warning: 'color.background.warning.bold', info: 'color.background.information.bold',
-    light: 'color.background.neutral', dark: 'color.background.neutral.bold',
-  };
-  const triplet = (hex) => {
-    const { r, g, b } = parseHex(hex);
-    return `${r} ${g} ${b}`;
-  };
-  const bridge = (m) => [
-    '--bs-body-bg: var(--ds-surface);', '--bs-body-color: var(--ds-text);', '--bs-border-color: var(--ds-border);',
-    '--bs-link-color: var(--ds-link);', '--bs-link-hover-color: var(--ds-link-pressed);',
-    '--bs-focus-ring-color: var(--ds-border-focused);', '--bs-secondary-color: var(--ds-text-subtle);',
-    ...Object.entries(roles).flatMap(([role, tok]) => [`--bs-${role}: var(${dsName(tok)});`, `--bs-${role}-rgb: ${triplet(by[tok][m])};`]),
-    `--bs-body-color-rgb: ${triplet(by['color.text'][m])};`, `--bs-link-color-rgb: ${triplet(by['color.link'][m])};`,
-  ];
-  files['_bootstrap-bridge.scss'] =
-    `${header}${block(LIGHT, bridge('light'))}\n${block(DARK, bridge('dark'))}\n${autoDark(bridge('dark'))}`;
+  files['_bootstrap-bridge.scss'] = header + bootstrapBridge(rows);
   return files;
+}
+
+/**
+ * Bootstrap is imported as compiled CSS, so it has no Sass variables to alias: the bridge points its
+ * root CSS variables at `--ds-*`. Each `var()` follows the mode by itself; the `*-rgb` triplets are
+ * literal numbers Bootstrap composes as `rgba(var(--bs-primary-rgb), .5)`, so they are comma-separated,
+ * written per mode, and the increased-contrast blocks carry only the triplets that change.
+ */
+const BRIDGE_VARS = {
+  'body-bg': 'elevation.surface', 'body-color': 'color.text', 'emphasis-color': 'color.text',
+  'secondary-color': 'color.text.subtle', 'secondary-bg': 'color.background.neutral',
+  'tertiary-bg': 'color.background.neutral.subtle.hovered',
+  'border-color': 'color.border', 'border-color-translucent': 'color.border',
+  'link-color': 'color.link', 'link-hover-color': 'color.link.pressed', 'focus-ring-color': 'color.border.focused',
+  'form-valid-color': 'color.text.success', 'form-valid-border-color': 'color.border.success',
+  'form-invalid-color': 'color.text.danger', 'form-invalid-border-color': 'color.border.danger',
+  primary: 'color.background.brand.bold', danger: 'color.background.danger.bold', success: 'color.background.success.bold',
+  warning: 'color.background.warning.bold', info: 'color.background.information.bold',
+  // Light and dark need opaque tokens: a triplet drops alpha, so an alpha token would turn `.bg-light` solid ink.
+  light: 'elevation.surface.sunken', dark: 'color.background.neutral.bold',
+};
+const BRIDGE_TRIPLETS = ['body-bg', 'body-color', 'link-color', 'link-hover-color', 'primary', 'danger', 'success', 'warning', 'info', 'light', 'dark'];
+
+function bootstrapBridge(rows) {
+  const by = Object.fromEntries(rows.map((r) => [r.name, r]));
+  const triplet = (name, mode) => {
+    const { r, g, b, a } = parseHex(by[name][mode]);
+    if (a !== null) throw new Error(`Bootstrap bridge: ${name} is translucent in ${mode}; a *-rgb triplet needs an opaque token`);
+    return `${r}, ${g}, ${b}`;
+  };
+  const vars = Object.entries(BRIDGE_VARS).map(([bs, tok]) => `--bs-${bs}: var(${dsName(tok)});`);
+  const triplets = (mode) => BRIDGE_TRIPLETS.map((bs) => `--bs-${bs}-rgb: ${triplet(BRIDGE_VARS[bs], mode)};`);
+  const changed = (mode, base) => {
+    const [ic, std] = [triplets(mode), triplets(base)];
+    return ic.filter((line, i) => line !== std[i]);
+  };
+  return (
+    `${block(LIGHT, [...vars, ...triplets('light')])}\n${block(DARK, [...vars, ...triplets('dark')])}\n${autoDark([...vars, ...triplets('dark')])}` +
+    contrastBlocks(changed('light_ic', 'light'), 'light') +
+    contrastBlocks(changed('dark_ic', 'dark'), 'dark')
+  );
 }

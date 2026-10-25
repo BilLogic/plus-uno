@@ -58,20 +58,33 @@ test('alphas are rgb() with a slash, never 8-digit hex', () => {
   assert.doesNotMatch(files['_palette.scss'] + files['_elevation.scss'], /#[0-9a-f]{8}\b/);
 });
 
-test('the Bootstrap bridge points --bs-* at --ds-* and writes rgb triplets per mode', () => {
+test('the Bootstrap bridge points --bs-* at --ds-* and writes comma triplets Bootstrap can compose', () => {
   const bridge = files['_bootstrap-bridge.scss'];
   assert.match(bridge, /--bs-primary: var\(--ds-background-brand-bold\);/);
-  assert.match(bridge, /--bs-primary-rgb: 20 123 132;/);
+  assert.match(bridge, /--bs-primary-rgb: 20, 123, 132;/);
+  for (const v of ['body-bg', 'body-color', 'border-color', 'link-color', 'link-hover-color', 'focus-ring-color']) assert.match(bridge, new RegExp(`--bs-${v}: var\\(--ds-`), v);
+  for (const v of ['body-bg', 'body-color', 'link-color', 'link-hover-color', 'primary', 'danger', 'success', 'warning', 'info', 'light', 'dark']) {
+    assert.match(bridge, new RegExp(`--bs-${v}-rgb: \\d+, \\d+, \\d+;`), v);
+  }
+  assert.doesNotMatch(bridge, /-rgb: \d+ \d+/); // space-separated triplets break rgba(var(--bs-*-rgb), a)
+  assert.doesNotMatch(bridge, /var\(--ds-[^)]*,/); // no fallbacks
+});
+
+test('the Bootstrap bridge keeps .bg-light light: its triplet comes from an opaque surface', () => {
+  assert.match(files['_bootstrap-bridge.scss'], /^:root,[^}]*--bs-light-rgb: 249, 248, 247;/m);
 });
 
 test('_elevation.scss follows the same switches as _semantic.scss', () => {
   assert.deepEqual(selectors(files['_elevation.scss']), MODE_SELECTORS);
 });
 
-test('the Bootstrap bridge follows color mode auto into dark', () => {
+test('the Bootstrap bridge follows every mode: auto into dark, and increased contrast as triplet overrides', () => {
   const bridge = files['_bootstrap-bridge.scss'];
-  assert.deepEqual(selectors(bridge), ['[data-color-mode="light"]', '[data-color-mode="dark"]', '@media (prefers-color-scheme: dark)', '[data-color-mode="auto"]']);
+  assert.deepEqual(selectors(bridge), MODE_SELECTORS);
   const [, dark, auto] = bridge.split(/\n(?=\S)/).filter((b) => b.includes('--bs-'));
   const decls = (b) => b.match(/--bs-[^\n]+/g);
   assert.deepEqual(decls(auto), decls(dark));
+  const lightMore = bridge.slice(bridge.indexOf(`${L}[data-contrast-mode="more"]`));
+  assert.match(lightMore.slice(0, lightMore.indexOf('}')), /--bs-body-color-rgb: 29, 27, 22;/);
+  assert.doesNotMatch(lightMore.slice(0, lightMore.indexOf('}')), /var\(/); // the var() lines already follow the mode
 });
