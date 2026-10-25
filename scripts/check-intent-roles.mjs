@@ -35,6 +35,7 @@ import {
   mixFailures,
   mixedUses,
   stylesheets,
+  themeMapUses,
 } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
@@ -65,6 +66,7 @@ const inputs = byRoot((repoRoot) => {
     files,
     uses: edgeUses(files, repoRoot),
     mixed: mixedUses(files, repoRoot),
+    mapped: themeMapUses(files, repoRoot),
     // A vanished roles file is the floor case, not a crash (#611).
     roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
@@ -114,8 +116,17 @@ const reasonless = (ratchet) => {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, uses, mixed, roles } = inputs(repoRoot);
+  const { files, uses, mixed, mapped, roles } = inputs(repoRoot);
   const found = [];
+
+  // A theme-map row that hands its edge slot the base. Held at zero, no record.
+  for (const use of mapped) {
+    found.push({
+      message:
+        `${use.file}:${use.line} — the '${use.intent}' row of a theme map puts ${use.token} in its edge ` +
+        `slot (slot ${use.slot}, where another row names its -border role). Use ${use.role}.`,
+    });
+  }
 
   if (files.length < MIN_FILES) {
     found.push({

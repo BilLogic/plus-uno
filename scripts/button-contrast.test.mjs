@@ -146,18 +146,19 @@ test('an unresolvable token is reported, not scored', () => {
   assert.match(findings(themes, values)[0], /cannot resolve --missing/);
 });
 
-test('against the real repo, it finds exactly what #312 measured in a browser', () => {
+test('against the real repo, every label clears AA and the one duplicate is info', () => {
   const { values, themes } = readRepo();
   const rows = sweep(themes, values);
 
   // Every combination resolves — no token in the map is missing.
   assert.equal(rows.filter((row) => row.ratio === null).length, 0);
 
-  // The one failure, at the value the browser sweep reported.
-  const failures = rows.filter((row) => row.ratio < 4.5);
-  assert.deepEqual(failures.map((row) => `${row.style}/${row.fill}`), ['warning/filled']);
-  assert.equal(failures[0].ratio, 3.7);
+  // No failures. Filled warning was the one at 3.70:1 with a white label; it
+  // takes the ink now and keeps its yellow, and the tightest row is that one.
+  assert.deepEqual(rows.filter((row) => row.ratio < 4.5), []);
+  const warning = rows.find((row) => row.style === 'warning' && row.fill === 'filled');
+  assert.equal(warning.ratio, 4.62);
 
-  // And the one duplicate.
+  // And the one duplicate, kept: info is an alias of tertiary by decision.
   assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
 });

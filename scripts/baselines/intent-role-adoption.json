@@ -33,11 +33,6 @@
       "outline": 1,
       "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
     },
-    "design-system/src/specs/Training/Lessons/Cards/AlertForSupervisors/AlertForSupervisors.scss": {
-      "border": 1,
-      "outline": 0,
-      "why": "The warning border is the ONE site whose migration would change a pixel: --color-warning-border is #715c00, not the #9f8205 base. The base measures 3.70:1 on this alert ground, which clears the 3:1 non-text bar, so there is no defect here to fix — only a choice, and #312 has not made it. Left alone deliberately; when the warning value is decided this entry goes to 0."
-    },
     "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
       "border": 0,
       "outline": 1,

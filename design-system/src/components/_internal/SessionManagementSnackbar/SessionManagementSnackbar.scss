@@ -35,9 +35,10 @@
             background-color: var(--color-info); // #0e8175 (Teal)
         }
 
-        &--canceled,
         &--canceled {
             background-color: var(--color-warning); // #9f8205 (Gold/Brown)
+            // White is 3.52:1 on the yellow; the ink is 4.62:1.
+            color: var(--color-on-warning);
         }
     }
 
