@@ -25,6 +25,7 @@ summary: Tokens — Overview & Decision Tree
 | The frame around the content box, and the rounded content box | **surface container**, **surface** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
 | Full-screen layer under a modal, and its scrim | **overlay** | `--overlay-*` |
 | Floating layer with no scrim (menu, popup, tooltip, flag) | **popover** | `--popover-*` |
+| A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |
 
 The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-pad-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
 

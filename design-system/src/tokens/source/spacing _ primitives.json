@@ -825,6 +825,41 @@
       "resolvedValuesByMode": {
         "19364:14": 640
       }
+    },
+    {
+      "id": "VariableID:19675:181",
+      "name": "Space/space-03125",
+      "variableCollectionId": "VariableCollectionId:19364:197",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:14": 5
+      },
+      "resolvedValuesByMode": {
+        "19364:14": 5
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--space-03125)"
+      }
+    },
+    {
+      "id": "VariableID:19675:182",
+      "name": "Radius/radius-03125",
+      "variableCollectionId": "VariableCollectionId:19364:197",
+      "resolvedType": "FLOAT",
+      "valuesByMode": {
+        "19364:14": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19675:181"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19364:14": 5
+      },
+      "scopes": [],
+      "codeSyntax": {
+        "WEB": "var(--radius-03125)"
+      }
     }
   ]
 }
