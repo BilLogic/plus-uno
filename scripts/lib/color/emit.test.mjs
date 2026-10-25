@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { renderPlan } from './build.mjs';
-import { dsName, paletteVar } from './emit.mjs';
+import { BRIDGE_TRIPLETS, dsName, paletteVar } from './emit.mjs';
 
 const files = renderPlan('A', 'scripts/generate-color-tokens.mjs');
 const selectors = (css) => [...css.matchAll(/^(@media[^{]*|\s*[^\s@][^{\n]*)\{$/gm)].map((m) => m[1].trim());
@@ -58,20 +58,45 @@ test('alphas are rgb() with a slash, never 8-digit hex', () => {
   assert.doesNotMatch(files['_palette.scss'] + files['_elevation.scss'], /#[0-9a-f]{8}\b/);
 });
 
-test('the Bootstrap bridge points --bs-* at --ds-* and writes rgb triplets per mode', () => {
+test('the Bootstrap bridge points --bs-* at --ds-* and writes comma triplets Bootstrap can compose', () => {
   const bridge = files['_bootstrap-bridge.scss'];
   assert.match(bridge, /--bs-primary: var\(--ds-background-brand-bold\);/);
-  assert.match(bridge, /--bs-primary-rgb: 20 123 132;/);
+  assert.match(bridge, /--bs-primary-rgb: 20, 123, 132;/);
+  for (const v of ['body-bg', 'body-color', 'border-color', 'link-color', 'link-hover-color', 'focus-ring-color']) assert.match(bridge, new RegExp(`--bs-${v}: var\\(--ds-`), v);
+  for (const v of Object.keys(BRIDGE_TRIPLETS)) assert.match(bridge, new RegExp(`${v}: \\d+, \\d+, \\d+;`), v);
+  for (const v of ['secondary-bg', 'tertiary-bg', 'emphasis-color']) assert.ok(`--bs-${v}-rgb` in BRIDGE_TRIPLETS, v);
+  assert.doesNotMatch(bridge, /-rgb: \d+ \d+/); // space-separated triplets break rgba(var(--bs-*-rgb), a)
+  assert.doesNotMatch(bridge, /var\(--ds-[^)]*,/); // no fallbacks
+  const defined = new Set(files['_semantic.scss'].match(/--ds-[\w-]+(?=:)/g));
+  for (const [, name] of bridge.matchAll(/var\((--ds-[\w-]+)\)/g)) assert.ok(defined.has(name), `${name} is a generated role`);
+});
+
+test('the Bootstrap bridge restates the form states and dropdown active item Bootstrap compiles in blue', () => {
+  const bridge = files['_bootstrap-bridge.scss'];
+  assert.doesNotMatch(bridge, /#0d6efd|#86b7fe|13, 110, 253/i);
+  assert.match(bridge, /\.form-check-input:checked,\n[^{]*\{\n  background-color: var\(--ds-background-selected-bold\);/);
+  assert.match(bridge, /\.form-check-input:focus \{\n  border-color: var\(--bs-border-color\);\n  box-shadow: none;\n  outline: 2px solid var\(--ds-border-focused\);\n  outline-offset: 2px;/);
+  assert.match(bridge, /--bs-dropdown-link-active-bg: var\(--ds-background-selected\);/);
+  // The check glyph is the inverse icon color, per mode: white on light, near-black on dark.
+  assert.match(bridge, /^:root,[^}]*--bs-form-check-checked-image: url\("[^"]*stroke='%23ffffff'/m);
+  assert.match(bridge, /^\[data-color-mode="dark"\][^}]*--bs-form-check-checked-image: url\("[^"]*stroke='%23191919'/m);
+});
+
+test('the Bootstrap bridge keeps .bg-light light: its triplet comes from an opaque surface', () => {
+  assert.match(files['_bootstrap-bridge.scss'], /^:root,[^}]*--bs-light-rgb: 249, 248, 247;/m);
 });
 
 test('_elevation.scss follows the same switches as _semantic.scss', () => {
   assert.deepEqual(selectors(files['_elevation.scss']), MODE_SELECTORS);
 });
 
-test('the Bootstrap bridge follows color mode auto into dark', () => {
+test('the Bootstrap bridge follows every mode: auto into dark, and increased contrast as triplet overrides', () => {
   const bridge = files['_bootstrap-bridge.scss'];
-  assert.deepEqual(selectors(bridge), ['[data-color-mode="light"]', '[data-color-mode="dark"]', '@media (prefers-color-scheme: dark)', '[data-color-mode="auto"]']);
+  assert.deepEqual(selectors(bridge).slice(0, MODE_SELECTORS.length), MODE_SELECTORS);
   const [, dark, auto] = bridge.split(/\n(?=\S)/).filter((b) => b.includes('--bs-'));
   const decls = (b) => b.match(/--bs-[^\n]+/g);
   assert.deepEqual(decls(auto), decls(dark));
+  const lightMore = bridge.slice(bridge.indexOf(`${L}[data-contrast-mode="more"]`));
+  assert.match(lightMore.slice(0, lightMore.indexOf('}')), /--bs-body-color-rgb: 29, 27, 22;/);
+  assert.doesNotMatch(lightMore.slice(0, lightMore.indexOf('}')), /var\(/); // the var() lines already follow the mode
 });

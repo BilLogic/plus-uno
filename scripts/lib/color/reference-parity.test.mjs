@@ -5,7 +5,7 @@
 // Point COLOR_REFERENCE_DIR at the folder that holds `generator/` and `out/` to
 // run it from another checkout.
 //
-// Two departures from the reference are deliberate, and the comparison is
+// Three departures from the reference are deliberate, and the comparison is
 // shaped around them:
 // - Descriptions (`use`, `deviation`, Figma `description`) say the rule rather
 //   than the proposal's decision numbers, so names, references and hex are
@@ -13,6 +13,12 @@
 // - `_elevation.scss` and `_bootstrap-bridge.scss` add the color-auto and
 //   contrast-auto blocks the reference omits, so every reference block must
 //   appear verbatim in ours, and ours may hold more.
+// - `_bootstrap-bridge.scss` writes its `*-rgb` triplets with commas, since
+//   Bootstrap composes them as `rgba(var(--bs-primary-rgb), .5)`; points
+//   `--bs-light` at an opaque surface, since a triplet drops alpha; and bridges
+//   more variables, with increased-contrast blocks. So every other reference
+//   declaration must appear in our block of the same selector, triplets
+//   compared as numbers.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -64,9 +70,15 @@ for (const key of ['A', 'B']) {
 
   test(`Plan ${key}: elevation and bridge SCSS keep every reference block`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
-    for (const file of ['_elevation.scss', '_bootstrap-bridge.scss']) {
-      const ours = blocks(body(files[file]));
-      for (const b of blocks(body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')))) assert.ok(ours.includes(b), `${file}: ${b.split('\n')[0]}`);
+    const ours = blocks(body(files['_elevation.scss']));
+    for (const b of blocks(body(readFileSync(join(REF, `out/${key}/_elevation.scss`), 'utf8')))) assert.ok(ours.includes(b), `_elevation.scss: ${b.split('\n')[0]}`);
+
+    const decls = (b) => (b.match(/--bs-[^\n;]+/g) ?? []).map((d) => d.replace(/(-rgb: )(\d+)[ ,]+(\d+)[ ,]+(\d+)/, '$1$2,$3,$4'));
+    const bySelector = (css) => new Map(blocks(css).map((b) => [b.slice(0, b.indexOf('{')).trim(), decls(b)]));
+    const bridge = bySelector(body(files['_bootstrap-bridge.scss']));
+    for (const [sel, refDecls] of bySelector(body(readFileSync(join(REF, `out/${key}/_bootstrap-bridge.scss`), 'utf8')))) {
+      assert.ok(bridge.has(sel), `_bootstrap-bridge.scss: ${sel}`);
+      for (const d of refDecls.filter((d) => !d.startsWith('--bs-light'))) assert.ok(bridge.get(sel).includes(d), `_bootstrap-bridge.scss ${sel}: ${d}`);
     }
   });
 }
