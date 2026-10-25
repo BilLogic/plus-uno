@@ -287,8 +287,6 @@ test('Switch: hover lays the 08 over the track, on or off', () => {
  * inverse-primary halo touching its border, and on a checked radio the two
  * merged into one thick primary edge that did not read as focus.
  */
-const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)' };
-
 for (const [name, file, selector, ring] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
   ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible', DS_RING_OUTSIDE],
