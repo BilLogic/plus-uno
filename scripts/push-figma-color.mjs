@@ -21,9 +21,20 @@
  *   - Upsert by name. A collection, mode, variable or effect style is found by
  *     its name and updated in place, or created when absent — so a re-run, or a
  *     retry after a batch failed halfway, converges instead of duplicating.
- *   - Never deletes. Nothing absent from the spec is removed or renamed; the
- *     drift check reports it, and `--diff` names it `extra`, for a person to
- *     decide.
+ *   - Never deletes. Nothing absent from the spec is removed; the drift check
+ *     reports it, and `--diff` names it `extra`, for a person to decide. The one
+ *     rename is a mode: a spec mode name missing from its collection takes over
+ *     the mode in the same position when that mode's name is not a spec name,
+ *     and is added otherwise. Modes beyond the spec stay, reported as warnings.
+ *   - Never guesses. Two collections, two variables in one collection, or two
+ *     effect styles with the same name stop the batch before it writes, listing
+ *     them.
+ *   - Never writes where it must not. Every script reads `figma.fileKey` first
+ *     and refuses the Specs file outright; a push batch refuses the BS4
+ *     Foundation library unless it was printed with `--target bs4`. The key is
+ *     the only reliable identity: `figma.root.name` reads "Document" and
+ *     `figma.root.id` "0:0" in every file (measured 2026-10-25), so a script that
+ *     cannot read the key refuses to run rather than fall back to them.
  *   - Order matters only across batches: primitives before the foundations that
  *     alias them, foundations before the effect styles bound to them.
  *
@@ -43,6 +54,8 @@
  * Usage:
  *   npm run push:figma-color -- --list            the batches, in run order
  *   npm run push:figma-color -- --batch N         print batch N's Plugin API script
+ *   ... --target bs4                              print batches allowed to write the
+ *                                                 BS4 Foundation library (Bill's call)
  *   npm run push:figma-color -- --probe           print the drift-check script
  *   npm run push:figma-color -- --diff FILE       name what differs, from the
  *                                                 probe's returned JSON in FILE
@@ -113,9 +126,9 @@ export function unescapeHtml(s) {
  * of its sorted `name=fingerprint` lines. The probe carries 64 of these per
  * collection instead of ~760 per-variable hashes, so it stays small enough to
  * paste; a missing, extra or changed variable moves exactly one bucket, and the
- * probe then lists that bucket's live variables for `--diff` to name.
+ * probe then lists that bucket's live variables for `--diff` to name. The 64 is
+ * written into both functions, since their source is what the probe embeds.
  */
-export const BUCKETS = 64;
 export function bucketOf(name) {
   return parseInt(fnv(name), 16) % 64;
 }
@@ -125,13 +138,18 @@ export function bucketHashes(entries) {
   return lines.map((l) => fnv(l.sort().join('\n')));
 }
 
+/** A spec variable's raw value in one mode: `{alias, name}` or `{value}`. One-mode collections carry `value`. */
+export function modeValue(v, mode) {
+  return v.values ? v.values[mode] : { value: v.value };
+}
+
 /**
  * A variable's Figma type. The spec writes `type` only for the shadow geometry;
  * the opacity variables carry a bare number and no type, so a number is FLOAT.
  */
 export function typeOf(v) {
   if (v.type) return v.type;
-  const first = v.values ? Object.values(v.values)[0] : { value: v.value };
+  const first = v.values ? Object.values(v.values)[0] : modeValue(v);
   return first && typeof first.value === 'number' ? 'FLOAT' : 'COLOR';
 }
 
@@ -139,7 +157,7 @@ export function typeOf(v) {
 export function specRecord(collection, v) {
   const type = typeOf(v);
   const values = collection.modes.map((mode) => {
-    const raw = v.values ? v.values[mode] : { value: v.value };
+    const raw = modeValue(v, mode);
     if (raw == null) return null;
     if (raw.alias) return { alias: `${raw.alias}:${raw.name}` };
     return type === 'FLOAT' ? { float: raw.value } : { color: raw.value };
@@ -152,6 +170,22 @@ export function specRecord(collection, v) {
     web: (v.codeSyntax && v.codeSyntax.WEB) || '',
     values,
   };
+}
+
+/* ----------------------------------------------------------------- guard -- */
+
+export const SPECS_FILE = 'W0qzhXWxFsMwSJzkdV2yal';
+export const BS4_LIBRARY = 'zAecJNRdvJzAUOcjV32tRX';
+
+/** The first lines of every printed script: which file this is, and whether it may run here. */
+function guard({ writes, allowBs4 }) {
+  return [
+    `const GUARD = { writes: ${!!writes}, allowBs4: ${!!allowBs4} };`,
+    `const FILE_KEY = typeof figma.fileKey === 'string' ? figma.fileKey : '';`,
+    `if (!FILE_KEY) throw new Error('push:figma-color refuses to run: figma.fileKey is unavailable, so the script cannot tell which file it is in (figma.root.name reads "Document" in every file).');`,
+    `if (FILE_KEY === '${SPECS_FILE}') throw new Error('push:figma-color refuses to run in the Specs file (${SPECS_FILE}); color foundations are never written or checked there.');`,
+    `if (GUARD.writes && FILE_KEY === '${BS4_LIBRARY}' && !GUARD.allowBs4) throw new Error('push:figma-color refuses to write the BS4 Foundation library (${BS4_LIBRARY}) without --target bs4; that run waits for Bill to approve it.');`,
+  ].join('\n');
 }
 
 /* ------------------------------------------------------------------ push -- */
@@ -175,11 +209,24 @@ const unpack = (part) => part.vars.map(([name, t, si, h, d, web, vals]) => ({
     return [m, typeof x === 'string' ? { alias: part.alias, name: x } : { value: Array.isArray(x) ? { r: x[0], g: x[1], b: x[2], a: x[3] } : x }];
   })),
 }));
-const out = { collections: {}, created: 0, updated: 0, effectStyles: [], errors: [] };
+const out = { collections: {}, created: 0, updated: 0, effectStyles: [], errors: [], warnings: [] };
 const localCols = await figma.variables.getLocalVariableCollectionsAsync();
 const allVars = await figma.variables.getLocalVariablesAsync();
 const colName = {};
 for (const c of localCols) colName[c.id] = c.name;
+// Same-named collections, variables in one collection, or effect styles: stop before any write.
+const dupes = [];
+const seenCol = {};
+for (const c of localCols) (seenCol[c.name] = seenCol[c.name] || []).push(c.id);
+for (const [n, ids] of Object.entries(seenCol)) if (ids.length > 1) dupes.push('collection "' + n + '": ' + ids.join(', '));
+const seenVar = {};
+for (const v of allVars) { const k = colName[v.variableCollectionId] + ' / ' + v.name; (seenVar[k] = seenVar[k] || []).push(v.id); }
+for (const [k, ids] of Object.entries(seenVar)) if (ids.length > 1) dupes.push('variable "' + k + '": ' + ids.join(', '));
+const localStyles = D.effectStyles ? await figma.getLocalEffectStylesAsync() : [];
+const seenStyle = {};
+for (const st of localStyles) (seenStyle[st.name] = seenStyle[st.name] || []).push(st.id);
+for (const [n, ids] of Object.entries(seenStyle)) if (ids.length > 1) dupes.push('effect style "' + n + '": ' + ids.join(', '));
+if (dupes.length) throw new Error('push:figma-color stops: these names are not unique, so an upsert by name would pick one at random. Resolve them in the file first.\n' + dupes.join('\n'));
 const byKey = {};
 for (const v of allVars) byKey[colName[v.variableCollectionId] + ':' + v.name] = v;
 for (const part of D.parts || []) {
@@ -187,11 +234,19 @@ for (const part of D.parts || []) {
   let col = localCols.find((c) => c.name === spec.name);
   if (!col) {
     col = figma.variables.createVariableCollection(spec.name);
-    col.renameMode(col.modes[0].modeId, spec.modes[0]);
     localCols.push(col);
     colName[col.id] = col.name;
   }
-  for (const m of spec.modes) if (!col.modes.some((x) => x.name === m)) col.addMode(m);
+  // Reconcile modes: a missing spec name takes over the mode in its position when
+  // that mode is not itself a spec name, else it is added. Nothing is deleted.
+  spec.modes.forEach((m, i) => {
+    if (col.modes.some((x) => x.name === m)) return;
+    const there = col.modes[i];
+    if (there && spec.modes.indexOf(there.name) < 0) col.renameMode(there.modeId, m);
+    else col.addMode(m);
+  });
+  const extraModes = col.modes.filter((x) => spec.modes.indexOf(x.name) < 0).map((x) => x.name);
+  if (extraModes.length) out.warnings.push(spec.name + ': modes outside the spec left in place: ' + extraModes.join(', '));
   if (spec.hidden !== undefined && col.hiddenFromPublishing !== spec.hidden) col.hiddenFromPublishing = spec.hidden;
   const modeId = {};
   for (const m of col.modes) modeId[m.name] = m.modeId;
@@ -216,12 +271,17 @@ for (const part of D.parts || []) {
   }
 }
 if (D.effectStyles) {
-  const styles = await figma.getLocalEffectStylesAsync();
+  const styles = localStyles;
   const fKey = 'color / foundations:';
+  // The first mode's value, alias chain followed; null when the chain breaks.
   const firstValue = (v) => {
     let val = v.valuesByMode[Object.keys(v.valuesByMode)[0]];
-    while (val && val.type === 'VARIABLE_ALIAS') { const t = Object.values(byKey).find((x) => x.id === val.id); val = t.valuesByMode[Object.keys(t.valuesByMode)[0]]; }
-    return val;
+    for (let hops = 0; val && val.type === 'VARIABLE_ALIAS'; hops++) {
+      const t = hops < 10 ? Object.values(byKey).find((x) => x.id === val.id) : null;
+      if (!t) return null;
+      val = t.valuesByMode[Object.keys(t.valuesByMode)[0]];
+    }
+    return val == null ? null : val;
   };
   for (const s of D.effectStyles) {
     let style = styles.find((x) => x.name === s.name);
@@ -237,10 +297,14 @@ if (D.effectStyles) {
         if (!vars[field]) out.errors.push(s.name + ': no variable ' + name);
       }
       if (Object.values(vars).some((x) => !x)) continue;
+      const first = {};
+      for (const field of Object.keys(vars)) first[field] = firstValue(vars[field]);
+      const unresolved = Object.keys(first).filter((field) => first[field] == null);
+      if (unresolved.length) { out.errors.push(s.name + ': no value to start from for ' + unresolved.join(', ')); continue; }
       let e = {
         type: layer.type, visible: true, blendMode: 'NORMAL', showShadowBehindNode: false,
-        color: firstValue(vars.color), offset: { x: firstValue(vars.offsetX), y: firstValue(vars.offsetY) },
-        radius: firstValue(vars.radius), spread: firstValue(vars.spread),
+        color: first.color, offset: { x: first.offsetX, y: first.offsetY },
+        radius: first.radius, spread: first.spread,
       };
       for (const field of Object.keys(vars)) e = figma.variables.setBoundVariableForEffect(e, field, vars[field]);
       effects.push(e);
@@ -265,8 +329,8 @@ export function stateOf(name) {
 }
 
 const runtime = PUSH_RUNTIME.replace('__DERIVED_WEB__', () => derivedWeb.toString()).replace('__STATE_OF__', () => stateOf.toString());
-const pushScript = (label, data) =>
-  `// push:figma-color — ${label}. Generated from ${SPEC_PATH}; safe to re-run.\nconst D = ${JSON.stringify(data)};\n${runtime}`;
+const pushScript = (label, data, allowBs4 = false) =>
+  `// push:figma-color — ${label}. Generated from ${SPEC_PATH}; safe to re-run.\n${guard({ writes: true, allowBs4 })}\nconst D = ${JSON.stringify(data)};\n${runtime}`;
 
 const collectionHeader = (c) => ({ name: c.name, modes: c.modes, hidden: c.hiddenFromPublishing });
 
@@ -287,7 +351,7 @@ export function pack(collection, v, scopeSets, aliasCollection, strings = []) {
   let si = scopeSets.findIndex((x) => JSON.stringify(x) === key);
   if (si < 0) si = scopeSets.push(v.scopes || []) - 1;
   const vals = collection.modes.map((mode) => {
-    const raw = v.values ? v.values[mode] : { value: v.value };
+    const raw = modeValue(v, mode);
     if (raw == null) throw new Error(`${v.name}: no value for mode ${mode}`);
     if (raw.alias) {
       if (raw.alias !== aliasCollection) throw new Error(`${v.name}: aliases ${raw.alias}, the part aliases ${aliasCollection}`);
@@ -326,7 +390,9 @@ function aliasTarget(c) {
  * do not fit; every batch re-declares its collection header, so any batch can be
  * re-run alone once its predecessors have run once.
  */
-export function batches(spec) {
+export function batches(spec, { target } = {}) {
+  if (target !== undefined && target !== 'bs4') throw new Error(`--target takes only bs4, not ${target}`);
+  const allowBs4 = target === 'bs4';
   const parts = [];
   for (const c of spec.collections) {
     const alias = aliasTarget(c);
@@ -355,8 +421,8 @@ export function batches(spec) {
     const what = data.effectStyles
       ? `${data.effectStyles.length} effect styles`
       : data.parts.map((p) => `${p.collection.name} ×${p.vars.length}`).join(', ');
-    const label = `batch ${i + 1} of ${merged.length}: ${what}`;
-    return { label, script: pushScript(label, data) };
+    const label = `batch ${i + 1} of ${merged.length}: ${what}${allowBs4 ? ' (may write the BS4 library)' : ''}`;
+    return { label, script: pushScript(label, data, allowBs4) };
   });
 }
 
@@ -377,7 +443,9 @@ for (const c of cols) colName[c.id] = c.name;
 const byId = {};
 for (const v of vars) byId[v.id] = v;
 for (const spec of E.collections) {
-  const col = cols.find((c) => c.name === spec.name);
+  const same = cols.filter((c) => c.name === spec.name);
+  if (same.length > 1) { out.collections[spec.name] = { found: true, duplicates: same.map((c) => c.id) }; continue; }
+  const col = same[0];
   if (!col) { out.collections[spec.name] = { found: false }; continue; }
   const modeIdByName = {};
   for (const m of col.modes) modeIdByName[m.name] = m.modeId;
@@ -404,13 +472,16 @@ for (const spec of E.collections) {
     modes: col.modes.map((m) => m.name), expectedModes: spec.modes,
     hidden: col.hiddenFromPublishing, expectedHidden: spec.hidden,
     bucketsDiffering: bad,
+    duplicateNames: live.map((l) => l.name).filter((n, i, a) => a.indexOf(n) !== i),
     allScopesCount: live.filter((l) => l.rec.scopes.indexOf('ALL_SCOPES') >= 0).length,
     withWebSyntax: live.filter((l) => l.rec.web).length,
   };
 }
 const styles = await figma.getLocalEffectStylesAsync();
 for (const s of E.effectStyles) {
-  const style = styles.find((x) => x.name === s.name);
+  const same = styles.filter((x) => x.name === s.name);
+  if (same.length > 1) { out.effectStyles[s.name] = { found: true, duplicates: same.map((x) => x.id) }; continue; }
+  const style = same[0];
   if (!style) { out.effectStyles[s.name] = { found: false }; continue; }
   const layers = style.effects.map((e) => {
     const b = {};
@@ -420,8 +491,8 @@ for (const s of E.effectStyles) {
   });
   out.effectStyles[s.name] = { found: true, description: unescapeHtml(style.description) === s.description, match: JSON.stringify(layers) === JSON.stringify(s.layers), layers: layers.length };
 }
-out.ok = Object.values(out.collections).every((c) => c.found && !c.bucketsDiffering.length && c.variables === c.expected && c.hidden === c.expectedHidden && JSON.stringify(c.modes) === JSON.stringify(c.expectedModes))
-  && Object.values(out.effectStyles).every((s) => s.found && s.description && s.match);
+out.ok = Object.values(out.collections).every((c) => c.found && !c.duplicates && !c.duplicateNames.length && !c.bucketsDiffering.length && c.variables === c.expected && c.hidden === c.expectedHidden && JSON.stringify(c.modes) === JSON.stringify(c.expectedModes))
+  && Object.values(out.effectStyles).every((s) => s.found && !s.duplicates && s.description && s.match);
 return out;
 `;
 
@@ -455,7 +526,7 @@ export function probeScript(spec) {
     .replace('__FINGERPRINT__', () => fingerprint.toString())
     .replace('__BUCKET_OF__', () => bucketOf.toString())
     .replace('__BUCKET_HASHES__', () => bucketHashes.toString());
-  return `// push:figma-color — drift check. Generated from ${SPEC_PATH}; read-only.\nconst E = ${JSON.stringify(expectation(spec))};\n${runtime}`;
+  return `// push:figma-color — drift check. Generated from ${SPEC_PATH}; read-only.\n${guard({ writes: false })}\nconst E = ${JSON.stringify(expectation(spec))};\n${runtime}`;
 }
 
 /**
@@ -486,11 +557,11 @@ export function diff(spec, probe) {
 
 function cli(argv) {
   const spec = readSpec();
-  const all = batches(spec);
   const arg = (flag) => {
     const i = argv.indexOf(flag);
     return i >= 0 ? argv[i + 1] : undefined;
   };
+  const all = batches(spec, { target: arg('--target') });
   const outDir = arg('--out');
   if (outDir) {
     fs.mkdirSync(outDir, { recursive: true });

@@ -1,7 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { batches, diff, fingerprint, probeScript, readSpec, specRecord } from './push-figma-color.mjs';
+import {
+  BS4_LIBRARY, SPECS_FILE, batches, bucketHashes, bucketOf, diff, fingerprint, probeScript, readSpec, specRecord,
+} from './push-figma-color.mjs';
 
 const SPEC = readSpec();
 const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
@@ -12,7 +14,7 @@ const AsyncFunction = Object.getPrototypeOf(async () => {}).constructor;
  * starts on ALL_SCOPES, colors come back as float32, and descriptions come back
  * HTML-escaped.
  */
-function fakeFigma() {
+function fakeFigma(fileKey = 'scratchScratchScratch01') {
   let next = 1;
   const id = (p) => `${p}:${next++}`;
   const collections = [];
@@ -22,6 +24,7 @@ function fakeFigma() {
   const escape = (d) => d.replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const f32 = (c) => ({ r: Math.fround(c.r), g: Math.fround(c.g), b: Math.fround(c.b), a: Math.fround(c.a ?? 1) });
   const figma = {
+    fileKey,
     variables: {
       getLocalVariableCollectionsAsync: async () => [...collections],
       getLocalVariablesAsync: async () => [...variables],
@@ -64,9 +67,9 @@ function fakeFigma() {
 
 const run = (figma, script) => new AsyncFunction('figma', script)(figma);
 
-async function pushAll(figma) {
+async function pushAll(figma, opts) {
   const results = [];
-  for (const b of batches(SPEC)) results.push(await run(figma, b.script));
+  for (const b of batches(SPEC, opts)) results.push(await run(figma, b.script));
   return results;
 }
 
@@ -178,4 +181,85 @@ test('the fingerprint sees every field it claims to compare', () => {
   ];
   for (const v of variants) assert.notEqual(fingerprint(v), h);
   assert.equal(fingerprint({ ...base, scopes: [...base.scopes].reverse() }), h, 'scope order is not a difference');
+});
+
+test('every script refuses the Specs file, and a push refuses BS4 unless printed with --target bs4', async () => {
+  for (const script of [...batches(SPEC).map((b) => b.script), probeScript(SPEC)]) {
+    const { figma, collections } = fakeFigma(SPECS_FILE);
+    await assert.rejects(run(figma, script), /refuses to run in the Specs file/);
+    assert.equal(collections.length, 0);
+  }
+  const bs4 = fakeFigma(BS4_LIBRARY);
+  for (const b of batches(SPEC)) await assert.rejects(run(bs4.figma, b.script), /without --target bs4/);
+  assert.equal(bs4.collections.length, 0, 'nothing written before the guard threw');
+  assert.equal((await run(bs4.figma, probeScript(SPEC))).ok, false, 'the read-only probe may run on BS4');
+  await pushAll(bs4.figma, { target: 'bs4' });
+  assert.equal((await run(bs4.figma, probeScript(SPEC))).ok, true);
+  assert.throws(() => batches(SPEC, { target: 'specs' }), /--target takes only bs4/);
+});
+
+test('a script that cannot read figma.fileKey refuses to run', async () => {
+  const { figma } = fakeFigma(undefined);
+  delete figma.fileKey;
+  await assert.rejects(run(figma, batches(SPEC)[0].script), /figma.fileKey is unavailable/);
+  await assert.rejects(run(figma, probeScript(SPEC)), /figma.fileKey is unavailable/);
+});
+
+test('duplicate names stop a batch before it writes, and the probe reports them', async () => {
+  const twoCollections = fakeFigma();
+  twoCollections.figma.variables.createVariableCollection('color / primitives');
+  twoCollections.figma.variables.createVariableCollection('color / primitives');
+  await assert.rejects(run(twoCollections.figma, batches(SPEC)[0].script), /collection "color \/ primitives": VariableCollectionId:\d+, VariableCollectionId:\d+/);
+  assert.equal(twoCollections.variables.length, 0);
+  assert.equal((await run(twoCollections.figma, probeScript(SPEC))).collections['color / primitives'].duplicates.length, 2);
+
+  const twoVariables = fakeFigma();
+  await pushAll(twoVariables.figma);
+  const prim = twoVariables.collections.find((c) => c.name === 'color / primitives');
+  twoVariables.figma.variables.createVariable('teal/100', prim, 'COLOR');
+  await assert.rejects(run(twoVariables.figma, batches(SPEC)[0].script), /variable "color \/ primitives \/ teal\/100"/);
+  const probe = await run(twoVariables.figma, probeScript(SPEC));
+  assert.deepEqual(probe.collections['color / primitives'].duplicateNames, ['teal/100']);
+  assert.equal(probe.ok, false);
+
+  const twoStyles = fakeFigma();
+  await pushAll(twoStyles.figma);
+  twoStyles.figma.createEffectStyle().name = 'elevation/shadow/raised';
+  await assert.rejects(run(twoStyles.figma, batches(SPEC).at(-1).script), /effect style "elevation\/shadow\/raised"/);
+  assert.equal((await run(twoStyles.figma, probeScript(SPEC))).effectStyles['elevation/shadow/raised'].duplicates.length, 2);
+});
+
+test('an existing same-named collection has its modes reconciled by position, never deleted', async () => {
+  const { figma, collections } = fakeFigma();
+  const old = figma.variables.createVariableCollection('color / foundations');
+  old.renameMode(old.modes[0].modeId, 'Light');
+  old.addMode('Mode 2');
+  old.addMode('Night');
+  old.addMode('Contrast');
+  old.addMode('Legacy');
+  const results = await pushAll(figma);
+  assert.deepEqual(old.modes.map((m) => m.name), ['Light', 'Dark', 'Light IC', 'Dark IC', 'Legacy']);
+  assert.ok(results.flatMap((r) => r.warnings).some((w) => /modes outside the spec left in place: Legacy/.test(w)));
+  assert.equal(collections.filter((c) => c.name === 'color / foundations').length, 1);
+  const probe = await run(figma, probeScript(SPEC));
+  assert.deepEqual(probe.collections['color / foundations'].bucketsDiffering, []);
+  assert.equal(probe.ok, false, 'the extra Legacy mode is drift');
+});
+
+test('an effect layer whose variable has no value is reported, not thrown', async () => {
+  const { figma, variables } = fakeFigma();
+  await pushAll(figma);
+  const v = variables.find((x) => x.name === 'elevation/shadow/raised/layer-1/radius');
+  v.valuesByMode = {};
+  const r = await run(figma, batches(SPEC).at(-1).script);
+  assert.ok(r.errors.some((e) => /elevation\/shadow\/raised: no value to start from for radius/.test(e)));
+  assert.equal(r.effectStyles.find((s) => s.name === 'elevation/shadow/raised').layers, 2);
+});
+
+test('the bucket count is the same 64 in both embedded functions', () => {
+  assert.equal(bucketHashes([]).length, 64);
+  assert.match(bucketOf.toString(), /% 64\b/);
+  assert.match(bucketHashes.toString(), /length: 64\b/);
+  const names = SPEC.collections[1].variables.map((v) => v.name);
+  assert.ok(names.every((n) => bucketOf(n) >= 0 && bucketOf(n) < 64));
 });
