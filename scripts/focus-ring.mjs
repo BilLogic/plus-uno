@@ -43,7 +43,7 @@
  *     which one wins is a decision, not a measurement.
  *  3. GROUND BEYOND THE STYLESHEET. The ground is resolved structurally, as in
  *     `check:text-contrast` (`scripts/lib/declared-grounds.mjs`): walking out
- *     from the rule, the first rule with a `--color-*` background or a
+ *     from the rule, the first rule with a `--color-*` or `--ds-*` background or a
  *     `@grounds` annotation decides, and a declared list must clear 3:1 on
  *     every ground. A ground painted by another component entirely, with no
  *     annotation, is still invisible and the page is assumed.
@@ -61,7 +61,7 @@ import {
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_PREFIXES, COLOR_TOKEN_PATHS, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 import { NON_TEXT, analyzeSheet, groundAt } from './lib/declared-grounds.mjs';
 import { REPO_ROOT, stylesheets } from './text-contrast.mjs';
@@ -92,7 +92,9 @@ export const AFFORDANCE = new RegExp(
 export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
 
 /**
- * Token definitions, from the color file and the role layer that follows it.
+ * Token definitions, from the color file, the role layer that follows it, and
+ * the generated `--palette-*` and `--ds-*` sets, so a ring on
+ * `--ds-border-focused` is measured the way one on `--color-focus-ring` is.
  *
  * Missing files are skipped rather than thrown: a vanished token directory is
  * the sentinel-floor case, and throwing would report a crash instead of the
@@ -102,7 +104,7 @@ export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
  * @returns {Map<string, string>}
  */
 export function colors(root = REPO_ROOT) {
-  const source = [`${TOKEN_DIR}/_colors.scss`, `${TOKEN_DIR}/_color_roles.scss`]
+  const source = [`${TOKEN_DIR}/_colors.scss`, `${TOKEN_DIR}/_color_roles.scss`, ...COLOR_TOKEN_PATHS]
     .map((file) => path.join(root, file))
     .filter((file) => fs.existsSync(file))
     .map((file) => fs.readFileSync(file, 'utf8'))
@@ -135,7 +137,7 @@ export function focusRules(files, root = REPO_ROOT) {
         selector: chain,
         property: declaration[2],
         value: declaration[3].split(/\s+/).join(' ').trim(),
-        tokens: [...declaration[3].matchAll(varReferencePattern('--color-'))].map((m) => m[1]),
+        tokens: [...declaration[3].matchAll(varReferencePattern(COLOR_PREFIXES))].map((m) => m[1]),
         ground: resolved.kind === 'background' ? resolved.token : PAGE_TOKEN,
         declared,
         block: blockStart(source, declaration.index),

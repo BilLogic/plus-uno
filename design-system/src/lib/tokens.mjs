@@ -64,9 +64,18 @@ export const TOKEN_NAME_TAIL = '[a-z0-9-]+';
 /** A whole token name, prefix included. */
 export const TOKEN_NAME = `--${TOKEN_NAME_TAIL}`;
 
-/** Escape a literal prefix so `--color-` cannot act as a pattern. */
+/**
+ * Escape a literal prefix so `--color-` cannot act as a pattern. A LIST of
+ * prefixes is one non-capturing alternation, so a caller reading two families
+ * at once (`['--color-', '--ds-']`, while the legacy color tokens and the
+ * Atlassian-shaped ones coexist) keeps the same group numbers as one reading a
+ * single prefix.
+ *
+ * @param {string|string[]} text
+ */
 function literal(text) {
-  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const escape = (one) => one.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return Array.isArray(text) ? `(?:${text.map(escape).join('|')})` : escape(text);
 }
 
 /**
@@ -76,10 +85,21 @@ function literal(text) {
  * left on. A fresh RegExp each call, because a `/g` pattern carries `lastIndex`
  * and a shared one is a bug that only shows up on the second caller.
  *
- * @param {string} [prefix] e.g. `--color-`; defaults to every token
+ * @param {string|string[]} [prefix] e.g. `--color-`, or a list of them;
+ *        defaults to every token
  */
 export function tokenDeclarationPattern(prefix = '--') {
   return new RegExp(`(${literal(prefix)}${TOKEN_NAME_TAIL})\\s*:\\s*([^;]+);`, 'g');
+}
+
+/**
+ * A bare token NAME and nothing else — `--ds-text`, as an annotation lists it —
+ * optionally narrowed to a prefix or a list of them. Anchored at both ends.
+ *
+ * @param {string|string[]} [prefix]
+ */
+export function tokenNamePattern(prefix = '--') {
+  return new RegExp(`^${literal(prefix)}${TOKEN_NAME_TAIL}$`);
 }
 
 /**
@@ -87,7 +107,7 @@ export function tokenDeclarationPattern(prefix = '--') {
  * token name. It deliberately does not try to match the closing paren: a
  * fallback can itself contain `var()`, and the name is all this needs.
  *
- * @param {string} [prefix]
+ * @param {string|string[]} [prefix] one prefix or a list of them
  */
 export function varReferencePattern(prefix = '--') {
   return new RegExp(`var\\(\\s*(${literal(prefix)}${TOKEN_NAME_TAIL})`, 'g');
@@ -106,7 +126,7 @@ const ALIAS = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*(?:,[^)]*)?\\)$`, 'i');
  * is better than a half-measure that looks like both.
  *
  * @param {string} source stylesheet text
- * @param {{prefix?: string}} [options]
+ * @param {{prefix?: string|string[]}} [options]
  * @returns {Map<string, string>}
  */
 export function readTokens(source, { prefix = '--' } = {}) {
