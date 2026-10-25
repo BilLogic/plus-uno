@@ -11,6 +11,8 @@ import PatternSidebar, {
     useOpenTabs,
 } from '@/patterns/Sidebar';
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `PatternSidebar` — the foundation sidebar: a header (the logo), the
@@ -149,6 +151,36 @@ export const SelectedItem = {
         await expect(onSelect).toHaveBeenCalledWith('sessions');
         await waitFor(() => expect(canvas.getByRole('button', { name: /^Sessions/ })).toHaveAttribute('aria-current', 'page'));
         await expect(canvas.getByRole('button', { name: 'Lessons' })).not.toHaveAttribute('aria-current');
+    },
+};
+
+/**
+ * In every color mode: rows rest in the subtle text color and hover on the
+ * neutral subtle step; the selected row is the neutral selected fill with the
+ * selected text and a leading bar in the selected border; group labels are
+ * the subtlest text.
+ */
+export const ColorModes = {
+    args: { activeId: 'lessons' },
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const selected = canvas.getByRole('button', { name: 'Lessons' });
+        const rest = canvas.getByRole('button', { name: 'Home' });
+        // The rows ease their fill; read the settled value in each mode.
+        [rest, selected].forEach((row) => { row.style.transition = 'none'; });
+        const label = canvasElement.querySelector('.plus-pattern-sidebar__section-label');
+        await inEveryColorMode(async (mode) => {
+            const color = (token) => tokenColor(canvasElement, token);
+            await expect(getComputedStyle(rest).color, `${mode}: a resting row`).toBe(color('--ds-text-subtle'));
+            await expect(withForcedPseudo(rest, ':hover', () => getComputedStyle(rest).backgroundColor), `${mode}: a hovered row`)
+                .toBe(color('--ds-background-neutral-subtle-hovered'));
+            const style = getComputedStyle(selected);
+            await expect(style.backgroundColor, `${mode}: the selected fill`).toBe(color('--ds-background-selected'));
+            await expect(style.color, `${mode}: the selected text`).toBe(color('--ds-text-selected'));
+            await expect(style.boxShadow, `${mode}: the selected bar`).toContain(color('--ds-border-selected'));
+            await expect(getComputedStyle(label).color, `${mode}: a group label`).toBe(color('--ds-text-subtlest'));
+        });
     },
 };
 

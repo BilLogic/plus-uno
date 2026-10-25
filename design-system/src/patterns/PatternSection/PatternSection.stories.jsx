@@ -1,5 +1,8 @@
 import React from 'react';
+import { expect } from 'storybook/test';
 import PatternSection from '@/patterns/PatternSection';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 
@@ -164,4 +167,24 @@ export const Interactive = {
             {slotContent('Content slot')}
         </PatternSection>
     ),
+};
+
+/** In every color mode a filled section is the translucent well, its title the body text and its description the subtle text. */
+export const ColorModes = {
+    render: () => (
+        <PatternSection title="Section title" description="A short description." background="container">
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const section = canvasElement.querySelector('.plus-pattern-section');
+        const title = canvasElement.querySelector('.plus-pattern-section-title');
+        const description = canvasElement.querySelector('.plus-pattern-section-description');
+        await inEveryColorMode(async (mode) => {
+            await expect(getComputedStyle(section).backgroundColor, `${mode}: the well`).toBe(tokenColor(canvasElement, '--ds-surface-container'));
+            await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
+            await expect(getComputedStyle(description).color, `${mode}: the description`).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
+        });
+    },
 };

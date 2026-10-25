@@ -1,5 +1,8 @@
 import React from 'react';
+import { expect } from 'storybook/test';
 import Surface, { SURFACE_LEVELS } from '@/patterns/Surface';
+import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -100,6 +103,32 @@ export const Overview = () => (
 );
 
 export const Levels = () => <SurfaceLevelsDemo />;
+
+/** What each level must draw: its fill and its shadow, as a pair. */
+const LEVEL_PAIRS = {
+    sunken: ['--ds-surface-sunken', 'none'],
+    default: ['--ds-surface', '0 0 0 var(--size-surface-border) var(--ds-border-surface)'],
+    raised: ['--ds-surface-raised', 'var(--ds-shadow-raised)'],
+    overlay: ['--ds-surface-overlay', 'var(--ds-shadow-overlay)'],
+};
+
+/** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
+export const ColorModes = {
+    render: () => <SurfaceLevelsDemo />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        await inEveryColorMode(async (mode) => {
+            for (const level of SURFACE_LEVELS) {
+                const el = canvasElement.querySelector(`.plus-pattern-surface-level-${level}`);
+                const [fill, shadow] = LEVEL_PAIRS[level];
+                const style = getComputedStyle(el);
+                await expect(style.backgroundColor, `${mode}: ${level} fill`).toBe(tokenColor(canvasElement, fill));
+                await expect(style.boxShadow, `${mode}: ${level} shadow`).toBe(computedShadow(canvasElement, shadow));
+                await expect(style.color, `${mode}: ${level} text`).toBe(tokenColor(canvasElement, '--ds-text'));
+            }
+        });
+    },
+};
 
 export const Interactive = {
     args: {

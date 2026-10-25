@@ -3,7 +3,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, Modal, Sidebar } from '@/components';
 import { Frame, Topbar } from '@/patterns';
-import { computedShadow, px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -134,6 +135,31 @@ const expectRowStack = async (frame, surface) => {
 /* ------------------------------------------------------------- stories */
 
 export const Overview = {};
+
+/**
+ * In every color mode the frame is the sunken backdrop in the body text color,
+ * and the surface is the default surface edged by the surface border, so the
+ * pair moves together.
+ */
+export const ColorModes = {
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const { frame, surface } = parts(canvasElement);
+        const lightSunken = tokenColor(canvasElement, '--ds-surface-sunken');
+        await inEveryColorMode(async (mode) => {
+            const frameStyle = getComputedStyle(frame);
+            const surfaceStyle = getComputedStyle(surface);
+            await expect(frameStyle.backgroundColor, `${mode}: the frame is sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(frameStyle.color, `${mode}: frame text`).toBe(tokenColor(canvasElement, '--ds-text'));
+            await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
+            await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
+                .toBe(computedShadow(canvasElement, '0 0 0 var(--size-surface-border) var(--ds-border-surface)'));
+            if (mode.startsWith('dark')) {
+                await expect(frameStyle.backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);
+            }
+        });
+    },
+};
 
 export const Reading = { args: { width: 'reading' } };
 
