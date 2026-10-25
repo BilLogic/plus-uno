@@ -3,7 +3,7 @@ import { TutorAdminWithChatView } from './views/TutorAdminWithChatView';
 
 /**
  * App root: Tutor Admin with integrated Research Assistant.
- * Content lives inside PageLayout's surface (.plus-surface-container__surface). On click of the
+ * Content lives inside PageLayout's surface (.plus-frame__surface). On click of the
  * compact chat text bar, training content dissolves out and full chat grows in.
  */
 export default function App(): React.ReactElement {

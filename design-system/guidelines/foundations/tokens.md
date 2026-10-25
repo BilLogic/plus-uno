@@ -22,7 +22,7 @@ summary: Tokens — Overview & Decision Tree
 | Tabular data (rows, cells, headers) | **table** | `--size-table-*` |
 | Overlay or dialog (confirmation, detail panel) | **modal** | `--size-modal-*` |
 | Page frame: topbar, sidebar, grid, content width, modal width | **layout** | `--layout-*` (per breakpoint) |
-| The frame around the content box, and the rounded content box | **surface container**, **surface** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
+| The frame around the content box, and the rounded content box (the `Frame` pattern; its spacing tokens keep the Figma name) | **surface container**, **surface** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
 | Full-screen layer under a modal, and its scrim | **overlay** | `--overlay-*` |
 | Floating layer with no scrim (menu, popup, tooltip, flag) | **popover** | `--popover-*` |
 | A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |

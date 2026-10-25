@@ -91,8 +91,8 @@ PatternSection.propTypes = {
     padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
     /** Gap scale between header and content (section gap tokens) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Background: transparent (default) or surface-container-low */
-    background: PropTypes.oneOf(['none', 'surface-container-low']),
+    /** Background: transparent (default) or `container`, the translucent well (`--ds-surface-container`) */
+    background: PropTypes.oneOf(['none', 'container']),
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot */

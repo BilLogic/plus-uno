@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlayStack';
 import Topbar from '../Topbar';
 import { SidebarControlContext } from './SidebarControl';
-import './SurfaceContainer.scss';
+import './Frame.scss';
 
 /** The sidebar docks from Large (1024), the same breakpoint the Layout tokens switch on. */
 const DOCK_QUERY = '(min-width: 1024px)';
@@ -52,7 +52,7 @@ const useWide = (ref) => {
 };
 
 /**
- * Surface container pattern: the app frame. Mirrors the Figma
+ * Frame pattern: the app frame. Mirrors the Figma
  * `Pattern/Surface container`: a 32 topbar over a row holding the sidebar and
  * the surface.
  *
@@ -77,7 +77,7 @@ const useWide = (ref) => {
  *   `--layout-max-width-content` (1232), centered, on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
  */
-const SurfaceContainer = ({
+const Frame = ({
     id,
     topbar,
     sidebar,
@@ -182,10 +182,10 @@ const SurfaceContainer = ({
     const peeking = hasSidebar && state === 'peek';
 
     const classes = [
-        'plus-surface-container',
+        'plus-frame',
         // The left pad token assumes the width's default; flip it when the user has.
-        docked && !wide ? 'plus-surface-container--docked-narrow' : '',
-        !docked && wide ? 'plus-surface-container--undocked-wide' : '',
+        docked && !wide ? 'plus-frame--docked-narrow' : '',
+        !docked && wide ? 'plus-frame--undocked-wide' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -194,11 +194,11 @@ const SurfaceContainer = ({
             ref={sidebarRef}
             id={sidebarId}
             aria-label={sidebarLabel}
-            className={`plus-surface-container__sidebar plus-surface-container__sidebar--${floating ? 'floating' : 'docked'}`}
+            className={`plus-frame__sidebar plus-frame__sidebar--${floating ? 'floating' : 'docked'}`}
             onPointerEnter={floating ? cancelLeave : undefined}
             onPointerLeave={floating ? leave : undefined}
         >
-            {floating ? <div className="plus-surface-container__topbar-space" aria-hidden="true" /> : null}
+            {floating ? <div className="plus-frame__topbar-space" aria-hidden="true" /> : null}
             {sidebar}
         </aside>
     );
@@ -220,24 +220,24 @@ const SurfaceContainer = ({
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
             <SidebarControlContext.Provider value={control}>
-                <div className="plus-surface-container__topbar">
+                <div className="plus-frame__topbar">
                     {topbar ?? (hasSidebar ? <Topbar /> : null)}
                 </div>
             </SidebarControlContext.Provider>
 
             {hasSidebar && state === 'closed' ? (
-                <div className="plus-surface-container__edge" aria-hidden="true" onPointerEnter={peek} />
+                <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peek} />
             ) : null}
             {peeking ? sidebarPanel(true) : null}
 
-            <div className="plus-surface-container__row">
+            <div className="plus-frame__row">
                 {docked ? sidebarPanel(false) : null}
-                <div className="plus-surface-container__surface">
+                <div className="plus-frame__surface">
                     {surfaceDirect ? children : (
                         <Content
                             className={[
-                                'plus-surface-container__content',
-                                `plus-surface-container__content--${width}`,
+                                'plus-frame__content',
+                                `plus-frame__content--${width}`,
                                 contentClassName,
                             ].filter(Boolean).join(' ')}
                         >
@@ -250,7 +250,7 @@ const SurfaceContainer = ({
     );
 };
 
-SurfaceContainer.propTypes = {
+Frame.propTypes = {
     id: PropTypes.string,
     /** The topbar row: a `Topbar`, which draws the sidebar toggle from the frame's state. Defaults to a bare Topbar when there is a sidebar. */
     topbar: PropTypes.node,
@@ -273,4 +273,4 @@ SurfaceContainer.propTypes = {
     children: PropTypes.node,
 };
 
-export default SurfaceContainer;
+export default Frame;

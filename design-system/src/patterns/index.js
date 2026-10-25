@@ -3,8 +3,8 @@
 // consumers fill the slots.
 
 export { default as Surface, SURFACE_LEVELS } from './Surface';
-export { default as SurfaceContainer } from './SurfaceContainer';
-export { useSidebarControl } from './SurfaceContainer/SidebarControl';
+export { default as Frame } from './Frame';
+export { useSidebarControl } from './Frame/SidebarControl';
 export { default as Topbar } from './Topbar';
 export {
     default as PatternSidebar,

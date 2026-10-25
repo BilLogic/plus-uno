@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Breadcrumb, Button, Skeleton, UserAvatar } from '@/components';
-import { useSidebarControl } from '../SurfaceContainer/SidebarControl';
+import { useSidebarControl } from '../Frame/SidebarControl';
 import './Topbar.scss';
 
 /**
@@ -17,7 +17,7 @@ import './Topbar.scss';
  * - **End**, 12 apart: Help Center, a secondary text button with
  *   `circle-question`, then the 32 UserAvatar.
  *
- * Inside a SurfaceContainer the frame owns the sidebar state and hands it over
+ * Inside a Frame the frame owns the sidebar state and hands it over
  * through context, so there is one toggle. Standalone, pass `sidebar`,
  * `docked` and `onToggle`; without `onToggle` there is no toggle.
  */
@@ -110,11 +110,11 @@ const Topbar = ({
 };
 
 Topbar.propTypes = {
-    /** Standalone: whether the sidebar is open (docked or floating). Sets the icon and `aria-expanded`. Inside a SurfaceContainer the frame decides. */
+    /** Standalone: whether the sidebar is open (docked or floating). Sets the icon and `aria-expanded`. Inside a Frame the frame decides. */
     sidebar: PropTypes.oneOf(['open', 'closed']),
     /** Standalone: whether an open sidebar is docked. Defaults to `sidebar === 'open'`. Docked, the start area is sidebar-wide. */
     docked: PropTypes.bool,
-    /** Standalone: called when the toggle is pressed. Without it, and outside a SurfaceContainer, there is no toggle. */
+    /** Standalone: called when the toggle is pressed. Without it, and outside a Frame, there is no toggle. */
     onToggle: PropTypes.func,
     /** Extra props for the toggle button, e.g. `aria-controls` */
     toggleProps: PropTypes.object,
