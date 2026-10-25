@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--color-on-surface` · `--color-outline-variant` · `--color-surface-overlay` · `--element-stack-md` · `--heading-xsmall` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popover-width-lg` · `--popover-width-md` · `--popover-width-sm` · `--size-spacing-medium-space-400` · `--surface-overlay-shadow`
+`--body-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--element-stack-md` · `--heading-xsmall` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popover-width-lg` · `--popover-width-md` · `--popover-width-sm` · `--size-spacing-medium-space-400`
 
 From `design-system/src/components/overlays-and-layering/Popover/Popover.scss`. Override these through the token layer, never with a literal.
 

@@ -226,8 +226,8 @@ grows to hold it.
   Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
   multi-select checkbox, which is decorative, since `aria-pressed` already
   says whether it is on.
-- **A selected row is shown by color.** `selected` gives the row the primary
-  state layer 08 and primary text, as Pattern/Menu draws it. Color is all
+- **A selected row is shown by color.** `selected` gives the row neutral ink,
+  `--ds-background-selected` with `--ds-text-selected`, as Pattern/Menu draws it. Color is all
   that marks it, so a row that switches on and off should also be an
   `isToggle` item, which says so through `aria-pressed`. A row with no
   leading visual starts its words at the padding.

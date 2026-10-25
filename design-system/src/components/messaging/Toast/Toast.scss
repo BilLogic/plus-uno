@@ -1,7 +1,9 @@
 /*
  * Toast Component Styles: the Popover family's Flag (Figma Pattern/Flag).
  * One surface, Popover/width-flag 400, pad Popover/pad 16, radius
- * Popover/radius 12, Elevation Light/3. Icon, content and close button sit in
+ * Popover/radius 12, on the overlay pair (elevation.surface.overlay with
+ * elevation.shadow.overlay, whose 1px ring is its edge, so no border). Icon,
+ * content and close button sit in
  * a row Element/inline-lg 12 apart; the title and its message stack
  * Element/stack-sm 4 apart. The style shows only in the icon's color.
  */
@@ -18,10 +20,9 @@
     width: var(--popover-width-flag);
     max-width: calc(100vw - 2 * var(--popover-gap-screen));
     padding: var(--popover-pad);
-    background-color: var(--color-surface-overlay);
-    border: var(--border-default) solid var(--color-outline-variant);
+    background-color: var(--ds-surface-overlay);
     border-radius: var(--popover-radius);
-    box-shadow: var(--surface-overlay-shadow);
+    box-shadow: var(--ds-shadow-overlay);
 
     // Bootstrap hides a toast that is not `.show` with display: none; keep that.
     &:not(.show) {
@@ -41,7 +42,7 @@
             // @contrast: non-text
             font-size: var(--icon-md);
             line-height: var(--icon-md);
-            color: var(--color-on-surface-variant);
+            color: var(--ds-icon-subtle);
         }
     }
 
@@ -64,23 +65,35 @@
         flex: 1 1 auto;
         min-width: 0;
         font: var(--heading-xsmall);
-        color: var(--color-on-surface);
+        color: var(--ds-text);
     }
 
     .plus-toast-timestamp {
         flex-shrink: 0;
         font: var(--body-small);
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
     .plus-toast-body {
         font: var(--body-default);
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
-    // The × is the shared CloseButton, styled by its own stylesheet.
+    // The × is the shared CloseButton. Its default tone is still on the legacy
+    // colors, so on the flag the glyph and its steps take the flag's own
+    // partners and flip with the surface in every mode; the ring is its own.
+    // Remove this override when CloseButton moves to the new color tokens.
     .plus-close-btn {
         flex-shrink: 0;
+        color: var(--ds-icon-subtle);
+
+        &:hover {
+            background-color: var(--ds-background-neutral-subtle-hovered);
+        }
+
+        &:active {
+            background-color: var(--ds-background-neutral-subtle-pressed);
+        }
     }
 
     // --- STYLE VARIANTS: the icon's color ---
@@ -89,35 +102,35 @@
     &.danger .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-danger-icon);
+            color: var(--ds-icon-danger);
         }
     }
 
     &.success .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-success-icon);
+            color: var(--ds-icon-success);
         }
     }
 
     &.warning .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-warning-icon);
+            color: var(--ds-icon-warning);
         }
     }
 
     &.info .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-info-icon);
+            color: var(--ds-icon-information);
         }
     }
 
     &.primary .plus-toast-icon {
         @include icon-glyph {
             // @contrast: non-text
-            color: var(--color-primary-icon);
+            color: var(--ds-icon-brand);
         }
     }
 }
@@ -142,8 +155,8 @@
     position: relative;
     box-sizing: border-box;
     min-height: 280px;
-    border: var(--border-default) solid var(--color-outline-variant);
-    background-color: var(--color-surface-container-lowest);
+    border: var(--border-default) solid var(--ds-border);
+    background-color: var(--ds-surface);
     border-radius: var(--size-element-radius-md);
     padding: var(--size-spacing-medium-space-400);
 }

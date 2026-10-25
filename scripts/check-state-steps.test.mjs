@@ -99,6 +99,11 @@ const RING_INSIDE = {
   'outline-offset': 'calc(-1 * var(--size-element-stroke-lg))',
 };
 
+/** The rings on the new color tokens: `color.border.focused`, outside or inside the box. */
+const DS_RING = 'var(--size-element-stroke-lg) solid var(--ds-border-focused)';
+const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: DS_RING };
+const DS_RING_INSIDE = { ...RING_INSIDE, outline: DS_RING };
+
 const layer = (token) => `var(${token})`;
 
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
@@ -111,11 +116,6 @@ const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
  * hovered and pressed steps above it) with a leading bar, and focus is the
  * focused ring 2px outside the row, with no fill.
  */
-const DS_RING_OUTSIDE = {
-  outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
-  'outline-offset': 'var(--size-element-stroke-lg)',
-};
-
 test('SidebarTab: neutral hover and press, neutral selection with its own steps, focus a ring outside with no fill', () => {
   expectRule(TAB, '.plus-sidebar-tab:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
     'background-color': layer('--ds-background-neutral-subtle-hovered'),
@@ -193,11 +193,13 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
 
 const DROPDOWN = 'components/forms-and-inputs/Dropdown/Dropdown.scss';
 
-test('Dropdown items: hover 08, pressed 12, selected primary 08 (dense list), focus ring only', () => {
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:hover', { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:active', { 'background-color': layer('--color-on-surface-state-12') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected', { 'background-color': layer('--color-primary-state-08') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:focus-visible', RING_INSIDE);
+test('Dropdown items: neutral hovered and pressed, selected neutral ink with its own steps, focus ring only', () => {
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected', { 'background-color': layer('--ds-background-selected') });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:hover', { 'background-color': layer('--ds-background-selected-hovered') });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:active', { 'background-color': layer('--ds-background-selected-pressed') });
+  expectRule(DROPDOWN, '.pdropdown .dropdown-item:focus-visible', DS_RING_INSIDE);
   expectNoFill(DROPDOWN, '.pdropdown .dropdown-item:focus-visible');
 });
 
@@ -316,10 +318,10 @@ for (const [name, file, selector, ring] of [
 
 /* ─── PatternModal close ─────────────────────────────────────────────────── */
 
-test('PatternModal: the close button hovers at 08 and presses at 12', () => {
+test('PatternModal: the close button takes the neutral hovered and pressed steps', () => {
   const file = 'patterns/PatternModal/PatternModal.scss';
-  expectRule(file, '.plus-pattern-modal-close:hover', { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(file, '.plus-pattern-modal-close:active', { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, '.plus-pattern-modal-close:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, '.plus-pattern-modal-close:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
 });
 
 /* ─── Field ──────────────────────────────────────────────────────────────── */

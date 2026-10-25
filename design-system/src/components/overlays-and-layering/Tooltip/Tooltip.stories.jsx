@@ -48,9 +48,9 @@ const containerStyle = {
     display: 'flex',
     flexWrap: 'wrap',
     padding: '40px 20px',
-    backgroundColor: 'var(--color-surface-container-lowest)',
+    backgroundColor: 'var(--ds-surface)',
     borderRadius: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
 };
 
 const blockStyle = {
@@ -61,25 +61,25 @@ function TooltipVariantsDemos() {
     return (
         <div style={containerStyle}>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TOP</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TOP</span>
                 <Tooltip text="Tooltip on top" placement="top" show={true}>
                     <Button text="Top" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BOTTOM</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">BOTTOM</span>
                 <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
                     <Button text="Bottom" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LEFT</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LEFT</span>
                 <Tooltip text="Tooltip on left" placement="left" show={true}>
                     <Button text="Left" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RIGHT</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">RIGHT</span>
                 <Tooltip text="Tooltip on right" placement="right" show={true}>
                     <Button text="Right" />
                 </Tooltip>
@@ -92,19 +92,19 @@ function TooltipSizesDemos() {
     return (
         <div style={containerStyle}>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">SMALL</span>
                 <Tooltip text="Small tooltip" size="small" placement="top" show={true}>
                     <Button text="Small" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">DEFAULT</span>
                 <Tooltip text="Default tooltip" size="default" placement="top" show={true}>
                     <Button text="Default" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
+                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LARGE</span>
                 <Tooltip text="Large tooltip" size="large" placement="top" show={true}>
                     <Button text="Large" />
                 </Tooltip>

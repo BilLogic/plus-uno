@@ -219,9 +219,8 @@ Scrim.play = async ({ canvasElement }) => {
     const scrim = doc.querySelector('.modal-backdrop');
     await expect(scrim).not.toBeNull();
     await waitFor(() => expect(getComputedStyle(scrim).opacity).toBe('1'));
-    // The scrim's color is the token's, black at 38%, and nothing else tints it.
-    await expect(getComputedStyle(scrim).backgroundColor).toBe(colorOf(doc, '--overlay-scrim'));
-    await expect(getComputedStyle(scrim).backgroundColor).toBe('rgba(0, 0, 0, 0.38)');
+    // The scrim is the blanket (color.blanket), in whichever mode is in force, and nothing else tints it.
+    await expect(getComputedStyle(scrim).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
     // Atlassian's layers: scrim 500, modal 510.
     await expect(getComputedStyle(scrim).zIndex).toBe('500');
     await expect(getComputedStyle(dialog.closest('.modal')).zIndex).toBe('510');
