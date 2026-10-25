@@ -437,6 +437,24 @@ export const CHECKS = [
       "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 color tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
   },
   {
+    name: 'check:color-system',
+    script: 'node scripts/check-color-system.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-color-system.mjs',
+    guards:
+      "the generated color system keeping its promises in BOTH plans and all four modes (light, dark and each with increased contrast): text, icon and edge contrast on the grounds they are drawn on; every accent family's tag text, bold fill and icon; meta text, links, focus and field edges on hovered, selected and overlay grounds, alphas composited first; no base, hovered and pressed triple sharing a value and the selection ladder staying ordered; status tints reading against the page and the sunken frame; categorical chart series 1-4 staying apart under protan and deutan simulation; the accent teal never reading as Lagoon; and PLAN PARITY, every semantic token mapped to the same primitive reference in every plan, because a plan is primitive values only and a mapping that forks per plan is a second semantic layer nobody decided. Builds each plan through the generator's own pipeline (scripts/lib/color/), so it judges what would be emitted, not a copy. Each finding names the check, the plan and the mode.",
+  },
+  {
+    name: 'check:color-tokens',
+    script: 'node scripts/generate-color-tokens.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-color-tokens.mjs',
+    guards:
+      'the generated color token files in design-system/src/tokens/color/ (palette, semantic, elevation and Bootstrap bridge SCSS plus the Figma spec) against the active plan and the generator. Drift means a hand edit or a plan change that was never regenerated.',
+  },
+  {
     name: 'check:atlassian-benchmark',
     script: 'node scripts/check-atlassian-benchmark.mjs',
     pkg: 'root',
@@ -571,7 +589,7 @@ export const CHECKS = [
   },
   {
     name: 'test:scripts',
-    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs',
+    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',

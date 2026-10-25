@@ -1,0 +1,56 @@
+{
+  "key": "A",
+  "name": "Paper",
+  "toward": "Notion",
+  "about": "Plan A, Paper (toward Notion): near-achromatic warm grays, white page, structure by borders, crisp shadows. Primitive values only; every plan maps the semantic tokens identically.",
+  "notes": {
+    "neutral": "Fitted role by role to Notion's own grays (read live 2026-10-25) and placed on Atlassian's steps by the role each step serves: 100 sunken, 200 neutral fill, 300 border, 500 input border (>= 3:1), 600 bold border, 700 subtlest text (>= 4.5:1), 800 subtle text, 1000 text. Dark: 0 sunken, 100 surface, 200 raised and input, 250 overlay, 600 input border, 700 subtlest, 800 subtle, 1000 text. Where Notion falls below AA, the step takes the nearest value that passes.",
+    "alpha": "Percent of ink (light) or paper (dark) behind each alpha slot. Slot 300 is the line (color.border): Notion draws dividers and table grids at about 7% warm ink.",
+    "shadow": "Light geometry per layer: [x, y, blur, spread, ink %]. Raised is Notion's card (a 5% ring and a very wide 2% blur); overlay is Notion's popover.",
+    "accents": "Notion's chroma ladder (app stylesheet, 2026-10-25) is the same for every hue; each family scales it by [tints <= 300, mid 400-700, dark 800+]. Lagoon (205) is the brand; teal is a mint (176) kept apart from Lagoon and green; yellow's warning.bold reads amber, not khaki. Lagoon's dark-mode states (250-400) come from the brand ramp, so dark hover brightens instead of draining."
+  },
+  "neutral": {
+    "light": {
+      "100": "#f9f8f7", "200": "#f0efed", "300": "#e6e5e3", "350": "#d4d3cf", "400": "#bcbab6", "500": "#8e8b86",
+      "600": "#7d7a75", "700": "#73726e", "750": "#696864", "800": "#5f5e5b", "900": "#484743", "1000": "#2c2c2b",
+      "1100": "#1d1b16"
+    },
+    "dark": {
+      "0": "#141413", "100": "#191919", "200": "#202020", "250": "#262626", "300": "#2c2c2b", "350": "#383836",
+      "400": "#4a4946", "500": "#5f5e59", "600": "#7d7a75", "700": "#8e8b86", "750": "#a19e99", "800": "#ada9a3",
+      "900": "#d4d3cf", "1000": "#f0efed", "1100": "#f7f6f5"
+    }
+  },
+  "alpha": {
+    "light": { "100": 3, "200": 6, "250": 8, "300": 8, "400": 10, "500": 12, "600": 14, "700": 16, "750": 24, "800": 31, "850": 32, "900": 49 },
+    "dark": { "100": 4, "200": 8, "300": 10, "400": 10, "500": 12, "600": 14, "700": 16, "750": 24, "800": 28, "850": 32, "900": 50 }
+  },
+  "blackAlpha": { "60": 60 },
+  "shadow": {
+    "raised": [[0, 0, 0, 1, 5], [0, 12, 32, 0, 2], [0, 0, 0, 0, 0]],
+    "overlay": [[0, 0, 0, 1, 7], [0, 5, 8, 0, 3], [0, 20, 24, 0, 5]]
+  },
+  "accents": {
+    "recipe": "ladder",
+    "vivid": 0.95,
+    "chroma": {
+      "100": 0.013, "200": 0.035, "250": 0.043, "300": 0.052, "400": 0.1, "500": 0.14, "600": 0.155,
+      "700": 0.13, "800": 0.11, "850": 0.085, "900": 0.052, "1000": 0.045, "1100": 0.038
+    },
+    "tintFloor": 0.02,
+    "families": {
+      "lagoon": { "H": 205, "scale": [1, 1, 1], "override": { "900": 0.07, "1000": 0.055, "1100": 0.045 } },
+      "blue": { "H": 250, "scale": [1, 1.04, 1] },
+      "teal": { "H": 176, "scale": [1.6, 1, 1.1] },
+      "green": { "H": 158, "scale": [0.57, 0.74, 0.76] },
+      "lime": { "H": 122, "scale": [0.7, 0.8, 0.8] },
+      "yellow": { "H": 86, "scale": [1.7, 0.9, 0.9], "hueLight": 94, "override": { "250": 0.09, "300": 0.12, "400": 0.12 } },
+      "orange": { "H": 60, "scale": [1, 0.86, 0.9] },
+      "red": { "H": 27, "scale": [1, 1.05, 1] },
+      "magenta": { "H": 350, "scale": [1, 0.97, 1] },
+      "purple": { "H": 310, "scale": [1, 0.97, 1] },
+      "brown": { "H": 55, "scale": [0.5, 0.48, 0.44] }
+    },
+    "borrow": { "family": "lagoon", "steps": [250, 300, 400], "from": { "H": 205, "vivid": 0.95, "cmax": 0.15 } }
+  }
+}

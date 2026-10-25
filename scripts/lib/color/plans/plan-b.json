@@ -1,0 +1,51 @@
+{
+  "key": "B",
+  "name": "Neutral",
+  "toward": "Claude",
+  "about": "Plan B, Neutral (toward Claude, 2026): achromatic grays, white page on a #fafafa frame, no borders, soft diffuse shadows. Primitive values only; every plan maps the semantic tokens identically.",
+  "notes": {
+    "neutral": "claude.ai --cds-gray (color v2, served 2026-10-25), placed on Atlassian's steps by role as Plan A's are. Text secondary is 60% and primary 90%; dark page and surface-0 is gray-900 #0b0b0b, surface-1 #151515, surface-2 #191919, popover #202020.",
+    "alpha": "Percent of ink (light) or paper (dark) behind each alpha slot. Slot 300 is the line (color.border): claude.ai draws borders at 8% and lines at 12%.",
+    "shadow": "Light geometry per layer: [x, y, blur, spread, ink %]. Raised is claude.ai's cards and composer; overlay is claude.ai's menus.",
+    "accents": "claude.ai's ramps: tints near L .91 with chroma .04-.08 and vivid fills (chroma .16-.19); a violet purple and a grass green. Each family is a hue and a chroma cap on the shared step shape, with the light tints scaled up."
+  },
+  "neutral": {
+    "light": {
+      "100": "#f9f9f9", "200": "#efefef", "300": "#e0e0e0", "350": "#d1d1d1", "400": "#c2c2c2", "500": "#878787",
+      "600": "#7f7f7f", "700": "#707070", "750": "#646464", "800": "#555555", "900": "#383838", "1000": "#1a1a1a",
+      "1100": "#0b0b0b"
+    },
+    "dark": {
+      "0": "#0b0b0b", "100": "#151515", "200": "#191919", "250": "#202020", "300": "#2c2c2c", "350": "#383838",
+      "400": "#444444", "500": "#5e5e5e", "600": "#6b6b6b", "700": "#878787", "750": "#9e9e9e", "800": "#c2c2c2",
+      "900": "#e0e0e0", "1000": "#efefef", "1100": "#f9f9f9"
+    }
+  },
+  "alpha": {
+    "light": { "100": 3, "200": 6, "250": 8, "300": 10, "400": 10, "500": 12, "600": 14, "700": 16, "750": 24, "800": 31, "850": 32, "900": 49 },
+    "dark": { "100": 4, "200": 8, "300": 10, "400": 10, "500": 12, "600": 14, "700": 16, "750": 24, "800": 28, "850": 32, "900": 50 }
+  },
+  "blackAlpha": { "60": 60 },
+  "shadow": {
+    "raised": [[0, 0, 0, 1, 12], [0, 4, 20, 0, 7.5], [0, 0, 0, 0, 0]],
+    "overlay": [[0, 0, 0, 1, 8], [0, 2, 6, 0, 8], [0, 8, 24, 0, 12]]
+  },
+  "accents": {
+    "recipe": "shape",
+    "vivid": 0.95,
+    "tintScale": 1.25,
+    "families": {
+      "lagoon": { "H": 205, "cmax": 0.15 },
+      "blue": { "H": 256, "cmax": 0.16 },
+      "teal": { "H": 170, "cmax": 0.12 },
+      "green": { "H": 145, "cmax": 0.16 },
+      "lime": { "H": 124, "cmax": 0.15 },
+      "yellow": { "H": 74, "cmax": 0.15, "hueLight": 84 },
+      "orange": { "H": 45, "cmax": 0.16, "hueLight": 55 },
+      "red": { "H": 25, "cmax": 0.17 },
+      "magenta": { "H": 358, "cmax": 0.16 },
+      "purple": { "H": 288, "cmax": 0.17 },
+      "brown": { "H": 48, "cmax": 0.09 }
+    }
+  }
+}
