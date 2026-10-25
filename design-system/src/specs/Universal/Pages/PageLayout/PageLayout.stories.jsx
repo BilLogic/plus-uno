@@ -106,7 +106,7 @@ export const Overview = {
 };
 
 /**
- * The page sits in the Frame frame: a 32 topbar the avatar fits in,
+ * The page sits in `Frame`: a 32 topbar the avatar fits in,
  * the toggle at (8, 8), and the sidebar docked from 1024 and closed below.
  */
 export const Frame = {

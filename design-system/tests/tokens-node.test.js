@@ -593,7 +593,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 623: the same three washes, now naming defined tokens, became comparable.
     // 615: the Popover took the Popup pattern's tokens, and its eight hex
     // fallbacks went with the dark header.
-    // 614: PageLayout moved onto the SurfaceContainer frame, and its surface
+    // 614: PageLayout moved onto the Frame pattern, and its surface
     // fill's hex fallback went with the inline styles.
     // 607: Modal.scss moved onto the modal pattern tokens and dropped its seven
     // color fallbacks.

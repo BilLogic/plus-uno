@@ -9,7 +9,7 @@ One row of a side navigation, matching the BS4 Foundation `Sidebar Tab` (node 17
 
 **Source:** `design-system/src/components/navigation/SidebarTab/SidebarTab.jsx`
 
-**Stories:** `design-system/src/components/navigation/SidebarTab/SidebarTab.stories.jsx` — InSidebar, Default, Overview, Selected, Hover, Disabled, NoIcon, WithTrailingIcon, Interactive, KeyboardFocus, LongLabel, WithDescription, WithElemAfter, WithActionsOnHover, ExternalLink, DisabledIsInert
+**Stories:** `design-system/src/components/navigation/SidebarTab/SidebarTab.stories.jsx` — InSidebar, Default, Overview, Selected, Hover, Disabled, NoIcon, WithTrailingIcon, Interactive, KeyboardFocus, ColorModes, LongLabel, WithDescription, WithElemAfter, WithActionsOnHover, ExternalLink, DisabledIsInert
 
 **Storybook page:** `design-system/src/components/navigation/SidebarTab/SidebarTab.mdx`
 

@@ -5,6 +5,8 @@
  * token; the per-breakpoint values come from the tokens' own media queries.
  */
 
+@use '../../styles/surface-edge' as *;
+
 .plus-frame {
     position: relative;
     display: flex;
@@ -70,10 +72,14 @@
     overflow-y: auto;
 }
 
+// Docked, the sidebar ends in a divider on its right. It sits flush against the
+// surface, so where increased contrast draws the surface edge, that ring lies
+// over this line rather than beside it: one line, never two.
 .plus-frame__sidebar--docked {
     position: static;
     flex-shrink: 0;
     padding: 0 var(--surface-container-pad);
+    border-right: var(--size-element-stroke-sm) solid var(--ds-border);
 }
 
 // Floating: over the page, from the top of the frame, with a shadow and no scrim.
@@ -123,10 +129,7 @@
     overflow: auto;
     border-radius: var(--surface-radius);
     background-color: var(--ds-surface);
-    // The surface's edge: transparent, except where increased contrast turns the
-    // frame white and the surface needs a line to stand on. A ring, so it takes
-    // no room from the pad.
-    box-shadow: 0 0 0 var(--size-surface-border) var(--ds-border-surface);
+    @include surface-edge;
 }
 
 // The 12-column content grid, capped and centered; never narrower than 720,

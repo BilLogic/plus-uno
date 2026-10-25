@@ -3,7 +3,9 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Sidebar } from '@/components';
 import { Frame, Topbar } from '@/patterns';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -214,14 +216,26 @@ export const Loading = {
 
 /* ------------------------------------------------------- in the frame */
 
-const InAppFrame = (args) => (
-    <div style={{ height: '100vh' }}>
-        <Frame
-            topbar={<Topbar breadcrumbs={args.breadcrumbs} user={args.user} />}
-            sidebar={<Sidebar user="tutor" activeTabId="home" />}
-        />
-    </div>
-);
+const TopbarInFrame = (args) => <InAppFrame breadcrumbs={args.breadcrumbs} user={args.user} />;
+
+/**
+ * In every color mode the topbar has no fill of its own: it is transparent on
+ * the frame's sunken backdrop, in the frame's text color. (Breadcrumb and
+ * UserAvatar keep their own colors and are not checked here.)
+ */
+export const ColorModes = {
+    parameters: { layout: 'fullscreen', docs: { disable: true } },
+    render: TopbarInFrame,
+    play: async ({ canvasElement }) => {
+        const frame = canvasElement.querySelector('.plus-frame');
+        const bar = frame.querySelector('.plus-topbar');
+        await inEveryColorMode(async (mode) => {
+            await expect(getComputedStyle(bar).backgroundColor, `${mode}: no fill of its own`).toBe('rgba(0, 0, 0, 0)');
+            await expect(getComputedStyle(frame).backgroundColor, `${mode}: on the sunken frame`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(getComputedStyle(bar).color, `${mode}: in the frame's text color`).toBe(tokenColor(canvasElement, '--ds-text'));
+        });
+    },
+};
 
 /**
  * Inside the Frame there is one toggle, and the frame drives it:
@@ -230,7 +244,7 @@ const InAppFrame = (args) => (
  */
 export const InFrame = {
     parameters: { layout: 'fullscreen' },
-    render: InAppFrame,
+    render: TopbarInFrame,
     play: async ({ canvasElement }) => withTestViewport(1024, 800, async () => {
         const canvas = within(canvasElement);
         const frame = canvasElement.querySelector('.plus-frame');

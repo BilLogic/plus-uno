@@ -6,6 +6,8 @@ import { Frame, Topbar } from '@/patterns';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { SURFACE_EDGE } from '@/patterns/Surface';
 
 /**
  * `Frame` — the app frame: a 32 topbar over a row holding the
@@ -37,17 +39,11 @@ const slot = (label, minHeight = 'var(--height-500)') => (
     </div>
 );
 
-const InAppFrame = (args) => (
-    <div style={{ height: '100vh' }}>
-        <Frame
-            topbar={<Topbar breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} user={{ name: 'John Doe', type: 'lead tutor' }} />}
-            sidebar={<Sidebar user="tutor" activeTabId="home" />}
-            {...args}
-        >
-            {slot('Content slot')}
-            {slot('Content slot')}
-        </Frame>
-    </div>
+const FrameWithSlots = (args) => (
+    <InAppFrame {...args}>
+        {slot('Content slot')}
+        {slot('Content slot')}
+    </InAppFrame>
 );
 
 export default {
@@ -55,7 +51,7 @@ export default {
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
-    render: InAppFrame,
+    render: FrameWithSlots,
     argTypes: {
         children: { table: { disable: true } },
         topbar: { table: { disable: true } },
@@ -139,26 +135,37 @@ export const Overview = {};
 /**
  * In every color mode the frame is the sunken backdrop in the body text color,
  * and the surface is the default surface edged by the surface border, so the
- * pair moves together.
+ * pair moves together. Docked, the sidebar ends in a 1px border-color divider,
+ * flush against the surface, so the surface edge (where increased contrast
+ * draws one) lies over the divider instead of beside it.
  */
 export const ColorModes = {
     parameters: { docs: { disable: true } },
-    play: async ({ canvasElement }) => {
-        const { frame, surface } = parts(canvasElement);
+    play: async ({ canvasElement }) => withTestViewport(1024, HEIGHT, async () => {
+        const { frame, surface, sidebar } = parts(canvasElement);
         const lightSunken = tokenColor(canvasElement, '--ds-surface-sunken');
+        await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024').toBe('static'));
+        const aside = sidebar();
+        await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
+        await expect(tokenLength(frame, '--size-surface-border'), 'the surface edge covers the divider')
+            .toBeGreaterThanOrEqual(tokenLength(frame, '--size-element-stroke-sm'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
             const surfaceStyle = getComputedStyle(surface);
+            const asideStyle = getComputedStyle(aside);
             await expect(frameStyle.backgroundColor, `${mode}: the frame is sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
             await expect(frameStyle.color, `${mode}: frame text`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
-                .toBe(computedShadow(canvasElement, '0 0 0 var(--size-surface-border) var(--ds-border-surface)'));
+                .toBe(computedShadow(canvasElement, SURFACE_EDGE));
+            await expect(asideStyle.borderRightStyle, `${mode}: the docked sidebar's divider`).toBe('solid');
+            await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--size-element-stroke-sm'), 1);
+            await expect(asideStyle.borderRightColor, `${mode}: in the border color`).toBe(tokenColor(canvasElement, '--ds-border'));
             if (mode.startsWith('dark')) {
                 await expect(frameStyle.backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);
             }
         });
-    },
+    }),
 };
 
 export const Reading = { args: { width: 'reading' } };

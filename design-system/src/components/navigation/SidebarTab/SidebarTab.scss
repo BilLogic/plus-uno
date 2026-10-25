@@ -23,6 +23,9 @@
     cursor: pointer;
     transition: background-color 0.15s ease;
 
+    // A link row keeps its own color on hover: without this, the link hover
+    // color (`a:hover`) wins over the row's rest color. The selected and
+    // disabled rows restate theirs on hover for the same reason.
     &:hover {
         color: var(--ds-text-subtle);
         text-decoration: none;

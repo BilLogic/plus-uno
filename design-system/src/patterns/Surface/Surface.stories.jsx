@@ -1,41 +1,26 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import Surface, { SURFACE_LEVELS } from '@/patterns/Surface';
+import Surface, { SURFACE_EDGE, SURFACE_LEVELS } from '@/patterns/Surface';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
-const slotContent = (label) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
-            borderRadius: 'var(--size-element-radius-md)',
-            color: 'var(--ds-text-subtle)',
-        }}
-        className="body1-txt"
-    >
-        {label}
-    </div>
-);
-
-const levelLabel = {
-    display: 'block',
-    marginBottom: 'var(--element-stack-md)',
-    font: 'var(--heading-xxsmall)',
-    color: 'var(--ds-text-subtle)',
+/** What each level must draw: its fill and its shadow, as a pair. */
+const LEVEL_PAIRS = {
+    sunken: ['--ds-surface-sunken', 'none'],
+    default: ['--ds-surface', SURFACE_EDGE],
+    raised: ['--ds-surface-raised', 'var(--ds-shadow-raised)'],
+    overlay: ['--ds-surface-overlay', 'var(--ds-shadow-overlay)'],
 };
 
-/** What each level pairs: its fill, and the shadow that goes with it. */
-const PAIRS = {
-    sunken: '--ds-surface-sunken, no shadow',
-    default: '--ds-surface, edged by --ds-border-surface',
-    raised: '--ds-surface-raised + --ds-shadow-raised',
-    overlay: '--ds-surface-overlay + --ds-shadow-overlay',
+/** A level's pair, as its slot names it. */
+const pairLabel = (level) => {
+    const [fill, shadow] = LEVEL_PAIRS[level];
+    if (shadow === 'none') return `${fill}, no shadow`;
+    if (shadow === SURFACE_EDGE) return `${fill}, edged by --ds-border-surface`;
+    return `${fill} + ${shadow.slice('var('.length, -1)}`;
 };
 
 /** Every elevation level, lowest to highest, on the frame's sunken backdrop — docs section only */
@@ -44,9 +29,9 @@ function SurfaceLevelsDemo() {
         <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
             {SURFACE_LEVELS.map((level) => (
                 <div key={level}>
-                    <span style={levelLabel}>{level}</span>
+                    <DemoLabel>{level}</DemoLabel>
                     <Surface level={level} padding="sm" radius="md">
-                        {slotContent(PAIRS[level])}
+                        {slotContent(pairLabel(level))}
                     </Surface>
                 </div>
             ))}
@@ -103,14 +88,6 @@ export const Overview = () => (
 );
 
 export const Levels = () => <SurfaceLevelsDemo />;
-
-/** What each level must draw: its fill and its shadow, as a pair. */
-const LEVEL_PAIRS = {
-    sunken: ['--ds-surface-sunken', 'none'],
-    default: ['--ds-surface', '0 0 0 var(--size-surface-border) var(--ds-border-surface)'],
-    raised: ['--ds-surface-raised', 'var(--ds-shadow-raised)'],
-    overlay: ['--ds-surface-overlay', 'var(--ds-shadow-overlay)'],
-};
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
 export const ColorModes = {

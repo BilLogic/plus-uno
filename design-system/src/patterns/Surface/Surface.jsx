@@ -9,6 +9,12 @@ import './Surface.scss';
 export const SURFACE_LEVELS = ['sunken', 'default', 'raised', 'overlay'];
 
 /**
+ * The default surface's edge, as the `surface-edge` mixin in
+ * `styles/_surface-edge.scss` draws it. For the stories that measure it.
+ */
+export const SURFACE_EDGE = '0 0 0 var(--size-surface-border) var(--ds-border-surface)';
+
+/**
  * Surface pattern for PLUS design system.
  * Bare tokenized surface: pick an elevation level, padding scale, radius scale
  * and border — children fill the content slot. The level sets the fill and its

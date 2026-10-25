@@ -3,49 +3,24 @@ import { expect } from 'storybook/test';
 import PatternSection from '@/patterns/PatternSection';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
-
-/** A demo's caption: a group name in the subtle text color. */
-const demoLabel = {
-    display: 'block',
-    marginBottom: 'var(--element-stack-md)',
-    font: 'var(--heading-xxsmall)',
-    textTransform: 'uppercase',
-    color: 'var(--ds-text-subtle)',
-};
-
-const slotContent = (label) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
-            borderRadius: 'var(--size-element-radius-md)',
-            color: 'var(--ds-text-subtle)',
-        }}
-        className="body1-txt"
-    >
-        {label}
-    </div>
-);
 
 /** Header slot combinations — docs section only */
 function PatternSectionSlotsDemos() {
     return (
         <div style={col}>
             <div>
-                <span style={demoLabel}>TITLE ONLY</span>
+                <DemoLabel>TITLE ONLY</DemoLabel>
                 <PatternSection title="Section title" padding="sm">
                     {slotContent('Content slot')}
                 </PatternSection>
             </div>
             <div>
-                <span style={demoLabel}>TITLE + DESCRIPTION + ACTIONS</span>
+                <DemoLabel>TITLE + DESCRIPTION + ACTIONS</DemoLabel>
                 <PatternSection
                     title="Section title"
                     description="Optional description that explains what this section contains."
@@ -63,7 +38,7 @@ function PatternSectionSlotsDemos() {
 function PatternSectionCompositionDemo() {
     return (
         <div>
-            <span style={demoLabel}>FILLED SECTION WITH CARDS</span>
+            <DemoLabel>FILLED SECTION WITH CARDS</DemoLabel>
             <PatternSection
                 title="Section title"
                 description="Sections group related cards, tables, or forms on a page."

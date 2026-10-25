@@ -4,6 +4,8 @@
  * Each level is a fill and its shadow, as a pair; every value is a token.
  */
 
+@use '../../styles/surface-edge' as *;
+
 .plus-pattern-surface {
     display: block;
     color: var(--ds-text);
@@ -14,11 +16,10 @@
     background-color: var(--ds-surface-sunken);
 }
 
-// The page: no shadow, and an edge that is transparent except where increased
-// contrast turns the frame white. A ring, so it takes no room.
+// The page: no shadow, only the surface edge.
 .plus-pattern-surface-level-default {
     background-color: var(--ds-surface);
-    box-shadow: 0 0 0 var(--size-surface-border) var(--ds-border-surface);
+    @include surface-edge;
 }
 
 .plus-pattern-surface-level-raised {
@@ -71,6 +72,11 @@
 /* Border */
 .plus-pattern-surface-bordered {
     border: var(--size-surface-border) solid var(--ds-border-bold);
+}
+
+// A bordered default surface draws its border instead of the edge ring, never both.
+.plus-pattern-surface-level-default.plus-pattern-surface-bordered {
+    box-shadow: none;
 }
 
 /* The page's h1: Heading/large 24/28, the top of the page outline. */
