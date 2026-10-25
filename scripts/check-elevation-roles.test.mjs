@@ -134,7 +134,7 @@ test('the row that mentions modals is NOT claimed by a role', () => {
  * fails.
  */
 const SURFACES = [
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--surface-raised-shadow' },
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging,', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/styles/main.scss', rule: '.plus-card--dragging {', shadow: '--surface-raised-shadow' },
   { file: 'design-system/src/components/overlays-and-layering/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--ds-shadow-overlay' },
@@ -152,9 +152,26 @@ const SURFACES = [
  * cards reads as one plane until the pointer picks one up.
  */
 const FLAT_CARDS = [
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', selector: '.plus-pattern-card', fill: '--surface-raised' },
   { file: 'design-system/src/styles/main.scss', selector: '.plus-card', fill: '--surface-raised' },
 ];
+
+/**
+ * THE CARD PATTERN IS ON ATLASSIAN'S RAISED PAIR (color proposal, decision
+ * 18): the raised surface under the raised shadow, whose ring is the edge, so
+ * no border. A clickable card lifts while hovered (the raised surface's hovered
+ * step under the overlay shadow) and settles while pressed; a dragged card is
+ * on the overlay pair. The card paints the current surface and sets it, so a
+ * sticky table cell inside matches the card.
+ */
+const PATTERN_CARD = {
+  file: 'design-system/src/patterns/PatternCard/PatternCard.scss',
+  states: [
+    ['.plus-pattern-card', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-pattern-card--clickable:hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
+    ['.plus-pattern-card--clickable:active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-pattern-card--dragging', '--ds-surface-overlay', '--ds-shadow-overlay'],
+  ],
+};
 
 /** The first value of `property` after the rule opens. */
 function firstAfter(source, rule, property) {
@@ -244,6 +261,26 @@ for (const card of FLAT_CARDS) {
     });
   });
 }
+
+test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed and dragged', () => {
+  const { file, states } = PATTERN_CARD;
+  const rest = compiledDecls(file, '.plus-pattern-card');
+  assert.equal(rest['background-color'], 'var(--ds-utility-elevation-surface-current)', `${file}: the card paints the current surface`);
+  assert.equal(rest.border ?? rest['border-width'], undefined, `${file}: the shadow's ring is the edge, not a border`);
+  for (const [selector, surface, shadow] of states) {
+    const decls = compiledDecls(file, selector);
+    assert.equal(decls['--ds-utility-elevation-surface-current'], `var(${surface})`, `${file}: "${selector}" surface`);
+    assert.equal(decls['box-shadow'], `var(${shadow})`, `${file}: "${selector}" shadow`);
+  }
+  compiledRules(file).walkRules((rule) => {
+    for (const selector of rule.selectors) {
+      assert.ok(
+        !(selector.trim() === '.plus-pattern-card:hover' && rule.nodes.some((n) => n.prop === 'box-shadow')),
+        `${file}: "${selector}" lifts every card on hover, not only a clickable one`,
+      );
+    }
+  });
+});
 
 test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
   // elevation.md rule 3: never hardcode shadows.
