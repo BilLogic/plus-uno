@@ -1,5 +1,6 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Field from './Field';
 
 /**
@@ -103,19 +104,27 @@ States.play = async ({ canvasElement }) => {
     for (const [name] of STATES) {
         await expect(px(style(name).borderTopWidth), `${name} border`).toBe(1);
     }
-    // Focus is a 2px ring, drawn inside the box.
+    // Focus is the focus ring: 2px, and 2px off the box onto the surface.
     await expect(style('focus').outlineStyle).toBe('solid');
     await expect(px(style('focus').outlineWidth)).toBe(2);
-    await expect(px(style('focus').outlineOffset)).toBe(-2);
-    // Hover changes the border color, not its width.
-    await expect(style('hover').borderTopColor).not.toBe(style('default').borderTopColor);
-    // One fill, and read-only's own.
-    await expect(style('read-only').backgroundColor).not.toBe(style('default').backgroundColor);
+    await expect(px(style('focus').outlineOffset)).toBe(2);
     // The disabled box fades once, by the disabled opacity token (0.4, Atlassian's opacity.disabled).
     await expect(Number(style('disabled').opacity)).toBeCloseTo(0.4, 2);
-    // Invalid and valid each own a border color.
-    await expect(style('invalid').borderTopColor).not.toBe(style('default').borderTopColor);
-    await expect(style('valid').borderTopColor).not.toBe(style('invalid').borderTopColor);
+
+    // Each state's colors are its tokens, in every color mode.
+    const placeholder = getComputedStyle(within(canvasElement).getByRole('textbox', { name: 'default field' }), '::placeholder');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(style('default').borderTopColor, `${mode}: border`).toBe(token('--ds-border-input'));
+        await expect(style('default').backgroundColor, `${mode}: fill`).toBe(token('--ds-background-input'));
+        await expect(style('default').color, `${mode}: text`).toBe(token('--ds-text'));
+        await expect(placeholder.color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
+        await expect(style('hover').borderTopColor, `${mode}: hover border`).toBe(token('--ds-border-focused'));
+        await expect(style('hover').backgroundColor, `${mode}: hover fill`).toBe(token('--ds-background-input'));
+        await expect(style('focus').outlineColor, `${mode}: ring`).toBe(token('--ds-border-focused'));
+        await expect(style('read-only').backgroundColor, `${mode}: read-only fill`).toBe(token('--ds-background-neutral'));
+        await expect(style('invalid').borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+        await expect(style('valid').borderTopColor, `${mode}: valid border`).toBe(token('--ds-border-success'));
+    });
 };
 
 /** Focus within the box draws the ring; nothing in the host tracks it. */
@@ -165,4 +174,11 @@ Subtle.play = async ({ canvasElement }) => {
 
     await expect(getComputedStyle(box('focus')).borderTopColor).not.toBe(transparent);
     await expect(px(getComputedStyle(box('focus')).outlineWidth)).toBe(2);
+
+    // Hover is the neutral subtle step; editing is the standard field's fill and border.
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box('hover')).backgroundColor, `${mode}: hover fill`).toBe(token('--ds-background-neutral-subtle-hovered'));
+        await expect(getComputedStyle(box('focus')).backgroundColor, `${mode}: editing fill`).toBe(token('--ds-background-input'));
+        await expect(getComputedStyle(box('focus')).borderTopColor, `${mode}: editing border`).toBe(token('--ds-border-input'));
+    });
 };

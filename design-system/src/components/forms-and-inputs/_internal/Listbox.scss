@@ -1,7 +1,7 @@
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popover family Menu.
- * Surface roles/surface-overlay and its shadow (Elevation Light/3, as every
- * floating layer without a scrim), an outline-variant border and
+ * `elevation.surface.overlay` and its shadow (as every floating layer
+ * without a blanket), a `color.border` edge and
  * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
  */
 
@@ -30,10 +30,10 @@
     width: 100%;
     max-height: var(--plus-listbox-max-height);
     overflow: hidden;
-    background-color: var(--color-surface-overlay);
-    border: var(--size-element-border) solid var(--color-outline-variant);
+    background-color: var(--ds-surface-overlay);
+    border: var(--size-element-border) solid var(--ds-border);
     border-radius: var(--popover-radius-menu-md);
-    box-shadow: var(--surface-overlay-shadow);
+    box-shadow: var(--ds-shadow-overlay);
 }
 
 /* In a portal: placed against its field by `useAnchoredPopup`, at least the
@@ -89,11 +89,11 @@
 }
 
 .plus-listbox-header {
-    border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+    border-bottom: var(--size-element-border) solid var(--ds-border);
 }
 
 .plus-listbox-footer {
-    border-top: var(--size-element-border) solid var(--color-outline-variant);
+    border-top: var(--size-element-border) solid var(--ds-border);
 }
 
 .plus-listbox-body {
@@ -132,7 +132,7 @@
     outline: none;
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: calc(-1 * var(--size-element-stroke-lg));
     }
 }
@@ -142,11 +142,11 @@
     align-items: center;
     gap: var(--size-element-gap-sm);
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font: var(--body-default);
 
     &--error {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
     }
 
     &--count,

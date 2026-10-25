@@ -9,7 +9,7 @@ Label, field and caption: the caption shows a validation message (or standing he
 
 **Source:** `design-system/src/components/forms-and-inputs/Input.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive, Anatomy, CaptionErrorAndCount, Autofill, Search, Subtle
+**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive, Anatomy, CaptionErrorAndCount, Autofill, Search, Subtle, CaptionColors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Input.mdx`
 
