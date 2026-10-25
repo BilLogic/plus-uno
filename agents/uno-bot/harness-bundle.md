@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **102,165 chars from 9 files**, against an assembled budget of 175,500 (73,335 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 81,781 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **102,916 chars from 9 files**, against an assembled budget of 175,500 (72,584 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 82,532 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,113 (−7,715 ide-only) | 10,113 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 14,550 | 24,692 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 46,160 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 47,806 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,054 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 54,747 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 66,533 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 86,353 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 89,821 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 96,337 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 101,310 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 102,165 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 15,301 | 25,443 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 46,911 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 48,557 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,805 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 55,498 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 67,284 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 87,104 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 90,572 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,461 | 97,088 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 102,061 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 102,916 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -260,6 +260,18 @@ A fundamental design primitive (color palette, type scale, grid).
 A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
 _Avoid_: bare "replica", "screenshot"
 
+**Static table**:
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Planned in code as `StaticTable`, built on today's `Table` primitive (`_internal/Table`); which type to use is `design-system/guidelines/composition/surfaces.md` § Choosing a table.
+_Avoid_: "basic table", bare "table" for this type
+
+**Dynamic table**:
+Any table people act on: sorting, filtering, selection, paging, row expansion or row actions. Planned in code as `DynamicTable`.
+_Avoid_: "data table", "interactive table"
+
+**Tree table**:
+A table whose rows nest under parent rows. Planned in code as `TreeTable`.
+_Avoid_: "table tree", "nested table"
+
 ### Estates
 
 **uno-blueprint**:
@@ -354,7 +366,7 @@ The Slack plan a person watches while a turn's lookups run: a **task card** per 
 _Avoid_: "plan stream", "progress surface", "steps"
 
 **result table**:
-The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; not a Markdown table.
+The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; a Slack answer table, not a Markdown table and not one of the design-system table types.
 _Avoid_: "card table", "data table"
 
 **source** / **Sources box**:
