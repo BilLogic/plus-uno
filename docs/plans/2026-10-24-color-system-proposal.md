@@ -1,7 +1,7 @@
 ---
 title: "Color system: research and proposal"
 type: research
-status: proposal, iteration 2; brand decided (Lagoon), Plan A vs Plan B and seven other calls awaiting Bill
+status: proposal, iteration 2; brand decided (Lagoon), Plan A vs Plan B and other calls awaiting Bill
 date: 2026-10-25
 repos: plus-uno (design-system/src/tokens, BS4 Foundation Figma library)
 artifact: https://claude.ai/artifact/SWQGFicTN9bV6HcF3fS3sk
@@ -15,7 +15,7 @@ Iteration 2 adds three things to the first draft:
 
 - **All nine Atlassian accent families, tuned to sit with Lagoon.** Hues are spaced for even perceptual distance and capped in chroma so no accent outshouts the brand (§4.2).
 - **Elevation in Atlassian's language**, mapped onto the UI patterns PLUS has already defined: the frame, the surface, sections, cards, tables, popovers and modals (§4.4, §4.5).
-- **Two directions for the neutrals and surfaces**, to explore before committing: **Plan A, Paper**, toward Notion, and **Plan B, Ivory**, toward Claude. They share every hue ramp and every token name, and differ only in the grays, the surface ladder, selection and shadow softness (§4.6).
+- **Two directions for the neutrals and surfaces**, to explore before committing: **Plan A, Paper**, toward Notion, and **Plan B, Neutral**, toward Claude as served today. They share every hue ramp and every token name, and differ only in the grays and in drawing structure with borders or with tone and soft shadow (§4.6).
 
 This is research and a proposal only. No token, component or Figma variable has changed. The visual companion is the artifact linked above. It renders both plans as a working PLUS screen in light and dark, plus every ramp and every semantic token. Section 5 lists the decisions only Bill can make, each with a recommendation.
 
@@ -43,8 +43,6 @@ Sources are the Zoom AI meeting summaries emailed to Bill (Zoom labels them "AI 
 3. *Revisit the token naming language.* Leave Material's `on-` / `container` / state-layer vocabulary for Atlassian's `property.role.emphasis.state`.
 4. *Move the color space to OKLCH.* Generate the ramps; don't hand-pick steps.
 
-Since this draft was first written, Bill chose Lagoon (2026-10-25) and asked for the Atlassian model in full: one brand color, functional colors, and a set of accent colors, with no tertiary. He also asked for elevation alongside color, and for two directions toward Notion and Claude to explore.
-
 ## 2. Benchmark
 
 Every claim carries its source. Atlassian facts come from the shipped package `@atlaskit/tokens@20.7.0` (published 2026-10-22), read as text from unpkg, and from atlassian.design. Short keys: **PAL** = [palette.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/artifacts/palettes-raw/palette.js), **RAW-L** = [tokens-raw/atlassian-light.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/artifacts/tokens-raw/atlassian-light.js), **CL** = [CHANGELOG.md](https://unpkg.com/@atlaskit/tokens@20.7.0/CHANGELOG.md), **GEN** = [generate-colors.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/generate-colors.js), **MAP** = [generate-token-map.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/generate-token-map.js).
@@ -65,7 +63,7 @@ Every claim carries its source. Atlassian facts come from the shipped package `@
 - **Overlays are the exception.** `color.interaction.hovered` / `.pressed` (`#00000029` / `#00000052` in light) are for elements "when their background color cannot change, such as avatars" ([RAW-L](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/artifacts/tokens-raw/atlassian-light.js)). Atlassian's system is opaque named steps first, overlays second; PLUS's is the reverse.
 - **Elevation.** `elevation.surface`, `.sunken`, `.raised`, `.overlay` and `.container`, each with hovered and pressed except sunken; shadows `elevation.shadow.raised`, `.overlay` and `.overflow`. "The higher the elevation, the lighter the surface looks" in dark mode ([elevation](https://atlassian.design/foundations/elevation)).
 - **Dark mode mirrors light by step:** 100↔1000, 200↔900, 250↔850, 400↔700. "If a button color is 700 in light theme, it will be 400 in dark theme" ([color-palette](https://atlassian.design/foundations/color/color-palette)); the custom-theme generator computes dark as `9 - lightIndex` ([MAP](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/generate-token-map.js)).
-- **Themes.** light, dark, light-increased-contrast and dark-increased-contrast, the last two also reachable with `data-contrast-mode="more"`; legacy themes were removed in 11.0.0 (2026-02-02) ([theme-ids.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/theme-ids.js), [CL](https://unpkg.com/@atlaskit/tokens@20.7.0/CHANGELOG.md) § 11.0.0). A flag-gated "FY27 Finesse" override (September 2026) turns selected states neutral gray instead of blue ([CL](https://unpkg.com/@atlaskit/tokens@20.7.0/CHANGELOG.md) § 16.11.2); whether it becomes the default is **unverified**.
+- **Themes: two color modes, each with an increased-contrast variant.** Atlassian has two modes, light and dark (`data-color-mode`). Contrast is a separate axis (`data-contrast-mode`: `more`, `no-preference` or `auto`, which follows the OS setting), and `more` swaps in `light-increased-contrast` or `dark-increased-contrast`. Those two themes `extend` their base and override only part of it: 253 of 466 light variables and 185 of 466 dark variables, mostly text, icon, border, bold backgrounds and chart colors. For example, `text.subtlest` goes from `#6B6E76` to `#3B3D42`, and `border.input` from `#8C8F97` to `#505258` (diffed from the 20.7.0 theme CSS, [themes](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/esm/artifacts/themes/), [theme-config.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/esm/theme-config.js)). So Atlassian ships four color themes in two modes, not three modes. legacy themes were removed in 11.0.0 (2026-02-02) ([theme-ids.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/theme-ids.js), [CL](https://unpkg.com/@atlaskit/tokens@20.7.0/CHANGELOG.md) § 11.0.0). A flag-gated "FY27 Finesse" override (September 2026) turns selected states neutral gray instead of blue ([CL](https://unpkg.com/@atlaskit/tokens@20.7.0/CHANGELOG.md) § 16.11.2); whether it becomes the default is **unverified**.
 - **CSS emission.** `--ds-` plus the path without `color.`: `color.background.brand.bold` → `--ds-background-brand-bold`, `elevation.surface` → `--ds-surface` ([get-css-custom-property.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/get-css-custom-property.js)). `token(path, fallback)` returns `var(--ds-…, fallback)`; `setGlobalTheme` sets `data-theme` and `data-color-mode` on `<html>` ([set-global-theme.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/set-global-theme.js)).
 - **Custom brand ramps are generated in HCT, not OKLCH.** `generateColors(brandHex)` keeps the brand's hue and chroma and solves each step's tone to hit a fixed WCAG ratio against white, from one of two tables chosen by how light the hue is: `[1.12, 1.33, 2.03, 2.73, 3.33, 4.27, 5.2, 6.62, 12.46, 14.25]` for dark hues and `[1.08, 1.24, 1.55, 1.99, 2.45, 3.34, 4.64, 6.1, 10.19, 12.6]` for light ones. It then swaps the nearest step for the exact brand hex ([GEN](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/generate-colors.js); HCT and contrast code "copied from @material/material-color-utilities", [contrast.js](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/cjs/utils/hct-color-utils/contrast.js)). There is no OKLCH anywhere in the package.
 
@@ -79,7 +77,12 @@ What PLUS takes from these: the foreground-pairing idea (Atlassian's `text.inver
 
 ### 2.4 Claude and Anthropic
 
-- **claude.ai** serves HSL channel triplets, not OKLCH. Role tokens are `--bg-000…500`, `--text-000…500`, `--border-*`, `--accent-*`, `--brand-*`, `--danger-*` and `--oncolor-*`, with `000` the strongest; the current "v2" set points them at raw primitives `--_gray-0…900`, `--_blue-*`, `--_violet-*` on an uneven step grid. Light grays are warm (hue 45–60°, saturation 9–14%) and the darkest grays go fully neutral. Brand clay is `#d97757`, emphasized clay `#c6613f`. (Read from claude.ai's served stylesheet in a signed-in browser pane, CSS rules only; plain requests return 403, so there is no public URL to cite.)
+- **claude.ai has three color generations in its stylesheet,** read 2026-10-25 from the served CSS in a signed-in browser pane (CSS rules only; plain requests return 403, so there is no public URL to cite):
+  - **v1, warm ivory.** Under `[data-theme="claude"]` without a color version: `--bg-100` is `hsl(48 33.3% 97.1%)`, i.e. `#faf9f5`. This is the Claude look the first draft of this doc benchmarked, and it is retired.
+  - **v2 base, barely warm.** Under `[data-color-version="v2"]`, role tokens point at a `--cds-gray-*` ramp from 0 to 900 that is close to neutral: `#f9f9f7`, `#e1e0d9`, `#6d6b67`, `#0b0b0b`.
+  - **v2 with the `color` flag, pure gray.** `data-cds-fizzy-lake="color"` overrides that ramp with pure grays (`#f9f9f9`, `#e0e0e0`, `#6b6b6b`). This is what Bill's account is served today: a `#fafafa` sidebar on a white page, no borders on content, selection at ink 5%, a near-black `#191919` primary button. One blue accent (`#257de0`) handles interaction, and the clay brand (`#d97757`) appears only in the mark.
+  - Whether the flag is rolled out to everyone is **unverified**. Both v2 states are near-neutral, so the direction is the same either way.
+  - **Shadows.** v2 shadows are soft and diffuse, for example `--cds-shadow-sm: 0 1px 2px` at 6% plus `0 2px 8px` at 8%, and `--cds-shadow-popover: 0 8px 24px` at 12% plus `0 2px 6px` at 8%. Dark mode starts at `#0b0b0b` and its surfaces get lighter as they rise (`gray-850`, `-830`, `-800`), as Atlassian's do.
 - **anthropic.com** serves hex, with no `oklch()` or `hsl()` in its CSS. Grays run `--color-gray-000…1000` in steps of 50 (`050 #faf9f5`, `500 #87867f`, `950 #141413`), and sections switch themes through `--theme-{background|foreground|border}-{primary…quaternary}` ([anthropic.com](https://www.anthropic.com/) served CSS). Anthropic's own brand-guidelines skill lists the same values: dark `#141413`, light `#faf9f5`, orange `#d97757`, blue `#6a9bcc`, green `#788c5d` ([brand-guidelines SKILL.md](https://raw.githubusercontent.com/anthropics/skills/main/skills/brand-guidelines/SKILL.md)). The names "Book Cloth", "Kraft" and "Manilla" are **unverified**: they appear in no served CSS or official source.
 
 ### 2.5 Notion
@@ -270,7 +273,7 @@ The semantic layer copies Atlassian's token list and its step references, and sw
 | `color.interaction.hovered` / `.pressed` | black at 16% / 32% | ink at 8% / 12% | PLUS's state-layer ruling (08/12/16). |
 | `color.interaction.dragged` | none | New, 16% | Completes the 08/12/16 ruling. |
 | `color.blanket` | Neutral500A, about 46% | ink at 32% | Lighter, in the pastel register; open to tuning on the specimen. |
-| Selection (Plan A only) | Blue tint | Neutral ink | Plan A follows Atlassian's newer Finesse theme and Notion (§4.6). |
+| Selection | Blue tint | Neutral ink | Both benchmarks select in neutral, as does Atlassian's FY27 Finesse override (§4.6). |
 
 The full list, with each token's use and its light and dark values in both plans, is in Appendix B. The artifact shows every token as a swatch in both themes.
 
@@ -322,15 +325,15 @@ Atlassian treats elevation as **paired tokens**: a surface color and its shadow 
 | `opacity.disabled` | Images and whole elements in a disabled state. *Today --color-disabled-opacity is 0.38 (M3); 0.4 is Atlassian's.* | `0.4` | `0.4` |
 | `opacity.loading` | Content under a loading spinner. *New.* | `0.2` | `0.2` |
 
-**Shadows, Plan B (softer):**
+**Shadows, Plan B (soft, claude.ai's geometry):**
 
 | Token | For | Light | Dark |
 |---|---|---|---|
-| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *Plan B: softer and wider, a hairline ring plus a faint drop, because white-on-ivory already lifts the card.* | `0px 1px 2px #1f1f1d14, 0px 0px 0px 1px #1f1f1d12` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
-| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Plan B: diffuse drop and hairline ring.* | `0px 6px 20px #1f1f1d1a, 0px 0px 0px 1px #1f1f1d12` | `0px 0px 0px 1px #e4e3e01f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
-| `elevation.shadow.overflow` | Shadow where content scrolls under other content, such as a table's sticky column. | `0px 0px 8px #1f1f1d29, 0px 0px 1px #1f1f1d1f` | `0px 0px 12px #0a09088f, 0px 0px 1px #0a090880` |
-| `elevation.shadow.overflow.spread` | Fallback for overflow when a box shadow is not feasible; pair with .perimeter. | `#1f1f1d29` | `#0a09088f` |
-| `elevation.shadow.overflow.perimeter` | Fallback for overflow when a box shadow is not feasible; pair with .spread. | `#1f1f1d1f` | `#0a090880` |
+| `elevation.shadow.raised` | Box shadow of a raised card: a clickable card while hovered, or a movable card. Pair with elevation.surface.raised. *Plan B: claude.ai --cds-shadow-sm geometry; cards have no border, so the soft shadow is their edge.* | `0px 1px 2px #1e1e1e0f, 0px 2px 8px #1e1e1e14` | `0px 0px 0px 1px #00000000, 0px 1px 1px #0a090880, 0px 0px 1px #0a090880` |
+| `elevation.shadow.overlay` | Box shadow of anything that sits over the UI: menus, popovers, tooltips, flags, modals, dragged items. Pair with elevation.surface.overlay. *Plan B: claude.ai --cds-shadow-popover geometry.* | `0px 8px 24px #1e1e1e1f, 0px 2px 6px #1e1e1e14` | `0px 0px 0px 1px #e3e3e31f, 0px 8px 12px #0a09085c, 0px 0px 1px 1px #0a090880` |
+| `elevation.shadow.overflow` | Shadow where content scrolls under other content, such as a table's sticky column. | `0px 0px 8px #1e1e1e29, 0px 0px 1px #1e1e1e1f` | `0px 0px 12px #0a09088f, 0px 0px 1px #0a090880` |
+| `elevation.shadow.overflow.spread` | Fallback for overflow when a box shadow is not feasible; pair with .perimeter. | `#1e1e1e29` | `#0a09088f` |
+| `elevation.shadow.overflow.perimeter` | Fallback for overflow when a box shadow is not feasible; pair with .spread. | `#1e1e1e1f` | `#0a090880` |
 | `opacity.disabled` | Images and whole elements in a disabled state. *Today --color-disabled-opacity is 0.38 (M3); 0.4 is Atlassian's.* | `0.4` | `0.4` |
 | `opacity.loading` | Content under a loading spinner. *New.* | `0.2` | `0.2` |
 
@@ -345,77 +348,83 @@ PLUS has already defined its UI patterns:
 
 Atlassian went through the same exercise when it moved its products onto elevation tokens: each pattern gets exactly one level, so nobody chooses a shadow by eye. The table assigns PLUS's patterns, in both plans.
 
-| Pattern | What it is | Plan A · Paper | Plan B · Ivory |
+| Pattern | What it is | Plan A · Paper | Plan B · Neutral |
 |---|---|---|---|
-| Surface container (the frame: topbar + docked sidebar) | The backdrop the work sits in. | elevation.surface.sunken (neutral.100, Notion's sidebar gray) | elevation.surface.sunken (neutral.200, deeper ivory) |
+| Surface container (the frame: topbar + docked sidebar) | The backdrop the work sits in. | elevation.surface.sunken (neutral.100 #f9f8f7, Notion's sidebar gray) | elevation.surface.sunken (neutral.100, near claude.ai's #fafafa sidebar) |
 | Topbar | Part of the frame. | Frame fill, no border | Frame fill, no border |
-| Sidebar item: hovered / selected | Navigation state. | background.neutral.subtle.hovered / background.selected (ink at 6%) + text.selected (ink) | background.neutral.subtle.hovered / background.selected (teal.100) + text.selected (teal.700) |
-| Sidebar peek (below 1024, floating, no scrim) | A layer over the page. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay |
-| Surface (the inner box) | Where the work happens; radius --surface-radius. | elevation.surface (white) + color.border hairline | elevation.surface (neutral.100 ivory); the frame-to-surface step reads by lightness, no border |
-| Section | Groups content inside the surface. | No fill; color.border divider when needed | No fill; color.border divider when needed |
-| Card, at rest | A flat container (ruling 2026-10-24). | elevation.surface (white) + color.border | elevation.surface.raised (white) + elevation.shadow.raised (hairline ring, no drop) |
+| Sidebar item: hovered / selected | Navigation state. | background.neutral.subtle.hovered / background.selected (ink at 6%) + text.selected (ink) | Same tokens; neutral selection, as claude.ai (ink at 5%) |
+| Sidebar peek (below 1024, floating, no scrim) | A layer over the page. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay (soft) |
+| Surface (the inner box) | Where the work happens; radius --surface-radius. | elevation.surface (white) + color.border hairline | elevation.surface (white), no border: the frame-to-surface step reads by tone alone |
+| Section | Groups content inside the surface. | No fill; color.border divider when needed | No fill; spacing first, color.border divider only in dense lists |
+| Card, at rest | A flat container (ruling 2026-10-24). | elevation.surface (white) + color.border | elevation.surface.raised (white) + elevation.shadow.raised (soft, no border) |
 | Card, clickable: hovered / dragged | Lift on interaction only. | elevation.surface.raised + elevation.shadow.raised / overlay pair | elevation.shadow.overlay on hover (Atlassian allows raised-to-overlay transitions) / overlay pair |
 | Well inside a card (code block, summary strip) | Recessed area. | elevation.surface.container (ink at 3%) | elevation.surface.container (ink at 3%) |
-| Table and Tree | Rows on the surface. | Head: color.border.bold rule; row hovered: background.neutral.subtle.hovered; row selected: background.selected; sticky column: elevation.shadow.overflow | Same tokens; selected rows show the teal tint |
-| Tile | A small selectable card. | background.neutral.subtle, hovered; selected: background.selected + border.selected | Same tokens; selected tiles show the teal tint |
-| Popover: Menu, Popup and flag | Floating layers without a scrim. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay (white on ivory) + elevation.shadow.overlay (soft) |
+| Table and Tree | Rows on the surface. | Head: color.border.bold rule; row hovered: background.neutral.subtle.hovered; row selected: background.selected; sticky column: elevation.shadow.overflow | Same tokens; row rules use color.border (lighter) rather than .bold |
+| Tile | A small selectable card. | background.neutral.subtle, hovered; selected: background.selected + border.selected | Same tokens |
+| Popover: Menu, Popup and flag | Floating layers without a scrim. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay (soft) |
 | Popover: Tooltip | A label over anything. | background.neutral.bold + text.inverse | background.neutral.bold + text.inverse |
 | Overlay (scrim) | Dims the page under a modal. | color.blanket | color.blanket |
 | Modal | A layer over the scrim. | elevation.surface.overlay + elevation.shadow.overlay | elevation.surface.overlay + elevation.shadow.overlay |
-| Element: input | Form fields. | background.input (white) + border.input; focus: border.focused ring | background.input (white on ivory) + border.input; focus: border.focused ring |
+| Element: input | Form fields. | background.input (white) + border.input; focus: border.focused ring | Same tokens |
 
 **Two consequences for existing rulings:**
 
-- **Cards.** "Cards are flat at rest" survives in Plan A literally: a white card with a hairline border. Plan B keeps it in spirit, with a hairline ring and no drop shadow. White on ivory already separates the card, so the ring only defines its edge.
+- **Cards.** "Cards are flat at rest" survives in Plan A literally: a white card with a hairline border. Plan B keeps it in spirit: no border, and a soft shadow so faint it reads as an edge rather than a lift.
 - **Modals.** "Floating layers use light-3, modals use light-4" collapses into a single `overlay` level, as in Atlassian. The blanket under a modal already sets it apart from a menu. This reverses a ruling, so it is open decision 3.
 
 **Name clash to settle.** PLUS calls the frame the "Surface container"; Atlassian's `elevation.surface.container` is a translucent well *inside* a card. Same words, opposite ends of the stack. Open decision 6.
 
 ### 4.6 Plan A and Plan B
 
-Notion and Claude point in two directions. Both are calm, warm and low-chroma, but they build depth differently. The two plans make that choice explicit. Both use Lagoon, the same nine accents, the same token names and the same contrast guarantees.
+Notion and Claude are both calm, low-chroma and monochrome around a single accent, but they draw structure differently. Notion uses warm grays and hairline borders. Claude, as served today, uses pure grays and no borders: tone and soft shadow do the work. The two plans make that choice explicit. Both use Lagoon, the same nine accents, the same token names and the same contrast guarantees.
 
-| | Plan A · Paper (toward Notion) | Plan B · Ivory (toward Claude) |
+**Which Claude.** The first draft of Plan B (Ivory) was fitted to Claude's warm ivory theme, and that theme is v1, now retired (§2.4). claude.ai as served to Bill on 2026-10-25 is v2 with its `color` flag, and its gray ramp is achromatic:
+
+- the sidebar is `#fafafa` and the main surface is white;
+- the grays include `#e0e0e0`, `#6b6b6b` and `#0b0b0b`;
+- content has no borders;
+- a selected item is ink at 5%;
+- the primary button is near-black `#191919`, with the clay orange only in the logo;
+- interactive accents use one blue (`#257de0`).
+
+Plan B is rebuilt on that.
+
+| | Plan A · Paper (toward Notion) | Plan B · Neutral (toward Claude, 2026) |
 |---|---|---|
-| Neutral hue and chroma | 85°, chroma 0.008 at most: near-achromatic warm gray | 98°, chroma 0.008–0.014 in the light steps: olive ivory |
-| Fit to benchmark | neutral.100 `#f9f8f7` is Notion's sidebar gray, to the hex | neutral.100 `#faf8f3` sits in Claude's ivory band (hue 95–106°, measured from its served CSS) |
-| Page | white `elevation.surface` | ivory `elevation.surface` (neutral.100) |
-| Frame (Surface container) | sunken neutral.100 | sunken neutral.200, a deeper ivory |
-| Cards and popovers | white, flat, bordered | white, raised by lightness and a hairline ring |
-| Inputs | white on white, bordered | white on ivory |
-| Selection | neutral: ink at 6% background, ink text (Notion; Atlassian Finesse) | teal: teal.100 background, teal.700 text |
-| Shadows | crisp, short (Atlassian geometry) | soft, wide, low opacity |
-| Brand presence | Lagoon appears only on actions, links and focus | Lagoon also marks selection, so it appears in navigation |
-| Risk | can feel plain; structure depends on borders | thinner contrast margins on ivory; more tokens differ between light and dark |
+| Neutral hue and chroma | 85°, chroma 0.008 at most: a barely warm gray | chroma 0: pure gray |
+| Fit to benchmark | neutral.100 `#f9f8f7` is Notion's sidebar gray, to the hex | neutral.100 `#f8f8f8`, against claude.ai's `#fafafa` sidebar and `#f9f9f9` surface-0 |
+| Frame (Surface container) | sunken neutral.100 | sunken neutral.100 |
+| Surface (inner box) | white, hairline border | white, no border; the frame-to-surface step is tone alone |
+| Cards at rest | white, flat, bordered | white, no border, soft shadow as the edge |
+| Shadows | crisp, short (Atlassian geometry) | soft, diffuse (claude.ai's `--cds-shadow-sm` and `--cds-shadow-popover` geometry) |
+| Selection | neutral: ink at 6%, ink text | neutral: the same tokens |
+| Brand presence | Lagoon on actions, links and focus | the same |
+| Risk | borders add visual noise in dense tables | cards and sections lean on spacing and shadow; harder to keep consistent across hand-built prototypes |
+
+Both plans now select in neutral, because both benchmarks do (Notion, and Claude at ink 5%), as does Atlassian's FY27 Finesse override. Teal selection stays possible in either plan as a variant (open decision 2).
 
 **Neutral ramps, light** (0 to 1100):
 
 - Plan A: `#ffffff #f9f8f7 #f3f1ef #e0dedc #bab8b5 #928f8a #827f7b #706d69 #555350 #3f3d3b #2c2b2a #1f1e1e`
-- Plan B: `#ffffff #faf8f3 #f4f2ea #e0ded4 #bab9b0 #919089 #81807a #6f6e69 #54544f #3e3d3b #2c2b29 #1f1f1d`
+- Plan B: `#ffffff #f8f8f8 #f1f1f1 #dedede #b8b8b8 #8f8f8f #7f7f7f #6d6d6d #535353 #3d3d3d #2b2b2b #1e1e1e`
 
 Dark ramps, OKLCH values and alphas for both plans are in Appendix A.
 
-**Thinnest margins in each plan:**
+**Contrast.** The two plans share step contrast, so their thinnest margins are the same:
 
-- **Plan A.**
-  - `color.text.brand` on `color.background.brand.subtlest`: 4.60:1.
-  - `color.border.input` on white: 3.22:1.
-  - `color.text.subtlest` on the sunken frame: 4.85:1.
-- **Plan B.**
-  - `color.border.input` on the ivory surface: 3.02:1.
-  - `color.text.subtlest` on the sunken frame: 4.56:1.
-  - `color.text.selected` on `color.background.selected`: 4.60:1.
-  - `color.border.selected` on ivory: 4.72:1.
+- `color.text.brand` on `color.background.brand.subtlest`: 4.60:1;
+- `color.border.input` on white: 3.22–3.23:1;
+- `color.text.subtlest` on the sunken frame: 4.85–4.87:1.
 
-  Everything passes, but Plan B has less room for later tweaks.
+The thin margins of the old Ivory plan (3.02:1 on ivory) are gone.
 
-**Recommendation: Plan A**, with one borrowing from Plan B worth trying: softer shadows on overlays. Three reasons:
+**Recommendation: still Plan A, but closer than before.** The plans now differ in two axes only: warm or pure gray, and borders or shadows.
 
-1. **It matches the patterns PLUS already has.** They lean on borders and flat cards.
-2. **It keeps margins wider.**
-3. **Neutral selection leaves Lagoon for actions only**, which makes the brand easier to read in a dense tutor dashboard.
+- **For Plan A.** PLUS's patterns already lean on borders and flat cards, and tutor dashboards are dense tables where hairlines carry structure.
+- **For Plan B.** It is the cleaner, more current look. It fits the "monochromatic tone for AI" Bill described for both benchmarks. Lagoon stands out more against pure gray.
 
-Plan B is the stronger choice if the brief tilts toward warmth and a branded feel over density. The artifact lets Bill compare the two side by side on the same screen.
+A hybrid is cheap to try: Plan A's warm gray and borders in tables and forms, with Plan B's soft shadows on cards and overlays. The artifact shows both plans on the same screen.
+
 
 ### 4.7 Contrast of the key pairs
 
@@ -423,26 +432,26 @@ WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens ar
 
 | Foreground | Background | Bar | A light | A dark | B light | B dark |
 |---|---|---|---|---|---|---|
-| `color.text.subtlest` | `elevation.surface.raised` | 4.5 | 5.15 | 5.45 | 5.11 | 5.44 |
-| `color.text.subtle` | `elevation.surface.sunken` | 4.5 | 7.23 | 7.81 | 6.79 | 7.81 |
-| `color.text` | `elevation.surface.sunken` | 4.5 | 13.32 | 11.51 | 12.62 | 11.60 |
-| `color.border.input` | `color.background.input` | 3 | 3.22 | 4.03 | 3.20 | 4.03 |
-| `color.text` | `elevation.surface` | 4.5 | 14.13 | 10.72 | 13.33 | 10.79 |
-| `color.text.subtle` | `elevation.surface` | 4.5 | 7.67 | 7.28 | 7.17 | 7.27 |
-| `color.text.subtlest` | `elevation.surface` | 4.5 | 5.15 | 5.87 | 4.81 | 5.86 |
-| `color.text.subtlest` | `elevation.surface.sunken` | 4.5 | 4.85 | 6.29 | 4.56 | 6.30 |
-| `color.text` | `elevation.surface.overlay` | 4.5 | 14.13 | 9.08 | 14.14 | 9.14 |
-| `color.text.brand` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 4.72 | 6.73 |
-| `color.link` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 4.72 | 6.73 |
-| `color.text.inverse` | `color.background.brand.bold` | 4.5 | 5.00 | 6.72 | 5.00 | 6.73 |
-| `color.text.inverse` | `color.background.selected.bold` | 4.5 | 14.13 | 10.72 | 5.00 | 6.73 |
-| `color.text.inverse` | `color.background.danger.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.66 |
-| `color.text.inverse` | `color.background.success.bold` | 4.5 | 4.96 | 6.66 | 4.96 | 6.67 |
-| `color.text.inverse` | `color.background.information.bold` | 4.5 | 5.04 | 6.64 | 5.04 | 6.64 |
-| `color.text.inverse` | `color.background.discovery.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.66 |
-| `color.text.inverse` | `color.background.neutral.bold` | 4.5 | 14.13 | 10.72 | 14.14 | 10.79 |
-| `color.text.warning.inverse` | `color.background.warning.bold` | 4.5 | 7.41 | 8.75 | 7.42 | 8.76 |
-| `color.text.selected` | `color.background.selected` | 4.5 | 12.62 | 8.83 | 4.60 | 5.59 |
+| `color.text.subtlest` | `elevation.surface.raised` | 4.5 | 5.15 | 5.45 | 5.17 | 5.45 |
+| `color.text.subtle` | `elevation.surface.sunken` | 4.5 | 7.23 | 7.81 | 7.24 | 7.81 |
+| `color.text` | `elevation.surface.sunken` | 4.5 | 13.32 | 11.51 | 13.33 | 11.51 |
+| `color.border.input` | `color.background.input` | 3 | 3.22 | 4.03 | 3.23 | 4.04 |
+| `color.text` | `elevation.surface` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
+| `color.text.subtle` | `elevation.surface` | 4.5 | 7.67 | 7.28 | 7.69 | 7.26 |
+| `color.text.subtlest` | `elevation.surface` | 4.5 | 5.15 | 5.87 | 5.17 | 5.85 |
+| `color.text.subtlest` | `elevation.surface.sunken` | 4.5 | 4.85 | 6.29 | 4.87 | 6.29 |
+| `color.text` | `elevation.surface.overlay` | 4.5 | 14.13 | 9.08 | 14.16 | 9.09 |
+| `color.text.brand` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
+| `color.link` | `elevation.surface` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
+| `color.text.inverse` | `color.background.brand.bold` | 4.5 | 5.00 | 6.72 | 5.00 | 6.72 |
+| `color.text.inverse` | `color.background.selected.bold` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
+| `color.text.inverse` | `color.background.danger.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.65 |
+| `color.text.inverse` | `color.background.success.bold` | 4.5 | 4.96 | 6.66 | 4.96 | 6.66 |
+| `color.text.inverse` | `color.background.information.bold` | 4.5 | 5.04 | 6.64 | 5.04 | 6.63 |
+| `color.text.inverse` | `color.background.discovery.bold` | 4.5 | 5.01 | 6.65 | 5.01 | 6.65 |
+| `color.text.inverse` | `color.background.neutral.bold` | 4.5 | 14.13 | 10.72 | 14.16 | 10.70 |
+| `color.text.warning.inverse` | `color.background.warning.bold` | 4.5 | 7.41 | 8.75 | 7.42 | 8.74 |
+| `color.text.selected` | `color.background.selected` | 4.5 | 12.62 | 8.83 | 12.65 | 8.84 |
 | `color.text.brand` | `color.background.brand.subtlest` | 4.5 | 4.60 | 5.59 | 4.60 | 5.59 |
 | `color.text.danger` | `color.background.danger` | 4.5 | 5.94 | 7.32 | 5.94 | 7.32 |
 | `color.text.warning` | `color.background.warning` | 4.5 | 5.87 | 7.37 | 5.87 | 7.37 |
@@ -453,26 +462,26 @@ WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens ar
 | `color.text.warning.bolder` | `color.background.warning.subtler` | 4.5 | 9.16 | 9.16 | 9.16 | 9.16 |
 | `color.text.success.bolder` | `color.background.success.subtler` | 4.5 | 9.14 | 9.14 | 9.14 | 9.14 |
 | `color.text.information.bolder` | `color.background.information.subtler` | 4.5 | 9.25 | 9.25 | 9.25 | 9.25 |
-| `color.text.danger` | `elevation.surface` | 4.5 | 6.41 | 8.72 | 6.04 | 8.73 |
-| `color.text.warning` | `elevation.surface` | 4.5 | 6.35 | 8.75 | 5.98 | 8.76 |
-| `color.text.success` | `elevation.surface` | 4.5 | 6.46 | 8.74 | 6.09 | 8.75 |
-| `color.text.information` | `elevation.surface` | 4.5 | 6.40 | 8.77 | 6.03 | 8.78 |
-| `color.icon` | `elevation.surface` | 3 | 14.13 | 10.72 | 13.33 | 10.79 |
-| `color.icon.subtle` | `elevation.surface` | 3 | 7.67 | 7.28 | 7.17 | 7.27 |
-| `color.icon.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 4.72 | 6.73 |
-| `color.icon.danger` | `elevation.surface` | 3 | 5.01 | 5.21 | 4.72 | 5.21 |
-| `color.icon.warning` | `elevation.surface` | 3 | 3.88 | 8.75 | 3.65 | 8.76 |
-| `color.icon.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.68 | 5.18 |
-| `color.icon.information` | `elevation.surface` | 3 | 3.92 | 5.21 | 3.69 | 5.22 |
-| `color.icon.discovery` | `elevation.surface` | 3 | 3.90 | 5.17 | 3.68 | 5.18 |
-| `color.border.input` | `elevation.surface` | 3 | 3.22 | 4.34 | 3.02 | 4.34 |
-| `color.border.bold` | `elevation.surface` | 3 | 3.98 | 4.34 | 3.73 | 4.34 |
-| `color.border.focused` | `elevation.surface` | 3 | 3.86 | 8.73 | 3.64 | 8.74 |
-| `color.border.danger` | `elevation.surface` | 3 | 3.90 | 5.21 | 3.68 | 5.21 |
-| `color.border.warning` | `elevation.surface` | 3 | 3.88 | 5.21 | 3.65 | 5.21 |
-| `color.border.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.68 | 5.18 |
-| `color.border.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 4.72 | 6.73 |
-| `color.border.selected` | `elevation.surface` | 3 | 14.13 | 10.72 | 4.72 | 6.73 |
+| `color.text.danger` | `elevation.surface` | 4.5 | 6.41 | 8.72 | 6.41 | 8.72 |
+| `color.text.warning` | `elevation.surface` | 4.5 | 6.35 | 8.75 | 6.35 | 8.74 |
+| `color.text.success` | `elevation.surface` | 4.5 | 6.46 | 8.74 | 6.46 | 8.74 |
+| `color.text.information` | `elevation.surface` | 4.5 | 6.40 | 8.77 | 6.40 | 8.77 |
+| `color.icon` | `elevation.surface` | 3 | 14.13 | 10.72 | 14.16 | 10.70 |
+| `color.icon.subtle` | `elevation.surface` | 3 | 7.67 | 7.28 | 7.69 | 7.26 |
+| `color.icon.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 5.00 | 6.72 |
+| `color.icon.danger` | `elevation.surface` | 3 | 5.01 | 5.21 | 5.01 | 5.21 |
+| `color.icon.warning` | `elevation.surface` | 3 | 3.88 | 8.75 | 3.88 | 8.74 |
+| `color.icon.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.90 | 5.18 |
+| `color.icon.information` | `elevation.surface` | 3 | 3.92 | 5.21 | 3.92 | 5.21 |
+| `color.icon.discovery` | `elevation.surface` | 3 | 3.90 | 5.17 | 3.90 | 5.17 |
+| `color.border.input` | `elevation.surface` | 3 | 3.22 | 4.34 | 3.23 | 4.34 |
+| `color.border.bold` | `elevation.surface` | 3 | 3.98 | 4.34 | 4.00 | 4.34 |
+| `color.border.focused` | `elevation.surface` | 3 | 3.86 | 8.73 | 3.86 | 8.73 |
+| `color.border.danger` | `elevation.surface` | 3 | 3.90 | 5.21 | 3.90 | 5.21 |
+| `color.border.warning` | `elevation.surface` | 3 | 3.88 | 5.21 | 3.88 | 5.20 |
+| `color.border.success` | `elevation.surface` | 3 | 3.90 | 5.18 | 3.90 | 5.18 |
+| `color.border.brand` | `elevation.surface` | 3 | 5.00 | 6.72 | 5.00 | 6.72 |
+| `color.border.selected` | `elevation.surface` | 3 | 14.13 | 10.72 | 14.16 | 10.70 |
 
 Today's equivalents fail: `--color-primary` is 4.08:1 on `surface-container-highest`, and `--color-tertiary` (info) fails 4.5:1 on four of five surfaces.
 
@@ -554,12 +563,56 @@ Reference counts are from `design-system/` and `prototypes/` today. The new name
 | `~15 hard-coded box-shadow literals` |  | `elevation.shadow.raised · .overlay · .overflow` | Swept with the components. |
 | `--color-disabled-opacity (0.38)` | 22 | `opacity.disabled (0.4)` | Atlassian value. |
 
+### 4.10 Color modes and the Figma setup
+
+**Modes.** Atlassian ships two color modes, light and dark. Increased contrast is not a third mode but a second axis: `light-increased-contrast` and `dark-increased-contrast` extend their base theme and override about half its variables (§2.2). PLUS should mirror that shape:
+
+- define **Light** and **Dark** now, as two modes of one Semantic collection;
+- leave **increased contrast** as a later override layer on text, icons, borders and bold fills.
+
+The generator makes that cheap. Increased contrast is the same token map pointed one or two steps darker (light) or lighter (dark), so no new primitives are needed.
+
+**Atlassian's public Figma libraries.** Atlassian publishes three current community files:
+
+- [ADS Foundations](https://www.figma.com/community/file/1527530559648073327/ads-foundations), with the semantic color, typography and spacing tokens and styles;
+- [ADS Components](https://www.figma.com/community/file/1527532229258392178/ads-components);
+- [ADS Iconography](https://www.figma.com/community/file/1592321163746398016/ads-iconography).
+
+All three are CC BY 4.0, and each replaces a "(Legacy)" file. Atlassian's own page says the libraries carry tokens "built-in as styles and in components", and that an employee-only plugin converts designs to dark mode ([use tokens in design](https://atlassian.design/foundations/tokens/use-tokens-in-design)). How the Foundations file splits variables, styles, collections and modes is **unverified**: reading it means opening it in a Figma account, which this pass did not do.
+
+**Typography tokens, from the same package** ([atlassian-typography](https://unpkg.com/@atlaskit/tokens@20.7.0/dist/esm/artifacts/themes/atlassian-typography.js)). Twenty-three tokens. Each composite token is one CSS `font` shorthand: weight, size and line height together.
+
+| Group | Tokens | Size / line height |
+|---|---|---|
+| Heading (weight 653) | `font.heading.xxlarge` … `.xxsmall` | 32/36, 28/32, 24/28, 20/24, 16/20, 14/20, 12/16 |
+| Body (400) | `font.body.large`, `font.body`, `font.body.small` | 16/24, 14/20, 12/16 |
+| Metric (653) | `font.metric.large`, `.medium`, `.small` | 28/32, 24/28, 16/20 |
+| Code | `font.code` | 0.875em, Atlassian Mono |
+| Weight | `font.weight.regular` / `.medium` / `.semibold` / `.bold` | 400 / 500 / 600 / 653 |
+| Family | `font.family.heading` / `.body` / `.code` / `.brand.heading` / `.brand.body` | Atlassian Sans, Atlassian Mono, Charlie Display / Text |
+
+What carries over to PLUS, which has already adopted Atlassian's type structure with its own families:
+
+1. **Composite tokens per role, not per property.** A heading is one token, so size and line height never drift apart.
+2. **Families as tokens.** Swapping a typeface is one edit.
+3. **Metric** is a separate role for numbers in dashboards. This matters for tutor stats.
+4. **Bold is 653**, a variable-font weight. PLUS's families would map bold to the nearest weight they ship.
+
+**Recommended PLUS Figma setup**, mirroring the token source:
+
+| Collection | Modes | Holds |
+|---|---|---|
+| Primitives | one | the nine hue ramps, both neutral ramps and the alphas, hidden from publishing so designers pick semantics |
+| Color | Light, Dark (Increased contrast later) | the semantic `color.*` and `elevation.surface.*` tokens, each aliasing a primitive |
+| Shadows | — | effect styles `elevation.shadow.raised / overlay / overflow`, one per mode, because Figma variables cannot hold shadows |
+| Typography | — | text styles named like the tokens (`font/heading/large`), with size, line height and weight as number variables underneath |
+
 ## 5. Open decisions for Bill
 
 Each needs Bill's call, and each has a recommendation. The brand hue is settled: Lagoon, 205°.
 
-1. **Plan A (Paper) or Plan B (Ivory).** *Recommend A*, trying Plan B's softer overlay shadow on it (§4.6). Compare the two on the same screen in the artifact before deciding.
-2. **Selection color.** Neutral ink, as in Plan A, Notion and Atlassian's newer Finesse theme, or the teal tint, as in Plan B and Atlassian's default. *Recommend following whichever plan wins.* They are separable if Bill wants Plan A's surfaces with teal selection.
+1. **Plan A (Paper) or Plan B (Neutral).** *Recommend A*, or a hybrid with Plan B's soft shadows on cards and overlays (§4.6). Compare the two on the same screen in the artifact before deciding.
+2. **Selection color.** Both plans now select in neutral ink, as Notion, today's Claude and Atlassian's Finesse override do. The alternative is the teal tint, Atlassian's default. *Recommend neutral.* It keeps Lagoon for actions, links and focus.
 3. **Modal elevation.** Collapse "modals use light-4" into the single `overlay` level, as Atlassian does, or keep a separate modal shadow. *Recommend collapsing.* The blanket already separates a modal from a menu. This reverses a ruling.
 4. **Dragged items.** Overlay, as Atlassian specifies, or raised. *Recommend overlay.* A dragged card is above everything else on the page.
 5. **Secondary and tertiary.** Drop both as roles. *Recommend dropping.* Secondary becomes `text.subtle` and `background.neutral`; tertiary becomes an accent. Bill's Atlassian model (one brand, functional colors, accents) already implies this.
@@ -575,8 +628,9 @@ Each needs Bill's call, and each has a recommendation. The brand hue is settled:
 10. **Warning edge darkness.** The ruling put the warning border and icon at `#715c00`; the Atlassian mapping gives yellow.600 (`#a17c16`) for border and icon and yellow.800 for text. *Recommend the mapping*: it clears 3:1 and keeps the dark value in text.
 11. **Scope.** *Recommend:*
     - sRGB only, no P3;
-    - dark values defined in the tokens now, but no theme toggle shipped until the component sweep is done;
-    - the generator in the repo as the source of truth, emitting SCSS and two Figma collections (Primitives, and Semantic with light and dark modes);
+    - Light and Dark modes defined in the tokens now, but no theme toggle shipped until the component sweep is done;
+    - increased contrast as a later override, as Atlassian does it (§4.10);
+    - the generator in the repo as the source of truth, emitting SCSS and the Figma collections in §4.10;
     - the `--ds-` CSS prefix.
 
 Still out of scope and still Bill's: the AI hue (#269). Atlassian's discovery purple is where it would go if he wants one.
@@ -628,52 +682,52 @@ Each step is its own ticket; step 4 splits per pattern.
 | 900 | `#582c05` 11.81 | `#612321` 11.86 | `#5a2540` 11.84 | `#402f5c` 11.80 |
 | 1000 | `#43240c` 14.03 | `#48201d` 14.00 | `#432032` 14.08 | `#312644` 14.08 |
 
-**Neutral ramps, Plan A (Paper) and Plan B (Ivory)** (hex · contrast on white)
+**Neutral ramps, Plan A (Paper) and Plan B (Neutral)** (hex · contrast on white)
 
 | Step | A dark | B dark | A light | B light |
 |---|---|---|---|---|
-| 0 | `#181716` 17.90 | `#171716` 17.94 | `#ffffff` 1.00 | `#ffffff` 1.00 |
-| 100 | `#1e1e1d` 16.68 | `#1e1e1c` 16.70 | `#f9f8f7` 1.06 | `#faf8f3` 1.06 |
-| 200 | `#252423` 15.49 | `#252423` 15.49 | `#f3f1ef` 1.13 | `#f4f2ea` 1.12 |
-| 250 | `#2c2b2a` 14.13 | `#2c2b2a` 14.13 |  |  |
-| 300 | `#313130` 13.02 | `#31312f` 13.04 | `#e0dedc` 1.34 | `#e0ded4` 1.35 |
-| 350 | `#3f3e3d` 10.67 | `#3f3e3b` 10.69 |  |  |
-| 400 | `#4d4d4c` 8.46 | `#4e4d4a` 8.45 | `#bab8b5` 1.98 | `#bab9b0` 1.97 |
-| 500 | `#656564` 5.84 | `#666562` 5.83 | `#928f8a` 3.22 | `#919089` 3.20 |
-| 600 | `#828281` 3.85 | `#83827f` 3.84 | `#827f7b` 3.98 | `#81807a` 3.96 |
-| 700 | `#9a9998` 2.84 | `#9a9996` 2.85 | `#706d69` 5.15 | `#6f6e69` 5.11 |
-| 800 | `#acabaa` 2.29 | `#acaba8` 2.30 | `#555350` 7.67 | `#54544f` 7.61 |
-| 900 | `#c1c0bf` 1.82 | `#c1c1bd` 1.81 | `#3f3d3b` 10.81 | `#3e3d3b` 10.85 |
-| 1000 | `#d0cfce` 1.56 | `#d0d0cc` 1.55 | `#2c2b2a` 14.13 | `#2c2b29` 14.14 |
-| 1100 | `#e4e3e2` 1.28 | `#e4e3e0` 1.28 | `#1f1e1e` 16.63 | `#1f1f1d` 16.51 |
+| 0 | `#181716` 17.90 | `#171717` 17.93 | `#ffffff` 1.00 | `#ffffff` 1.00 |
+| 100 | `#1e1e1d` 16.68 | `#1e1e1e` 16.67 | `#f9f8f7` 1.06 | `#f8f8f8` 1.06 |
+| 200 | `#252423` 15.49 | `#242424` 15.52 | `#f3f1ef` 1.13 | `#f1f1f1` 1.13 |
+| 250 | `#2c2b2a` 14.13 | `#2b2b2b` 14.16 |  |  |
+| 300 | `#313130` 13.02 | `#313131` 13.01 | `#e0dedc` 1.34 | `#dedede` 1.35 |
+| 350 | `#3f3e3d` 10.67 | `#3e3e3e` 10.70 |  |  |
+| 400 | `#4d4d4c` 8.46 | `#4d4d4d` 8.45 | `#bab8b5` 1.98 | `#b8b8b8` 1.98 |
+| 500 | `#656564` 5.84 | `#656565` 5.83 | `#928f8a` 3.22 | `#8f8f8f` 3.23 |
+| 600 | `#828281` 3.85 | `#828282` 3.84 | `#827f7b` 3.98 | `#7f7f7f` 4.00 |
+| 700 | `#9a9998` 2.84 | `#999999` 2.85 | `#706d69` 5.15 | `#6d6d6d` 5.17 |
+| 800 | `#acabaa` 2.29 | `#ababab` 2.30 | `#555350` 7.67 | `#535353` 7.69 |
+| 900 | `#c1c0bf` 1.82 | `#c0c0c0` 1.82 | `#3f3d3b` 10.81 | `#3d3d3d` 10.86 |
+| 1000 | `#d0cfce` 1.56 | `#cfcfcf` 1.56 | `#2c2b2a` 14.13 | `#2b2b2b` 14.16 |
+| 1100 | `#e4e3e2` 1.28 | `#e3e3e3` 1.28 | `#1f1e1e` 16.63 | `#1e1e1e` 16.67 |
 
 **OKLCH source values: Lagoon and both light neutrals**
 
 | Step | teal (Lagoon) | neutral A | neutral B |
 |---|---|---|---|
 | 0 |  | `oklch(1.000 0.000 90)` | `oklch(1.000 0.000 90)` |
-| 100 | `oklch(0.969 0.020 208)` | `oklch(0.980 0.002 68)` | `oklch(0.979 0.007 89)` |
-| 200 | `oklch(0.911 0.045 205)` | `oklch(0.959 0.003 68)` | `oklch(0.960 0.011 95)` |
-| 300 | `oklch(0.784 0.087 206)` | `oklch(0.902 0.003 68)` | `oklch(0.899 0.014 97)` |
-| 400 | `oklch(0.708 0.115 204)` | `oklch(0.783 0.005 78)` | `oklch(0.784 0.013 102)` |
-| 500 | `oklch(0.641 0.104 206)` | `oklch(0.651 0.008 81)` | `oklch(0.652 0.010 100)` |
-| 600 | `oklch(0.595 0.097 205)` | `oklch(0.598 0.007 75)` | `oklch(0.599 0.009 99)` |
-| 700 | `oklch(0.534 0.087 204)` | `oklch(0.536 0.007 75)` | `oklch(0.538 0.008 97)` |
-| 800 | `oklch(0.477 0.077 206)` | `oklch(0.443 0.006 78)` | `oklch(0.444 0.008 107)` |
-| 900 | `oklch(0.333 0.054 204)` | `oklch(0.361 0.004 68)` | `oklch(0.360 0.004 85)` |
-| 1000 | `oklch(0.290 0.047 204)` | `oklch(0.290 0.002 68)` | `oklch(0.289 0.004 85)` |
-| 1100 |  | `oklch(0.236 0.002 17)` | `oklch(0.239 0.004 107)` |
+| 100 | `oklch(0.969 0.020 208)` | `oklch(0.980 0.002 68)` | `oklch(0.979 0.000 90)` |
+| 200 | `oklch(0.911 0.045 205)` | `oklch(0.959 0.003 68)` | `oklch(0.958 0.000 90)` |
+| 300 | `oklch(0.784 0.087 206)` | `oklch(0.902 0.003 68)` | `oklch(0.901 0.000 90)` |
+| 400 | `oklch(0.708 0.115 204)` | `oklch(0.783 0.005 78)` | `oklch(0.783 0.000 90)` |
+| 500 | `oklch(0.641 0.104 206)` | `oklch(0.651 0.008 81)` | `oklch(0.650 0.000 90)` |
+| 600 | `oklch(0.595 0.097 205)` | `oklch(0.598 0.007 75)` | `oklch(0.596 0.000 90)` |
+| 700 | `oklch(0.534 0.087 204)` | `oklch(0.536 0.007 75)` | `oklch(0.535 0.000 90)` |
+| 800 | `oklch(0.477 0.077 206)` | `oklch(0.443 0.006 78)` | `oklch(0.442 0.000 90)` |
+| 900 | `oklch(0.333 0.054 204)` | `oklch(0.361 0.004 68)` | `oklch(0.360 0.000 90)` |
+| 1000 | `oklch(0.290 0.047 204)` | `oklch(0.290 0.002 68)` | `oklch(0.289 0.000 90)` |
+| 1100 |  | `oklch(0.236 0.002 17)` | `oklch(0.235 0.000 90)` |
 
 **Alpha neutrals** (ink in light, paper in dark)
 
 | Step | A light | A dark | B light | B dark |
 |---|---|---|---|---|
-| 100A | `#1f1e1e08` | `#e4e3e20a` | `#1f1f1d08` | `#e4e3e00a` |
-| 200A | `#1f1e1e0f` | `#e4e3e214` | `#1f1f1d0f` | `#e4e3e014` |
-| 250A |  | `#e4e3e21a` |  | `#e4e3e01a` |
-| 300A | `#1f1e1e24` | `#e4e3e229` | `#1f1f1d24` | `#e4e3e029` |
-| 400A | `#1f1e1e4f` | `#e4e3e247` | `#1f1f1d4f` | `#e4e3e047` |
-| 500A | `#1f1e1e7d` | `#e4e3e280` | `#1f1f1d7d` | `#e4e3e080` |
+| 100A | `#1f1e1e08` | `#e4e3e20a` | `#1e1e1e08` | `#e3e3e30a` |
+| 200A | `#1f1e1e0f` | `#e4e3e214` | `#1e1e1e0f` | `#e3e3e314` |
+| 250A |  | `#e4e3e21a` |  | `#e3e3e31a` |
+| 300A | `#1f1e1e24` | `#e4e3e229` | `#1e1e1e24` | `#e3e3e329` |
+| 400A | `#1f1e1e4f` | `#e4e3e247` | `#1e1e1e4f` | `#e3e3e347` |
+| 500A | `#1f1e1e7d` | `#e4e3e280` | `#1e1e1e7d` | `#e3e3e380` |
 
 ## Appendix B: Semantic tokens, light and dark, both plans
 
@@ -684,15 +738,15 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.text` | Primary text, such as body copy, sentence case headers, and buttons | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2c2b29` / darkNeutral.1000 `#d0d0cc` |
-| `color.text.disabled` | Text in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1f1f1d4f` / darkNeutralAlpha.400 `#e4e3e047` |
-| `color.text.inverse` | Text on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1c` |
-| `color.text.selected` | Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.text` | Primary text, such as body copy, sentence case headers, and buttons | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
+| `color.text.disabled` | Text in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
+| `color.text.inverse` | Text on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
+| `color.text.selected` | Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.text.brand` | Text that reinforces our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
 | `color.text.danger` | Critical text, such as input field error messaging | red.800 `#9e413d` / red.300 `#f2a9a3` | same as A |
 | `color.text.danger.bolder` | Text on top of danger semantic labels to ensure accessibility and desired visual appearance | red.900 `#612321` / red.200 `#fedcd8` | same as A |
 | `color.text.warning` | Text to emphasize caution, such as in moved lozenges | yellow.800 `#765c0d` / yellow.300 `#d0ba7f` | same as A |
-| `color.text.warning.inverse` | Text when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2c2b29` / darkNeutral.100 `#1e1e1c` |
+| `color.text.warning.inverse` | Text when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
 | `color.text.warning.bolder` | Text on top of warning semantic labels to ensure accessibility and desired visual appearance | yellow.900 `#463605` / yellow.200 `#ede3c5` | same as A |
 | `color.text.success` | Text to communicate a favorable outcome, such as input field success messaging | green.800 `#0f6c44` / green.300 `#90c8a7` | same as A |
 | `color.text.success.bolder` | Text on top of success semantic labels to ensure accessibility and desired visual appearance | green.900 `#064126` / green.200 `#ceead8` | same as A |
@@ -700,38 +754,38 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#402f5c` / purple.200 `#e8dffc` | same as A |
 | `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#365f9d` / blue.300 `#9ebeed` | same as A |
 | `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#1c375f` / blue.200 `#d3e4fe` | same as A |
-| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6f6e69` / darkNeutral.700 `#9a9996` |
-| `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#54544f` / darkNeutral.800 `#acaba8` |
+| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
+| `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
 
 #### Icon
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.icon` | Icon-only buttons, or icons paired with color.text | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2c2b29` / darkNeutral.1000 `#d0d0cc` |
-| `color.icon.disabled` | Icons in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1f1f1d4f` / darkNeutralAlpha.400 `#e4e3e047` |
-| `color.icon.inverse` | Icons on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1c` |
-| `color.icon.selected` | Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.icon` | Icon-only buttons, or icons paired with color.text | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
+| `color.icon.disabled` | Icons in a disabled state | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
+| `color.icon.inverse` | Icons on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
+| `color.icon.selected` | Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.icon.brand` | Icons that reinforce our brand | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
 | `color.icon.danger` | Icons communicating critical information, such as those used in error handing | red.700 `#b84d48` / red.500 `#e36b65` | same as A |
 | `color.icon.warning` | Icons communicating caution, such as those used in warning section messages | yellow.600 `#9f7d16` / yellow.300 `#d0ba7f` | same as A |
-| `color.icon.warning.inverse` | Icons when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2c2b29` / darkNeutral.100 `#1e1e1c` |
+| `color.icon.warning.inverse` | Icons when on bold warning backgrounds | neutral.1000 `#2c2b2a` / darkNeutral.100 `#1e1e1d` | neutral.1000 `#2b2b2b` / darkNeutral.100 `#1e1e1e` |
 | `color.icon.success` | Icons communicating a favorable outcome, such as those used in success section messaged | green.600 `#1b935e` / green.500 `#32a26c` | same as A |
 | `color.icon.discovery` | Icons communicating change or something new, such as discovery section messages | purple.600 `#9171c6` / purple.500 `#a07fd7` | same as A |
 | `color.icon.information` | Icons communicating information or something in-progress, such as information section messages | blue.600 `#4e81ce` / blue.500 `#5c91de` | same as A |
-| `color.icon.subtlest` | Icons paired with color.text.subtlest | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6f6e69` / darkNeutral.700 `#9a9996` |
-| `color.icon.subtle` | Icons paired with color.text.subtle | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#54544f` / darkNeutral.800 `#acaba8` |
+| `color.icon.subtlest` | Icons paired with color.text.subtlest | neutral.700 `#706d69` / darkNeutral.700 `#9a9998` | neutral.700 `#6d6d6d` / darkNeutral.700 `#999999` |
+| `color.icon.subtle` | Icons paired with color.text.subtle | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
 
 #### Border
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1f1f1d24` / darkNeutralAlpha.300 `#e4e3e029` |
-| `color.border.disabled` | Borders of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.200 `#e4e3e014` |
+| `color.border` | Use to visually group or separate UI elements, such as flat cards or side panel dividers | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.border.disabled` | Borders of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
 | `color.border.focused` | The focus ring or border of an element that currently has keyboard or input focus. Do not use to indicate selection or hover alone. When an element is both selected and focused, keep its selected treatment and add a separate focus indicator *One step darker than Atlassian (500), for margin: 3.9:1 on white instead of 3.2:1.* | teal.600 `#198f9a` / teal.300 `#70c9d4` | same as A |
-| `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#919089` / darkNeutral.600 `#83827f` |
-| `color.border.input.search` | The border of search inputs | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1f1f1d24` / darkNeutralAlpha.300 `#e4e3e029` |
-| `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#181716` | neutral.0 `#ffffff` / darkNeutral.0 `#171716` |
-| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | teal.700 `#147b84` / teal.400 `#23b5c2` |
+| `color.border.input` | Borders of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.500 `#928f8a` / darkNeutral.600 `#828281` | neutral.500 `#8f8f8f` / darkNeutral.600 `#828282` |
+| `color.border.input.search` | The border of search inputs | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.border.inverse` | Borders on bold backgrounds | neutral.0 `#ffffff` / darkNeutral.0 `#181716` | neutral.0 `#ffffff` / darkNeutral.0 `#171717` |
+| `color.border.selected` | Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
 | `color.border.brand` | Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons | teal.700 `#147b84` / teal.400 `#23b5c2` | same as A |
 | `color.border.danger` | Borders communicating critical information, such as the borders on invalid text fields | red.600 `#d15c57` / red.500 `#e36b65` | same as A |
 | `color.border.danger.subtle` | Decorative danger borders that do not need to meet 3:1 contrast requirements | red.300 `#f2a9a3` / red.800 `#9e413d` | same as A |
@@ -743,35 +797,35 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.border.discovery.subtle` | Decorative discovery borders that do not need to meet 3:1 contrast requirements | purple.300 `#c5b3e8` / purple.800 `#6c5196` | same as A |
 | `color.border.information` | Borders communicating information or something in-progress | blue.600 `#4e81ce` / blue.500 `#5c91de` | same as A |
 | `color.border.information.subtle` | Decorative information borders that do not need to meet 3:1 contrast requirements | blue.300 `#9ebeed` / blue.800 `#365f9d` | same as A |
-| `color.border.bold` | A neutral border option that passes min 3:1 contrast ratios | neutral.600 `#827f7b` / darkNeutral.600 `#828281` | neutral.600 `#81807a` / darkNeutral.600 `#83827f` |
-| `color.border.focused.inverse` | PLUS addition. Focus ring on a bold or colored ground (today --color-focus-ring-inverse). *today's Focus Ring Inverse* | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1c` |
+| `color.border.bold` | A neutral border option that passes min 3:1 contrast ratios | neutral.600 `#827f7b` / darkNeutral.600 `#828281` | neutral.600 `#7f7f7f` / darkNeutral.600 `#828282` |
+| `color.border.focused.inverse` | PLUS addition. Focus ring on a bold or colored ground (today --color-focus-ring-inverse). *today's Focus Ring Inverse* | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
 
 #### Background: neutral, input, inverse, disabled, selected, brand
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `color.background.disabled` | Backgrounds of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.300 `#e4e3e029` |
-| `color.background.input` | Background of form UI elements, such as text fields, checkboxes, and radio buttons *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | same as A |
-| `color.background.input.hovered` | Hovered state for color.background.input *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.100 `#f9f8f7` / darkNeutral.250 `#2c2b2a` | neutral.100 `#faf8f3` / darkNeutral.250 `#2c2b2a` |
-| `color.background.input.pressed` | Pressed state for color.background.input *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | same as A |
-| `color.background.inverse.subtle` | Backgrounds of elements on a bold background, such as in the buttons on spotlight cards | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1f1f1d29` / paper @16% `#e4e3e029` |
-| `color.background.inverse.subtle.hovered` | The hovered state of color.background.inverse.subtle | ink @24% `#1f1e1e3d` / paper @24% `#e4e3e23d` | ink @24% `#1f1f1d3d` / paper @24% `#e4e3e03d` |
-| `color.background.inverse.subtle.pressed` | The pressed state of color.background.inverse.subtle | ink @32% `#1f1e1e52` / paper @32% `#e4e3e252` | ink @32% `#1f1f1d52` / paper @32% `#e4e3e052` |
-| `color.background.neutral` | The default background for neutral elements, such as default buttons | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.200 `#e4e3e014` |
-| `color.background.neutral.hovered` | Hovered state for color.background.neutral | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1f1f1d24` / darkNeutralAlpha.300 `#e4e3e029` |
-| `color.background.neutral.pressed` | Pressed state for color.background.neutral | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1f1f1d4f` / darkNeutralAlpha.400 `#e4e3e047` |
+| `color.background.disabled` | Backgrounds of elements in a disabled state | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.background.input` | Background of form UI elements, such as text fields, checkboxes, and radio buttons | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
+| `color.background.input.hovered` | Hovered state for color.background.input | neutral.100 `#f9f8f7` / darkNeutral.250 `#2c2b2a` | neutral.100 `#f8f8f8` / darkNeutral.250 `#2b2b2b` |
+| `color.background.input.pressed` | Pressed state for color.background.input | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
+| `color.background.inverse.subtle` | Backgrounds of elements on a bold background, such as in the buttons on spotlight cards | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1e1e1e29` / paper @16% `#e3e3e329` |
+| `color.background.inverse.subtle.hovered` | The hovered state of color.background.inverse.subtle | ink @24% `#1f1e1e3d` / paper @24% `#e4e3e23d` | ink @24% `#1e1e1e3d` / paper @24% `#e3e3e33d` |
+| `color.background.inverse.subtle.pressed` | The pressed state of color.background.inverse.subtle | ink @32% `#1f1e1e52` / paper @32% `#e4e3e252` | ink @32% `#1e1e1e52` / paper @32% `#e3e3e352` |
+| `color.background.neutral` | The default background for neutral elements, such as default buttons | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `color.background.neutral.hovered` | Hovered state for color.background.neutral | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.background.neutral.pressed` | Pressed state for color.background.neutral | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
 | `color.background.neutral.subtle` | The background of elements that appear to have no background in a resting state, such as subtle buttons and menu items | transparent `#00000000` / transparent `#00000000` | same as A |
-| `color.background.neutral.subtle.hovered` | Hovered state for color.background.neutral.subtle | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.200 `#e4e3e014` |
-| `color.background.neutral.subtle.pressed` | Pressed state for color.background.neutral.subtle | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1f1f1d24` / darkNeutralAlpha.300 `#e4e3e029` |
-| `color.background.neutral.bold` | A vibrant background option for neutral UI elements, such as announcement banners | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2c2b29` / darkNeutral.1000 `#d0d0cc` |
-| `color.background.neutral.bold.hovered` | Hovered state of color.background.neutral.bold | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3e3d3b` / darkNeutral.900 `#c1c1bd` |
-| `color.background.neutral.bold.pressed` | Pressed state of color.background.neutral.bold | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#54544f` / darkNeutral.800 `#acaba8` |
-| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | teal.100 `#e6f9fc` / teal.1000 `#043236` |
-| `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | teal.200 `#c0ebf0` / teal.900 `#063e43` |
-| `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | teal.300 `#70c9d4` / teal.800 `#106972` |
-| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | teal.700 `#147b84` / teal.400 `#23b5c2` |
-| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | teal.800 `#106972` / teal.300 `#70c9d4` |
-| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override.* | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | teal.900 `#063e43` / teal.200 `#c0ebf0` |
+| `color.background.neutral.subtle.hovered` | Hovered state for color.background.neutral.subtle | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `color.background.neutral.subtle.pressed` | Pressed state for color.background.neutral.subtle | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.background.neutral.bold` | A vibrant background option for neutral UI elements, such as announcement banners | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
+| `color.background.neutral.bold.hovered` | Hovered state of color.background.neutral.bold | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3d3d3d` / darkNeutral.900 `#c0c0c0` |
+| `color.background.neutral.bold.pressed` | Pressed state of color.background.neutral.bold | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
+| `color.background.selected` | The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `color.background.selected.hovered` | The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.300 `#e4e3e229` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.300 `#e3e3e329` |
+| `color.background.selected.pressed` | The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutralAlpha.400 `#1f1e1e4f` / darkNeutralAlpha.400 `#e4e3e247` | neutralAlpha.400 `#1e1e1e4f` / darkNeutralAlpha.400 `#e3e3e347` |
+| `color.background.selected.bold` | The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.1000 `#2c2b2a` / darkNeutral.1000 `#d0cfce` | neutral.1000 `#2b2b2b` / darkNeutral.1000 `#cfcfcf` |
+| `color.background.selected.bold.hovered` | The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.900 `#3f3d3b` / darkNeutral.900 `#c1c0bf` | neutral.900 `#3d3d3d` / darkNeutral.900 `#c0c0c0` |
+| `color.background.selected.bold.pressed` | The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone *Plan A: selection is neutral, as in Notion and Atlassian's FY27 Finesse override. Plan B: selection is neutral, as on claude.ai (ink at 5%) and in Atlassian's FY27 Finesse override.* | neutral.800 `#555350` / darkNeutral.800 `#acabaa` | neutral.800 `#535353` / darkNeutral.800 `#ababab` |
 | `color.background.brand.subtlest` | The background of elements used to reinforce our brand, but with less emphasis | teal.100 `#e6f9fc` / teal.1000 `#043236` | same as A |
 | `color.background.brand.subtlest.hovered` | Hovered state of color.background.brand.subtlest | teal.200 `#c0ebf0` / teal.900 `#063e43` | same as A |
 | `color.background.brand.subtlest.pressed` | Pressed state of color.background.brand.subtlest | teal.250 `#9cdae1` / teal.850 `#0a545a` | same as A |
@@ -805,32 +859,32 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.link.pressed` | Links in a pressed state | teal.800 `#106972` / teal.300 `#70c9d4` | same as A |
 | `color.link.visited` | Visited links | purple.800 `#6c5196` / purple.300 `#c5b3e8` | same as A |
 | `color.link.visited.pressed` | Visited links in a pressed state | purple.900 `#402f5c` / purple.200 `#e8dffc` | same as A |
-| `color.interaction.hovered` | A background overlay for elements in a hovered state when their background color cannot change, such as avatars *PLUS state-layer ruling (2026-10-24): hover is an 8% overlay. Atlassian uses 16%.* | neutralAlpha ink @8% `#1f1e1e14` / paper @8% `#e4e3e214` | neutralAlpha ink @8% `#1f1f1d14` / paper @8% `#e4e3e014` |
-| `color.interaction.pressed` | A background overlay for elements in a pressed state when their background color cannot change, such as avatars *PLUS ruling: pressed is a 12% overlay. Atlassian uses 32%.* | neutralAlpha ink @12% `#1f1e1e1f` / paper @12% `#e4e3e21f` | neutralAlpha ink @12% `#1f1f1d1f` / paper @12% `#e4e3e01f` |
-| `color.skeleton` | Skeleton loading states | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.200 `#e4e3e014` |
-| `color.skeleton.subtle` | The pulse or shimmer effect in skeleton loading states | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1f1f1d08` / darkNeutralAlpha.100 `#e4e3e00a` |
-| `color.blanket` | The screen overlay that appears with modal dialogs *Keeps today's 0.32 scrim (#383). Atlassian is ~46%.* | ink @32% `#1f1e1e52` / black @60% `#00000099` | ink @32% `#1f1f1d52` / black @60% `#00000099` |
+| `color.interaction.hovered` | A background overlay for elements in a hovered state when their background color cannot change, such as avatars *PLUS state-layer ruling (2026-10-24): hover is an 8% overlay. Atlassian uses 16%.* | neutralAlpha ink @8% `#1f1e1e14` / paper @8% `#e4e3e214` | neutralAlpha ink @8% `#1e1e1e14` / paper @8% `#e3e3e314` |
+| `color.interaction.pressed` | A background overlay for elements in a pressed state when their background color cannot change, such as avatars *PLUS ruling: pressed is a 12% overlay. Atlassian uses 32%.* | neutralAlpha ink @12% `#1f1e1e1f` / paper @12% `#e4e3e21f` | neutralAlpha ink @12% `#1e1e1e1f` / paper @12% `#e3e3e31f` |
+| `color.skeleton` | Skeleton loading states | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `color.skeleton.subtle` | The pulse or shimmer effect in skeleton loading states | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1e1e1e08` / darkNeutralAlpha.100 `#e3e3e30a` |
+| `color.blanket` | The screen overlay that appears with modal dialogs *Keeps today's 0.32 scrim (#383). Atlassian is ~46%.* | ink @32% `#1f1e1e52` / black @60% `#00000099` | ink @32% `#1e1e1e52` / black @60% `#00000099` |
 | `color.blanket.selected` | A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected Editor blocks. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone | teal.500 @8% `#1d9eab14` / teal.600 @8% `#198f9a14` | same as A |
 | `color.blanket.danger` | An overlay to communicate danger states when a simple background color change isn't possible, such as deletion of Editor block elements | red.500 @8% `#e36b6514` / red.600 @8% `#d15c5714` | same as A |
-| `color.interaction.dragged` | PLUS addition. Selected-or-dragged overlay, the 16% step of the state-layer ruling. *PLUS ruling 2026-10-24* | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1f1f1d29` / paper @16% `#e4e3e029` |
+| `color.interaction.dragged` | PLUS addition. Selected-or-dragged overlay, the 16% step of the state-layer ruling. *PLUS ruling 2026-10-24* | ink @16% `#1f1e1e29` / paper @16% `#e4e3e229` | ink @16% `#1e1e1e29` / paper @16% `#e3e3e329` |
 
 #### Elevation surfaces
 
 | Token | For | Plan A light / dark | Plan B light / dark |
 |---|---|---|---|
-| `elevation.surface` | The primary background for the UI *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.100 `#faf8f3` / darkNeutral.100 `#1e1e1c` |
-| `elevation.surface.hovered` | Hovered state of elevation.surface *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.200 `#f3f1ef` / darkNeutral.200 `#252423` | neutral.200 `#f4f2ea` / darkNeutral.200 `#252423` |
-| `elevation.surface.pressed` | Pressed state of elevation.surface *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.300 `#e0dedc` / darkNeutral.250 `#2c2b2a` | neutral.300 `#e0ded4` / darkNeutral.250 `#2c2b2a` |
-| `elevation.surface.container` | A neutral container surface background | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1f1f1d08` / darkNeutralAlpha.100 `#e4e3e00a` |
-| `elevation.surface.container.hovered` | Hovered state of elevation.surface.container | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1f1f1d0f` / darkNeutralAlpha.200 `#e4e3e014` |
-| `elevation.surface.container.pressed` | Pressed state of elevation.surface.container | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.250 `#e4e3e21a` | neutralAlpha.300 `#1f1f1d24` / darkNeutralAlpha.250 `#e4e3e01a` |
-| `elevation.surface.overlay` | The background of elements that sit on top of they UI, such as modals, dialogs, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with elevation.shadow.overlay *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.0 `#ffffff` / darkNeutral.250 `#2c2b2a` | same as A |
-| `elevation.surface.overlay.hovered` | Hovered state of elevation.surface.overlay *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.200 `#f3f1ef` / darkNeutral.300 `#313130` | neutral.100 `#faf8f3` / darkNeutral.300 `#31312f` |
-| `elevation.surface.overlay.pressed` | Pressed state of elevation.surface.overlay *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.300 `#e0dedc` / darkNeutral.350 `#3f3e3d` | neutral.200 `#f4f2ea` / darkNeutral.350 `#3f3e3b` |
-| `elevation.surface.raised` | The background of cards that can be moved, such as Jira cards on a Kanban board. Combine with elevation.shadow.raised *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | same as A |
-| `elevation.surface.raised.hovered` | Hovered state of elevation.surface.raised *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.200 `#f3f1ef` / darkNeutral.250 `#2c2b2a` | neutral.100 `#faf8f3` / darkNeutral.250 `#2c2b2a` |
-| `elevation.surface.raised.pressed` | Pressed state of elevation.surface.raised *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.300 `#e0dedc` / darkNeutral.300 `#313130` | neutral.200 `#f4f2ea` / darkNeutral.300 `#31312f` |
-| `elevation.surface.sunken` | A secondary background for the UI commonly used for grouping items, such as Jira cards in columns *Plan B: the page is ivory and raised layers are white, so lift reads as lightness, as on claude.ai.* | neutral.100 `#f9f8f7` / darkNeutral.0 `#181716` | neutral.200 `#f4f2ea` / darkNeutral.0 `#171716` |
+| `elevation.surface` | The primary background for the UI | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1d` | neutral.0 `#ffffff` / darkNeutral.100 `#1e1e1e` |
+| `elevation.surface.hovered` | Hovered state of elevation.surface | neutral.200 `#f3f1ef` / darkNeutral.200 `#252423` | neutral.200 `#f1f1f1` / darkNeutral.200 `#242424` |
+| `elevation.surface.pressed` | Pressed state of elevation.surface | neutral.300 `#e0dedc` / darkNeutral.250 `#2c2b2a` | neutral.300 `#dedede` / darkNeutral.250 `#2b2b2b` |
+| `elevation.surface.container` | A neutral container surface background | neutralAlpha.100 `#1f1e1e08` / darkNeutralAlpha.100 `#e4e3e20a` | neutralAlpha.100 `#1e1e1e08` / darkNeutralAlpha.100 `#e3e3e30a` |
+| `elevation.surface.container.hovered` | Hovered state of elevation.surface.container | neutralAlpha.200 `#1f1e1e0f` / darkNeutralAlpha.200 `#e4e3e214` | neutralAlpha.200 `#1e1e1e0f` / darkNeutralAlpha.200 `#e3e3e314` |
+| `elevation.surface.container.pressed` | Pressed state of elevation.surface.container | neutralAlpha.300 `#1f1e1e24` / darkNeutralAlpha.250 `#e4e3e21a` | neutralAlpha.300 `#1e1e1e24` / darkNeutralAlpha.250 `#e3e3e31a` |
+| `elevation.surface.overlay` | The background of elements that sit on top of they UI, such as modals, dialogs, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with elevation.shadow.overlay | neutral.0 `#ffffff` / darkNeutral.250 `#2c2b2a` | neutral.0 `#ffffff` / darkNeutral.250 `#2b2b2b` |
+| `elevation.surface.overlay.hovered` | Hovered state of elevation.surface.overlay | neutral.200 `#f3f1ef` / darkNeutral.300 `#313130` | neutral.200 `#f1f1f1` / darkNeutral.300 `#313131` |
+| `elevation.surface.overlay.pressed` | Pressed state of elevation.surface.overlay | neutral.300 `#e0dedc` / darkNeutral.350 `#3f3e3d` | neutral.300 `#dedede` / darkNeutral.350 `#3e3e3e` |
+| `elevation.surface.raised` | The background of cards that can be moved, such as Jira cards on a Kanban board. Combine with elevation.shadow.raised | neutral.0 `#ffffff` / darkNeutral.200 `#252423` | neutral.0 `#ffffff` / darkNeutral.200 `#242424` |
+| `elevation.surface.raised.hovered` | Hovered state of elevation.surface.raised | neutral.200 `#f3f1ef` / darkNeutral.250 `#2c2b2a` | neutral.200 `#f1f1f1` / darkNeutral.250 `#2b2b2b` |
+| `elevation.surface.raised.pressed` | Pressed state of elevation.surface.raised | neutral.300 `#e0dedc` / darkNeutral.300 `#313130` | neutral.300 `#dedede` / darkNeutral.300 `#313131` |
+| `elevation.surface.sunken` | A secondary background for the UI commonly used for grouping items, such as Jira cards in columns | neutral.100 `#f9f8f7` / darkNeutral.0 `#181716` | neutral.100 `#f8f8f8` / darkNeutral.0 `#171717` |
 
 | Emphasis | warning (yellow) | success (green) | information (blue) | discovery (purple) |
 |---|---|---|---|---|
