@@ -10,6 +10,7 @@ test('a folder component and a flat file component are keyed by name', () => {
   assert.equal(componentOf(`${COMPONENTS_ROOT}/navigation/Breadcrumb/Breadcrumb.scss`), 'navigation/Breadcrumb');
   assert.equal(componentOf(`${COMPONENTS_ROOT}/navigation/Breadcrumb/parts/Item.jsx`), 'navigation/Breadcrumb');
   assert.equal(componentOf(`${COMPONENTS_ROOT}/forms-and-inputs/Checkbox.stories.jsx`), 'forms-and-inputs/Checkbox');
+  assert.equal(componentOf(`${COMPONENTS_ROOT}/index.js`), null);
 });
 
 test('counts legacy color uses, skips spacing names and tests, sorts by uses', () => {

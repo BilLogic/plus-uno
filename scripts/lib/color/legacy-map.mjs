@@ -203,7 +203,7 @@ export function aliasScss(header) {
 /** Where legacy names are used: the design system and the prototypes, stylesheets and components. */
 export const SCAN_ROOTS = ['design-system', 'prototypes'];
 const SCAN_EXT = ['.scss', '.css', '.js', '.jsx', '.ts', '.tsx', '.mdx'];
-const USE = /var\(\s*(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])/g;
+export const USE = /var\(\s*(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])/g;
 const DEFINE = /(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])\s*:/g;
 /** The generated folder defines the aliases, and tests plant fixture names; neither is a use. */
 const SKIP = (rel) => rel.startsWith('design-system/src/tokens/color/') || /\.test\.[jt]sx?$/.test(rel);

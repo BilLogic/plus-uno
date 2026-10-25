@@ -2,11 +2,12 @@
  * Which components still use legacy color tokens — read-only, for the
  * migration guide's generated list.
  *
- * A legacy color name is a `var()` of a `--color-*`, `--surface-*` or
- * `--elevation-*` name, the same capture `legacyCoverage()` in
- * `legacy-map.mjs` uses, minus the `--surface-container`, `-pad`, `-stack`
- * and `-radius` names: those are spacing and radius, and the migration map
- * leaves them unchanged.
+ * A legacy use is what `legacyCoverage()` in `legacy-map.mjs` counts (its
+ * `USE` capture: a `var()` of a `--color-*`, `--surface-*` or `--elevation-*`
+ * name), minus the names whose map row leaves them unchanged — the
+ * `--surface-container`, `-pad`, `-stack` and `-radius` spacing and radius
+ * names. A name with no row at all still counts: it is used and defined
+ * nowhere, and the sweep fixes it at the call site.
  *
  * A component is a folder under a category (`navigation/NavTabs/…`) or, for a
  * flat file, its file name up to the first dot (`loading/Spinner.scss` and
@@ -19,18 +20,27 @@ import { join } from 'node:path';
 
 import { REPO_ROOT, documents } from '../corpus.mjs';
 
+import { USE, rowFor } from './legacy-map.mjs';
+
 export const COMPONENTS_ROOT = 'design-system/src/components';
 const EXT = ['.scss', '.css', '.js', '.jsx', '.ts', '.tsx', '.mdx'];
-const USE = /var\(\s*(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])/g;
-const NOT_COLOR = /^--surface-(container|pad|stack|radius)(-[a-z0-9]+)*$/;
 const TEST = /\.test\.[jt]sx?$/;
 
-/** `navigation/NavTabs/NavTabs.scss` -> `navigation/NavTabs`; `loading/Spinner.stories.jsx` -> `loading/Spinner`. */
+/** A name the map keeps as it is, because it is not a color. */
+const isUnchanged = (name) => rowFor(name)?.proposed.startsWith('unchanged') ?? false;
+
+const stem = (file) => file.split('.')[0];
+
+/**
+ * `navigation/NavTabs/NavTabs.scss` -> `navigation/NavTabs`;
+ * `loading/Spinner.stories.jsx` -> `loading/Spinner`;
+ * a file at the root of the components folder (`index.js`) -> null, since it
+ * belongs to no component.
+ */
 export function componentOf(rel) {
   const parts = rel.slice(COMPONENTS_ROOT.length + 1).split('/');
-  if (parts.length >= 3) return `${parts[0]}/${parts[1]}`;
-  if (parts.length === 2) return `${parts[0]}/${parts[1].split('.')[0]}`;
-  return parts[0].split('.')[0];
+  if (parts.length < 2) return null;
+  return `${parts[0]}/${parts.length === 2 ? stem(parts[1]) : parts[1]}`;
 }
 
 /**
@@ -42,10 +52,11 @@ export function legacyComponents({ root = REPO_ROOT } = {}) {
   const byComponent = new Map();
   for (const rel of documents(COMPONENTS_ROOT, { root, ext: EXT })) {
     if (TEST.test(rel)) continue;
+    const key = componentOf(rel);
+    if (!key) continue;
     const text = readFileSync(join(root, rel), 'utf8');
     for (const [, name] of text.matchAll(USE)) {
-      if (NOT_COLOR.test(name)) continue;
-      const key = componentOf(rel);
+      if (isUnchanged(name)) continue;
       const entry = byComponent.get(key) ?? { component: key, uses: 0, names: new Set() };
       entry.uses += 1;
       entry.names.add(name);
