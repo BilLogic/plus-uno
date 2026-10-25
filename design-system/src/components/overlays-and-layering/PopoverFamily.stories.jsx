@@ -100,10 +100,10 @@ MenuRows.play = async ({ canvasElement }) => {
     const icon = plain.querySelector('i');
     await expect(getComputedStyle(icon).fontSize).toBe('16px');
 
-    // Selected is the primary state layer 08 with primary text, no left bar.
+    // Selected is neutral ink, background.selected with text.selected, no left bar.
     const selectedStyle = getComputedStyle(selected);
-    await expect(selectedStyle.backgroundColor).toBe(tokenColor(canvasElement, '--color-primary-state-08'));
-    await expect(selectedStyle.color).toBe(tokenColor(canvasElement, '--color-primary-text'));
+    await expect(selectedStyle.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(selectedStyle.color).toBe(tokenColor(canvasElement, '--ds-text-selected'));
     await expect(getComputedStyle(selected, '::before').content).toBe('none');
 };
 

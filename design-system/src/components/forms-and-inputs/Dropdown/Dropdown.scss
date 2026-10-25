@@ -123,12 +123,12 @@ $dropdown-themes: (
         overflow-y: auto;
         overscroll-behavior: contain;
         padding: var(--popover-pad-menu);
-        // The overlay role and its shadow (Light/3), as every floating layer
-        // without a scrim takes.
-        background-color: var(--color-surface-overlay);
-        border: var(--border-default) solid var(--color-outline-variant);
+        // The overlay pair, as every floating layer without a scrim takes.
+        // Its shadow carries the 1px edge ring, so the menu draws no border.
+        background-color: var(--ds-surface-overlay);
+        border: none;
         border-radius: var(--popover-radius-menu-md);
-        box-shadow: var(--surface-overlay-shadow);
+        box-shadow: var(--ds-shadow-overlay);
         display: none;
 
         &.show {
@@ -155,13 +155,13 @@ $dropdown-themes: (
         padding: var(--element-pad-y-md) var(--element-pad-x-md);
         border-radius: var(--element-radius-item-md);
         // Transparent so the item always adopts the menu container's surface — a hard-coded
-        // --color-surface left items near-white on menus that use a darker container token
-        // (e.g. the Engagement/Attendance menus on --color-surface-container-high), so the
-        // rows didn't match their container. Hover/selected/focus/active are translucent
-        // overlays and layer correctly on whatever base the container provides.
+        // surface fill left items near-white on menus that use a darker container (e.g. the
+        // Engagement/Attendance menus), so the rows didn't match their container.
+        // Hover/selected/focus/active are translucent and layer correctly on whatever base
+        // the container provides.
         background-color: transparent;
         border: none;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         font: var(--body-default);
         text-align: left;
         text-decoration: none;
@@ -170,37 +170,45 @@ $dropdown-themes: (
 
         // Hover state
         &:hover {
-            background-color: var(--color-on-surface-state-08);
-            color: var(--color-on-surface);
+            background-color: var(--ds-background-neutral-subtle-hovered);
+            color: var(--ds-text);
         }
 
         // Focus-visible state: the ring alone, no fill
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
         // Pressed state
         &:active {
-            background-color: var(--color-on-surface-state-12);
+            background-color: var(--ds-background-neutral-subtle-pressed);
         }
 
         // Selected (JSX uses 'selected'), as Pattern/Menu's `state=selected`:
-        // the primary state layer 08 with primary text, label and description
-        // alike. There is no left bar. A menu is a dense list, so it selects at
-        // 08 rather than navigation's 16 (foundations/color.md).
+        // selection is neutral ink, color.background.selected with
+        // color.text.selected, label and description alike, and its own
+        // hovered and pressed steps. There is no left bar.
         &.selected,
         &.active {
-            background-color: var(--color-primary-state-08);
-            color: var(--color-primary-text);
+            background-color: var(--ds-background-selected);
+            color: var(--ds-text-selected);
+
+            &:hover {
+                background-color: var(--ds-background-selected-hovered);
+            }
+
+            &:active {
+                background-color: var(--ds-background-selected-pressed);
+            }
 
             .pdropdown-item-description {
-                color: var(--color-primary-text);
+                color: var(--ds-text-selected);
             }
         }
 
         &.disabled {
-            opacity: var(--color-disabled-opacity);
+            opacity: var(--ds-opacity-disabled);
             pointer-events: none;
             cursor: not-allowed;
         }
@@ -225,7 +233,7 @@ $dropdown-themes: (
             font-size: var(--icon-md);
             line-height: var(--icon-md);
             text-align: center;
-            color: var(--color-on-surface-variant);
+            color: var(--ds-icon-subtle);
         }
 
         .badge {
@@ -242,7 +250,7 @@ $dropdown-themes: (
         display: block;
         min-height: 0;
         padding: var(--element-pad-y-md) var(--element-pad-x-md);
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         font: var(--heading-xxsmall);
         white-space: nowrap;
         pointer-events: none;
@@ -250,10 +258,10 @@ $dropdown-themes: (
     }
 
     // --- MULTI-SELECT CHECKBOX ---
-    // Figma's `_Form Checkbox Button`. Unchecked: an on-primary box with a
-    // primary-border stroke. Checked: a primary box, no stroke, with an
-    // on-primary check. On a disabled row: a surface box with an on-surface
-    // stroke. The 12px size is a literal because Figma's box is a fixed 12px
+    // Figma's `_Form Checkbox Button`. Unchecked: an input box with an input
+    // stroke. Checked: a selected-bold (Lagoon) box, no stroke, with an
+    // inverse check. A disabled row dims the box with the rest of the row
+    // (opacity.disabled), so the box keeps its own colors there. The 12px size is a literal because Figma's box is a fixed 12px
     // frame bound to no size variable; the radius is the radius-50 primitive
     // because that is the variable Figma binds (no semantic radius is 2px).
     .pdropdown-checkbox {
@@ -261,15 +269,15 @@ $dropdown-themes: (
         box-sizing: border-box;
         width: 12px;
         height: 12px;
-        border: var(--size-element-stroke-sm) solid var(--color-primary-border);
+        border: var(--size-element-stroke-sm) solid var(--ds-border-input);
         border-radius: var(--size-border-radius-radius-50);
-        background-color: var(--color-on-primary);
+        background-color: var(--ds-background-input);
 
         // The check takes the box's color (`currentColor`).
         &.is-checked {
             border-width: 0;
-            background-color: var(--color-primary);
-            color: var(--color-on-primary);
+            background-color: var(--ds-background-selected-bold);
+            color: var(--ds-icon-inverse);
         }
 
         svg {
@@ -278,12 +286,6 @@ $dropdown-themes: (
             height: 100%;
             fill: currentColor;
         }
-    }
-
-    .dropdown-item.disabled .pdropdown-checkbox:not(.is-checked),
-    .dropdown-item:disabled .pdropdown-checkbox:not(.is-checked) {
-        border-color: var(--color-on-surface);
-        background-color: var(--color-surface);
     }
 
     .dropdown-item-inner {
@@ -305,7 +307,7 @@ $dropdown-themes: (
     // to hold it.
     .pdropdown-item-description {
         font: var(--body-small);
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
     // --- COUNTER BADGE ---
@@ -319,7 +321,7 @@ $dropdown-themes: (
         min-width: 1.5em;
         height: 1.5em;
         padding: 0 0.4em;
-        background-color: var(--color-on-surface-state-16);
+        background-color: var(--ds-background-neutral);
         border-radius: var(--size-element-radius-full);
         font: var(--body-small);
         line-height: 1;
@@ -328,7 +330,7 @@ $dropdown-themes: (
     // --- DIVIDER ---
     .pdropdown-divider {
         height: var(--size-element-stroke-sm);
-        background-color: var(--color-outline-variant);
+        background-color: var(--ds-border);
         margin: 0;
     }
 

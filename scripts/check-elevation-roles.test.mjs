@@ -20,11 +20,12 @@
  *
  *  1. WHETHER THE TABLE IS RIGHT. If Light/2 is the wrong shadow for a card,
  *     this passes happily. It checks agreement, not judgment.
- *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. A modal sits on the overlay fill
- *     but names `--elevation-light-4` itself, since no role carries the modal
- *     shadow. The surfaces listed below are pinned one by one; auditing every
- *     `box-shadow` against the table is a different check with a much larger
- *     corpus.
+ *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. The layers moved to the new color
+ *     tokens name `--ds-shadow-overlay` with `--ds-surface-overlay` themselves;
+ *     a modal takes that overlay pair too, since the blanket under it is what
+ *     sets it apart from a menu. The surfaces listed below are pinned one by
+ *     one; auditing every `box-shadow` against the table is a different check
+ *     with a much larger corpus.
  *  3. ROLES WITH NO ROW. `--surface-container` carries no shadow and appears in
  *     no elevation row; it is simply not covered here.
  *
@@ -135,14 +136,14 @@ test('the row that mentions modals is NOT claimed by a role', () => {
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--surface-raised-shadow' },
   { file: 'design-system/src/styles/main.scss', rule: '.plus-card--dragging {', shadow: '--surface-raised-shadow' },
-  { file: 'design-system/src/components/overlays-and-layering/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--surface-overlay-shadow' },
-  { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--surface-overlay-shadow' },
-  { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--surface-overlay-shadow' },
+  { file: 'design-system/src/components/overlays-and-layering/Popover/Popover.scss', rule: '.plus-popover {', shadow: '--ds-shadow-overlay' },
+  { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.tooltip-inner {', shadow: '--ds-shadow-overlay' },
+  { file: 'design-system/src/components/messaging/Toast/Toast.scss', rule: '.plus-toast', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/patterns/SurfaceContainer/SurfaceContainer.scss', rule: '.plus-surface-container__sidebar--floating {', shadow: '--surface-overlay-shadow', fill: '--surface-overlay' },
-  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--elevation-light-4', fill: '--color-surface-overlay' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--elevation-light-4', fill: '--surface-overlay' },
+  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--surface-overlay-shadow', fill: '--color-surface-overlay' },
-  { file: 'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss', rule: '.dropdown-menu', shadow: '--surface-overlay-shadow', fill: '--color-surface-overlay' },
+  { file: 'design-system/src/components/forms-and-inputs/Dropdown/Dropdown.scss', rule: '.dropdown-menu', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
 ];
 
 /**
