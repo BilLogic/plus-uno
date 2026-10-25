@@ -285,6 +285,7 @@ export const FAMILIES = [
   { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
+  { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
 ];
