@@ -1,7 +1,8 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { computedShadow } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -30,15 +31,15 @@ function PatternCardSlotsDemos() {
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HEADER + BODY + FOOTER</span>
                 <PatternCard
                     title="Card title"
-                    actions={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Actions slot</span>}
-                    footer={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Footer slot</span>}
+                    actions={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Actions slot</span>}
+                    footer={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Footer slot</span>}
                 >
                     {bodyCopy}
                 </PatternCard>
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CUSTOM HEADER</span>
-                <PatternCard header={<span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Custom header slot: tabs or a toolbar</span>}>
+                <PatternCard header={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Custom header slot: tabs or a toolbar</span>}>
                     {bodyCopy}
                 </PatternCard>
             </div>
@@ -187,9 +188,34 @@ export const Interactive = {
     ),
 };
 
+/** Light, dark, and each at more contrast: the four modes a card is held in. */
+const MODES = [
+    ['light', 'no-preference'],
+    ['dark', 'no-preference'],
+    ['light', 'more'],
+    ['dark', 'more'],
+];
+
+/** Runs `check` once per mode, then puts <html> back as the toolbar left it. */
+const inEveryMode = async (check) => {
+    const root = document.documentElement;
+    const saved = ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((name) => [name, root.getAttribute(name)]);
+    try {
+        for (const [colorMode, contrastMode] of MODES) {
+            applyColorModes(colorMode, contrastMode);
+            await check(`${colorMode}, ${contrastMode} contrast`);
+        }
+    } finally {
+        saved.forEach(([name, value]) => (value === null ? root.removeAttribute(name) : root.setAttribute(name, value)));
+    }
+};
+
 /**
- * A card rests flat on its outline. Only a clickable card lifts, to the raised
- * shadow (Light/2), while it is hovered or dragged.
+ * A card rests on Atlassian's raised pair: the raised surface and its shadow,
+ * whose ring is the edge, with no border. A clickable card lifts while hovered
+ * (the raised surface's hovered step under the overlay shadow) and settles
+ * back while pressed; a dragged card is on the overlay pair. Held in all four
+ * modes.
  */
 export const Elevation = {
     parameters: { docs: { disable: true } },
@@ -201,18 +227,39 @@ export const Elevation = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const card = (name) => within(canvasElement).getByText(name).closest('.plus-pattern-card');
-        const shadow = (el) => {
+        const card = (name) => {
+            const el = within(canvasElement).getByText(name).closest('.plus-pattern-card');
             el.style.transition = 'none';
-            return getComputedStyle(el).boxShadow;
+            return el;
         };
-        const raised = computedShadow(canvasElement, 'var(--surface-raised-shadow)');
+        const paint = (el) => {
+            const style = getComputedStyle(el);
+            return { shadow: style.boxShadow, fill: style.backgroundColor };
+        };
+        const pair = (surface, shadow) => ({
+            shadow: computedShadow(canvasElement, `var(${shadow})`),
+            fill: tokenColor(canvasElement, surface),
+        });
+        const lightRaised = tokenColor(canvasElement, '--ds-surface-raised');
 
-        await expect(shadow(card('Static')), 'a static card rests flat').toBe('none');
-        await expect(shadow(card('Clickable')), 'a clickable card rests flat').toBe('none');
-        await expect(withForcedPseudo(card('Static'), ':hover', () => shadow(card('Static'))), 'hovering a static card').toBe('none');
-        await expect(withForcedPseudo(card('Clickable'), ':hover', () => shadow(card('Clickable'))), 'hovering a clickable card').toBe(raised);
-        await expect(shadow(card('Dragging')), 'a dragged card').toBe(raised);
-        await expect(getComputedStyle(card('Static')).borderTopWidth, 'the 1px outline').toBe('1px');
+        await inEveryMode(async (mode) => {
+            const raised = pair('--ds-surface-raised', '--ds-shadow-raised');
+            const static_ = card('Static');
+            const clickable = card('Clickable');
+
+            await expect(paint(static_), `${mode}: a card rests on the raised pair`).toEqual(raised);
+            await expect(paint(clickable), `${mode}: a clickable card rests on the raised pair`).toEqual(raised);
+            await expect(withForcedPseudo(static_, ':hover', () => paint(static_)), `${mode}: hovering a static card`).toEqual(raised);
+            await expect(withForcedPseudo(clickable, ':hover', () => paint(clickable)), `${mode}: hovering a clickable card`)
+                .toEqual(pair('--ds-surface-raised-hovered', '--ds-shadow-overlay'));
+            await expect(withForcedPseudo(clickable, ':active', () => paint(clickable)), `${mode}: pressing a clickable card`)
+                .toEqual(pair('--ds-surface-raised-pressed', '--ds-shadow-raised'));
+            await expect(paint(card('Dragging')), `${mode}: a dragged card`).toEqual(pair('--ds-surface-overlay', '--ds-shadow-overlay'));
+            await expect(getComputedStyle(static_).borderTopWidth, `${mode}: the ring is the edge, not a border`).toBe('0px');
+            await expect(getComputedStyle(static_).color, `${mode}: card text`).toBe(tokenColor(canvasElement, '--ds-text'));
+            if (mode.startsWith('dark')) {
+                await expect(raised.fill, `${mode}: the raised surface moves with the mode`).not.toBe(lightRaised);
+            }
+        });
     },
 };

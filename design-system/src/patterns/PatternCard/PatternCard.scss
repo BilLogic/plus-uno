@@ -1,34 +1,52 @@
 /**
- * Card pattern (Patterns/Card), mirroring Figma `Pattern/Card`: the raised
- * surface's fill on an outline-variant border, Card radius, flat at rest.
- * Image, then content (`_Card header` over the body), then footer. Every
- * length is a Card token.
+ * Card pattern (Patterns/Card), mirroring Figma `Pattern/Card`: Atlassian's
+ * raised pair, the raised surface and its shadow, on the Card radius. The
+ * shadow's 1px ring is the card's edge, so there is no border. Image, then
+ * content (`_Card header` over the body), then footer. Every length is a Card
+ * token.
  */
 
 .plus-pattern-card {
+    // A surface tells what sits on it which surface it is: a sticky table
+    // cell inside the card paints this, so it matches the card, not the page.
+    --ds-utility-elevation-surface-current: var(--ds-surface-raised);
+
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     min-width: 0;
-    // Flat at rest (elevation.md): the page's own fill and a 1px outline. The
-    // raised shadow is for a clickable card while it is hovered or dragged.
-    background-color: var(--surface-raised);
-    color: var(--color-on-surface);
-    border: var(--size-card-border-sm) solid var(--color-outline-variant);
+    // The raised pair travels together: the surface and its shadow, never one
+    // without the other, or the card loses its edge in dark.
+    background-color: var(--ds-utility-elevation-surface-current);
+    color: var(--ds-text);
     border-radius: var(--card-radius);
-    box-shadow: none;
+    box-shadow: var(--ds-shadow-raised);
     overflow: hidden; // clip the image to the card radius
-    transition: box-shadow 0.15s ease;
+    transition: box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
 .plus-pattern-card--clickable {
     cursor: pointer;
 }
 
-// The lift, Light/2 through the raised role's shadow.
-.plus-pattern-card--clickable:hover,
-.plus-pattern-card--dragging {
-    box-shadow: var(--surface-raised-shadow);
+// A clickable card lifts while hovered: the raised surface's hovered step
+// under the overlay shadow. Pressed settles back onto the raised shadow.
+.plus-pattern-card--clickable:hover {
+    --ds-utility-elevation-surface-current: var(--ds-surface-raised-hovered);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+.plus-pattern-card--clickable:active {
+    --ds-utility-elevation-surface-current: var(--ds-surface-raised-pressed);
+    box-shadow: var(--ds-shadow-raised);
+}
+
+// A dragged card is over the UI: the overlay pair.
+.plus-pattern-card--dragging,
+.plus-pattern-card--dragging:hover,
+.plus-pattern-card--dragging:active {
+    --ds-utility-elevation-surface-current: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
 }
 
 .plus-pattern-card-pad-sm {
@@ -103,13 +121,13 @@
 .plus-pattern-card-title {
     margin: 0;
     font: var(--heading-xsmall);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-pattern-card-description {
     margin: 0;
     font: var(--body-default);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-pattern-card-actions {
