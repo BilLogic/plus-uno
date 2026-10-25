@@ -4,6 +4,7 @@ import { expect } from 'storybook/test';
 
 import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
 import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
+import { BRIDGE_TRIPLETS } from '../../../scripts/lib/color/emit.mjs';
 import figmaSpec from '../tokens/color/figma-spec.json';
 
 /**
@@ -319,10 +320,10 @@ export const BootstrapBridge = () => (
         style={{
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',
-            padding: 'var(--size-spacing-medium-space-300)',
+            padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
-            gap: 'var(--size-spacing-medium-space-300)',
+            gap: 'var(--size-card-gap-md)',
             alignItems: 'start',
         }}
     >
@@ -337,6 +338,8 @@ export const BootstrapBridge = () => (
         <Dropdown.Menu show className="position-static">
             <Dropdown.ItemText>Dropdown</Dropdown.ItemText>
             <Dropdown.Item href="#">An item</Dropdown.Item>
+            {/* The `active` class without react-bootstrap's `active` prop, which adds an aria-selected a link may not carry. */}
+            <Dropdown.Item href="#" className="active" aria-current="true">The active item</Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item href="#">Another item</Dropdown.Item>
         </Dropdown.Menu>
@@ -368,24 +371,10 @@ export const BootstrapBridge = () => (
                 <Form.Control disabled defaultValue="Disabled" />
             </Form.Group>
             <Form.Check id="bridge-check" label="Checkbox" defaultChecked />
+            <Form.Check id="bridge-switch" type="switch" label="Switch" defaultChecked />
         </Form>
     </div>
 );
-
-/** Each `*-rgb` triplet the bridge writes, and the role it must match. */
-const BRIDGE_TRIPLETS = {
-    '--bs-body-bg-rgb': '--ds-surface',
-    '--bs-body-color-rgb': '--ds-text',
-    '--bs-link-color-rgb': '--ds-link',
-    '--bs-link-hover-color-rgb': '--ds-link-pressed',
-    '--bs-primary-rgb': '--ds-background-brand-bold',
-    '--bs-danger-rgb': '--ds-background-danger-bold',
-    '--bs-success-rgb': '--ds-background-success-bold',
-    '--bs-warning-rgb': '--ds-background-warning-bold',
-    '--bs-info-rgb': '--ds-background-information-bold',
-    '--bs-light-rgb': '--ds-surface-sunken',
-    '--bs-dark-rgb': '--ds-background-neutral-bold',
-};
 
 BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
     const root = canvasElement.querySelector('[data-testid="bootstrap-bridge"]');
@@ -397,9 +386,9 @@ BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
         return getComputedStyle(probe).color;
     };
     const style = (selector) => getComputedStyle(root.querySelector(selector));
-    // Bootstrap transitions a control's border color, so a read right after a
-    // mode switch would land mid-fade.
-    root.querySelectorAll('.form-control, .form-select').forEach((el) => { el.style.transition = 'none'; });
+    // Bootstrap transitions controls' colors, so a read right after a mode
+    // switch would land mid-fade.
+    root.querySelectorAll('.form-control, .form-select, .form-check-input, .dropdown-item').forEach((el) => { el.style.transition = 'none'; });
     const painted = {};
     try {
         for (const [mode, [color, contrast]] of Object.entries(SPEC_MODES)) {
@@ -415,14 +404,28 @@ BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
             await expect(style('.modal-content').backgroundColor, `Modal surface, ${mode}`).toBe(surface);
             await expect(style('.modal-body').color, `Modal text, ${mode}`).toBe(text);
             await expect(style('.dropdown-menu').backgroundColor, `Dropdown surface, ${mode}`).toBe(surface);
-            await expect(style('.dropdown-item').color, `Dropdown item, ${mode}`).toBe(text);
+            await expect(style('.dropdown-item:not(.active)').color, `Dropdown item, ${mode}`).toBe(text);
             await expect(style('.toast').backgroundColor, `Toast, ${mode}`)
                 .toBe(surface.replace('rgb(', 'rgba(').replace(')', ', 0.85)'));
             await expect(style('#bridge-text').backgroundColor, `input fill, ${mode}`).toBe(surface);
             await expect(style('#bridge-text').color, `input text, ${mode}`).toBe(text);
             await expect(style('#bridge-text').borderTopColor, `input border, ${mode}`).toBe(resolve('var(--ds-border)'));
-            await expect(style('#bridge-disabled').backgroundColor, `disabled input, ${mode}`).toBe(resolve('var(--ds-background-neutral)'));
+            await expect(style('#bridge-disabled').backgroundColor, `disabled input, ${mode}`).toBe(resolve('var(--ds-surface-hovered)'));
             await expect(style('.invalid-feedback').color, `invalid feedback, ${mode}`).toBe(resolve('var(--ds-text-danger)'));
+            const selectedBold = resolve('var(--ds-background-selected-bold)');
+            await expect(style('#bridge-check').backgroundColor, `checked checkbox fill, ${mode}`).toBe(selectedBold);
+            await expect(style('#bridge-check').borderTopColor, `checked checkbox border, ${mode}`).toBe(selectedBold);
+            await expect(style('#bridge-switch').backgroundColor, `checked switch fill, ${mode}`).toBe(selectedBold);
+            await expect(style('.dropdown-item.active').backgroundColor, `active dropdown item, ${mode}`).toBe(resolve('var(--ds-background-selected)'));
+            await expect(style('.dropdown-item.active').color, `active dropdown text, ${mode}`).toBe(resolve('var(--ds-text-selected)'));
+            const input = root.querySelector('#bridge-text');
+            input.focus();
+            const focused = getComputedStyle(input);
+            await expect(focused.outlineColor, `focus ring, ${mode}`).toBe(resolve('var(--ds-border-focused)'));
+            await expect([focused.outlineStyle, focused.outlineWidth, focused.outlineOffset], `focus ring shape, ${mode}`).toEqual(['solid', '2px', '2px']);
+            await expect(focused.boxShadow, `no glow, ${mode}`).toBe('none');
+            await expect(focused.borderTopColor, `focused border, ${mode}`).toBe(resolve('var(--ds-border)'));
+            input.blur();
             await expect(document.documentElement.getAttribute('data-bs-theme'), `data-bs-theme, ${mode}`).toBe(mode);
             painted[mode] = style('.modal-content').backgroundColor;
         }

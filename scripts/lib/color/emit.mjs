@@ -115,13 +115,20 @@ export function emitScss({ rows, shadows, opacity, palette }, header) {
  * Bootstrap is imported as compiled CSS, so it has no Sass variables to alias: the bridge points its
  * root CSS variables at `--ds-*`. Each `var()` follows the mode by itself; the `*-rgb` triplets are
  * literal numbers Bootstrap composes as `rgba(var(--bs-primary-rgb), .5)`, so they are comma-separated,
- * written per mode, and the increased-contrast blocks carry only the triplets that change.
+ * written per mode, and the increased-contrast blocks carry only the literals that change.
  */
 const BRIDGE_VARS = {
   'body-bg': 'elevation.surface', 'body-color': 'color.text', 'emphasis-color': 'color.text',
-  'secondary-color': 'color.text.subtle', 'secondary-bg': 'color.background.neutral',
-  'tertiary-bg': 'color.background.neutral.subtle.hovered',
-  'border-color': 'color.border', 'border-color-translucent': 'color.border',
+  'secondary-color': 'color.text.subtle',
+  // Both have triplets (`.bg-body-secondary`, `.bg-body-tertiary`), so both need opaque tokens, and both
+  // paint at rest: secondary the disabled field and the progress track, tertiary `.input-group-text`.
+  // Bootstrap keeps secondary the darker step, so secondary takes the hovered surface's gray and
+  // tertiary the sunken surface.
+  'secondary-bg': 'elevation.surface.hovered', 'tertiary-bg': 'elevation.surface.sunken',
+  'border-color': 'color.border',
+  // Bootstrap's translucent border exists to sit on any fill; `color.border` is already translucent
+  // ink, so it serves. It also re-borders .card, .popover, .offcanvas, .modal, .dropdown-menu and .toast.
+  'border-color-translucent': 'color.border',
   'link-color': 'color.link', 'link-hover-color': 'color.link.pressed', 'focus-ring-color': 'color.border.focused',
   'form-valid-color': 'color.text.success', 'form-valid-border-color': 'color.border.success',
   'form-invalid-color': 'color.text.danger', 'form-invalid-border-color': 'color.border.danger',
@@ -130,7 +137,56 @@ const BRIDGE_VARS = {
   // Light and dark need opaque tokens: a triplet drops alpha, so an alpha token would turn `.bg-light` solid ink.
   light: 'elevation.surface.sunken', dark: 'color.background.neutral.bold',
 };
-const BRIDGE_TRIPLETS = ['body-bg', 'body-color', 'link-color', 'link-hover-color', 'primary', 'danger', 'success', 'warning', 'info', 'light', 'dark'];
+
+/** The bridged variables Bootstrap 5.3 also reads as `*-rgb` triplets. */
+const BOOTSTRAP_RGB = [
+  'body-bg', 'body-color', 'emphasis-color', 'secondary-color', 'secondary-bg', 'tertiary-bg',
+  'link-color', 'link-hover-color', 'primary', 'danger', 'success', 'warning', 'info', 'light', 'dark',
+];
+
+/** Each `--bs-*-rgb` triplet the bridge writes, and the `--ds-*` role it must equal in every mode. */
+export const BRIDGE_TRIPLETS = Object.fromEntries(BOOTSTRAP_RGB.map((bs) => [`--bs-${bs}-rgb`, dsName(BRIDGE_VARS[bs])]));
+
+/**
+ * Bootstrap paints its form glyphs as SVG data URIs, which cannot read a CSS variable, so each mode
+ * gets its own: the check, radio dot, indeterminate bar and switch knob in the inverse icon color
+ * over the checked fill, and the focused switch knob in the focus color.
+ */
+const svg = (viewBox, body) => `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='${viewBox}'%3e${body}%3c/svg%3e")`;
+const stroke = (hex, d) => `%3cpath fill='none' stroke='${hex}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='${d}'/%3e`;
+const FORM_GLYPHS = {
+  'form-check-checked-image': ['color.icon.inverse', (c) => svg('0 0 20 20', stroke(c, 'm6 10 3 3 6-6'))],
+  'form-check-radio-image': ['color.icon.inverse', (c) => svg('-4 -4 8 8', `%3ccircle r='2' fill='${c}'/%3e`)],
+  'form-check-indeterminate-image': ['color.icon.inverse', (c) => svg('0 0 20 20', stroke(c, 'M6 10h8'))],
+  'form-switch-checked-image': ['color.icon.inverse', (c) => svg('-4 -4 8 8', `%3ccircle r='3' fill='${c}'/%3e`)],
+  'form-switch-focus-image': ['color.border.focused', (c) => svg('-4 -4 8 8', `%3ccircle r='3' fill='${c}'/%3e`)],
+};
+
+/**
+ * Bootstrap compiles its brand blue into form states and the dropdown's active item, out of reach of
+ * any root variable, so the bridge restates those rules on the tokens. Checked controls take the
+ * selected bold fill; focus is the focus color as a 2px ring 2px out, in place of the blue glow;
+ * the dropdown's active item is the neutral selected fill.
+ */
+const BRIDGE_RULES = [
+  ['.form-control:focus,\n.form-select:focus,\n.form-check-input:focus', [
+    'border-color: var(--bs-border-color);', 'box-shadow: none;',
+    'outline: 2px solid var(--ds-border-focused);', 'outline-offset: 2px;',
+  ]],
+  ['.form-check-input:checked,\n.form-check-input[type=checkbox]:indeterminate', [
+    'background-color: var(--ds-background-selected-bold);', 'border-color: var(--ds-background-selected-bold);',
+  ]],
+  ['.form-check-input:checked[type=checkbox]', ['--bs-form-check-bg-image: var(--bs-form-check-checked-image);']],
+  ['.form-check-input:checked[type=radio]', ['--bs-form-check-bg-image: var(--bs-form-check-radio-image);']],
+  ['.form-check-input[type=checkbox]:indeterminate', ['--bs-form-check-bg-image: var(--bs-form-check-indeterminate-image);']],
+  ['.form-switch .form-check-input:focus', ['--bs-form-switch-bg: var(--bs-form-switch-focus-image);']],
+  ['.form-switch .form-check-input:checked', ['--bs-form-switch-bg: var(--bs-form-switch-checked-image);']],
+  ['.dropdown-menu', [
+    '--bs-dropdown-link-hover-bg: var(--ds-background-neutral-subtle-hovered);',
+    '--bs-dropdown-link-active-bg: var(--ds-background-selected);',
+    '--bs-dropdown-link-active-color: var(--ds-text-selected);',
+  ]],
+];
 
 function bootstrapBridge(rows) {
   const by = Object.fromEntries(rows.map((r) => [r.name, r]));
@@ -140,14 +196,18 @@ function bootstrapBridge(rows) {
     return `${r}, ${g}, ${b}`;
   };
   const vars = Object.entries(BRIDGE_VARS).map(([bs, tok]) => `--bs-${bs}: var(${dsName(tok)});`);
-  const triplets = (mode) => BRIDGE_TRIPLETS.map((bs) => `--bs-${bs}-rgb: ${triplet(BRIDGE_VARS[bs], mode)};`);
+  const literals = (mode) => [
+    ...BOOTSTRAP_RGB.map((bs) => `--bs-${bs}-rgb: ${triplet(BRIDGE_VARS[bs], mode)};`),
+    ...Object.entries(FORM_GLYPHS).map(([bs, [tok, image]]) => `--bs-${bs}: ${image(by[tok][mode].replace('#', '%23'))};`),
+  ];
   const changed = (mode, base) => {
-    const [ic, std] = [triplets(mode), triplets(base)];
+    const [ic, std] = [literals(mode), literals(base)];
     return ic.filter((line, i) => line !== std[i]);
   };
   return (
-    `${block(LIGHT, [...vars, ...triplets('light')])}\n${block(DARK, [...vars, ...triplets('dark')])}\n${autoDark([...vars, ...triplets('dark')])}` +
+    `${block(LIGHT, [...vars, ...literals('light')])}\n${block(DARK, [...vars, ...literals('dark')])}\n${autoDark([...vars, ...literals('dark')])}` +
     contrastBlocks(changed('light_ic', 'light'), 'light') +
-    contrastBlocks(changed('dark_ic', 'dark'), 'dark')
+    contrastBlocks(changed('dark_ic', 'dark'), 'dark') +
+    `\n${BRIDGE_RULES.map(([sel, lines]) => block(sel, lines)).join('\n')}`
   );
 }
