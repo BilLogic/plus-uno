@@ -1,0 +1,29 @@
+import { Meta, Title, Story } from '@storybook/addon-docs/blocks';
+import * as ColorModesStories from './ColorModes.stories.jsx';
+
+<Meta of={ColorModesStories} />
+
+<Title />
+
+The generated color tokens in each color and contrast mode. Switch **Color mode** (light, dark, auto) and **Contrast** (standard, more, auto) in the toolbar; each swatch shows the value the page resolves for its role right now.
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Modes
+
+A mode is an attribute on `<html>`: `data-color-mode` is `light`, `dark` or `auto`, and `data-contrast-mode` is `no-preference`, `more` or `auto`. No attribute means light at standard contrast, and `auto` follows the OS's `prefers-color-scheme` and `prefers-contrast`. The toolbar also sets Bootstrap's `data-bs-theme` to match.
+
+<Story of={ColorModesStories.Modes} />
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the palette the current components still use, see **Color**.
+- For the surfaces and shadows these roles pair, see **Elevation**.
+
+</div>
+
+</div>

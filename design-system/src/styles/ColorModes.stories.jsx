@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { expect } from 'storybook/test';
 
+import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
+import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
+import figmaSpec from '../tokens/color/figma-spec.json';
+
 /**
  * The generated color tokens in every color and contrast mode.
  *
@@ -14,15 +18,20 @@ import { expect } from 'storybook/test';
  * auto) and `data-contrast-mode` (more, no-preference, auto). No attribute
  * means light at standard contrast. `auto` follows the OS's
  * `prefers-color-scheme` and `prefers-contrast`. The decorator in
- * `.storybook/preview.jsx` sets them from the toolbar, plus Bootstrap's
- * `data-bs-theme`.
+ * `.storybook/preview.jsx` sets them from the toolbar through
+ * `applyColorModes`, plus Bootstrap's `data-bs-theme`.
  *
- * WHAT THE PLAY FUNCTION HOLDS. That dark and increased contrast each resolve
- * different values from light, that no attribute is light, and, inside the
- * test runner, that `auto` lands on light or dark and on standard or more
- * contrast with the OS preference Playwright emulates. It restores the
- * attributes and the emulation when it is done, so the a11y check and later
- * story files see the page as the toolbar left it.
+ * WHAT THE PLAY FUNCTIONS HOLD.
+ *   - Modes: every color role resolves to the Plan A primitive the generated
+ *     Figma spec names for it, in light, dark, light and dark at more
+ *     contrast; each role changes where the plan says it does; no attribute
+ *     is light; and, inside the test runner, `auto` lands on the right mode
+ *     under each OS preference Playwright emulates.
+ *   - FromToolbar: the toolbar globals, through the real decorator, put the
+ *     right three attributes on <html>, and `applyColorModes` resolves
+ *     `data-bs-theme` from the OS under auto.
+ * Each restores the attributes and the emulation when it is done, so the a11y
+ * check and later story files see the page as the toolbar left it.
  */
 
 export default {
@@ -30,24 +39,30 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-/** The roles drawn, and the ones the play function compares across modes. */
+/**
+ * The roles drawn and tested — one entry per role. `dark` and `more` say
+ * whether the role's value moves from standard light in dark and at more
+ * contrast; `spec` says the role is a plain color whose value the generated
+ * Figma spec names, so its exact value is checked.
+ */
 const TOKENS = [
-    '--ds-text',
-    '--ds-surface',
-    '--ds-surface-raised',
-    '--ds-shadow-raised',
-    '--ds-surface-overlay',
-    '--ds-shadow-overlay',
-    '--ds-background-brand-bold',
-    '--ds-border-focused',
+    { name: '--ds-text', dark: true, more: true, spec: true },
+    { name: '--ds-surface', dark: true, more: false, spec: true },
+    { name: '--ds-surface-raised', dark: true, more: false, spec: true },
+    { name: '--ds-shadow-raised', dark: true, more: true, spec: false },
+    { name: '--ds-surface-overlay', dark: true, more: false, spec: true },
+    { name: '--ds-shadow-overlay', dark: true, more: true, spec: false },
+    { name: '--ds-background-brand-bold', dark: true, more: true, spec: true },
+    { name: '--ds-border-focused', dark: true, more: true, spec: true },
 ];
+const NAMES = TOKENS.map((t) => t.name);
 
 const MODE_ATTRIBUTES = ['data-color-mode', 'data-contrast-mode'];
 
 const readToken = (name) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-const readAll = () => Object.fromEntries(TOKENS.map((name) => [name, readToken(name)]));
+const readAll = () => Object.fromEntries(NAMES.map((name) => [name, readToken(name)]));
 
 /** Sets both mode attributes; `null` removes one. */
 const setModes = (colorMode, contrastMode) => {
@@ -133,7 +148,7 @@ export const Modes = () => {
                 font: 'var(--body-default)',
             }}
         >
-            <p style={{ margin: 0, color: 'var(--ds-text-subtle)' }} data-testid="modes">
+            <p style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
                 <code>{modes}</code>
             </p>
             <div
@@ -162,19 +177,32 @@ export const Modes = () => {
 
 /* -------------------------------------------------------------------- tests */
 
-/** True only inside the Vitest browser runner, where Playwright can set OS preferences. */
-const inTestRunner = () => import.meta.env.MODE === 'test' && window.__vitest_browser__ === true;
+/** The four Figma modes, keyed by the attributes that select each. */
+const SPEC_MODES = {
+    'Light': ['light', 'no-preference'],
+    'Dark': ['dark', 'no-preference'],
+    'Light IC': ['light', 'more'],
+    'Dark IC': ['dark', 'more'],
+};
 
-/** Sets the emulated OS color scheme and contrast; `null` restores each. */
-const emulate = async (colorScheme, contrast) => {
-    const commands = window.__vitest_browser_runner__?.commands;
-    if (!commands) {
-        throw new Error(
-            'emulateColorPreferences: the Vitest runner handle (window.__vitest_browser_runner__.commands) '
-            + 'is missing. Check it against the installed Vitest version.',
-        );
-    }
-    await commands.triggerCommand('emulateColorPreferences', [colorScheme, contrast]);
+/** `#rrggbb` from the spec's 0–1 channels. */
+const toHex = ({ r, g, b }) =>
+    `#${[r, g, b].map((c) => Math.round(c * 255).toString(16).padStart(2, '0')).join('')}`;
+
+/**
+ * The value the generated Figma spec gives a role in a mode: the role's alias
+ * in `color / foundations`, resolved through `color / primitives`. Read from
+ * the generated file at test time, so a regenerated plan is what is checked.
+ */
+const specValue = (name, mode) => {
+    const [primitives, foundations] = ['color / primitives', 'color / foundations']
+        .map((n) => figmaSpec.collections.find((c) => c.name === n));
+    const role = foundations.variables.find((v) => v.codeSyntax?.WEB === `var(${name})`);
+    if (!role) throw new Error(`figma-spec.json has no role for ${name}`);
+    const alias = role.values[mode];
+    const primitive = primitives.variables.find((v) => v.name === alias.name);
+    if (!primitive) throw new Error(`figma-spec.json has no primitive ${alias.name}`);
+    return toHex(primitive.value);
 };
 
 const valuesIn = (colorMode, contrastMode) => {
@@ -182,65 +210,94 @@ const valuesIn = (colorMode, contrastMode) => {
     return readAll();
 };
 
-/** Every token resolves to something, in every mode. */
-const expectResolved = async (values, mode) => {
-    for (const [name, value] of Object.entries(values)) {
-        await expect(value, `${name} resolves in ${mode}`).not.toBe('');
-    }
-};
-
-/** Names the tokens whose value differs between two readings. */
-const changed = (a, b) => TOKENS.filter((name) => a[name] !== b[name]);
-
-Modes.play = async () => {
+/** Restores the mode attributes as they were, whatever `run` did. */
+const keepingModes = async (run) => {
     const root = document.documentElement;
-    const saved = MODE_ATTRIBUTES.map((a) => root.getAttribute(a));
+    const attributes = [...MODE_ATTRIBUTES, 'data-bs-theme'];
+    const saved = attributes.map((a) => root.getAttribute(a));
     try {
-        const none = valuesIn(null, null);
-        const light = valuesIn('light', 'no-preference');
-        const lightMore = valuesIn('light', 'more');
-        const dark = valuesIn('dark', 'no-preference');
-        const darkMore = valuesIn('dark', 'more');
-
-        await expectResolved(light, 'light');
-        await expectResolved(dark, 'dark');
-        await expectResolved(lightMore, 'light, more contrast');
-        await expectResolved(darkMore, 'dark, more contrast');
-
-        await expect(none, 'no attribute is light at standard contrast').toEqual(light);
-
-        // Dark moves every role drawn here.
-        for (const name of ['--ds-text', '--ds-surface', '--ds-surface-raised', '--ds-shadow-raised',
-            '--ds-shadow-overlay', '--ds-background-brand-bold', '--ds-border-focused']) {
-            await expect(dark[name], `${name} differs between light and dark`).not.toBe(light[name]);
-        }
-
-        // More contrast deepens ink, brand, focus and the raised edge.
-        for (const name of ['--ds-text', '--ds-shadow-raised', '--ds-background-brand-bold', '--ds-border-focused']) {
-            await expect(lightMore[name], `${name} differs between light and light with more contrast`).not.toBe(light[name]);
-        }
-        await expect(changed(dark, darkMore).length, 'dark with more contrast differs from dark').toBeGreaterThan(0);
-
-        if (inTestRunner()) {
-            try {
-                await emulate('dark', 'no-preference');
-                await expect(valuesIn('auto', 'no-preference'), 'auto under an OS dark preference is dark').toEqual(dark);
-                await expect(valuesIn('auto', 'auto'), 'auto/auto under OS dark, standard contrast is dark').toEqual(dark);
-                await emulate('light', 'no-preference');
-                await expect(valuesIn('auto', 'no-preference'), 'auto under an OS light preference is light').toEqual(light);
-                await emulate('light', 'more');
-                await expect(valuesIn('light', 'auto'), 'contrast auto under an OS more preference is more').toEqual(lightMore);
-                await expect(valuesIn('auto', 'auto'), 'auto/auto under OS light, more contrast is light more').toEqual(lightMore);
-                await emulate('dark', 'more');
-                await expect(valuesIn('auto', 'auto'), 'auto/auto under OS dark, more contrast is dark more').toEqual(darkMore);
-            } finally {
-                await emulate(null, null);
-            }
-        }
+        await run();
     } finally {
-        MODE_ATTRIBUTES.forEach((a, i) => {
+        attributes.forEach((a, i) => {
             if (saved[i] === null) root.removeAttribute(a);
             else root.setAttribute(a, saved[i]);
         });
     }
+};
+
+/** Runs `run`, then puts the OS preferences back; skips outside the runner. */
+const withEmulation = async (run) => {
+    if (!(await emulateColorPreferences(null, null))) return;
+    try {
+        await run();
+    } finally {
+        await emulateColorPreferences(null, null);
+    }
+};
+
+Modes.play = async () => keepingModes(async () => {
+    const byMode = Object.fromEntries(
+        Object.entries(SPEC_MODES).map(([mode, [color, contrast]]) => [mode, valuesIn(color, contrast)]),
+    );
+    const light = byMode.Light;
+
+    // Exact values: each color role is the primitive the plan names for it.
+    for (const [mode, values] of Object.entries(byMode)) {
+        for (const { name, spec } of TOKENS) {
+            await expect(values[name], `${name} resolves in ${mode}`).not.toBe('');
+            if (spec) await expect(values[name], `${name} in ${mode}`).toBe(specValue(name, mode));
+        }
+    }
+
+    await expect(valuesIn(null, null), 'no attribute is light at standard contrast').toEqual(light);
+
+    // Where each role moves.
+    for (const { name, dark, more } of TOKENS) {
+        const darkMoves = byMode.Dark[name] !== light[name];
+        const moreMoves = byMode['Light IC'][name] !== light[name];
+        await expect(darkMoves, `${name} ${dark ? 'changes' : 'holds'} between light and dark`).toBe(dark);
+        await expect(moreMoves, `${name} ${more ? 'changes' : 'holds'} between light and light, more contrast`).toBe(more);
+    }
+
+    // `auto` under each OS preference.
+    await withEmulation(async () => {
+        await emulateColorPreferences('dark', 'no-preference');
+        await expect(valuesIn('auto', 'no-preference'), 'auto, OS dark: dark').toEqual(byMode.Dark);
+        await expect(valuesIn('auto', 'auto'), 'auto/auto, OS dark standard: dark').toEqual(byMode.Dark);
+        await emulateColorPreferences('light', 'no-preference');
+        await expect(valuesIn('auto', 'no-preference'), 'auto, OS light: light').toEqual(light);
+        await emulateColorPreferences('light', 'more');
+        await expect(valuesIn('light', 'auto'), 'contrast auto, OS more: more').toEqual(byMode['Light IC']);
+        await expect(valuesIn('auto', 'auto'), 'auto/auto, OS light more: light more').toEqual(byMode['Light IC']);
+        await emulateColorPreferences('dark', 'more');
+        await expect(valuesIn('auto', 'auto'), 'auto/auto, OS dark more: dark more').toEqual(byMode['Dark IC']);
+    });
+});
+
+/** The modes as the toolbar sets them: these globals go through the real decorator. */
+export const FromToolbar = () => <Modes />;
+FromToolbar.globals = { plusColorMode: 'dark', plusContrastMode: 'more' };
+
+const attributesOnRoot = () => {
+    const root = document.documentElement;
+    return ['data-color-mode', 'data-contrast-mode', 'data-bs-theme'].map((a) => root.getAttribute(a));
+};
+
+FromToolbar.play = async () => {
+    // Set by the decorator from this story's globals, before render.
+    await expect(attributesOnRoot(), 'the toolbar globals reach <html>').toEqual(['dark', 'more', 'dark']);
+    await expect(readToken('--ds-text'), 'and the tokens follow').toBe(specValue('--ds-text', 'Dark IC'));
+
+    await keepingModes(async () => {
+        applyColorModes('light', 'no-preference');
+        await expect(attributesOnRoot(), 'light').toEqual(['light', 'no-preference', 'light']);
+        await withEmulation(async () => {
+            await emulateColorPreferences('dark', null);
+            applyColorModes('auto', 'auto');
+            await expect(attributesOnRoot(), 'auto under OS dark').toEqual(['auto', 'auto', 'dark']);
+            await emulateColorPreferences('light', null);
+            applyColorModes('auto', 'auto');
+            await expect(attributesOnRoot(), 'auto under OS light').toEqual(['auto', 'auto', 'light']);
+        });
+    });
 };

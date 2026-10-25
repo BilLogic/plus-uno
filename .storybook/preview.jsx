@@ -7,6 +7,7 @@ import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
+import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
  * Storybook preview configuration for PLUS Design System
@@ -102,31 +103,8 @@ if (!globalThis.__PLUS_STORYBOOK_CONSOLE_PATCHED__) {
 }
 
 // ---- Color and contrast modes -----------------------------------------------
-// The generated color tokens key every mode off attributes on <html>:
-// `data-color-mode` (light, dark, auto) and `data-contrast-mode` (more,
-// no-preference, auto). Bootstrap keys its own light and dark off
-// `data-bs-theme`, which has no `auto`, so for auto it follows the OS's
-// `prefers-color-scheme`, read when the story renders and again on change.
-
-const COLOR_SCHEME_QUERY = '(prefers-color-scheme: dark)';
-
-/**
- * Sets the mode attributes on <html> for the toolbar's choices.
- * @param {string} colorMode light | dark | auto
- * @param {string} contrastMode no-preference | more | auto
- */
-const applyColorModes = (colorMode, contrastMode) => {
-  if (typeof document === 'undefined') return;
-  const root = document.documentElement;
-  root.setAttribute('data-color-mode', colorMode);
-  root.setAttribute('data-contrast-mode', contrastMode);
-  const osDark =
-    typeof window !== 'undefined' && window.matchMedia
-      ? window.matchMedia(COLOR_SCHEME_QUERY).matches
-      : false;
-  const bsTheme = colorMode === 'auto' ? (osDark ? 'dark' : 'light') : colorMode;
-  root.setAttribute('data-bs-theme', bsTheme);
-};
+// The toolbar's Color mode and Contrast globals become attributes on <html>;
+// see design-system/src/storybook-docs/lib/color-modes.js.
 
 /** Applies the modes before the story renders, and tracks the OS while on auto. */
 const ColorModes = ({ colorMode, contrastMode, children }) => {

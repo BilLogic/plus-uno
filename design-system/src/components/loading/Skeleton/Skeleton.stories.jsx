@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import Count from '../../labels/Count';
 import Status from '../../labels/Status';
 import Tag from '../../labels/Tag';
@@ -20,53 +21,14 @@ import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './S
 
 /* ------------------------------------------------------------- the runner */
 
-/**
- * Whether this is the Storybook test runner (Vitest Browser Mode). Two signals
- * must agree: Vite's `test` mode, and Vitest's own browser marker
- * (`window.__vitest_browser__`, private, checked against Vitest 5.0.4). Plain
- * Storybook has neither. If only one is present — `vitest --mode other`, or a
- * Vitest upgrade that drops the marker — this throws, so the ReducedMotion
- * story fails instead of skipping silently.
- */
-const inTestRunner = () => {
-    const testMode = import.meta.env.MODE === 'test';
-    const marker = window.__vitest_browser__ === true;
-    if (testMode !== marker) {
-        throw new Error(
-            `Skeleton stories: the runner signals disagree (Vite mode "${import.meta.env.MODE}", `
-            + `window.__vitest_browser__ ${marker ? 'present' : 'absent'}). Check both against the installed Vitest.`,
-        );
-    }
-    return marker;
-};
-
-/**
- * Sets the page's `prefers-reduced-motion` through the runner: a custom
- * browser command (`commands.emulateReducedMotion` in vite.config.js) calls
- * Playwright's `page.emulateMedia`. `null` restores no preference.
- *
- * THIS USES A PRIVATE API. `window.__vitest_browser_runner__.commands` is
- * Vitest's internal handle, checked against Vitest 5.0.4. The documented
- * route, `import { commands } from 'vitest/browser'`, cannot be used here: that
- * module throws when loaded outside Browser Mode, and this file also loads in
- * plain Storybook. If a Vitest upgrade moves the handle, the ReducedMotion
- * story fails loudly inside the runner rather than skipping.
- *
- * @returns {Promise<boolean>} false only in plain Storybook, where there is no
- *   runner to ask; inside the runner a missing handle throws.
- */
-const emulateReducedMotion = async (value) => {
-    if (!inTestRunner()) return false;
-    const commands = window.__vitest_browser_runner__?.commands;
-    if (!commands) {
-        throw new Error(
-            'emulateReducedMotion: the Vitest runner handle (window.__vitest_browser_runner__.commands) '
-            + 'is missing. Check it against the installed Vitest version.',
-        );
-    }
-    await commands.triggerCommand('emulateReducedMotion', [value]);
-    return true;
-};
+// `emulateReducedMotion` (test-viewport.js) sets the page's
+// `prefers-reduced-motion` through the runner: a custom browser command in
+// vite.config.js calls Playwright's `page.emulateMedia`. It reaches Vitest's
+// PRIVATE handle, `window.__vitest_browser_runner__.commands` (checked against
+// Vitest 5.0.4), because the documented `vitest/browser` import throws outside
+// Browser Mode and this file also loads in plain Storybook. It resolves false
+// in plain Storybook and throws inside the runner if the handle has moved, so
+// the ReducedMotion story fails loudly rather than skipping.
 
 export default {
     title: 'Components/Loading/Skeleton',

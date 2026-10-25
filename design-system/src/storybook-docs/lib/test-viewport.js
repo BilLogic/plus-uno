@@ -99,3 +99,51 @@ export const withTestViewport = async (width, height, run) => {
         await setTestViewport(before.w, before.h);
     }
 };
+
+/**
+ * Runs one of the runner-side browser commands registered in vite.config.js
+ * (`browser.commands`), for what a page cannot do to itself, such as set the
+ * OS's motion, color-scheme or contrast preference. Each calls Playwright's
+ * `page.emulateMedia` for the whole page; `null` restores a preference.
+ *
+ * THIS USES A PRIVATE API. `window.__vitest_browser_runner__.commands` is
+ * Vitest's internal handle, checked against Vitest 5.0.4. The documented
+ * route, `import { commands } from 'vitest/browser'`, cannot be used here: that
+ * module throws when loaded outside Browser Mode, and story files also load in
+ * plain Storybook. If a Vitest upgrade moves the handle, the stories that call
+ * this fail loudly inside the runner rather than skipping.
+ *
+ * @param {string} name the command's key in vite.config.js
+ * @param {unknown[]} args
+ * @returns {Promise<boolean>} false only in plain Storybook, where there is no
+ *   runner to ask; inside the runner a missing handle throws.
+ */
+const runBrowserCommand = async (name, args) => {
+    if (!inTestRunner()) return false;
+    const commands = window.__vitest_browser_runner__?.commands;
+    if (!commands) {
+        throw new Error(
+            `${name}: the Vitest runner handle (window.__vitest_browser_runner__.commands) `
+            + 'is missing. Check it against the installed Vitest version.',
+        );
+    }
+    await commands.triggerCommand(name, args);
+    return true;
+};
+
+/**
+ * Sets the page's `prefers-reduced-motion`; `null` restores no preference.
+ * @param {'reduce' | 'no-preference' | null} value
+ * @returns {Promise<boolean>} false only in plain Storybook.
+ */
+export const emulateReducedMotion = (value) => runBrowserCommand('emulateReducedMotion', [value]);
+
+/**
+ * Sets the page's `prefers-color-scheme` and `prefers-contrast`; `null`
+ * restores each.
+ * @param {'light' | 'dark' | null} colorScheme
+ * @param {'more' | 'no-preference' | null} contrast
+ * @returns {Promise<boolean>} false only in plain Storybook.
+ */
+export const emulateColorPreferences = (colorScheme, contrast) =>
+    runBrowserCommand('emulateColorPreferences', [colorScheme, contrast]);
