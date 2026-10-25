@@ -6,7 +6,8 @@ import './PatternCard.scss';
 /**
  * Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`:
  * an optional image, then the content (the `_Card header` over the body), then
- * an optional footer, on the raised surface role with an outline border.
+ * an optional footer, on Atlassian's raised pair: the raised surface and its
+ * shadow, whose 1px ring is the card's edge.
  *
  * - **Header** (`_Card header`): `title` (Heading/xsmall 14, one heading level
  *   below its section) over an optional `description` (Body/default 14), with
@@ -16,9 +17,11 @@ import './PatternCard.scss';
  *   the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
- * - **Elevation**: flat at rest, a 1px outline and no shadow. A card with an
- *   `onClick` lifts to the raised shadow (Light/2) on hover, and `dragging`
- *   lifts any card while it moves.
+ * - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on
+ *   hover to the raised surface's hovered step under the overlay shadow, and
+ *   settles back onto the raised shadow while pressed; `dragging` puts any card
+ *   on the overlay pair while it moves. The card also sets the current surface,
+ *   so a sticky table cell inside it matches the card.
  */
 const PatternCard = ({
     id,
@@ -97,7 +100,7 @@ PatternCard.propTypes = {
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** The card is being dragged: it lifts to the raised shadow (Light/2) */
+    /** The card is being dragged: it lifts to the overlay pair */
     dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
