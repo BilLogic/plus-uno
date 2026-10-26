@@ -58,7 +58,7 @@ const Home = () => {
                 title={`${TODAY.greeting}, ${TUTOR.firstName}`}
                 aside={(
                     <span className="tr-home__illustration">
-                        <Illustration character="social-emotional" size={96} />
+                        <Illustration character="mastering-content" size={96} />
                     </span>
                 )}
             />
