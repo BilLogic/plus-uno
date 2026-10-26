@@ -18,7 +18,7 @@ import { expect, waitFor, within } from 'storybook/test';
 
 import TutorHomePageNewLayout from './TutorHomePageNewLayout';
 import { BLOCKS, columnWidth, spanWidth } from './homeGrid';
-import { computedShadow, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
@@ -139,16 +139,6 @@ const expectNoClippedText = async (list) => {
     }
 };
 
-/** The resolved color a CSS custom property names, as computed styles print it. */
-const resolvedColor = (el, token) => {
-    const probe = document.createElement('span');
-    probe.style.color = `var(${token})`;
-    el.appendChild(probe);
-    const value = getComputedStyle(probe).color;
-    probe.remove();
-    return value;
-};
-
 /** The skills chart shows 0 to 100 in quarters and every x label, inside its box, its line in the brand chart color. */
 const expectChartAxes = async (canvasElement) => {
     const block = canvasElement.querySelector('[data-block="skills"]');
@@ -158,7 +148,7 @@ const expectChartAxes = async (canvasElement) => {
     const yLabels = [...chart.querySelectorAll('.highcharts-yaxis-labels text')];
     await expect(yLabels.map((t) => t.textContent), 'the score axis, 0 row included').toEqual(['0', '25', '50', '75', '100']);
     await expect(getComputedStyle(chart.querySelector('.highcharts-graph')).stroke, 'the line is the brand chart color')
-        .toBe(resolvedColor(block, '--ds-chart-brand'));
+        .toBe(tokenColor(block, '--ds-chart-brand'));
     for (const t of [...yLabels, ...chart.querySelectorAll('.highcharts-xaxis-labels text')]) {
         const r = rect(t);
         await expect(r.top >= box.top - 0.5 && r.bottom <= box.bottom + 0.5, `"${t.textContent}" inside the chart`).toBe(true);
@@ -326,7 +316,7 @@ export const ColorModes = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await waitFor(() => expect(canvas.getByRole('heading', { level: 1 })).toBeTruthy());
-        const first = (selector) => canvasElement.querySelector(selector);
+        const queryOne = (selector) => canvasElement.querySelector(selector);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             for (const card of canvasElement.querySelectorAll('.plus-home-new__lesson .plus-pattern-card')) {
                 const css = getComputedStyle(card);
@@ -334,19 +324,20 @@ export const ColorModes = {
                 await expect(css.boxShadow, `${mode}: a lesson card has the raised shadow`).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
                 await expect(css.borderTopWidth, `${mode}: a lesson card has no border`).toBe('0px');
             }
-            const tag = first('.plus-home-new__lesson .plus-smart-badge');
+            const tag = queryOne('.plus-home-new__lesson .plus-smart-badge');
             await expect(getComputedStyle(tag).backgroundColor, `${mode}: the SMART tag's fill`).toBe(token('--ds-background-smart-mastering-content'));
             await expect(getComputedStyle(tag).color, `${mode}: the SMART tag's ink`).toBe(token('--ds-text-smart-mastering-content'));
-            await expect(getComputedStyle(first('.plus-home-new__callout')).backgroundColor, `${mode}: the callout is a well`).toBe(token('--ds-surface-container'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__callout')).backgroundColor, `${mode}: the callout is a well`).toBe(token('--ds-surface-container'));
             // The divider is on the inline start while the stats share a row, and on the block start once they stack.
-            const second = getComputedStyle(first('.plus-home-new__stat + .plus-home-new__stat'));
+            const second = getComputedStyle(queryOne('.plus-home-new__stat + .plus-home-new__stat'));
             const divider = second.borderInlineStartWidth === '0px' ? second.borderBlockStartColor : second.borderInlineStartColor;
             await expect(divider, `${mode}: the stat divider`).toBe(token('--ds-border'));
-            await expect(getComputedStyle(first('.plus-home-new__stat-value')).color, `${mode}: a stat value`).toBe(token('--ds-text'));
-            await expect(getComputedStyle(first('.plus-home-new__body')).color, `${mode}: body text`).toBe(token('--ds-text'));
-            await expect(getComputedStyle(first('.plus-home-new__secondary')).color, `${mode}: secondary text`).toBe(token('--ds-text-subtle'));
-            await expect(getComputedStyle(first('.plus-home-new__caption')).color, `${mode}: a caption`).toBe(token('--ds-text-subtlest'));
-            await expect(getComputedStyle(first('.plus-home-new__glyph')).color, `${mode}: a tab's info glyph`).toBe(token('--ds-icon-subtle'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__stat-value')).color, `${mode}: a stat value`).toBe(token('--ds-text'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__body')).color, `${mode}: body text`).toBe(token('--ds-text'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__secondary')).color, `${mode}: secondary text`).toBe(token('--ds-text-subtle'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__caption')).color, `${mode}: a caption`).toBe(token('--ds-text-subtlest'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__note')).color, `${mode}: the chart's note`).toBe(token('--ds-text-subtle'));
+            await expect(getComputedStyle(queryOne('.plus-home-new__glyph')).color, `${mode}: a tab's info glyph`).toBe(token('--ds-icon-subtlest'));
         });
     },
 };

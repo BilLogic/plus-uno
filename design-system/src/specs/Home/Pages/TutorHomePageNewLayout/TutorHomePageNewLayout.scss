@@ -41,7 +41,7 @@
     block-size: var(--icon-md);
     font-size: var(--icon-md);
     line-height: 1;
-    color: var(--ds-icon-subtle);
+    color: var(--ds-icon-subtlest);
 }
 
 .plus-home-new__inline--wrap {
@@ -60,8 +60,8 @@
     gap: var(--surface-stack-lg);
 }
 
-// Plain text in a slot, on the type styles. A caption is meta text: a
-// duration, a chart's note.
+// Plain text in a slot, on the type styles. A caption is meta text only, such
+// as a lesson's duration; a note that explains something is secondary text.
 .plus-home-new__body {
     margin: 0;
     font: var(--body-default);
@@ -78,6 +78,12 @@
     margin: 0;
     font: var(--body-small);
     color: var(--ds-text-subtlest);
+}
+
+.plus-home-new__note {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
 }
 
 // The badge: a slim callout row under the page header, a well on the surface.
@@ -167,7 +173,7 @@
     color: var(--ds-text);
 }
 
-// Skills: the chart straight on the surface, its caption under it.
+// Skills: the chart straight on the surface, its note under it.
 .plus-home-new__chart {
     display: flex;
     flex-direction: column;

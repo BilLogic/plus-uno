@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, Button, Count, NavTabs, Select, StaticBadgeSmart, Status } from '@/components';
+import { Alert, Button, Count, NavTabs, Select, StaticBadgeSmart, Status, Tag } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -154,8 +154,9 @@ const infoGlyph = <i className="fa-solid fa-circle-info plus-home-new__glyph" ar
  *   session with its tabs, Your impact with its stats and the Skills
  *   subsection (h3), and Personalized recommendations, whose lesson cards are
  *   the page's only cards.
- * - Every color comes from the --ds- tokens, through the patterns and
- *   components, and the page's stylesheet for what its slots hold.
+ * - Every color is a --ds- token. The patterns and components paint their
+ *   own; the page's stylesheet colors only the text, wells and dividers in
+ *   the slots.
  */
 const TutorHomePageNewLayout = ({
     id,
@@ -335,7 +336,7 @@ const TutorHomePageNewLayout = ({
                                             color: SCORE_COLOR,
                                         }]}
                                     />
-                                    <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                                    <p className="plus-home-new__note">Each point represents the average score across 5 sessions.</p>
                                 </>
                             ) : (
                                 <RadarChart
@@ -384,10 +385,12 @@ const TutorHomePageNewLayout = ({
                                 footer={<Button text="Review" style="secondary" fill="tonal" aria-label={`Review ${lesson.title}`} onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
-                                    {CATEGORY_AREA[lesson.category] && <StaticBadgeSmart type={CATEGORY_AREA[lesson.category]} />}
+                                    {CATEGORY_AREA[lesson.category]
+                                        ? <StaticBadgeSmart type={CATEGORY_AREA[lesson.category]} />
+                                        : lesson.category && <Tag color="gray">{lesson.category}</Tag>}
                                     {lesson.duration && <span className="plus-home-new__caption">{lesson.duration}</span>}
                                     {lesson.inProgress && <Status style="warning" leadingVisual="spinner">In progress</Status>}
-                                    {lesson.aiRecommended && <Status style="info" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
+                                    {lesson.aiRecommended && <Status style="discovery" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
                                 </div>
                             </PatternCard>
                         </li>
