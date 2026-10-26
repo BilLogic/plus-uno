@@ -115,9 +115,9 @@ const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
  * up the neutral subtle steps, selection is the neutral selected fill (its
  * hovered and pressed steps above it) with a medium-weight label and no
  * leading bar, and focus is the
- * focused ring 2px outside the row (DS_RING_OUTSIDE, above), with no fill.
+ * focused ring 2px inside the row (DS_RING_INSIDE, above), with no fill.
  */
-test('SidebarTab: neutral hover and press, neutral selection with its own steps, focus a ring outside with no fill', () => {
+test('SidebarTab: neutral hover and press, neutral selection with its own steps, focus a ring inside with no fill', () => {
   expectRule(TAB, '.plus-sidebar-tab:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)', {
     'background-color': layer('--ds-background-neutral-subtle-hovered'),
   });
@@ -141,8 +141,8 @@ test('SidebarTab: neutral hover and press, neutral selection with its own steps,
     'background-color': layer('--ds-background-selected-pressed'),
   });
   expectNoFill(TAB, '.plus-sidebar-tab--focus');
-  expectRule(TAB, '.plus-sidebar-tab--focus', DS_RING_OUTSIDE);
-  expectRule(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)', DS_RING_OUTSIDE);
+  expectRule(TAB, '.plus-sidebar-tab--focus', DS_RING_INSIDE);
+  expectRule(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)', DS_RING_INSIDE);
   expectNoFill(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)');
 });
 
