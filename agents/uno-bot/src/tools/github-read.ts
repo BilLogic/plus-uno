@@ -21,12 +21,16 @@ import {
   type RepoResolution,
 } from "../integrations/github";
 import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
+import { storybookDocFor, type StorybookDoc } from "../integrations/storybook-docs";
 
 export interface GithubReadDeps {
   /** The model's `repo` input, resolved against the repo list. */
   resolveRepo(requested: unknown): RepoResolution;
   readPath(target: RepoEntry, path: string, ref?: string): Promise<GithubReadResult>;
   searchCode(target: RepoEntry, query: string): Promise<GithubCodeHit[]>;
+  /** The Storybook docs page of the component a path in the default repo
+   *  belongs to; absent, the baked map (`integrations/storybook-docs.ts`). */
+  storybookDoc?(path: string): StorybookDoc | null;
 }
 
 export async function readGithub(input: Record<string, unknown>, deps: GithubReadDeps): Promise<string> {
@@ -83,6 +87,13 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
 
   try {
     const r = await deps.readPath(target.entry, path, ref);
+    // The registry the docs map is baked from is the default repo's, so only
+    // its paths have a Storybook page (#1563).
+    const doc = target.isDefault ? (deps.storybookDoc ?? storybookDocFor)(r.path) : null;
+    const storybook = doc ? { storybook: doc } : {};
+    const storybookNote = doc
+      ? " Its Storybook docs page is `storybook.url`: link that one when you name the Storybook page, never a Storybook link you build."
+      : "";
     if (r.kind === "dir") {
       return JSON.stringify({
         ok: true,
@@ -91,7 +102,8 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
         url: githubLink(repo, "tree", r.path, ref),
         kind: "dir",
         entries: r.entries,
-        note: "Directory listing — use it to confirm what exists (e.g. a DS component folder). Link it at its `url`.",
+        ...storybook,
+        note: `Directory listing — use it to confirm what exists (e.g. a DS component folder). Link it at its \`url\`.${storybookNote}`,
       });
     }
     return JSON.stringify({
@@ -102,7 +114,8 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
       kind: "file",
       content: r.text,
       truncated: r.truncated,
-      note: "File contents from the repo. Ground your answer in this and link it at its `url`.",
+      ...storybook,
+      note: `File contents from the repo. Ground your answer in this and link it at its \`url\`.${storybookNote}`,
     });
   } catch (err) {
     return JSON.stringify({

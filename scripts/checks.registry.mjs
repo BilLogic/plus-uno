@@ -992,6 +992,16 @@ export const PULL_REQUEST_WORKFLOWS = [
  *             is a decision rather than a silence.
  */
 export const DEPLOY_CHAIN = [
+  {
+    step: 'npm run generate:storybook-docs',
+    notAGate:
+      'it WRITES. Each component\'s Storybook docs id is baked from design-system/figma/' +
+      'component-registry.json into src/generated/storybook-docs.ts before anything is ' +
+      'typechecked or bundled, so the link `github_read` hands back is the registry on main ' +
+      'at deploy (#1563). Not a pull-request check on purpose: the registry changes with ' +
+      'every component PR, and a drift gate here would redden those PRs for a file only the ' +
+      'deploy reads.',
+  },
   { step: 'npm run typecheck', runs: 'typecheck' },
   { step: 'npm run check:fetch', runs: 'check:fetch' },
   { step: 'npm run check:contract', runs: 'check:contract' },

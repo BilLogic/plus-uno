@@ -68,6 +68,7 @@ import { answerOnlyReply, figmaReplyText, plainAnswer, type FigmaReply, type Fig
 import { figmaAskDelivery, type FigmaAskDelivery } from "./delivery";
 import { askText, asksUno, asPosted, GOAT_REACTION, isOwnComment } from "./trigger";
 import { figmaFileUrl } from "../figma/links";
+import { estateOfUrl } from "../slack/estate-hosts";
 
 /** How long a comment's mark is kept: past every Figma redelivery and runner retry. */
 export const ASK_MARK_TTL_S = 8 * 24 * 60 * 60;
@@ -361,6 +362,14 @@ export function askInstruction(teammate: boolean): string {
  * `design-system/…/Button.jsx`, as `github_read` hands it — is the source, at
  * the link that read returned.
  *
+ * Failing both, what the turn read stands behind the answer (#1563): the first
+ * Storybook docs page a lookup returned, else the last GitHub file or folder
+ * read — the most specific read, since a turn reads the index before the
+ * component. The answer was grounded in those reads, and a link the answer
+ * made up is never posted: its lines carry link labels, not links. Nothing
+ * else the turn read is a fallback; a turn that read neither still says it
+ * could not find this.
+ *
  * @param cited - The links the answer cites, in order
  * @param read - What the turn's lookups returned
  * @param asked - The frame (or the file) the ask was made on
@@ -378,7 +387,18 @@ export function sourceOf(cited: readonly string[], read: readonly TaskCardSource
       return at === null ? [] : [{ at, source: { name: s.text, url: s.url } }];
     })
     .sort((a, b) => a.at - b.at);
-  return named[0]?.source ?? null;
+  if (named[0]) return named[0].source;
+  return readFallback(read, asked);
+}
+
+/** What the turn read that stands behind an answer citing nothing it read:
+ *  a Storybook docs page, else the last GitHub read. */
+function readFallback(read: readonly TaskCardSource[], asked: string): FigmaSource | null {
+  const visible = threadVisibleSources(read).filter((s) => !sameFigmaPlace(s.url, asked));
+  const storybook = visible.find((s) => estateOfUrl(s.url) === "storybook");
+  const github = visible.filter((s) => estateOfUrl(s.url) === "github").at(-1);
+  const pick = storybook ?? github;
+  return pick ? { name: pick.text, url: pick.url } : null;
 }
 
 /** The repo path a github.com file or directory link names, decoded; null for any other link. */
@@ -421,8 +441,10 @@ function sameReadLink(cited: string, read: string): boolean {
 
 /**
  * A link as links are compared here: host without `www.`, path without a
- * trailing slash, no fragment, and the query kept only on Figma, where it
- * names the frame. Null for what is not a URL.
+ * trailing slash, no fragment, and the query kept only where it names the
+ * page — on Figma, the frame; on Storybook, the docs page (`?path=`), so a
+ * made-up Storybook id never matches a real one (#1563). Null for what is not
+ * a URL.
  */
 function normalizedLink(url: string): { host: string; path: string; query: string } | null {
   let u: URL;
@@ -432,7 +454,7 @@ function normalizedLink(url: string): { host: string; path: string; query: strin
     return null;
   }
   const host = u.hostname.toLowerCase().replace(/^www\./, "");
-  const query = /(^|\.)figma\.com$/.test(host) ? u.search : "";
+  const query = /(^|\.)figma\.com$/.test(host) || estateOfUrl(url) === "storybook" ? u.search : "";
   return { host, path: u.pathname.replace(/\/+$/, ""), query };
 }
 

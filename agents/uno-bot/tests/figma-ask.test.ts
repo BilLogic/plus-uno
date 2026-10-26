@@ -674,6 +674,7 @@ describe("the source must have been read", () => {
 describe("a GitHub file the turn read directly", () => {
   const BUTTON = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/forms-and-inputs/Button/Button.jsx";
   const BUTTON_PATH = "design-system/src/components/forms-and-inputs/Button/Button.jsx";
+  const STORYBOOK_BUTTON = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs";
   // What github_read itself returns for the read: the real tool, on fake GitHub.
   const readResult = (repo: string, path: string, ref?: string) =>
     readGithub(
@@ -763,7 +764,8 @@ describe("a GitHub file the turn read directly", () => {
     });
   });
 
-  it("says it couldn't find this when the path the answer names is only the folder of the file read", async () => {
+  // Failing a cited match, the file read stands behind the answer (#1563).
+  it("falls back to the file read when the path the answer names is only its folder", async () => {
     const read = await readResult("BilLogic/plus-uno", BUTTON_PATH);
     const w = world({
       replies: [
@@ -773,19 +775,24 @@ describe("a GitHub file the turn read directly", () => {
       toolResultFor: (name) => (name === "github_read" ? read : PRD_FOUND),
     });
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
+    assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: Storybook: Button — ${STORYBOOK_BUTTON}`]);
   });
 
-  it("says it couldn't find this when the cited file is not the one read", async () => {
+  it("falls back to what was read, never the link cited, when the cited file is not the one read", async () => {
     const w = await answered(BUTTON, await readResult("BilLogic/plus-uno", BUTTON_PATH.replace("Button.jsx", "Button.stories.jsx")));
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
+    const [message] = w.replies().map((r) => r.message);
+    assert.equal(message?.split("\n").at(-1), `Source: Storybook: Button — ${STORYBOOK_BUTTON}`);
+    assert.ok(!message?.includes(BUTTON), "the cited link is never posted");
   });
 
-  it("says it couldn't find this when the same path was read in another repo", async () => {
-    const w = await answered(BUTTON, await readResult("BilLogic/other-repo", BUTTON_PATH));
+  it("falls back to the last GitHub file read when no Storybook page was read", async () => {
+    const OTHER_PATH = "src/hero.astro";
+    const read = await readResult("BilLogic/plus-marketing-website", OTHER_PATH);
+    const w = await answered(BUTTON, read);
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
-    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
+    const readUrl = (JSON.parse(read) as { url: string }).url;
+    assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: hero.astro — ${readUrl}`]);
   });
 
   it("says it couldn't find this when the read was refused as a private repo", async () => {
@@ -793,6 +800,51 @@ describe("a GitHub file the turn read directly", () => {
     const w = await answered(BUTTON, refused);
     await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
     assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
+  });
+});
+
+describe("a Storybook link the turn made up (#1563)", () => {
+  const FILES = [
+    "design-system/agent-views/components/index.md",
+    "design-system/src/components/forms-and-inputs/Button/index.md",
+    "design-system/src/components/forms-and-inputs/Button/Button.mdx",
+    "design-system/src/components/forms-and-inputs/Button/Button.stories.jsx",
+  ];
+  const REAL = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs";
+  const MADE_UP = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-button--docs";
+  const read = (path: string) =>
+    readGithub(
+      { path },
+      {
+        resolveRepo: () => ({ ok: true, entry: { repo: "BilLogic/plus-uno", purpose: "design system", workflows: [] }, isDefault: true }),
+        readPath: async (_t, p) => ({ path: p, kind: "file", text: "Button: primary, secondary, tertiary…" }),
+        searchCode: async () => [],
+      },
+    );
+  const turn = async (answer: string) => {
+    const results = new Map(await Promise.all(FILES.map(async (f) => [f, await read(f)] as const)));
+    return world({
+      replies: [
+        ...FILES.map((path) => ({ text: "Reading.", toolCalls: [{ name: "github_read", args: { path } }] })),
+        { text: answer },
+      ],
+      toolResultFor: (name, args) => (name === "github_read" ? results.get(String(args.path))! : PRD_FOUND),
+    });
+  };
+
+  it("answers with the real Storybook page as its source, as r768 should have", async () => {
+    const w = await turn(`Buttons come in primary, secondary and tertiary styles. [Button](${MADE_UP})`);
+    await ask(w, comment("100", "@le goat what button options does plus design system provide?"));
+    const [message] = w.replies().map((r) => r.message);
+    assert.equal(message?.split("\n").at(-1), `Source: Storybook: Button — ${REAL}`);
+    assert.doesNotMatch(message ?? "", /components-forms-button--docs/);
+    assert.doesNotMatch(message ?? "", new RegExp(CANT_FIND_LINE.slice(0, 20)));
+  });
+
+  it("matches a cited Storybook link to the page read only when its docs id is the same", async () => {
+    const w = await turn(`Buttons come in primary, secondary and tertiary styles. [Button](${REAL})`);
+    await ask(w, comment("100", "@le goat what button options does plus design system provide?"));
+    assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: Storybook: Button — ${REAL}`]);
   });
 });
 
