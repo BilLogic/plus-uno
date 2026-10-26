@@ -111,8 +111,12 @@ export const webAppSourceSnippets = {
     ]),
     jumbotron: snippet([
         '<Jumbotron',
-        '  title="Hello, world!"',
-        '  children="This is a simple hero unit."',
+        '  title="Plan your next session"',
+        '  description="See who is on your roster, review their progress and join the call from one place."',
+        '  actions={<>',
+        '    <Button text="Get started" style="primary" fill="filled" />',
+        '    <Button text="Learn more" style="secondary" fill="outline" />',
+        '  </>}',
         '/>'
     ]),
     listGroup: snippet([

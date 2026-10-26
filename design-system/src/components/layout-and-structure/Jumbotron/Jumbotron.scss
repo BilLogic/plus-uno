@@ -1,108 +1,153 @@
 /*
- * Jumbotron Component Styles
- * Per Figma specs - 3 sizes (sm/md/lg) with section-based tokens
- * Uses surface-container-low background
+ * Jumbotron, mirroring Figma `Jumbotron`: a page-level `_Section header`, an
+ * actions slot and an optional media slot, in a card or a full-bleed band.
+ * The card is PatternCard (the raised pair at Card/pad-lg), so only the band,
+ * the layout inside and the media are styled here. Every length is a Card,
+ * Section, Surface, Layout or Width token.
  */
 
 .plus-jumbotron {
+    box-sizing: border-box;
+    width: 100%;
+    color: var(--ds-text);
+}
+
+/* Band: full bleed on the surface container, square, no outline or shadow */
+.plus-jumbotron--band {
+    background-color: var(--ds-surface-container);
+    padding: var(--surface-stack-lg) var(--layout-pad-x-screen);
+}
+
+/* Layout: media and content, stacked (top) or side by side */
+.plus-jumbotron-layout {
     display: flex;
     flex-direction: column;
+    gap: var(--section-stack-md); /* media (top) to content */
+    min-width: 0;
+}
+
+.plus-jumbotron--media-side .plus-jumbotron-layout {
+    flex-direction: row;
     align-items: center;
+    gap: var(--layout-gutter); /* content to media (side) */
+}
+
+/* Content: the header, then the actions */
+.plus-jumbotron-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--section-stack-lg); /* header to actions */
+    min-width: 0;
+}
+
+.plus-jumbotron--media-side .plus-jumbotron-content {
+    flex: 1 1 auto;
+    min-width: var(--section-min-width-main);
+}
+
+/* `_Section header` at level=page */
+.plus-jumbotron-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-xs);
+    min-width: 0;
+}
+
+.plus-jumbotron-title {
+    margin: 0;
+    font: var(--heading-large);
+    color: var(--ds-text);
+}
+
+.plus-jumbotron-description {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+.plus-jumbotron-body {
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+    min-width: 0;
+}
+
+/* Actions: one filled button, then an optional outlined one */
+.plus-jumbotron-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--element-inline-md);
+}
+
+/* Center: the header and the actions on the center line */
+.plus-jumbotron--align-center .plus-jumbotron-content {
+    align-items: center;
+    text-align: center;
+}
+
+.plus-jumbotron--align-center .plus-jumbotron-actions {
     justify-content: center;
+}
+
+/* Media: an image fills the slot at its ratio, clipped, never stretched */
+.plus-jumbotron-media {
+    overflow: hidden;
+    min-width: 0;
+
+    > img,
+    > picture > img,
+    > video {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+.plus-jumbotron-media--top {
     width: 100%;
-    // Per Figma: surface-container-low background
-    background-color: var(--color-surface-container-low);
-    // Default to medium size
-    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
-    gap: var(--size-section-gap-md);
-    border-radius: var(--size-section-radius-md);
+    aspect-ratio: 16 / 9;
+}
 
-    // --- CONTENT WRAPPER ---
-    .plus-jumbotron-content {
-        display: flex;
+.plus-jumbotron-media--side {
+    flex: 0 0 var(--width-2500);
+    width: var(--width-2500);
+    aspect-ratio: 4 / 3;
+}
+
+/*
+ * Side media needs 944 of width: 480 of text (Section/min-width-main), 16 of
+ * gutter (Grid/gutter), 400 of image (Size/Width/2500) and 48 of padding
+ * (Card/pad-lg, or Screen/pad-x-screen in a band, on both sides). The frame is
+ * the box inside that padding, so the query asks for the other 896. A query
+ * cannot read a token, so the sum is written out; below it the media moves on
+ * top, as media=top. Only a side Jumbotron's frame is a size container, so no
+ * other Jumbotron changes how it sizes.
+ */
+.plus-jumbotron-frame {
+    min-width: 0;
+}
+
+.plus-jumbotron--media-side .plus-jumbotron-frame {
+    container-type: inline-size;
+}
+
+@container (max-width: 895.98px) {
+    .plus-jumbotron--media-side .plus-jumbotron-layout {
         flex-direction: column;
-        gap: var(--size-section-gap-sm);
+        align-items: stretch;
+        gap: var(--section-stack-md);
+    }
+
+    .plus-jumbotron--media-side .plus-jumbotron-content {
+        min-width: 0;
+    }
+
+    .plus-jumbotron-media--side {
+        order: -1;
+        flex: 0 0 auto;
         width: 100%;
-    }
-
-    // --- TITLE (H2 per Figma medium) ---
-    .plus-jumbotron-title {
-        font: var(--heading-xxlarge);
-        color: var(--color-on-surface);
-        margin: 0;
-    }
-
-    // --- SUBTITLE (B2 per Figma) ---
-    .plus-jumbotron-subtitle {
-        font: var(--body-default);
-        color: var(--color-on-surface-variant);
-        margin: 0;
-    }
-
-    // --- BODY (B1 per Figma) ---
-    .plus-jumbotron-body {
-        font: var(--body-large);
-        color: var(--color-on-surface-variant);
-    }
-
-    // --- ACTIONS (Button container) ---
-    .plus-jumbotron-actions {
-        display: flex;
-        gap: var(--size-element-gap-md);
-        flex-wrap: wrap;
-        margin-top: var(--size-section-gap-sm);
-    }
-
-    // --- SIZE VARIANTS ---
-    // Small
-    &.plus-jumbotron-pad-sm {
-        padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
-        gap: var(--size-section-gap-sm);
-
-        .plus-jumbotron-title {
-            font: var(--heading-large);
-        }
-
-        .plus-jumbotron-body {
-            font: var(--body-small);
-        }
-    }
-
-    // Large
-    &.plus-jumbotron-pad-lg {
-        padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
-        gap: var(--size-section-gap-lg);
-
-        .plus-jumbotron-title {
-            font: var(--heading-xlarge);
-        }
-
-        .plus-jumbotron-body {
-            font: var(--body-large);
-        }
-    }
-
-    // --- GAP VARIANTS ---
-    &.plus-jumbotron-gap-sm {
-        gap: var(--size-section-gap-sm);
-    }
-
-    &.plus-jumbotron-gap-lg {
-        gap: var(--size-section-gap-lg);
-    }
-
-    // --- RADIUS VARIANTS ---
-    &.plus-jumbotron-radius-sm {
-        border-radius: var(--size-section-radius-sm);
-    }
-
-    &.plus-jumbotron-radius-lg {
-        border-radius: var(--size-section-radius-lg);
-    }
-
-    // --- FLUID (full width, no radius) ---
-    &.plus-jumbotron-fluid {
-        border-radius: 0;
-        width: 100%;
+        aspect-ratio: 16 / 9;
     }
 }

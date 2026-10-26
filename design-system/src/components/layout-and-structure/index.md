@@ -12,12 +12,12 @@ authored half (#166), counted rather than assumed.
 | [Carousel](Carousel/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Collapse](Collapse/index.md) | 12 | ✅ | ✅ | ✅ |
 | [Divider](Divider/index.md) | 7 | ✅ | ✅ | ✅ |
-| [Jumbotron](Jumbotron/index.md) | 12 | ✅ | ✅ | ✅ |
+| [Jumbotron](Jumbotron/index.md) | 18 | ✅ | ✕ | ✅ |
 | [ListGroup](ListGroup/index.md) | 5 | ✅ | ✕ | ✅ |
 | [MediaObject](MediaObject/index.md) | 8 | ✅ | ✅ | ✅ |
 | [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 8/9 (89%) · Accessibility 9/9 (100%)
+**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 7/9 (78%) · Accessibility 9/9 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
