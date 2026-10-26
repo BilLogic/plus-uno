@@ -1,16 +1,48 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '../Overlay';
 import './PatternModal.scss';
+
+const REPLACEMENTS = {
+    padding: 'the modal pads Modal/pad 16 on every side.',
+    gap: 'the modal stacks Modal/stack-md 16.',
+    maxHeight: 'use height="hug" (grows to the screen less 128) or height="fill".',
+};
+
+/** The deprecated props that have warned in this session, so each warns once. */
+const warned = new Set();
+
+/**
+ * Says once per session, in development, that an old sizing prop is kept only
+ * so no caller breaks.
+ *
+ * @param {Record<string, unknown>} passed - The deprecated props, by name, as the caller passed them.
+ */
+function useDeprecatedSizing(passed) {
+    const names = Object.keys(passed).filter((name) => passed[name] != null).join(',');
+    React.useEffect(() => {
+        if (!names || process.env.NODE_ENV === 'production') return;
+        for (const name of names.split(',')) {
+            if (warned.has(name)) continue;
+            warned.add(name);
+            // eslint-disable-next-line no-console
+            console.warn(`[PatternModal] ${name} is deprecated and kept only so no caller breaks; ${REPLACEMENTS[name]}`);
+        }
+    }, [names]);
+}
 
 /**
  * Modal pattern for PLUS design system.
- * Modal shell rendered inline (no portal/backdrop): header with title + close
- * button, body slot with internal scroll (`maxHeight`), and footer slot.
+ * Modal shell rendered inline (no portal, focus trap or Escape): header with
+ * title and close button, body slot, footer slot. Width is a step of the
+ * screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and
+ * height hugs the content up to the screen less 128 or fills to it, the body
+ * scrolling past it. Place it in `Overlay` for the scrim.
  * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
- * `--ds-shadow-overlay`), as the Modal component draws it, and the modal
- * radius/padding/gap tokens.
- * Mirrors the "Modal" slot component in the Figma design system file.
+ * `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad,
+ * Modal/stack-md and Modal/radius.
+ * Mirrors "Pattern/Modal" in the Figma design system file.
  * For a real overlay dialog (backdrop, focus trap), use the core Modal component.
  *
  * A dialog is its own page: the title is its h1, at Heading/medium 20, and a
@@ -21,20 +53,25 @@ const PatternModal = ({
     title,
     onClose,
     footer,
+    width = 'sm',
+    height = 'hug',
     maxHeight,
-    padding = 'md',
-    gap = 'md',
+    padding,
+    gap,
     className = '',
     style,
     children,
     ...props
 }) => {
     const reactId = React.useId();
+    useDeprecatedSizing({ padding, gap, maxHeight });
 
     const classes = [
         'plus-pattern-modal',
-        `plus-pattern-modal-pad-${padding}`,
-        `plus-pattern-modal-gap-${gap}`,
+        `plus-pattern-modal-width-${width}`,
+        `plus-pattern-modal-height-${height}`,
+        padding ? `plus-pattern-modal-pad-${padding}` : '',
+        gap ? `plus-pattern-modal-gap-${gap}` : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -50,11 +87,13 @@ const PatternModal = ({
     const titleId = `${reactId}-title`;
     const labelledBy = title ? titleId : undefined;
 
-    // The body is `overflow-y: auto`, so once a max height constrains it the
-    // content scrolls — and a scrollable region that holds no focusable content
-    // is unreachable by keyboard. Give it a tab stop exactly when it can
-    // scroll, rather than adding one to every modal.
-    const bodyScrolls = (maxHeight ?? style?.maxHeight) != null;
+    // The body scrolls once the modal reaches its cap, and a scrollable region
+    // that holds no focusable content is unreachable by keyboard. A fill modal
+    // is always at its cap, a hug one when its content outgrows the screen, an
+    // old `maxHeight` one past that height: give the body a tab stop then.
+    const bodyRef = React.useRef(null);
+    const overflows = useOverflows(bodyRef);
+    const bodyScrolls = height === 'fill' || (maxHeight ?? style?.maxHeight) != null || overflows;
 
     return (
         <div
@@ -80,12 +119,29 @@ const PatternModal = ({
                 )}
             </div>
             <HeadingLevelContext.Provider value={1}>
-                <div className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
+                <div ref={bodyRef} className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
             </HeadingLevelContext.Provider>
             {footer && <div className="plus-pattern-modal-footer">{footer}</div>}
         </div>
     );
 };
+
+/** True while an element's content is taller than its box. */
+function useOverflows(ref) {
+    const [overflows, setOverflows] = React.useState(false);
+    React.useLayoutEffect(() => {
+        const el = ref.current;
+        if (!el) return undefined;
+        const measure = () => setOverflows(el.scrollHeight > el.clientHeight);
+        measure();
+        if (typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(measure);
+        observer.observe(el);
+        if (el.firstElementChild) observer.observe(el.firstElementChild);
+        return () => observer.disconnect();
+    }, [ref]);
+    return overflows;
+}
 
 PatternModal.propTypes = {
     id: PropTypes.string,
@@ -95,11 +151,19 @@ PatternModal.propTypes = {
     onClose: PropTypes.func,
     /** Footer slot (typically action buttons) */
     footer: PropTypes.node,
-    /** Max height constraint; the body scrolls internally past it */
+    /**
+     * `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad
+     * (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440).
+     * Grows with the screen, never shrinks, ignores the sidebar.
+     */
+    width: PropTypes.oneOf(OVERLAY_WIDTHS),
+    /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
+    height: PropTypes.oneOf(OVERLAY_HEIGHTS),
+    /** Deprecated: a fixed cap. Use `height`. */
     maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Padding scale (modal padding tokens) */
+    /** Deprecated: the old Modal/pad-* tokens. The modal pads Modal/pad 16. */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Gap scale between header, body, and footer (modal gap tokens) */
+    /** Deprecated: the old Modal/gap-* tokens. The modal stacks Modal/stack-md 16. */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     className: PropTypes.string,
     style: PropTypes.object,
