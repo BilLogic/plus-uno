@@ -8,7 +8,7 @@ export const OVERLAY_WIDTHS = ['sm', 'md', 'lg'];
 /** `hug` grows with the content to the screen less 128; `fill` sits at that cap. */
 export const OVERLAY_HEIGHTS = ['hug', 'fill'];
 
-/** Screen-grid columns per width step, matched by `screen-grid-width-steps` in `_screen-grid.scss`. */
+/** Screen-grid columns per width step, matched by `screen-grid-width-steps` in `styles/_screen-grid.scss`. */
 export const OVERLAY_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
 
 /**
@@ -21,7 +21,7 @@ export const OVERLAY_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
  *
  * It draws the layer only: it does not trap focus, close on Escape or count
  * toward the two-overlay limit. For a real dialog, use the core Modal
- * component, which draws the same Overlay.
+ * component, which draws the same layers and scrim tokens.
  */
 const Overlay = ({
     inline = false,
@@ -67,7 +67,10 @@ Overlay.propTypes = {
     inline: PropTypes.bool,
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */
     screenWidth: PropTypes.number,
-    /** Inline only: the screen height (px); a layer inside caps at it less 128. */
+    /**
+     * Inline only: the screen height (px); a layer inside caps at it less Overlay/pad-y above and below.
+     * The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.
+     */
     screenHeight: PropTypes.number,
     /** Called for a click on the scrim, not on the layer it holds. */
     onScrimClick: PropTypes.func,

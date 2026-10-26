@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import Overlay from '@/patterns/Overlay';
 import PatternModal from '@/patterns/PatternModal';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 

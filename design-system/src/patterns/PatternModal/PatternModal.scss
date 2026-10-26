@@ -7,7 +7,7 @@
  * screen grid and height hugs or fills to the screen less 128, both from the
  * Overlay pattern it is placed in.
  */
-@use '../Overlay/screen-grid' as *;
+@use '../../styles/screen-grid' as *;
 
 .plus-pattern-modal {
     @include screen-grid-width(var(--modal-pad));

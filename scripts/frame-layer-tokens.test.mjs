@@ -358,11 +358,11 @@ test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, t
 });
 
 /*
- * The Overlay pattern's screen grid (`_screen-grid.scss`) is the same rule for
+ * The patterns' screen grid (`styles/_screen-grid.scss`) is the same rule for
  * any layer placed in an Overlay — PatternModal now, a drawer later. At the
  * three mode widths it has to land on Figma's Modal/width-modal-* too.
  */
-const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/patterns/Overlay/_screen-grid.scss'), 'utf8');
+const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
 
 /** The width the screen-grid mixin computes for a span on a screen `width` wide, with the modal pad. */
 function screenGridWidth(span, width, mode) {

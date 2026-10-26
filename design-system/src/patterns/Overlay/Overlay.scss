@@ -13,8 +13,9 @@
     inset: 0;
     z-index: var(--layout-z-index-scrim);
     display: flex;
-    align-items: center;
-    justify-content: center;
+    /* Safe: a layer bigger than the screen starts at the pad and the overlay scrolls, rather than spilling past the top or left edge. */
+    align-items: safe center;
+    justify-content: safe center;
     box-sizing: border-box;
     padding: var(--overlay-pad-y) var(--overlay-pad-x);
     background-color: var(--ds-blanket);

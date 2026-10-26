@@ -6,15 +6,18 @@
  * columns plus its own pad on each side, so it grows with the screen, never
  * shrinks below the 768 screen and ignores the sidebar. Figma's
  * Modal/width-modal-* per mode are this rule at 768 · 1024 · 1440, and
- * scripts/frame-layer-tokens.test.mjs holds it to those tokens.
+ * scripts/frame-layer-tokens.test.mjs holds it to those tokens. The core
+ * Modal (components/messaging/Modal/Modal.scss) works the same rule out with
+ * its own `--plus-modal-*` names, and the same test holds both.
  *
  * The screen is `--plus-overlay-screen` when an inline Overlay sets it (a docs
  * frame drawn at a mode's width), and the viewport otherwise. The screen pad
  * is Screen/pad-x-screen below 1440, 24; from 1440 the grid is already at its
  * 1232 cap with either pad, so one value serves.
  *
- * Any layer placed in the Overlay (the modal, the drawer) includes this and
- * sets `--plus-overlay-span` from its width step: 6 · 8 · 10 for sm · md · lg.
+ * Any layer placed in the Overlay pattern (patterns/Overlay) includes this and
+ * sets `--plus-overlay-span` from its width step: 6 · 8 · 10 for sm · md · lg,
+ * with `screen-grid-width-steps`.
  *
  * @param $pad the layer's own pad, added on each side of the columns
  */
@@ -34,7 +37,7 @@
 
 /**
  * The width steps: `&-width-sm` · `-md` · `-lg` set the span to 6 · 8 · 10.
- * The numbers match OVERLAY_SPANS in Overlay.jsx.
+ * The numbers match OVERLAY_SPANS in patterns/Overlay/Overlay.jsx.
  */
 @mixin screen-grid-width-steps {
     &-width-sm { --plus-overlay-span: 6; }
