@@ -16,17 +16,18 @@ own fill (`color.md` § Surface Colors).
 |-------|-------|
 | `--elevation-light-1` | Subtle lift |
 | `--elevation-light-2` | Clickable cards on hover or drag |
-| `--elevation-light-3` | Floating layers without a scrim |
-| `--elevation-light-4` | Modals |
+| `--elevation-light-3` | Floating layers still on legacy tokens (Specs pages not yet swept) |
+| `--elevation-light-4` | Legacy, unused |
 | `--elevation-light-5` | Dialogs |
+| `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, listboxes, popovers, tooltips, toasts and the floating sidebar: `elevation.surface.overlay` + `elevation.shadow.overlay` |
 
 ## Shadow Values
 
 Levels 1-3 now point at the generated `elevation.shadow.*` tokens
 (`design-system/src/tokens/color/_legacy-aliases.scss`), which change with the
 color mode: levels 1-2 share the raised shadow and level 3 is the overlay
-shadow. The modal levels 4 and 5 keep their own values until the component
-sweep moves modals.
+shadow. Levels 4 and 5 keep their own values; no modal uses them, since modals
+take the overlay pair like every other floating layer.
 
 ```css
 --elevation-light-1: var(--ds-shadow-raised);
@@ -38,9 +39,11 @@ sweep moves modals.
 
 ## Usage
 
-A floating layer and a card name the surface role, which pairs the fill with
-its shadow (`design-system/src/tokens/_elevation.scss`). A modal names its level
-directly, because no role carries Light/4.
+A card names the surface role, which pairs the fill with its shadow
+(`design-system/src/tokens/_elevation.scss`). A layer on the new color tokens
+(a modal, menu, popover, tooltip or toast) names the overlay pair directly:
+`--ds-surface-overlay` with `--ds-shadow-overlay`, whose 1px ring is the edge,
+so it draws no border.
 
 ```css
 .my-card {
@@ -55,13 +58,13 @@ directly, because no role carries Light/4.
 }
 
 .my-menu {
-  background-color: var(--surface-overlay);
-  box-shadow: var(--surface-overlay-shadow); /* Light/3 */
+  background-color: var(--ds-surface-overlay);
+  box-shadow: var(--ds-shadow-overlay);
 }
 
 .my-modal {
-  background-color: var(--surface-overlay);
-  box-shadow: var(--elevation-light-4);
+  background-color: var(--ds-surface-overlay);
+  box-shadow: var(--ds-shadow-overlay); /* the blanket sets it apart, not the shadow */
 }
 ```
 
@@ -71,13 +74,14 @@ directly, because no role carries Light/4.
 |----------------|----------------------|
 | Cards at rest | none: a 1px outline-variant border |
 | Clickable cards on hover or drag | `--elevation-light-2` |
-| Menus, dropdowns, popovers, tooltips, toasts, listboxes | `--elevation-light-3` |
-| Modals | `--elevation-light-4` |
+| Modals, menus, dropdowns, listboxes, popovers, tooltips, toasts, the floating sidebar | `--ds-surface-overlay` + `--ds-shadow-overlay` |
+| Floating layers still on legacy tokens, until they move | `--elevation-light-3` |
 | Dialogs | `--elevation-light-5` |
 
-Every floating layer without a scrim takes Light/3: menus and dropdowns,
-Popover, Tooltip, Toast and Flag, and Listbox. A modal sits on the white overlay
-fill (`--surface-overlay`) over a scrim, with Light/4.
+Every floating layer takes the overlay pair, `elevation.surface.overlay` with
+`elevation.shadow.overlay`: menus and dropdowns, Listbox, Popover, Tooltip,
+Toast and Flag, the Frame's floating sidebar, and modals. A modal is set apart from a menu by the blanket under it
+(`--ds-blanket`), not by a heavier shadow.
 
 ## Rules
 

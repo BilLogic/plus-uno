@@ -36,9 +36,11 @@
     width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--layout-gutter) + 2 * var(--modal-pad));
     flex-shrink: 0;
     box-sizing: border-box;
-    background-color: var(--color-surface-overlay);
+    /* The overlay pair, as every floating layer: the blanket under the modal sets it apart from a menu. */
+    background-color: var(--ds-surface-overlay);
+    color: var(--ds-text);
     border-radius: var(--modal-radius);
-    box-shadow: var(--elevation-light-4);
+    box-shadow: var(--ds-shadow-overlay);
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
@@ -108,19 +110,19 @@
 .plus-modal-title {
     margin: 0;
     font: var(--heading-medium);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* A string `body`: Body/default 14/20. */
 .plus-modal-body-text {
     font: var(--body-default);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-modal-description {
     margin: 0;
     font: var(--body-default);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-modal-header-actions {
@@ -142,25 +144,30 @@
     border: none;
     border-radius: var(--element-radius-md);
     background-color: transparent;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     font-size: var(--icon-md);
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 .plus-modal-close-btn:hover {
-    background-color: var(--color-on-surface-state-08);
-    color: var(--color-on-surface);
+    background-color: var(--ds-background-neutral-subtle-hovered);
+    color: var(--ds-icon);
+}
+
+.plus-modal-close-btn:active {
+    background-color: var(--ds-background-neutral-subtle-pressed);
+    color: var(--ds-icon);
 }
 
 .plus-modal-close-btn:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg);
 }
 
 .plus-modal-divider {
     height: var(--size-element-stroke-sm);
-    background-color: var(--color-outline-variant);
+    background-color: var(--ds-border);
     flex-shrink: 0;
 }
 
@@ -209,7 +216,7 @@
 
 /*
  * The Overlay: react-bootstrap's `.modal` and its backdrop, on Atlassian's
- * layers (scrim 500, modal 510) and the Overlay/scrim token. The dialog is
+ * layers (scrim 500, modal 510) and the blanket (color.blanket). The dialog is
  * centered with Overlay/pad-y above and below and Overlay/pad-x at the sides;
  * a modal wider than a narrow screen keeps its width and the overlay scrolls.
  */
@@ -221,7 +228,7 @@
 
 .modal-backdrop.plus-modal-scrim {
     --bs-backdrop-zindex: var(--layout-z-index-scrim);
-    --bs-backdrop-bg: var(--overlay-scrim);
+    --bs-backdrop-bg: var(--ds-blanket);
     --bs-backdrop-opacity: 1;
 }
 

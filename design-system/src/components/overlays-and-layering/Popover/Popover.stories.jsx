@@ -95,7 +95,7 @@ function PopoverLayoutDemos() {
 function PopoverContentDemo() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NO TITLE</span>
+            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">NO TITLE</span>
             <Popover
                 trigger={<Button text="Content Only" style="primary" />}
                 placement="right"
@@ -109,7 +109,7 @@ function PopoverContentDemo() {
 function PopoverInteractionStatesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TRIGGER TYPES</span>
+            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TRIGGER TYPES</span>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <Popover
                     trigger={<Button text="Click (Default)" style="info" />}

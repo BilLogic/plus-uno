@@ -1152,18 +1152,21 @@ a.sbdocs-a {
  * design-system/src/storybook-docs/lib/color-modes.js). A story that paints no
  * background of its own would otherwise sit on white in dark mode, so in dark
  * (chosen, or auto under an OS dark preference) the preview body and each
- * docs-page story block take the page surface. The docs page paints its own
- * background over the body, so its prose stays as it is. Light is untouched:
- * these selectors match nothing there.
+ * docs-page story block take the page surface, and the text on it moves with
+ * it to color.text (the light rule above pins the legacy ink). The docs page
+ * paints its own background over the body, so its prose stays as it is. Light
+ * is untouched: these selectors match nothing there.
  */
 html[data-color-mode="dark"] body,
 html[data-color-mode="dark"] .docs-story {
   background: var(--ds-surface) !important;
+  color: var(--ds-text) !important;
 }
 
 @media (prefers-color-scheme: dark) {
   html[data-color-mode="auto"] body,
   html[data-color-mode="auto"] .docs-story {
     background: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
   }
 }

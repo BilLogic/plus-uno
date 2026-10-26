@@ -372,17 +372,17 @@ export const MenuKeepsActions = {
         // Selectable: a toggle, off, then on and still in the open menu. It
         // leads with the Dropdown's multi-select checkbox, Figma's
         // `_Form Checkbox Button`, decorative since aria-pressed carries the
-        // state: an on-primary box with a primary-border stroke and no check,
-        // then a primary box with an on-primary check.
+        // state: the input fill with the input stroke and no check, then a
+        // selected-bold (Lagoon) box with a check.
         const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
         const toggle = canvas.getByRole('button', { name: 'Mathematics' });
         await expect(toggle).toHaveAttribute('aria-pressed', 'false');
         const offBox = checkboxOf(toggle);
         await expect(offBox, 'a checkbox leads the row').not.toBeNull();
         await expect(getComputedStyle(offBox).backgroundColor, 'unchecked fill')
-            .toBe(tokenColor(canvasElement, '--color-on-primary'));
+            .toBe(tokenColor(canvasElement, '--ds-background-input'));
         await expect(getComputedStyle(offBox).borderTopColor, 'unchecked stroke')
-            .toBe(tokenColor(canvasElement, '--color-primary-border'));
+            .toBe(tokenColor(canvasElement, '--ds-border-input'));
         await expect(offBox.querySelector('svg'), 'no check while off').toBeNull();
         await userEvent.click(toggle);
         await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
@@ -390,12 +390,12 @@ export const MenuKeepsActions = {
         await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
         const onBox = checkboxOf(canvas.getByRole('button', { name: 'Mathematics' }));
         await expect(getComputedStyle(onBox).backgroundColor, 'checked fill')
-            .toBe(tokenColor(canvasElement, '--color-primary'));
+            .toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
         await expect(onBox.querySelector('svg'), 'a check is drawn').not.toBeNull();
         // Waited for: the item's background eases in. The token is read once,
         // outside the wait: its probe element would otherwise wake the wait's
         // own mutation observer on every read.
-        const selectedGround = tokenColor(canvasElement, '--color-primary-state-08');
+        const selectedGround = tokenColor(canvasElement, '--ds-background-selected');
         await waitFor(() => expect(
             getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
             'the item shows the menu\'s selected state',
