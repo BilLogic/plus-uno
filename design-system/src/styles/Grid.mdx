@@ -1,141 +1,260 @@
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 import * as GridStories from './Grid.stories.jsx';
 
 <Meta of={GridStories} />
 
 <Title />
-The grid is the horizontal structure of every PLUS page. There are two, both
-12 columns with gutter 16: the **screen grid**, which modals and overlays size
-from, and the **content grid** inside the surface, which cards, tables, forms
-and text blocks align to. The grid governs **where
-content containers sit**; the [spacing tokens](?path=/docs/foundations-spacing--docs)
-govern everything inside them. PLUS is a **desktop-only product**: the grid
-starts at **MD (768px)** — do not design or build below 768px.
+
+PLUS lays pages out on two 12-column grids with a 16 gutter at every width,
+and page content caps at 1232. The grid decides where containers sit: cards,
+tables, forms and text blocks. The [spacing tokens](?path=/docs/foundations-spacing--docs)
+decide everything inside them. PLUS is desktop only, from 768 up.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-58171"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_frame_layers.scss"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Grid anatomy
+### Overview
 
-Each grid is made of three parts. Columns flex with the screen; gutters stay 16
-at every breakpoint.
+<Canvas of={GridStories.GridAnatomy} sourceState="none" />
 
-<GridStories.GridAnatomy />
+In code, a region lays itself out on the grid rather than reading column
+widths:
+
+```css
+display: grid;
+grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+gap: var(--layout-gutter);
+```
 </div>
 
 <div className="sb-ds-doc-section">
 ### Breakpoints
 
-PLUS uses a **single min-width rule**: each breakpoint is defined only by its
-fixed minimum width, and all column values are computed from the grid at that
-minimum. There are no min/max ranges to design against — between minimums the
-columns simply stretch. This supersedes the old Breakpoint component's
-min–max drag behavior, which is **deprecated**; the grid is now the source of
-truth for how layouts respond.
+Each breakpoint is one minimum width and one mode. The column count stays 12
+and the gutter 16 at every width. The sidebar docks from 1024.
 
-In Figma, breakpoints are **modes** on the `spacing / layout` variable
-collection — Medium (768px) / Large (1024px) / X-Large (1440px). In code they
-are `--breakpoint-md-min` / `-lg-min` / `-xl-min` in
-`design-system/src/tokens/_layout.scss`, and each mode's grid values are in
-`design-system/src/tokens/_frame_layers.scss`.
+<RefTable
+    head={['Mode', 'From', 'Code', 'Sidebar', 'Surface pad', 'Content width', 'Column']}
+    rows={[
+        ['Medium', '768', <C>--breakpoint-md-min</C>, 'closed', '16', '720', '45.33'],
+        ['Large', '1024', <C>--breakpoint-lg-min</C>, 'docked, 240', '16', '744', '47.33'],
+        ['X-Large', '1440', <C>--breakpoint-xl-min</C>, 'docked, 240', '24', '1144', '80.67'],
+    ]}
+/>
 
-<GridStories.Breakpoints />
+Code also defines `--breakpoint-xxl-min` (1920), but nothing switches there.
+Below 768 nothing switches either: the content holds its 720 minimum and the
+surface scrolls sideways. Design at Medium and X-Large at least, so the stretch
+between them is intentional.
 
-The column count is **12 at every breakpoint**. Because PLUS never renders on
-small screens, we never drop to 6 or 2 columns — a 4-column card row at XL is
-still a 4-column card row at MD, just narrower.
+In Figma, a breakpoint is a mode of the `spacing / layout` collection. A frame
+changes breakpoint by switching its mode, never by hand-editing its grid.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Two grids
 
-Neither grid is per-breakpoint: each is bound to `spacing / layout` variables,
-so it adapts when you switch the frame's mode. The **screen grid** lives on the
-Overlay layer only: it spans the screen inside the screen pad, centered and
-capped at 1232, ignores the sidebar, and shows and hides with the overlay.
-Modals and overlays size from it. The **content grid** lives inside the surface
-of the `Pattern/Surface container` component, is what page content aligns to,
-and is the only grid a page frame carries. Code draws neither grid.
+Both grids are 12 columns with a 16 gutter.
 
-<GridStories.TwoGrids />
+- **The screen grid** spans the screen inside the screen pad, centered and
+  capped at 1232. It ignores the sidebar, so an overlay sits in the same place
+  whether the sidebar is docked or closed. Modals and overlays size from it.
+  In Figma it lives on the Overlay layer only, and shows and hides with it.
+- **The content grid** sits inside the surface, after the sidebar and the
+  surface pad take their share. Cards, tables, forms and text blocks align to
+  it, and it is the only grid a page frame carries. At X-Large:
+  1440 − 240 sidebar − 8 container pad − 2 × 24 = 1144.
+
+These tokens change with the screen, so the table gives the value at each
+breakpoint: Medium · Large · X-Large.
+
+<TokenTable
+    valueHeader="MD · LG · XL"
+    rows={[
+        { token: '--layout-columns', figma: 'Grid/columns', value: '12 · 12 · 12' },
+        { token: '--layout-gutter', figma: 'Grid/gutter', value: '16 · 16 · 16' },
+        { token: '--layout-width-screen', figma: 'Screen/width-screen', value: '768 · 1024 · 1440' },
+        { token: '--layout-pad-x-screen', figma: 'Screen/pad-x-screen', value: '24 · 24 · 32' },
+        { token: '--layout-width-column-screen', figma: 'Grid/width-column-screen', value: '45.33 · 66.67 · 88' },
+        { token: '--layout-width-content', figma: 'Content/width-content', value: '720 · 744 · 1144' },
+        { token: '--layout-width-column', figma: 'Grid/width-column', value: '45.33 · 47.33 · 80.67' },
+        { token: '--surface-pad', figma: 'Surface/pad', value: '16 · 16 · 24' },
+    ]}
+/>
 </div>
 
 <div className="sb-ds-doc-section">
-### Fixed and fluid grids
+### Content widths
 
-Grid modes are a deliberate choice per page — pick one and stay with it.
-**Fixed grids** have a maximum width and center themselves inside Main (the
-default). **Fluid grids** expand to fill all available space; use them only
-when content has no natural maximum width, and be careful at very wide viewports
-where text lines get too long.
+Pick one width mode per page and keep it.
 
-<GridStories.FixedFluid />
+<RefTable
+    head={['Mode', 'Width', 'Token', 'Use']}
+    rows={[
+        ['Fixed-wide (default)', '1232', <C>--layout-max-width-content</C>, 'Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1528 screen.'],
+        ['Fixed-narrow', '864', <C>--layout-max-width-reading</C>, 'Long-form reading, so lines stay a comfortable length.'],
+        ['Fluid', 'no cap', '—', 'Canvases, boards and timelines that grow sideways.'],
+        ['Minimum', '720', <C>--layout-min-width-content</C>, 'Narrower than this, the content stays 720 and the surface scrolls sideways; the topbar stays put.'],
+    ]}
+/>
 </div>
 
 <div className="sb-ds-doc-section">
-### Layout regions
+### The frame
 
-PLUS adopts the same region names Atlassian uses for the app shell. The grid
-never spans across SideNav, TopNav, or Panel — those regions have fixed
-dimensions and their own internal spacing. Columns are computed from the width
-of Main after the shell has taken its share.
+The frame (Surface container in Figma, `Frame` in code) draws the shell the
+content grid is measured in: the topbar, then a row with the sidebar and the
+surface.
 
-<GridStories.LayoutRegions />
+<TokenTable
+    valueHeader="MD · LG · XL"
+    rows={[
+        { token: '--layout-height-topbar', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
+        { token: '--layout-width-sidebar', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
+        { token: '--layout-pad-left-container', figma: 'Sidebar/pad-left-container', value: '8 · 0 · 0' },
+        { token: '--surface-pad', figma: 'Surface/pad', value: '16 · 16 · 24' },
+        { token: '--surface-radius', figma: 'Surface/radius', value: '16 · 16 · 16' },
+    ]}
+/>
+
+The container pad and stack are 8. The topbar is 32 with no vertical pad. Below
+1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
+no scrim. An outside click closes it, and the page never reflows. The dock is a
+step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
+744, so cards reflow there while modals keep their width.
 </div>
 
 <div className="sb-ds-doc-section">
-### What aligns to the grid
+### Column spans
 
-- **Content containers align to columns**: cards, tables, forms, images,
-  charts, and text blocks. A container can span any number of columns, and can
-  be centered by leaving symmetric columns empty on either side.
-- **Small elements never align to the grid**: buttons, icons, chips, and
-  avatars are positioned with spacing tokens (`--size-element-*`), not columns.
-- **Only the top level aligns**: inside a container, use spacing tokens for
-  everything. The grid stops at the container's edge.
-- **Overlays float above the content grid**: modals take their width from the
-  screen grid; dropdowns, tooltips, and toasts are positioned relative to their
-  trigger or the screen, not to columns.
-</div>
+A region takes whole columns: span n = n × column + (n − 1) × 16.
 
-<div className="sb-ds-doc-section">
-### Column reference
+<Canvas of={GridStories.ColumnSpans} sourceState="none" />
 
-<GridStories.ColumnReference />
+<RefTable
+    head={['Span', 'Medium', 'Large', 'X-Large']}
+    rows={[
+        ['span 1', '45.33', '47.33', '80.67'],
+        ['span 2', '106.67', '110.67', '177.33'],
+        ['span 3', '168', '174', '274'],
+        ['span 4', '229.33', '237.33', '370.67'],
+        ['span 6', '352', '364', '564'],
+        ['span 8', '474.67', '490.67', '757.33'],
+        ['span 12', '720', '744', '1144'],
+    ]}
+/>
+
+Cards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum
+width: `--card-min-width-sm` 224, `-md` 304, `-lg` 480. In a section narrower
+than 12 columns, only counts that divide its span apply. A split section keeps
+its main column at least 480 (`--section-min-width-main`) and its side column
+at least 224 (`--section-min-width-side`); below those, they stack.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Modal widths
 
-<GridStories.ModalWidths />
+A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its
+own pad of 16 on each side: width = n × column + (n − 1) × 16 + 2 × 16. It
+grows with the screen between breakpoints, stops past a 1280 screen, never
+shrinks below its Medium width, ignores the sidebar, and never comes closer
+than 16 to the side of the screen.
+
+<TokenTable
+    valueHeader="MD · LG · XL"
+    rows={[
+        { token: '--layout-width-modal-sm', figma: 'Modal/width-modal-sm', value: '384 · 512 · 640' },
+        { token: '--layout-width-modal-md', figma: 'Modal/width-modal-md', value: '507 · 677 · 848' },
+        { token: '--layout-width-modal-lg', figma: 'Modal/width-modal-lg', value: '629 · 843 · 1056' },
+        { token: '--overlay-pad-x', figma: 'Overlay/pad-x', value: '16' },
+        { token: '--overlay-pad-y', figma: 'Overlay/pad-y', value: '64' },
+    ]}
+/>
 </div>
 
 <div className="sb-ds-doc-section">
-### Grid inside the app shell
+### Usage
 
-<GridStories.ShellMath />
+The grid owns where top-level containers sit; spacing owns everything inside
+them.
+
+**Keep the gutter 16 at every width.** Columns flex with the screen; the
+gutter never changes.
+
+<Canvas of={GridStories.Gutter} sourceState="none" />
+
+**Span whole columns.** A content container spans whole columns (3, 4, 6 or
+12) and can be centered by leaving the same number of columns empty on each
+side. Content never bleeds into a gutter or into the surface pad.
+
+<Canvas of={GridStories.SpanWholeColumns} sourceState="none" />
+
+**Size modals from the screen grid.** Pass `sm`, `md` or `lg`. The width comes
+from screen-grid columns, so a modal lines up with the page whenever the
+sidebar is closed.
+
+<Canvas of={GridStories.ModalFromScreenGrid} sourceState="none" />
+
+**Cap reading text at 864.** Long-form text uses the reading cap, so lines stay
+readable. Structured content, such as dashboards and tables, uses the 1232 cap.
+
+<Canvas of={GridStories.ReadingCap} sourceState="none" />
+
+**Align containers, not their parts.** Only top-level containers align to
+columns: cards, tables, forms, images, charts and text blocks. Inside a
+container the grid stops and spacing tokens take over, so buttons, icons, tags
+and avatars never stretch to columns. Cards have no inner grid.
+
+<Canvas of={GridStories.AlignContainers} sourceState="none" />
+
+**Change breakpoint by mode.** In Figma, use one page frame and switch its
+`spacing / layout` mode: the grid, the widths and the sidebar follow together.
+Never keep a copy of the page per breakpoint with hand-edited grids. The copies
+drift, and the variable bindings stop working.
+
+**Put the screen grid on the Overlay layer only.** A page frame carries only
+the content grid.
+
+**Design from 768 up.** PLUS has no small-screen tier. Never design below 768,
+and never drop to 6 or 2 columns: a four-card row at X-Large is still a
+four-card row at Medium, just narrower.
 </div>
 
 <div className="sb-ds-doc-section">
-### Do's and don'ts
+### Accessibility
 
-<GridStories.DosAndDonts />
+- Long-form text stays under the 864 reading cap, so a line is easy to follow
+  to its end and back.
+- Content never sits under the sidebar or the topbar. Below 1024 the sidebar
+  opens over the page and closes on an outside click or Escape, and focus
+  returns to its toggle.
+- At the 720 minimum the surface scrolls sideways instead of squeezing
+  content, so text never overlaps or clips when the page is zoomed.
 </div>
 
+<div className="sb-ds-doc-section">
+### Legacy layout tokens
+
+The older grid had 12 columns with an 8 gutter, on a 672 · 748 · 1164 content
+width: in code `--layout-grid-gap` with `--col-1` to `--col-12`, and in Figma
+the `size / layout` collection and the Grid styles. New work uses the tokens above.
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the padding and gaps inside a region, see **Spacing** — the grid owns columns, spacing owns everything between.
-- For the Main content region the grid is measured from, use `Frame`.
-- For a region inside it, use `Section`.
+- **Spacing**, for the pad, stack and radius inside each container.
+- **Size roles**, for the sizes of the parts inside a container.
+- **Frame**, **Section**, **Card** and **Modal** in Patterns, which sit on these grids.
+- **Elevation**, for which surface each layer sits on.
 
 </div>
 

@@ -1,0 +1,110 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import * as RadiusStories from './Radius.stories.jsx';
+
+<Meta of={RadiusStories} />
+
+<Title />
+
+Radius is the roundness of a box's corners. Each component sets its own, and
+it does not change with where the component sits. An **Item**, a control with
+a fixed height such as a button or a field, takes its height ÷ 4. A container
+takes its pattern's radius. A part inset inside a parent takes the parent's
+radius minus the inset.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-55024"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_scales.scss"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### The rules
+
+<Canvas of={RadiusStories.Rules} sourceState="none" />
+
+<RefTable
+    head={['Rule', 'Values', 'Where']}
+    rows={[
+        ['Items: height ÷ 4', '24 → 6 · 32 → 8', <><C>--element-radius-item-sm</C> and <C>-md</C>: buttons, fields, tabs, menu rows</>],
+        ['Containers keep their own radius', 'Surface 16 · Card 16 (sm 12) · Modal 12 · Popup and flag 12 · Table 8 · Tooltip 6', 'The pattern’s radius token, whatever it sits in'],
+        ['Inset parts: the parent’s radius minus the inset', 'Menu 12, rows inset 4 → 8 · a menu of 24 rows → 10', 'Menu rows, a segmented control’s thumb'],
+        ['Flush parts are clipped', 'No radius of their own', 'A table’s head row, a card’s image: the parent clips them'],
+        ['Pills and circles are fully round', <C>--element-radius-full</C>, 'Toggle, Radio, Avatar, pill Tag, Progress bar'],
+        ['The focus ring sits 2 outside', 'Control radius + 2: 8 → 10', 'Every focusable control'],
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### Tokens
+
+Element radii are for parts and Items. Each pattern carries its own.
+
+<TokenTable
+    rows={[
+        { token: '--element-radius-sm', figma: 'Element/radius-sm', use: 'A part inside a component' },
+        { token: '--element-radius-md', figma: 'Element/radius-md', use: 'A part inside a component' },
+        { token: '--element-radius-lg', figma: 'Element/radius-lg', use: 'A part inside a component' },
+        { token: '--element-radius-item-sm', figma: 'Element/radius-item-sm', use: 'Compact 24 Items' },
+        { token: '--element-radius-item-md', figma: 'Element/radius-item-md', use: 'Default 32 Items' },
+        { token: '--element-radius-full', figma: 'Element/radius-full', use: 'Pills and circles' },
+    ]}
+/>
+
+<TokenTable
+    rows={[
+        { token: '--surface-radius', figma: 'Surface/radius' },
+        { token: '--card-radius', figma: 'Card/radius' },
+        { token: '--card-radius-sm', figma: 'Card/radius-sm', use: 'A small card, or a well inside a card' },
+        { token: '--modal-radius', figma: 'Modal/radius' },
+        { token: '--popover-radius', figma: 'Popover/Popup and flag/radius' },
+        { token: '--popover-radius-menu-sm', figma: 'Popover/Menu/radius-menu-sm', use: 'A menu of 24 rows' },
+        { token: '--popover-radius-menu-md', figma: 'Popover/Menu/radius-menu-md', use: 'A menu of 32 rows' },
+        { token: '--popover-radius-tooltip', figma: 'Popover/Tooltip/radius-tooltip' },
+        { token: '--table-radius', figma: 'Table/radius', use: 'A framed table only' },
+        { token: '--tile-radius-sm', figma: 'Tile/radius-sm', use: 'The smallest tiles; Tile sets the rest from its size' },
+    ]}
+/>
+
+Border widths sit beside radius: strokes are 1 at rest, and 2 for selected
+and focused.
+
+<TokenTable
+    rows={[
+        { token: '--border-default', figma: 'Border/default' },
+        { token: '--border-selected', figma: 'Border/selected' },
+        { token: '--border-focused', figma: 'Border/focused' },
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### Do and don't
+
+<Canvas of={RadiusStories.InsetRows} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- The focus ring follows the control's shape at its radius + 2, so it reads
+  as belonging to the control. Never clip it with the parent's radius or
+  overflow.
+- Radius never carries meaning on its own. A pill and a square tag are the
+  same component at two shapes, not two states.
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- **Spacing**, for the pad inside each box.
+- **Size roles**, for the Item heights that set an Item's radius.
+- **Tile**, for the radius of each tile size.
+
+</div>
+
+</div>
