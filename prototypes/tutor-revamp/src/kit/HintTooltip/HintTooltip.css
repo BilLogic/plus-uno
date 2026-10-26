@@ -1,0 +1,46 @@
+.tr-hint {
+    position: relative;
+    display: inline-flex;
+}
+
+.tr-hint__tip {
+    position: absolute;
+    left: var(--tr-hint-at, 50%);
+    z-index: 6;
+    padding: var(--space-025) var(--space-050);
+    border-radius: var(--radius-0375);
+    background: var(--ds-background-neutral-bold);
+    color: var(--ds-text-inverse);
+    font: var(--body-small);
+    white-space: nowrap;
+    box-shadow: var(--ds-shadow-overlay);
+    pointer-events: none;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 150ms cubic-bezier(.2, .8, .2, 1), visibility 0s linear 150ms;
+}
+
+.tr-hint__tip--top { bottom: calc(100% + var(--space-050)); }
+.tr-hint__tip--bottom { top: calc(100% + var(--space-050)); }
+
+.tr-hint__tip::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    margin-left: calc(-1 * var(--space-025));
+    border: var(--space-025) solid transparent;
+}
+
+.tr-hint__tip--top::after { top: 100%; border-top-color: var(--ds-background-neutral-bold); }
+.tr-hint__tip--bottom::after { bottom: 100%; border-bottom-color: var(--ds-background-neutral-bold); }
+
+.tr-hint--open > .tr-hint__tip {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 150ms cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tr-hint__tip { transition: none; }
+}

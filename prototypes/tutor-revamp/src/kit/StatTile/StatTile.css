@@ -1,0 +1,59 @@
+.tr-stat-tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-025);
+    min-width: 0;
+    padding: var(--space-100) var(--space-125) var(--space-125);
+    border-radius: var(--card-radius);
+    background: var(--tr-tile-bg, var(--ds-surface-container));
+    color: var(--ds-text);
+    text-decoration: none;
+}
+.tr-stat-tile--teal { --tr-tile-bg: var(--ds-background-accent-teal-subtlest); --tr-tile-icon: var(--ds-text-accent-teal); }
+.tr-stat-tile--yellow { --tr-tile-bg: var(--ds-background-accent-yellow-subtlest); --tr-tile-icon: var(--ds-text-accent-yellow); }
+.tr-stat-tile--blue { --tr-tile-bg: var(--ds-background-accent-blue-subtlest); --tr-tile-icon: var(--ds-text-accent-blue); }
+.tr-stat-tile--green { --tr-tile-bg: var(--ds-background-accent-green-subtlest); --tr-tile-icon: var(--ds-text-accent-green); }
+.tr-stat-tile--purple { --tr-tile-bg: var(--ds-background-accent-purple-subtlest); --tr-tile-icon: var(--ds-text-accent-purple); }
+
+.tr-stat-tile--link {
+    transition: box-shadow 200ms cubic-bezier(.2, .8, .2, 1), transform 200ms cubic-bezier(.2, .8, .2, 1);
+}
+.tr-stat-tile--link:hover {
+    color: var(--ds-text);
+    box-shadow: var(--ds-shadow-raised);
+    transform: translateY(-1px);
+}
+.tr-stat-tile--link:focus-visible {
+    outline: 2px solid var(--ds-border-focused);
+    outline-offset: 2px;
+}
+
+.tr-stat-tile__label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-050);
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+.tr-stat-tile__label > i {
+    font-size: var(--space-0875);
+    color: var(--tr-tile-icon, var(--ds-icon-subtle));
+}
+.tr-stat-tile__value {
+    margin-top: var(--space-100);
+    font: var(--metric-large);
+    font-variant-numeric: tabular-nums;
+}
+.tr-stat-tile__value small {
+    margin-left: var(--space-025);
+    font: var(--metric-small);
+    color: var(--ds-text-subtle);
+}
+.tr-stat-tile__meter { display: block; margin: var(--space-0375) 0 var(--space-0125); }
+.tr-stat-tile__caption { font: var(--body-small); color: var(--ds-text-subtle); }
+
+@media (prefers-reduced-motion: reduce) {
+    .tr-stat-tile--link { transition: none; }
+    .tr-stat-tile--link:hover { transform: none; }
+}
+.tr-stat-tile__meter .tr-goal-meter { background: var(--ds-surface-raised); }

@@ -61,6 +61,17 @@
   to = "/prototypes/post-session-reflection/index.html"
   status = 200
 
+# Branch experiment: tutor revamp prototype (shell, kit and screens)
+[[redirects]]
+  from = "/prototypes/tutor-revamp"
+  to = "/prototypes/tutor-revamp/"
+  status = 302
+
+[[redirects]]
+  from = "/prototypes/tutor-revamp/*"
+  to = "/prototypes/tutor-revamp/index.html"
+  status = 200
+
 # SPA catch-all for live-app routes (must come AFTER Storybook + demo redirects).
 [[redirects]]
   from = "/*"

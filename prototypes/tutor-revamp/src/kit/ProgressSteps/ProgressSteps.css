@@ -1,0 +1,11 @@
+.tr-progress-steps { display: flex; gap: 2px; width: 100%; }
+.tr-progress-steps__seg {
+    flex: 1;
+    height: var(--space-025);
+    border-radius: var(--radius-0125);
+    background: var(--ds-background-neutral);
+}
+.tr-progress-steps__seg--done { background: var(--ds-chart-brand); }
+.tr-progress-steps__seg--current {
+    background: linear-gradient(90deg, var(--ds-chart-brand) 50%, var(--ds-background-neutral) 50%);
+}
