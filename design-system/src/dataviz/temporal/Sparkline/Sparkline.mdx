@@ -1,0 +1,69 @@
+import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+
+import * as SparklineStories from './Sparkline.stories.jsx';
+
+import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SparklineStories} />
+
+<Title />
+
+A sparkline is a word-sized line chart: the **shape of a trend**, set beside the number it belongs to.
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+### Overview
+A sparkline draws one 2px line with no axes, grid or legend, and marks the latest value. It uses the same theme as the line chart, so it follows every color mode.
+
+<Primary />
+
+---
+
+### When to Use
+
+<table>
+  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
+  <tbody>
+    <tr><td>A trend beside a KPI or stat</td><td>✅ Ideal</td></tr>
+    <tr><td>Many small trends in a table row</td><td>✅ Good</td></tr>
+    <tr><td>Reading exact values</td><td>❌ Use Line Chart</td></tr>
+    <tr><td>Comparing several series</td><td>❌ Use Line Chart</td></tr>
+  </tbody>
+</table>
+
+---
+
+### Color
+
+The line takes `--ds-chart-brand`, the color for a chart with one series. When the trend itself means a status, set `tone` to `success`, `warning`, `danger` or `information`, and say the status in the text beside it too: color alone never carries it. The marker on the latest value is ringed in `--ds-border-inverse`, so it stands off the line in light and dark.
+
+---
+
+### How to Use
+
+**Best Practices:**
+✅ Put the current value beside it, in text
+✅ Name it with `label` for screen readers
+✅ Keep the brand tone unless the trend means a status
+
+**Avoid:**
+❌ More than one line
+❌ Axes, grids or legends: use a line chart instead
+
+---
+
+### Interactive playground
+
+<DocsInteractivePlayground of={SparklineStories.Interactive} />
+
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For values someone reads off an axis, or several series, use `LineChart`.
+- For a single headline number with no trend, use a stat, not a chart.
+
+</div>
+
+</div>

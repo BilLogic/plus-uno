@@ -16,10 +16,10 @@ const refs = (key, name) => {
 };
 const hex = (key, name, mode = 'light') => buildPlan(key).semantics.rows.find((row) => row.name === name)[mode];
 
-test('523 tokens, every value a primitive reference', () => {
+test('533 tokens, every value a primitive reference', () => {
   const { rows } = buildPlan('A').semantics;
-  assert.equal(rows.length, 523);
-  assert.equal(new Set(rows.map((r) => r.name)).size, 523);
+  assert.equal(rows.length, 533);
+  assert.equal(new Set(rows.map((r) => r.name)).size, 533);
   for (const r of rows) {
     for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
       assert.match(r[`${m}_ref`], /^(transparent|[a-zA-Z]+\.[0-9]+(a[0-9]+)?)$/, `${r.name} ${m}`);
@@ -46,8 +46,18 @@ test('checked controls follow brand.bold; tags step one further; SMART aliases i
   assert.deepEqual(refs('A', 'color.text.accent.blue'), ['blue.850', 'blue.250', 'blue.1000', 'blue.100']);
   assert.deepEqual(refs('A', 'color.text.smart.relationship'), refs('A', 'color.text.accent.magenta'));
   assert.deepEqual(refs('A', 'color.background.accent.brown.subtler'), ['brown.200', 'brown.900', 'brown.200', 'brown.900']);
-  assert.deepEqual(refs('A', 'color.chart.categorical.1'), ['blue.600', 'blue.400', 'blue.850', 'blue.300']);
+  assert.deepEqual(refs('A', 'color.chart.categorical.1'), ['blue.600', 'blue.600', 'blue.850', 'blue.400']);
+  assert.deepEqual(refs('A', 'color.chart.categorical.4'), ['orange.500', 'orange.500', 'orange.800', 'orange.300']);
   assert.deepEqual(refs('A', 'color.background.danger.subtle'), ['red.300', 'red.800', 'red.300', 'red.900']);
+});
+
+test('SMART chart series alias their accent hue at the step that keeps S-M-A-R-T neighbors apart', () => {
+  assert.deepEqual(refs('A', 'color.chart.smart.social-emotional'), refs('A', 'color.chart.orange.bold'));
+  assert.deepEqual(refs('A', 'color.chart.smart.mastering-content'), refs('A', 'color.chart.teal.boldest'));
+  assert.deepEqual(refs('A', 'color.chart.smart.advocacy'), refs('A', 'color.chart.lime.bold'));
+  assert.deepEqual(refs('A', 'color.chart.smart.relationship'), refs('A', 'color.chart.magenta.boldest'));
+  assert.deepEqual(refs('A', 'color.chart.smart.technology-tools'), refs('A', 'color.chart.brown.bold'));
+  assert.deepEqual(refs('A', 'color.chart.smart.advocacy.hovered'), refs('A', 'color.chart.lime.bold.hovered'));
 });
 
 test('a plan changes hex values, never references', () => {

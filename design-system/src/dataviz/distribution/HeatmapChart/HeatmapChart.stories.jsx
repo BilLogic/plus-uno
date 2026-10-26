@@ -1,4 +1,5 @@
 import React from 'react';
+import { HUES } from '@/dataviz/palette';
 import HeatmapChart from './HeatmapChart';
 
 export default {
@@ -19,8 +20,8 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 
 ### How to Read
 - **Rows/Columns** = categories being compared
-- **Cell color** = value intensity (darker = higher)
-- **Color scale** = reference for interpreting values
+- **Cell color** = value intensity (the strongest tone is the biggest value: darker in light mode, lighter in dark)
+- **Color scale** = one hue's sequential ramp (\`hue\`), or a diverging ramp around a neutral midpoint (\`diverging\`)
 - Look for **patterns** in color distribution
 
 ---
@@ -58,7 +59,7 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 ✅ Add cell values if space permits
 
 **Avoid:**
-❌ Rainbow color scales
+❌ Rainbow color scales, or a red-to-green diverging pair
 ❌ Too many categories
 ❌ Missing legends
                 `
@@ -70,8 +71,8 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
         yCategories: { control: 'object', description: 'Categories for Y axis' },
         data: { control: 'object', description: 'Array of [x, y, value] points' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        minColor: { control: 'color', description: 'Color for minimum values' },
-        maxColor: { control: 'color', description: 'Color for maximum values' }
+        hue: { control: 'select', options: HUES, description: "The sequential ramp's hue" },
+        diverging: { control: 'object', description: 'Two hues, [low, high], for a diverging ramp' }
     }
 };
 
@@ -94,7 +95,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Weekly Activity Heatmap</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows user activity patterns by day and hour.
             </p>
             <HeatmapChart {...activityData} />
@@ -110,8 +111,7 @@ export const Interactive = {
         xCategories: ['A', 'B', 'C', 'D'],
         yCategories: ['Row 1', 'Row 2', 'Row 3'],
         height: 300,
-        minColor: '#c3e8ff',
-        maxColor: '#0066cc',
+        hue: 'blue',
         data: [
             [0, 0, 10], [0, 1, 20], [0, 2, 30],
             [1, 0, 40], [1, 1, 50], [1, 2, 60],

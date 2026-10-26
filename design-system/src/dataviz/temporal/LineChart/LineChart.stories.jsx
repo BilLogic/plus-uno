@@ -55,7 +55,8 @@ A line chart displays data as connected points, ideal for showing **trends over 
 **Best Practices:**
 ✅ Use consistent time intervals
 ✅ Limit to 4-5 lines maximum
-✅ Use distinct colors/styles
+✅ Let the theme color the lines: one line takes the brand chart color, several take the categorical colors in order
+✅ Label lines directly or add a dash style: line order cannot be controlled, so color alone is not enough
 ✅ Include legend for multiple series
 
 **Avoid:**
@@ -91,7 +92,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Monthly Active Users</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Tracks user growth over time with year-over-year comparison.
             </p>
             <LineChart {...usersData} />

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { BRAND, CHROME } from '@/dataviz/palette';
 
 /**
  * HistogramChart Component
@@ -42,8 +43,9 @@ const HistogramChart = ({
         }],
         plotOptions: {
             histogram: {
-                color: chartTheme.colors[0],
-                borderColor: chartTheme.colors[0],
+                color: BRAND,
+                // Adjacent bins stand apart, as Atlassian separates adjacent chart colors.
+                borderColor: CHROME.separator,
                 binWidth: binWidth
             }
         },

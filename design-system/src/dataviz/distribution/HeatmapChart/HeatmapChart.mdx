@@ -21,8 +21,8 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 
 ### How to Read
 - **Rows/Columns** = categories being compared
-- **Cell color** = value intensity (darker = higher)
-- **Color scale** = reference for interpreting values
+- **Cell color** = value intensity (the strongest tone is the biggest value: darker in light mode, lighter in dark)
+- **Color scale** = one hue's sequential ramp (`hue`), or a diverging ramp around a neutral midpoint (`diverging`)
 - Look for **patterns** in color distribution
 
 ---
@@ -66,7 +66,7 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 ✅ Add cell values if space permits
 
 **Avoid:**
-❌ Rainbow color scales
+❌ Rainbow color scales, or a red-to-green diverging pair
 ❌ Too many categories
 ❌ Missing legends
 

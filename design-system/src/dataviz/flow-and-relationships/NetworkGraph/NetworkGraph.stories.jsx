@@ -105,7 +105,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Concept Map</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows relationships between math concepts.
             </p>
             <NetworkGraph {...conceptMapData} />
@@ -113,7 +113,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>Social Network</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows connections between people.
             </p>
             <NetworkGraph {...socialNetworkData} height={400} />

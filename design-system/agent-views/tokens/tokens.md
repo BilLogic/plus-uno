@@ -824,6 +824,16 @@ The Atlassian-shaped color set, generated from a plan into `design-system/src/to
 --ds-chart-red-bolder-hovered
 --ds-chart-red-boldest
 --ds-chart-red-boldest-hovered
+--ds-chart-smart-advocacy
+--ds-chart-smart-advocacy-hovered
+--ds-chart-smart-mastering-content
+--ds-chart-smart-mastering-content-hovered
+--ds-chart-smart-relationship
+--ds-chart-smart-relationship-hovered
+--ds-chart-smart-social-emotional
+--ds-chart-smart-social-emotional-hovered
+--ds-chart-smart-technology-tools
+--ds-chart-smart-technology-tools-hovered
 --ds-chart-success
 --ds-chart-success-bold
 --ds-chart-success-bold-hovered

@@ -54,6 +54,40 @@ test('chart color vision: two series a protan reads as one fail', () => {
   assert.ok(failing(set(sem, 'color.chart.categorical.2', 'light', one)).includes('chart color vision'));
 });
 
+test('chart color vision: series 5 and 6 a protan reads as one fail, in dark too', () => {
+  const sem = fresh();
+  const five = sem.rows.find((r) => r.name === 'color.chart.categorical.5').dark;
+  assert.ok(failing(set(sem, 'color.chart.categorical.6', 'dark', five)).includes('chart color vision'));
+});
+
+test('chart color vision: neighboring SMART subjects that read as one fail', () => {
+  const sem = fresh();
+  const s = sem.rows.find((r) => r.name === 'color.chart.smart.social-emotional').light;
+  assert.ok(failing(set(sem, 'color.chart.smart.mastering-content', 'light', s)).includes('chart color vision'));
+});
+
+test('chart color vision: neighbors too alike for full color vision fail', () => {
+  const sem = fresh();
+  // the same hue one step on: far enough apart under simulation, too close for anyone
+  const one = sem.rows.find((r) => r.name === 'color.chart.categorical.1.hovered').light;
+  assert.ok(failing(set(sem, 'color.chart.categorical.2', 'light', one)).includes('chart color vision'));
+});
+
+test('chart contrast: a series under 3:1 on a surface fails', () => {
+  assert.ok(failing(set(fresh(), 'color.chart.categorical.3', 'dark', '#2a2a2a')).includes('chart contrast'));
+  assert.ok(failing(set(fresh(), 'color.chart.success', 'light_ic', '#9fd0a0')).includes('chart contrast'));
+});
+
+test('chart ramps: a sequential step that does not move away from the surface fails', () => {
+  const sem = fresh();
+  const bold = sem.rows.find((r) => r.name === 'color.chart.teal.bold').dark;
+  assert.ok(failing(set(sem, 'color.chart.teal.bolder', 'dark', bold)).includes('chart ramps'));
+});
+
+test('chart ramps: a diverging midpoint further from the surface than an arm fails', () => {
+  assert.ok(failing(set(fresh(), 'color.background.accent.gray.subtler', 'light', '#333333')).includes('chart ramps'));
+});
+
 test('teal vs Lagoon: an accent teal on the brand ramp fails', () => {
   const sem = fresh();
   sem.palette.teal = structuredClone(sem.palette.lagoon);

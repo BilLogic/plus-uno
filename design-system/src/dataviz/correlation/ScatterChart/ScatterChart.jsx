@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * ScatterChart Component
@@ -16,10 +17,10 @@ const ScatterChart = ({
 }) => {
     // data: keys of { name, data: [[x,y], [x,y]...] }
 
-    const seriesWithTheme = data.map((s, i) => ({
+    const seriesWithTheme = data.map((s, i, all) => ({
         ...s,
         type: 'scatter',
-        color: s.color || chartTheme.colors[i % chartTheme.colors.length]
+        color: s.color || seriesColor(i, all.length)
     }));
 
     const options = {
@@ -54,7 +55,7 @@ const ScatterChart = ({
                     states: {
                         hover: {
                             enabled: true,
-                            lineColor: 'rgb(100,100,100)'
+                            lineColor: 'var(--ds-border-bold)'
                         }
                     }
                 },

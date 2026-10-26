@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { BRAND } from '@/dataviz/palette';
 
 /**
  * AreaRangeChart Component
@@ -41,7 +42,7 @@ const AreaRangeChart = ({
         series: [{
             name: 'Range',
             data: data,
-            color: chartTheme.colors[0],
+            color: BRAND,
             fillOpacity: 0.3,
             lineWidth: 0,
             marker: {

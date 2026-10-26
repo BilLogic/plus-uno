@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * RadarChart Component
@@ -26,10 +27,10 @@ const RadarChart = ({
 }) => {
     // Merge theme colors into series if not provided
     // Handle dashStyle and type for mixed area/line charts
-    const seriesWithTheme = series.map((s, i) => {
+    const seriesWithTheme = series.map((s, i, all) => {
         const baseSeries = {
             ...s,
-            color: s.color || chartTheme.colors[i % chartTheme.colors.length],
+            color: s.color || seriesColor(i, all.length),
             pointPlacement: 'on'
         };
         
@@ -85,7 +86,7 @@ const RadarChart = ({
                 const categoryIndex = this.pos;
                 const iconClass = categoryIcons[categoryIndex];
                 if (iconClass) {
-                    return `<i class="fa-solid ${iconClass}" style="font-size: 14px; color: var(--color-on-surface-variant, #3f484a);" aria-hidden="true"></i>`;
+                    return `<i class="fa-solid ${iconClass}" style="font-size: 14px; color: var(--ds-icon-subtle);" aria-hidden="true"></i>`;
                 }
                 return this.value ?? '';
             },
@@ -97,7 +98,7 @@ const RadarChart = ({
             formatter: function() {
                 const categoryIndex = this.pos;
                 const category = categories[categoryIndex];
-                let color = 'var(--color-on-surface)';
+                let color = 'var(--ds-text)';
                 
                 // Handle object mapping (category name -> color)
                 if (Array.isArray(categoryColors)) {
@@ -181,7 +182,7 @@ const RadarChart = ({
                         fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
                         fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
                         fontFamily: 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)',
-                        color: 'var(--color-on-surface, #191c1e)',
+                        color: 'var(--ds-text)',
                         textOutline: 'none'
                     },
                     allowOverlap: true,
@@ -196,7 +197,7 @@ const RadarChart = ({
                         fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
                         fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
                         fontFamily: 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)',
-                        color: 'var(--color-on-surface, #191c1e)',
+                        color: 'var(--ds-text)',
                         textOutline: 'none'
                     },
                     allowOverlap: true,

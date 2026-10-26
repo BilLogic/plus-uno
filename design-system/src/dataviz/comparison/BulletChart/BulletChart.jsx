@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { BRAND } from '@/dataviz/palette';
 
 /**
  * BulletChart Component
@@ -33,15 +34,15 @@ const BulletChart = ({
             plotBands: [{
                 from: 0,
                 to: 60,
-                color: 'var(--color-danger-container)'
+                color: 'var(--ds-background-danger)'
             }, {
                 from: 60,
                 to: 80,
-                color: 'var(--color-warning-container)'
+                color: 'var(--ds-background-warning)'
             }, {
                 from: 80,
                 to: 100,
-                color: 'var(--color-success-container)'
+                color: 'var(--ds-background-success)'
             }],
             max: 100
         },
@@ -53,10 +54,11 @@ const BulletChart = ({
             bullet: {
                 pointPadding: 0.25,
                 borderWidth: 0,
-                color: chartTheme.colors[0],
+                color: BRAND,
                 targetOptions: {
                     width: '140%',
-                    color: 'var(--color-on-surface)'
+                    // The target is a reference mark: the strongest gray, which reads on every band.
+                    color: 'var(--ds-chart-gray-boldest)'
                 }
             }
         },

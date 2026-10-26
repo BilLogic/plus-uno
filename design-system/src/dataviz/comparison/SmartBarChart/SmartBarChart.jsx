@@ -43,7 +43,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
             labels: {
                 style: {
                     fontSize: 'var(--font-size-body3, 12px)',
-                    color: 'var(--color-on-surface-variant, #3f484a)' // Use token
+                    color: 'var(--ds-text-subtle)'
                 }
             },
             lineWidth: 0,
@@ -84,7 +84,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
             {
                 name: 'Background',
                 data: data.map(() => 100),
-                color: 'var(--color-surface-container-high, #dde3e5)', // Use proper token
+                color: 'var(--ds-background-neutral)', // the track
                 enableMouseTracking: false,
                 pointPadding: 0.3, // Match width of foreground
             },
