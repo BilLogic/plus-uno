@@ -3,12 +3,17 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CATEGORICAL, CHROME } from '@/dataviz/palette';
+import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
 /**
  * StackedBarChart Component
  * Displays a stacked bar chart using Highcharts.
  */
 const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
+    // Labels sit on their segment, so their ink is resolved per mode: re-render when it changes.
+    useColorModeKey();
+    const inks = textInks();
     // data: Array of { segments: [{ value, color, height (%), textColor }] }
     // dates: Array of strings (x-axis categories)
 
@@ -34,7 +39,8 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             // We need a numeric Y value. If height is implicit % of total, we can use it.
             return {
                 y: parseFloat(segment.height), // Parse "25%" -> 25
-                color: segment.color,
+                // A segment without a color takes its series' categorical color.
+                color: segment.color || CATEGORICAL[i % CATEGORICAL.length],
                 // Custom data label value to check later
                 customValue: segment.value,
                 textColor: segment.textColor
@@ -82,10 +88,10 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             labels: {
                 style: {
                     fontSize: 'var(--font-size-body3, 12px)',
-                    color: 'var(--color-on-surface-variant, #3f484a)'
+                    color: 'var(--ds-text-subtle)'
                 }
             },
-            lineColor: 'var(--color-outline-variant, #bec8ca)',
+            lineColor: 'var(--ds-border)',
             lineWidth: 1,
             tickWidth: 0
         },
@@ -94,17 +100,17 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             max: calculatedMax, // Set max dynamically based on data
             reversedStacks: false, // Ensure first series (Green) is at the bottom
             lineWidth: 1,
-            lineColor: 'var(--color-outline-variant, #bec8ca)',
+            lineColor: 'var(--ds-border)',
             tickPositions: tickPositions, // Dynamic ticks based on calculated max
             title: { text: null },
             gridLineWidth: 1,
             gridLineDashStyle: 'Dot', // Dotted lines as per screenshot
-            gridLineColor: '#C4C7C5',
+            gridLineColor: 'var(--ds-border)',
             labels: {
                 style: {
                     fontSize: '12px',
                     fontFamily: 'Merriweather Sans',
-                    color: '#3F484A'
+                    color: 'var(--ds-text-subtle)'
                 }
             }
         },
@@ -117,18 +123,20 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
                     formatter: function () {
                         // Only show if value > 0 and fits?
                         if (this.point.y < 1) return null;
-                        return this.point.customValue;
+                        // The text ink that reads best on this segment, unless the data names one.
+                        const ink = this.point.textColor || inkFor(resolveColor(this.point.color), inks);
+                        return `<span style="color: ${ink}">${this.point.customValue}</span>`;
                     },
                     style: {
-                        color: 'white',
                         textOutline: 'none',
                         fontWeight: '300',
                         fontSize: '12px',
                         fontFamily: 'Merriweather Sans'
                     }
                 },
-                borderWidth: 0,
-                // Adjust bar width if needed
+                // A gap between stacked segments, as Atlassian separates adjacent chart colors.
+                borderWidth: 2,
+                borderColor: CHROME.separator,
                 pointWidth: 48 // Match 48px from visual analysis
             }
         },
@@ -151,7 +159,7 @@ StackedBarChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape({
         segments: PropTypes.arrayOf(PropTypes.shape({
             value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-            color: PropTypes.string.isRequired,
+            color: PropTypes.string,
             height: PropTypes.string.isRequired, // '25%'
             textColor: PropTypes.string
         })).isRequired

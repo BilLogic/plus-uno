@@ -1,0 +1,13 @@
+// The card title's type, defined once: a Heading/xsmall 14 container title at
+// every heading level, with no margin. `Card` (`.plus-card-title` in
+// `main.scss`) and `PatternCard` (`.plus-pattern-card-title`) both include it,
+// so a size change is this one edit. The color stays with each card, since
+// each sets its own text color.
+//
+//     .plus-x-title {
+//         @include card-title-type;
+//     }
+@mixin card-title-type {
+    margin: 0;
+    font: var(--heading-xsmall);
+}

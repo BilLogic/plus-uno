@@ -5,7 +5,7 @@
 // Point COLOR_REFERENCE_DIR at the folder that holds `generator/` and `out/` to
 // run it from another checkout.
 //
-// Four departures from the reference are deliberate, and the comparison is
+// Five departures from the reference are deliberate, and the comparison is
 // shaped around them:
 // - PLUS adds tokens the reference never had: `color.background.smart.<subject>.subtle`,
 //   the mid-strength SMART fill for illustration bodies. They are dropped from
@@ -22,6 +22,10 @@
 //   more variables, with increased-contrast blocks. So every other reference
 //   declaration must appear in our block of the same selector, triplets
 //   compared as numbers.
+// - The chart series moved after the reference was cut: the categorical order
+//   and steps, the SMART chart series, and the gray chart mark in dark
+//   increased contrast (`semantics.mjs` § charts). Those tokens are left out
+//   of every comparison; `check:color-system` holds them instead.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -47,6 +51,19 @@ const withoutPlusOnly = (spec) => ({
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
 });
 /** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
+const CHART_DEPARTURE = /^color\.chart\.(categorical|smart)\.|^color\.chart\.(neutral|gray\.bold)$/;
+const isDeparture = (name) => CHART_DEPARTURE.test(name);
+const keptRows = (rows) => rows.filter((r) => !isDeparture(r.name));
+/** A Figma spec without the departed variables (`color/chart/neutral/default` is `color.chart.neutral`). */
+const keptSpec = (spec) => ({
+  ...spec,
+  collections: spec.collections.map((c) => ({
+    ...c,
+    variables: c.variables.filter((v) => !isDeparture(v.name.replace(/\/default$/, '').replaceAll('/', '.'))),
+  })),
+});
+/** A stylesheet without the departed declarations. */
+const keptCss = (css) => css.split('\n').filter((l) => !/--ds-chart-(categorical|smart)-|--ds-chart-(neutral|gray-bold):/.test(l)).join('\n');
 const blocks = (css) => css.split(/(?<=^\}\n)/m).map((b) => b.trim()).filter(Boolean);
 
 for (const key of ['A', 'B']) {
@@ -57,25 +74,25 @@ for (const key of ['A', 'B']) {
     assert.deepEqual(Object.keys(semantics.palette), Object.keys(ref));
   });
 
-  test(`Plan ${key}: all 518 reference tokens match, names, refs and hex, in every mode`, { skip }, () => {
+  test(`Plan ${key}: every reference token but the chart departures matches, names, refs and hex, in every mode`, { skip }, () => {
     const { semantics } = buildPlan(key);
     const ref = json(`generator/semantics_${key}.json`);
     const rows = semantics.rows.filter((r) => !PLUS_ONLY_TOKEN.test(r.name));
-    assert.equal(rows.length, 518);
-    assert.deepEqual(values(rows), values(ref.rows));
+    assert.equal(ref.rows.length, 518);
+    assert.deepEqual(values(keptRows(rows)), values(keptRows(ref.rows)));
     assert.deepEqual(withoutProse(semantics.shadows), withoutProse(ref.shadows));
     assert.deepEqual(withoutProse(semantics.opacity), withoutProse(ref.opacity));
   });
 
   test(`Plan ${key}: the Figma spec matches the reference, descriptions aside`, { skip }, () => {
     const { semantics } = buildPlan(key);
-    assert.deepEqual(withoutProse(withoutPlusOnly(figmaSpec(key, semantics))), withoutProse(json(`out/${key}/figma-spec.json`)));
+    assert.deepEqual(withoutProse(keptSpec(withoutPlusOnly(figmaSpec(key, semantics)))), withoutProse(keptSpec(json(`out/${key}/figma-spec.json`))));
   });
 
   test(`Plan ${key}: palette and semantic SCSS match byte for byte below the header`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
     for (const file of ['_palette.scss', '_semantic.scss']) {
-      assert.equal(body(files[file]).replace(PLUS_ONLY_SCSS_DECL, ''), body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')), file);
+      assert.equal(keptCss(body(files[file]).replace(PLUS_ONLY_SCSS_DECL, '')), keptCss(body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8'))), file);
     }
   });
 

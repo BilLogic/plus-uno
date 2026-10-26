@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CHROME } from '@/dataviz/palette';
 
 /**
  * TreegraphChart Component
@@ -23,6 +24,7 @@ const TreegraphChart = ({
         title: { text: null },
         series: [{
             type: 'treegraph',
+            link: { color: CHROME.link },
             data: data.map(item => ({
                 id: item.id,
                 parent: item.parent,
@@ -40,7 +42,7 @@ const TreegraphChart = ({
             dataLabels: {
                 enabled: true,
                 style: {
-                    color: '#000000',
+                    color: 'var(--ds-text)',
                     textOutline: 'none'
                 }
             },

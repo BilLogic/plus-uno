@@ -53,7 +53,8 @@ A pie chart displays **parts of a whole** as slices of a circle.
 **Best Practices:**
 ✅ Limit to 5 or fewer slices
 ✅ Order slices by size (largest first)
-✅ Use contrasting colors
+✅ Sort slices from most to least; the theme colors them in categorical order
+✅ Group past six slices into "Other"
 ✅ Label slices with percentages
 
 **Avoid:**
@@ -88,7 +89,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Browser Market Share</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Classic pie chart showing proportions.
             </p>
             <PieChart {...marketShareData} />

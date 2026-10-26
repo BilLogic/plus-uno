@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * AreaChart Component
@@ -15,9 +16,9 @@ const AreaChart = ({
     yAxisLabel,
     height = 300
 }) => {
-    const seriesWithTheme = data.map((s, i) => ({
+    const seriesWithTheme = data.map((s, i, all) => ({
         ...s,
-        color: s.color || chartTheme.colors[i % chartTheme.colors.length]
+        color: s.color || seriesColor(i, all.length)
     }));
 
     const options = {

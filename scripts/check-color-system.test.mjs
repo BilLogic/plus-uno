@@ -22,7 +22,7 @@ function fixture(edit) {
 
 test('the repo passes, and the green line says what was checked', () => {
   assert.deepEqual(run(), []);
-  assert.match(summary(), /2 plans x 523 tokens x 4 modes/);
+  assert.match(summary(), /2 plans x 533 tokens x 4 modes/);
 });
 
 test('a plan whose body text loses contrast fails, naming the check, plan and mode', () => {

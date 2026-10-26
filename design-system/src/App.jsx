@@ -25,9 +25,8 @@ const App = () => {
                                 <Jumbotron
                                     title="Welcome to PLUS Design System"
                                     description="This is the React implementation of the PLUS Design System."
-                                >
-                                    <Button btnStyle="primary" btnFill="filled">Get Started</Button>
-                                </Jumbotron>
+                                    actions={<Button text="Get started" style="primary" fill="filled" />}
+                                />
                             </Col>
                         </Row>
                         <Row>

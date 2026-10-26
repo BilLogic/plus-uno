@@ -25,7 +25,7 @@ const DonutChartSVG = ({
                 fontWeight: 'var(--font-weight-normal, 300)',
                 fontSize: '12px',
                 lineHeight: '1.4',
-                color: 'var(--color-on-surface-variant, #3f484a)',
+                color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
             };
         }
@@ -35,7 +35,7 @@ const DonutChartSVG = ({
             fontWeight: 'bold',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',
-            color: 'var(--color-on-surface, #191c1e)'
+            color: 'var(--ds-text)'
         };
     };
     
@@ -103,8 +103,8 @@ const DonutChartSVG = ({
                         left: `${tooltipPosition.x}px`,
                         top: `${tooltipPosition.y - 40}px`,
                         transform: 'translate(-50%, -100%)',
-                        backgroundColor: 'var(--color-on-surface, #191c1e)',
-                        color: 'var(--color-surface, #fff)',
+                        backgroundColor: 'var(--ds-text)',
+                        color: 'var(--ds-text-inverse)',
                         padding: 'var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 8px)',
                         borderRadius: 'var(--size-element-radius-sm, 4px)',
                         fontSize: 'var(--font-size-body3, 12px)',
@@ -112,7 +112,7 @@ const DonutChartSVG = ({
                         pointerEvents: 'none',
                         zIndex: 'var(--layout-z-index-tooltip)',
                         whiteSpace: 'nowrap',
-                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
+                        boxShadow: 'var(--ds-shadow-overlay)',
                         textAlign: 'center'
                     }}
                 >
@@ -155,7 +155,7 @@ const DonutChartSVG = ({
                     <span style={{
                         fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3)',
-                        color: 'var(--color-on-surface-variant, #666)',
+                        color: 'var(--ds-text-subtle)',
                         marginTop: '4px'
                     }}>
                         {label}

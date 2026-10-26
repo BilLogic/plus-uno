@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CHROME } from '@/dataviz/palette';
 
 /**
  * OrganizationChart Component
@@ -29,7 +30,7 @@ const OrganizationChart = ({
             levels: [{
                 level: 0,
                 color: chartTheme.colors[0],
-                dataLabels: { color: 'white' }
+                dataLabels: { color: CHROME.textInverse }
             }, {
                 level: 1,
                 color: chartTheme.colors[1]
@@ -42,7 +43,8 @@ const OrganizationChart = ({
                 name: name
             })),
             colorByPoint: false,
-            borderColor: chartTheme.colors[0]
+            borderColor: chartTheme.colors[0],
+            link: { color: CHROME.link }
         }],
         tooltip: {
             ...chartTheme.tooltip,

@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternTableStories} />
 
 <Title />
-The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background. Grid lines are `--ds-border` and the head rule `--ds-border-bold`; there is no zebra. Row states are layered over each cell's fill, never swapped for it: a hovered row takes `--ds-background-neutral-subtle-hovered` and a pressed one `-pressed`. A selected row is neutral ink across the whole row, `--ds-background-selected` (held under hover and press by its `-hovered` and `-pressed` steps), with no stripe on its leading edge: state takes the whole shape, never one edge. The checkbox a selectable row carries is the cue that does not rest on color. Mark it with `aria-selected="true"`, which belongs to a row of a `role="grid"` table. Body cells are Body/default, and head cells are Heading/xxsmall, a group label rather than a heading.
+The table pattern is a shell for data presentation: the table content slot (you pass your own `thead`/`tbody`), a pagination slot under the rows, and an empty-state slot. It sits in a Section and spans it. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions, so nothing sits between that header and the head row. The `toolbar` slot is deprecated; it still renders, with a one-time warning in development. The table itself is no-fill — the surrounding card or surface owns the background. Grid lines are `--ds-border` and the head rule `--ds-border-bold`; there is no zebra. Row states are layered over each cell's fill, never swapped for it: a hovered row takes `--ds-background-neutral-subtle-hovered` and a pressed one `-pressed`. A selected row is neutral ink across the whole row, `--ds-background-selected` (held under hover and press by its `-hovered` and `-pressed` steps), with no stripe on its leading edge: state takes the whole shape, never one edge. The checkbox a selectable row carries is the cue that does not rest on color. Mark it with `aria-selected="true"`, which belongs to a row of a `role="grid"` table. Body cells are Body/default, and head cells are Heading/xxsmall, a group label rather than a heading.
 
 `stickyHeader` pins the head row and `stickyColumn` the first column. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Sticky cells paint `--ds-utility-elevation-surface-current`, so they match the page, or the card that sets it to its raised fill, and the row state stays layered on top. A sticky edge takes `--ds-shadow-overflow` only while content is scrolled under it. It mirrors the Table slot component in Figma.
 
@@ -21,7 +21,7 @@ The table pattern is a shell for data presentation: a toolbar slot, the table co
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Toolbar slot, table children, and pagination slot.</>}>
+<DocsCanvasShell attachSourceBelow description={<>The table in a Section: the Section header carries the title and actions, and the pagination slot sits under the rows.</>}>
     <Canvas of={PatternTableStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -31,7 +31,7 @@ The table pattern is a shell for data presentation: a toolbar slot, the table co
 
 ### Composition
 
-<DocsCanvasShell description={<>The table shell composed inside a card shell — the card provides the raised fill and its shadow.</>}>
+<DocsCanvasShell description={<>The table spans its Section, plain, with no card around it and no toolbar of its own. Paging stays under the rows, inside the same Section.</>}>
     <DsCanvasQuiet of={PatternTableStories.Composition} />
 </DocsCanvasShell>
 
@@ -61,7 +61,7 @@ The table pattern is a shell for data presentation: a toolbar slot, the table co
 
 ### Empty state
 
-<DocsCanvasShell description={<>With <code>empty</code>, the empty-state slot replaces the table and pagination.</>}>
+<DocsCanvasShell description={<>With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the Section header stays usable. A message row takes no hover state, and the pager hides with the rows. Say what will appear and offer the first action.</>}>
     <DsCanvasQuiet of={PatternTableStories.EmptyState} />
 </DocsCanvasShell>
 
@@ -90,8 +90,8 @@ The table pattern is a shell for data presentation: a toolbar slot, the table co
 
 - For one row's worth of data on its own, use `Card`.
 - For a short list with no columns to compare, use `ListGroup`.
-- For moving between pages of rows, use `Pagination` — the table pattern has a slot for it.
-- For the region a table sits in, use `PatternSection`.
+- For moving between pages of rows, use `Pagination` — the table pattern has a slot for it, under the rows.
+- For the region a table sits in, and the header that carries its title, search, filters and actions, use `PatternSection`.
 
 </div>
 
