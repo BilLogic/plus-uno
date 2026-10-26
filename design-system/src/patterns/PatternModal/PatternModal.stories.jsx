@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternModal from '@/patterns/PatternModal';
 import Overlay, { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '@/patterns/Overlay';
 import { Button } from '@/components';
@@ -166,6 +166,125 @@ export const Heights = {
         await expect(body.scrollHeight, 'the long body scrolls').toBeGreaterThan(body.clientHeight);
         await expect(body, 'a body that scrolls is a tab stop').toHaveAttribute('tabindex', '0');
         await expect(fill.querySelector('.plus-pattern-modal-body')).toHaveAttribute('tabindex', '0');
+    },
+};
+
+const fields = (rows) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        {rows.map(([label, value]) => (
+            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{label}</span>
+                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{value}</span>
+            </div>
+        ))}
+    </div>
+);
+
+const STUDENTS = ['Ana Ruiz', 'Ben Okafor', 'Chloe Tran', 'Diego Alvarez', 'Emma Chen', 'Farah Haddad', 'Gabe Miller', 'Hana Sato', 'Isaac Reyes', 'Jada Brooks', 'Kai Nguyen', 'Lena Fischer'];
+
+/** Three views of one session, the students one long enough to scroll. */
+const sessionTabs = [
+    {
+        key: 'details',
+        label: 'Details',
+        content: fields([['Tutor', 'Kim Lee'], ['Time', 'Thursday, 4:30–5:15 PM'], ['Location', 'Room 204 · Lincoln High']]),
+    },
+    {
+        key: 'students',
+        label: 'Students',
+        content: fields(STUDENTS.map((name, i) => [name, `Algebra I · session ${i + 1} · attended, notes filed`])),
+    },
+    { key: 'notes', label: 'Notes', content: bodyCopy },
+];
+
+const saveActions = (
+    <>
+        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
+        <Button text="Save" style="primary" fill="filled" size="small" onClick={() => {}} />
+    </>
+);
+
+/**
+ * A tab group under the title, as `_Modal header` type=tabs: NavTabs in tabs
+ * mode, in the header, so it stays put while only the body scrolls. The body is
+ * the selected tab's panel. Left and Right move between tabs, Home and End jump
+ * to the ends.
+ */
+export const Tabs = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <InOverlay>
+                <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
+            </InOverlay>
+            <InOverlay>
+                <PatternModal
+                    title="Session settings"
+                    width="md"
+                    height="fill"
+                    tabs={sessionTabs}
+                    defaultActiveTab="students"
+                    onClose={() => {}}
+                    footer={saveActions}
+                />
+            </InOverlay>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const [hug, fill] = dialogs(canvasElement);
+        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--overlay-pad-y');
+        const tabsOf = (modal) => within(modal).getAllByRole('tab');
+        const panelOf = (modal) => within(modal).getByRole('tabpanel');
+        const selectedOf = (modal) => tabsOf(modal).find((tab) => tab.getAttribute('aria-selected') === 'true');
+
+        // The tabs sit in the header, Modal/stack-sm under the title row.
+        const group = hug.querySelector('.plus-pattern-modal-header-group');
+        await expect(group.querySelector('[role="tablist"]'), 'the tablist is in the header').not.toBeNull();
+        await expect(getComputedStyle(group).rowGap, 'Modal/stack-sm').toBe(`${tokenLength(canvasElement, '--modal-stack-sm')}px`);
+
+        // Keyboard: arrows move selection and focus together; the panel follows.
+        await userEvent.click(tabsOf(hug)[0]);
+        await expect(panelOf(hug)).toHaveAttribute('aria-labelledby', tabsOf(hug)[0].id);
+        await userEvent.keyboard('{ArrowRight}');
+        await expect(tabsOf(hug)[1]).toHaveFocus();
+        await expect(tabsOf(hug)[1]).toHaveAttribute('aria-selected', 'true');
+        await expect(panelOf(hug), 'the panel is named by its tab').toHaveAttribute('aria-labelledby', tabsOf(hug)[1].id);
+        await userEvent.keyboard('{End}');
+        await expect(tabsOf(hug)[2]).toHaveAttribute('aria-selected', 'true');
+        await userEvent.keyboard('{ArrowRight}');
+        await expect(tabsOf(hug)[0], 'Right wraps to the first tab').toHaveAttribute('aria-selected', 'true');
+        await userEvent.keyboard('{ArrowLeft}');
+        await expect(tabsOf(hug)[2], 'Left wraps to the last tab').toHaveAttribute('aria-selected', 'true');
+        await userEvent.keyboard('{Home}');
+        await expect(tabsOf(hug)[0]).toHaveFocus();
+        await expect(tabsOf(hug).filter((tab) => tab.tabIndex === 0), 'one tab stop for the strip').toHaveLength(1);
+        await userEvent.tab();
+        await expect(panelOf(hug), 'Tab moves from the strip into the panel').toHaveFocus();
+
+        // Hug: a short tab hugs, a long one stops at the cap and scrolls.
+        await expect(hug.getBoundingClientRect().height, 'a short tab hugs').toBeLessThan(cap);
+        await userEvent.click(within(hug).getByRole('tab', { name: 'Students' }));
+        await waitFor(() => expect(hug.getBoundingClientRect().height, 'a long tab stops at the cap').toBeCloseTo(cap, 0));
+
+        // Fill: the tabs stay put while the body scrolls under them.
+        await expect(fill.getBoundingClientRect().height, 'fill sits at the cap').toBeCloseTo(cap, 0);
+        const body = panelOf(fill);
+        const strip = within(fill).getByRole('tablist');
+        await expect(body.scrollHeight, 'the long tab scrolls').toBeGreaterThan(body.clientHeight);
+        const stripTop = strip.getBoundingClientRect().top;
+        body.scrollTop = body.scrollHeight;
+        await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0));
+        await expect(strip.getBoundingClientRect().top, 'the tabs do not scroll').toBeCloseTo(stripTop, 0);
+        await expect(fill.getBoundingClientRect().height, 'switching tabs never resizes a fill modal').toBeCloseTo(cap, 0);
+        await userEvent.click(within(fill).getByRole('tab', { name: 'Details' }));
+        await expect(panelOf(fill).scrollTop, 'a new tab starts at the top').toBe(0);
+        await expect(fill.getBoundingClientRect().height, 'fill holds its height on a short tab').toBeCloseTo(cap, 0);
+
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            const selected = selectedOf(fill);
+            await expect(getComputedStyle(selected).color, `selected tab ink (${mode})`).toBe(token('--ds-text-selected'));
+            await expect(getComputedStyle(selected).borderBottomColor, `selected tab underline (${mode})`).toBe(token('--ds-border-selected'));
+            await expect(getComputedStyle(fill).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
+        });
     },
 };
 
