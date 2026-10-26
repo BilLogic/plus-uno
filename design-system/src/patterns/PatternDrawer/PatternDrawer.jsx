@@ -55,6 +55,7 @@ const PatternDrawer = ({
     screenHeight,
     className = '',
     style,
+    onKeyDown,
     children,
     ...props
 }) => {
@@ -89,6 +90,8 @@ const PatternDrawer = ({
     const descriptionId = `${reactId}-description`;
 
     const handleKeyDown = (event) => {
+        // A caller's own handler runs first; one that prevents the default keeps the key.
+        onKeyDown?.(event);
         if (event.key === 'Escape') {
             // An inner control (a menu, a search box) that handled Escape keeps it.
             if (event.defaultPrevented || !onClose) return;
@@ -105,7 +108,13 @@ const PatternDrawer = ({
         const first = nodes[0];
         const last = nodes[nodes.length - 1];
         const active = document.activeElement;
-        if (event.shiftKey && (active === first || active === panelRef.current)) {
+        const panel = panelRef.current;
+        if (active !== panel && !nodes.includes(active)) {
+            // Focus sits on something Tab cannot reach (a tabindex="-1" node):
+            // carry on from the nearest end.
+            event.preventDefault();
+            (event.shiftKey ? last : first).focus();
+        } else if (event.shiftKey && (active === first || active === panel)) {
             event.preventDefault();
             last.focus();
         } else if (!event.shiftKey && active === last) {
@@ -208,6 +217,8 @@ PatternDrawer.propTypes = {
     screenHeight: PropTypes.number,
     className: PropTypes.string,
     style: PropTypes.object,
+    /** Runs before the drawer's own Escape and Tab handling; preventing the default on Escape keeps the drawer open. */
+    onKeyDown: PropTypes.func,
     /** Body content slot; it scrolls once it outgrows the screen */
     children: PropTypes.node,
 };

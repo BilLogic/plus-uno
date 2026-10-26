@@ -133,4 +133,28 @@ describe('PatternDrawer', () => {
         expect(drawer.parentElement).toHaveClass('plus-pattern-overlay-inline');
         expect(drawer.parentElement.style.getPropertyValue('--plus-overlay-screen')).toBe('1024px');
     });
+
+    it('runs a caller\'s onKeyDown before its own handling, which still traps and closes', () => {
+        const onKeyDown = vi.fn();
+        const onClose = vi.fn();
+        render(<PatternDrawer title="Filters" onClose={onClose} onKeyDown={onKeyDown}>Body</PatternDrawer>);
+        fireEvent.keyDown(screen.getByRole('button', { name: 'Close' }), { key: 'Escape' });
+        expect(onKeyDown).toHaveBeenCalledTimes(1);
+        expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('carries Tab on from an unreachable focus back into the cycle', () => {
+        render(
+            <PatternDrawer title="Filters" onClose={() => {}} footer={<button type="button">Apply</button>}>
+                <p tabIndex={-1} data-testid="note">Note</p>
+            </PatternDrawer>,
+        );
+        const note = screen.getByTestId('note');
+        note.focus();
+        fireEvent.keyDown(note, { key: 'Tab' });
+        expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+        note.focus();
+        fireEvent.keyDown(note, { key: 'Tab', shiftKey: true });
+        expect(screen.getByRole('button', { name: 'Apply' })).toHaveFocus();
+    });
 });

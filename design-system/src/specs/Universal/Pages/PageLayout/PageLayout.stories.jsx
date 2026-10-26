@@ -140,7 +140,7 @@ export const Frame = {
     },
 };
 
-/** A md drawer open over the page, as `drawer?` shows it on Figma's Pattern/Page template. */
+/** A md drawer open over the page: Figma's Pattern/Page template with its drawer? boolean on. */
 const DrawerOverPage = () => {
     const [open, setOpen] = React.useState(true);
     return (
