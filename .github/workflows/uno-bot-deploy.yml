@@ -20,8 +20,9 @@ name: uno-bot — deploy Worker
 # repo ran on a PR at all; `check-harness.yml` now does, and it composes
 # `check:harness-bundle`, so a stale bundle is caught on the branch rather than
 # here. What protects the DEPLOY is still the gating inside `npm run deploy`
-# (typecheck · check:fetch · check:contract · check:secrets · test:bundle ·
-# test · test:workerd · bundle:harness · wrangler deploy), and that runs either
+# (generate:storybook-docs · typecheck · check:fetch · check:contract ·
+# check:secrets · test:bundle · test · test:workerd · bundle:harness ·
+# wrangler deploy), and that runs either
 # way — the PR gate deliberately leaves `check:fetch` and `check:contract` to
 # this boundary (scripts/check-harness.mjs § EXCLUDED).
 #

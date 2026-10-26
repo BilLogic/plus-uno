@@ -972,11 +972,11 @@ export const PULL_REQUEST_WORKFLOWS = [
 
 /**
  * The `deploy` script of agents/uno-bot, in order, as data — the seven `deploy`
- * rows plus the two steps that are not checks.
+ * rows plus the three steps that are not checks.
  *
  * WHY ASSERTED AND NOT GENERATED. The rows alone cannot write this chain: they
- * are a set and the chain is a sequence, and its last two segments are not
- * checks at all. Writing it would also mean this generator authoring the line
+ * are a set and the chain is a sequence, and three of its segments are not
+ * checks at all — the write that opens it and the two that close it. Writing it would also mean this generator authoring the line
  * that INVOKES the deployment — `node scripts/deploy.mjs`, the command that
  * reaches a real Cloudflare account — and how the deployment is authorized is
  * not a thing a drift check should hold the pen on. So the order and the tail

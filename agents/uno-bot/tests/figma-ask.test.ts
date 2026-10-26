@@ -795,6 +795,23 @@ describe("a GitHub file the turn read directly", () => {
     assert.deepEqual(w.replies().map((r) => r.message.split("\n").at(-1)), [`Source: hero.astro — ${readUrl}`]);
   });
 
+  it("never falls back to a code-search hit or an intake issue: only a file or folder read", async () => {
+    const HIT = "https://github.com/BilLogic/plus-uno/blob/3f9c2a1/src/hero.astro";
+    const ISSUE = "https://github.com/BilLogic/plus-uno/issues/5";
+    const search = JSON.stringify({ ok: true, repo: "BilLogic/plus-uno", search: "hero", count: 1, hits: [{ path: "src/hero.astro", url: HIT }] });
+    const intake = JSON.stringify({ ok: true, count: 1, matches: [{ title: "Hero copy", url: ISSUE }] });
+    const w = world({
+      replies: [
+        { text: "Finding it.", toolCalls: [{ name: "github_read", args: { search: "hero" } }] },
+        { text: "Checking intakes.", toolCalls: [{ name: "github_intake_search", args: { keywords: "hero" } }] },
+        { text: `It comes in small, medium and large. [Button.jsx](${BUTTON})` },
+      ],
+      toolResultFor: (name) => (name === "github_read" ? search : name === "github_intake_search" ? intake : PRD_FOUND),
+    });
+    await ask(w, comment("100", "@uno what sizes does the Button component come in?"));
+    assert.deepEqual(w.replies().map((r) => r.message), [`🐐: ${CANT_FIND_LINE}`]);
+  });
+
   it("says it couldn't find this when the read was refused as a private repo", async () => {
     const refused = JSON.stringify({ ok: false, error: "that repo is private, so it is not read for an answer posted outside Slack" });
     const w = await answered(BUTTON, refused);

@@ -362,13 +362,14 @@ export function askInstruction(teammate: boolean): string {
  * `design-system/…/Button.jsx`, as `github_read` hands it — is the source, at
  * the link that read returned.
  *
- * Failing both, what the turn read stands behind the answer (#1563): the first
- * Storybook docs page a lookup returned, else the last GitHub file or folder
- * read — the most specific read, since a turn reads the index before the
- * component. The answer was grounded in those reads, and a link the answer
- * made up is never posted: its lines carry link labels, not links. Nothing
- * else the turn read is a fallback; a turn that read neither still says it
- * could not find this.
+ * Failing both, what the turn read stands behind the answer (#1563): the last
+ * Storybook docs page `github_read` handed back, else the last GitHub file or
+ * folder it read — the most specific read, since a turn reads the index before
+ * the component. Only a path read counts (`queried: "page"`): a code-search hit
+ * was never opened, and an intake issue is no read of the design system. The
+ * answer was grounded in those reads, and a link the answer made up is never
+ * posted: its lines carry link labels, not links. A turn that read neither
+ * still says it could not find this.
  *
  * @param cited - The links the answer cites, in order
  * @param read - What the turn's lookups returned
@@ -392,11 +393,11 @@ export function sourceOf(cited: readonly string[], read: readonly TaskCardSource
 }
 
 /** What the turn read that stands behind an answer citing nothing it read:
- *  a Storybook docs page, else the last GitHub read. */
+ *  the last Storybook docs page, else the last GitHub file or folder read. */
 function readFallback(read: readonly TaskCardSource[], asked: string): FigmaSource | null {
-  const visible = threadVisibleSources(read).filter((s) => !sameFigmaPlace(s.url, asked));
-  const storybook = visible.find((s) => estateOfUrl(s.url) === "storybook");
-  const github = visible.filter((s) => estateOfUrl(s.url) === "github").at(-1);
+  const pages = threadVisibleSources(read.filter((s) => s.queried === "page")).filter((s) => !sameFigmaPlace(s.url, asked));
+  const storybook = pages.filter((s) => estateOfUrl(s.url) === "storybook").at(-1);
+  const github = pages.filter((s) => estateOfUrl(s.url) === "github").at(-1);
   const pick = storybook ?? github;
   return pick ? { name: pick.text, url: pick.url } : null;
 }
