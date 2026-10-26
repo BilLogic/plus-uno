@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 72,
-    "uses": 229,
+    "names": 71,
+    "uses": 225,
     "bare": 5
   },
   "tokens": {
@@ -34,10 +34,6 @@
     },
     "--color-error-container": {
       "uses": 2,
-      "bare": 0
-    },
-    "--color-neutral-container": {
-      "uses": 1,
       "bare": 0
     },
     "--color-neutral-text": {
@@ -125,7 +121,7 @@
       "bare": 0
     },
     "--font-size-title-s": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--font-weight-light": {
@@ -133,7 +129,7 @@
       "bare": 0
     },
     "--font-weight-medium": {
-      "uses": 3,
+      "uses": 1,
       "bare": 0
     },
     "--line-height-h4": {

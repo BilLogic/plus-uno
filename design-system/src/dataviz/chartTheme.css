@@ -1,0 +1,35 @@
+/*
+ * Highcharts' own palette variables, pointed at PLUS tokens.
+ *
+ * Highcharts 13 draws every default it ships (slice and column separators,
+ * data-label outlines, the reset-zoom button, a gauge's pane, the loading
+ * veil) from `--highcharts-*` variables it injects at :root with fixed light
+ * values. Redefined on the chart container, they follow the color mode like
+ * every other token: separators take `--ds-border-inverse`, as Atlassian
+ * separates adjacent chart colors; inks take the text tokens; tints take the
+ * neutral and selected backgrounds. A chart option still wins where a chart
+ * sets one.
+ */
+.highcharts-container {
+    --highcharts-background-color: var(--ds-border-inverse);
+    --highcharts-neutral-color: var(--ds-text);
+    --highcharts-neutral-color-100: var(--ds-text);
+    --highcharts-neutral-color-80: var(--ds-text);
+    --highcharts-neutral-color-60: var(--ds-text-subtle);
+    --highcharts-neutral-color-40: var(--ds-border-bold);
+    --highcharts-neutral-color-20: var(--ds-border);
+    --highcharts-neutral-color-10: var(--ds-border);
+    --highcharts-neutral-color-5: var(--ds-background-neutral-subtle-hovered);
+    --highcharts-neutral-color-3: var(--ds-background-neutral-subtle-hovered);
+    --highcharts-highlight-color: var(--ds-chart-brand);
+    --highcharts-highlight-color-100: var(--ds-chart-brand);
+    --highcharts-highlight-color-80: var(--ds-chart-brand);
+    --highcharts-highlight-color-60: var(--ds-chart-brand-hovered);
+    --highcharts-highlight-color-40: var(--ds-border-selected);
+    --highcharts-highlight-color-20: var(--ds-background-selected-hovered);
+    --highcharts-highlight-color-10: var(--ds-background-selected);
+    --highcharts-highlight-color-5: var(--ds-background-selected);
+    --highcharts-highlight-color-3: var(--ds-background-selected);
+    --highcharts-positive-color: var(--ds-chart-success);
+    --highcharts-negative-color: var(--ds-chart-danger);
+}

@@ -1265,15 +1265,25 @@
       "color/background/smart/technology-tools/bold/pressed": "var(--ds-background-smart-technology-tools-bold-pressed)",
       "color/text/smart/technology-tools": "var(--ds-text-smart-technology-tools)",
       "color/icon/smart/technology-tools": "var(--ds-icon-smart-technology-tools)",
-      "color/border/smart/technology-tools": "var(--ds-border-smart-technology-tools)"
+      "color/border/smart/technology-tools": "var(--ds-border-smart-technology-tools)",
+      "color/chart/smart/social-emotional/default": "var(--ds-chart-smart-social-emotional)",
+      "color/chart/smart/social-emotional/hovered": "var(--ds-chart-smart-social-emotional-hovered)",
+      "color/chart/smart/mastering-content/default": "var(--ds-chart-smart-mastering-content)",
+      "color/chart/smart/mastering-content/hovered": "var(--ds-chart-smart-mastering-content-hovered)",
+      "color/chart/smart/advocacy/default": "var(--ds-chart-smart-advocacy)",
+      "color/chart/smart/advocacy/hovered": "var(--ds-chart-smart-advocacy-hovered)",
+      "color/chart/smart/relationship/default": "var(--ds-chart-smart-relationship)",
+      "color/chart/smart/relationship/hovered": "var(--ds-chart-smart-relationship-hovered)",
+      "color/chart/smart/technology-tools/default": "var(--ds-chart-smart-technology-tools)",
+      "color/chart/smart/technology-tools/hovered": "var(--ds-chart-smart-technology-tools-hovered)"
     }
   },
   "validation": {
-    "scssTokenCount": 1491,
+    "scssTokenCount": 1501,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1115,
-      "resolved": 1086,
+      "total": 1125,
+      "resolved": 1096,
       "percent": 97,
       "unresolved": [
         {

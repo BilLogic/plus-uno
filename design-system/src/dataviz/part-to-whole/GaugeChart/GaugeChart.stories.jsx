@@ -1,4 +1,5 @@
 import React from 'react';
+import { STATUS } from '@/dataviz/palette';
 import GaugeChart from './GaugeChart';
 
 export default {
@@ -54,7 +55,7 @@ A gauge chart displays a **single value on a dial**, perfect for KPIs and progre
 **Best Practices:**
 ✅ Use sparingly for key metrics only
 ✅ Include clear min/max labels
-✅ Add color zones for thresholds (red/yellow/green)
+✅ When the value is a status, color it with the status chart tokens (\`chartPalette.STATUS\`) and say the status in the label
 ✅ Show exact value in center
 
 **Avoid:**
@@ -82,13 +83,13 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Performance Gauges</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows KPIs at a glance.
             </p>
             <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                 <GaugeChart value={75} label="Completion" />
-                <GaugeChart value={92} label="Accuracy" color="var(--color-success)" />
-                <GaugeChart value={45} label="Engagement" color="var(--color-warning)" />
+                <GaugeChart value={92} label="Accuracy" color={STATUS.success} />
+                <GaugeChart value={45} label="Engagement" color={STATUS.warning} />
             </div>
         </section>
     </div>

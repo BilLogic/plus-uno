@@ -3,19 +3,31 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
+import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
 /**
  * HeatmapChart Component
  * Displays data as a matrix of colored cells.
- * Color intensity represents magnitude.
+ * Color intensity represents magnitude: the strongest tone is the biggest value.
+ *
+ * The color axis is a sequential ramp of one hue by default, or a diverging
+ * ramp around a neutral midpoint when `diverging` names two hues. A color axis
+ * interpolates, so its stops are the tokens resolved in the current color
+ * mode, and resolved again when the mode changes.
  */
 const HeatmapChart = ({
     xCategories = [],
     yCategories = [],
     data = [],
     height = 400,
-    minColor = '#c3e8ff',
-    maxColor = '#0066cc',
+    /** The ramp's hue (see `HUES` in palette.js). */
+    hue = 'blue',
+    /** Two hues, [low, high], for a diverging ramp; overrides `hue`. */
+    diverging = null,
+    /** Lowest and highest values on the color axis; default to the data's own. */
+    min,
+    max,
     /** When false, hides the legend (including the color bar). */
     showLegend = true,
     /** When true, hides legend pagination/navigation (e.g. scroll arrows). */
@@ -31,7 +43,11 @@ const HeatmapChart = ({
     /** Animation duration in ms when animation is enabled. */
     animationDuration = 1000
 }) => {
-    const options = useMemo(() => ({
+    const mode = useColorModeKey();
+    const options = useMemo(() => {
+        const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
+        const inks = textInks();
+        return {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
@@ -51,13 +67,12 @@ const HeatmapChart = ({
             reversed: true
         },
         colorAxis: {
-            min: 0,
-            max: 1,
-            stops: [
-                [0, minColor],
-                [0.5, minColor], // Hold the lower color a bit longer
-                [1, maxColor]
-            ]
+            min,
+            max,
+            // The ramp spans the data, not the rounded ticks, so the biggest value takes the strongest tone.
+            startOnTick: false,
+            endOnTick: false,
+            stops: rampStops(ramp, resolveColor)
         },
         plotOptions: {
             heatmap: {
@@ -89,21 +104,29 @@ const HeatmapChart = ({
             data: data,
             dataLabels: {
                 enabled: showDataLabels,
-                color: '#000000',
+                // A label sits on its cell, so it takes whichever text ink reads on that cell.
+                formatter: function () {
+                    const ink = inkFor(this.point.color, inks);
+                    return `<span style="color: ${ink}">${this.point.value}</span>`;
+                },
                 style: {
                     textOutline: 'none'
                 }
             }
         }]
-    }), [
+    };
+    }, [
         animationDuration,
         compactSpacing,
         data,
+        diverging,
         enableAnimation,
         height,
         hideLegendNavigation,
-        maxColor,
-        minColor,
+        hue,
+        max,
+        min,
+        mode,
         pointPadding,
         showDataLabels,
         showLegend,
@@ -127,10 +150,14 @@ HeatmapChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)),
     /** Chart height in pixels */
     height: PropTypes.number,
-    /** Color for minimum values */
-    minColor: PropTypes.string,
-    /** Color for maximum values */
-    maxColor: PropTypes.string,
+    /** The sequential ramp's hue */
+    hue: PropTypes.oneOf(HUES),
+    /** Two hues, [low, high], for a diverging ramp around a neutral midpoint */
+    diverging: PropTypes.arrayOf(PropTypes.string),
+    /** Lowest value on the color axis */
+    min: PropTypes.number,
+    /** Highest value on the color axis */
+    max: PropTypes.number,
     /** When false, hides the legend (including the color bar) */
     showLegend: PropTypes.bool,
     /** When true, hides legend pagination/navigation */

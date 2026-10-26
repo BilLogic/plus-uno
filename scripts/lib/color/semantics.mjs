@@ -321,11 +321,17 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   setMode('color.icon.danger', 'light_ic', H('red', 800));
 
   // ---- charts: categorical order chosen for color-vision deficiency (protan and deutan) in both plans ----
+  // Atlassian's order is blue, lime, purple, orange, then darker blue, purple, teal and orange. PLUS keeps blue
+  // first and Atlassian's limit of six, and re-picks the hues and steps so neighbors stay apart.
   const CH_WHY =
-    'PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan ' +
-    'simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.';
-  const CAT = { 1: ['blue', 600, 400], 2: ['yellow', 600, 400], 3: ['magenta', 600, 400], 4: ['brown', 600, 400],
-    5: ['blue', 800, 300], 6: ['purple', 700, 300], 7: ['green', 600, 400], 8: ['orange', 700, 400] };
+    'PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under ' +
+    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. ' +
+    'Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and ' +
+    'pull same-family neighbors together. No red, ' +
+    'which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are ' +
+    'darker reprises of 1 and 4 for overflow past the limit of six.';
+  const CAT = { 1: ['blue', 600, 600], 2: ['yellow', 500, 500], 3: ['magenta', 800, 700], 4: ['orange', 500, 500],
+    5: ['purple', 600, 500], 6: ['lime', 500, 500], 7: ['blue', 800, 700], 8: ['orange', 800, 700] };
   const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];
   for (const [i, [f, l, d]] of Object.entries(CAT)) {
     for (const [suf, dl] of [['', 0], ['.hovered', 1]]) {
@@ -335,9 +341,14 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       setMode(n, 'light', H(f, ls));
       setMode(n, 'dark', H(f, ds));
       setMode(n, 'light_ic', H(f, nxt(ls, 3)));
-      setMode(n, 'dark_ic', H(f, nxt(ds, -1)));
+      setMode(n, 'dark_ic', H(f, nxt(ds, -2)));
       byName[n].deviation = CH_WHY;
     }
+  }
+  // The gray chart mark at the base emphasis keeps 4.5:1 on overlays in dark increased contrast.
+  for (const n of ['color.chart.neutral', 'color.chart.gray.bold']) {
+    setMode(n, 'dark_ic', D(750));
+    byName[n].deviation = 'PLUS increased-contrast fix: darkNeutral.750, half a step past Atlassian, so the mark keeps 4.5:1 on overlays.';
   }
 
   const digitSteps = (f) => Object.keys(pal[f]).filter(isDigits).map(Number).sort((a, b) => a - b);
@@ -401,6 +412,21 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       const n = tn.replace('{s}', subject);
       const r = { ...r0, name: n, atl_light: '—', atl_dark: '—', use: `${use} Aliases the ${fam} accent.`,
         deviation: `PLUS product layer: SMART ${subject} is the ${fam} accent.` };
+      rows.push(r);
+      byName[n] = r;
+    }
+  }
+  // A subject's chart series is its accent hue at the emphasis that keeps S-M-A-R-T neighbors apart
+  // (deltaE >= 8 under protan and deutan, >= 15 for full color vision), in that order.
+  const SMART_CHART = { 'social-emotional': 'bold', 'mastering-content': 'boldest', advocacy: 'bold', relationship: 'boldest', 'technology-tools': 'bold' };
+  for (const [subject, emphasis] of Object.entries(SMART_CHART)) {
+    const fam = SMART[subject];
+    for (const suf of ['', '.hovered']) {
+      const r0 = byName[`color.chart.${fam}.${emphasis}${suf}`];
+      const n = `color.chart.smart.${subject}${suf}`;
+      const r = { ...r0, name: n, atl_light: '—', atl_dark: '—',
+        use: suf ? `Hovered state of color.chart.smart.${subject}.` : `Chart series for the ${subject} subject. Aliases color.chart.${fam}.${emphasis}.`,
+        deviation: `PLUS product layer: SMART ${subject} charts in the ${fam} hue, at ${emphasis} so neighbors in S-M-A-R-T order stay apart.` };
       rows.push(r);
       byName[n] = r;
     }

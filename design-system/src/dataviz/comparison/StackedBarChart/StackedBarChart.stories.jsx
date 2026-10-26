@@ -1,4 +1,5 @@
 import React from 'react';
+import { CATEGORICAL } from '@/dataviz/palette';
 import StackedBarChart from './StackedBarChart';
 
 export default {
@@ -77,32 +78,32 @@ const weeklyData = {
     data: [
         {
             segments: [
-                { value: '10', color: 'var(--color-success-container)', height: '20', textColor: 'var(--color-on-success-container)' },
-                { value: '40', color: 'var(--color-warning-container)', height: '80', textColor: 'var(--color-on-warning-container)' }
+                { value: '10', color: CATEGORICAL[0], height: '20' },
+                { value: '40', color: CATEGORICAL[1], height: '80' }
             ]
         },
         {
             segments: [
-                { value: '20', color: 'var(--color-success-container)', height: '40', textColor: 'var(--color-on-success-container)' },
-                { value: '30', color: 'var(--color-warning-container)', height: '60', textColor: 'var(--color-on-warning-container)' }
+                { value: '20', color: CATEGORICAL[0], height: '40' },
+                { value: '30', color: CATEGORICAL[1], height: '60' }
             ]
         },
         {
             segments: [
-                { value: '15', color: 'var(--color-success-container)', height: '30', textColor: 'var(--color-on-success-container)' },
-                { value: '35', color: 'var(--color-warning-container)', height: '70', textColor: 'var(--color-on-warning-container)' }
+                { value: '15', color: CATEGORICAL[0], height: '30' },
+                { value: '35', color: CATEGORICAL[1], height: '70' }
             ]
         },
         {
             segments: [
-                { value: '25', color: 'var(--color-success-container)', height: '50', textColor: 'var(--color-on-success-container)' },
-                { value: '25', color: 'var(--color-warning-container)', height: '50', textColor: 'var(--color-on-warning-container)' }
+                { value: '25', color: CATEGORICAL[0], height: '50' },
+                { value: '25', color: CATEGORICAL[1], height: '50' }
             ]
         },
         {
             segments: [
-                { value: '5', color: 'var(--color-success-container)', height: '10', textColor: 'var(--color-on-success-container)' },
-                { value: '45', color: 'var(--color-warning-container)', height: '90', textColor: 'var(--color-on-warning-container)' }
+                { value: '5', color: CATEGORICAL[0], height: '10' },
+                { value: '45', color: CATEGORICAL[1], height: '90' }
             ]
         }
     ]
@@ -115,7 +116,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Weekly Breakdown</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows part-to-whole relationships within comparison contexts.
             </p>
             <StackedBarChart {...weeklyData} />
@@ -133,20 +134,20 @@ export const Interactive = {
         data: [
             {
                 segments: [
-                    { value: '30', color: 'var(--color-primary-container)', height: '60', textColor: 'var(--color-on-primary-container)' },
-                    { value: '20', color: 'var(--color-secondary-container)', height: '40', textColor: 'var(--color-on-secondary-container)' }
+                    { value: '30', color: CATEGORICAL[0], height: '60' },
+                    { value: '20', color: CATEGORICAL[1], height: '40' }
                 ]
             },
             {
                 segments: [
-                    { value: '25', color: 'var(--color-primary-container)', height: '50', textColor: 'var(--color-on-primary-container)' },
-                    { value: '25', color: 'var(--color-secondary-container)', height: '50', textColor: 'var(--color-on-secondary-container)' }
+                    { value: '25', color: CATEGORICAL[0], height: '50' },
+                    { value: '25', color: CATEGORICAL[1], height: '50' }
                 ]
             },
             {
                 segments: [
-                    { value: '40', color: 'var(--color-primary-container)', height: '80', textColor: 'var(--color-on-primary-container)' },
-                    { value: '10', color: 'var(--color-secondary-container)', height: '20', textColor: 'var(--color-on-secondary-container)' }
+                    { value: '40', color: CATEGORICAL[0], height: '80' },
+                    { value: '10', color: CATEGORICAL[1], height: '20' }
                 ]
             }
         ]

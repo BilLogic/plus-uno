@@ -24,7 +24,7 @@ const DependencyWheel = ({
             keys: ['from', 'to', 'weight'],
             data: data,
             dataLabels: {
-                color: 'var(--color-on-surface)',
+                color: 'var(--ds-text)',
                 style: chartTheme.tooltip.style,
                 textPath: {
                     enabled: true,

@@ -54,7 +54,7 @@ const DonutChartSVG = ({
                 fontWeight: 'var(--font-weight-normal, 300)',
                 fontSize: '12px',
                 lineHeight: '1.4',
-                color: 'var(--color-on-surface-variant, #3f484a)',
+                color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
             };
         }
@@ -64,7 +64,7 @@ const DonutChartSVG = ({
             fontWeight: 'bold',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',
-            color: 'var(--color-on-surface, #191c1e)'
+            color: 'var(--ds-text)'
         };
     };
     
@@ -98,14 +98,14 @@ const DonutChartSVG = ({
                 fill="none"
                 style={{ position: 'absolute', top: 0, left: 0 }}
             >
-                {/* Full circle (white background) */}
-                <path d={fullCirclePath} fill="white"/>
+                {/* Full circle: the track */}
+                <path d={fullCirclePath} fill="var(--ds-background-neutral)"/>
                 
-                {/* Completed segment (yellow with opacity) - only show if there's progress */}
+                {/* Completed segment, shown once there is progress */}
                 {percentage > 0 && (
                     <path 
                         d={completedPath} 
-                        fill="#FFE17A" 
+                        fill="var(--ds-chart-yellow-bold)" 
                         opacity="0.8"
                     />
                 )}
@@ -136,7 +136,7 @@ const DonutChartSVG = ({
                     <span style={{
                         fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3)',
-                        color: 'var(--color-on-surface-variant, #666)',
+                        color: 'var(--ds-text-subtle)',
                         marginTop: '4px'
                     }}>
                         {label}
