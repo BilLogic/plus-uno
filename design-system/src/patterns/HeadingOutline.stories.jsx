@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { Card, Dropdown, Modal, Popover, Table, Toast } from '@/components';
-import { PatternSection, Surface } from '@/patterns';
+import { PatternCard, PatternSection, Surface } from '@/patterns';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
@@ -59,13 +59,17 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
     await expectStyle(canvas.getByText('Every session you tutor from Monday to Sunday.'), 'section description', BODY_DEFAULT);
 };
 
-/** A card's title is 14 at every level; its tag is one below its section. */
+/**
+ * A card's title is 14 at every level; its tag is one below its section. Card
+ * and PatternCard share the one card title type.
+ */
 export const CardTitles = () => (
     <Surface title="Sessions">
         <PatternSection title="This week">
             <Card title="Algebra I" subtitle="Two students" body="Thursday at 4:00 PM." />
             <PatternSection title="Monday">
                 <Card title="Geometry" subtitle="One student" />
+                <PatternCard title="Chemistry" description="Three students" />
             </PatternSection>
         </PatternSection>
     </Surface>
@@ -75,6 +79,8 @@ CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expectStyle(headingNamed(canvas, 3, 'Algebra I'), 'card in a section', HEADING_XSMALL);
     await expectStyle(headingNamed(canvas, 4, 'Geometry'), 'card in a subsection', HEADING_XSMALL);
+    await expectStyle(headingNamed(canvas, 4, 'Chemistry'), 'pattern card in a subsection', HEADING_XSMALL);
+    await expectStyle(canvas.getByText('Three students'), 'pattern card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Thursday at 4:00 PM.'), 'card body', BODY_DEFAULT);
 };

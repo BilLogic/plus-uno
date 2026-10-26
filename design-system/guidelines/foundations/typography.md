@@ -11,7 +11,7 @@ summary: Apply these classes to elements for consistent typography
 Component text takes a text style: `font: var(--heading-small)`, `var(--body-default)` and the rest of the Type Scale in `design-system/agent-views/tokens/tokens.md`. An icon glyph takes an icon size (`--icon-md`). `npm run check:font-size-literals` holds components and patterns to that.
 
 - **Headings step one size per nesting level**, and the tag follows the nesting: the page's one `h1` is Heading/large 24, a section's `h2` Heading/medium 20, a subsection's `h3` Heading/small 16. `PatternSection` picks its level from `@/lib/headingLevel`; a page or a dialog is level 1.
-- **Container titles are fixed**: a modal's is Heading/medium 20 and is the dialog's `h1`, named by `aria-labelledby`; a card's, a popup's and a flag's are Heading/xsmall 14, and a card's sits over a Body/default 14 description, tagged one level below its section.
+- **Container titles are fixed**: a modal's is Heading/medium 20 and is the dialog's `h1`, named by `aria-labelledby`; a card's, a popup's and a flag's are Heading/xsmall 14, and a card's sits over a Body/default 14 description, tagged one level below its section. Card and PatternCard read the card title's type from one mixin, `card-title-type` in `design-system/src/styles/_card-title.scss`, so a size change is that one edit.
 - **Group labels** are Heading/xxsmall 12 and name a `role="group"` or a table head cell; they are never headings.
 - **Button and Tab group labels** are Body/default at `--type-weight-medium`, with no separate button style.
 - **A Sidebar tab's label is Body/default at regular weight**: a Sidebar tab is a navigation row, not a tab in a Tab group.
