@@ -12,7 +12,8 @@ import './PatternTable.scss';
  *
  * - **Row states**: hovered and pressed rows take the neutral subtle steps; a
  *   row with `aria-selected="true"` (in a `role="grid"` table) takes the
- *   selected ladder and a 2px Lagoon bar at its leading edge.
+ *   selected ladder across the whole row, with no stripe on its leading edge;
+ *   the row's checkbox is the cue that does not rest on color.
  * - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the
  *   first column. They paint the current surface, so they match the page or
  *   the card they sit in, and take the overflow shadow only while content is
