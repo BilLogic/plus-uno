@@ -116,6 +116,7 @@
         "Sidebar",
         "Card",
         "Section",
+        "Overlay",
         "Modal",
         "Table"
       ],

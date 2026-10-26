@@ -1,0 +1,47 @@
+/**
+ * Overlay pattern (Patterns/Overlay)
+ * The full-screen layer a modal is placed in: the scrim (color.blanket, 32%
+ * Light · 60% Dark), Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above
+ * and below (24 under 640 tall), its child centered. On Atlassian's layers:
+ * the scrim at 500 and the layer it holds at 510. A confirm raised from a
+ * modal is a second Overlay later in the page, so it reuses 500 / 510 and
+ * covers the first.
+ */
+
+.plus-pattern-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layout-z-index-scrim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: var(--overlay-pad-y) var(--overlay-pad-x);
+    background-color: var(--ds-blanket);
+    /* A layer wider than a narrow screen keeps its width and the overlay scrolls. */
+    overflow: auto;
+
+    > * {
+        position: relative;
+        z-index: var(--layout-z-index-modal);
+    }
+}
+
+/*
+ * Inline: drawn in the page flow at a stand-in screen, for docs and previews.
+ * The layers inside size themselves from `--plus-overlay-screen` and
+ * `--plus-overlay-max-height` rather than the viewport.
+ */
+.plus-pattern-overlay-inline {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    width: var(--plus-overlay-screen, 100%);
+    max-width: 100%;
+    height: var(--plus-overlay-screen-height, auto);
+    --plus-overlay-max-height: calc(var(--plus-overlay-screen-height, 100dvh) - 2 * var(--overlay-pad-y));
+
+    > * {
+        z-index: auto;
+    }
+}

@@ -3,44 +3,41 @@
  * Inline modal shell, drawn as the Modal component draws one: the overlay
  * pair (elevation.surface.overlay with elevation.shadow.overlay, the level
  * every floating layer takes; the blanket under a real modal sets it apart),
- * modal radius/padding/gap tokens, internal body scroll.
+ * Modal/pad 16, Modal/stack-md 16 and Modal/radius 12. Width is a step of the
+ * screen grid and height hugs or fills to the screen less 128, both from the
+ * Overlay pattern it is placed in.
  */
+@use '../Overlay/screen-grid' as *;
 
 .plus-pattern-modal {
+    @include screen-grid-width(var(--modal-pad));
+    @include screen-grid-width-steps;
+
     display: flex;
     flex-direction: column;
+    gap: var(--modal-stack-md);
+    padding: var(--modal-pad);
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
-    border-radius: var(--size-modal-radius-md);
+    border-radius: var(--modal-radius);
     box-shadow: var(--ds-shadow-overlay);
     overflow: hidden; // keep scrolling body clipped to the radius
+    /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
+    max-height: $overlay-max-height;
 }
 
-/* Padding scale */
-.plus-pattern-modal-pad-sm {
-    padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm);
+/* Fill: at the cap whatever the content, so a settings or editor modal never jumps. */
+.plus-pattern-modal-height-fill {
+    height: $overlay-max-height;
 }
 
-.plus-pattern-modal-pad-md {
-    padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md);
-}
-
-.plus-pattern-modal-pad-lg {
-    padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg);
-}
-
-/* Gap scale */
-.plus-pattern-modal-gap-sm {
-    gap: var(--size-modal-gap-sm);
-}
-
-.plus-pattern-modal-gap-md {
-    gap: var(--size-modal-gap-md);
-}
-
-.plus-pattern-modal-gap-lg {
-    gap: var(--size-modal-gap-lg);
-}
+/* Deprecated sizing props: the old Modal/* tokens, for the callers that still pass them. */
+.plus-pattern-modal.plus-pattern-modal-pad-sm { padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); }
+.plus-pattern-modal.plus-pattern-modal-pad-md { padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); }
+.plus-pattern-modal.plus-pattern-modal-pad-lg { padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg); }
+.plus-pattern-modal.plus-pattern-modal-gap-sm { gap: var(--size-modal-gap-sm); }
+.plus-pattern-modal.plus-pattern-modal-gap-md { gap: var(--size-modal-gap-md); }
+.plus-pattern-modal.plus-pattern-modal-gap-lg { gap: var(--size-modal-gap-lg); }
 
 /* Header: title + close */
 .plus-pattern-modal-header {
@@ -79,7 +76,7 @@
     }
 }
 
-/* Body: internal scroll past maxHeight */
+/* Body: takes what the header and footer leave and scrolls past the cap */
 .plus-pattern-modal-body {
     flex: 1 1 auto;
     min-height: 0;
