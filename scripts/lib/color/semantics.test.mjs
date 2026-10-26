@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { buildPlan } from './build.mjs';
 import { buildPalette, loadPlan } from './plans.mjs';
 import { buildSemantics } from './semantics.mjs';
+import { contrast } from './oklch.mjs';
 
 const refs = (key, name) => {
   const r = buildPlan(key).semantics.rows.find((row) => row.name === name);
@@ -15,10 +16,10 @@ const refs = (key, name) => {
 };
 const hex = (key, name, mode = 'light') => buildPlan(key).semantics.rows.find((row) => row.name === name)[mode];
 
-test('518 tokens, every value a primitive reference', () => {
+test('523 tokens, every value a primitive reference', () => {
   const { rows } = buildPlan('A').semantics;
-  assert.equal(rows.length, 518);
-  assert.equal(new Set(rows.map((r) => r.name)).size, 518);
+  assert.equal(rows.length, 523);
+  assert.equal(new Set(rows.map((r) => r.name)).size, 523);
   for (const r of rows) {
     for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
       assert.match(r[`${m}_ref`], /^(transparent|[a-zA-Z]+\.[0-9]+(a[0-9]+)?)$/, `${r.name} ${m}`);
@@ -60,4 +61,26 @@ test('the base palette is not mutated by registering hue alphas', () => {
   const { palette: extended } = buildSemantics(palette);
   assert.equal('500a8' in palette.red, false);
   assert.equal(extended.red['500a8'].hex, '#e16c6214');
+});
+
+test('SMART subtle: every subject, every mode, its accent subtle; the line work it carries', () => {
+  const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
+  for (const key of ['A', 'B']) {
+    const byName = Object.fromEntries(buildPlan(key).semantics.rows.map((r) => [r.name, r]));
+    for (const [subject, hue] of Object.entries(SMART)) {
+      const name = `color.background.smart.${subject}.subtle`;
+      const accent = byName[`color.background.accent.${hue}.subtle`];
+      assert.ok(byName[name], `${name} exists in Plan ${key}`);
+      assert.equal(`${name}.hovered` in byName || `${name}.pressed` in byName, false, `${name} has no states`);
+      for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
+        assert.equal(byName[name][`${m}_ref`], accent[`${m}_ref`], `${name} ${m}`);
+        assert.equal(byName[name][m], accent[m], `${name} ${m} hex`);
+      }
+      // The dark-gray line work (color.icon.subtle) on the body, in Light, sits under 3:1:
+      // about 2.6:1 in Plan A and 3.0:1 in Plan B, the same as on the math characters'
+      // accent subtle. The floor catches a ramp change that would push it lower.
+      const ratio = contrast(byName['color.icon.subtle'].light, byName[name].light);
+      assert.ok(ratio >= 2.5, `${name}: icon.subtle at ${ratio.toFixed(2)}:1 in Plan ${key} Light`);
+    }
+  }
 });

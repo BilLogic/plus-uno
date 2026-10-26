@@ -6,7 +6,8 @@
  * A plan (`scripts/lib/color/plans/plan-*.json`) is primitive values only:
  * accent ramp recipes solved to per-step contrast targets, neutral hexes,
  * alpha slot percents and shadow geometry. The semantic layer — Atlassian's
- * 518-token grammar (`color.property.role.emphasis.state`, `--ds-` in CSS)
+ * token grammar (`color.property.role.emphasis.state`, `--ds-` in CSS; 523
+ * tokens with the PLUS layer)
  * remapped onto those primitives with every PLUS override — is the same for
  * every plan. The pipeline lives in `scripts/lib/color/`; this file only
  * writes and compares.

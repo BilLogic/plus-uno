@@ -16582,6 +16582,36 @@
      }
     },
     {
+     "name": "color/background/smart/mastering-content/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-mastering-content-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/mastering-content/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-mastering-content-bold)"
@@ -16847,6 +16877,36 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "magenta/800"
+      }
+     }
+    },
+    {
+     "name": "color/background/smart/relationship/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-relationship-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/900"
       }
      }
     },
@@ -17120,6 +17180,36 @@
      }
     },
     {
+     "name": "color/background/smart/social-emotional/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-social-emotional-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/social-emotional/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-social-emotional-bold)"
@@ -17389,6 +17479,36 @@
      }
     },
     {
+     "name": "color/background/smart/advocacy/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-advocacy-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/advocacy/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-advocacy-bold)"
@@ -17654,6 +17774,36 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "brown/800"
+      }
+     }
+    },
+    {
+     "name": "color/background/smart/technology-tools/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-technology-tools-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "brown/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "brown/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "brown/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "brown/900"
       }
      }
     },
