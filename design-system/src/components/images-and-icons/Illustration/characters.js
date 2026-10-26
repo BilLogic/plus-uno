@@ -11,8 +11,17 @@
  *   color. The geometry is exactly the export's; only the fill was removed,
  *   so the color comes from a token.
  *
- * To change a character, change it in Figma and re-export; do not edit the
- * paths by hand.
+ * HOW IT WAS MADE. This is hand-maintained data, converted once from Figma:
+ * each variant of the Character set (19786:47743) and of the _Character / Body
+ * set was exported as SVG through the REST images endpoint (outline text, no
+ * ids). The paths in the line color were copied as they are, without their
+ * fill. `body` is the Body instance's offset in the variant, from the REST
+ * nodes endpoint, and `frame` is the body's offset in the character export
+ * less `body`. The body masks in assets/images/illustrations are the same
+ * Body variants rendered as PNG at scale 1.5, kept as alpha only.
+ *
+ * To change a character, change it in Figma and repeat those steps for it;
+ * do not edit the paths by hand.
  */
 export const CHARACTER_GEOMETRY = {
     'mastering-content': {

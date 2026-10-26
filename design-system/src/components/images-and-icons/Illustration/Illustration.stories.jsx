@@ -257,6 +257,6 @@ Interactive.args = {
 };
 Interactive.argTypes = {
     character: { control: 'select', options: ILLUSTRATION_CHARACTERS },
-    size: { control: 'select', options: ILLUSTRATION_SIZES },
+    size: { control: { type: 'number', min: 24, step: 8 } },
     title: { control: 'text' },
 };

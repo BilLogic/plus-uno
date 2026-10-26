@@ -87,8 +87,8 @@ export const Illustration = ({
             className={classes}
             style={{ inlineSize: `${size}px`, blockSize: `${size}px`, ...style }}
             data-character={character}
-            {...a11y}
             {...rest}
+            {...a11y}
         >
             <span
                 className="plus-illustration__body"
@@ -111,8 +111,8 @@ export const Illustration = ({
                 aria-hidden="true"
                 focusable="false"
             >
+                {/* A fixed list that never reorders, so the index is a stable key. */}
                 {geometry.lines.map((d, i) => (
-                    // eslint-disable-next-line react/no-array-index-key
                     <path key={i} d={d} />
                 ))}
             </svg>
