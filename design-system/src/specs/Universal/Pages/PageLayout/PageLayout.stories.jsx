@@ -17,10 +17,12 @@ import React from 'react';
 import PageLayout from './PageLayout';
 import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
-import { PatternDrawer } from '@/patterns';
-import { Button } from '@/components';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { Button, Input, Textarea } from '@/components';
+import { PatternDrawer, PatternSection } from '@/patterns';
+import { SURFACE_EDGE } from '@/patterns/Surface';
+import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { setTestViewport, withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 export default {
@@ -266,4 +268,260 @@ export const Interactive = {
             table: { category: 'Content' },
         },
     },
+};
+
+/* ------------------------------------------------------------- frame="focused" */
+
+/**
+ * `frame="focused"` — the page for one task: no sidebar, a Back · title · Close
+ * topbar, the surface at reading width, and the actions in a footer row. The
+ * focused stories below set the viewport first, because the layout tokens
+ * switch on `@media (min-width: …)`, and read every expected length and color
+ * from its token through a probe.
+ */
+
+const FOCUSED_HEIGHT = 900;
+
+const NoteForm = () => (
+    <>
+        <PatternSection title="Session details" description="What the student worked on today.">
+            <Input label="Topic" placeholder="e.g. Solving two-step equations" />
+            <Textarea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
+        </PatternSection>
+        <PatternSection title="Follow-up">
+            <Input label="Next step" placeholder="e.g. Practice set 4" />
+        </PatternSection>
+    </>
+);
+
+const NoteActions = () => (
+    <>
+        <Button style="secondary" fill="outline" text="Save draft" />
+        <Button style="primary" fill="filled" text="Submit note" />
+    </>
+);
+
+const focusedArgs = { title: 'Add a session note', onBack: fn(), onClose: fn() };
+
+const FocusedNote = ({ breakpoint, body = 1, withActions = true, ...args }) => (
+    <PageLayout
+        frame="focused"
+        style={{ height: '100%', minHeight: '100%' }}
+        actions={withActions ? <NoteActions /> : undefined}
+        {...args}
+    >
+        {Array.from({ length: body }, (_, i) => <NoteForm key={i} />)}
+    </PageLayout>
+);
+
+const rect = (el) => el.getBoundingClientRect();
+
+const focusedParts = (canvasElement) => {
+    const canvas = within(canvasElement);
+    const frame = canvasElement.querySelector('.plus-page-layout--focused .plus-frame');
+    return {
+        canvas,
+        frame,
+        banner: canvas.getByRole('banner'),
+        main: canvas.getByRole('main'),
+        footer: canvas.queryByRole('contentinfo', { name: 'Page actions' }),
+        back: canvas.queryByRole('button', { name: 'Back' }),
+        close: canvas.queryByRole('button', { name: 'Close' }),
+        title: canvas.getByRole('heading', { level: 1 }),
+        surface: frame.querySelector('.plus-frame__surface'),
+        actions: frame.querySelector('.plus-page-focused__actions'),
+    };
+};
+
+/** The focused page at one width: three rows 8 apart, the reading column, the actions over it. */
+const expectFocusedLayout = async (canvasElement, width) => {
+    const { frame, banner, back, close, surface, main, footer, actions } = focusedParts(canvasElement);
+    const padX = tokenLength(frame, '--focused-page-pad-x');
+    const padY = tokenLength(frame, '--focused-page-pad-y');
+    const stack = tokenLength(frame, '--focused-page-stack-sm');
+    const reading = tokenLength(frame, '--layout-max-width-reading');
+    const minimum = tokenLength(frame, '--layout-min-width-content');
+    const surfacePad = tokenLength(frame, '--surface-pad');
+
+    await expect(rect(banner).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);
+    await expect(rect(banner).top - rect(frame).top, 'the frame pads the top').toBeCloseTo(padY, 0);
+    await expect(rect(back).left - rect(frame).left, 'Back sits at the frame pad').toBeCloseTo(padX, 0);
+    await expect(rect(frame).right - rect(close).right, 'Close sits at the frame pad').toBeCloseTo(padX, 0);
+    await expect(canvasElement.querySelector('aside'), 'no sidebar').toBeNull();
+    await expect(rect(surface).left - rect(frame).left, 'the surface starts at the frame pad').toBeCloseTo(padX, 0);
+    await expect(rect(surface).top - rect(banner).bottom, 'a stack under the topbar').toBeCloseTo(stack, 0);
+
+    // The column is 864, or the surface less its pads, never under 720.
+    const expected = Math.max(minimum, Math.min(reading, rect(surface).width - 2 * surfacePad));
+    await expect(rect(main).width, `reading column at ${width}`).toBeCloseTo(expected, 0);
+    if (width >= 1440) await expect(rect(main).width, 'capped at the reading width').toBeCloseTo(reading, 0);
+    await expect(rect(actions).width, `the actions column at ${width}`).toBeCloseTo(expected, 0);
+    await expect(rect(actions).left, 'the actions line up with the content').toBeCloseTo(rect(main).left, 0);
+
+    await expect(rect(footer).top - rect(surface).bottom, 'a stack under the surface').toBeCloseTo(stack, 0);
+    await expect(rect(frame).bottom - rect(footer).bottom, 'the frame pads the foot').toBeCloseTo(padY, 0);
+};
+
+/** A focused page: a session note, with Save draft and Submit note in the footer. */
+export const Focused = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+};
+
+/** Back, Close, the content and the footer actions, in that order, with the page's landmarks. */
+export const FocusedKeyboardAndLandmarks = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement, args }) => {
+        const { canvas, banner, main, footer, back, close, title } = focusedParts(canvasElement);
+
+        // One banner, one main, one named footer; the title is the page's one h1, in the banner.
+        await expect(canvas.getAllByRole('banner')).toHaveLength(1);
+        await expect(canvas.getAllByRole('main')).toHaveLength(1);
+        await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+        await expect(banner).toContainElement(title);
+        await expect(title).toHaveTextContent(args.title);
+        await expect(banner).toContainElement(back);
+        await expect(banner).toContainElement(close);
+        await expect(main).not.toContainElement(footer);
+        await expect(canvas.queryByRole('complementary'), 'no sidebar').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /sidebar/i }), 'no sidebar toggle').toBeNull();
+
+        // Focus order: Back first in the page, then Close, the fields, then the actions.
+        const page = canvasElement.querySelector('.plus-page-layout--focused');
+        const focusables = [...page.querySelectorAll('a[href], button, input, textarea')];
+        await expect(focusables[0], 'Back is the first stop').toBe(back);
+        back.focus();
+        await userEvent.tab();
+        await expect(close).toHaveFocus();
+        await userEvent.tab();
+        await expect(canvas.getByLabelText('Topic')).toHaveFocus();
+        await userEvent.tab();
+        await expect(canvas.getByLabelText('Notes')).toHaveFocus();
+        await userEvent.tab();
+        await expect(canvas.getByLabelText('Next step')).toHaveFocus();
+        await userEvent.tab();
+        await expect(within(footer).getByRole('button', { name: 'Save draft' })).toHaveFocus();
+        await userEvent.tab();
+        await expect(within(footer).getByRole('button', { name: 'Submit note' })).toHaveFocus();
+
+        // Back and Close call their handlers, from a click and from the keyboard.
+        await userEvent.click(back);
+        await expect(args.onBack).toHaveBeenCalledTimes(1);
+        await userEvent.click(close);
+        await expect(args.onClose).toHaveBeenCalledTimes(1);
+        back.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(args.onBack).toHaveBeenCalledTimes(2);
+        close.focus();
+        await userEvent.keyboard(' ');
+        await expect(args.onClose).toHaveBeenCalledTimes(2);
+    },
+};
+
+/** In every color mode: the sunken frame, the default surface with its edge, the title in the body text color. */
+export const FocusedColorModes = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const { frame, surface, title } = focusedParts(canvasElement);
+        const lightSunken = tokenColor(canvasElement, '--ds-surface-sunken');
+        await inEveryColorMode(async (mode) => {
+            await expect(getComputedStyle(frame).backgroundColor, `${mode}: the frame is sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(getComputedStyle(surface).backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
+            await expect(getComputedStyle(surface).boxShadow, `${mode}: the surface edge`).toBe(computedShadow(canvasElement, SURFACE_EDGE));
+            await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
+            if (mode.startsWith('dark')) {
+                await expect(getComputedStyle(frame).backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);
+            }
+        });
+    },
+};
+
+/** At 768 a long title truncates on one line, and Back and Close keep their size. */
+export const FocusedLongTitle = {
+    args: { ...focusedArgs, title: 'Reflection on the session with Jordan about two-step equations, word problems and the practice set we planned for next week' },
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(768, FOCUSED_HEIGHT, async () => {
+        const { frame, title, back, close } = focusedParts(canvasElement);
+        const style = getComputedStyle(title);
+        await expect(style.whiteSpace).toBe('nowrap');
+        await expect(style.textOverflow).toBe('ellipsis');
+        await expect(title.scrollWidth, 'the title overflows and truncates').toBeGreaterThan(title.clientWidth);
+        await expect(rect(close).height, 'Close keeps its 32').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+        await expect(rect(back).height, 'Back keeps its 32').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+        await expect(rect(frame).right - rect(close).right, 'Close stays on screen').toBeCloseTo(tokenLength(frame, '--focused-page-pad-x'), 0);
+    }),
+};
+
+/** Without actions there is no footer; without handlers there is no Back or Close. */
+export const FocusedBare = {
+    args: { title: 'Session report' },
+    render: (args) => <FocusedNote {...args} withActions={false} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('contentinfo')).toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Back' })).toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' })).toBeNull();
+        await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('Session report');
+    },
+};
+
+/** With `backHref`, Back is an anchor to that address (Button keeps its button role). */
+export const FocusedBackAsLink = {
+    args: { ...focusedArgs, onBack: undefined, backHref: '#sessions' },
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const { back, banner } = focusedParts(canvasElement);
+        await expect(back.tagName).toBe('A');
+        await expect(back).toHaveAttribute('href', '#sessions');
+        await expect(banner).toContainElement(back);
+    },
+};
+
+/** A long body scrolls inside the surface; the topbar and the footer stay put. */
+export const FocusedLongBody = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} body={3} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(1024, 600, async () => {
+        const { surface, footer, banner, frame } = focusedParts(canvasElement);
+        await waitFor(() => expect(surface.scrollHeight, 'the body overflows').toBeGreaterThan(surface.clientHeight));
+        const footerTop = rect(footer).top;
+        const bannerTop = rect(banner).top;
+        surface.scrollTop = surface.scrollHeight;
+        await expect(surface.scrollTop, 'the surface scrolled').toBeGreaterThan(0);
+        await expect(rect(footer).top, 'the footer did not move').toBeCloseTo(footerTop, 0);
+        await expect(rect(banner).top, 'the topbar did not move').toBeCloseTo(bannerTop, 0);
+        await expect(rect(frame).bottom - rect(footer).bottom, 'the footer stays at the foot').toBeCloseTo(tokenLength(frame, '--focused-page-pad-y'), 0);
+    }),
+};
+
+/** 768: the column is the surface less its pads, 720; the actions line up with it. */
+export const FocusedMedium768 = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(768, FOCUSED_HEIGHT, () => expectFocusedLayout(canvasElement, 768)),
+};
+
+/** 1024: still under the cap, so the column fills the padded surface. */
+export const FocusedLarge1024 = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(1024, FOCUSED_HEIGHT, () => expectFocusedLayout(canvasElement, 1024)),
+};
+
+/** 1440: the column caps at 864, centered, and the actions cap with it. */
+export const FocusedXLarge1440 = {
+    args: focusedArgs,
+    render: (args) => <FocusedNote {...args} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => withTestViewport(1440, FOCUSED_HEIGHT, () => expectFocusedLayout(canvasElement, 1440)),
 };

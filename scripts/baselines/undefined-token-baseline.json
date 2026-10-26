@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 71,
-    "uses": 225,
+    "names": 69,
+    "uses": 222,
     "bare": 5
   },
   "tokens": {
@@ -28,12 +28,8 @@
       "uses": 2,
       "bare": 0
     },
-    "--color-error": {
-      "uses": 1,
-      "bare": 0
-    },
     "--color-error-container": {
-      "uses": 2,
+      "uses": 1,
       "bare": 0
     },
     "--color-neutral-text": {
@@ -41,10 +37,6 @@
       "bare": 0
     },
     "--color-on-background": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-on-error-container": {
       "uses": 1,
       "bare": 0
     },

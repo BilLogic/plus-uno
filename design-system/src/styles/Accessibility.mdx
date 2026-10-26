@@ -1,211 +1,148 @@
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 <Meta of={AccessibilityStories} />
 
 <Title />
-Baseline accessibility expectations for the design system. These rules are
-built into the tokens and the Pattern System — following the token pairings
-below keeps components compliant by default.
+
+These are the accessibility rules every PLUS screen meets. Most of them are
+built into the tokens and the patterns, so a screen built from them meets the
+rules by default. Each component page adds the rules for its own name, role
+and keyboard behavior.
+
+<ResourcesBlock githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles" />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 ### Heading levels
 
-**The tag is the outline position. The class is the appearance.** A heading that
-has to *look* small but sit high in the page's outline is written
-`<h2 className="h4">`, not `<h4>`.
+**A heading's tag is its place in the outline. Its style is its look.** Choose
+the two separately. A heading that has to look small but sits high in the
+page's outline is an `h2` set in a small style, never an `h4` picked for its
+size.
 
-This works because `design-system/src/tokens/_fonts.scss` declares every heading
-step against **both** selectors at once — `h4, .h4 { … }`, `h6, .h6 { … }`, and
-so on for all six. Font family, size, line height, weight and the nested
-FontAwesome sizing are one rule shared by the tag and the class, so moving a
-heading to a different tag and keeping its `hN` class leaves its rendered size
-byte-identical. Nothing else in the system needs to change.
+- The tag comes from where the heading sits in its own page: one level below
+  the heading it belongs to, never skipping a level.
+- The style comes from **Typography**: `--heading-medium` for a section,
+  `--heading-xsmall` for a card title, and so on.
+- A component that can land at different depths, such as a card, takes its
+  heading level from where it sits.
+- Text that only looks like a heading, such as a metric, is not a heading. Set
+  it in its style on a paragraph, so it takes no place in the outline.
+- Removing a heading can create a skip: `h2, h3, h4` with the `h3` taken out
+  becomes `h2` → `h4`. Read the outline before you remove or re-tag one.
 
-Two consequences worth stating outright:
+**For developers.** The legacy `h1`–`h6` classes are declared against the tag and the class at
+once (`h4, .h4 { … }`), so `<h2 className="h4">` draws exactly like an `h4`.
+Re-tagging a heading keeps its look only if it keeps its class, and CSS that
+selects a heading by its tag stops applying when the tag changes: match the
+class as well. New work sets `font: var(--heading-*)` and needs neither.
 
-- **A heading with no size class takes its appearance from its tag**, and the
-  steps are not interchangeable — `h1`–`h3` are `%font-headline` (weight 700),
-  `h4`–`h6` are `%font-title` (weight 600), and every step has its own line
-  height. So re-tagging a bare `<h3 style={{ fontSize: '14px' }}>` silently
-  changes its weight and leading. Give it the class of the tag it is leaving
-  (`<h4 className="h3" style={…}>`) in the same edit.
-- **CSS that selects a heading by tag re-couples the two.** A rule like
-  `.lesson-content__question h4 { … }` stops applying the moment that heading's
-  outline position is corrected. Where such a rule exists, match the size class
-  as well: `h4, .h4 { … }`.
-
-What this rules out is choosing a level for its size. 329 `<h6>` against 5
-`<h1>` across `specs/` was `h6` being used as small bold text; a page then ran
-`h2` → `h6` and axe's `heading-order` reported the three skipped levels. The
-level a heading carries is decided by where it sits in *its own page's* outline,
-so a shared component that lands at different depths takes the level as a prop —
-`OverviewCard`'s `titleAs` is the pattern.
-
-The same separation covers text that is not a heading at all. A metric drawn at
-display size is not a section: `<p className="h4">Answered Correctly</p>` in
-`LessonsDetailPage` is how that text gets heading type without taking an outline
-slot, and the score beside it is `<p className="h1">` for the same reason. The
-values in `MetricsCard` and `TrainingProgressCard` read the same way — the class
-carries the whole appearance, so the tag has no work left to do.
-
-Dropping a heading is not free. It can **create** a skip where none existed:
-`h2, h3, h4` with the `h3` taken out becomes `h2` → `h4`. Read the page's
-outline before you remove one, the same as before you re-tag one.
-
-The docs view used to break this separation. `.sbdocs h1 / h2 / h3–h6 { …
-!important }` in `.storybook/storybook-overrides.css` reached into story
-canvases — `.docs-story` sits inside `.sbdocs` — and forced every heading a
-component rendered to one of three docs sizes, so `<h3 className="h6">` drew at
-28px instead of 16px and the preview was not showing the component. Those rules
-are now fenced with `:not(:where(.docs-story *))` and apply to MDX prose only.
-Any new `.sbdocs hN` rule needs the same fence.
-
+In the docs, the `.sbdocs hN` rules apply to MDX prose only: each is fenced
+with `:not(:where(.docs-story *))`, so a story's own headings draw at their
+real size. A new rule of that kind needs the same fence.
 </div>
 
 <div className="sb-ds-doc-section">
 ### The top of the outline
 
-**Every page's outline starts with an `<h1>`.** The rule above places a heading
-*within* an outline; this one says the outline has a top at all. They are
-separate defects with separate causes, and only one of them is something axe can
-report. (Starts with, not "has exactly one": a story that renders the same page
-twice, or a lesson's completion screen, legitimately shows more than one.)
+**Every page's outline starts with an `h1`.** The rule above places a heading
+within the outline; this one says the outline has a top.
 
-`heading-order` flags a heading that jumps more than one level below its
-predecessor. The **first** heading on a page has no predecessor, so a page whose
-whole outline reads `h4 → h4 → h4` satisfies the rule and still has no top. That
-was 111 of 114 page stories before the page-outline check was added.
+- A page with a visible title marks that title up as the `h1`.
+- A page whose name sits only in the topbar still has an `h1`, hidden
+  visually but kept for assistive technology.
+- A visually hidden heading is moved off-screen, never hidden with
+  `display: none`, which would remove it for screen readers too.
+- A modal's title is the dialog's own `h1`.
+- A fragment is not a page. A card or a label never carries an `h1`.
 
-`page-has-heading-one` is the rule for exactly this, and it never runs here: axe
-evaluates its page-level rules only when the run context is the whole document,
-and `addon-a11y` scopes every run to the story root. No page-level rule appears
-anywhere in `scripts/baselines/a11y-baseline.json` — not because they pass, because
-they are never evaluated.
+Adding the `h1` moves everything under it: a page that ran `h4 → h4` becomes
+`h2 → h3`, with the look unchanged.
 
-So it is guarded by two things that are not the baseline:
-
-- `.storybook/page-outline.js` asserts, in the browser suite, that every page
-  story renders an `<h1>` and that no other heading precedes it. A failure is
-  blocking, not ratcheted.
-- `npm run check:page-outline` holds the half that assertion cannot: that its
-  title-based selector still picks out exactly the story files under
-  `specs/**/Pages/**` plus the three area overviews, that the population has not
-  shrunk, and that the assertion is still registered in
-  `.storybook/vitest.setup.ts`.
-
-**Where the `<h1>` comes from.** `PageLayout` takes a `title` and renders it as
-the first element inside `<main>`, visually hidden — these pages put their name
-in the TopBar breadcrumb rather than in the content, so a visible title would be
-a design change, and 41 of the 42 page stories reach their `<h1>` this way from
-one prop. It is hidden off-screen and **never** with `display: none`, which
-would take it out of the accessibility tree and leave the page with no top at
-all. A page that renders its own visible title heading — `LoginPortal`'s
-"Login", the area overviews' "Admin Organisms" — marks *that* heading up as the
-`<h1>` and leaves `title` unset, rather than carrying two.
-
-**A fragment is not a document.** An `<h1>` in a `Badge` story would be wrong.
-The population is `specs/**/Pages/**` plus the area overviews, and it is written
-down in `scripts/check-page-outline.mjs` rather than inferred.
-
-**Adding the `<h1>` moves everything under it.** An `h1` followed by an `h4` is
-a three-level skip, so a page that used to run `h4 → h4` has to become
-`h2 → h3` — tag only, class kept, nothing changes on screen. Two consequences,
-both of which bit when the page-outline check was first applied:
-
-- A component that lands at two depths takes its level as a prop.
-  `SectionTitle` is an `h3` under a page's own header and an `h2` on the
-  Reflection page, which has no such header.
-- Tag-keyed CSS has to be widened in the same edit, exactly as § Heading levels
-  says. `.lesson-content__title-section h4` silently dropped a color and a
-  margin the moment those titles became `h2`.
+**For developers.** axe's `heading-order` rule cannot see a missing top, because the first heading
+has no predecessor, and its `page-has-heading-one` rule does not run when the
+check is scoped to a story. `PageLayout` renders a page's hidden `h1` from
+its `title`. The browser suite asserts the rule instead: every
+page story renders an `h1`, and no other heading precedes it. The page stories
+are the spec pages plus the area overviews, and `npm run check:page-outline`
+holds that list.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Contrast
 
-Text and icon colors are paired with their surface tokens so contrast is
-guaranteed by the palette, not checked per-component:
+Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what
+they sit on, in light and dark. Under increased contrast the bars are 7:1 and
+4.5:1. Each text and icon token is made for a surface or a fill, and using the
+pair keeps the contrast, so it is never checked one component at a time.
 
-<AccessibilityStories.ContrastPairings />
+<Canvas of={AccessibilityStories.ContrastPairings} sourceState="none" />
 
-Never place `on-surface` colors on accent fills or vice versa — always use the
-`on-` token that matches the background's role.
+Never put a neutral text token on a bold fill, or an inverse token on a
+surface. **Color** shows every pair, measured, in both modes.
 </div>
 
 <div className="sb-ds-doc-section">
-### Focus states
+### Focus
 
-Focus is shown by the **focus ring**, never by a fill:
+Focus is shown by the **focus ring**, never by a fill.
 
-- A 2px outline in `--color-focus-ring` (`--size-element-stroke-lg`), 2px off a
-  control's edge (Button, Checkbox, Radio) or inside a row or tab.
-- The base fill stays as it is; no state layer is added for focus.
-- Component opacity stays at 100%.
+- The ring is 2px of `--ds-border-focused`, drawn 2px outside a control's
+  edge, at the control's radius + 2. Inside a row or a tab, it is drawn inset.
+- The control's fill stays as it is, and its opacity stays at 100%.
+- The ring clears 3:1 against what it sits on, so every interactive element,
+  including cards, table rows and list items, has the same visible indicator.
 
-The ring holds 3:1 against the ground it sits on (`check:focus-ring`), so every
-interactive element (buttons, cards, table rows, list items) has a visible,
-consistent focus indicator.
+<Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Disabled states
+### Disabled
 
-Disabled components are set to **40% total opacity**
-(`--color-disabled-opacity`, which points at `opacity.disabled`, 0.4), applied to the whole component rather than
-recoloring individual parts. Disabled elements are not focus targets.
+A disabled component is dimmed as a whole to `--ds-opacity-disabled` (0.4),
+rather than recoloring its parts. Disabled elements are not focus targets, and
+they keep their label, so people can still tell what is unavailable.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Charts
 
-Every chart in Data visualizations is a Highcharts wrapper, and they all share
-`dataviz/chartTheme.js`. Two settings there carry the accessibility contract, so
-a chart built on the theme needs no per-component work:
+Every chart describes itself to screen readers: its type, its axes, each
+series and each point, and its data can be read with the keyboard. A chart is
+a labeled group inside its section, not a landmark of its own, so a dashboard
+of six charts does not add six entries to the landmark menu. Give every chart
+a title or a label, and never carry a series by color alone.
 
-- **The accessibility module is on.** Highcharts only describes itself when
-  `accessibility.enabled` is true — it then emits a screen-reader section naming
-  the chart type and axes, labels every series and point, and makes the data
-  keyboard-navigable. With it off, Highcharts falls back to stamping the SVG
-  `role="img"` with a label read off the chart title; since these charts render
-  no title, that label was empty and every chart announced as an unlabeled
-  image.
-- **Charts are groups, not landmarks.** `landmarkVerbosity: 'disabled'` keeps
-  the chart a labeled `role="group"` instead of a `role="region"` landmark. A
-  chart here is a widget inside a page region, not a region of its own, so a
-  dashboard with six charts adds six groups rather than six entries to the
-  landmark menu.
-
-A chart that assembles its own options instead of spreading `chartTheme` has to
-carry `accessibility: chartTheme.accessibility` itself. Do not wrap a chart in
-`aria-hidden` to quiet a labeling warning — that hides the keyboard-navigation
-proxies the module creates, which is a worse defect than the one it silences.
+**For developers.** The charts share `chartTheme`, which turns on the Highcharts accessibility
+module and sets `landmarkVerbosity: 'disabled'`. A chart that builds its own
+options carries `accessibility: chartTheme.accessibility` itself. Never wrap a
+chart in `aria-hidden` to quiet a labeling warning: that hides the keyboard
+proxies the module creates.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Automated checks
 
-The a11y addon (`@storybook/addon-a11y`) is enabled in `.storybook/main.js` and
-runs axe checks inside story tests. To run the checks for a set of stories:
+Every story runs axe in the Storybook test suite, and a story may not add a
+violation, so a component that breaks a rule here is caught before it ships.
+
+**For developers.** Run the checks for a set of stories with:
 
 ```bash
 npx vitest --project=storybook --run <path>
 ```
-
-Violations surface in the test UI (the `a11y.test` parameter in
-`.storybook/preview.jsx` controls whether they are advisory or fail CI).
 </div>
-
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the contrast every color pair measures at, see **Colors** — the bold and `(Text)` halves of each semantic, with ratios.
-- For the type sizes and line-heights, see **Typography**.
-- For when an icon needs a label and when it is decorative, see **Icons**.
+- **Color**, for every text and icon pair, measured in each mode.
+- **Typography**, for the heading styles and sizes.
+- **Iconography**, for when an icon needs a name and when it is decorative.
 
 </div>
 

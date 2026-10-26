@@ -17,6 +17,7 @@ export const propRows = [
     ['className', 'string', 'none', 'An extra class on the frame.', 'none'],
     ['style', 'object', 'none', 'Inline style on the frame.', 'none'],
     ['id', 'string', 'none', 'The frame\'s id.', 'none'],
+    ['footer', 'node', 'none', 'An optional row under the surface, 8 below it and lined up with it. A focused page puts its actions here.', 'none'],
     ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Surface content slot'],
 ];
 
@@ -92,6 +93,8 @@ For a whole page with the PLUS Topbar and sidebar already filled in, start from 
 2. **Surface** is a part. It is the rounded content box on `--ds-surface`, with the pad and radius from the table below.
 3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
 4. **Sidebar** is a part. It holds the logo, Home, then the sidebar sections. It docks from 1024 and floats over the page below that.
+
+An optional footer row sits under the surface, 8 below it and lined up with it. A focused page puts its actions there.
 
 The Topbar, Sidebar and Surface have their own pages. This page covers how the frame places them.
 
@@ -268,6 +271,7 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - <a href="?path=/docs/foundations-patterns-surfaces--docs">Surface</a> for the bare fill-and-elevation primitive the content box is built on.
 - <a href="?path=/docs/foundations-patterns-topbar--docs">Topbar</a> and <a href="?path=/docs/foundations-patterns-sidebar--docs">Sidebar</a> for the two parts the frame places.
 - <a href="?path=/docs/foundations-patterns-section--docs">Section</a> for a region inside the content.
+- Page templates, with the focused frame, for a page that holds one task and has no sidebar.
 - <a href="?path=/docs/foundations-layout-grid--docs">Layout & grid</a> for the column math the frame is sized by.
 - **Page templates** for a whole page: the surface container with its content slot filled.
 

@@ -1,0 +1,109 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import * as SizeRolesStories from './SizeRoles.stories.jsx';
+
+<Meta of={SizeRolesStories} />
+
+<Title />
+
+Size roles set how tall or wide a part is: a control, a table row, an icon, a
+label, a picture, a field. PLUS has one size scale, used through six roles.
+Pick the role, then its size. You never type a height or width.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-55024"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_scales.scss"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Overview
+
+<Canvas of={SizeRolesStories.Roles} sourceState="none" />
+
+<RefTable
+    head={['Role', 'Tokens', 'Values', 'Use']}
+    rows={[
+        ['Control', <><C>--item-height-sm</C> · <C>-md</C></>, '24 · 32', 'Anything you click or type into. 32 for everything, fields included; 24 only inside table rows and inline toolbars.'],
+        ['Icon', <><C>--icon-sm</C> · <C>-md</C> · <C>-lg</C></>, '12 · 16 · 24', 'The glyph box of an icon. An icon in a 24 or 32 control is drawn at 16; a larger mark goes in a Tile.'],
+        ['Row', <><C>--row-height-sm</C> · <C>-md</C> · <C>-lg</C></>, '32 · 40 · 48', 'One record in a table or list. A minimum: rows grow with their content.'],
+        ['Label', <><C>--label-height-sm</C> · <C>-md</C> · <C>--label-max-width</C></>, '16 · 20 · max 160', 'Tag, Status and Count.'],
+        ['Media', <><C>--image-xxs</C> … <C>--image-xl</C></>, '16 · 20 · 24 · 32 · 40 · 48', 'Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card.'],
+        ['Field', <><C>--field-width-xs</C> … <C>-xl</C> · <C>--field-min-height-sm</C> · <C>-lg</C></>, '80 · 160 · 240 · 320 · 480 · min 80 · 120', 'Fields fill their column by default; a fixed width takes a field width. Text area and Rich text editor take the minimum heights.'],
+    ]}
+/>
+
+Shell sizes (the 32 topbar, the 240 sidebar, the 720 minimum and the 864 and
+1232 caps) are layout tokens, and Layout & grid covers them. Minimum and maximum widths
+come from the same width scale (`--width-1000` is 160); there is no separate
+list of them.
+</div>
+
+<div className="sb-ds-doc-section">
+### Tokens
+
+Each role points at the common height and width scale.
+
+<TokenTable
+    rows={[
+        { token: '--item-height-sm', figma: 'Size/Item/height-sm' },
+        { token: '--item-height-md', figma: 'Size/Item/height-md' },
+        { token: '--row-height-sm', figma: 'Size/Row/height-sm' },
+        { token: '--row-height-md', figma: 'Size/Row/height-md' },
+        { token: '--row-height-lg', figma: 'Size/Row/height-lg' },
+        { token: '--label-height-sm', figma: 'Size/Label/height-sm' },
+        { token: '--label-height-md', figma: 'Size/Label/height-md' },
+        { token: '--label-max-width', figma: 'Size/Label/max-width' },
+        { token: '--icon-sm', figma: 'Size/Icon/sm' },
+        { token: '--icon-md', figma: 'Size/Icon/md' },
+        { token: '--icon-lg', figma: 'Size/Icon/lg' },
+        { token: '--image-xxs', figma: 'Size/Image/xxs' },
+        { token: '--image-xs', figma: 'Size/Image/xs' },
+        { token: '--image-sm', figma: 'Size/Image/sm' },
+        { token: '--image-md', figma: 'Size/Image/md' },
+        { token: '--image-lg', figma: 'Size/Image/lg' },
+        { token: '--image-xl', figma: 'Size/Image/xl' },
+        { token: '--field-width-xs', figma: 'Size/Field/width-xs' },
+        { token: '--field-width-sm', figma: 'Size/Field/width-sm' },
+        { token: '--field-width-md', figma: 'Size/Field/width-md' },
+        { token: '--field-width-lg', figma: 'Size/Field/width-lg' },
+        { token: '--field-width-xl', figma: 'Size/Field/width-xl' },
+        { token: '--field-min-height-sm', figma: 'Size/Field/min-height-sm' },
+        { token: '--field-min-height-lg', figma: 'Size/Field/min-height-lg' },
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### Do and don't
+
+<Canvas of={SizeRolesStories.ControlHeights} sourceState="none" />
+
+<Canvas of={SizeRolesStories.LargerMeansTile} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- Every control is at least 24 tall, and 32 everywhere outside a table row or
+  an inline toolbar, so it stays an easy target.
+- An icon never sets the height of the line it sits in: its box is exactly
+  its size. A control with only an icon still needs a name.
+- A Tag whose label is cut short shows the full label in a tooltip, on hover
+  and on focus.
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- **Spacing**, for the pad that turns a 20 line into a 24 or 32 Item.
+- **Radius**, for an Item's radius, its height ÷ 4.
+- **Iconography**, for which icon goes at which size.
+- **Layout & grid**, for the shell sizes and the column widths.
+
+</div>
+
+</div>

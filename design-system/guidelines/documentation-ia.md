@@ -38,7 +38,9 @@ Every docs page uses the same skeleton:
 ```
 
 Markdown pipe-tables do not parse in this MDX setup — use styled `<table>` JSX.
-The shared pattern is in `design-system/src/styles/Spacing.stories.jsx`.
+Build them from `DocsTable` (`design-system/src/storybook-docs/ds-docs-layout.jsx`);
+foundation pages use its `TokenTable` and `RefTable` wrappers and the `DoDont`
+pair in `design-system/src/storybook-docs/foundation-blocks.jsx`.
 
 ## The four tabs
 

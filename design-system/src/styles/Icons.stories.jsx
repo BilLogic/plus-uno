@@ -1,158 +1,145 @@
 import React from 'react';
+import { Button, Tile } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 
+/**
+ * Specimens for Foundations/Iconography: Font Awesome Free glyphs at the three
+ * icon sizes, in the icon color tokens.
+ */
 export default {
     title: 'Foundations/Iconography',
     tags: ['!dev', '!autodocs'],
 };
 
-const IconTokenTable = ({ rows }) => (
-    <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '24px', border: '1px solid var(--color-outline-variant)' }}>
-        <thead>
-            <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
-                {['Token', 'Size', 'Line Height', 'Description'].map(h => (
-                    <th key={h} style={{ padding: '12px', textAlign: 'left', fontWeight: '600' }} className="body2-txt">{h}</th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {rows.map((row, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
-                    <td style={{ padding: '12px' }}><code>{row.token}</code></td>
-                    <td style={{ padding: '12px', fontFamily: 'monospace' }}>{row.size}</td>
-                    <td style={{ padding: '12px', fontFamily: 'monospace' }}>{row.lineHeight}</td>
-                    <td style={{ padding: '12px' }} className="body2-txt">{row.description}</td>
-                </tr>
-            ))}
-        </tbody>
-    </table>
+const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
+const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
+const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
+
+const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-icon-subtle' }) => (
+    <i
+        className={`${family} fa-${name}`}
+        aria-hidden="true"
+        style={{ fontSize: `var(${size})`, width: `var(${size})`, height: `var(${size})`, lineHeight: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: `var(${color})` }}
+    />
 );
 
-export const Overview = () => (
-    <div style={{ maxWidth: '1200px' }}>
-        <p className="body2-txt" style={{ marginBottom: '24px' }}>
-            PLUS Design System uses <strong>Font Awesome's free icon library</strong> for all icons.
-        </p>
+const SIZES = [
+    ['--icon-sm', '12', 'chevron-down', 'Use sparingly: chevrons, small text, field validation, and inside small components such as tags and table headers.'],
+    ['--icon-md', '16', 'calendar-days', 'The default. Beside 14 and 16 text in buttons, menus, fields and lists.'],
+    ['--icon-lg', '24', 'folder', 'The largest icon. Empty states, section headers and standalone status marks.'],
+];
 
-        <h4 className="h4" style={{ marginBottom: '16px' }}>Icon Styles</h4>
-        <ul className="body2-txt" style={{ paddingLeft: '24px', marginBottom: '24px' }}>
-            <li><strong>Solid (fas)</strong>: Filled icons for emphasis or primary actions</li>
-            <li><strong>Regular (far)</strong>: Outlined icons for secondary actions or lighter emphasis</li>
-        </ul>
-
-        <h4 className="h4" style={{ marginBottom: '16px' }}>Usage Example</h4>
-        <pre style={{
-            backgroundColor: 'var(--color-surface-container-low)',
-            padding: '16px',
-            borderRadius: '4px',
-            fontFamily: 'monospace'
-        }}>
-            {`<i class="fas fa-star"></i>
-<i class="far fa-star"></i>`}
-        </pre>
-    </div>
-);
-
-export const IconSizeTokensSolid = () => (
-    <div style={{ maxWidth: '1200px' }}>
-
-        <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
-        <IconTokenTable
-            rows={[
-                { token: '--font-size-fa-h1-solid', size: '36px (2.25rem)', lineHeight: '177.8%', description: 'H1 headline icon size' },
-                { token: '--font-size-fa-h2-solid', size: '28px (1.75rem)', lineHeight: '171.4%', description: 'H2 headline icon size' },
-                { token: '--font-size-fa-h3-solid', size: '24px (1.5rem)', lineHeight: '166.7%', description: 'H3 headline icon size' },
-                { token: '--font-size-fa-h4-solid', size: '20px (1.25rem)', lineHeight: '160%', description: 'H4 headline icon size' },
-                { token: '--font-size-fa-h5-solid', size: '16px (1rem)', lineHeight: '175%', description: 'H5 headline icon size' },
-                { token: '--font-size-fa-h6-solid', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'H6 headline icon size' },
-            ]}
-        />
-
-        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h4>
-        <IconTokenTable
-            rows={[
-                { token: '--font-size-fa-body1-solid', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'Body 1 icon size' },
-                { token: '--font-size-fa-body2-solid', size: '12px (0.75rem)', lineHeight: '183.3%', description: 'Body 2 icon size (default)' },
-                { token: '--font-size-fa-body3-solid', size: '10px (0.625rem)', lineHeight: '200%', description: 'Body 3 icon size' },
-            ]}
-        />
-    </div>
-);
-
-export const IconSizeTokensRegular = () => (
-    <div style={{ maxWidth: '1200px' }}>
-
-        <h4 className="h4" style={{ marginBottom: '16px' }}>Headline Icons</h4>
-        <IconTokenTable
-            rows={[
-                { token: '--font-size-fa-h1-regular', size: '36px (2.25rem)', lineHeight: '177.8%', description: 'H1 headline icon size' },
-                { token: '--font-size-fa-h2-regular', size: '28px (1.75rem)', lineHeight: '171.4%', description: 'H2 headline icon size' },
-                { token: '--font-size-fa-h3-regular', size: '24px (1.5rem)', lineHeight: '166.7%', description: 'H3 headline icon size' },
-                { token: '--font-size-fa-h4-regular', size: '20px (1.25rem)', lineHeight: '160%', description: 'H4 headline icon size' },
-                { token: '--font-size-fa-h5-regular', size: '16px (1rem)', lineHeight: '175%', description: 'H5 headline icon size' },
-                { token: '--font-size-fa-h6-regular', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'H6 headline icon size' },
-            ]}
-        />
-
-        <h4 className="h4" style={{ marginBottom: '16px', marginTop: '32px' }}>Body Icons</h4>
-        <IconTokenTable
-            rows={[
-                { token: '--font-size-fa-body1-regular', size: '14px (0.875rem)', lineHeight: '171.4%', description: 'Body 1 icon size' },
-                { token: '--font-size-fa-body2-regular', size: '12px (0.75rem)', lineHeight: '183.3%', description: 'Body 2 icon size (default)' },
-                { token: '--font-size-fa-body3-regular', size: '10px (0.625rem)', lineHeight: '200%', description: 'Body 3 icon size' },
-            ]}
-        />
-    </div>
-);
-
-export const CommonIcons = () => {
-    const commonIcons = [
-        { name: 'circle-check', label: 'Check', class: 'fas' },
-        { name: 'xmark', label: 'Close', class: 'fas' },
-        { name: 'user', label: 'User', class: 'far' },
-        { name: 'house', label: 'Home', class: 'fas' },
-        { name: 'gear', label: 'Settings', class: 'fas' },
-        { name: 'magnifying-glass', label: 'Search', class: 'fas' },
-        { name: 'bell', label: 'Notification', class: 'far' },
-        { name: 'envelope', label: 'Message', class: 'far' },
-        { name: 'heart', label: 'Favorite', class: 'far' },
-        { name: 'star', label: 'Star', class: 'fas' },
-        { name: 'arrow-right', label: 'Arrow Right', class: 'fas' },
-        { name: 'arrow-left', label: 'Arrow Left', class: 'fas' },
-        { name: 'caret-down', label: 'Caret Down', class: 'fas' },
-        { name: 'caret-up', label: 'Caret Up', class: 'fas' },
-        { name: 'plus', label: 'Add', class: 'fas' },
-        { name: 'minus', label: 'Remove', class: 'fas' },
-        { name: 'pen-to-square', label: 'Edit', class: 'far' },
-        { name: 'trash-can', label: 'Delete', class: 'far' },
-        { name: 'download', label: 'Download', class: 'fas' },
-        { name: 'upload', label: 'Upload', class: 'fas' },
-    ];
-
-    return (
-        <div style={{ maxWidth: '1200px' }}>
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-                gap: '16px'
-            }}>
-                {commonIcons.map(icon => (
-                    <div key={icon.name} style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '12px',
-                        backgroundColor: 'var(--color-surface-container-low)',
-                        borderRadius: '4px'
-                    }}>
-                        <i className={`${icon.class} fa-${icon.name}`} style={{ fontSize: '1.5rem', color: 'var(--color-on-surface-variant)' }} aria-hidden="true"></i>
-                        <div className="body3-txt">{icon.label}</div>
-                        <div className="body3-txt" style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--color-on-surface-variant)' }}>
-                            fa-{icon.name}
-                        </div>
-                    </div>
-                ))}
+/** The three icon sizes. */
+export const Sizes = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
+        {SIZES.map(([token, value, name, use]) => (
+            <div key={token} style={col('var(--element-stack-md)')}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-surface-sunken)' }}>
+                    <Glyph name={name} size={token} color="--ds-icon" />
+                </span>
+                <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
+                <span style={caption}>{use}</span>
             </div>
-        </div>
-    );
-};
+        ))}
+    </div>
+);
+
+/** Solid, regular and brands: the three Font Awesome Free families. */
+export const Families = () => (
+    <div style={{ display: 'flex', gap: 'var(--surface-stack-md)', flexWrap: 'wrap' }}>
+        {[
+            ['fa-solid', ['calendar-days', 'bell', 'gear', 'user', 'circle-check']],
+            ['fa-regular', ['calendar-days', 'bell', 'user', 'circle-check', 'file']],
+            ['fa-brands', ['figma', 'github', 'google', 'slack', 'notion']],
+        ].map(([family, names]) => (
+            <div key={family} style={col('var(--element-stack-md)')}>
+                <span style={{ display: 'flex', gap: 'var(--element-inline-lg)' }}>
+                    {names.map((n) => <Glyph key={n} name={n} family={family} size="--icon-lg" color="--ds-icon" />)}
+                </span>
+                <span style={code}>{family}</span>
+            </div>
+        ))}
+    </div>
+);
+
+const COLORS = [
+    ['--ds-icon', 'Beside body text'],
+    ['--ds-icon-subtle', 'The default for an icon beside a label'],
+    ['--ds-icon-subtlest', 'Beside metadata'],
+    ['--ds-icon-brand', 'Brand marks'],
+    ['--ds-icon-success', 'A success status'],
+    ['--ds-icon-warning', 'A warning status'],
+    ['--ds-icon-danger', 'An error'],
+    ['--ds-icon-information', 'Information'],
+];
+
+/** Icons take an icon color token. */
+export const Colors = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--field-width-md), 1fr))', gap: 'var(--element-stack-lg)' }}>
+        {COLORS.map(([token, use]) => (
+            <div key={token} style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}>
+                <Glyph name="circle-info" size="--icon-lg" color={token} />
+                <span style={col('var(--element-stack-sm)')}>
+                    <span style={code}>{token}</span>
+                    <span style={caption}>{use}</span>
+                </span>
+            </div>
+        ))}
+    </div>
+);
+
+/** A label says what the icon means. */
+export const PairWithLabels = () => (
+    <DoDont>
+        <Do caption="An icon beside its label. The label says what it does, and a screen reader reads the label.">
+            <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+                <Button text="Reschedule" leadingVisual="calendar-days" style="default" fill="outline" />
+                <Button text="Message" leadingVisual="comment" style="default" fill="outline" />
+            </span>
+        </Do>
+        <Dont caption="Icons alone for actions people use rarely. Each one costs the reader a guess.">
+            <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+                <Button leadingVisual="calendar-days" title="Reschedule" aria-label="Reschedule" style="default" fill="outline" />
+                <Button leadingVisual="comment" title="Message" aria-label="Message" style="default" fill="outline" />
+            </span>
+        </Dont>
+    </DoDont>
+);
+
+/** One glyph for one meaning, across the product. */
+export const OneGlyphOneMeaning = () => (
+    <DoDont>
+        <Do caption="Every date in the product takes the same calendar glyph.">
+            <span style={col('var(--element-stack-md)')}>
+                {['Tuesday, June 3', 'Due Friday', 'Started May 12'].map((t) => (
+                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                        <Glyph name="calendar-days" />{t}
+                    </span>
+                ))}
+            </span>
+        </Do>
+        <Dont caption="Three different glyphs for a date. People read them as three different things.">
+            <span style={col('var(--element-stack-md)')}>
+                {[['Tuesday, June 3', 'calendar-days'], ['Due Friday', 'clock'], ['Started May 12', 'flag']].map(([t, g]) => (
+                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                        <Glyph name={g} />{t}
+                    </span>
+                ))}
+            </span>
+        </Dont>
+    </DoDont>
+);
+
+/** 24 is the largest icon; a larger mark goes in a Tile. */
+export const LargerMeansTile = () => (
+    <div style={{ display: 'flex', gap: 'var(--surface-stack-md)', alignItems: 'flex-end' }}>
+        <span style={col('var(--element-stack-md)')}>
+            <Glyph name="folder" size="--icon-lg" color="--ds-icon" />
+            <span style={caption}>24: the largest icon</span>
+        </span>
+        <span style={col('var(--element-stack-md)')}>
+            <Tile content="icon" icon="book-open" size={48} color="teal" />
+            <span style={caption}>Larger: a Tile</span>
+        </span>
+    </div>
+);

@@ -1,0 +1,70 @@
+/**
+ * PageLayout frame="focused": the Frame with no sidebar, a Back · title ·
+ * Close topbar, the surface at reading width, and a footer row for the
+ * actions. Mirrors the Figma `Pattern/Page template` frame=focused. Every
+ * length is a Focused page, Layout or Surface token.
+ */
+
+/* ------------------------------------------------------------- frame */
+
+// The focused frame pads the same on every side, so the row and the footer
+// drop the left pad the default frame keeps for its sidebar toggle.
+.plus-page-layout--focused > .plus-frame {
+    padding: var(--focused-page-pad-y) var(--focused-page-pad-x);
+    gap: var(--focused-page-stack-sm);
+}
+
+.plus-page-layout--focused > .plus-frame > .plus-frame__row,
+.plus-page-layout--focused > .plus-frame > .plus-frame__footer {
+    padding-left: var(--space-0);
+}
+
+/* ------------------------------------------------------------- topbar */
+
+.plus-page-focused__topbar {
+    display: flex;
+    align-items: center;
+    gap: var(--focused-page-inline-md);
+    width: 100%;
+    min-width: 0;
+    height: var(--layout-height-topbar);
+}
+
+.plus-page-focused__back,
+.plus-page-focused__close {
+    flex-shrink: 0;
+}
+
+// The title takes what is left and stays on one line.
+.plus-page-focused__title {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font: var(--heading-xsmall);
+    color: var(--ds-text);
+}
+
+/* ------------------------------------------------------------- footer */
+
+// As wide as the surface and padded like it, so the actions column lands
+// exactly over the content column.
+.plus-page-focused__footer {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-inline: var(--surface-pad);
+}
+
+.plus-page-focused__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--focused-page-inline-sm);
+    width: 100%;
+    min-width: var(--layout-min-width-content);
+    max-width: var(--layout-max-width-reading);
+    margin-inline: auto;
+    box-sizing: border-box;
+}
