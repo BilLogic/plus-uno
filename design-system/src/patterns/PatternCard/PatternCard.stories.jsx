@@ -4,6 +4,8 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
+import { Button, Skeleton } from '@/components';
+import { CardJobs } from './PatternCardCases.jsx';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -72,6 +74,150 @@ function PatternCardConstraintsDemos() {
                     </PatternCard>
                 </div>
             </div>
+        </div>
+    );
+}
+
+const CARD_SIZES = ['sm', 'md', 'lg'];
+
+const DemoCaption = ({ children }) => (
+    <span
+        style={{
+            display: 'block',
+            marginBottom: 'var(--element-stack-md)',
+            font: 'var(--heading-xxsmall)',
+            textTransform: 'uppercase',
+            color: 'var(--ds-text-subtle)',
+        }}
+    >
+        {children}
+    </span>
+);
+
+const wrapRow = { display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' };
+
+const sessionBody = (
+    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
+);
+
+const viewSession = <Button text="View session" style="primary" fill="text" size="small" onClick={() => {}} />;
+
+/** The three sizes: each sets the pad, the radius and the minimum width together. */
+function PatternCardSizesDemo() {
+    return (
+        <div style={wrapRow}>
+            {CARD_SIZES.map((size) => (
+                <div key={size}>
+                    <DemoCaption>{`size=${size}`}</DemoCaption>
+                    <PatternCard
+                        padding={size}
+                        minWidth={`var(--card-min-width-${size})`}
+                        title="Ana Ruiz"
+                        description="Algebra I · Thu 4:00 PM"
+                        footer={viewSession}
+                    >
+                        {sessionBody}
+                    </PatternCard>
+                </div>
+            ))}
+        </div>
+    );
+}
+
+const imagePlaceholder = (ratio) => (
+    <div
+        style={{
+            aspectRatio: ratio.replace(':', ' / '),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--element-inline-md)',
+            backgroundColor: 'var(--ds-background-neutral)',
+            color: 'var(--ds-text-subtle)',
+            font: 'var(--body-default)',
+        }}
+    >
+        <i className="fa-regular fa-image" aria-hidden="true" />
+        {ratio}
+    </div>
+);
+
+/** The image slot at each ratio, edge to edge above the padded content. */
+function PatternCardImageDemo() {
+    return (
+        <div style={wrapRow}>
+            {['16:9', '4:3', '1:1'].map((ratio) => (
+                <PatternCard
+                    key={ratio}
+                    image={imagePlaceholder(ratio)}
+                    title="Ana Ruiz"
+                    description="Algebra I · Thu 4:00 PM"
+                    style={{ width: 'var(--card-min-width-md)' }}
+                >
+                    {sessionBody}
+                </PatternCard>
+            ))}
+        </div>
+    );
+}
+
+/** A loading card: text bars at the text line heights, in a card kept at its final size. */
+function PatternCardLoadingDemo() {
+    return (
+        <div style={wrapRow}>
+            <div>
+                <DemoCaption>Default</DemoCaption>
+                <PatternCard title="Ana Ruiz" description="Algebra I · Thu 4:00 PM" footer={viewSession} style={{ width: 'var(--card-min-width-md)' }}>
+                    {sessionBody}
+                </PatternCard>
+            </div>
+            <div>
+                <DemoCaption>Loading</DemoCaption>
+                <PatternCard aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
+                        <Skeleton shape="text" width="50%" />
+                        <Skeleton shape="text" width="75%" />
+                        <Skeleton shape="text" width="100%" />
+                        <Skeleton shape="text" width="40%" />
+                    </div>
+                </PatternCard>
+            </div>
+        </div>
+    );
+}
+
+/** A row of cards at three content widths: the most that keeps each card at its minimum. */
+function PatternCardRowsDemo() {
+    const people = [
+        ['Ana Ruiz', 'Algebra I · Thu 4:00 PM'],
+        ['Marcus Lee', 'Geometry · Thu 5:00 PM'],
+        ['Priya Shah', 'Biology · Fri 3:30 PM'],
+        ['Jordan Kim', 'Chemistry · Fri 4:15 PM'],
+        ['Ana Ruiz', 'Algebra I · Thu 4:00 PM'],
+        ['Marcus Lee', 'Geometry · Thu 5:00 PM'],
+    ];
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
+            {[['Medium', 720], ['Large', 744], ['X-Large', 1144]].map(([mode, width]) => (
+                <div key={mode} style={{ overflowX: 'auto' }}>
+                    <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
+                    <div
+                        data-row={mode}
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
+                            gap: 'var(--layout-gutter)',
+                            width,
+                        }}
+                    >
+                        {people.map(([name, detail], i) => (
+                            <PatternCard key={`${name}-${i}`} title={name} description={detail}>
+                                {sessionBody}
+                            </PatternCard>
+                        ))}
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
@@ -239,5 +385,37 @@ export const Elevation = {
                 await expect(raised.fill, `${mode}: the raised surface moves with the mode`).not.toBe(lightRaised);
             }
         });
+    },
+};
+
+/** A static card, a clickable card and a dragged card, for the docs page. */
+export const ElevationStates = () => (
+    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+        <PatternCard title="Static" minWidth={200}>{bodyCopy}</PatternCard>
+        <PatternCard title="Clickable" minWidth={200} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+        <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
+    </div>
+);
+
+export const Sizes = () => <PatternCardSizesDemo />;
+
+export const Jobs = () => <CardJobs />;
+
+export const ImageRatios =() => <PatternCardImageDemo />;
+
+export const Loading = () => <PatternCardLoadingDemo />;
+
+/** At the content widths of the three modes, a md card row holds 2, 2 and 3 cards. */
+export const Rows = {
+    render: () => <PatternCardRowsDemo />,
+    play: async ({ canvasElement }) => {
+        const count = (mode) => {
+            const cards = Array.from(canvasElement.querySelector(`[data-row="${mode}"]`).children);
+            const top = Math.min(...cards.map((card) => Math.round(card.getBoundingClientRect().top)));
+            return cards.filter((card) => Math.round(card.getBoundingClientRect().top) === top).length;
+        };
+        await expect(count('Medium'), 'Medium holds 2 md cards').toBe(2);
+        await expect(count('Large'), 'Large holds 2 md cards').toBe(2);
+        await expect(count('X-Large'), 'X-Large holds 3 md cards').toBe(3);
     },
 };

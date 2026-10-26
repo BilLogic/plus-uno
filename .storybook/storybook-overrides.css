@@ -16,8 +16,9 @@ body,
 /*
  * Headers in MDX prose only.
  * Do NOT let these reach inside a story canvas — that is what
- * `:not(:where(.docs-story *))` is fencing off, and it is the same lesson the
- * body-text rules below already learned.
+ * `:not(:where(.docs-story *, .sb-ds-dodont-card *))` is fencing off, and it is the same lesson the
+ * body-text rules below already learned. A do and don't card holds live
+ * components, so it is fenced the same way as a canvas.
  *
  * `.docs-story` is a descendant of `.sbdocs`, so an unfenced
  * `.sbdocs h3 { font-size: … !important }` outranks a story's own `hN` size
@@ -40,7 +41,7 @@ body,
  * selectors that used to sit alongside these were deleted: they were never
  * emitted, so they had never once applied. `.sbdocs-title` IS emitted and stays.
  */
-.sbdocs h1:not(:where(.docs-story *)),
+.sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-display4, 56px) !important;
@@ -48,7 +49,7 @@ body,
     color: var(--color-on-surface, #191c1e) !important;
 }
 
-.sbdocs h2:not(:where(.docs-story *)) {
+.sbdocs h2:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-h2, 32px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
@@ -56,10 +57,10 @@ body,
     margin-top: var(--size-section-gap-md) !important;
 }
 
-.sbdocs h3:not(:where(.docs-story *)),
-.sbdocs h4:not(:where(.docs-story *)),
-.sbdocs h5:not(:where(.docs-story *)),
-.sbdocs h6:not(:where(.docs-story *)) {
+.sbdocs h3:not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs h4:not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs h5:not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs h6:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--font-family-header, 'Lato', sans-serif) !important;
     font-size: var(--font-size-h3, 28px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
@@ -102,8 +103,8 @@ body,
  * the map does not class is an element this rule already catches. A second
  * mechanism that alters no pixel is a second authority for one job.
  */
-.sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *)),
-.sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *)) {
+.sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif);
     font-size: var(--font-size-body1, 16px);
     line-height: var(--font-line-height-body1, 150%);
@@ -128,8 +129,8 @@ body,
  * The cap goes on the LIST rather than on each item, so a wrapped item and its
  * marker stay in one column.
  */
-.sbdocs .sbdocs-content ul:not([class]):not(:where(.docs-story *)),
-.sbdocs .sbdocs-content ol:not([class]):not(:where(.docs-story *)) {
+.sbdocs .sbdocs-content ul:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
+.sbdocs .sbdocs-content ol:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     max-width: 55ch;
 }
 
@@ -635,7 +636,7 @@ a.sbdocs-a {
 /* Add margin under the main Title. Fenced out of story canvases for the same
    reason as the type-scale rules at the top of this file — LessonsDetailPage's
    P5 canvas renders `<h1>`s of its own. */
-.sbdocs h1:not(:where(.docs-story *)),
+.sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
   margin-bottom: var(--size-section-gap-md) !important;
 }
@@ -1031,7 +1032,7 @@ a.sbdocs-a {
  * could never render below it. They are now part of the page, and this is their
  * only styling.
  *
- * Scoped entirely under `.sb-ds-docs-tabs`, so the `:not(:where(.docs-story *))`
+ * Scoped entirely under `.sb-ds-docs-tabs`, so the `:not(:where(.docs-story *, .sb-ds-dodont-card *))`
  * fence the heading rules above need does not apply here: nothing in this block
  * selects a bare tag.
  */

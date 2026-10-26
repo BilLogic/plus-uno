@@ -1,15 +1,18 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PatternSectionStories from './PatternSection.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SectionOfTwoCards, SectionRepeatingCardTitle, CardOwnsCommit, SectionFooterCommits, TabsInSectionHeader, TabsAboveSectionHeader } from './PatternSectionCases.jsx';
 
 <Meta of={PatternSectionStories} />
 
 <Title />
-A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options: the Surface around it supplies the pad. The Section header comes first, then the body, then an optional footer, Section/stack-md apart. It mirrors `Pattern/Section` in Figma.
+A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options: the Surface around it supplies the pad, so a section never draws a box of its own. The Section header comes first, then the body, then an optional footer.
+
+The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-2987"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternSection"
 />
 
@@ -19,7 +22,7 @@ A section is a span of the page grid that groups content under one heading. It h
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Title, description, actions slot and content slot.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A section with a title, a description, an actions slot and a content slot.</>}>
     <Canvas of={PatternSectionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,10 +30,153 @@ A section is a span of the page grid that groups content under one heading. It h
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Make a section when the content has a **heading**, shares **actions**, shows or hides as a unit, or takes its own span of the grid. Otherwise the content is part of the section above it.
+
+Do not wrap a single card in a section that repeats the card's own title. A section holds cards, tables, rows, forms or subsections, and never a card inside a card.
+
+A subsection is a section inside a section. Use two levels at most. Use `layout="subsections"` when one page holds several related groups that each need a title, such as a settings page with Profile, Notifications and Privacy.
+
+When something else fits better:
+
+- For one object, such as a student, a session or a metric, use a Card.
+- For a region that needs a fill or an edge of its own, use a Surface.
+- For rows and columns of data, put a Table inside the section. The section header carries the table's search, filters and actions.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A section's parts, top to bottom. A slot is a place you fill with your own content.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Footer} />
+</DocsCanvasShell>
+
+1. **Section header** is a part of its own with a title, a description and an actions slot, and an optional bottom row for tabs or a toolbar. Its level sets the heading size.
+2. **Content** is a slot. It holds cards, tables, rows or forms.
+3. **Footer** is an optional slot at the end, for "View all" or paging.
+4. **Side** is a second content slot, used only by <code>layout="split"</code>.
+
+Parts stack Section/stack-md 16 apart. Inside the header, the title row sits Section/stack-sm 8 above the tabs or toolbar row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Values</th>
+            <th>Default</th>
+            <th>Figma</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>title</code></td><td>node</td><td>The section heading</td><td>none</td><td><code>title</code></td></tr>
+        <tr><td><code>description</code></td><td>node</td><td>One line under the title, Body/default 14/20</td><td>none</td><td><code>description?</code></td></tr>
+        <tr><td><code>actions</code></td><td>node</td><td>Buttons at the end of the title row</td><td>none</td><td><code>actions?</code></td></tr>
+        <tr><td><code>type</code></td><td>string</td><td><code>default</code>, <code>tabs</code>, <code>toolbar</code>, <code>custom</code>, <code>tabs-only</code></td><td>read from the slots you fill</td><td><code>type</code> (<code>tabs only</code>)</td></tr>
+        <tr><td><code>tabs</code></td><td>node</td><td>The tabs row, under the title row</td><td>none</td><td>tabs slot</td></tr>
+        <tr><td><code>onAddView</code></td><td>function</td><td>Shows "Add view" at the end of the tabs row</td><td>none</td><td><code>add view?</code></td></tr>
+        <tr><td><code>addViewLabel</code></td><td>string</td><td>The label of that button</td><td><code>Add view</code></td><td>none</td></tr>
+        <tr><td><code>toolbar</code></td><td>node</td><td>The toolbar row, usually a <code>PatternSection.Toolbar</code></td><td>none</td><td>exposed <code>_Section toolbar</code></td></tr>
+        <tr><td><code>header</code></td><td>node</td><td>A free-form header in place of title and description</td><td>none</td><td>header slot</td></tr>
+        <tr><td><code>level</code></td><td>string</td><td><code>page</code> makes the title the page's h1. Left off, the level follows nesting.</td><td>follows nesting</td><td><code>level</code></td></tr>
+        <tr><td><code>layout</code></td><td>string</td><td><code>single</code>, <code>split</code>, <code>subsections</code></td><td><code>single</code></td><td><code>layout</code></td></tr>
+        <tr><td><code>side</code></td><td>node</td><td>The side column of a split</td><td>none</td><td>side slot</td></tr>
+        <tr><td><code>footer</code></td><td>node</td><td>"View all" or paging, at the end</td><td>none</td><td><code>footer?</code></td></tr>
+        <tr><td><code>loading</code></td><td>boolean</td><td>Replaces the header with skeleton bars</td><td><code>false</code></td><td><code>loading?</code></td></tr>
+        <tr><td><code>gap</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code> (Section/stack)</td><td><code>md</code></td><td>none; the Figma section stacks Section/stack-md</td></tr>
+        <tr><td><code>children</code></td><td>node</td><td>The content slot; with <code>split</code>, the main column</td><td>none</td><td>content slot</td></tr>
+    </tbody>
+</DocsTable>
+
+**The toolbar** is its own part, <code>PatternSection.Toolbar</code>. It has two states.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Values</th>
+            <th>Default</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>state</code></td><td>string</td><td><code>default</code>, <code>selected</code></td><td><code>default</code></td></tr>
+        <tr><td><code>search</code></td><td>node</td><td>The search field, at the start</td><td>none</td></tr>
+        <tr><td><code>filters</code></td><td>node</td><td>Filter buttons after the search</td><td>none</td></tr>
+        <tr><td><code>count</code></td><td>node</td><td>A count such as "48 students". It truncates first.</td><td>none</td></tr>
+        <tr><td><code>actions</code></td><td>node</td><td>Buttons at the end</td><td>none</td></tr>
+        <tr><td><code>selection</code></td><td>node</td><td>Selected state: the selection, such as "3 selected"</td><td>none</td></tr>
+        <tr><td><code>bulkActions</code></td><td>node</td><td>Selected state: the bulk action buttons</td><td>none</td></tr>
+        <tr><td><code>onClear</code></td><td>function</td><td>Selected state: shows Clear and runs when it is pressed</td><td>none</td></tr>
+        <tr><td><code>clearLabel</code></td><td>string</td><td>The label of Clear</td><td><code>Clear</code></td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Used for</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--section-stack-sm</code></td><td>8</td><td>The title row to the tabs or toolbar row</td></tr>
+        <tr><td><code>--section-stack-md</code></td><td>16</td><td>The header to the body, and the body to the footer</td></tr>
+        <tr><td><code>--section-stack-lg</code></td><td>24</td><td>Between subsections</td></tr>
+        <tr><td><code>--section-min-width-main</code></td><td>480</td><td>The main column of a split</td></tr>
+        <tr><td><code>--section-min-width-side</code></td><td>224</td><td>The side column of a split</td></tr>
+        <tr><td><code>--element-stack-sm</code></td><td>4</td><td>The title to the description</td></tr>
+        <tr><td><code>--element-inline-md</code></td><td>8</td><td>Items in the title row and the tabs row</td></tr>
+        <tr><td><code>--heading-large</code></td><td>24/28</td><td>A page title (<code>level="page"</code>)</td></tr>
+        <tr><td><code>--heading-medium</code></td><td>20/24</td><td>A section title</td></tr>
+        <tr><td><code>--heading-small</code></td><td>16/20</td><td>A subsection title</td></tr>
+        <tr><td><code>--body-default</code></td><td>14/20</td><td>The description, at every level</td></tr>
+        <tr><td><code>--ds-text</code></td><td>color</td><td>The title</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>color</td><td>The description</td></tr>
+        <tr><td><code>--ds-background-selected</code></td><td>color</td><td>The bulk bar of the selected toolbar</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Header types
 
-<DocsCanvasShell description={<>The type is read from the slots you fill: <code>header</code> makes it <code>custom</code>, <code>toolbar</code> makes it <code>toolbar</code>, <code>tabs</code> makes it <code>tabs</code>. Pass <code>type="tabs-only"</code> to show only the tabs row. In <code>custom</code> and <code>tabs-only</code> the title stays in the markup as the heading, visually hidden, so screen readers still reach it. <code>onAddView</code> puts "Add view" at the end of the tabs row.</>}>
+Five types set what the header holds. The type is read from the slots you fill: <code>header</code> makes it custom, <code>toolbar</code> makes it toolbar and <code>tabs</code> makes it tabs. Pass <code>type="tabs-only"</code> to show only the tabs row.
+
+Tabs belong to the section. They are the bottom row of the section header, and each tab's content is the section body. Use tabs for views of the same thing, and keep each label to one or two words. Use tabs only when the page title already names the view. The title then hides visually and stays for screen readers.
+
+<DocsCanvasShell description={<>Default, tabs with "Add view", toolbar in both states, custom and tabs only. In custom and tabs only, the title stays in the page, visually hidden.</>}>
     <DsCanvasQuiet of={PatternSectionStories.HeaderTypes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Level
+
+The title is one heading level below what holds it, and one size smaller. A section on a page is an h2 at Heading/medium 20/24. A subsection is an h3 at Heading/small 16/20, and deeper sections keep that size. <code>level="page"</code> makes the title the page header, an h1 at Heading/large 24/28, and the sections inside it become h2.
+
+<DocsCanvasShell description={<>A page title, a section inside it and a subsection inside that. The description is Body/default 14/20 at every level.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Levels} />
 </DocsCanvasShell>
 
 </div>
@@ -39,7 +185,9 @@ A section is a span of the page grid that groups content under one heading. It h
 
 ### Layouts
 
-<DocsCanvasShell description={<><code>single</code> is the content alone. <code>split</code> puts the content (span 8, at least 480) beside <code>side</code> (span 4, at least 224); when a column would drop below its minimum, they stack. <code>subsections</code> stacks nested sections 24 apart, each an h3 under the section's h2.</>}>
+<code>single</code> is the content alone. <code>split</code> puts the content, span 8 with a minimum of 480, beside <code>side</code>, span 4 with a minimum of 224. When a column would drop below its minimum, they stack. <code>subsections</code> splits one section into named groups that share a single page heading, and stacks them Section/stack-lg 24 apart. Each group is a subsection, an h3 under the section's h2.
+
+<DocsCanvasShell description={<>Single with three cards, split, and subsections for a settings page.</>}>
     <DsCanvasQuiet of={PatternSectionStories.Layouts} />
 </DocsCanvasShell>
 
@@ -49,8 +197,22 @@ A section is a span of the page grid that groups content under one heading. It h
 
 ### Footer
 
-<DocsCanvasShell description={<>Only for "View all" or paging, at the end. Actions that commit changes go in a card footer, not on the section.</>}>
+The footer is only for "View all" or paging, and it sits at the end. Actions that commit changes belong in a card footer, never on the section.
+
+<DocsCanvasShell description={<>A "View all" button in the footer, Section/stack-md under the content.</>}>
     <DsCanvasQuiet of={PatternSectionStories.Footer} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Toolbar
+
+A table gets its controls from the section header above it, never from the table itself. Use the toolbar type for search, filters, the record count and actions, and the tabs type for saved views. When rows are selected, the toolbar switches to the selected state: the selection, bulk actions and Clear, on <code>--ds-background-selected</code>.
+
+<DocsCanvasShell description={<>The default state, then the selected state with three rows selected.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Toolbar} />
 </DocsCanvasShell>
 
 </div>
@@ -59,7 +221,9 @@ A section is a span of the page grid that groups content under one heading. It h
 
 ### Loading
 
-<DocsCanvasShell description={<><code>loading</code> swaps the header for skeleton bars and marks the section busy. The body is the content's to load.</>}>
+<code>loading</code> replaces the whole header with skeleton bars and marks the section busy. The bars are a title bar, a description bar and, when the header has one, a bar for the tabs or toolbar row. Tabs only draws just that row bar. The body is the content's to load.
+
+<DocsCanvasShell description={<>A default header, a toolbar header and a tabs-only header while loading.</>}>
     <DsCanvasQuiet of={PatternSectionStories.Loading} />
 </DocsCanvasShell>
 
@@ -83,11 +247,63 @@ A section is a span of the page grid that groups content under one heading. It h
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Do and don't
 
-- For one object rather than a region, use `Card`.
-- For a region that needs a fill of its own, use `Surface` or `Card`. A section is transparent, and the page shows through. `padding` and `background` are deprecated: they still work, and warn once in development.
-- For how a section's content lines up across breakpoints, see **Layout & Grid**.
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <SectionOfTwoCards />,
+            doCaption: 'Two cards share one heading, so they form a section: "Upcoming sessions".',
+            dontExample: <SectionRepeatingCardTitle />,
+            dontCaption: "One card gets a section whose heading repeats its own title. Drop the section, and the card stands on its own.",
+        },
+        {
+            doExample: <CardOwnsCommit />,
+            doCaption: 'The card owns its commit action in its footer. The section footer stays free for "View all".',
+            dontExample: <SectionFooterCommits />,
+            dontCaption: "A commit action in the section footer sits far from what it saves, and the footer no longer leads to more.",
+        },
+        {
+            doExample: <TabsInSectionHeader />,
+            doCaption: 'The tabs sit under the section title, in the header, and the body belongs to the selected tab.',
+            dontExample: <TabsAboveSectionHeader />,
+            dontCaption: "Tabs placed above a section header make two competing headings, and the tabs no longer belong to the section.",
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- The title is a heading, and its level follows nesting: one h1 per page, h2 for a section, h3 for a subsection. Nest sections instead of choosing a tag.
+- A section with no title is a wrapper. What it holds keeps the parent's heading level.
+- In the custom and tabs-only types the title is hidden from sight but stays in the page, so the section keeps its name. Always give those sections a title.
+- A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
+- The selected toolbar announces its selection, such as "3 selected", politely.
+- Give the tabs row a label that says what the tabs switch, such as "Views".
+- Selection is never color alone: the count and the Clear button say it in words.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+<code>padding</code> and <code>background</code> are deprecated. They still work and warn once in development. <code>padding</code> draws a pad around the section, and <code>background="container"</code> draws a translucent well. The Surface around a section supplies the pad, so leave both off. For a region with a fill of its own, use a Surface or a Card.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- <a target="_top" href="./?path=/docs/foundations-patterns-card--docs">Card</a>: for one object rather than a region.
+- <a target="_top" href="./?path=/docs/foundations-patterns-surfaces--docs">Surface</a>: for a region that needs a fill or an edge. A section is transparent.
+- <a target="_top" href="./?path=/docs/foundations-patterns-table--docs">Table</a>: the section header above a table carries its toolbar and tabs.
+- <a target="_top" href="./?path=/docs/foundations-patterns-frame--docs">Surface container</a>: the frame that sets the pad a section sits in.
 
 </div>
 

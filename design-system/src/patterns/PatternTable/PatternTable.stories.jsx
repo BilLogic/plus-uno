@@ -4,7 +4,6 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternTable from '@/patterns/PatternTable';
-import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
 import Button from '@/components/forms-and-inputs/Button';
 import { Checkbox } from '@/components';
@@ -81,20 +80,6 @@ const wideTable = (
     </>
 );
 
-/** The table in a Section: the header carries the title and actions, paging stays under the rows — docs section only */
-function PatternTableCompositionDemo() {
-    return (
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TABLE IN A SECTION</span>
-            <PatternSection title="Team members" actions={sectionActions}>
-                <PatternTable pagination={paginationSlot}>
-                    {tableContent}
-                </PatternTable>
-            </PatternSection>
-        </div>
-    );
-}
-
 export default {
     title: 'Foundations/Patterns/Table',
     component: PatternTable,
@@ -143,8 +128,6 @@ export const Overview = () => (
         </PatternTable>
     </PatternSection>
 );
-
-export const Composition = () => <PatternTableCompositionDemo />;
 
 /**
  * The empty state sits inside the table, under its head row, as a message row
@@ -311,19 +294,19 @@ export const RowStates = {
 };
 
 /**
- * A sticky header and first column inside a card. The sticky cells paint the
- * current surface, which the card sets to its raised fill, and take the
+ * A sticky header and first column in a Section. The sticky cells paint the
+ * current surface, so they match what the table sits on, and take the
  * overflow shadow only once content is scrolled under them. Held in all four
  * modes.
  */
 export const Sticky = {
     render: () => (
         <div style={{ maxWidth: '480px' }}>
-            <PatternCard title="Tutors">
+            <PatternSection title="Tutors">
                 <PatternTable stickyHeader stickyColumn maxHeight={240}>
                     {wideTable}
                 </PatternTable>
-            </PatternCard>
+            </PatternSection>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -339,10 +322,10 @@ export const Sticky = {
                 scroller.scrollTo(0, 0);
                 await waitFor(() => expect(scroller.hasAttribute('data-scrolled-y')).toBe(false));
                 await expect(getComputedStyle(head).position, `${mode}: the head row is sticky`).toBe('sticky');
-                await expect(getComputedStyle(head).backgroundColor, `${mode}: a sticky head cell matches the card it sits in`)
-                    .toBe(color('--ds-surface-raised'));
-                await expect(getComputedStyle(selectedFirst).backgroundColor, `${mode}: a sticky column cell matches the card`)
-                    .toBe(color('--ds-surface-raised'));
+                await expect(getComputedStyle(head).backgroundColor, `${mode}: a sticky head cell matches the surface it sits on`)
+                    .toBe(color('--ds-utility-elevation-surface-current'));
+                await expect(getComputedStyle(selectedFirst).backgroundColor, `${mode}: a sticky column cell matches the surface`)
+                    .toBe(color('--ds-utility-elevation-surface-current'));
                 await expect(getComputedStyle(selectedFirst).backgroundImage, `${mode}: a sticky cell keeps the selected row's layer`)
                     .toContain(color('--ds-background-selected'));
                 await expect(shadow(head), `${mode}: no shadow before anything scrolls under the header`).toBe('none');

@@ -1,15 +1,18 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PatternCardStories from './PatternCard.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { MetricInSmall, MetricInLarge } from './PatternCardCases.jsx';
 
 <Meta of={PatternCardStories} />
 
 <Title />
-The card pattern is a componentized shell with baked-in tokens — Atlassian's raised pair, `--ds-surface-raised` under `--ds-shadow-raised`, on the card radius. The shadow's 1px ring is the card's edge, so there is no border; in dark the raised surface is a lighter gray than the page. A card with an `onClick` lifts on hover to `--ds-surface-raised-hovered` under `--ds-shadow-overlay` and settles back onto the raised shadow while pressed, and `dragging` puts any card on the overlay pair while it moves. Consumers fill the header (`title`, `description` and `actions`, or a custom `header`), the body, an optional `image` and a left-aligned footer; the shell owns the frame and the Card spacing tokens. It mirrors `Pattern/Card` and `_Card header` in Figma. For the fully-featured content card (title, media, links, actions), use the core Card component instead.
+A card is a raised container for one object on a page, such as a student, a session or a metric. It holds an optional image, a header over a body, and an optional footer, and it rests on the raised pair with no border. The pad and the radius follow the card size, and the stack between parts follows use.
+
+The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3003"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternCard"
 />
 
@@ -19,7 +22,7 @@ The card pattern is a componentized shell with baked-in tokens — Atlassian's r
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Card shell with a title, a description and body children.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A card with a title, a description and a body.</>}>
     <Canvas of={PatternCardStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,9 +30,134 @@ The card pattern is a componentized shell with baked-in tokens — Atlassian's r
 
 <div className="sb-ds-doc-section">
 
+### When to use
+
+Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer.
+
+Two pages document a card, and they do different jobs:
+
+- **This pattern** is the shell for a card placed in a region of a page. You fill its slots with your own parts: a header, a body, an image and a footer.
+- **The <a target="_top" href="./?path=/docs/components-layout-and-structure-card--docs">Card component</a>** is the ready-made content card, with a title, subtitle, body, list items, links and an action button already built. Use it when those parts already fit what you show.
+
+When something else fits better:
+
+- For a region of the page that holds several things under one heading, use a Section.
+- For many objects of the same shape that people compare across columns, use a Table.
+- For something that must be decided before the page can continue, use a Modal.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>Image, header, body and footer, with actions at the end of the header row.</>}>
+    <DsCanvasQuiet of={PatternCardStories.ImageRatios} />
+</DocsCanvasShell>
+
+1. **Image** is an optional slot above everything else. It runs edge to edge, outside the card pad, and the card radius clips its corners.
+2. **Header** holds the title, an optional description and an optional actions slot. A custom header replaces all three, for tabs or a toolbar.
+3. **Body** is a slot for text, a list or media.
+4. **Footer** is an optional slot, left-aligned, for actions that commit a change.
+
+The image sits above a padded frame. The header, the body and the footer sit inside that frame.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Values</th>
+            <th>Default</th>
+            <th>Figma</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>title</code></td><td>node</td><td>The card title, Heading/xsmall 14/20</td><td>none</td><td><code>title</code></td></tr>
+        <tr><td><code>description</code></td><td>node</td><td>One line under the title, Body/default 14/20</td><td>none</td><td><code>description?</code></td></tr>
+        <tr><td><code>actions</code></td><td>node</td><td>An overflow or buttons at the end of the header row</td><td>none</td><td><code>actions?</code></td></tr>
+        <tr><td><code>header</code></td><td>node</td><td>A custom header in place of title, description and actions</td><td>none</td><td><code>type=custom</code></td></tr>
+        <tr><td><code>image</code></td><td>node</td><td>The image slot above the content</td><td>none</td><td><code>image?</code> and <code>ratio</code></td></tr>
+        <tr><td><code>children</code></td><td>node</td><td>The body slot</td><td>none</td><td>body slot</td></tr>
+        <tr><td><code>footer</code></td><td>node</td><td>The footer slot</td><td>none</td><td><code>footer?</code></td></tr>
+        <tr><td><code>padding</code></td><td>string</td><td><code>sm</code> 16, <code>md</code> 20, <code>lg</code> 24</td><td><code>md</code></td><td><code>size</code>, which also sets the radius</td></tr>
+        <tr><td><code>minWidth</code></td><td>number or CSS length</td><td>A width, such as <code>var(--card-min-width-md)</code></td><td>none</td><td><code>size</code>, which also sets the minimum width</td></tr>
+        <tr><td><code>gap</code></td><td>string</td><td><code>sm</code> 4, <code>md</code> 8, <code>lg</code> 12: header to body</td><td><code>md</code></td><td>stack follows use</td></tr>
+        <tr><td><code>onClick</code></td><td>function</td><td>Makes the card clickable: it lifts on hover</td><td>none</td><td>hover state</td></tr>
+        <tr><td><code>dragging</code></td><td>boolean</td><td>Puts the card on the overlay pair while it moves</td><td><code>false</code></td><td>dragged state</td></tr>
+    </tbody>
+</DocsTable>
+
+In Figma, <code>size</code> picks the pad, the radius and the minimum width together. In code, <code>padding</code> sets the pad and the radius, and <code>minWidth</code> sets the minimum width. A small card has radius 12. Medium and large cards have radius 16.
+
+These Figma properties have no prop in code. Each is described under Variants and states.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Figma property</th>
+            <th>In code</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>loading?</code></td><td>Build the loading card from Skeleton bars in the body.</td></tr>
+        <tr><td><code>ratio</code> (16:9, 4:3, 1:1)</td><td>Size the image you pass with <code>aspect-ratio</code>.</td></tr>
+        <tr><td><code>text</code> (truncate, wrap)</td><td>Clamp the title and the description with CSS.</td></tr>
+        <tr><td>Max height (sm 304, md 400, lg 640)</td><td>Set <code>style</code> with <code>maxHeight</code>. The card clips past the cap.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Used for</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--card-pad-sm</code></td><td>16</td><td>The pad of a small card</td></tr>
+        <tr><td><code>--card-pad-md</code></td><td>20</td><td>The pad of a medium card</td></tr>
+        <tr><td><code>--card-pad-lg</code></td><td>24</td><td>The pad of a large card</td></tr>
+        <tr><td><code>--card-radius-sm</code></td><td>12</td><td>The radius of a small card</td></tr>
+        <tr><td><code>--card-radius</code></td><td>16</td><td>The radius of medium and large cards</td></tr>
+        <tr><td><code>--card-stack-sm</code></td><td>4</td><td>The title to the description</td></tr>
+        <tr><td><code>--card-stack-md</code></td><td>8</td><td>The header to the body</td></tr>
+        <tr><td><code>--card-stack-lg</code></td><td>12</td><td>The body to the footer</td></tr>
+        <tr><td><code>--card-inline-sm</code>, <code>-md</code>, <code>-lg</code></td><td>4 · 8 · 12</td><td>Space between items on a row, such as actions in the header</td></tr>
+        <tr><td><code>--card-min-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>224 · 304 · 480</td><td>The minimum width of each size</td></tr>
+        <tr><td><code>--card-max-height-sm</code>, <code>-md</code>, <code>-lg</code></td><td>304 · 400 · 640</td><td>The height cap of each size</td></tr>
+        <tr><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code></td><td>color pair</td><td>The card at rest. The shadow's 1 px ring is the edge, so there is no border.</td></tr>
+        <tr><td><code>--ds-surface-raised-hovered</code> with <code>--ds-shadow-overlay</code></td><td>color pair</td><td>A clickable card while hovered</td></tr>
+        <tr><td><code>--ds-surface-raised-pressed</code> with <code>--ds-shadow-raised</code></td><td>color pair</td><td>A clickable card while pressed</td></tr>
+        <tr><td><code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code></td><td>color pair</td><td>A card while it is dragged</td></tr>
+        <tr><td><code>--heading-xsmall</code></td><td>14/20</td><td>The title</td></tr>
+        <tr><td><code>--body-default</code></td><td>14/20</td><td>The description</td></tr>
+        <tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Slots
 
-<DocsCanvasShell description={<>Body only, header + body, header + body + footer, and a custom header. The header sits <code>--card-stack-md</code> above the body and the footer <code>--card-stack-lg</code> below it.</>}>
+Pick the slots the object needs. A card with a header over a body is the common case. Turn the header off only when the body carries its own title, such as a metric tile. A card that holds actions that commit a change gets a footer, and its actions start on the left, under the content. Only a modal footer aligns right.
+
+<DocsCanvasShell description={<>Body only, header and body, header with actions and a footer, and a custom header. The header sits <code>--card-stack-md</code> above the body, and the footer <code>--card-stack-lg</code> below it.</>}>
     <DsCanvasQuiet of={PatternCardStories.Slots} />
 </DocsCanvasShell>
 
@@ -37,10 +165,128 @@ The card pattern is a componentized shell with baked-in tokens — Atlassian's r
 
 <div className="sb-ds-doc-section">
 
-### Constraints
+### Building a card
 
-<DocsCanvasShell description={<>Card padding scale tokens and the <code>minWidth</code> constraint.</>}>
-    <DsCanvasQuiet of={PatternCardStories.Constraints} />
+The card owns its pad, its radius and the space between header, body and footer. Build one in four steps.
+
+1. Pick the size by what the card holds. A single stat starts at sm.
+2. Choose the header. The default type shows a title and a description, and a custom header hands the header to a slot. Turn the header off when the body carries its own title, as a metric tile does.
+3. Fill the body slot. Space only inside the slot content, with the Card stack tokens, and never add spacing to the card itself.
+4. Add the footer only for actions that commit. Card actions start at the left, under the content.
+
+An empty slot keeps a minimum height, so it still reads as a place to drop content. The content then sets the real height.
+
+<DocsCanvasShell description={<>One card shell, three jobs: a metric tile, a progress display and a session summary. Only the slot content changes.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Jobs} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Size
+
+Content picks the size. Choose the smallest card that holds the content without clipping, then let the row decide how many fit. The size sets the pad, the radius and the minimum width. A stack follows use, whatever the size.
+
+- **sm** holds one number or one line. **md** holds a short list or a few lines. **lg** holds a summary with several parts.
+- Visible empty space inside the card means size down. A clipped or crowded body means size up.
+- Height always hugs the content. There is no fixed height per size, and an optional maximum height lets the body scroll.
+- Every size has a minimum width. A card narrower than its minimum belongs in a smaller size.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Size</th>
+            <th>Pad</th>
+            <th>Radius</th>
+            <th>Minimum width</th>
+            <th>Height cap</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>sm</code></td><td>16</td><td>12</td><td>224</td><td>304</td></tr>
+        <tr><td><code>md</code></td><td>20</td><td>16</td><td>304</td><td>400</td></tr>
+        <tr><td><code>lg</code></td><td>24</td><td>16</td><td>480</td><td>640</td></tr>
+    </tbody>
+</DocsTable>
+
+<DocsCanvasShell description={<>A small, a medium and a large card, each at its minimum width.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Sizes} />
+</DocsCanvasShell>
+
+A card hugs its content. In a row, it stretches to the tallest card. A card can cap its height at the figure in the table, and what passes the cap is clipped.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Cards in a row
+
+In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. Each size moves between two counts, and they switch between a 1224 and a 1256 screen with the sidebar docked.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Mode</th>
+            <th>Content width</th>
+            <th>Small, 224</th>
+            <th>Medium, 304</th>
+            <th>Large, 480</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td>Medium, 768</td><td>720</td><td>3</td><td>2</td><td>1</td></tr>
+        <tr><td>Large, 1024</td><td>744</td><td>3</td><td>2</td><td>1</td></tr>
+        <tr><td>X-Large, 1440</td><td>1144</td><td>4</td><td>3</td><td>2</td></tr>
+    </tbody>
+</DocsTable>
+
+<DocsCanvasShell description={<>Six medium cards at each content width: 2, 2 and 3 to a row.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Rows} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Image
+
+An image runs edge to edge across the top, outside the card pad, and the card radius clips it. Pick a ratio of 16:9, 4:3 or 1:1.
+
+<DocsCanvasShell description={<>The image slot at each ratio.</>}>
+    <DsCanvasQuiet of={PatternCardStories.ImageRatios} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Text
+
+The title always truncates to one line with an ellipsis. In <code>text=truncate</code>, the default, the description stops at three lines with an ellipsis. In <code>text=wrap</code> the description has no line limit. A body that passes the height cap is clipped.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Loading
+
+While data loads, swap the content for skeleton bars at the text line heights. Keep the card at its final size so the page does not jump when the content arrives.
+
+<DocsCanvasShell description={<>The same card, loaded and loading.</>}>
+    <DsCanvasQuiet of={PatternCardStories.Loading} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Elevation
+
+A card rests on the raised pair, <code>--ds-surface-raised</code> under <code>--ds-shadow-raised</code>, and has no border. The shadow's 1 px ring is the edge. In dark, the raised surface is a lighter gray than the page. A clickable card lifts on hover to <code>--ds-surface-raised-hovered</code> under <code>--ds-shadow-overlay</code>, and settles back onto the raised shadow while pressed. A dragged card takes <code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code>.
+
+<DocsCanvasShell description={<>A static card, a clickable card and a dragged card. Hover the clickable one.</>}>
+    <DsCanvasQuiet of={PatternCardStories.ElevationStates} />
 </DocsCanvasShell>
 
 </div>
@@ -61,15 +307,51 @@ The card pattern is a componentized shell with baked-in tokens — Atlassian's r
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <MetricInSmall />,
+            doCaption: 'One number fits sm. The card is only as wide as it needs, so a row of them stays tidy.',
+            dontExample: <MetricInLarge />,
+            dontCaption: "The same number in lg leaves most of the card empty. Size down instead of filling the space.",
+        },
+    ]}
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Accessibility
 
-- For a REGION of a page rather than one object, use `PatternSection` — a card is a thing, a section is a place.
-- For the raw fill and elevation with no slots, use `Surface`. `Card` is a `Surface` with a shape agreed.
-- For something that must be decided before the page can continue, use `Modal`.
-- For many objects of the same shape, use `Table` — a column of cards is a table that lost its columns.
+- The title is a heading one level below the section the card sits in: an h3 in a section, an h2 straight on a page.
+- A card that is clickable as a whole needs a role and a tab stop, and it must answer Enter and Space. When the card has one action, put a Button in the footer instead.
+- A loading card is marked busy, and the skeleton bars are hidden from assistive technology.
+- The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
+- Text sits on the raised surface in <code>--ds-text</code> and <code>--ds-text-subtle</code>, which meet contrast in every color mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+The card sets the current surface to its raised fill, so a sticky table cell inside it matches the card. The title tag comes from the heading level of the section around the card, so nest the card inside a Section rather than choosing a tag.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- <a target="_top" href="./?path=/docs/components-layout-and-structure-card--docs">Card component</a>: the ready-made content card, with title, subtitle, body, items, links and an action button.
+- <a target="_top" href="./?path=/docs/foundations-patterns-section--docs">Section</a>: for a region that holds cards under one heading.
+- <a target="_top" href="./?path=/docs/foundations-patterns-table--docs">Table</a>: for many objects of the same shape that people compare across columns.
+- <a target="_top" href="./?path=/docs/foundations-patterns-surfaces--docs">Surface</a>: for a fill and an elevation with no slots.
 
 </div>
 
