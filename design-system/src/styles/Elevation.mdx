@@ -15,7 +15,7 @@ The examples draw light and dark side by side, and follow the toolbar's
 **Color mode** and **Contrast** switches.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18313-50824"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=19878-438"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens/color"
 />
 
@@ -61,8 +61,8 @@ with a faint blur, so a resting card still reads almost flat in light. In dark,
 the ring is light, so the card keeps an edge.
 
 A clickable card lifts to `--ds-shadow-overlay` on hover and while it is
-dragged. A card
-that cannot be clicked never lifts.
+dragged. Pressed, it settles back to `--ds-shadow-raised` on
+`--ds-surface-raised-pressed`. A card that cannot be clicked never lifts.
 
 <Canvas of={ElevationStories.Cards} sourceState="none" />
 </div>

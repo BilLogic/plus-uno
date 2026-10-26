@@ -264,6 +264,7 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --table-pad-y-cell
 --table-radius
 --table-stack
+--tile-radius-lg
 --tile-radius-sm
 ```
 
