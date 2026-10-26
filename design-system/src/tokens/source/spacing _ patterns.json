@@ -1390,6 +1390,27 @@
       }
     },
     {
+      "id": "VariableID:19675:184",
+      "name": "Tile/radius-lg",
+      "variableCollectionId": "VariableCollectionId:19378:46226",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "CORNER_RADIUS"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--tile-radius-lg)"
+      },
+      "valuesByMode": {
+        "19378:4": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19364:219"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:4": 10
+      }
+    },
+    {
       "id": "VariableID:19858:130755",
       "name": "Focused page/pad-x",
       "variableCollectionId": "VariableCollectionId:19378:46226",
