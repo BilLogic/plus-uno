@@ -17,7 +17,7 @@ import AiLabel, { AI_ORIGINS } from './AiLabel';
  * story rendered, and may fall but never rise.
  */
 export default {
-    title: 'Components/Labels/AI label',
+    title: 'Components/Labels/AI label/AI label',
     component: AiLabel,
     tags: ['!dev', '!autodocs'],
     parameters: {

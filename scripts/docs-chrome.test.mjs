@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { chromeFailures, measureScript } from './docs-chrome.mjs';
 
 const page = (over = {}) => ({
-  page: 'components-forms-and-inputs-button--docs',
+  page: 'components-forms-and-inputs-button-button--docs',
   width: 1440,
   bodyScroll: 1140,
   bodyClient: 1140,
@@ -192,7 +192,7 @@ test('every failure is reported, not just the first', () => {
     page({ width: 1440 }),
   ]);
   assert.equal(f.length, 3);
-  assert.ok(f.every((l) => l.startsWith('components-forms-and-inputs-button--docs @ 768px')));
+  assert.ok(f.every((l) => l.startsWith('components-forms-and-inputs-button-button--docs @ 768px')));
 });
 
 /* ----------------------------------------------------------- the measurement */

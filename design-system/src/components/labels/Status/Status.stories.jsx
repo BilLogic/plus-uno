@@ -20,7 +20,7 @@ import Status, { STATUS_DATE_STYLES, STATUS_SIZES, STATUS_STYLES, STATUS_TYPES }
  */
 
 export default {
-    title: 'Components/Labels/Status',
+    title: 'Components/Labels/Status, count & tag/Status',
     component: Status,
     tags: ['!dev', '!autodocs'],
     parameters: {

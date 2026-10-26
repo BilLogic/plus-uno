@@ -6,7 +6,7 @@ import React from 'react';
  * and style consistently with the other Foundation docs (see Spacing / Layout).
  */
 export default {
-    title: 'Foundations/Grid',
+    title: 'Foundations/Layout & grid',
     tags: ['!dev', '!autodocs'],
 };
 

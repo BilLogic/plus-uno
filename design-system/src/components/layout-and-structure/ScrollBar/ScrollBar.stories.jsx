@@ -2,7 +2,7 @@ import React from 'react';
 import ScrollBar from '@/components/layout-and-structure/ScrollBar';
 
 export default {
-    title: 'Components/Layout and structure/Scroll bar',
+    title: 'Components/Layout and structure/Scrollbar',
     component: ScrollBar,
     tags: ['!dev', '!autodocs'],
     parameters: {

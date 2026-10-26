@@ -169,25 +169,25 @@ const preview = {
           "Foundations",
           [
             "Introduction",
+            "Iconography",
             "Color",
+            "Elevation",
             "Typography",
             "Spacing",
-            "Grid",
+            "Layout & grid",
             "Patterns",
             [
               "Introduction",
-              "Surfaces",
               "Frame",
+              "Topbar",
               "Sidebar",
-              "Card",
+              "Surfaces",
               "Section",
+              "Card",
+              "Table",
               "Overlay",
-              "Modal",
-              "Table"
+              "Modal"
             ],
-            "Elevation",
-            "Iconography",
-            "Logos",
             "Imagery",
             "Design tokens",
             "Accessibility"
@@ -197,12 +197,15 @@ const preview = {
             "Forms and inputs",
             [
               "Button",
+              [
+                "Button",
+                "Close button"
+              ],
               "Button group",
               "Cascader",
               "Checkbox",
               "Choice grid",
               "Choice group",
-              "Close button",
               "Date picker",
               "Date time picker",
               "Dropdown menu",
@@ -223,16 +226,24 @@ const preview = {
             ],
             "Images and icons",
             [
-              "Tile"
+              "Logo",
+              "Tile",
+              "Illustrations"
             ],
             "Labels",
             [
+              "Status, count & tag",
+              [
+                "Status",
+                "Count",
+                "Tag",
+                "Tag group"
+              ],
               "AI label",
-              "Count",
-              "Status",
-              "Suggestion",
-              "Tag",
-              "Tag group",
+              [
+                "AI label",
+                "Suggestion"
+              ],
               "Deprecated"
             ],
             "Layout and structure",
@@ -245,13 +256,16 @@ const preview = {
               "Jumbotron",
               "List group",
               "Media object",
-              "Scroll bar"
+              "Scrollbar"
             ],
             "Loading",
             [
               "Progress bar",
-              "Skeleton",
-              "Spinner"
+              "Loading",
+              [
+                "Spinner",
+                "Skeleton"
+              ]
             ],
             "Messaging",
             [
@@ -262,16 +276,24 @@ const preview = {
             "Navigation",
             [
               "Breadcrumbs",
-              "Nav pills",
               "Pagination",
               "Scrollspy",
               "Sidebar tab",
-              "Tabs"
+              "Tabs, nav pills & navbar",
+              [
+                "Tabs",
+                "Nav pills",
+                "Navbar"
+              ]
             ],
             "Overlays and layering",
             [
               "Popup",
               "Tooltip"
+            ],
+            "Text and data display",
+            [
+              "Table"
             ]
           ],
           "Data visualizations",

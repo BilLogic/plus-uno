@@ -295,6 +295,50 @@ export const figmaMeta = {
       "status": "verified",
       "verifiedAt": "2026-06-13",
       "notes": "Maps to Button with fill=outline and vertical=true."
+    },
+    {
+      "id": "button-base",
+      "name": "_Button",
+      "componentSetNodeId": "31:548",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=31-548",
+      "codeDefaults": {},
+      "variantProps": {
+        "size": "size"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        }
+      },
+      "source": "designer-supplied",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "The base shape every horizontal fill set nests, by size only (3 variants): the label row, padding and corners. Not used on its own; in code it is Button's size, with fill, style and state coming from the fill set around it."
+    },
+    {
+      "id": "vertical-button-base",
+      "name": "_Vertical_Button",
+      "componentSetNodeId": "7204:6902",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-6902",
+      "codeDefaults": {
+        "vertical": true
+      },
+      "variantProps": {
+        "size": "size"
+      },
+      "variantValueMap": {
+        "size": {
+          "small": "small",
+          "medium (default)": "medium",
+          "large": "large"
+        }
+      },
+      "source": "designer-supplied",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "The base shape that Vertical outlined buttons nest, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
     }
   ]
 };

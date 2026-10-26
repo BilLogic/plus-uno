@@ -7,7 +7,7 @@ import NavTabs from './NavTabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 export default {
-    title: 'Components/Navigation/Tabs',
+    title: 'Components/Navigation/Tabs, nav pills & navbar/Tabs',
     component: NavTabs,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -7,7 +7,7 @@ import CloseButton from './CloseButton';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
 export default {
-    title: 'Components/Forms and inputs/Close button',
+    title: 'Components/Forms and inputs/Button/Close button',
     component: CloseButton,
     tags: ['!dev', '!autodocs'],
     parameters: {

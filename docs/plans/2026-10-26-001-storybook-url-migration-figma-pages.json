@@ -1,0 +1,1918 @@
+{
+  "$comment": "Storybook ids and URLs that changed when the sidebar took the BS4 Foundation library's page structure: a Figma page that holds several components became a folder of the same name, Logo and Table moved to Figma's category, and Grid, Scroll bar and Illustration took Figma's page names. Old ids follow from the old titles by Storybook's own id rule (scripts/lib/storybook-id.mjs); new ids are read from the built index.json. It follows 2026-10-24-001-storybook-url-migration.json: a link still on an id older than that file goes through that file first, then this one. Delete this file once those links are rewritten.",
+  "generated": "2026-10-26",
+  "base": "https://plus-uno.netlify.app/storybook/",
+  "titles": {
+    "Components/Forms and inputs/Button": "Components/Forms and inputs/Button/Button",
+    "Components/Forms and inputs/Close button": "Components/Forms and inputs/Button/Close button",
+    "Components/Labels/Status": "Components/Labels/Status, count & tag/Status",
+    "Components/Labels/Count": "Components/Labels/Status, count & tag/Count",
+    "Components/Labels/Tag": "Components/Labels/Status, count & tag/Tag",
+    "Components/Labels/Tag group": "Components/Labels/Status, count & tag/Tag group",
+    "Components/Labels/AI label": "Components/Labels/AI label/AI label",
+    "Components/Labels/Suggestion": "Components/Labels/AI label/Suggestion",
+    "Components/Loading/Spinner": "Components/Loading/Loading/Spinner",
+    "Components/Loading/Skeleton": "Components/Loading/Loading/Skeleton",
+    "Components/Navigation/Tabs": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+    "Components/Navigation/Nav pills": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+    "Components/Navigation/Navbar": "Components/Navigation/Tabs, nav pills & navbar/Navbar",
+    "Components/Layout and structure/Scroll bar": "Components/Layout and structure/Scrollbar",
+    "Components/Layout and structure/Table": "Components/Text and data display/Table",
+    "Foundations/Logos": "Components/Images and icons/Logo",
+    "Foundations/Grid": "Foundations/Layout & grid",
+    "Components/Images and icons/Illustration": "Components/Images and icons/Illustrations"
+  },
+  "count": 189,
+  "entries": [
+    {
+      "type": "docs",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "Docs",
+      "oldId": "components-forms-and-inputs-button--docs",
+      "newId": "components-forms-and-inputs-button-button--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "Interactive",
+      "oldId": "components-forms-and-inputs-button--interactive",
+      "newId": "components-forms-and-inputs-button-button--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-button--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "Keyboard Focus",
+      "oldId": "components-forms-and-inputs-button--keyboard-focus",
+      "newId": "components-forms-and-inputs-button-button--keyboard-focus",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button--keyboard-focus",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-button--keyboard-focus"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "Overview",
+      "oldId": "components-forms-and-inputs-button--overview",
+      "newId": "components-forms-and-inputs-button-button--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-button--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "Sizes Filled Row",
+      "oldId": "components-forms-and-inputs-button--sizes-filled-row",
+      "newId": "components-forms-and-inputs-button-button--sizes-filled-row",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button--sizes-filled-row",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-button--sizes-filled-row"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Button",
+      "newTitle": "Components/Forms and inputs/Button/Button",
+      "name": "State Steps",
+      "oldId": "components-forms-and-inputs-button--state-steps",
+      "newId": "components-forms-and-inputs-button-button--state-steps",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button--state-steps",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-button--state-steps"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Docs",
+      "oldId": "components-forms-and-inputs-close-button--docs",
+      "newId": "components-forms-and-inputs-button-close-button--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-close-button--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-close-button--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Fixed Size",
+      "oldId": "components-forms-and-inputs-close-button--fixed-size",
+      "newId": "components-forms-and-inputs-button-close-button--fixed-size",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--fixed-size",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--fixed-size"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Focus",
+      "oldId": "components-forms-and-inputs-close-button--focus",
+      "newId": "components-forms-and-inputs-button-close-button--focus",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--focus",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--focus"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Interactive",
+      "oldId": "components-forms-and-inputs-close-button--interactive",
+      "newId": "components-forms-and-inputs-button-close-button--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Inverse Grounds",
+      "oldId": "components-forms-and-inputs-close-button--inverse-grounds",
+      "newId": "components-forms-and-inputs-button-close-button--inverse-grounds",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--inverse-grounds",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--inverse-grounds"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Names",
+      "oldId": "components-forms-and-inputs-close-button--names",
+      "newId": "components-forms-and-inputs-button-close-button--names",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--names",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--names"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Overview",
+      "oldId": "components-forms-and-inputs-close-button--overview",
+      "newId": "components-forms-and-inputs-button-close-button--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Forms and inputs/Close button",
+      "newTitle": "Components/Forms and inputs/Button/Close button",
+      "name": "Tones",
+      "oldId": "components-forms-and-inputs-close-button--tones",
+      "newId": "components-forms-and-inputs-button-close-button--tones",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--tones",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--tones"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Docs",
+      "oldId": "components-images-and-icons-illustration--docs",
+      "newId": "components-images-and-icons-illustrations--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-images-and-icons-illustration--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-images-and-icons-illustrations--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Advocacy",
+      "oldId": "components-images-and-icons-illustration--advocacy",
+      "newId": "components-images-and-icons-illustrations--advocacy",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--advocacy",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--advocacy"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "All",
+      "oldId": "components-images-and-icons-illustration--all",
+      "newId": "components-images-and-icons-illustrations--all",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--all",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--all"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Approximately Equal",
+      "oldId": "components-images-and-icons-illustration--approximately-equal",
+      "newId": "components-images-and-icons-illustrations--approximately-equal",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--approximately-equal",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--approximately-equal"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Decorative",
+      "oldId": "components-images-and-icons-illustration--decorative",
+      "newId": "components-images-and-icons-illustrations--decorative",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--decorative",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--decorative"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Default Size",
+      "oldId": "components-images-and-icons-illustration--default-size",
+      "newId": "components-images-and-icons-illustrations--default-size",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--default-size",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--default-size"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Divider",
+      "oldId": "components-images-and-icons-illustration--divider",
+      "newId": "components-images-and-icons-illustrations--divider",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--divider",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--divider"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Dot",
+      "oldId": "components-images-and-icons-illustration--dot",
+      "newId": "components-images-and-icons-illustrations--dot",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--dot",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--dot"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Equal",
+      "oldId": "components-images-and-icons-illustration--equal",
+      "newId": "components-images-and-icons-illustrations--equal",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--equal",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--equal"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Gallery",
+      "oldId": "components-images-and-icons-illustration--gallery",
+      "newId": "components-images-and-icons-illustrations--gallery",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--gallery",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--gallery"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Interactive",
+      "oldId": "components-images-and-icons-illustration--interactive",
+      "newId": "components-images-and-icons-illustrations--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Mastering Content",
+      "oldId": "components-images-and-icons-illustration--mastering-content",
+      "newId": "components-images-and-icons-illustrations--mastering-content",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--mastering-content",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--mastering-content"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Math Characters",
+      "oldId": "components-images-and-icons-illustration--math-characters",
+      "newId": "components-images-and-icons-illustrations--math-characters",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--math-characters",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--math-characters"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Pi",
+      "oldId": "components-images-and-icons-illustration--pi",
+      "newId": "components-images-and-icons-illustrations--pi",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--pi",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--pi"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Relationships",
+      "oldId": "components-images-and-icons-illustration--relationships",
+      "newId": "components-images-and-icons-illustrations--relationships",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--relationships",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--relationships"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Root",
+      "oldId": "components-images-and-icons-illustration--root",
+      "newId": "components-images-and-icons-illustrations--root",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--root",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--root"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Sizes",
+      "oldId": "components-images-and-icons-illustration--sizes",
+      "newId": "components-images-and-icons-illustrations--sizes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--sizes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--sizes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Smart Characters",
+      "oldId": "components-images-and-icons-illustration--smart-characters",
+      "newId": "components-images-and-icons-illustrations--smart-characters",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--smart-characters",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--smart-characters"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Social Emotional",
+      "oldId": "components-images-and-icons-illustration--social-emotional",
+      "newId": "components-images-and-icons-illustrations--social-emotional",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--social-emotional",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--social-emotional"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Technology",
+      "oldId": "components-images-and-icons-illustration--technology",
+      "newId": "components-images-and-icons-illustrations--technology",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--technology",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--technology"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Titled",
+      "oldId": "components-images-and-icons-illustration--titled",
+      "newId": "components-images-and-icons-illustrations--titled",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--titled",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--titled"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Foundations/Logos",
+      "newTitle": "Components/Images and icons/Logo",
+      "name": "Docs",
+      "oldId": "foundations-logos--docs",
+      "newId": "components-images-and-icons-logo--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/foundations-logos--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-images-and-icons-logo--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Logos",
+      "newTitle": "Components/Images and icons/Logo",
+      "name": "Overview",
+      "oldId": "foundations-logos--overview",
+      "newId": "components-images-and-icons-logo--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-logos--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-logo--overview"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Docs",
+      "oldId": "components-labels-ai-label--docs",
+      "newId": "components-labels-ai-label-ai-label--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-ai-label--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-ai-label-ai-label--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Confidence Is In The Name",
+      "oldId": "components-labels-ai-label--confidence-is-in-the-name",
+      "newId": "components-labels-ai-label-ai-label--confidence-is-in-the-name",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--confidence-is-in-the-name",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--confidence-is-in-the-name"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Explain Is A Real Button",
+      "oldId": "components-labels-ai-label--explain-is-a-real-button",
+      "newId": "components-labels-ai-label-ai-label--explain-is-a-real-button",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--explain-is-a-real-button",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--explain-is-a-real-button"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Interactive",
+      "oldId": "components-labels-ai-label--interactive",
+      "newId": "components-labels-ai-label-ai-label--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Low Confidence Carries Its Advice",
+      "oldId": "components-labels-ai-label--low-confidence-carries-its-advice",
+      "newId": "components-labels-ai-label-ai-label--low-confidence-carries-its-advice",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--low-confidence-carries-its-advice",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--low-confidence-carries-its-advice"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "No Brand Hue Is Assumed",
+      "oldId": "components-labels-ai-label--no-brand-hue-is-assumed",
+      "newId": "components-labels-ai-label-ai-label--no-brand-hue-is-assumed",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--no-brand-hue-is-assumed",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--no-brand-hue-is-assumed"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "Origins",
+      "oldId": "components-labels-ai-label--origins",
+      "newId": "components-labels-ai-label-ai-label--origins",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--origins",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--origins"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "The Glyph Is Decoration",
+      "oldId": "components-labels-ai-label--the-glyph-is-decoration",
+      "newId": "components-labels-ai-label-ai-label--the-glyph-is-decoration",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--the-glyph-is-decoration",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--the-glyph-is-decoration"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/AI label",
+      "newTitle": "Components/Labels/AI label/AI label",
+      "name": "The Mark Is Not A Control",
+      "oldId": "components-labels-ai-label--the-mark-is-not-a-control",
+      "newId": "components-labels-ai-label-ai-label--the-mark-is-not-a-control",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label--the-mark-is-not-a-control",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-ai-label--the-mark-is-not-a-control"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Docs",
+      "oldId": "components-labels-suggestion--docs",
+      "newId": "components-labels-ai-label-suggestion--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-suggestion--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-ai-label-suggestion--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Accept Into Tags",
+      "oldId": "components-labels-suggestion--accept-into-tags",
+      "newId": "components-labels-ai-label-suggestion--accept-into-tags",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--accept-into-tags",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--accept-into-tags"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Callbacks",
+      "oldId": "components-labels-suggestion--callbacks",
+      "newId": "components-labels-ai-label-suggestion--callbacks",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--callbacks",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--callbacks"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Disabled Beside Tags",
+      "oldId": "components-labels-suggestion--disabled-beside-tags",
+      "newId": "components-labels-ai-label-suggestion--disabled-beside-tags",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--disabled-beside-tags",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--disabled-beside-tags"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Focus Ring",
+      "oldId": "components-labels-suggestion--focus-ring",
+      "newId": "components-labels-ai-label-suggestion--focus-ring",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--focus-ring",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--focus-ring"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "In A Tag Row",
+      "oldId": "components-labels-suggestion--in-a-tag-row",
+      "newId": "components-labels-ai-label-suggestion--in-a-tag-row",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--in-a-tag-row",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--in-a-tag-row"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Interactive",
+      "oldId": "components-labels-suggestion--interactive",
+      "newId": "components-labels-ai-label-suggestion--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "State Layers",
+      "oldId": "components-labels-suggestion--state-layers",
+      "newId": "components-labels-ai-label-suggestion--state-layers",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--state-layers",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--state-layers"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Suggestion",
+      "newTitle": "Components/Labels/AI label/Suggestion",
+      "name": "Types",
+      "oldId": "components-labels-suggestion--types",
+      "newId": "components-labels-ai-label-suggestion--types",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-suggestion--types",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-ai-label-suggestion--types"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Docs",
+      "oldId": "components-labels-count--docs",
+      "newId": "components-labels-status-count-tag-count--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-count--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-status-count-tag-count--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Appearances",
+      "oldId": "components-labels-count--appearances",
+      "newId": "components-labels-status-count-tag-count--appearances",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--appearances",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--appearances"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Deprecated Style Names",
+      "oldId": "components-labels-count--deprecated-style-names",
+      "newId": "components-labels-status-count-tag-count--deprecated-style-names",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--deprecated-style-names",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--deprecated-style-names"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Dot Needs A Label",
+      "oldId": "components-labels-count--dot-needs-a-label",
+      "newId": "components-labels-status-count-tag-count--dot-needs-a-label",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--dot-needs-a-label",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--dot-needs-a-label"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Interactive",
+      "oldId": "components-labels-count--interactive",
+      "newId": "components-labels-status-count-tag-count--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Labeled Number",
+      "oldId": "components-labels-count--labeled-number",
+      "newId": "components-labels-status-count-tag-count--labeled-number",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--labeled-number",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--labeled-number"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Max",
+      "oldId": "components-labels-count--max",
+      "newId": "components-labels-status-count-tag-count--max",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--max",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--max"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Ring",
+      "oldId": "components-labels-count--ring",
+      "newId": "components-labels-status-count-tag-count--ring",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--ring",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--ring"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Sizes",
+      "oldId": "components-labels-count--sizes",
+      "newId": "components-labels-status-count-tag-count--sizes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--sizes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--sizes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Styles",
+      "oldId": "components-labels-count--styles",
+      "newId": "components-labels-status-count-tag-count--styles",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--styles",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--styles"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Count",
+      "newTitle": "Components/Labels/Status, count & tag/Count",
+      "name": "Zero",
+      "oldId": "components-labels-count--zero",
+      "newId": "components-labels-status-count-tag-count--zero",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-count--zero",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-count--zero"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Docs",
+      "oldId": "components-labels-status--docs",
+      "newId": "components-labels-status-count-tag-status--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-status--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-status-count-tag-status--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Date Style Fallback",
+      "oldId": "components-labels-status--date-style-fallback",
+      "newId": "components-labels-status-count-tag-status--date-style-fallback",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--date-style-fallback",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--date-style-fallback"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Dates",
+      "oldId": "components-labels-status--dates",
+      "newId": "components-labels-status-count-tag-status--dates",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--dates",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--dates"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Deprecated Style Names",
+      "oldId": "components-labels-status--deprecated-style-names",
+      "newId": "components-labels-status-count-tag-status--deprecated-style-names",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--deprecated-style-names",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--deprecated-style-names"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Interactive",
+      "oldId": "components-labels-status--interactive",
+      "newId": "components-labels-status-count-tag-status--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Leading Visual",
+      "oldId": "components-labels-status--leading-visual",
+      "newId": "components-labels-status-count-tag-status--leading-visual",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--leading-visual",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--leading-visual"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Narrow Container",
+      "oldId": "components-labels-status--narrow-container",
+      "newId": "components-labels-status-count-tag-status--narrow-container",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--narrow-container",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--narrow-container"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Never A Button",
+      "oldId": "components-labels-status--never-a-button",
+      "newId": "components-labels-status-count-tag-status--never-a-button",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--never-a-button",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--never-a-button"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Pinned Weight",
+      "oldId": "components-labels-status--pinned-weight",
+      "newId": "components-labels-status-count-tag-status--pinned-weight",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--pinned-weight",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--pinned-weight"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Styles",
+      "oldId": "components-labels-status--styles",
+      "newId": "components-labels-status-count-tag-status--styles",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--styles",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--styles"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Truncation",
+      "oldId": "components-labels-status--truncation",
+      "newId": "components-labels-status-count-tag-status--truncation",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--truncation",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--truncation"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "Unknown Values Fall Back",
+      "oldId": "components-labels-status--unknown-values-fall-back",
+      "newId": "components-labels-status-count-tag-status--unknown-values-fall-back",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--unknown-values-fall-back",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--unknown-values-fall-back"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Status",
+      "newTitle": "Components/Labels/Status, count & tag/Status",
+      "name": "With Count",
+      "oldId": "components-labels-status--with-count",
+      "newId": "components-labels-status-count-tag-status--with-count",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status--with-count",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-status--with-count"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Docs",
+      "oldId": "components-labels-tag--docs",
+      "newId": "components-labels-status-count-tag-tag--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-tag--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-status-count-tag-tag--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Avatar Edge Cases",
+      "oldId": "components-labels-tag--avatar-edge-cases",
+      "newId": "components-labels-status-count-tag-tag--avatar-edge-cases",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--avatar-edge-cases",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--avatar-edge-cases"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Avatar Fallback",
+      "oldId": "components-labels-tag--avatar-fallback",
+      "newId": "components-labels-status-count-tag-tag--avatar-fallback",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--avatar-fallback",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--avatar-fallback"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Avatar Fills",
+      "oldId": "components-labels-tag--avatar-fills",
+      "newId": "components-labels-status-count-tag-tag--avatar-fills",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--avatar-fills",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--avatar-fills"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Behaviors",
+      "oldId": "components-labels-tag--behaviors",
+      "newId": "components-labels-status-count-tag-tag--behaviors",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--behaviors",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--behaviors"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Colors",
+      "oldId": "components-labels-tag--colors",
+      "newId": "components-labels-status-count-tag-tag--colors",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--colors",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--colors"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Count On Selectable",
+      "oldId": "components-labels-tag--count-on-selectable",
+      "newId": "components-labels-status-count-tag-tag--count-on-selectable",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--count-on-selectable",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--count-on-selectable"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Deprecated Names",
+      "oldId": "components-labels-tag--deprecated-names",
+      "newId": "components-labels-status-count-tag-tag--deprecated-names",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--deprecated-names",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--deprecated-names"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Disabled In Field",
+      "oldId": "components-labels-tag--disabled-in-field",
+      "newId": "components-labels-status-count-tag-tag--disabled-in-field",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--disabled-in-field",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--disabled-in-field"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Elevated Avatar Types",
+      "oldId": "components-labels-tag--elevated-avatar-types",
+      "newId": "components-labels-status-count-tag-tag--elevated-avatar-types",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--elevated-avatar-types",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--elevated-avatar-types"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Elevated Disabled",
+      "oldId": "components-labels-tag--elevated-disabled",
+      "newId": "components-labels-status-count-tag-tag--elevated-disabled",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--elevated-disabled",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--elevated-disabled"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Elevated Only Read Only And Link",
+      "oldId": "components-labels-tag--elevated-only-read-only-and-link",
+      "newId": "components-labels-status-count-tag-tag--elevated-only-read-only-and-link",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--elevated-only-read-only-and-link",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--elevated-only-read-only-and-link"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Elevated Remove Focus",
+      "oldId": "components-labels-tag--elevated-remove-focus",
+      "newId": "components-labels-status-count-tag-tag--elevated-remove-focus",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--elevated-remove-focus",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--elevated-remove-focus"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Focus Ring",
+      "oldId": "components-labels-tag--focus-ring",
+      "newId": "components-labels-status-count-tag-tag--focus-ring",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--focus-ring",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--focus-ring"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Interactive",
+      "oldId": "components-labels-tag--interactive",
+      "newId": "components-labels-status-count-tag-tag--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Link With Remove",
+      "oldId": "components-labels-tag--link-with-remove",
+      "newId": "components-labels-status-count-tag-tag--link-with-remove",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--link-with-remove",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--link-with-remove"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "New Colors Contrast",
+      "oldId": "components-labels-tag--new-colors-contrast",
+      "newId": "components-labels-status-count-tag-tag--new-colors-contrast",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--new-colors-contrast",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--new-colors-contrast"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "On Images",
+      "oldId": "components-labels-tag--on-images",
+      "newId": "components-labels-status-count-tag-tag--on-images",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--on-images",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--on-images"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Person Focus Ring",
+      "oldId": "components-labels-tag--person-focus-ring",
+      "newId": "components-labels-status-count-tag-tag--person-focus-ring",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--person-focus-ring",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--person-focus-ring"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Remove Focus Ring On Types",
+      "oldId": "components-labels-tag--remove-focus-ring-on-types",
+      "newId": "components-labels-status-count-tag-tag--remove-focus-ring-on-types",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--remove-focus-ring-on-types",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--remove-focus-ring-on-types"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Remove Needs A Name For Node Labels",
+      "oldId": "components-labels-tag--remove-needs-a-name-for-node-labels",
+      "newId": "components-labels-status-count-tag-tag--remove-needs-a-name-for-node-labels",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--remove-needs-a-name-for-node-labels",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--remove-needs-a-name-for-node-labels"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Removing",
+      "oldId": "components-labels-tag--removing",
+      "newId": "components-labels-status-count-tag-tag--removing",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--removing",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--removing"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Saving",
+      "oldId": "components-labels-tag--saving",
+      "newId": "components-labels-status-count-tag-tag--saving",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--saving",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--saving"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Selecting",
+      "oldId": "components-labels-tag--selecting",
+      "newId": "components-labels-status-count-tag-tag--selecting",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--selecting",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--selecting"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "State Layers",
+      "oldId": "components-labels-tag--state-layers",
+      "newId": "components-labels-status-count-tag-tag--state-layers",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--state-layers",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--state-layers"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Truncation",
+      "oldId": "components-labels-tag--truncation",
+      "newId": "components-labels-status-count-tag-tag--truncation",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--truncation",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--truncation"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Type Behaviors",
+      "oldId": "components-labels-tag--type-behaviors",
+      "newId": "components-labels-status-count-tag-tag--type-behaviors",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--type-behaviors",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--type-behaviors"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag",
+      "newTitle": "Components/Labels/Status, count & tag/Tag",
+      "name": "Types",
+      "oldId": "components-labels-tag--types",
+      "newId": "components-labels-status-count-tag-tag--types",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag--types",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag--types"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Docs",
+      "oldId": "components-labels-tag-group--docs",
+      "newId": "components-labels-status-count-tag-tag-group--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-tag-group--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-labels-status-count-tag-tag-group--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Alignment Right",
+      "oldId": "components-labels-tag-group--alignment-right",
+      "newId": "components-labels-status-count-tag-tag-group--alignment-right",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--alignment-right",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--alignment-right"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Cap Never Squeezes",
+      "oldId": "components-labels-tag-group--cap-never-squeezes",
+      "newId": "components-labels-status-count-tag-tag-group--cap-never-squeezes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--cap-never-squeezes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--cap-never-squeezes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Collapse",
+      "oldId": "components-labels-tag-group--collapse",
+      "newId": "components-labels-status-count-tag-tag-group--collapse",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--collapse",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--collapse"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Collapse Menu",
+      "oldId": "components-labels-tag-group--collapse-menu",
+      "newId": "components-labels-status-count-tag-tag-group--collapse-menu",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--collapse-menu",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--collapse-menu"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Collapse With Suggestions",
+      "oldId": "components-labels-tag-group--collapse-with-suggestions",
+      "newId": "components-labels-status-count-tag-tag-group--collapse-with-suggestions",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--collapse-with-suggestions",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--collapse-with-suggestions"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Conditional Children Are Not Counted",
+      "oldId": "components-labels-tag-group--conditional-children-are-not-counted",
+      "newId": "components-labels-status-count-tag-tag-group--conditional-children-are-not-counted",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--conditional-children-are-not-counted",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--conditional-children-are-not-counted"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Custom Overflow Action",
+      "oldId": "components-labels-tag-group--custom-overflow-action",
+      "newId": "components-labels-status-count-tag-tag-group--custom-overflow-action",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--custom-overflow-action",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--custom-overflow-action"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Digit Boundary",
+      "oldId": "components-labels-tag-group--digit-boundary",
+      "newId": "components-labels-status-count-tag-tag-group--digit-boundary",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--digit-boundary",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--digit-boundary"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Disabled",
+      "oldId": "components-labels-tag-group--disabled",
+      "newId": "components-labels-status-count-tag-tag-group--disabled",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--disabled",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--disabled"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Interactive",
+      "oldId": "components-labels-tag-group--interactive",
+      "newId": "components-labels-status-count-tag-tag-group--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Max Visible",
+      "oldId": "components-labels-tag-group--max-visible",
+      "newId": "components-labels-status-count-tag-tag-group--max-visible",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--max-visible",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--max-visible"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Menu Keeps Actions",
+      "oldId": "components-labels-tag-group--menu-keeps-actions",
+      "newId": "components-labels-status-count-tag-tag-group--menu-keeps-actions",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--menu-keeps-actions",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--menu-keeps-actions"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "No Overflow When It Fits",
+      "oldId": "components-labels-tag-group--no-overflow-when-it-fits",
+      "newId": "components-labels-status-count-tag-tag-group--no-overflow-when-it-fits",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--no-overflow-when-it-fits",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--no-overflow-when-it-fits"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "One More Tag",
+      "oldId": "components-labels-tag-group--one-more-tag",
+      "newId": "components-labels-status-count-tag-tag-group--one-more-tag",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--one-more-tag",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--one-more-tag"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Overflow Tag",
+      "oldId": "components-labels-tag-group--overflow-tag",
+      "newId": "components-labels-status-count-tag-tag-group--overflow-tag",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--overflow-tag",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--overflow-tag"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Removable Set",
+      "oldId": "components-labels-tag-group--removable-set",
+      "newId": "components-labels-status-count-tag-tag-group--removable-set",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--removable-set",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--removable-set"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Squeezed First Replaced",
+      "oldId": "components-labels-tag-group--squeezed-first-replaced",
+      "newId": "components-labels-status-count-tag-tag-group--squeezed-first-replaced",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--squeezed-first-replaced",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--squeezed-first-replaced"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Stable On Parent Render",
+      "oldId": "components-labels-tag-group--stable-on-parent-render",
+      "newId": "components-labels-status-count-tag-tag-group--stable-on-parent-render",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--stable-on-parent-render",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--stable-on-parent-render"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Wrapped Suggestions Are Not Counted",
+      "oldId": "components-labels-tag-group--wrapped-suggestions-are-not-counted",
+      "newId": "components-labels-status-count-tag-tag-group--wrapped-suggestions-are-not-counted",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--wrapped-suggestions-are-not-counted",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--wrapped-suggestions-are-not-counted"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Labels/Tag group",
+      "newTitle": "Components/Labels/Status, count & tag/Tag group",
+      "name": "Wrapping",
+      "oldId": "components-labels-tag-group--wrapping",
+      "newId": "components-labels-status-count-tag-tag-group--wrapping",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-tag-group--wrapping",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-labels-status-count-tag-tag-group--wrapping"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Layout and structure/Scroll bar",
+      "newTitle": "Components/Layout and structure/Scrollbar",
+      "name": "Docs",
+      "oldId": "components-layout-and-structure-scroll-bar--docs",
+      "newId": "components-layout-and-structure-scrollbar--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-layout-and-structure-scroll-bar--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-layout-and-structure-scrollbar--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Scroll bar",
+      "newTitle": "Components/Layout and structure/Scrollbar",
+      "name": "Content",
+      "oldId": "components-layout-and-structure-scroll-bar--content",
+      "newId": "components-layout-and-structure-scrollbar--content",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scroll-bar--content",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scrollbar--content"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Scroll bar",
+      "newTitle": "Components/Layout and structure/Scrollbar",
+      "name": "Interactive",
+      "oldId": "components-layout-and-structure-scroll-bar--interactive",
+      "newId": "components-layout-and-structure-scrollbar--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scroll-bar--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scrollbar--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Scroll bar",
+      "newTitle": "Components/Layout and structure/Scrollbar",
+      "name": "Layout",
+      "oldId": "components-layout-and-structure-scroll-bar--layout",
+      "newId": "components-layout-and-structure-scrollbar--layout",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scroll-bar--layout",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scrollbar--layout"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Scroll bar",
+      "newTitle": "Components/Layout and structure/Scrollbar",
+      "name": "Overview",
+      "oldId": "components-layout-and-structure-scroll-bar--overview",
+      "newId": "components-layout-and-structure-scrollbar--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scroll-bar--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-scrollbar--overview"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Docs",
+      "oldId": "components-loading-skeleton--docs",
+      "newId": "components-loading-loading-skeleton--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-loading-skeleton--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-loading-loading-skeleton--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Ignored Props Warn",
+      "oldId": "components-loading-skeleton--ignored-props-warn",
+      "newId": "components-loading-loading-skeleton--ignored-props-warn",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--ignored-props-warn",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--ignored-props-warn"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Interactive",
+      "oldId": "components-loading-skeleton--interactive",
+      "newId": "components-loading-loading-skeleton--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Label Presets",
+      "oldId": "components-loading-skeleton--label-presets",
+      "newId": "components-loading-loading-skeleton--label-presets",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--label-presets",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--label-presets"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Loading Card",
+      "oldId": "components-loading-skeleton--loading-card",
+      "newId": "components-loading-loading-skeleton--loading-card",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--loading-card",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--loading-card"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Loading Table",
+      "oldId": "components-loading-skeleton--loading-table",
+      "newId": "components-loading-loading-skeleton--loading-table",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--loading-table",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--loading-table"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Paragraph",
+      "oldId": "components-loading-skeleton--paragraph",
+      "newId": "components-loading-loading-skeleton--paragraph",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--paragraph",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--paragraph"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Preset Wins Over Shape",
+      "oldId": "components-loading-skeleton--preset-wins-over-shape",
+      "newId": "components-loading-loading-skeleton--preset-wins-over-shape",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--preset-wins-over-shape",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--preset-wins-over-shape"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Reduced Motion",
+      "oldId": "components-loading-skeleton--reduced-motion",
+      "newId": "components-loading-loading-skeleton--reduced-motion",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--reduced-motion",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--reduced-motion"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Shapes",
+      "oldId": "components-loading-skeleton--shapes",
+      "newId": "components-loading-loading-skeleton--shapes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--shapes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--shapes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Shimmer",
+      "oldId": "components-loading-skeleton--shimmer",
+      "newId": "components-loading-loading-skeleton--shimmer",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--shimmer",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--shimmer"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Skeleton",
+      "newTitle": "Components/Loading/Loading/Skeleton",
+      "name": "Tag Group Preset",
+      "oldId": "components-loading-skeleton--tag-group-preset",
+      "newId": "components-loading-loading-skeleton--tag-group-preset",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--tag-group-preset",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--tag-group-preset"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Docs",
+      "oldId": "components-loading-spinner--docs",
+      "newId": "components-loading-loading-spinner--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-loading-spinner--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-loading-loading-spinner--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Interactive",
+      "oldId": "components-loading-spinner--interactive",
+      "newId": "components-loading-loading-spinner--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Loading Button Example",
+      "oldId": "components-loading-spinner--loading-button-example",
+      "newId": "components-loading-loading-spinner--loading-button-example",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--loading-button-example",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--loading-button-example"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Overview",
+      "oldId": "components-loading-spinner--overview",
+      "newId": "components-loading-loading-spinner--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Sizes",
+      "oldId": "components-loading-spinner--sizes",
+      "newId": "components-loading-loading-spinner--sizes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--sizes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--sizes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Spinner States",
+      "oldId": "components-loading-spinner--spinner-states",
+      "newId": "components-loading-loading-spinner--spinner-states",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--spinner-states",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--spinner-states"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Style Variants",
+      "oldId": "components-loading-spinner--style-variants",
+      "newId": "components-loading-loading-spinner--style-variants",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--style-variants",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--style-variants"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Loading/Spinner",
+      "newTitle": "Components/Loading/Loading/Spinner",
+      "name": "Styles",
+      "oldId": "components-loading-spinner--styles",
+      "newId": "components-loading-loading-spinner--styles",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-spinner--styles",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-spinner--styles"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Docs",
+      "oldId": "components-navigation-nav-pills--docs",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-nav-pills--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-tabs-nav-pills-navbar-nav-pills--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Content",
+      "oldId": "components-navigation-nav-pills--content",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--content",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--content",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--content"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Interactive",
+      "oldId": "components-navigation-nav-pills--interactive",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Layout",
+      "oldId": "components-navigation-nav-pills--layout",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--layout",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--layout",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--layout"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Nav Pills Item Interactive",
+      "oldId": "components-navigation-nav-pills--nav-pills-item-interactive",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-item-interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--nav-pills-item-interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-item-interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Nav Pills Item States",
+      "oldId": "components-navigation-nav-pills--nav-pills-item-states",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-item-states",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--nav-pills-item-states",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-item-states"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Nav Pills Sub Overview",
+      "oldId": "components-navigation-nav-pills--nav-pills-sub-overview",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--nav-pills-sub-overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Nav Pills Sub Pill Dropdowns",
+      "oldId": "components-navigation-nav-pills--nav-pills-sub-pill-dropdowns",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-pill-dropdowns",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--nav-pills-sub-pill-dropdowns",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-pill-dropdowns"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Nav Pills Sub Pill Group",
+      "oldId": "components-navigation-nav-pills--nav-pills-sub-pill-group",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-pill-group",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--nav-pills-sub-pill-group",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--nav-pills-sub-pill-group"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Nav pills",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Nav pills",
+      "name": "Overview",
+      "oldId": "components-navigation-nav-pills--overview",
+      "newId": "components-navigation-tabs-nav-pills-navbar-nav-pills--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-nav-pills--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-nav-pills--overview"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Navigation/Navbar",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Navbar",
+      "name": "Docs",
+      "oldId": "components-navigation-navbar--docs",
+      "newId": "components-navigation-tabs-nav-pills-navbar-navbar--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-navbar--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-tabs-nav-pills-navbar-navbar--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Navbar",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Navbar",
+      "name": "Dark",
+      "oldId": "components-navigation-navbar--dark",
+      "newId": "components-navigation-tabs-nav-pills-navbar-navbar--dark",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-navbar--dark",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-navbar--dark"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Navbar",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Navbar",
+      "name": "Overview",
+      "oldId": "components-navigation-navbar--overview",
+      "newId": "components-navigation-tabs-nav-pills-navbar-navbar--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-navbar--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-navbar--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Navbar",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Navbar",
+      "name": "Primary",
+      "oldId": "components-navigation-navbar--primary",
+      "newId": "components-navigation-tabs-nav-pills-navbar-navbar--primary",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-navbar--primary",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-navbar--primary"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Docs",
+      "oldId": "components-navigation-tabs--docs",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-tabs--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-navigation-tabs-nav-pills-navbar-tabs--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Content",
+      "oldId": "components-navigation-tabs--content",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--content",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--content",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--content"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Interaction States",
+      "oldId": "components-navigation-tabs--interaction-states",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--interaction-states",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--interaction-states",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--interaction-states"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Interactive",
+      "oldId": "components-navigation-tabs--interactive",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Layout",
+      "oldId": "components-navigation-tabs--layout",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--layout",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--layout",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--layout"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Overview",
+      "oldId": "components-navigation-tabs--overview",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Navigation/Tabs",
+      "newTitle": "Components/Navigation/Tabs, nav pills & navbar/Tabs",
+      "name": "Semantics",
+      "oldId": "components-navigation-tabs--semantics",
+      "newId": "components-navigation-tabs-nav-pills-navbar-tabs--semantics",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs--semantics",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-navigation-tabs-nav-pills-navbar-tabs--semantics"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Layout and structure/Table",
+      "newTitle": "Components/Text and data display/Table",
+      "name": "Docs",
+      "oldId": "components-layout-and-structure-table--docs",
+      "newId": "components-text-and-data-display-table--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-layout-and-structure-table--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-text-and-data-display-table--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Table",
+      "newTitle": "Components/Text and data display/Table",
+      "name": "Bordered",
+      "oldId": "components-layout-and-structure-table--bordered",
+      "newId": "components-text-and-data-display-table--bordered",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-table--bordered",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-text-and-data-display-table--bordered"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Table",
+      "newTitle": "Components/Text and data display/Table",
+      "name": "Empty",
+      "oldId": "components-layout-and-structure-table--empty",
+      "newId": "components-text-and-data-display-table--empty",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-table--empty",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-text-and-data-display-table--empty"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Table",
+      "newTitle": "Components/Text and data display/Table",
+      "name": "Overview",
+      "oldId": "components-layout-and-structure-table--overview",
+      "newId": "components-text-and-data-display-table--overview",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-table--overview",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-text-and-data-display-table--overview"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Layout and structure/Table",
+      "newTitle": "Components/Text and data display/Table",
+      "name": "Striped",
+      "oldId": "components-layout-and-structure-table--striped",
+      "newId": "components-text-and-data-display-table--striped",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-layout-and-structure-table--striped",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-text-and-data-display-table--striped"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Docs",
+      "oldId": "foundations-grid--docs",
+      "newId": "foundations-layout-grid--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/foundations-grid--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/foundations-layout-grid--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Breakpoints",
+      "oldId": "foundations-grid--breakpoints",
+      "newId": "foundations-layout-grid--breakpoints",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--breakpoints",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--breakpoints"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Column Reference",
+      "oldId": "foundations-grid--column-reference",
+      "newId": "foundations-layout-grid--column-reference",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--column-reference",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--column-reference"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Dos And Donts",
+      "oldId": "foundations-grid--dos-and-donts",
+      "newId": "foundations-layout-grid--dos-and-donts",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--dos-and-donts",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--dos-and-donts"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Fixed Fluid",
+      "oldId": "foundations-grid--fixed-fluid",
+      "newId": "foundations-layout-grid--fixed-fluid",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--fixed-fluid",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--fixed-fluid"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Grid Anatomy",
+      "oldId": "foundations-grid--grid-anatomy",
+      "newId": "foundations-layout-grid--grid-anatomy",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--grid-anatomy",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--grid-anatomy"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Layout Regions",
+      "oldId": "foundations-grid--layout-regions",
+      "newId": "foundations-layout-grid--layout-regions",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--layout-regions",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--layout-regions"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Modal Widths",
+      "oldId": "foundations-grid--modal-widths",
+      "newId": "foundations-layout-grid--modal-widths",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--modal-widths",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--modal-widths"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Shell Math",
+      "oldId": "foundations-grid--shell-math",
+      "newId": "foundations-layout-grid--shell-math",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--shell-math",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--shell-math"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Foundations/Grid",
+      "newTitle": "Foundations/Layout & grid",
+      "name": "Two Grids",
+      "oldId": "foundations-grid--two-grids",
+      "newId": "foundations-layout-grid--two-grids",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-grid--two-grids",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/foundations-layout-grid--two-grids"
+    }
+  ]
+}

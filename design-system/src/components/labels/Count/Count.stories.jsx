@@ -18,7 +18,7 @@ import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
  */
 
 export default {
-    title: 'Components/Labels/Count',
+    title: 'Components/Labels/Status, count & tag/Count',
     component: Count,
     tags: ['!dev', '!autodocs'],
     parameters: {

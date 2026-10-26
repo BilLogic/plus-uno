@@ -2,7 +2,7 @@ import React from 'react';
 import Spinner from './Spinner';
 
 export default {
-    title: 'Components/Loading/Spinner',
+    title: 'Components/Loading/Loading/Spinner',
     component: Spinner,
     tags: ['!dev'],
     parameters: {

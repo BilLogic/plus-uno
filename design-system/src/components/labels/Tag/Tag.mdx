@@ -38,16 +38,6 @@ export const figmaMeta = {
         "isElevated": "elevated"
       },
       "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
-    },
-    {
-      "id": "remove-button",
-      "name": "Remove button",
-      "componentSetNodeId": "17827:846",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
-      "source": "manual",
-      "status": "verified",
-      "isComponentSet": true,
-      "notes": "On the Button page. Tag uses size small (16, 12px ×); its states are the × inside a removable tag. Medium and large are not built in code yet."
     }
   ]
 };

@@ -56,7 +56,7 @@ const NOW = Number(FIRST_TS) * 1000 + 60_000;
 const REGISTRY: DevLinkRegistry = {
   components: {
     Button: {
-      code: { source: "design-system/src/components/forms-and-inputs/Button/Button.jsx", storybookId: "components-forms-and-inputs-button--docs" },
+      code: { source: "design-system/src/components/forms-and-inputs/Button/Button.jsx", storybookId: "components-forms-and-inputs-button-button--docs" },
       figma: {
         fileKey: LIB,
         sets: [
@@ -81,7 +81,7 @@ const REGISTRY: DevLinkRegistry = {
 };
 
 const BUTTON_CODE = "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/components/forms-and-inputs/Button/Button.jsx";
-const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button--docs";
+const BUTTON_STORYBOOK = "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs";
 
 interface Posted {
   text: string;
@@ -328,7 +328,7 @@ describe("only registry components", () => {
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
       assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
     }
-    assert.equal(registry.components.Button!.code!.storybookId, "components-forms-and-inputs-button--docs");
+    assert.equal(registry.components.Button!.code!.storybookId, "components-forms-and-inputs-button-button--docs");
   });
 });
 

@@ -27,7 +27,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
  */
 
 export default {
-    title: 'Components/Labels/Suggestion',
+    title: 'Components/Labels/AI label/Suggestion',
     component: Suggestion,
     tags: ['!dev', '!autodocs'],
     parameters: {
