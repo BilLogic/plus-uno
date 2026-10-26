@@ -1,16 +1,33 @@
 /**
  * Section pattern (Patterns/Section)
- * Large structural page block — no fill, or the translucent container well,
- * section padding/gap tokens, never elevated.
+ * A span of the page grid: no fill, no pad, never elevated. Parts stack
+ * Section/stack-md; the header's rows stack Section/stack-sm.
  */
 
 .plus-pattern-section {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     color: var(--ds-text);
 }
 
-/* Background */
+/* Gap between the header, the body and the footer: Section/stack-md is the Figma value. */
+.plus-pattern-section-gap-sm {
+    gap: var(--section-stack-sm);
+}
+
+.plus-pattern-section-gap-md {
+    gap: var(--section-stack-md);
+}
+
+.plus-pattern-section-gap-lg {
+    gap: var(--section-stack-lg);
+}
+
+/*
+ * Deprecated: `background` and `padding`. A section has no fill and no pad;
+ * these classes appear only when a caller still passes the props.
+ */
 .plus-pattern-section-bg-none {
     background-color: transparent;
 }
@@ -21,7 +38,6 @@
     border-radius: var(--size-section-radius-md);
 }
 
-/* Padding scale */
 .plus-pattern-section-pad-none {
     padding: 0;
 }
@@ -38,20 +54,7 @@
     padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
 }
 
-/* Gap scale */
-.plus-pattern-section-gap-sm {
-    gap: var(--size-section-gap-sm);
-}
-
-.plus-pattern-section-gap-md {
-    gap: var(--size-section-gap-md);
-}
-
-.plus-pattern-section-gap-lg {
-    gap: var(--size-section-gap-lg);
-}
-
-/* `_Section header`: the title row, then the tabs row when there is one */
+/* `_Section header`: the title row, then the tabs or toolbar row when there is one */
 .plus-pattern-section-header {
     display: flex;
     flex-direction: column;
@@ -59,18 +62,20 @@
     min-width: 0;
 }
 
-/* Title row: heading block + actions slot */
+/* Title row: heading block (or the custom header) + actions slot */
 .plus-pattern-section-title-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--size-element-gap-lg);
+    gap: var(--element-inline-md);
 }
 
-.plus-pattern-section-heading {
+.plus-pattern-section-heading,
+.plus-pattern-section-custom {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--element-stack-sm);
     min-width: 0;
 }
 
@@ -79,7 +84,7 @@
     color: var(--ds-text);
 }
 
-/* The page header: Heading/large 24. */
+/* The page header: Heading/large 24/28. */
 .plus-pattern-section-title--page {
     font: var(--heading-large);
 }
@@ -103,14 +108,125 @@
 .plus-pattern-section-actions {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--element-inline-md);
     flex-shrink: 0;
 }
 
+/* Tabs row: the tabs, then "Add view" at its end. */
 .plus-pattern-section-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
     min-width: 0;
 }
 
+.plus-pattern-section-toolbar {
+    min-width: 0;
+}
+
+/* Loading: skeleton bars in place of the header, Element/stack-sm apart. */
+.plus-pattern-section-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+}
+
+/* Body */
 .plus-pattern-section-content {
     min-width: 0;
+}
+
+/* Subsections: nested sections, Section/stack-lg apart. */
+.plus-pattern-section-content--subsections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-lg);
+}
+
+/*
+ * Split: a main column (span 8) beside a side column (span 4), a gutter
+ * apart. Growing 2:1 from these bases gives the 8/4 spans of the 12-column
+ * grid exactly; each column wraps under the other once it would drop below
+ * its minimum.
+ */
+.plus-pattern-section-content--split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--layout-gutter);
+}
+
+.plus-pattern-section-main {
+    flex: 2 1 var(--layout-gutter);
+    min-width: min(100%, var(--section-min-width-main));
+}
+
+.plus-pattern-section-side {
+    flex: 1 1 0;
+    min-width: min(100%, var(--section-min-width-side));
+}
+
+/* Footer: "View all" or paging, at the end. */
+.plus-pattern-section-footer {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+/*
+ * `_Section toolbar`. Default: search, filters and count at the start,
+ * actions at the end, wrapping Section/stack-sm under each other on a narrow
+ * section. Selected: the bulk bar on the selected background.
+ */
+.plus-section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: var(--element-inline-lg);
+    row-gap: var(--section-stack-sm);
+    min-height: var(--item-height-md);
+    min-width: 0;
+}
+
+.plus-section-toolbar__start {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--element-inline-md);
+    min-width: min(100%, var(--width-3000));
+}
+
+.plus-section-toolbar__search {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-section-toolbar__slot {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-sm);
+    flex-shrink: 0;
+}
+
+/* The count truncates first. */
+.plus-section-toolbar__count {
+    flex: 1 1 0;
+    min-width: var(--size-300);
+    overflow: hidden;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-section-toolbar--selected {
+    padding: 0 var(--table-pad-x-cell);
+    border-radius: var(--element-radius-lg);
+    background-color: var(--ds-background-selected);
+}
+
+.plus-section-toolbar__selection {
+    font: var(--body-small);
+    color: var(--ds-text);
+    white-space: nowrap;
 }

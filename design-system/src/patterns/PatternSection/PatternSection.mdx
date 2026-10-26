@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternSectionStories} />
 
 <Title />
-The section pattern is a large structural block for page layout: a title, optional description, an actions slot on the title row, an optional tabs row under it (`tabs`), and a content slot. `level="page"` makes it the page header: an h1 at Heading/large, with the sections it holds as h2s. Standard section padding and gap tokens are baked in; basic sections are never elevated. It mirrors the Section slot component in Figma.
+A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options: the Surface around it supplies the pad. The Section header comes first, then the body, then an optional footer, Section/stack-md apart. It mirrors `Pattern/Section` in Figma.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
@@ -19,7 +19,7 @@ The section pattern is a large structural block for page layout: a title, option
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Title, description, actions slot, and content slot.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Title, description, actions slot and content slot.</>}>
     <Canvas of={PatternSectionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,20 +27,40 @@ The section pattern is a large structural block for page layout: a title, option
 
 <div className="sb-ds-doc-section">
 
-### Slots
+### Header types
 
-<DocsCanvasShell description={<>Title-only header, and the full header row with description and actions.</>}>
-    <DsCanvasQuiet of={PatternSectionStories.Slots} />
+<DocsCanvasShell description={<>The type is read from the slots you fill: <code>header</code> makes it <code>custom</code>, <code>toolbar</code> makes it <code>toolbar</code>, <code>tabs</code> makes it <code>tabs</code>. Pass <code>type="tabs-only"</code> to show only the tabs row. In <code>custom</code> and <code>tabs-only</code> the title stays in the markup as the heading, visually hidden, so screen readers still reach it. <code>onAddView</code> puts "Add view" at the end of the tabs row.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.HeaderTypes} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Composition
+### Layouts
 
-<DocsCanvasShell description={<>A filled section (<code>background="container"</code>, the translucent <code>--ds-surface-container</code> well) grouping card shells.</>}>
-    <DsCanvasQuiet of={PatternSectionStories.Composition} />
+<DocsCanvasShell description={<><code>single</code> is the content alone. <code>split</code> puts the content (span 8, at least 480) beside <code>side</code> (span 4, at least 224); when a column would drop below its minimum, they stack. <code>subsections</code> stacks nested sections 24 apart, each an h3 under the section's h2.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Layouts} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Footer
+
+<DocsCanvasShell description={<>Only for "View all" or paging, at the end. Actions that commit changes go in a card footer, not on the section.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Footer} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Loading
+
+<DocsCanvasShell description={<><code>loading</code> swaps the header for skeleton bars and marks the section busy. The body is the content's to load.</>}>
+    <DsCanvasQuiet of={PatternSectionStories.Loading} />
 </DocsCanvasShell>
 
 </div>
@@ -61,14 +81,13 @@ The section pattern is a large structural block for page layout: a title, option
 
 </div>
 
-
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For one object rather than a region, use `Card`.
-- For a region that needs a fill of its own, give it `background="container"` (`--ds-surface-container`), or see `Surface`. A section is transparent by default and the page shows through.
-- For how a section's content lines up across breakpoints, see **Layout & Grid**; the section carries the padding, the grid carries the columns.
+- For a region that needs a fill of its own, use `Surface` or `Card`. A section is transparent, and the page shows through. `padding` and `background` are deprecated: they still work, and warn once in development.
+- For how a section's content lines up across breakpoints, see **Layout & Grid**.
 
 </div>
 
