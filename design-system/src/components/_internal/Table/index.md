@@ -9,7 +9,7 @@ Standard table component for displaying tabular data.
 
 **Source:** `design-system/src/components/_internal/Table/Table.jsx`
 
-**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty
+**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty, Anatomy, MessageRow, DoDont, Cells, RowStates, CellStatesExample, RowSizeRule, FrameRule
 
 **Storybook page:** `design-system/src/components/_internal/Table/Table.mdx`
 
@@ -20,10 +20,10 @@ Standard table component for displaying tabular data.
 | `id` | string | — | — |
 | `headers` | arrayOf or string or shape or node or object | `[]` | Column headers — a string, or { text, width, align, className } for control over layout |
 | `rows` | arrayOf or node or shape or string or number or object | `[]` | Row data — each row is an array of cells; a cell is a node or { content, align, colSpan, className } |
-| `striped` | bool | `false` | Alternate row background |
+| `striped` | bool | `false` | Alternate row background. The table rules do not stripe rows. |
 | `hover` | bool | `true` | Highlight the row under the cursor |
 | `bordered` | bool | `false` | Draw cell borders |
-| `density` | enum | `'md'` | Vertical cell padding, bound to the --size-table-cell-y token family |
+| `density` | enum | `'md'` | Cell padding: sm, md or lg |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -43,8 +43,4 @@ From `design-system/src/components/_internal/Table/Table.scss`. Override these t
 
 Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Table` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

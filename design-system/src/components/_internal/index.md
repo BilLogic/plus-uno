@@ -15,10 +15,10 @@ authored half (#166), counted rather than assumed.
 | [SessionManagementSnackbar](SessionManagementSnackbar/index.md) | 4 | ✕ | ✕ | ✕ |
 | [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |
 | [StaticBadgeSmart](StaticBadgeSmart/index.md) | 4 | ✕ | ✕ | ✕ |
-| [Table](Table/index.md) | 9 | ✕ | ✕ | ✕ |
+| [Table](Table/index.md) | 9 | ✅ | ✅ | ✅ |
 | [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 0/10 (0%) · Correct/incorrect 0/10 (0%) · Accessibility 0/10 (0%)
+**Authored coverage:** When to use 1/10 (10%) · Correct/incorrect 1/10 (10%) · Accessibility 1/10 (10%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

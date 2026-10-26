@@ -9,7 +9,7 @@ Universal card component for creating self-contained containers that display rel
 
 **Source:** `design-system/src/components/layout-and-structure/Card/Card.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive, Elevation
+**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive, Elevation, WhichCard
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Card/Card.mdx`
 
@@ -56,4 +56,6 @@ Anything not listed is not a valid value.
 
 Same group: `Accordion` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

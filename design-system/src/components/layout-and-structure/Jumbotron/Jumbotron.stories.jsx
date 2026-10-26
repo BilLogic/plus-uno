@@ -4,6 +4,8 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { computedShadow, probe, tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { Button } from '@/components';
+import PatternSection from '@/patterns/PatternSection';
+import { DoDontGrid } from '@/storybook-docs/ds-docs-layout.jsx';
 import Jumbotron from './Jumbotron';
 
 const TITLE = 'Plan your next session';
@@ -255,3 +257,83 @@ export const SideMediaNeeds944 = {
         await expect(narrowMedia.bottom <= narrowContent.top, 'above the content').toBe(true);
     },
 };
+
+const filledAndOutlined = (
+    <>
+        <Button text="Get started" style="primary" fill="filled" size="small" />
+        <Button text="Learn more" style="secondary" fill="outline" size="small" />
+    </>
+);
+
+const twoFilled = (
+    <>
+        <Button text="Get started" style="primary" fill="filled" size="small" />
+        <Button text="Learn more" style="primary" fill="filled" size="small" />
+    </>
+);
+
+const sectionBelow = (
+    <PatternSection title="Your roster" description="Students you tutor this term.">
+        <span className="body1-txt">Content: cards, tables, rows or forms.</span>
+    </PatternSection>
+);
+
+const stack = { display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' };
+
+/** The four do and don't pairs of the Jumbotron rules, built from the component. */
+export const DoDont = () => (
+    <DoDontGrid
+        pairs={[
+            {
+                doExample: (
+                    <div style={stack}>
+                        <Jumbotron title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />
+                        {sectionBelow}
+                    </div>
+                ),
+                doCaption: 'One Jumbotron first, then the page content in Sections.',
+                dontExample: (
+                    <div style={stack}>
+                        <Jumbotron title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />
+                        <Jumbotron title="Join the call" description={DESCRIPTION} actions={filledAndOutlined} />
+                    </div>
+                ),
+                dontCaption: 'Two Jumbotrons stacked on the same page. A second one competes with the first.',
+            },
+            {
+                doExample: <Jumbotron title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />,
+                doCaption: 'One filled primary button, with an outlined one beside it.',
+                dontExample: <Jumbotron title={TITLE} description={DESCRIPTION} actions={twoFilled} />,
+                dontCaption: 'Two filled buttons competing for the main action.',
+            },
+            {
+                doExample: <Jumbotron title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />,
+                doCaption: 'A short title and one supporting line.',
+                dontExample: (
+                    <Jumbotron
+                        title="Everything you need to know before your first tutoring session this semester"
+                        description="Your roster, your session schedule, the training modules you still need to finish, the reflection forms that are due this week, how to reach your supervisor and what to do if a student does not show up all start here, so read this first before you open anything else."
+                        actions={filledAndOutlined}
+                    />
+                ),
+                dontCaption: 'A title that wraps and a paragraph of instructions.',
+            },
+            {
+                doExample: (
+                    <div style={stack}>
+                        <Jumbotron container="band" title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />
+                        {sectionBelow}
+                    </div>
+                ),
+                doCaption: 'A band across the full width, at the top of the page.',
+                dontExample: (
+                    <div style={stack}>
+                        {sectionBelow}
+                        <Jumbotron container="band" title={TITLE} description={DESCRIPTION} actions={filledAndOutlined} />
+                    </div>
+                ),
+                dontCaption: 'A band dropped between sections in the content column, where it reads as a card with no edge.',
+            },
+        ]}
+    />
+);

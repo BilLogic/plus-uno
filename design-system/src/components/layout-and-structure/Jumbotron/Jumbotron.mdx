@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as JumbotronStories from './Jumbotron.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,12 +23,14 @@ export const figmaMeta = {
 
 <Title />
 
+A Jumbotron is the one hero block at the top of a landing or overview page: a page-level title, one supporting line and up to two actions, with optional media. It is a composition, not a new surface. It puts the Section header at the page level (the title at Heading/large, the description at Body/default) together with an actions slot and an optional media slot, inside a card or a full-bleed band.
+
 <DocsTabs of={JumbotronStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-116802"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Jumbotron"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -47,31 +50,123 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Container
+## Anatomy
 
-<DocsCanvasShell description={<><code>card</code> sits in the content column on the raised pair; <code>band</code> runs edge to edge on the surface container.</>}>
+Four parts, numbered as in the Figma anatomy.
+
+<SpecTable
+    head={['#', 'Part', 'What it is']}
+    rows={[
+        ['1', 'Container', 'A raised card, or a full-bleed band on the surface container. The card has no outline. The band has no radius and no outline.'],
+        ['2', 'Section header', 'The title at Heading/large 24 and one description line at Body/default. The title is the page title and the page’s one h1.'],
+        ['3', 'Actions', 'One filled primary button, then an optional outlined one. Turn them off by passing no actions.'],
+        ['4', 'Media', 'An image at 16:9 on top or 4:3 at the side. It is present only when media is set.'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<SpecTable
+    head={['Prop', 'Values', 'Default', 'What it does', 'Figma']}
+    rows={[
+        [<code>title</code>, 'node', 'none', 'The page title, rendered as the page’s h1 at Heading/large.', 'Text on the Section header'],
+        [<code>description</code>, 'node', 'none', 'One supporting line at Body/default.', 'Text on the Section header'],
+        [<code>actions</code>, 'node', 'none', 'The actions slot: a filled primary Button, then an optional outlined one.', 'actions slot, actions? (default on)'],
+        [<code>media</code>, 'node', 'none', 'The media slot. An image fills it at its ratio.', 'media slot'],
+        [<code>mediaPosition</code>, <><code>top</code>, <code>side</code></>, <code>top</code>, 'Where the media sits. Side media moves on top below 944 wide.', 'media = top, side'],
+        [<code>container</code>, <><code>card</code>, <code>band</code></>, <code>card</code>, 'A card in the content column, or a band across the page.', 'container = card, band'],
+        [<code>align</code>, <><code>start</code>, <code>center</code></>, <code>start</code>, 'Text alignment. Side media keeps the text at the start.', 'align = start, center'],
+    ]}
+/>
+
+In Figma, media = none is the absence of media, and actions? = false is the absence of actions. In code both are the prop left unset.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable
+    head={['Token', 'Value', 'Used for']}
+    rows={[
+        [<code>--ds-surface-raised</code>, 'raised surface', 'Card fill'],
+        [<code>--ds-shadow-raised</code>, 'raised shadow', 'The card’s edge. There is no outline.'],
+        [<code>--card-radius</code>, '16', 'Card corners. The band is square.'],
+        [<code>--ds-surface-container</code>, 'surface container', 'Band fill'],
+        [<code>--card-pad-lg</code>, '24', 'Card padding, all sides'],
+        [<code>--layout-pad-x-screen</code>, '24', 'Band padding, left and right'],
+        [<code>--surface-stack-lg</code>, '40', 'Band padding, top and bottom'],
+        [<code>--section-stack-lg</code>, '24', 'Header to actions'],
+        [<code>--section-stack-md</code>, '16', 'Top media to content'],
+        [<code>--layout-gutter</code>, '16', 'Content to side media'],
+        [<code>--element-inline-md</code>, '8', 'Between the two buttons'],
+        [<code>--section-min-width-main</code>, '480', 'The narrowest the text column goes'],
+        [<code>--width-2500</code>, '400', 'Side media width'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+### Container
+
+<DocsCanvasShell description={<><code>card</code> sits in the content column on the raised surface. <code>band</code> runs edge to edge on the surface container.</>}>
     <DsCanvasQuiet of={JumbotronStories.Containers} />
 </DocsCanvasShell>
 
-</div>
+### Align
 
-<div className="sb-ds-doc-section">
-
-## Alignment
-
-<DocsCanvasShell description={<><code>start</code> or <code>center</code>. Side media keeps the text start-aligned.</>}>
+<DocsCanvasShell description={<><code>start</code> or <code>center</code>. Center goes with no media or top media. Side media keeps the text at the start.</>}>
     <DsCanvasQuiet of={JumbotronStories.Alignment} />
 </DocsCanvasShell>
 
+### Media
+
+Side media needs 944 of width: 480 for the text, 16 of gutter, 400 for the image and 48 of padding. Below that, the media moves on top.
+
+<DocsCanvasShell description={<>16:9 on top, or 4:3 at the side.</>}>
+    <DsCanvasQuiet of={JumbotronStories.Media} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Media
+## States
 
-<DocsCanvasShell description={<>16:9 on top, or 4:3 at the side. Side media needs 944 of width; below that it moves on top.</>}>
-    <DsCanvasQuiet of={JumbotronStories.Media} />
+A Jumbotron has one state. It is static, and its buttons carry their own rest, hover, pressed, focus and disabled states. It has no loading state, because it holds static hero content.
+
+<DocsCanvasShell description={<>With no actions, it is a title and a line only.</>}>
+    <DsCanvasQuiet of={JumbotronStories.WithoutActions} />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<DsCanvasQuiet of={JumbotronStories.DoDont} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Use the title as the page title.** It is Heading/large 24. Do not swap in a Display style to make it louder.
+- **Give side media 944 or more.** Below that, use top media.
+- **Center only with no media or top media.** Side media keeps the text at the start.
+- **Fill the media slot at its ratio.** Images are 16:9 on top and 4:3 at the side. Do not stretch them.
+- **Draw button icons from the new Icon set.** They are off by default.
 
 </div>
 
@@ -81,12 +176,7 @@ export const figmaMeta = {
 
 <DocsInteractivePlayground
     of={JumbotronStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+    description={<>Use the table below to change props.</>}
 />
 
 </div>
@@ -103,99 +193,9 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Jumbotron` when a landing or overview page opens with one message and one
-next step, such as a tutor home or a program overview. One per page, at the top.
-For one item among many, use `Card`. For a message the reader has to act on, use
-`Alert`.
+Use a Jumbotron when a landing or overview page opens with one message and one next step, such as a tutor home or a program overview. For one item among many, use Card. For a message the reader has to act on, use Section message. For rotating hero slides, use Carousel.
 
-It is a composition, not a new surface: the page-level section header (`title`
-as the page's `h1` at Heading/large, one `description` line at Body/default), an
-`actions` slot and an optional `media` slot, inside a `container`.
-
-```jsx
-<Jumbotron
-  title="Plan your next session"
-  description="See who is on your roster, review their progress and join the call from one place."
-  actions={<>
-    <Button text="Get started" style="primary" fill="filled" />
-    <Button text="Learn more" style="secondary" fill="outline" />
-  </>}
-/>
-```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Lead with one filled button.
-
-The filled button is the next step. The outlined one is an optional alternative,
-such as reading more first.
-
-```jsx
-// Incorrect — two filled buttons compete for the main action.
-<Jumbotron
-  title="Plan your next session"
-  actions={<>
-    <Button text="Get started" style="primary" fill="filled" />
-    <Button text="Learn more" style="primary" fill="filled" />
-  </>}
-/>
-
-// Correct — one filled primary, then an outlined alternative.
-<Jumbotron
-  title="Plan your next session"
-  actions={<>
-    <Button text="Get started" style="primary" fill="filled" />
-    <Button text="Learn more" style="secondary" fill="outline" />
-  </>}
-/>
-```
-
-### One per page, at the top.
-
-The title is the page's `h1`, so a second Jumbotron, or one under another `h1`,
-breaks the outline.
-
-```jsx
-// Incorrect — two level-one headings.
-<h1>Program</h1>
-<Jumbotron title="Autumn 2026" description="12 weeks, 48 sessions" />
-
-// Correct — the Jumbotron is the page heading.
-<Jumbotron title="Autumn 2026" description="12 weeks, 48 sessions" />
-```
-
-### Keep it to a headline and one line.
-
-Longer copy belongs in the page below. The title is the page title at
-Heading/large; do not swap in a Display style to make it louder.
-
-### Pick the container by where it sits.
-
-`container="band"` runs edge to edge at the top of the page. `container="card"`
-sits inside the content column, next to other cards and sections. A band between
-sections reads as a card with no edge.
-
-### Side media needs 944 or wider.
-
-480 for the text, 16 of gutter and 400 for the image make 896 inside the padding;
-with 24 of padding on each side that is 944. Below that the media moves on top on
-its own, inside the padding. Center alignment goes with no media or top media
-only.
-
-```jsx
-// Incorrect — side media keeps the text start-aligned, so `center` is ignored.
-<Jumbotron title="Plan your next session" align="center" media={image} mediaPosition="side" />
-
-// Correct.
-<Jumbotron title="Plan your next session" align="center" media={image} />
-```
-
-Images fill the slot at its ratio, 16:9 on top and 4:3 at the side, and are
-cropped rather than stretched.
+Colors follow the toolbar's Color mode and Contrast switches: the card sits on the raised surface and the band on the surface container, in every mode.
 
 </div>
 
@@ -203,14 +203,11 @@ cropped rather than stretched.
 
 ## Accessibility
 
-- **The title is the page's `h1`.** A page with a Jumbotron has no other `h1`,
-  and its sections are `h2`s.
-- **The description is a paragraph,** not a heading, so the outline has one entry
-  for the hero.
-- **Media is content.** Give an image its `alt`, or an empty `alt` when it only
-  decorates.
-- **The block is a plain `div`.** It sits inside whatever `main` the page already
-  has.
+- **The title is the page’s h1.** A page with a Jumbotron has no other h1, and its sections are h2s.
+- **The description is a paragraph,** not a heading, so the outline has one entry for the hero.
+- **Media is content.** Give an image alternative text, or an empty alternative when it only decorates.
+- **Text and buttons keep their contrast** in the card and in the band, in every Color mode and Contrast setting.
+- **The block adds no landmark.** It sits inside the page’s main region.
 
 </div>
 
@@ -218,10 +215,10 @@ cropped rather than stretched.
 
 ## Related
 
-- `Card` for one item among many. The Jumbotron card is built on the Card
-  pattern (`PatternCard`), not on this component.
-- `Alert` for a message the reader has to act on.
-- `Carousel` for rotating hero slides.
+- Section, in Patterns: the page-level header the Jumbotron is built on.
+- Card and the card pattern, in Patterns: the container behind <code>container="card"</code>.
+- Section message: a message the reader has to act on.
+- Carousel: rotating hero slides.
 
 </div>
 

@@ -9,7 +9,7 @@ Mirrors Figma `Jumbotron`: a page-level `_Section header` (the title is the page
 
 **Source:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.stories.jsx` — Overview, Containers, Alignment, Media, WithoutActions, Interactive, Anatomy, SideMediaNeeds944
+**Stories:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.stories.jsx` — Overview, Containers, Alignment, Media, WithoutActions, Interactive, Anatomy, SideMediaNeeds944, DoDont
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.mdx`
 

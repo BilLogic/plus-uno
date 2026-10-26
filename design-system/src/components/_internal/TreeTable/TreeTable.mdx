@@ -1,0 +1,208 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as TreeTableStories from './TreeTable.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
+import { PlannedNote, WhichTableRule } from '@/storybook-docs/table-doc-examples.jsx';
+import { tableTokens } from '@/storybook-docs/table-doc-content.jsx';
+
+<Meta of={TreeTableStories} />
+
+<Title />
+
+A Tree table shows records that contain other records, such as a course with its units and their lessons. Each parent opens its children in place, under it. Use it when people need the hierarchy and the columns together. When they only need the hierarchy, a list or a Tree select is lighter.
+
+<PlannedNote
+    planned="TreeTable"
+    today={<>Today, build it from the table pattern, with your own indent and toggle in the first column. The rules below say how those parts behave.</>}
+/>
+
+<DocsTabs of={TreeTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19616-15803"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternTable"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## What it is
+
+The first column is the tree column. It holds the indent, the 12px toggle and the record name. Only parents have a toggle, and leaf rows keep its space so names stay aligned. A Tree table is never mixed with flat Static or Dynamic table rows in one block.
+
+Colors follow the toolbar’s Color mode and Contrast switches.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Which table?
+
+Pick the type from what people do with the rows. Rows they only read are a Static table. Rows they sort, filter, select, page or act on are a Dynamic table. Rows that nest under other rows are a Tree table, and nesting wins even when the table is interactive.
+
+The <a href="?path=/docs/foundations-patterns-table--docs">table pattern</a> shows how a table sits in a Section, with its pagination and empty-state slots.
+
+<WhichTableRule />
+
+This is the Tree table case: school, class, student. Every row belongs to the row above it, so the level has to show, and every level keeps the same columns.
+
+<DsCanvasQuiet of={TreeTableStories.WhichTable} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+Seven parts, numbered as in the Figma anatomy.
+
+<DocsCanvasShell description={<>A course, its units and their lessons, with one parent loading.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Anatomy} />
+</DocsCanvasShell>
+
+<SpecTable
+    head={['#', 'Part', 'What it is']}
+    rows={[
+        ['1', 'Toggle', 'The 12px chevron in its own 24 target, named “Expand Algebra I row”.'],
+        ['2', 'Indent', '24 per level. Three levels at most.'],
+        ['3', 'Name', 'The tree column’s title, emphasized and truncated with a tooltip.'],
+        ['4', 'Count', 'How many children the parent holds.'],
+        ['5', 'Leaf row', 'No toggle, but the space is kept so the name lines up.'],
+        ['6', 'Loading parent', 'The toggle shows loading while its children are fetched.'],
+        ['7', 'Loading row', 'A message row of the loading type, indented under the parent until the children arrive.'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+These are the Figma options. TreeTable has no props yet. Its shared head row, cell, message row and footer are the Static table’s.
+
+### Tree table
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['State', 'default, empty, loading', 'Empty shows a message row under the header. Loading shows skeleton rows on first load.'],
+        ['Frame', 'plain, framed', 'As on the Static table.'],
+        ['Rows', 'slot', 'Tree rows in tree order, plus message rows under empty or loading parents.'],
+        ['Footer', 'on, off', 'A pager for long top-level lists. Paging counts top-level rows.'],
+    ]}
+/>
+
+### Tree row
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Level', '0, 1, 2', 'The indent, 24 per level.'],
+        ['Toggle', 'collapsed, expanded, leaf, loading', 'The exposed toggle. Leaf keeps the space and draws nothing.'],
+        ['Name, count', 'text, on, off', 'The record name and its child count.'],
+        ['State', 'rest, hover, pressed, focus, selected, selected hover, highlighted, disabled', 'The same steps as a table row.'],
+        ['Frame', 'framed, plain', 'As on a table row.'],
+        ['Cells, select, actions, divider', 'slot, on, off', 'As on a table row.'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable head={['Token', 'Value', 'Used for']} rows={tableTokens} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+Each level indents the tree column by 24. The toggle tells whether a row has children and whether they are showing: collapsed, expanded, leaf or loading.
+
+<DocsCanvasShell description={<>The four toggles.</>}>
+    <DsCanvasQuiet of={TreeTableStories.ToggleVariants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+Tree rows take the same states as table rows. The toggle has its own hover and focus, because it is a separate control from the row.
+
+An empty tree shows a message row under the header. The first load shows skeleton rows.
+
+<DocsCanvasShell description={<>The empty state.</>}>
+    <DsCanvasQuiet of={TreeTableStories.EmptyState} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Each rule is drawn with the table pattern. The left card is what to do, and the right card is what to avoid.
+
+<DsCanvasQuiet of={TreeTableStories.DoDont} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a Tree table when a row has children. Nesting wins over everything else, even in an interactive table. Keep trees shallow: three levels is the most a Tree table should show. Deeper structures need a different view, such as opening the record on its own page.
+
+- For records people only read, with no nesting, use a Static table.
+- For a table people sort, filter, select or page, with no nesting, use a Dynamic table.
+- For picking one item from a hierarchy, with no columns, use Tree select.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Name each toggle for its row,** such as “Expand Algebra I row”, and say whether the row is expanded.
+- **Make the level readable without the indent.** The level is part of the row’s structure, so a screen reader can say how deep a row is.
+- **Give the toggle its own focus.** It is a separate control from the row, with its own hover and focus ring.
+- **Do not mark selection with color alone.** A selected row shows a checked box as well as the fill.
+- **Keep contrast.** Text, rules and fills keep their contrast in every Color mode and Contrast setting.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/components-text-and-data-display-static-table--docs">Static table</a>: the shared parts and rules.
+- <a href="?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a>: sorting, paging and selection.
+- <a href="?path=/docs/foundations-patterns-table--docs">Table</a>, in Patterns: the table pattern that stands in for TreeTable today.
+- Tree select, in Forms and inputs: picking one item from a hierarchy, without columns.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

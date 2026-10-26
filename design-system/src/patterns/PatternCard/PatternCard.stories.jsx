@@ -4,6 +4,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
+import { WhichCardExample } from '@/storybook-docs/which-card-example.jsx';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -241,3 +242,6 @@ export const Elevation = {
         });
     },
 };
+
+/** The Card component and the card pattern with the same content, side by side. */
+export const WhichCard = () => <WhichCardExample />;

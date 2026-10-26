@@ -294,6 +294,9 @@ const preview = {
             ],
             "Text and data display",
             [
+              "Static table",
+              "Dynamic table",
+              "Tree table",
               "Table"
             ]
           ],

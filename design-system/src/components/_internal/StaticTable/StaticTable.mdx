@@ -1,0 +1,290 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as StaticTableStories from './StaticTable.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
+import { PlannedNote, WhichTableRule } from '@/storybook-docs/table-doc-examples.jsx';
+import {
+    staticAnatomy,
+    cellPresets,
+    cellOptions,
+    headCellOptions,
+    rowOptions,
+    messageRowTypes,
+    tableTokens,
+} from '@/storybook-docs/table-doc-content.jsx';
+
+<Meta of={StaticTableStories} />
+
+<Title />
+
+A Static table shows records people read and compare across columns: students, sessions, tutors, schools and scores. Nothing on it changes on its own: no sorting, filtering, selection, paging, row expansion, row actions or inline edits. A link inside a cell is fine. It sits inside a Section and spans it.
+
+<PlannedNote
+    planned="StaticTable"
+    today={<>Today, build a read-only table with the table primitive, or with the table pattern when you need its pagination and empty-state slots. The rules below apply to both.</>}
+/>
+
+<DocsTabs of={StaticTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19611-84184"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## What it is
+
+The Section header above the table carries the title and any action that leaves the rows as they are, such as Export, so the table never has a toolbar of its own. Search, filters, view tabs, a bulk bar or a pager make it a Dynamic table.
+
+The feel is quiet. The header is 12px and muted, with a stronger rule under it. Rows are flat, with hairline rules between them and no zebra striping. One title column is emphasized, numbers align to the end, and rows rest, with highlighted as the only other row state.
+
+Colors follow the toolbar’s Color mode and Contrast switches.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Which table?
+
+Pick the type from what people do with the rows. Rows they only read are a Static table. Rows they sort, filter, select, page or act on are a Dynamic table. Rows that nest under other rows are a Tree table, and nesting wins even when the table is interactive.
+
+The <a href="?path=/docs/foundations-patterns-table--docs">table pattern</a> shows how a table sits in a Section, with its pagination and empty-state slots.
+
+<WhichTableRule />
+
+Each case is built from its type, beside the mistake it replaces. This is the Static table case: a weekly session summary. People read the days and compare them. Nothing is sorted, selected or paged, and the total sits in the summary row.
+
+<DsCanvasQuiet of={StaticTableStories.WhichTable} />
+
+The Dynamic table page shows the roster case, and the Tree table page shows the school, class and student case.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+Six parts, numbered as in the Figma anatomy.
+
+<DocsCanvasShell description={<>A title column, a number column and a summary row.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Anatomy} />
+</DocsCanvasShell>
+
+<SpecTable head={['#', 'Part', 'What it is']} rows={staticAnatomy} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+Every part keeps its options on the part itself. Booleans end in a question mark and variant values are lowercase. Widths are not properties: resize the head cell and the cells of a column together. These are the Figma options. StaticTable has no props yet.
+
+### Table
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Frame', 'framed, plain', 'Plain sits flush in its section. Framed adds a 1px outline and a radius of 8.'],
+        ['Rows', 'slot', 'Rows, group rows, expanded content and message rows, top to bottom.'],
+        ['Summary', 'on, off', 'Shows the summary row. A Static table never has a pager.'],
+    ]}
+/>
+
+### Head cell
+
+<SpecTable head={['Property', 'Values', 'What it does']} rows={[['Label', 'text', 'The column name, 12px and muted.'], ...headCellOptions]} />
+
+### Cell
+
+<SpecTable head={['Property', 'Values', 'What it does']} rows={cellOptions} />
+
+### Row
+
+<SpecTable head={['Property', 'Values', 'What it does']} rows={rowOptions} />
+
+### Group row
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Label, count', 'text, on, off', 'The group value and how many rows it holds.'],
+        ['Toggle', 'expanded, collapsed', 'Opens or closes the group.'],
+        ['Leading', 'on, off', 'A slot for a Status or an avatar that shows the group value.'],
+    ]}
+/>
+
+### Message row
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Type', 'empty, no results, error, loading, load more', 'Why rows are missing, and what to do next.'],
+        ['Description, action', 'on, off', 'Hide the second line or the action.'],
+    ]}
+/>
+
+### Summary row
+
+One muted calculation per column: count, sum, average or latest.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable head={['Token', 'Value', 'Used for']} rows={tableTokens} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+### Frame
+
+Plain is the default on a page: the table spans its section with no outer frame, and its first and last cells are flush with the section edge. Use framed when the table sits beside other content and needs its own edge, such as inside a modal body.
+
+<DocsCanvasShell description={<>Plain and framed.</>}>
+    <DsCanvasQuiet of={StaticTableStories.FrameVariants} />
+</DocsCanvasShell>
+
+### Row size
+
+Rows are 32, 40 or 48 tall at minimum. Pick by how much each row holds, not by screen width: small for dense admin lists, medium for most tables, large when rows hold avatars or two lines.
+
+<DocsCanvasShell description={<>The three row heights.</>}>
+    <DsCanvasQuiet of={StaticTableStories.RowSizeVariants} />
+</DocsCanvasShell>
+
+### Cells
+
+A cell is text or a slot. Text cells can add a muted second line, wrap, or carry the title emphasis. The leading slot puts an avatar, an icon or a Status before the text.
+
+### Groups and expandable rows
+
+A group row heads the rows that share a value, such as a week or a status, with the count beside it. Group rows alone keep the table static. An expandable row opens a detail panel under it, and makes the table a Dynamic table.
+
+### Summary
+
+The summary row closes the table, muted, with one calculation per column. A Static table never pages, so it has no footer. When the rows need a pager, use a Dynamic table, whose footer shows the range and the pager.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+Static table rows rest, or are highlighted to mark a new or changed row. Hover, pressed, focus, selected and disabled rows belong to the Dynamic and Tree tables. States use the tokens’ own steps. Hovered and pressed are the neutral subtle background steps, selected is the selected background across the whole row with no edge bar, and highlighted is the warning background. Focus is always a 2px focus ring drawn inside the cell or row, so a sticky header or the scroll container never clips it, and it never adds a fill.
+
+### Row
+
+<DocsCanvasShell description={<>A row at rest, and a highlighted row.</>}>
+    <DsCanvasQuiet of={StaticTableStories.RowStates} />
+</DocsCanvasShell>
+
+### Cell
+
+An error cell is tinted and adds a 12px error icon. The message is in a tooltip. A loading cell shows a skeleton bar.
+
+<DocsCanvasShell description={<>A cell in error, and a cell that is loading.</>}>
+    <DsCanvasQuiet of={StaticTableStories.CellStateExamples} />
+</DocsCanvasShell>
+
+### Message rows
+
+When rows are missing, the header stays and a message row says why. Empty means nothing exists yet, no results means filters hid everything, and error means it did not load.
+
+<DocsCanvasShell description={<>Each type of message row under the header.</>}>
+    <DsCanvasQuiet of={StaticTableStories.MessageRowTypes} />
+</DocsCanvasShell>
+
+<SpecTable head={['Type', 'When']} rows={messageRowTypes} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Each rule is drawn with the table pattern. The left card is what to do, and the right card is what to avoid.
+
+<DsCanvasQuiet of={StaticTableStories.DoDont} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Cell presets
+
+Presets are recipes, not variants: start from a cell and fill its content or leading slot. Each recipe lists what goes in the cell and how it aligns.
+
+<DocsCanvasShell description={<>A number, a date, a Status, a link and the empty dash.</>}>
+    <DsCanvasQuiet of={StaticTableStories.CellRecipes} />
+</DocsCanvasShell>
+
+<SpecTable head={['Preset', 'Recipe']} rows={cellPresets} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a Static table for records people read and compare, with nothing to do to the table itself.
+
+- For a table people sort, filter, select, page or expand, use a Dynamic table.
+- For rows that nest under other rows, use a Tree table.
+- For a list of records with no columns to line up, use List group.
+- For one item among many, use Card.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Give every column a heading.** A column heading cell names its column for every cell below it.
+- **Label controls that sit in cells.** A checkbox column needs a label on each box. An icon button names its row: “More actions for Ava Lee”.
+- **Show truncated text in full.** A truncated cell shows its full value in a tooltip on hover and focus. Wrap the text people must read in full.
+- **Do not mark state with color alone.** A highlighted row needs words or an icon beside it. An error cell carries its icon and a message.
+- **Keep the focus ring visible.** It is drawn inside the cell or row, so scrolling and sticky headers never clip it.
+- **Keep contrast.** Text, rules and fills keep their contrast in every Color mode and Contrast setting.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a> and <a href="?path=/docs/components-text-and-data-display-tree-table--docs">Tree table</a>: the other two types of table.
+- <a href="?path=/docs/components-text-and-data-display-table--docs">Table</a>: the table primitive that stands in for StaticTable today.
+- <a href="?path=/docs/foundations-patterns-table--docs">Table</a>, in Patterns: the table pattern, a shell with pagination and empty-state slots.
+- <a href="?path=/docs/foundations-patterns-section--docs">Section</a>, in Patterns: the header above every table, with its toolbar and tabs types.
+- Status, Tag and Tag group, in Labels: what goes in status and tag cells.
+- Checkbox, Tooltip, Progress bar and Skeleton: cell content and loading.
+- Icon, in Images and icons: every icon in these parts comes from the new 12, 16 and 24 set.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

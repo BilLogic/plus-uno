@@ -1,0 +1,260 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as DynamicTableStories from './DynamicTable.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
+import { PlannedNote, WhichTableRule } from '@/storybook-docs/table-doc-examples.jsx';
+import { tableTokens } from '@/storybook-docs/table-doc-content.jsx';
+
+<Meta of={DynamicTableStories} />
+
+<Title />
+
+A Dynamic table is any table people work with: they sort a column, page through hundreds of records and select rows to act on them together. It uses the same parts as the Static table, so everything on the Static table page applies here too.
+
+<PlannedNote
+    planned="DynamicTable"
+    today={<>Today, build it from the table pattern, with your own sort buttons, checkboxes and pagination. The rules below say how those parts behave.</>}
+/>
+
+<DocsTabs of={DynamicTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19615-11652"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternTable"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## What it is
+
+Sorting changes one column at a time, and the arrow moves to the sorted column. Paging always shows the range, such as “1–25 of 340”. Selection adds a checkbox to every row and a select-all box to the header, which turns indeterminate when only some rows are chosen. Bulk actions appear in the Section header above the table, never inside it.
+
+Colors follow the toolbar’s Color mode and Contrast switches.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Which table?
+
+Pick the type from what people do with the rows. Rows they only read are a Static table. Rows they sort, filter, select, page or act on are a Dynamic table. Rows that nest under other rows are a Tree table, and nesting wins even when the table is interactive.
+
+The <a href="?path=/docs/foundations-patterns-table--docs">table pattern</a> shows how a table sits in a Section, with its pagination and empty-state slots.
+
+<WhichTableRule />
+
+This is the Dynamic table case: a student roster. Tutors sort students, select several and act on them together, and 340 rows need paging.
+
+<DsCanvasQuiet of={DynamicTableStories.WhichTable} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+Eight parts, numbered as in the Figma anatomy.
+
+<DocsCanvasShell description={<>Two rows selected, the bulk bar in the Section header, one sorted column and the pager.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.Anatomy} />
+</DocsCanvasShell>
+
+<SpecTable
+    head={['#', 'Part', 'What it is']}
+    rows={[
+        ['1', 'Select all', 'The head row select box. Indeterminate when some rows are selected. It names itself “Select all rows”.'],
+        ['2', 'Sorted column', 'The one sorted column: the 12px arrow, and the label in the default text color.'],
+        ['3', 'Selected row', 'A checked box and the selected background across the whole row. Never the fill alone, and never an edge bar.'],
+        ['4', 'More actions', 'Shown on hover and focus, and always on touch. Its label names the row.'],
+        ['5', 'Summary row', 'One muted calculation per column, over all the rows, not just this page.'],
+        ['6', 'Range', '“1–25 of 340”. Always present when the table pages.'],
+        ['7', 'Pager', 'Previous is disabled on the first page and next on the last.'],
+        ['8', 'Scroll shadow', 'The edge shadow says more columns are clipped. The scroll region takes keyboard focus.'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+These are the Figma options. DynamicTable has no props yet. It adds the options below to the head cell, cell, row and message row of the Static table.
+
+### Table
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['State', 'default, empty, no results, loading, refreshing, error', 'What the table shows. The header stays visible in every state.'],
+        ['Frame', 'plain, framed', 'Plain spans its section. Framed adds the outline and a radius of 8.'],
+        ['Rows', 'slot', 'Rows with select on, plus any group rows or expanded content.'],
+        ['Footer', 'on (default), off', 'The range and the pager.'],
+        ['Summary', 'on, off', 'The summary row above the footer.'],
+        ['Scroll shadow', 'on, off', 'The clipped-edge cue for horizontal overflow.'],
+        ['Frozen', 'false, true', 'The first column stays put with a stronger edge while the rest scrolls. On your own rows, turn it on for that column’s head cell and cells.'],
+        ['Dividers vertical', 'false, true', 'Adds column rules. On your own rows, set a divider on each cell but the last.'],
+        ['Wrap all', 'false, true', 'Wraps every cell. On your own rows, set overflow to wrap.'],
+    ]}
+/>
+
+### Row
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Size', 'sm, md, lg', '32, 40 or 48 minimum height. Two-line cells grow it.'],
+        ['State', 'rest, hover, pressed, focus, selected, selected hover, highlighted, disabled', 'Hover and pressed take the neutral subtle steps, focus a ring, selected the selected background with a checked box and no edge bar, selected hover its hovered step, highlighted the warning background for a new or changed row, and disabled 38%.'],
+        ['Select', 'on, off', 'The checkbox column.'],
+        ['Expander', 'on, off', 'The 12px chevron. Set the toggle to expanded and add expanded content under the row.'],
+        ['Actions', 'on, off', 'The More actions button, shown on hover and focus and always on touch.'],
+        ['Divider', 'on, off', 'Turn it off on the last row of the table.'],
+    ]}
+/>
+
+### Head row
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Select', 'none, unchecked, checked, indeterminate', 'The select-all checkbox. Indeterminate when some rows are selected.'],
+        ['Expander, actions', 'on, off', 'Blank columns that line the header up with rows that have a chevron or More actions.'],
+        ['Stuck', 'on, off', 'A soft shadow under the rule while rows scroll under a sticky header.'],
+    ]}
+/>
+
+### Footer
+
+<SpecTable
+    head={['Property', 'Values', 'What it does']}
+    rows={[
+        ['Range', 'text', '“1–25 of 340”. Always present when the table pages.'],
+        ['Type', 'full, compact', 'Page numbers, or previous and next only.'],
+        ['Page', 'first, middle, last', 'Shows the disabled ends: previous on the first page, next on the last.'],
+    ]}
+/>
+
+### Parts
+
+<SpecTable
+    head={['Part', 'Property', 'Values', 'What it does']}
+    rows={[
+        ['Expanded content', 'Content, select', 'slot, on, off', 'The detail panel under an expanded row, indented to the title text. Turn select on when the table has a checkbox column, so the indent matches.'],
+        ['Toggle', 'Toggle', 'collapsed, expanded, leaf, loading', 'The 12px chevron in a 24 control. Leaf keeps the space and draws nothing.'],
+        ['Icon button', 'Size', 'sm, md', '24 control in small rows, 32 in medium and large rows.'],
+        ['Page button', 'Type', 'page, previous, next, gap', 'One pager control in the footer. The current page carries the selected background.'],
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable head={['Token', 'Value', 'Used for']} rows={tableTokens} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+The frame works as on the Static table. The three options below change how columns read when the table is wide or the text is long: a frozen first column with a scroll shadow, vertical dividers, and wrap all.
+
+### Frame
+
+<DocsCanvasShell description={<>Plain and framed.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.FrameVariants} />
+</DocsCanvasShell>
+
+### Footer
+
+The footer shows the range and the pager whenever the table pages. Use the compact type in narrow cards and on small screens. Only a Dynamic table has a footer.
+
+<DocsCanvasShell description={<>The full footer, and the compact footer.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.FooterVariants} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+First load shows skeleton rows. Later loads, after a sort, a page change or a filter, keep the old rows dimmed under a spinner, so the layout does not jump and nothing reads as gone. When rows are missing, a message row says why and offers the next step. The header stays visible in every state.
+
+<DocsCanvasShell description={<>Default, loading, refreshing, empty and error.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.StateVariants} />
+</DocsCanvasShell>
+
+Row states follow the Static table page: hover and pressed take the neutral subtle steps, focus is a ring inside the row, selected is the selected background across the whole row, and highlighted is the warning background.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Each rule is drawn with the table pattern. The left card is what to do, and the right card is what to avoid.
+
+<DsCanvasQuiet of={DynamicTableStories.DoDont} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a Dynamic table when any of these apply: sort, filter, select (including bulk actions), paginate, expand rows, row actions, a frozen column, or loading and empty states. Hover, pressed, focus and selected rows live here and in Tree tables.
+
+- For records people only read, use a Static table.
+- For rows that nest under other rows, use a Tree table.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Name the select-all box.** The head row checkbox is “Select all rows”, and it is indeterminate when only some rows are chosen.
+- **Name each row’s controls.** A row checkbox and a More actions button carry the row’s name in their labels.
+- **Do not mark selection with color alone.** A selected row shows a checked box as well as the fill.
+- **Announce the selection.** The bulk bar in the Section header says how many rows are selected.
+- **Make the scroll region reachable.** A region that scrolls takes keyboard focus, and the focus ring is drawn inside it.
+- **Say where people are in the pages.** The range, such as “1–25 of 340”, sits beside the pager.
+- **Keep contrast.** Text, rules and fills keep their contrast in every Color mode and Contrast setting.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/components-text-and-data-display-static-table--docs">Static table</a>: the shared parts and the rules every table follows.
+- <a href="?path=/docs/components-text-and-data-display-tree-table--docs">Tree table</a>: nested records.
+- <a href="?path=/docs/foundations-patterns-table--docs">Table</a>, in Patterns: the table pattern that stands in for DynamicTable today.
+- <a href="?path=/docs/foundations-patterns-section--docs">Section</a>, in Patterns: its toolbar type holds search, filters, the count and the bulk bar, and its tabs type holds saved views.
+- Pagination: the footer pager is drawn with the table’s own 12px chevrons.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

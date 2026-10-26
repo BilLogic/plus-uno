@@ -6,7 +6,17 @@ import {
     DocsCanvasShell,
     DocsInteractivePlayground,
     ResourcesBlock,
+    DsCanvasQuiet,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
+import {
+    staticAnatomy,
+    cellPresets,
+    cellOptions,
+    headCellOptions,
+    messageRowTypes,
+    tableTokens,
+} from '@/storybook-docs/table-doc-content.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -55,14 +65,14 @@ export const figmaMeta = {
 
 <Title />
 
-Data table for tabular content. Cells accept any node, so a row can carry Badges, formatted currency, or a Button used as a sort trigger.
+The table primitive is a read-only table for records people read and compare across columns, such as students, sessions, tutors, schools and scores. You pass the column headers and the rows, and it draws a quiet table: a 12px muted header with a stronger rule under it, flat rows with hairline rules between them, and no zebra striping. StaticTable is planned. Today this primitive is the table to use for read-only data.
 
 <DocsTabs of={TableStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19611-84184"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -74,10 +84,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 ## Overview
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Default table with hover enabled and medium density.</>}
->
+<DocsCanvasShell attachSourceBelow description={<>The default table: the header, flat rows and hover on.</>}>
 
 <Canvas of={TableStories.Overview} />
 
@@ -87,33 +94,150 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Anatomy
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Striped rows and bordered cells are independent switches.</>}
->
+Six parts, numbered as in the Figma anatomy.
 
-<Canvas of={TableStories.Striped} />
+<DocsCanvasShell attachSourceBelow description={<>Head row, head cells, rows, a title column, a number column and a summary row.</>}>
 
-<Canvas of={TableStories.Bordered} />
+<Canvas of={TableStories.Anatomy} />
 
 </DocsCanvasShell>
+
+<SpecTable head={['#', 'Part', 'What it is']} rows={staticAnatomy} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Empty state
+## Properties
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>With no rows the header still renders — pair it with an empty-state message.</>}
->
+<SpecTable
+    head={['Prop', 'Values', 'Default', 'What it does', 'Figma']}
+    rows={[
+        [<code>headers</code>, <>text, or <code>text</code>, <code>width</code>, <code>align</code>, <code>className</code>, <code>style</code></>, 'none', 'The column headers. Each is a column heading cell.', 'Head cell: label, align'],
+        [<code>rows</code>, <>a list of rows; each cell a node, or <code>content</code>, <code>align</code>, <code>colSpan</code>, <code>className</code>, <code>style</code></>, 'none', <>The data. A cell can hold any node: text, a Status, a Tag or a link. Use <code>colSpan</code> for a message row.</>, 'Rows slot; cell: content, align'],
+        [<code>density</code>, <><code>sm</code>, <code>md</code>, <code>lg</code></>, <code>md</code>, 'Declared as the row size. Rows draw at one height in code, so it changes nothing.', 'size = sm, md, lg: 32, 40, 48'],
+        [<code>hover</code>, 'boolean', <code>true</code>, 'Fills the row under the cursor.', 'Dynamic table only'],
+        [<code>bordered</code>, 'boolean', <code>false</code>, 'Draws a border around every cell.', 'frame = framed: one outline and a radius of 8'],
+        [<code>striped</code>, 'boolean', <code>false</code>, 'Alternates the row background. The table rules do not stripe rows.', 'No zebra striping'],
+        [<code>onRowClick</code>, 'function', 'none', 'Runs with the row index when a row is clicked.', 'Row actions belong to the Dynamic table'],
+        [<code>id</code>, 'text', 'none', 'The table’s id.', 'none'],
+        [<code>className</code>, 'text', 'none', 'A class on the table.', 'none'],
+    ]}
+/>
 
-<Canvas of={TableStories.Empty} />
+Neither Figma’s Static table nor the primitive has a summary prop: a summary is the last row of <code>rows</code>. Sorting is not built in. The page owns the sort state and passes the rows already ordered.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable head={['Token', 'Value', 'Used for']} rows={tableTokens} />
+
+The primitive’s stylesheet reads the older cell padding tokens, <code>--size-table-cell-x</code> and <code>--size-table-cell-y</code>. The table tokens above are the names the Static table rules use.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+### Frame
+
+Plain is the default on a page: the table spans its section with no outer frame, and its first and last cells are flush with the section edge. Use framed when the table sits beside other content and needs its own edge, such as inside a modal body.
+
+<DocsCanvasShell description={<>Plain and framed. The framed outline is a 1px border with the table radius.</>}>
+
+<DsCanvasQuiet of={TableStories.FrameRule} />
 
 </DocsCanvasShell>
+
+### Row size
+
+Rows are 32, 40 or 48 tall at minimum. Pick by how much each row holds, not by screen width: small for dense admin lists, medium for most tables, large when rows hold avatars or two lines. Two-line cells grow the row.
+
+<DocsCanvasShell description={<>The three row heights of the rule.</>}>
+
+<DsCanvasQuiet of={TableStories.RowSizeRule} />
+
+</DocsCanvasShell>
+
+### Cells
+
+A cell is text or a slot. Text cells can add a muted second line, wrap, or carry the title emphasis. A leading slot puts an avatar, an icon or a Status before the text.
+
+<SpecTable head={['Option', 'Values', 'What it does']} rows={cellOptions} />
+
+### Cell presets
+
+Presets are recipes, not variants: start from a cell and fill its content. Each recipe says what goes in the cell and how it aligns.
+
+<DocsCanvasShell description={<>A number, a date, a Status, a link and the empty dash.</>}>
+
+<DsCanvasQuiet of={TableStories.Cells} />
+
+</DocsCanvasShell>
+
+<SpecTable head={['Preset', 'Recipe']} rows={cellPresets} />
+
+### Head cell
+
+<SpecTable head={['Option', 'Values', 'What it does']} rows={headCellOptions} />
+
+### Summary
+
+The summary row closes the table, muted, with one calculation per column. A read-only table never pages, so it has no footer. When the rows need a pager, use a Dynamic table.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+Rows rest, or are highlighted to mark a new or changed row. Hover, pressed, focus, selected and disabled rows belong to the Dynamic and Tree tables. Highlighted is the warning background across the whole row. Focus is always a 2px focus ring drawn inside the cell or row, so a sticky header or the scroll container never clips it, and it never adds a fill.
+
+### Row
+
+<DocsCanvasShell description={<>A row at rest, and a highlighted row.</>}>
+
+<DsCanvasQuiet of={TableStories.RowStates} />
+
+</DocsCanvasShell>
+
+### Cell
+
+An error cell is tinted and carries a 12px error icon. The message is in a tooltip. A loading cell shows a skeleton bar while the value loads.
+
+<DocsCanvasShell description={<>A cell in error, and a cell that is loading.</>}>
+
+<DsCanvasQuiet of={TableStories.CellStatesExample} />
+
+</DocsCanvasShell>
+
+### Message rows
+
+When rows are missing, the header stays and a message row says why. Empty means nothing exists yet, no results means filters hid everything, and error means it did not load.
+
+<DocsCanvasShell description={<>A message row is one cell spanning every column.</>}>
+
+<Canvas of={TableStories.MessageRow} />
+
+</DocsCanvasShell>
+
+<SpecTable head={['Type', 'When']} rows={messageRowTypes} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Each rule is drawn with the table pattern. The left card is what to do, and the right card is what to avoid.
+
+<DsCanvasQuiet of={TableStories.DoDont} />
 
 </div>
 
@@ -135,11 +259,32 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## When to use
 
-- **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
-- **Per-cell control** — pass `{ content, align, colSpan, className }` instead of a bare value when a cell needs alignment or spanning.
-- **Density** maps to the `--size-table-cell-*` token family.
+Use the table when nothing about the table’s data changes on its own: no sorting, filtering, selection, paging, row expansion, row actions or inline edits. A link inside a cell is fine. Rows rest, or are highlighted to mark a new or changed row. The table sits inside a Section and spans it. The Section header above it carries the title and any action that leaves the rows as they are, such as Export, so the table never has a toolbar of its own.
+
+- For a table people sort, filter, select, page or act on, use a Dynamic table. It is planned, and the table pattern is what to build it from today.
+- For rows that nest under other rows, use a Tree table, also planned.
+- For a list of records with no columns to line up, use List group.
+- For one item among many, use Card.
+
+Not sure which type? See the Which table? rule on the <a href="?path=/docs/components-text-and-data-display-static-table--docs">Static table</a> page, and the <a href="?path=/docs/foundations-patterns-table--docs">table pattern</a> for the table in a Section.
+
+Colors follow the toolbar’s Color mode and Contrast switches.
+
+</div>
+
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Every header is a column heading.** The primitive draws each header as a column heading cell, so a screen reader announces it with every cell below.
+- **Name a row-select control.** A checkbox in a cell needs its own label, because the column heading does not name it. Label an icon button for its row, such as “More actions for Ava Lee”.
+- **Put keyboard actions in a control, not a row.** A row has no button role and no key handling. A row that needs a keyboard action needs a real button or link inside a cell.
+- **Show truncated text in full.** A truncated cell shows its full value in a tooltip on hover and focus. Wrap the text people must read in full.
+- **Do not mark state with color alone.** A highlighted row needs words or an icon beside it. An error cell carries its icon and a message.
+- **Keep contrast.** Text, rules and fills keep their contrast in every Color mode and Contrast setting.
 
 </div>
 
@@ -147,10 +292,13 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 ## Related
 
-- For a list of records with no columns to line up, use `ListGroup`.
-- For splitting a long result set across pages, use `Pagination`.
-- For a status or a count inside a cell, use `Badge`.
-- For a row-select control, use `Checkbox` with an `aria-label` — the column heading does not name it.
+- <a href="?path=/docs/components-text-and-data-display-static-table--docs">Static table</a>, <a href="?path=/docs/components-text-and-data-display-dynamic-table--docs">Dynamic table</a> and <a href="?path=/docs/components-text-and-data-display-tree-table--docs">Tree table</a>: the planned table components, with the Which table? rule.
+- <a href="?path=/docs/foundations-patterns-table--docs">Table</a>, in Patterns: the table pattern, a shell with pagination and empty-state slots.
+- <a href="?path=/docs/foundations-patterns-section--docs">Section</a>, in Patterns: the header above every table, with its toolbar and tabs.
+- Status, Tag and Tag group, in Labels: what goes in status and tag cells.
+- Checkbox, Tooltip, Progress bar and Skeleton: cell content and loading.
+- List group: a list of records with no columns.
+- Pagination: splitting a long result set across pages.
 
 </div>
 

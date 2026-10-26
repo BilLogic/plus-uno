@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Card from '@/components/layout-and-structure/Card';
+import { WhichCardExample } from '@/storybook-docs/which-card-example.jsx';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -15,8 +16,8 @@ const imageCap = (
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'var(--color-surface-variant)',
-            color: 'var(--color-on-surface-variant)'
+            backgroundColor: 'var(--ds-background-neutral)',
+            color: 'var(--ds-text-subtle)'
         }}
     >
         Image cap
@@ -311,3 +312,6 @@ export const Elevation = {
         await expect(getComputedStyle(card('Static')).borderTopColor, 'the outline role').toBe(tokenColor(canvasElement, '--color-outline-variant'));
     },
 };
+
+/** The Card component and the card pattern with the same content, side by side. */
+export const WhichCard = () => <WhichCardExample />;

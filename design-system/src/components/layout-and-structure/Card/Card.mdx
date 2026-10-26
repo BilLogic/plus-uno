@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CardStories from './Card.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpecTable } from '@/storybook-docs/docs-spec-table.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -30,14 +31,17 @@ export const figmaMeta = {
 <Meta of={CardStories} />
 
 <Title />
-A card is a flexible and extensible content container. Cards support a wide variety of content, including images, text, list groups, links, and more.
+
+A card is a self-contained box for related content: an image, a title, body copy, a list, links and an action. Reach for it when one item needs its own space beside its peers.
+
+Use this Card component for one item among peers, such as a session, a tutor or a program, when the content fits its props: an image, a title, text, a list, links and one action. Use the <a href="?path=/docs/foundations-patterns-card--docs">card pattern</a> for one block you compose yourself, such as a table, a chart or a form with its own header.
 
 <DocsTabs of={CardStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-52792"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -49,7 +53,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Title, body, subtitle, and optional media.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A title and body text.</>}>
     <Canvas of={CardStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -57,31 +61,168 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Which Card to use when
 
-<DocsCanvasShell description={<>Basic body, media slot, and subtitle line.</>}>
+Two cards exist, and each answers a different question. Ask what you are putting in the box.
+
+<SpecTable
+    head={['', 'Card component', 'Card pattern']}
+    rows={[
+        ['What it is', 'A content card. You pass the content as props.', 'A frame with slots. You place your own content in them.'],
+        ['Best for', 'One item among peers, in a grid or a list: a session, a tutor, a program.', 'One object or block on a page: a metric tile, a table in a card, a form, a list with a header.'],
+        ['What you give it', <>An <code>image</code>, a <code>title</code>, a <code>subtitle</code>, <code>body</code> text, <code>items</code>, <code>links</code> and one <code>actionButton</code>.</>, <>A <code>title</code>, a <code>description</code> and <code>actions</code> (or a custom <code>header</code>), an <code>image</code>, any body children and a <code>footer</code>.</>],
+        ['Sizes', <><code>paddingSize</code>, <code>gapSize</code>, <code>radiusSize</code> and <code>borderSize</code>.</>, <><code>padding</code> and <code>gap</code>, at the Card tokens.</>],
+        ['Import', <code>Card</code>, <code>PatternCard</code>],
+    ]}
+/>
+
+<DocsCanvasShell description={<>The same content in each: the Card component on the left, the card pattern on the right.</>}>
+    <DsCanvasQuiet of={CardStories.WhichCard} />
+</DocsCanvasShell>
+
+The card pattern is documented under Patterns, as Card. It is the one to reach for when a card holds anything beyond the props above.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+Seven parts, numbered as in the Figma anatomy. Each part has its own switch, so a card shows only what it needs.
+
+<SpecTable
+    head={['#', 'Part', 'Code prop']}
+    rows={[
+        ['1', 'Image', <code>image</code>],
+        ['2', 'Title', <code>title</code>],
+        ['3', 'Subtitle', <code>subtitle</code>],
+        ['4', 'Content: the body copy', <code>body</code>],
+        ['5', 'List: a list group of items', <code>items</code>],
+        ['6', 'Link: one or more text links', <code>links</code>],
+        ['7', 'Button: one action', <code>actionButton</code>],
+    ]}
+/>
+
+The header and the footer are two more strips, set with <code>header</code> and <code>footer</code>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<SpecTable
+    head={['Prop', 'Values', 'Default', 'What it does', 'Figma']}
+    rows={[
+        [<code>image</code>, 'URL or node', 'none', 'The image across the top, edge to edge.', 'image?'],
+        [<code>header</code>, 'text', 'none', 'A strip above the body.', 'header?'],
+        [<code>title</code>, 'text', 'none', 'The card title, a heading one level below its section.', 'title?'],
+        [<code>subtitle</code>, 'text', 'none', 'A Body/default line under the title.', 'subtitle?'],
+        [<code>body</code>, 'text or node', 'none', 'The body copy. Children render after it.', 'content?'],
+        [<code>items</code>, 'list of text or nodes', 'none', 'A list group of items.', 'list?'],
+        [<code>footer</code>, 'text', 'none', 'A strip under the body.', 'footer?'],
+        [<code>links</code>, <>list of <code>text</code>, <code>href</code>, <code>onClick</code></>, 'none', 'One or more text links.', 'link?'],
+        [<code>actionButton</code>, <><code>text</code>, <code>onClick</code>, <code>style</code>, <code>fill</code>, <code>size</code></>, 'none', 'The card’s one action.', 'button?'],
+        [<code>paddingSize</code>, <><code>sm</code>, <code>md</code>, <code>lg</code></>, <code>md</code>, 'Padding: 16, 20 or 24.', 'Not split into variants'],
+        [<code>gapSize</code>, <><code>sm</code>, <code>md</code>, <code>lg</code></>, <code>md</code>, 'The gap between parts: 10, 16 or 20.', 'Not split into variants'],
+        [<code>radiusSize</code>, <><code>sm</code>, <code>md</code></>, <code>sm</code>, 'Corner radius: 12 or 16.', 'Not split into variants'],
+        [<code>borderSize</code>, <><code>sm</code>, <code>md</code>, <code>lg</code></>, <code>sm</code>, 'Outline width: 1, 1.5 or 2.', 'Figma draws no outline'],
+        [<code>showBorder</code>, 'boolean', <code>true</code>, 'Draws the outline.', 'Figma draws no outline'],
+        [<code>dragging</code>, 'boolean', <code>false</code>, 'Lifts the card while it is dragged.', 'none'],
+        [<code>onClick</code>, 'function', 'none', 'Makes the card clickable. It lifts on hover.', 'none'],
+    ]}
+/>
+
+Figma’s Card also has parts to build from (links, subtitle, text, title, header, footer, item and link padding) and an Overview card with a summary and a breakdown. In code, a card renders each part from the props above, and an overview card is a card whose body holds the figure and its detail.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<SpecTable
+    head={['Token', 'Value', 'Used for']}
+    rows={[
+        [<><code>--size-card-pad-x-sm</code> · <code>-md</code> · <code>-lg</code>, and the same for <code>-y-</code></>, '16 · 20 · 24', 'Padding by size'],
+        [<><code>--size-card-radius-sm</code> · <code>--size-card-radius-md</code></>, '12 · 16', 'Corner radius'],
+        [<><code>--size-card-gap-sm</code> · <code>--size-card-gap-md</code> · <code>--size-card-gap-lg</code></>, '10 · 16 · 20', 'Gap between parts. The Card component is the only user.'],
+        [<><code>--size-card-border-sm</code> · <code>--size-card-border-md</code> · <code>--size-card-border-lg</code></>, '1 · 1.5 · 2', 'Outline width. The Card component is the only user.'],
+        [<code>--ds-surface-raised</code>, 'raised surface', 'Card fill'],
+        [<code>--ds-shadow-raised</code>, 'raised shadow', 'The raised pair’s edge. Its 1px ring is the edge, so the card has no outline.'],
+    ]}
+/>
+
+The card pattern binds <code>--card-pad-sm</code>, <code>--card-pad-md</code>, <code>--card-pad-lg</code>, <code>--card-radius-sm</code> and <code>--card-radius</code>, which hold the same values.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+<DocsCanvasShell description={<>Basic body, media, and a subtitle line.</>}>
     <DsCanvasQuiet of={CardStories.Content} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Actions
-
-<DocsCanvasShell description={<>Primary action button, link row, and simple list items.</>}>
+<DocsCanvasShell description={<>A primary action, text links and a list of items.</>}>
     <DsCanvasQuiet of={CardStories.Actions} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Every part together: header, footer, media, subtitle, list, links and an action.</>}>
+    <DsCanvasQuiet of={CardStories.Layout} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## States
 
-<DocsCanvasShell description={<>Full example with header, footer, media, links, and primary action.</>}>
-    <DsCanvasQuiet of={CardStories.Layout} />
+Figma draws one state, default. A card with an <code>onClick</code> gets hover and focus from the browser.
+
+Figma rests the card raised, on the raised surface and shadow, with no outline. In code the Card component rests flat on a 1px outline and lifts to the raised shadow when it is clickable and hovered, or dragged. The card pattern rests raised, as Figma does.
+
+<DocsCanvasShell description={<>Static, clickable and dragging.</>}>
+    <DsCanvasQuiet of={CardStories.Elevation} />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Turn parts off rather than leaving them empty.** Each part has its own switch. An empty title or link row still takes space.
+- **Keep one action per card.** A card with several buttons reads as a form. Put the main action in the button slot and the rest as links.
+- **Pick a size, not pixels.** Padding, gap, radius and border come from <code>paddingSize</code>, <code>gapSize</code>, <code>radiusSize</code> and <code>borderSize</code>. Choose a size and set no value.
+- **Pad the sides at least as much as the top and bottom.**
+- **Do not wrap a card in a link.** Every element inside it, including a button, becomes part of one link target. Give the card an explicit action instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+<code>header</code> and <code>footer</code> take text, not nodes. Put nodes in the body:
+
+```jsx
+<Card header="Live session" footer="Updated 4 minutes ago">
+  <Status style="success">Live</Status>
+</Card>
+```
+
+<code>radiusSize</code> accepts <code>sm</code> and <code>md</code> only.
+
+A clickable card needs a control inside it:
+
+```jsx
+<Card
+  title="Algebra · Tue 4pm"
+  actionButton={{ text: 'Open session', onClick: () => open(session) }}
+/>
+```
 
 </div>
 
@@ -91,12 +232,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <DocsInteractivePlayground
     of={CardStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+    description={<>Use the table below to change props.</>}
 />
 
 </div>
@@ -113,51 +249,15 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 ## When to use
 
-Use `Card` for a bounded piece of content that stands on its own — a session
-summary in a list, a tutor's stats block, a dashboard tile. The props map to the
-regions in order: `image`, `header`, then a body of `title` / `subtitle` /
-`body` / `children`, an optional `items` list, and a footer built from `footer`,
-`links` and `actionButton`.
+Use a card when one item’s content belongs together. It groups an item’s image, title, text and action so it can sit in a grid or list of like items, such as a session summary, a tutor’s stats block or a dashboard tile.
 
-Padding, gap, radius and border are token-backed size props (`paddingSize`,
-`gapSize`, `radiusSize`, `borderSize`), so a card should never need custom CSS
-for spacing.
+- For rows that share fields, use Table or List group.
+- For a page’s one main message, use Jumbotron.
+- For collapsible sections, use Accordion.
+- For media beside text, use Media object.
+- For a box whose content you compose yourself, such as a table or a form with its own header, use the card pattern. See Which Card to use when, below.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### `header` and `footer` take strings, not nodes.
-
-```jsx
-// Incorrect — both are declared as PropTypes.string, so a node here warns
-// even though it happens to render.
-<Card header={<Badge text="Live" />} footer={<Timestamp value={t} />} />
-
-// Correct — strings in the string slots, nodes in the body.
-<Card header="Live session" footer="Updated 4 minutes ago">
-  <Badge text="Live" style="success" />
-</Card>
-```
-
-### Radius has two values here, not three.
-
-```jsx
-// Incorrect — `radiusSize` on Card accepts only `sm` and `md`. (Modal accepts
-// `lg`; Card does not.)
-<Card radiusSize="lg" title="Weekly summary" />
-
-// Correct.
-<Card radiusSize="md" title="Weekly summary" />
-```
-
-### A card is not a link.
-
-Wrapping a card in an anchor makes every element inside it part of one link
-target, including any button it contains. Give the card an explicit action
-instead.
+Colors follow the toolbar’s Color mode and Contrast switches.
 
 </div>
 
@@ -165,37 +265,12 @@ instead.
 
 ## Accessibility
 
-- **The card title is a heading.** `title` renders a real heading tagged one
-  level below the section the card sits in: an `h3` in a section, an `h2`
-  straight on a page. It keeps the one card title type at every level, so a
-  screen-reader user can jump between cards by heading without the type
-  changing. A card that should not appear in the heading outline leaves
-  `title` unset and puts its text in `children`.
-- **`onClick` on the card adds no semantics.** No `role`, no `tabIndex`, no key
-  handling — only `cursor: pointer`. Unknown props are spread onto the card
-  element, so `role`, `tabIndex` and `onKeyDown` can be added by hand, but a real
-  `Button` or link inside the card is the better answer.
-- **The action button stops propagation.** `actionButton`'s handler calls
-  `stopPropagation` before yours runs, so it will not also fire a card-level
-  `onClick`. That is deliberate, and it is the reason the two can coexist.
-- **Links need real destinations.** A `links` entry with no `href` falls back to
-  `#`; supplying `onClick` alone gives you a link that goes nowhere for anyone
-  navigating by link list. Give every link an `href`.
-- **Images carry no alt.** A string `image` renders the card image with no `alt`
-  attribute. If the image carries meaning, pass a node you control instead.
-
-### A clickable card is not a keyboard-reachable card.
-
-```jsx
-// Incorrect — mouse-only. No role, no tabindex, no Enter or Space.
-<Card title="Algebra · Tue 4pm" onClick={() => open(session)} />
-
-// Correct — the action is a real control inside the card.
-<Card
-  title="Algebra · Tue 4pm"
-  actionButton={{ text: 'Open session', onClick: () => open(session) }}
-/>
-```
+- **The title is a heading.** It is tagged one level below the section the card sits in: an h3 in a section, an h2 straight on a page. A screen-reader user can jump between cards by heading. Leave <code>title</code> unset to keep a card out of the heading outline, and put its text in the body.
+- **A clickable card is not a keyboard-reachable card.** <code>onClick</code> adds no role, no tab stop and no key handling. Put the action in a real button or link inside the card.
+- **The action button does not trigger the card.** Its handler stops the click, so it never also fires the card’s own <code>onClick</code>.
+- **Give every link a destination.** A link with no <code>href</code> goes to <code>#</code>.
+- **Describe meaningful images.** A URL <code>image</code> renders with no alternative text. Pass a node you control when the image carries meaning.
+- **Text and icons keep their contrast** on the card in every Color mode and Contrast setting.
 
 </div>
 
@@ -203,10 +278,12 @@ instead.
 
 ## Related
 
-- For a plain container with no surface treatment, use a `div` — a card implies a grouped, self-contained unit.
-- For a page-level hero, use `Jumbotron`.
-- For a media-and-text row, use `MediaObject`.
-- For tabular data, use `Table`.
+- <a href="?path=/docs/foundations-patterns-card--docs">Card pattern</a>, in Patterns: a frame with slots for content you compose. See Which Card to use when.
+- Jumbotron: a page’s one main message.
+- Accordion: collapsible sections.
+- List group: a list of rows.
+- Media object: media beside text.
+- Table: records that share columns.
 
 </div>
 
