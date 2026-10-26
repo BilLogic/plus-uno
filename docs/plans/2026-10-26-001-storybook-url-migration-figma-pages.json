@@ -1,5 +1,5 @@
 {
-  "$comment": "Storybook ids and URLs that changed when the sidebar took the BS4 Foundation library's page structure: a Figma page that holds several components became a folder of the same name, Logo and Table moved to Figma's category, and Grid and Scroll bar took Figma's page names. Old ids follow from the old titles by Storybook's own id rule (scripts/lib/storybook-id.mjs); new ids are read from the built index.json. It follows 2026-10-24-001-storybook-url-migration.json: a link still on an id older than that file goes through that file first, then this one. Delete this file once those links are rewritten.",
+  "$comment": "Storybook ids and URLs that changed when the sidebar took the BS4 Foundation library's page structure: a Figma page that holds several components became a folder of the same name, Logo and Table moved to Figma's category, and Grid, Scroll bar and Illustration took Figma's page names. Old ids follow from the old titles by Storybook's own id rule (scripts/lib/storybook-id.mjs); new ids are read from the built index.json. It follows 2026-10-24-001-storybook-url-migration.json: a link still on an id older than that file goes through that file first, then this one. Delete this file once those links are rewritten.",
   "generated": "2026-10-26",
   "base": "https://plus-uno.netlify.app/storybook/",
   "titles": {
@@ -19,9 +19,10 @@
     "Components/Layout and structure/Scroll bar": "Components/Layout and structure/Scrollbar",
     "Components/Layout and structure/Table": "Components/Text and data display/Table",
     "Foundations/Logos": "Components/Images and icons/Logo",
-    "Foundations/Grid": "Foundations/Layout & grid"
+    "Foundations/Grid": "Foundations/Layout & grid",
+    "Components/Images and icons/Illustration": "Components/Images and icons/Illustrations"
   },
-  "count": 168,
+  "count": 189,
   "entries": [
     {
       "type": "docs",
@@ -162,6 +163,216 @@
       "newId": "components-forms-and-inputs-button-close-button--tones",
       "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-close-button--tones",
       "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-forms-and-inputs-button-close-button--tones"
+    },
+    {
+      "type": "docs",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Docs",
+      "oldId": "components-images-and-icons-illustration--docs",
+      "newId": "components-images-and-icons-illustrations--docs",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-images-and-icons-illustration--docs",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/docs/components-images-and-icons-illustrations--docs"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Advocacy",
+      "oldId": "components-images-and-icons-illustration--advocacy",
+      "newId": "components-images-and-icons-illustrations--advocacy",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--advocacy",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--advocacy"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "All",
+      "oldId": "components-images-and-icons-illustration--all",
+      "newId": "components-images-and-icons-illustrations--all",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--all",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--all"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Approximately Equal",
+      "oldId": "components-images-and-icons-illustration--approximately-equal",
+      "newId": "components-images-and-icons-illustrations--approximately-equal",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--approximately-equal",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--approximately-equal"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Decorative",
+      "oldId": "components-images-and-icons-illustration--decorative",
+      "newId": "components-images-and-icons-illustrations--decorative",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--decorative",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--decorative"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Default Size",
+      "oldId": "components-images-and-icons-illustration--default-size",
+      "newId": "components-images-and-icons-illustrations--default-size",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--default-size",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--default-size"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Divider",
+      "oldId": "components-images-and-icons-illustration--divider",
+      "newId": "components-images-and-icons-illustrations--divider",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--divider",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--divider"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Dot",
+      "oldId": "components-images-and-icons-illustration--dot",
+      "newId": "components-images-and-icons-illustrations--dot",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--dot",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--dot"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Equal",
+      "oldId": "components-images-and-icons-illustration--equal",
+      "newId": "components-images-and-icons-illustrations--equal",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--equal",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--equal"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Gallery",
+      "oldId": "components-images-and-icons-illustration--gallery",
+      "newId": "components-images-and-icons-illustrations--gallery",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--gallery",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--gallery"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Interactive",
+      "oldId": "components-images-and-icons-illustration--interactive",
+      "newId": "components-images-and-icons-illustrations--interactive",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--interactive",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--interactive"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Mastering Content",
+      "oldId": "components-images-and-icons-illustration--mastering-content",
+      "newId": "components-images-and-icons-illustrations--mastering-content",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--mastering-content",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--mastering-content"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Math Characters",
+      "oldId": "components-images-and-icons-illustration--math-characters",
+      "newId": "components-images-and-icons-illustrations--math-characters",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--math-characters",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--math-characters"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Pi",
+      "oldId": "components-images-and-icons-illustration--pi",
+      "newId": "components-images-and-icons-illustrations--pi",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--pi",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--pi"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Relationships",
+      "oldId": "components-images-and-icons-illustration--relationships",
+      "newId": "components-images-and-icons-illustrations--relationships",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--relationships",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--relationships"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Root",
+      "oldId": "components-images-and-icons-illustration--root",
+      "newId": "components-images-and-icons-illustrations--root",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--root",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--root"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Sizes",
+      "oldId": "components-images-and-icons-illustration--sizes",
+      "newId": "components-images-and-icons-illustrations--sizes",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--sizes",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--sizes"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Smart Characters",
+      "oldId": "components-images-and-icons-illustration--smart-characters",
+      "newId": "components-images-and-icons-illustrations--smart-characters",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--smart-characters",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--smart-characters"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Social Emotional",
+      "oldId": "components-images-and-icons-illustration--social-emotional",
+      "newId": "components-images-and-icons-illustrations--social-emotional",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--social-emotional",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--social-emotional"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Technology",
+      "oldId": "components-images-and-icons-illustration--technology",
+      "newId": "components-images-and-icons-illustrations--technology",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--technology",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--technology"
+    },
+    {
+      "type": "story",
+      "oldTitle": "Components/Images and icons/Illustration",
+      "newTitle": "Components/Images and icons/Illustrations",
+      "name": "Titled",
+      "oldId": "components-images-and-icons-illustration--titled",
+      "newId": "components-images-and-icons-illustrations--titled",
+      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustration--titled",
+      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-images-and-icons-illustrations--titled"
     },
     {
       "type": "docs",
