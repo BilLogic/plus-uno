@@ -58,3 +58,17 @@ export function popoverOverlayProps(offset) {
         },
     };
 }
+
+/**
+ * Where a popup mounts: the page, or the modal its trigger sits in.
+ *
+ * A popup is on the popup layer (400), under a modal (510). One opened from a
+ * trigger inside a modal mounts in the modal's overlay instead, so it takes
+ * the modal's layer and draws above the dialog.
+ *
+ * @param {{current: Element | null} | undefined} triggerRef the trigger
+ * @returns {Element}
+ */
+export function popupMountOf(triggerRef) {
+    return triggerRef?.current?.closest('.modal') ?? document.body;
+}

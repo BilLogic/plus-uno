@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import './Popover.scss';
 import { Popover as BootstrapPopover, OverlayTrigger } from 'react-bootstrap';
-import { popoverOverlayProps } from '@/lib/popoverPlacement';
+import { popoverOverlayProps, popupMountOf } from '@/lib/popoverPlacement';
 
 /** The width tiers, Popover/width-sm · md · lg: 320 · 400 · 480. */
 const WIDTHS = ['sm', 'md', 'lg'];
@@ -75,6 +75,9 @@ const Popover = ({
     const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultShow);
     const isOpen = show !== undefined ? show : uncontrolledOpen;
 
+    // The trigger's node, so a popup opened inside a modal mounts in it.
+    const triggerRef = React.useRef(null);
+
     const overlayTriggerProps = {
         placement,
         overlay: (
@@ -83,7 +86,8 @@ const Popover = ({
             </PopoverContent>
         ),
         defaultShow,
-        container,
+        // The page, or the modal the trigger sits in, unless the caller says.
+        container: container ?? (() => popupMountOf(triggerRef)),
         // 4 from the trigger unless the caller passes `offset`, and never
         // nearer than 8 to the screen's edge.
         ...popoverOverlayProps(offset),
@@ -159,14 +163,22 @@ const Popover = ({
      */
     const expandable = acceptsExpandedState(triggerElement);
 
+    const ownRef = triggerElement.props.ref ?? triggerElement.ref;
+    const keepTriggerNode = (node) => {
+        triggerRef.current = node;
+        if (typeof ownRef === 'function') ownRef(node);
+        else if (ownRef) ownRef.current = node;
+    };
+
     return (
         <OverlayTrigger {...overlayTriggerProps}>
-            {expandable
-                ? React.cloneElement(triggerElement, {
+            {React.cloneElement(triggerElement, {
+                ref: keepTriggerNode,
+                ...(expandable && {
                     'aria-haspopup': 'dialog',
                     'aria-expanded': isOpen,
-                })
-                : triggerElement}
+                }),
+            })}
         </OverlayTrigger>
     );
 };
