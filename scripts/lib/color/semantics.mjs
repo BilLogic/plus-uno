@@ -27,6 +27,9 @@ import { STEPS } from './ramps.mjs';
 
 export const MODES = ['light', 'dark', 'light_ic', 'dark_ic'];
 
+/** SMART subject → the accent hue it aliases. */
+export const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
+
 /** The vendored Atlassian reference tokens, in their published order. */
 export function loadAtlassian({ root = REPO_ROOT } = {}) {
   return JSON.parse(readFileSync(join(root, 'scripts/lib/color/atlassian-tokens.json'), 'utf8')).tokens;
@@ -380,7 +383,6 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
 
   // ---- SMART subjects: a product layer aliasing the non-role accents. Each subject takes an
   // accent no semantic role uses, so a subject tag never reads as information, success, warning, danger or discovery.
-  const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
   const SMART_MAP = [
     ['color.background.smart.{s}', 'color.background.accent.{f}.subtler', 'Subject tag and chip fill.'],
     ['color.background.smart.{s}.hovered', 'color.background.accent.{f}.subtler.hovered', 'Hovered subject chip.'],

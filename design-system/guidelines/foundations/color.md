@@ -56,6 +56,8 @@ any new divergence.
 | Relationship | `--color-relationship` | Pink/Magenta |
 | Technology Tools | `--color-technology-tools` | Blue |
 
+On the new tokens, an illustration body takes `--ds-background-smart-<subject>-subtle`, the mid step between the chip fill and the bold fill.
+
 ```jsx
 <Badge style="social-emotional">Social-Emotional</Badge>
 <Badge style="mastering-content">Mastering Content</Badge>

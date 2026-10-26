@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 import { buildPlan } from './build.mjs';
 import { buildPalette, loadPlan } from './plans.mjs';
-import { buildSemantics } from './semantics.mjs';
+import { buildSemantics, SMART } from './semantics.mjs';
 import { contrast } from './oklch.mjs';
 
 const refs = (key, name) => {
@@ -64,7 +64,6 @@ test('the base palette is not mutated by registering hue alphas', () => {
 });
 
 test('SMART subtle: every subject, every mode, its accent subtle; the line work it carries', () => {
-  const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
   for (const key of ['A', 'B']) {
     const byName = Object.fromEntries(buildPlan(key).semantics.rows.map((r) => [r.name, r]));
     for (const [subject, hue] of Object.entries(SMART)) {

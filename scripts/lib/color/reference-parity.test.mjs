@@ -39,14 +39,14 @@ const VALUE_KEYS = ['name', 'light_ref', 'light', 'dark_ref', 'dark', 'light_ic_
 const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, r[k]])));
 const withoutProse = (value) =>
   JSON.parse(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v)));
-/** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ADDED = /^color[./]background[./]smart[./][a-z-]+[./]subtle$/;
-const ADDED_DECL = /^ +--ds-background-smart-[a-z-]+-subtle: [^\n]*\n/gm;
-const withoutAdded = (spec) => ({
+const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-background-smart-[a-z-]+-subtle: [^\n]*\n/gm;
+const withoutPlusOnly = (spec) => ({
   ...spec,
-  collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ADDED.test(v.name)) })),
+  collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
 });
+/** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
 const blocks = (css) => css.split(/(?<=^\}\n)/m).map((b) => b.trim()).filter(Boolean);
 
 for (const key of ['A', 'B']) {
@@ -60,7 +60,7 @@ for (const key of ['A', 'B']) {
   test(`Plan ${key}: all 518 reference tokens match, names, refs and hex, in every mode`, { skip }, () => {
     const { semantics } = buildPlan(key);
     const ref = json(`generator/semantics_${key}.json`);
-    const rows = semantics.rows.filter((r) => !PLUS_ADDED.test(r.name));
+    const rows = semantics.rows.filter((r) => !PLUS_ONLY_TOKEN.test(r.name));
     assert.equal(rows.length, 518);
     assert.deepEqual(values(rows), values(ref.rows));
     assert.deepEqual(withoutProse(semantics.shadows), withoutProse(ref.shadows));
@@ -69,13 +69,13 @@ for (const key of ['A', 'B']) {
 
   test(`Plan ${key}: the Figma spec matches the reference, descriptions aside`, { skip }, () => {
     const { semantics } = buildPlan(key);
-    assert.deepEqual(withoutProse(withoutAdded(figmaSpec(key, semantics))), withoutProse(json(`out/${key}/figma-spec.json`)));
+    assert.deepEqual(withoutProse(withoutPlusOnly(figmaSpec(key, semantics))), withoutProse(json(`out/${key}/figma-spec.json`)));
   });
 
   test(`Plan ${key}: palette and semantic SCSS match byte for byte below the header`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
     for (const file of ['_palette.scss', '_semantic.scss']) {
-      assert.equal(body(files[file]).replace(ADDED_DECL, ''), body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')), file);
+      assert.equal(body(files[file]).replace(PLUS_ONLY_SCSS_DECL, ''), body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')), file);
     }
   });
 
