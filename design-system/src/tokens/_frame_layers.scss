@@ -124,6 +124,15 @@
     --popover-gap-screen: var(--space-050);
     /* Tile */
     --tile-radius-sm: var(--radius-03125);
+    --tile-radius-lg: var(--radius-0625);
+    /* Focused page */
+    --focused-page-pad-x: var(--space-050);
+    --focused-page-pad-y: var(--space-050);
+    --focused-page-stack-sm: var(--space-050);
+    --focused-page-stack-md: var(--space-100);
+    --focused-page-stack-lg: var(--space-150);
+    --focused-page-inline-sm: var(--space-050);
+    --focused-page-inline-md: var(--space-075);
 
     /* color / patterns */
     /* Overlay */

@@ -737,6 +737,7 @@
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
       "Table/radius": "var(--table-radius)",
       "Table/stack": "var(--table-stack)",
+      "Tile/radius-lg": "var(--tile-radius-lg)",
       "Tile/radius-sm": "var(--tile-radius-sm)"
     },
     "color / patterns": {
@@ -1279,11 +1280,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1511,
+    "scssTokenCount": 1519,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1125,
-      "resolved": 1096,
+      "total": 1126,
+      "resolved": 1097,
       "percent": 97,
       "unresolved": [
         {

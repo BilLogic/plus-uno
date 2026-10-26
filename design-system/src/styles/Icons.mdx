@@ -1,44 +1,127 @@
-import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TokenTable } from '@/storybook-docs/foundation-blocks.jsx';
 import * as IconsStories from './Icons.stories.jsx';
 
 <Meta of={IconsStories} />
 
 <Title />
 
+Icons are small symbols that help people find their way and act faster. PLUS
+draws every icon from Font Awesome Free, at one of three sizes, in an icon
+color token. This page holds the rules every icon follows.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-53331"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_scales.scss"
+/>
+
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Font Awesome Free Icon Library
+### Principles
 
-<IconsStories.Overview />
+**Use symbols people already recognize.** Pick the glyph most people read the
+same way: a calendar for dates, a bell for notifications, a gear for settings.
+A clever metaphor costs the reader a guess.
+
+**Keep shapes simple.** Font Awesome glyphs are drawn for small sizes. Prefer
+the plainest glyph that says it, and use one glyph for one meaning across the
+product.
+
+<Canvas of={IconsStories.OneGlyphOneMeaning} sourceState="none" />
+
+**Pair icons with text labels where you can.** A label says what the icon
+means and helps people who use a screen reader. Leave an icon alone only for a
+well-known action in a tight space, such as close or more, and give it a name.
+
+<Canvas of={IconsStories.PairWithLabels} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Solid Icon Tokens
+### Sizes: 12, 16 and 24
 
-<IconsStories.IconSizeTokensSolid />
+Icons come in three sizes, bound to the icon size tokens. The box is exactly
+the size, so an icon never adds height to the line it sits in.
+
+<Canvas of={IconsStories.Sizes} sourceState="none" />
+
+<TokenTable
+    rows={[
+        { token: '--icon-sm', figma: 'Size/Icon/sm', use: 'Chevrons, small text, validation, inside tags and table headers' },
+        { token: '--icon-md', figma: 'Size/Icon/md', use: 'The default, beside 14 and 16 text' },
+        { token: '--icon-lg', figma: 'Size/Icon/lg', use: 'Empty states, section headers, standalone status marks' },
+    ]}
+/>
+
+**Larger means Tile.** 24 is the largest icon. A bigger or decorative mark,
+such as a list-item badge, a tool logo or an empty-state picture, goes in a
+Tile, which sets its size, corner and color in one place.
+
+<Canvas of={IconsStories.LargerMeansTile} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Regular Icon Tokens
+### Font Awesome Free
 
-<IconsStories.IconSizeTokensRegular />
+Code loads Font Awesome Free 7. Use only its three free families: `fa-solid`,
+`fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands
+fa-figma` and `fa-brands fa-github`.
+
+```jsx
+<i className="fa-solid fa-calendar-days" aria-hidden="true" />
+```
+
+Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only
+names are not licensed here, and they render as a blank square. Components
+that take an icon, such as Button's `leadingVisual` and Tile's `icon`, take
+the glyph's name (`calendar-days`) and draw it solid.
+
+<Canvas of={IconsStories.Families} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Common Icons
+### Color
 
-<IconsStories.CommonIcons />
+Color an icon with an icon token, never a picked value. An icon beside a label
+defaults to `--ds-icon-subtle`. A status icon takes its role's icon token, such
+as `--ds-icon-success` or `--ds-icon-danger`, and warning's icon is the darker
+`--ds-icon-warning`, never the yellow warning fill. On a bold fill, an icon
+takes `--ds-icon-inverse`.
+
+<Canvas of={IconsStories.Colors} sourceState="none" />
 </div>
 
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- A decorative icon, one beside a label that already says what it means,
+  takes `aria-hidden="true"`.
+- An icon with no label, such as a close button, gets a name on its control:
+  `aria-label="Close"`. The name says what the control does, not what the
+  glyph shows.
+- Icons that carry meaning, such as status icons and the focus of a control,
+  clear 3:1 against their surface. The icon tokens do in every mode.
+- Never let an icon be the only cue for a status. Pair it with a word.
+</div>
+
+<div className="sb-ds-doc-section">
+### Legacy icon sizes
+
+The older sizes named icons after type registers (b3 to h1, and HUGE) inside
+line boxes taller than the glyph. Components that already use them keep them.
+Don't use them in new work: use the three sizes above.
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the Font Awesome sizes that pair with each type register, see **Typography**.
-- For which color an icon takes, see **Colors** — the `(Text)` half of a semantic, not the bold half.
-- For when an icon needs an accessible name, see **Accessibility**.
+- **Tile**, for a mark larger than 24.
+- **Illustration**, for the hand-drawn characters on empty states and onboarding.
+- **Size roles**, for the icon sizes beside control and media sizes.
+- **Color**, for the icon tokens.
+- **Typography**, for the text an icon sits beside.
 
 </div>
 

@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-10-25",
-  "totalVariables": 592,
+  "totalVariables": 593,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 346,
+    "FLOAT": 347,
     "BOOLEAN": 9,
     "STRING": 5
   },
@@ -674,6 +674,7 @@
         "Table/pad-y-cell",
         "Table/radius",
         "Table/stack",
+        "Tile/radius-lg",
         "Tile/radius-sm"
       ]
     },

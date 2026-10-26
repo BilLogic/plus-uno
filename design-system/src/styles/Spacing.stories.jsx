@@ -1,256 +1,241 @@
 import React from 'react';
+import { Button, Input, Tag, Suggestion } from '@/components';
+import { PatternCard } from '@/patterns';
+import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
- * Companion styled tables for Spacing.mdx. All tables are explicit <table>
- * elements (markdown tables do NOT parse in this MDX setup) and share ONE
- * column geometry via <DocTable> + fixed table-layout, so every spacing table
- * lines its Token / Value / Description columns up identically.
+ * Specimens for Foundations/Spacing: the three kinds of box, and the spacing
+ * principles as Do and Don't pairs. Every gap is a spacing token; a Don't that
+ * shows a wrong gap names the wrong value in its caption.
  */
 export default {
     title: 'Foundations/Spacing',
     tags: ['!dev', '!autodocs'],
 };
 
-const wrap = { maxWidth: '1200px' };
+const box = {
+    padding: 'var(--modal-pad)',
+    borderRadius: 'var(--modal-radius)',
+    background: 'var(--ds-surface-overlay)',
+    boxShadow: 'var(--ds-shadow-overlay)',
+    color: 'var(--ds-text)',
+};
+const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
+const row = (gap) => ({ display: 'flex', alignItems: 'center', gap, flexWrap: 'wrap' });
+const tag = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 
-/**
- * Shared table. `cols` = [{ header, width, align, mono, code }]; `rows` = arrays of cells.
- * Fixed layout + explicit widths keep every table visually consistent.
- */
-const DocTable = ({ cols, rows }) => (
-    <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', marginBottom: '8px', border: '1px solid var(--color-outline-variant)' }}>
-        <colgroup>
-            {cols.map((c, i) => <col key={i} style={{ width: c.width }} />)}
-        </colgroup>
-        <thead>
-            <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
-                {cols.map((c, i) => (
-                    <th key={i} className="body2-txt" style={{ padding: '10px 12px', textAlign: c.align || 'left', fontWeight: 600 }}>{c.header}</th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {rows.map((row, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
-                    {row.map((cell, j) => {
-                        const c = cols[j];
-                        const content = c.code ? <code style={{ fontSize: '0.85em', wordBreak: 'break-word' }}>{cell}</code> : cell;
-                        return (
-                            <td key={j} className={c.mono || c.code ? undefined : 'body2-txt'}
-                                style={{ padding: '10px 12px', textAlign: c.align || 'left', fontFamily: c.mono ? 'monospace' : 'inherit', wordBreak: 'break-word' }}>
-                                {content}
-                            </td>
-                        );
-                    })}
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
+const School = ({ id }) => <Input id={`${id}-school`} label="School" placeholder="Select a school" />;
+const Teacher = ({ id }) => <Input id={`${id}-teacher`} label="Teacher" placeholder="Select a teacher" />;
+const SessionDate = ({ id }) => <Input id={`${id}-date`} label="Session date" defaultValue="Tuesday, June 3" />;
 
-// Shared column geometry for the per-context value tables — identical across all of them.
-const VALUE_COLS = [
-    { header: 'Token', width: '46%', code: true },
-    { header: 'Value', width: '16%', mono: true },
-    { header: 'Description', width: '38%' },
-];
-const VALUE_COLS_4 = [
-    { header: 'Token', width: '34%', code: true },
-    { header: 'Value', width: '14%', mono: true },
-    { header: 'Use with', width: '26%', mono: true },
-    { header: 'Best for', width: '26%' },
-];
-// Shared geometry for the conceptual 3-column reference tables.
-const REF_COLS = (a, b, c) => [
-    { header: a, width: '22%' },
-    { header: b, width: '46%', code: false },
-    { header: c, width: '32%' },
-];
-
-export const PrimitiveScale = () => (
-    <div style={wrap}>
-        <DocTable
-            cols={[
-                { header: 'Group', width: '22%' },
-                { header: 'Token', width: '58%', code: true },
-                { header: 'Value', width: '20%', mono: true },
-            ]}
-            rows={[
-                ['Small', '--size-spacing-small-space-000', '0px'],
-                ['Small', '--size-spacing-small-space-025', '2px'],
-                ['Small', '--size-spacing-small-space-050', '4px'],
-                ['Small', '--size-spacing-small-space-075', '6px'],
-                ['Small', '--size-spacing-small-space-100', '8px'],
-                ['Small', '--size-spacing-small-space-150', '10px'],
-                ['Medium', '--size-spacing-medium-space-200', '12px'],
-                ['Medium', '--size-spacing-medium-space-300', '16px'],
-                ['Medium', '--size-spacing-medium-space-400', '20px'],
-                ['Medium', '--size-spacing-medium-space-500', '24px'],
-                ['Large', '--size-spacing-large-space-600', '32px'],
-                ['Large', '--size-spacing-large-space-650', '36px'],
-                ['Large', '--size-spacing-large-space-700', '40px'],
-                ['Large', '--size-spacing-large-space-800', '48px'],
-                ['Large', '--size-spacing-large-space-900', '64px'],
-                ['Large', '--size-spacing-large-space-1000', '80px'],
-            ]}
-        />
+/** Item, Container and Wrapper: the kind of box decides its pad. */
+export const ThreeKinds = () => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
+        <div style={col('var(--element-stack-md)')}>
+            <span><Button text="Save changes" style="primary" fill="filled" /></span>
+            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Item</span>
+            <span style={tag}>A minimum height, and pad-x larger than pad-y: 32 = 20 line + 2 × 6, pad-x 12. Button, Text field, Tag, a menu or table row.</span>
+        </div>
+        <div style={col('var(--element-stack-md)')}>
+            <PatternCard title="Container" description="Card/pad-md, 20 on every side." />
+            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Container</span>
+            <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popover, Flag, Section message.</span>
+        </div>
+        <div style={col('var(--element-stack-md)')}>
+            <span style={row('var(--element-inline-md)')}>
+                <Button text="Cancel" style="default" fill="outline" />
+                <Button text="Save" style="primary" fill="filled" />
+            </span>
+            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Wrapper</span>
+            <span style={tag}>No fill and no pad. It only arranges its children with a gap or a grid. Section, Button group, Tag group, a form row.</span>
+        </div>
     </div>
 );
 
-export const SemanticTokens = () => (
-    <div style={wrap}>
-        <DocTable
-            cols={REF_COLS('Context', 'Token pattern', 'Used for')}
-            rows={[
-                ['Element', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-element-pad-{'{x|y}'}-{'{sm|md|lg}'}, --size-element-gap-{'{xs|sm|md|lg}'}</code>, 'Buttons, inputs, chips, and their internal spacing'],
-                ['Card', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-card-pad-{'{x|y}'}-{'{sm|md|lg}'}, --size-card-gap-{'{sm|md|lg}'}</code>, 'Card padding and spacing between items inside a card'],
-                ['Section', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-section-pad-{'{x|y}'}-{'{sm|md|lg}'}, --size-section-gap-{'{sm|md|lg}'}</code>, 'Page sections and spacing between major blocks'],
-                ['Modal', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-modal-pad-{'{x|y}'}-{'{sm|md|lg}'}, --size-modal-gap-{'{sm|md|lg}'}</code>, 'Modal body padding and content spacing'],
-                ['Surface', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-surface-pad-{'{x|y}'}, --size-surface-gap-{'{sm|md|lg}'}</code>, 'Outermost page surface'],
-                ['Table', <code style={{ fontSize: '0.82em', wordBreak: 'break-word' }}>--size-table-cell-{'{x|y|gap}'}</code>, 'Table cell padding and cell content gaps'],
-            ]}
-        />
+/** Items pad by their height: compact 24, default 32, label 20. */
+export const ItemHeights = () => (
+    <div style={row('var(--surface-stack-md)')}>
+        <div style={col('var(--element-stack-md)')}>
+            <span><Button text="Compact" size="small" style="default" fill="outline" /></span>
+            <span style={tag}>24 · pad-y 2, pad-x 8 · table rows and inline toolbars</span>
+        </div>
+        <div style={col('var(--element-stack-md)')}>
+            <span><Button text="Default" style="default" fill="outline" /></span>
+            <span style={tag}>32 · pad-y 6, pad-x 12 · buttons, tabs, menu rows, fields</span>
+        </div>
+        <div style={col('var(--element-stack-md)')}>
+            <span><Tag text="Grade 7" /></span>
+            <span style={tag}>Label 20 · pad-x 4 · Tag, Status, Count</span>
+        </div>
     </div>
 );
 
-export const TierGuide = () => (
-    <div style={wrap}>
-        <DocTable
-            cols={REF_COLS('Layer', 'Token tier', 'Example')}
-            rows={[
-                ['Page / surface', <code style={{ fontSize: '0.85em' }}>--size-surface-*</code>, 'Outer page padding'],
-                ['Container', <code style={{ fontSize: '0.85em' }}>--size-surface-container-*</code>, 'Grouped content regions on the surface'],
-                ['Section', <code style={{ fontSize: '0.85em' }}>--size-section-*</code>, 'Gap between major page blocks (e.g. two Cards)'],
-                ['Card / modal', <code style={{ fontSize: '0.85em' }}>--size-card-*, --size-modal-*</code>, 'Card padding, modal body spacing'],
-                ['Element', <code style={{ fontSize: '0.85em' }}>--size-element-*</code>, 'Gap between headers and text inside a Card'],
-            ]}
-        />
+/** 1 · Similarity: the same kind of thing takes the same gap. */
+export const Similarity = () => (
+    <DoDont>
+        <Do caption={<>Three fields in one group, <C>--modal-stack-md</C> (16) between each.</>}>
+            <div style={{ ...box, ...col('var(--modal-stack-md)') }}>
+                <School id="sim-do" /><Teacher id="sim-do" /><SessionDate id="sim-do" />
+            </div>
+        </Do>
+        <Dont caption="The same fields 8 and 24 apart. Uneven gaps suggest groups that are not there.">
+            <div style={{ ...box, ...col(0) }}>
+                <School id="sim-dont" />
+                <div style={{ height: 'var(--space-050)' }} />
+                <Teacher id="sim-dont" />
+                <div style={{ height: 'var(--space-150)' }} />
+                <SessionDate id="sim-dont" />
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+/** 2 · Differentiation: a new group gets a bigger gap. */
+export const Differentiation = () => (
+    <DoDont>
+        <Do caption={<><C>--modal-stack-lg</C> (24) between the suggestion and the fields; <C>--modal-stack-md</C> (16) between the fields.</>}>
+            <div style={{ ...box, ...col('var(--modal-stack-lg)') }}>
+                <span><Suggestion label="Use last week's school and teacher" /></span>
+                <div style={col('var(--modal-stack-md)')}><School id="dif-do" /><Teacher id="dif-do" /></div>
+            </div>
+        </Do>
+        <Dont caption="One small gap everywhere. The suggestion and the form run together.">
+            <div style={{ ...box, ...col('var(--modal-stack-sm)') }}>
+                <span><Suggestion label="Use last week's school and teacher" /></span>
+                <School id="dif-dont" /><Teacher id="dif-dont" />
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+const MiniSection = ({ title, gap, cardGap }) => (
+    <div style={col(gap)}>
+        <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>{title}</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: cardGap }}>
+            <PatternCard title="Algebra" description="4 students" />
+            <PatternCard title="Geometry" description="6 students" />
+        </div>
     </div>
 );
 
-export const ElementSpacings = () => (
-    <div style={wrap}>
-        <h4 className="h4" style={{ marginBottom: '12px' }}>Padding</h4>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-element-pad-x-lg', '16px', 'Large horizontal padding'],
-            ['--size-element-pad-x-md', '12px', 'Medium horizontal padding'],
-            ['--size-element-pad-x-sm', '8px', 'Small horizontal padding'],
-            ['--size-element-pad-y-lg', '8px', 'Large vertical padding'],
-            ['--size-element-pad-y-md', '6px', 'Medium vertical padding'],
-            ['--size-element-pad-y-sm', '4px', 'Small vertical padding'],
-        ]} />
-        <h4 className="h4" style={{ margin: '28px 0 12px' }}>Gap</h4>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-element-gap-lg', '12px', 'Large gap'],
-            ['--size-element-gap-md', '10px', 'Medium gap'],
-            ['--size-element-gap-sm', '8px', 'Small gap'],
-            ['--size-element-gap-xs', '4px', 'Extra small gap'],
-        ]} />
-        <h4 className="h4" style={{ margin: '28px 0 12px' }}>Radius</h4>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-element-radius-sm', '4px', 'Small radius (radius-100)'],
-            ['--size-element-radius-md', '4px', 'Medium radius (radius-100)'],
-            ['--size-element-radius-lg', '8px', 'Large radius (radius-200)'],
-            ['--size-element-radius-full', '999px', 'Pill shape (radius-1000)'],
-        ]} />
+/** 3 · Rhythm: gaps come in tiers that grow with the box. */
+export const Rhythm = () => (
+    <DoDont>
+        <Do caption={<>Sections 24 apart (<C>--surface-stack-md</C>), heading to cards 16 (<C>--section-stack-md</C>), cards 16 apart on the gutter.</>}>
+            <div style={col('var(--surface-stack-md)')}>
+                <MiniSection title="This week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
+                <MiniSection title="Next week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
+            </div>
+        </Do>
+        <Dont caption="16 everywhere. Sections, headings and cards sit the same distance apart, so nothing groups.">
+            <div style={col('var(--space-100)')}>
+                <MiniSection title="This week" gap="var(--space-100)" cardGap="var(--space-100)" />
+                <MiniSection title="Next week" gap="var(--space-100)" cardGap="var(--space-100)" />
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+/** 4 · Hierarchy: headings and primary actions get room. */
+export const Hierarchy = () => (
+    <DoDont>
+        <Do caption={<>Title to description <C>--card-stack-sm</C> (4), heading to body <C>--section-stack-md</C> (16), body to the action <C>--section-stack-lg</C> (24).</>}>
+            <div style={col(0)}>
+                <div style={col('var(--card-stack-sm)')}>
+                    <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Profile</span>
+                    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Shown to your students.</span>
+                </div>
+                <div style={{ height: 'var(--section-stack-md)' }} />
+                <Input id="hie-do-name" label="Display name" defaultValue="Maya Chen" />
+                <div style={{ height: 'var(--section-stack-lg)' }} />
+                <span><Button text="Save changes" style="primary" fill="filled" /></span>
+            </div>
+        </Do>
+        <Dont caption="Everything 8 apart. The heading and the action are lost in the body.">
+            <div style={col('var(--space-050)')}>
+                <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Profile</span>
+                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Shown to your students.</span>
+                <Input id="hie-dont-name" label="Display name" defaultValue="Maya Chen" />
+                <span><Button text="Save changes" style="primary" fill="filled" /></span>
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+const Footer = () => (
+    <span style={{ ...row('var(--modal-inline-sm)'), justifyContent: 'flex-end' }}>
+        <Button text="Cancel" style="default" fill="outline" />
+        <Button text="Create session" style="primary" fill="filled" />
+    </span>
+);
+
+/** 5 · White space: a modal breathes before its footer. */
+export const WhiteSpace = () => (
+    <DoDont>
+        <Do caption={<><C>--modal-pad</C> 16 on every side, <C>--modal-stack-lg</C> (24) from the fields to the footer.</>}>
+            <div style={{ ...box, ...col('var(--modal-stack-lg)') }}>
+                <span style={{ font: 'var(--heading-medium)' }}>Create new session</span>
+                <div style={col('var(--modal-stack-md)')}><School id="ws-do" /><SessionDate id="ws-do" /></div>
+                <Footer />
+            </div>
+        </Do>
+        <Dont caption="The footer squeezed 4 under the last field. Commit actions need distance from the inputs.">
+            <div style={{ ...box, ...col(0) }}>
+                <span style={{ font: 'var(--heading-medium)' }}>Create new session</span>
+                <div style={{ height: 'var(--modal-stack-lg)' }} />
+                <div style={col('var(--modal-stack-md)')}><School id="ws-dont" /><SessionDate id="ws-dont" /></div>
+                <div style={{ height: 'var(--space-025)' }} />
+                <Footer />
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+/** Never hand-space: step to the next tier instead. */
+export const NeverHandSpace = () => (
+    <DoDont>
+        <Do caption={<>The gap looked tight, so it steps up a tier: <C>--section-stack-lg</C> (24).</>}>
+            <div style={col('var(--section-stack-lg)')}>
+                <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Upcoming</span>
+                <PatternCard title="Algebra with Maya" description="Tuesday, 11:00 am" />
+            </div>
+        </Do>
+        <Dont caption="6 added under a 16 gap because it looked tight. The extra space is invisible in the tokens and nobody can repeat it.">
+            <div style={col('var(--section-stack-md)')}>
+                <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)', paddingBottom: 'var(--space-0375)' }}>Upcoming</span>
+                <PatternCard title="Algebra with Maya" description="Tuesday, 11:00 am" />
+            </div>
+        </Dont>
+    </DoDont>
+);
+
+const Metric = ({ value, label, divider }) => (
+    <div style={{ ...col('var(--card-stack-sm)'), paddingTop: divider ? 'var(--card-stack-lg)' : 0, borderTop: divider ? 'var(--border-default) solid var(--ds-border)' : 'none' }}>
+        <span style={{ font: 'var(--metric-medium)', color: 'var(--ds-text)' }}>{value}</span>
+        <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{label}</span>
     </div>
 );
 
-export const CardSpacings = () => (
-    <div style={wrap}>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-card-pad-x-sm', '16px', 'Small horizontal padding'],
-            ['--size-card-pad-x-md', '20px', 'Medium horizontal padding'],
-            ['--size-card-pad-x-lg', '24px', 'Large horizontal padding'],
-            ['--size-card-pad-y-sm', '16px', 'Small vertical padding'],
-            ['--size-card-pad-y-md', '20px', 'Medium vertical padding'],
-            ['--size-card-pad-y-lg', '24px', 'Large vertical padding'],
-            ['--size-card-gap-sm', '10px', 'Small gap'],
-            ['--size-card-gap-md', '16px', 'Medium gap'],
-            ['--size-card-gap-lg', '20px', 'Large gap'],
-            ['--size-card-radius-sm', '12px', 'Small border radius'],
-            ['--size-card-radius-md', '16px', 'Medium border radius'],
-            ['--size-card-radius-full', '999px', 'Pill shape'],
-            ['--size-card-border-sm', '1px', 'Small border'],
-            ['--size-card-border-md', '1.5px', 'Medium border'],
-            ['--size-card-border-lg', '2px', 'Large border'],
-        ]} />
-    </div>
+/** No card inside a card. */
+export const NoCardInCard = () => (
+    <DoDont>
+        <Do caption="One card; three metrics stacked in its body, split by dividers.">
+            <PatternCard title="Sessions this week" gap="lg">
+                <div style={col('var(--card-stack-lg)')}>
+                    <Metric value="128" label="Completed" />
+                    <Metric value="12" label="Canceled" divider />
+                    <Metric value="4" label="No-shows" divider />
+                </div>
+            </PatternCard>
+        </Do>
+        <Dont caption="Three mini cards inside the card. Shadows pile up and the hierarchy flattens.">
+            <PatternCard title="Sessions this week" gap="lg">
+                <div style={col('var(--card-stack-md)')}>
+                    <PatternCard padding="sm"><Metric value="128" label="Completed" /></PatternCard>
+                    <PatternCard padding="sm"><Metric value="12" label="Canceled" /></PatternCard>
+                    <PatternCard padding="sm"><Metric value="4" label="No-shows" /></PatternCard>
+                </div>
+            </PatternCard>
+        </Dont>
+    </DoDont>
 );
-
-export const SectionSpacings = () => (
-    <div style={wrap}>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-section-pad-x-lg', '36px', 'Large horizontal padding'],
-            ['--size-section-pad-x-md', '24px', 'Medium horizontal padding'],
-            ['--size-section-pad-x-sm', '16px', 'Small horizontal padding'],
-            ['--size-section-pad-y-lg', '36px', 'Large vertical padding'],
-            ['--size-section-pad-y-md', '24px', 'Medium vertical padding'],
-            ['--size-section-pad-y-sm', '16px', 'Small vertical padding'],
-            ['--size-section-gap-lg', '24px', 'Large gap'],
-            ['--size-section-gap-md', '16px', 'Medium gap'],
-            ['--size-section-gap-sm', '8px', 'Small gap'],
-            ['--size-section-radius-sm', '8px', 'Small border radius'],
-            ['--size-section-radius-md', '12px', 'Medium border radius (radius-300)'],
-            ['--size-section-radius-lg', '16px', 'Large border radius'],
-        ]} />
-    </div>
-);
-
-export const ModalSpacings = () => (
-    <div style={wrap}>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-modal-pad-x-sm', '10px', 'Small horizontal padding'],
-            ['--size-modal-pad-x-md', '16px', 'Medium horizontal padding'],
-            ['--size-modal-pad-x-lg', '20px', 'Large horizontal padding'],
-            ['--size-modal-pad-y-sm', '8px', 'Small vertical padding'],
-            ['--size-modal-pad-y-md', '12px', 'Medium vertical padding'],
-            ['--size-modal-pad-y-lg', '16px', 'Large vertical padding'],
-            ['--size-modal-gap-sm', '8px', 'Small gap'],
-            ['--size-modal-gap-md', '12px', 'Medium gap'],
-            ['--size-modal-gap-lg', '20px', 'Large gap'],
-            ['--size-modal-radius-sm', '4px', 'Small border radius'],
-            ['--size-modal-radius-md', '6px', 'Medium border radius'],
-            ['--size-modal-radius-lg', '12px', 'Large border radius'],
-            ['--size-modal-radius-full', '999px', 'Pill shape'],
-            ['--size-modal-border-sm', '1px', 'Small border'],
-            ['--size-modal-border-md', '1.5px', 'Medium border'],
-            ['--size-modal-border-lg', '2px', 'Large border'],
-        ]} />
-    </div>
-);
-
-export const SurfaceSpacings = () => (
-    <div style={wrap}>
-        <DocTable cols={VALUE_COLS} rows={[
-            ['--size-surface-pad-x', '32px', 'Horizontal padding (matches grid margin)'],
-            ['--size-surface-pad-y', '24px', 'Vertical padding'],
-            ['--size-surface-gap-lg', '32px', 'Large gap'],
-            ['--size-surface-gap-md', '24px', 'Medium gap'],
-            ['--size-surface-gap-sm', '16px', 'Small gap'],
-            ['--size-surface-radius', '16px', 'Border radius'],
-            ['--size-surface-border', '2px', 'Border width'],
-        ]} />
-    </div>
-);
-
-export const CornerRadiusApplication = () => (
-    <div style={wrap}>
-        <p className="body1-txt" style={{ marginBottom: '20px' }}>
-            Corner radius should match the padding/gap size tier of the container.
-        </p>
-        <h4 className="h4" style={{ marginBottom: '12px' }}>Elements layer</h4>
-        <DocTable cols={VALUE_COLS_4} rows={[
-            ['--size-element-radius-sm', '4px', 'element-pad-sm', 'Small buttons'],
-            ['--size-element-radius-md', '4px', 'element-pad-md', 'Standard buttons'],
-            ['--size-element-radius-lg', '8px', 'element-pad-lg', 'Large buttons'],
-            ['--size-element-radius-full', '999px', 'Pill shape', 'Badges, chips'],
-        ]} />
-        <h4 className="h4" style={{ margin: '28px 0 12px' }}>Cards layer</h4>
-        <DocTable cols={VALUE_COLS_4} rows={[
-            ['--size-card-radius-sm', '12px', 'card-pad-sm', 'Compact cards'],
-            ['--size-card-radius-md', '16px', 'card-pad-md/lg', 'Standard cards'],
-        ]} />
-    </div>
-);
-CornerRadiusApplication.storyName = 'Corner Radius Application';
