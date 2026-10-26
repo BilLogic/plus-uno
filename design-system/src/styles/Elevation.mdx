@@ -1,33 +1,163 @@
-import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
 <Meta of={ElevationStories} />
 
 <Title />
 
+Elevation is how far a surface sits above the page. Each level is a pair of
+tokens, a surface color and its shadow, and the two always travel together.
+PLUS follows Atlassian's elevation model: a raised card or a menu keeps the
+page's color and lifts by its shadow, and only the sunken frame changes fill.
+The examples draw light and dark side by side, and follow the toolbar's
+**Color mode** and **Contrast** switches.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18313-50824"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens/color"
+/>
+
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 ### Overview
 
-<ElevationStories.Overview />
+<Canvas of={ElevationStories.Overview} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Elevation Levels
+### The levels
 
-<ElevationStories.AllElevations />
+Five levels, lowest to highest. Pick the level by what the surface is, never
+by how strong a shadow looks.
+
+<RefTable
+    head={['Level', 'Surface', 'Shadow', 'What sits there']}
+    rows={[
+        ['Sunken', <C>--ds-surface-sunken</C>, 'none', 'The frame: the topbar and the docked sidebar, behind the work.'],
+        ['Default', <C>--ds-surface</C>, 'none', 'The page itself, and flat content on it: sections and tables.'],
+        ['Raised', <C>--ds-surface-raised</C>, <C>--ds-shadow-raised</C>, 'Cards.'],
+        ['Overlay', <C>--ds-surface-overlay</C>, <C>--ds-shadow-overlay</C>, 'Anything over the interface: menus, popups, flags, tooltips, toasts, the sidebar when it opens over the page, modals, and a card while it is dragged.'],
+        ['Overflow', 'the surface under it', <C>--ds-shadow-overflow</C>, 'Where content scrolls under other content, such as a sticky table column.'],
+    ]}
+/>
+
+`--ds-surface-container` is not a level. It is a translucent fill for a
+recessed area inside a surface, such as a summary strip in a card, so it works
+on any surface beneath it.
+
+Raised and overlay surfaces have `-hovered` and `-pressed` steps for a
+surface that can be clicked, such as a clickable card.
 </div>
 
+<div className="sb-ds-doc-section">
+### Cards
 
+A card rests on the raised pair, `--ds-surface-raised` with
+`--ds-shadow-raised`, and has no border. The raised shadow is a 1px ring at 5%
+with a faint blur, so a resting card still reads almost flat in light. In dark,
+the ring is light, so the card keeps an edge.
+
+A clickable card lifts to `--ds-shadow-overlay` on hover and while it is
+dragged. A card
+that cannot be clicked never lifts.
+
+<Canvas of={ElevationStories.Cards} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Each pattern's level
+
+Every pattern takes exactly one level, so nobody picks a shadow by eye.
+
+<RefTable
+    head={['Pattern', 'Surface and shadow']}
+    rows={[
+        ['Surface container (the frame: topbar and docked sidebar)', <><C>--ds-surface-sunken</C>, no shadow</>],
+        ['Surface (the box that holds the page)', <><C>--ds-surface</C>, no border</>],
+        ['Section, Table', 'No fill of their own: they sit on the surface'],
+        ['Card', <><C>--ds-surface-raised</C> + <C>--ds-shadow-raised</C>; clickable cards lift to <C>--ds-shadow-overlay</C></>],
+        ['Menu, Popup, Flag, Toast', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C></>],
+        ['Sidebar, opened over the page below 1024', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, no scrim</>],
+        ['Tooltip', <><C>--ds-background-neutral-bold</C> with <C>--ds-text-inverse</C></>],
+        ['Modal', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, over the <C>--ds-blanket</C> scrim</>],
+    ]}
+/>
+
+A modal and a menu share the overlay level. The scrim under the modal is what
+sets it apart.
+</div>
+
+<div className="sb-ds-doc-section">
+### Tokens
+
+<TokenTable
+    rows={[
+        { token: '--ds-surface-sunken', figma: 'elevation/surface/sunken', use: 'The frame' },
+        { token: '--ds-surface', figma: 'elevation/surface/default', use: 'The page' },
+        { token: '--ds-surface-raised', figma: 'elevation/surface/raised', use: 'A card; pair with the raised shadow' },
+        { token: '--ds-surface-overlay', figma: 'elevation/surface/overlay', use: 'A layer over the interface; pair with the overlay shadow' },
+        { token: '--ds-surface-container', figma: 'elevation/surface/container', use: 'A recessed well inside a surface' },
+    ]}
+    swatch
+/>
+
+<TokenTable
+    rows={[
+        { token: '--ds-shadow-raised', figma: 'elevation/shadow/raised', value: 'a 1px ring and a faint blur', use: 'Cards' },
+        { token: '--ds-shadow-overlay', figma: 'elevation/shadow/overlay', value: 'a 1px ring and a soft drop', use: 'Every layer over the interface' },
+        { token: '--ds-shadow-overflow', figma: 'elevation/shadow/overflow', value: 'a short spread on both sides', use: 'Content scrolling under a sticky part' },
+    ]}
+    valueHeader="Shape"
+/>
+
+Layers stack in a fixed order, from `--layout-z-index-card` (100) through
+navigation 200, dialog 300, popup 400, scrim 500, modal 510 and flag 600, to
+`--layout-z-index-tooltip` (800). A layer takes its pattern's index, never a
+number of its own.
+</div>
+
+<div className="sb-ds-doc-section">
+### Do and don't
+
+<Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
+
+<Canvas of={ElevationStories.NoCardBorder} sourceState="none" />
+
+<Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- A shadow is never the only thing that tells two surfaces apart. Content on
+  a card or a menu still has its own heading, and a modal sits on a scrim.
+- Under increased contrast, the ring in the raised and overlay shadows darkens
+  to a 3:1 line, so cards and menus keep a visible edge. In light increased
+  contrast the frame turns white, and the Surface draws `--ds-border-surface`
+  so its edge stays.
+- Text on any of the five surfaces uses the text tokens from **Color**, which
+  clear 4.5:1 on all of them.
+</div>
+
+<div className="sb-ds-doc-section">
+### Legacy elevation names
+
+`--elevation-light-1` to `-5` and the older `--surface-*` roles still resolve,
+so components that have not moved keep rendering. Levels 1 and 2 point at
+`--ds-shadow-raised`, and level 3 at `--ds-shadow-overlay`. Don't use them in
+new work: use the pairs above.
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the surfaces these shadows sit on, see **Colors** → surface roles.
-- For the primitive that pairs a fill with a shadow, use `Surface`.
-- For the two patterns that carry elevation of their own, see `Card` (raised) and `Modal` (overlay).
+- **Color**, for the surface and text tokens each level sits with.
+- **Patterns**, for the frame, Card and Modal, which bake their level in.
+- **Spacing** and **Radius**, for the pad and corners inside a lifted surface.
 
 </div>
 

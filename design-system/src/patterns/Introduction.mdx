@@ -44,9 +44,9 @@ A pattern never renders your content for you. It answers exactly one question â€
             ['Frame (app frame)', 'Frame', '--ds-surface-sunken frame; the surface inside is --ds-surface and carries the content grid', '0'],
             ['Sidebar (side navigation)', 'PatternSidebar', 'none: it sits on the Frame (--ds-surface-sunken), or --ds-surface-overlay when floating', '0'],
             ['Section', 'PatternSection', 'no fill', '0'],
-            ['Card', 'PatternCard', '--surface-raised on a 1px --color-outline-variant border', '0 at rest; Light/2 while a clickable card is hovered or dragged'],
+            ['Card', 'PatternCard', '--ds-surface-raised, no border', '--ds-shadow-raised at rest; --ds-shadow-overlay while a clickable card is hovered or dragged'],
             ['Table', 'PatternTable', 'no-fill (container owns the background)', '0'],
-            ['Modal', 'PatternModal', '--surface-overlay (white), over a scrim', 'Light/4'],
+            ['Modal', 'PatternModal', '--ds-surface-overlay, over a scrim', '--ds-shadow-overlay'],
         ].map((row, i) => (
             <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
                 <td className="body2-txt" style={{ padding: '10px 12px' }}>{row[0]}</td>

@@ -1,45 +1,299 @@
-import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 import * as ColorsStories from './Colors.stories.jsx';
+import * as ColorModesStories from './ColorModes.stories.jsx';
 
 <Meta of={ColorsStories} />
 
 <Title />
+
+Color in PLUS is a set of `--ds-*` tokens, each named for the job it does: the
+text on a page, the edge of a field, the fill of the primary button. A token
+has one value in each color mode, so a component that uses the right token is
+right in light, dark and increased contrast without any work of its own. The
+examples on this page draw both modes side by side, and they follow the
+toolbar's **Color mode** and **Contrast** switches.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-61272"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens/color"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 ### Overview
 
-<ColorsStories.Overview />
+One card, drawn twice from the same tokens. Nothing in it names a hex value or
+a mode.
+
+<Canvas of={ColorsStories.Overview} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Accent Colors
+### How the tokens are built
 
-<ColorsStories.AccentColors />
+There are two layers.
+
+- **Primitives** are the raw ramps: `lagoon` (the brand), `neutral`, and the
+  accent hues blue, teal, green, lime, yellow, orange, red, magenta, purple
+  and brown. In CSS they are `--palette-lagoon-700` and so on. They exist so
+  the semantic tokens have something to point at. Never use one in a design or
+  a component.
+- **Semantic tokens** point at a primitive and name a job. They are the only
+  color tokens you bind. Their names follow Atlassian's, so an Atlassian
+  guideline usually applies to PLUS word for word.
+
+A semantic name reads from the general to the specific:
+`property.role.emphasis.state`. In Figma the parts are joined with slashes
+(`color/text/subtle`). In CSS, drop the leading `color.` and join the parts
+with dashes behind `--ds-` (`--ds-text-subtle`).
+
+<RefTable
+    head={['Part', 'Values', 'What it says']}
+    rows={[
+        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>blanket</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
+        ['role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-teal</C> · <C>smart-advocacy</C></>, 'What it means. Left out for the default neutral.'],
+        ['emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'How far it stands from the surface. Only the steps a role defines exist.'],
+        ['state', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
+    ]}
+/>
+
+So `--ds-background-brand-bold-hovered` is the fill of the primary button
+while the pointer is over it, and `--ds-text-subtlest` is the faintest text,
+used for metadata such as a timestamp.
 </div>
 
 <div className="sb-ds-doc-section">
-### Status Colors
+### Modes
 
-<ColorsStories.StatusColors />
+PLUS has two color modes, **light** and **dark**, and each has an
+**increased contrast** version for people who need stronger text and edges.
+That makes four modes. A fifth setting, **auto**, follows the operating system:
+`prefers-color-scheme` picks light or dark, and `prefers-contrast` turns
+increased contrast on.
+
+- **Dark** is not light inverted. Raised and overlay surfaces get lighter as
+  they rise, because a shadow is hard to see on a dark page.
+- **Increased contrast** darkens text and meaningful borders in light and
+  lightens them in dark. Text then reaches 7:1, and borders, icons and the
+  focus ring reach 4.5:1. Tints, surfaces and the scrim stay as they are.
+
+The mode is set once, on the page, by two attributes: `data-color-mode`
+(`light`, `dark` or `auto`) and `data-contrast-mode` (`no-preference`, `more`
+or `auto`). No attribute means light at standard contrast. In Storybook, the
+toolbar sets both. Each swatch below shows the value the page resolves for its
+token right now, so switching the toolbar changes it at once.
+
+<Canvas of={ColorModesStories.Modes} sourceState="none" />
+
+React-Bootstrap components follow the mode too. A bridge points Bootstrap's
+own color variables at the `--ds-*` tokens, so a Bootstrap modal, dropdown,
+toast or form control carries no PLUS styling and still matches the page.
+
+<Canvas of={ColorModesStories.BootstrapBridge} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Neutral Colors
+### Text and icons
 
-<ColorsStories.NeutralColors />
+Text comes in three emphasis levels of one neutral: `--ds-text` for body text
+and labels, `--ds-text-subtle` for secondary text and helper text, and
+`--ds-text-subtlest` for metadata and placeholders. There is no secondary or
+tertiary text color. Icons follow the same three levels.
+
+<Canvas of={ColorsStories.TextRoles} sourceState="none" />
+
+<Canvas of={ColorsStories.IconRoles} sourceState="none" />
+
+Links take `--ds-link`. Brand text that is not a link takes `--ds-text-brand`.
+A status word takes its role's text token, such as `--ds-text-danger`.
 </div>
 
+<div className="sb-ds-doc-section">
+### Borders
+
+`--ds-border` is the hairline for dividers and the edges of containers.
+`--ds-border-input` is the edge of a field or control, and
+`--ds-border-focused` is the focus ring. A border that carries meaning, such
+as an invalid field's `--ds-border-danger`, clears 3:1. A `-subtle` border is
+decorative and does not have to.
+
+<Canvas of={ColorsStories.BorderRoles} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Backgrounds and surfaces
+
+A **surface** is what content sits on: the page, a card, a menu. A
+**background** is the fill of a part: a button, a selected row, a chip.
+
+- `--ds-background-neutral-subtle` is transparent at rest. Menu items and
+  subtle buttons use it and take its `-hovered` and `-pressed` steps.
+- `--ds-background-brand-bold` is the primary action.
+- `--ds-background-selected` marks a selected row or tab, with
+  `--ds-text-selected` on it. `--ds-background-selected-bold` is a checked
+  checkbox or a selected radio, never a primary action.
+- `--ds-blanket` is the scrim under a modal.
+
+<Canvas of={ColorsStories.BackgroundRoles} sourceState="none" />
+
+The surfaces pair with shadows, and Elevation explains which goes where.
+
+<Canvas of={ColorsStories.SurfaceRoles} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Status colors
+
+Danger, warning, success, information and discovery each come in four
+emphasis levels:
+
+- the **default** tint, for a section message;
+- **subtler**, for a status label;
+- **subtle**, for a chip that is not interactive;
+- **bold**, the filled version, with `--ds-text-inverse` on it.
+
+Warning's bold fill is a light yellow, so the text on it is
+`--ds-text-warning-inverse`, the dark ink. Discovery marks something new or
+proposed, such as a Suggestion.
+
+<Canvas of={ColorsStories.StatusRoles} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Choosing a token
+
+1. **Name the property.** Is the color painting text, an icon, a border or a
+   background? That is the first part of the name.
+2. **Name the role.** Default neutral, brand, selected, a status, or an
+   accent. If the color means nothing in particular, it is neutral.
+3. **Pick the emphasis.** Start at the default. Step to `subtle` or `bold` only
+   when the design calls for less or more weight.
+4. **Add the state** if the element is interactive: `-hovered`, `-pressed`.
+
+Pick by meaning, never by a matching value. A danger fill, its border and its
+icon are three tokens even when two of them share a value today. When the
+values change, a borrowed token will not follow.
+
+Interaction states use each role's own steps. A row or menu item takes
+`--ds-background-neutral-subtle-hovered` and `-pressed`, and a bold fill takes
+its own `-hovered` and `-pressed`. Only an avatar or an image, whose fill
+cannot change, lays a translucent `--ds-interaction-hovered` over itself.
+Focus is never a fill: it is the 2px focus ring in `--ds-border-focused`.
+
+<Canvas of={ColorsStories.AccentOnComponents} sourceState="none" />
+
+<Canvas of={ColorsStories.TextTokenForWords} sourceState="none" />
+
+<Canvas of={ColorsStories.FocusIsARing} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Partner pairs and contrast
+
+Every foreground token has a background it is made for, and the pair clears
+the WCAG bar in all four modes: 4.5:1 for text, 3:1 for icons, borders and the
+focus ring, and 7:1 and 4.5:1 under increased contrast.
+
+- **On a bold fill**, text and icons take `--ds-text-inverse` and
+  `--ds-icon-inverse`. Warning is the exception: `--ds-text-warning-inverse`.
+- **On a status tint**, text takes the role's text token
+  (`--ds-text-danger` on `--ds-background-danger`), or its `-bolder` step on
+  `-subtler` and `-subtle`.
+- **On any surface**, text takes `--ds-text`, `--ds-text-subtle` or
+  `--ds-text-subtlest`. All three keep 4.5:1 on hovered and selected rows too.
+
+Each ratio below is measured from the rendered colors.
+
+<Canvas of={ColorsStories.PartnerPairs} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### SMART subjects
+
+The five SMART areas of tutoring each have a role of their own:
+`--ds-background-smart-<subject>` for a chip, with `--ds-text-smart-<subject>`
+and `--ds-border-smart-<subject>`; `-bold` for a filled mark; and `-subtle`, a
+middle step made for illustration bodies. The subjects are
+`social-emotional`, `mastering-content`, `advocacy`, `relationship` and
+`technology-tools`. Use a SMART color only to name its subject.
+
+<Canvas of={ColorsStories.SmartSubjects} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Data-viz color
+
+Charts take the `--ds-chart-*` tokens, and every chart color does one job.
+
+<RefTable
+    head={['Job', 'What it encodes', 'Tokens']}
+    rows={[
+        ['One series', 'The data, with nothing to tell apart', <><C>--ds-chart-brand</C>; a comparison or reference line takes <C>--ds-chart-neutral</C></>],
+        ['Categorical', 'Which series', <><C>--ds-chart-categorical-1</C> to <C>-6</C>, in order</>],
+        ['Sequential', 'How much', 'One hue, from its subtlest step to its boldest; the strongest tone is the biggest value'],
+        ['Diverging', 'Which side of a baseline', 'Two hues around a gray midpoint, orange and blue by default'],
+        ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, each with <C>-bold</C></>],
+        ['SMART subject', 'Which subject', <C>--ds-chart-smart-&lt;subject&gt;</C>],
+    ]}
+/>
+
+Use five or six categories at most and group the rest. Never mix categorical
+and status colors in one chart, and give every color a second cue: a label, a
+shape or a pattern. Titles, axes and grid lines wear text and border tokens,
+never a chart color. The full rules, with the categorical order and the ramps,
+are in the [data-viz color guide](https://github.com/BilLogic/plus-uno/blob/main/design-system/guidelines/foundations/color.md#data-viz-color),
+and every chart under **Data visualizations** already applies them.
+</div>
+
+<div className="sb-ds-doc-section">
+### Legacy color names
+
+The older names (`--color-primary`, `--color-on-surface`,
+`--color-surface-container-*`, `--elevation-light-*`) still resolve, so
+components that have not moved yet keep rendering. Each now points at a
+`--ds-*` token where one meaning fits. Don't use them in new work.
+
+<TokenTable
+    showFigma={false}
+    rows={[
+        { token: '--color-on-surface', value: '--ds-text · --ds-icon', use: 'Text, or an icon' },
+        { token: '--color-on-surface-variant', value: '--ds-text-subtle · --ds-icon-subtle', use: 'Secondary text, or an icon' },
+        { token: '--color-outline-variant', value: '--ds-border', use: 'A divider or an edge' },
+        { token: '--color-outline', value: '--ds-border-input · --ds-border-bold', use: 'A control edge, or a strong rule' },
+        { token: '--color-primary', value: '--ds-background-brand-bold · --ds-border-brand · --ds-link', use: 'A fill, an edge or a link' },
+        { token: '--color-surface-container-lowest', value: '--ds-surface · --ds-surface-raised · --ds-surface-overlay', use: 'The page, a card or a menu' },
+    ]}
+    valueHeader="Use instead"
+/>
+
+One legacy name often did two jobs, so read it with the property it sits on.
+The [color migration guide](https://github.com/BilLogic/plus-uno/blob/main/design-system/guidelines/foundations/color-migration.md)
+maps every name and lists the components still to move.
+</div>
+
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- Text clears 4.5:1 and icons, borders and the focus ring 3:1 against what
+  they sit on, in light and dark. Under increased contrast the bars are 7:1
+  and 4.5:1. Use the partner pairs above and the bar is met.
+- Never carry meaning by color alone. A status has an icon or a word, a chart
+  has a legend or direct labels, and a selected row has more than a tint.
+- Check a new screen in all four modes before review: the toolbar's
+  **Color mode** and **Contrast** switches set them here.
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For which surface a shadow belongs to, see **Elevation** — the `--surface-*` role tokens pair the two.
-- For how every color token is defined and aliased, see **Design tokens**.
-- For the contrast rules these colors have to satisfy, see **Accessibility**.
-- For the text colors specifically, see **Typography**.
+- **Elevation**, for which surface pairs with which shadow.
+- **Typography**, for the text styles these colors are set in.
+- **Accessibility**, for the contrast rules every pair has to meet.
+- **Tag** and **Status**, for colored labels built on the status and accent roles.
 
 </div>
 

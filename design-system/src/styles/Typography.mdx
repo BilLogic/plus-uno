@@ -1,60 +1,160 @@
-import { Meta, Title, Description } from '@storybook/addon-docs/blocks';
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 import * as TypographyStories from './Typography.stories.jsx';
 
 <Meta of={TypographyStories} />
 
 <Title />
 
+PLUS sets text in three families of style: **Heading**, **Body** and
+**Metric**. There are seven Heading sizes, three Body sizes and three Metric
+sizes, following Atlassian's type scale, with Lato for headings and metrics
+and Merriweather Sans for body text. Pick a style by where the text sits on
+the page, not by how big it should look. The older registers (Display, H1–H6
+and the B1–B3 body styles) are legacy, and new work never applies them.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18313-50621"
+    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_type.scss"
+/>
+
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Display
+### Type scale
 
-<div className="sb-unstyled">
-<TypographyStories.TypographyDisplay />
-</div>
-</div>
+Each style is one token that sets the weight, size, line height and family at
+once: `font: var(--heading-medium)`. In Figma, each style is a text style whose
+every property is bound to a variable, so a later change edits a variable and
+never a component.
 
-<div className="sb-ds-doc-section">
-### Headlines
+<Canvas of={TypographyStories.TypeScale} sourceState="none" />
 
-<div className="sb-unstyled">
-<TypographyStories.TypographyHeadlines />
-</div>
-</div>
-
-<div className="sb-ds-doc-section">
-### Titles
-
-<div className="sb-unstyled">
-<TypographyStories.TypographyTitles />
-</div>
+<TokenTable
+    rows={[
+        { token: '--type-family-heading', figma: 'Family/heading', use: 'Headings and metrics' },
+        { token: '--type-family-body', figma: 'Family/body', use: 'Body text and labels' },
+        { token: '--type-weight-regular', figma: 'Weight/regular', use: 'Body text' },
+        { token: '--type-weight-medium', figma: 'Weight/medium', use: 'Button and tab labels' },
+        { token: '--type-weight-semibold', figma: 'Weight/semibold', use: 'Headings and metrics' },
+    ]}
+/>
 </div>
 
 <div className="sb-ds-doc-section">
-### Body
+### Heading levels
 
-<div className="sb-unstyled">
-<TypographyStories.TypographyBody />
-</div>
+Headings step down one size per nesting level, and containers use a fixed
+title size.
+
+<Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
 </div>
 
 <div className="sb-ds-doc-section">
-### Interactive
+### Labels
 
-<DocsInteractivePlayground of={TypographyStories.Interactive} />
+Button and tab labels are `--body-default` at `--type-weight-medium` (500).
+There is no separate button style, as in Atlassian. In Figma, changing the
+weight of a styled text node drops its style, so a label carries no text style
+and binds four variables instead: Font size/0875, Line height/125, Family/body
+and Weight/medium.
+
+<Canvas of={TypographyStories.LabelStyle} sourceState="none" />
 </div>
 
+<div className="sb-ds-doc-section">
+### Code
+
+`--code` sets code samples, token names and property values in Source Code
+Pro, at 0.875em of the text around it, so a code span follows its paragraph's
+size. In Figma docs the style is Code/default, 12/16.
+
+<Canvas of={TypographyStories.CodeStyle} sourceState="none" />
+</div>
+
+<div className="sb-ds-doc-section">
+### Usage
+
+**Step one size per nesting level.** The page title is `--heading-large` 24
+(h1), a section `--heading-medium` 20 (h2), a subsection `--heading-small` 16
+(h3). Never skip a step; there is nothing below a subsection. Containers have
+fixed titles: a modal's is `--heading-medium` 20, and a card's, a popup's and a
+flag's is `--heading-xsmall` 14, over a `--body-default` description.
+
+<Canvas of={TypographyStories.OneStepPerLevel} sourceState="none" />
+
+**Take the tag from where the heading sits.** One h1 per page. A modal's title
+is the dialog's h1, named by `aria-labelledby`. A card title is tagged one
+level below its section. A title hidden by a tabs-only header keeps its level,
+visually hidden. Group labels (`--heading-xxsmall` 12) name a menu group or a
+head cell and are never headings.
+
+**Keep xxlarge and xlarge for heroes.** `--heading-xxlarge` 32 and
+`--heading-xlarge` 28 are for heroes, empty states and metric-heavy dashboards
+only, never for a page title.
+
+**Body/default runs the interface.** Every control label is 14/20, which is
+what sets the 24 and 32 Item heights. `--body-large` is for reading text, such
+as lessons and help articles. `--body-small` is for meta text, Tag, Status,
+Count and tooltips.
+
+**Numbers take Metric.** Stat cards and counts use `--metric-large` 28,
+`-medium` 24 or `-small` 16, as plain text, never as headings.
+
+**Change the token, not the text.** Never type a size, and never detach a
+style.
+</div>
+
+<div className="sb-ds-doc-section">
+### Accessibility
+
+- Heading tags follow the page's outline, not the size: one h1 per page, and
+  no skipped levels. The style and the tag are chosen separately.
+- Body text is never under 12, and running text uses `--body-default` 14 or
+  `--body-large` 16.
+- Sizes are in rem, so text scales with the browser's font size setting.
+  Never fix a line's height in pixels around text.
+- Text color comes from the text tokens in **Color**, which clear 4.5:1 on
+  every surface.
+</div>
+
+<div className="sb-ds-doc-section">
+### Legacy registers
+
+Display, Headline (H1–H3), Title (H4–H6) and the Body registers are
+deprecated. Existing components keep them until they are rebuilt. Use this
+map to move text onto the live scale.
+
+<RefTable
+    head={['Legacy', 'Size', 'Use instead']}
+    rows={[
+        ['Display 1–4', '80 · 72 · 64 · 56', <C>--heading-xxlarge</C>],
+        ['H1 · H2', '40 · 32', <C>--heading-xxlarge</C>],
+        ['H3', '28', <C>--heading-xlarge</C>],
+        ['H4', '24', <><C>--heading-large</C> (page title)</>],
+        ['H5', '20', <><C>--heading-medium</C> (section and modal title)</>],
+        ['H6', '16', <><C>--heading-small</C> (subsection title)</>],
+        ['B1, Lead, Blockquote', '16 · 20', <C>--body-large</C>],
+        ['B2', '14', <><C>--body-default</C>; semibold becomes <C>--body-default</C> with <C>--type-weight-semibold</C>, or <C>--heading-xsmall</C> for a title</>],
+        ['B3', '12', <><C>--body-small</C>; semibold becomes <C>--heading-xxsmall</C> for a title</>],
+        ['Special/Code', '14', <C>--code</C>],
+    ]}
+/>
+
+In code the legacy registers are the `h1`–`h6` elements and classes,
+`.display1-txt` to `.display4-txt`, `.body1-txt` to `.body3-txt`, and the
+`--type-h1` to `--type-body3` composites.
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the text colors these registers are drawn in, see **Colors** — the `(Text)` half of each semantic.
-- For where the font tokens live and how the composites are built, see **Design tokens**.
-- For the contrast and sizing rules type has to satisfy, see **Accessibility**.
-- For the Font Awesome sizes that pair with each register, see **Icons**.
+- **Color**, for the text tokens: `--ds-text`, `--ds-text-subtle`, `--ds-text-subtlest`.
+- **Spacing**, for the 14/20 label that sets the 24 and 32 Item heights.
+- **Iconography**, for icon sizes beside text.
+- **Accessibility**, for heading levels across a page.
 
 </div>
 

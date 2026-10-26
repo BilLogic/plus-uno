@@ -174,6 +174,8 @@ const preview = {
             "Elevation",
             "Typography",
             "Spacing",
+            "Radius",
+            "Size roles",
             "Layout & grid",
             "Patterns",
             [

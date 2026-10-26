@@ -610,7 +610,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // fallbacks, so their 81 color fallbacks (40 washes) went.
     // 486: the charts moved onto the --ds-chart tokens, and their 28 hex
     // fallbacks went with the legacy names.
-    expect(comparable).toBe(486);
+    // 481: the Foundations docs moved onto the --ds- tokens, and the old Grid
+    // stories' five color fallbacks went with them.
+    expect(comparable).toBe(481);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

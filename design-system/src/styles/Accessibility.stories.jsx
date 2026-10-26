@@ -1,40 +1,40 @@
 import React from 'react';
+import { Button } from '@/components';
+import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 
 export default {
     title: 'Foundations/Accessibility',
     tags: ['!dev', '!autodocs'],
 };
 
-const code = (t) => <code style={{ fontSize: '0.85em', wordBreak: 'break-word' }}>{t}</code>;
-
+/** Which text and icon token goes on which fill. */
 export const ContrastPairings = () => (
-    <div style={{ maxWidth: '1200px' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', border: '1px solid var(--color-outline-variant)' }}>
-            <colgroup>
-                <col style={{ width: '34%' }} />
-                <col style={{ width: '30%' }} />
-                <col style={{ width: '36%' }} />
-            </colgroup>
-            <thead>
-                <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
-                    {['Content', 'Token', 'Pairs with'].map(h => (
-                        <th key={h} className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600 }}>{h}</th>
-                    ))}
-                </tr>
-            </thead>
-            <tbody>
-                {[
-                    ['Primary text', <>{code('--color-on-surface')}</>, 'Any surface / surface-container step'],
-                    ['Secondary text (subtitles, metadata, timestamps)', <>{code('--color-on-surface-variant')}</>, 'Any surface / surface-container step'],
-                    ['Text on filled color', <>{code('--color-on-primary')}, {code('--color-on-*')}</>, <>The matching {code('--color-{role}')} / {code('-container')} fill</>],
-                ].map((row, i) => (
-                    <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
-                        <td className="body2-txt" style={{ padding: '10px 12px', wordBreak: 'break-word' }}>{row[0]}</td>
-                        <td style={{ padding: '10px 12px', wordBreak: 'break-word' }}>{row[1]}</td>
-                        <td className="body2-txt" style={{ padding: '10px 12px', wordBreak: 'break-word' }}>{row[2]}</td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
+    <RefTable
+        head={['Content', 'Token', 'Sits on']}
+        rows={[
+            ['Body text and labels', <C>--ds-text</C>, 'Any surface'],
+            ['Secondary text, helper text', <C>--ds-text-subtle</C>, 'Any surface'],
+            ['Metadata, placeholders, timestamps', <C>--ds-text-subtlest</C>, 'Any surface, including hovered and selected rows'],
+            ['Text or an icon on a bold fill', <><C>--ds-text-inverse</C>, <C>--ds-icon-inverse</C></>, <>Any <C>-bold</C> background except warning</>],
+            ['Text on the bold warning fill', <C>--ds-text-warning-inverse</C>, <C>--ds-background-warning-bold</C>],
+            ['Status text', <C>--ds-text-danger</C>, <><C>--ds-background-danger</C>, and the same for each status</>],
+        ]}
+    />
+);
+
+/** Focus is a ring outside the control, never a fill. */
+export const FocusRing = () => (
+    <DoDont>
+        <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the button. The fill is unchanged.</>}>
+            <span style={{ display: 'inline-flex', borderRadius: 'var(--element-radius-item-md)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)' }}>
+                <Button text="Save changes" style="primary" fill="filled" />
+            </span>
+        </Do>
+        <Dont caption="Focus shown only by darkening the fill. It reads as hover or press, and it is easy to miss.">
+            <span style={{ display: 'inline-flex' }}>
+                <Button text="Save changes" style="primary" fill="filled" className="sb-focus-by-fill" />
+                <style>{'.sb-focus-by-fill.btn { background-color: var(--ds-background-brand-bold-pressed); }'}</style>
+            </span>
+        </Dont>
+    </DoDont>
 );
