@@ -12,7 +12,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, CloseButton } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame, PatternDrawer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
 import './PageLayout.scss';
@@ -141,6 +141,13 @@ const PageLayout = ({
     style,
     mainClassName = '',
     floatingContent,
+    /**
+     * A drawer over the page: the props of PatternDrawer (`open`, `title`,
+     * `description`, `width`, `placement`, `footer`, `onClose`, `children`, ...).
+     * Without it there is no drawer. The page holds its open state and passes
+     * it as `open`. Mirrors the Figma `drawer?` toggle on Pattern/Page template.
+     */
+    drawer,
     /**
      * The page's name — rendered as the `<h1>` that tops its heading outline.
      *
@@ -274,6 +281,9 @@ const PageLayout = ({
             </Frame>
             )}
 
+            {/* The Drawer pattern, over the frame; it places itself at the edge in its own Overlay. */}
+            {drawer ? <PatternDrawer {...drawer} /> : null}
+
             {/* Floating content anchored to page frame (e.g. FAB) */}
             {floatingContent && (
                 <div
@@ -310,6 +320,17 @@ PageLayout.propTypes = {
     style: PropTypes.object,
     mainClassName: PropTypes.string,
     floatingContent: PropTypes.node,
+    /** The props of PatternDrawer, to draw a drawer over the page. Without it there is no drawer. */
+    drawer: PropTypes.shape({
+        open: PropTypes.bool,
+        title: PropTypes.string,
+        description: PropTypes.string,
+        onClose: PropTypes.func,
+        footer: PropTypes.node,
+        width: PropTypes.oneOf(['sm', 'md', 'lg']),
+        placement: PropTypes.oneOf(['end', 'start']),
+        children: PropTypes.node,
+    }),
     title: PropTypes.string,
     contentDirect: PropTypes.bool,
     shellLoading: PropTypes.bool,

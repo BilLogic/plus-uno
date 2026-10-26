@@ -119,7 +119,7 @@ In Figma, Page template has the variants `frame` (default or focused) and `conte
         <tr><td><code>sidebarHidden</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Leaves out the sidebar and its toggle.</td></tr>
         <tr><td><code>topBarConfig</code></td><td>object</td><td>keys <code>breadcrumbs</code>, <code>user</code>, <code>onHelpClick</code>, <code>helpHref</code></td><td><code>{'{}'}</code></td><td>Default frame. The breadcrumb and the account in the topbar, and where Help Center goes.</td></tr>
         <tr><td><code>sidebarConfig</code></td><td>object</td><td>keys <code>user</code>, <code>activeTabId</code> (or <code>activeTab</code>); the rest go to the sidebar</td><td><code>{'{}'}</code></td><td>Default frame. The user type and the active tab in the sidebar.</td></tr>
-        <tr><td><code>drawer?</code></td><td>boolean</td><td><code>on</code> · <code>off</code></td><td>off</td><td>Figma only. Code has no such prop: the page holds the drawer's open state and renders the drawer beside the layout.</td></tr>
+        <tr><td><code>drawer</code></td><td>object</td><td>the props of the Drawer: <code>open</code>, <code>title</code>, <code>description</code>, <code>width</code>, <code>placement</code>, <code>footer</code>, <code>onClose</code>, <code>children</code></td><td>none</td><td>Draws the Drawer over the page. Without it there is no drawer. This is Figma's <code>drawer?</code>. The page holds the open state and passes it as <code>open</code>.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -311,7 +311,7 @@ Rules for the focused frame:
 
 A drawer opens over the page template. The scrim covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the scrim closes it and returns focus to what opened it. The page stays where it was.
 
-<DocsCanvasShell attachSourceBelow={false} description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. A page opens it from a button and holds its open state itself.</>}>
+<DocsCanvasShell attachSourceBelow={false} description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. The page opens it from a button and holds its open state, passing it to the template's <code>drawer</code> prop.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
 </DocsCanvasShell>
 
@@ -412,7 +412,7 @@ A page is built from the top down out of patterns. A Sessions page is a surface 
 
 ### For developers
 
-The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and sidebar. `frame="focused"` fills it with the focused topbar, the reading surface and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` boolean has no prop in code: the page holds the drawer's open state and renders `PatternDrawer` beside the layout.
+The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and sidebar. `frame="focused"` fills it with the focused topbar, the reading surface and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. The page holds the open state and passes it as `open`.
 
 </div>
 
