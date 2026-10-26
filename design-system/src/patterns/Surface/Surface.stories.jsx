@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 import Surface, { SURFACE_EDGE, SURFACE_LEVELS } from '@/patterns/Surface';
-import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
@@ -119,6 +119,23 @@ export const ColorModes = {
                 await expect(style.color, `${mode}: ${level} text`).toBe(tokenColor(canvasElement, '--ds-text'));
             }
         });
+    },
+};
+
+/** A surface used alone pads as the surface inside the frame does: the frame's `--surface-pad`, on every side. */
+export const MediumPad = {
+    render: () => (
+        <Surface padding="md">
+            {slotContent('Content slot')}
+        </Surface>
+    ),
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const style = getComputedStyle(canvasElement.querySelector('.plus-pattern-surface'));
+        const pad = px(probe(canvasElement, 'paddingTop', 'var(--surface-pad)', { display: 'block' }));
+        for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+            await expect(px(style[`padding${side}`]), `pad ${side.toLowerCase()}`).toBe(pad);
+        }
     },
 };
 
