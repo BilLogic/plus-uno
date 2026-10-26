@@ -6558,7 +6558,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6588,7 +6588,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6618,7 +6618,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check). Atlassian presses to 31%.",
+     "description": "The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe. Atlassian presses to 31%.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6648,7 +6648,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6678,7 +6678,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6708,7 +6708,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -9290,7 +9290,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -10653,7 +10653,7 @@
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -11493,7 +11493,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
