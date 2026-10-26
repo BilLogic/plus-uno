@@ -1,0 +1,397 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PageTemplatesStories from './PageTemplates.stories.jsx';
+import {
+    FocusedTopbarDo,
+    FocusedTopbarDont,
+    FocusedActionsDo,
+    FocusedActionsDont,
+    SlotsDo,
+    SlotsDont,
+} from './PageTemplateExamples.jsx';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontGrid,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import { ModeFrame } from '@/storybook-docs/lib/mode-frame.jsx';
+
+<Meta of={PageTemplatesStories} />
+
+<Title />
+A page template is the whole page every screen starts from: the topbar, the sidebar and the surface that holds the page's content. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
+
+The examples on this page follow the toolbar's Color mode and Contrast switches.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2958"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The dashboard template at the width of this page. From 1024 the sidebar docks. Below it, hover the menu control to open the sidebar over the page.</>}>
+    <Canvas of={PageTemplatesStories.Dashboard} story={{ inline: false, height: '640px' }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### When to use
+
+Start every page from a page template. Pick the frame by the kind of work the page holds.
+
+- **Default frame.** The person moves among pages: browse, compare, come back. It keeps the sidebar and the breadcrumb.
+- **Focused frame.** One task that takes more than a screen or a few minutes. The person finishes or leaves it, and the rest of the app would only distract. Writing a session note, setting up a session and reviewing an import are focused tasks.
+- **For a short decision, use Modal.** A confirmation, a rename or a few fields that keep the page behind them in view belong in a modal. A form that scrolls for long or has sections is a focused page.
+- **For a panel that needs the page in view, use Drawer.** The details of a row or a set of filters open in a drawer over the template.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+The default frame is a surface container, a content slot and a topbar. In code the surface container is `Frame`.
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>1 Surface container</strong></td><td>The frame around the page: the topbar, the sidebar and the surface row. Its fill is the sunken surface.</td></tr>
+        <tr><td><strong>2 Content</strong></td><td>A slot in the surface. It holds a page-level Section header and the Sections.</td></tr>
+        <tr><td><strong>3 Topbar</strong></td><td>The 32 row across the full width. It carries the sidebar toggle, the breadcrumb, Help Center and the account.</td></tr>
+    </tbody>
+</DocsTable>
+
+The focused frame has four parts.
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>1 Focused page</strong></td><td>The frame, on the sunken surface. It pads 8 on every side and stacks its rows 8 apart.</td></tr>
+        <tr><td><strong>2 Focused topbar</strong></td><td>32 high. Back, a text button with <code>arrow-left</code>, then the title, the page's <code>h1</code> on one line that truncates, then Close. The parts sit 12 apart.</td></tr>
+        <tr><td><strong>3 Surface</strong></td><td>The surface at reading width. Its content slot holds Sections, capped at 864 and centered.</td></tr>
+        <tr><td><strong>4 Focused footer</strong></td><td>The actions slot, end-aligned in the same 864 column, 8 apart, the primary action last.</td></tr>
+    </tbody>
+</DocsTable>
+
+The page carries two grids. The **content grid** belongs to the surface and has 12 columns with a 16 gutter. The **screen grid** belongs to Overlay and positions modals and drawers. A page itself carries only the content grid.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+In Figma, Page template has the variants `frame` (default or focused) and `content` (blank, dashboard or reading; focused has blank and reading), and the focused frame has a `footer?` boolean. The spacing and layout mode is set on the template instance.
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>frame</code></td><td>enum</td><td><code>default</code> · <code>focused</code></td><td><code>default</code></td><td>The default frame has the topbar and the sidebar. The focused frame has neither toggle nor sidebar.</td></tr>
+        <tr><td><code>title</code></td><td>string</td><td>any text</td><td>none</td><td>The page <code>h1</code>. In the default frame it is visually hidden. In the focused frame it is the visible title in the topbar.</td></tr>
+        <tr><td><code>onBack</code> · <code>backHref</code></td><td>function · string</td><td>—</td><td>none</td><td>Focused. With either, the topbar shows Back. With <code>backHref</code>, Back is a link.</td></tr>
+        <tr><td><code>backLabel</code></td><td>string</td><td>any text</td><td><code>Back</code></td><td>Focused. The Back button label.</td></tr>
+        <tr><td><code>onClose</code></td><td>function</td><td>—</td><td>none</td><td>Focused. Without it there is no Close.</td></tr>
+        <tr><td><code>closeLabel</code></td><td>string</td><td>any text</td><td><code>Close</code></td><td>Focused. The accessible name of the Close button.</td></tr>
+        <tr><td><code>actions</code></td><td>node</td><td>buttons</td><td>none</td><td>Focused. The footer actions, end-aligned, the primary last. Without them there is no footer. This is Figma's <code>footer?</code>.</td></tr>
+        <tr><td><code>actionsLabel</code></td><td>string</td><td>any text</td><td><code>Page actions</code></td><td>Focused. The accessible name of the footer.</td></tr>
+        <tr><td><code>children</code></td><td>node</td><td>Sections</td><td>none</td><td>The content slot in the surface.</td></tr>
+        <tr><td><code>sidebarHidden</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Leaves out the sidebar and its toggle.</td></tr>
+        <tr><td><code>topBarConfig</code> · <code>sidebarConfig</code></td><td>object</td><td>—</td><td><code>{'{}'}</code></td><td>Default frame. The breadcrumb and account in the topbar, and the user type and active tab in the sidebar.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 1024 to 1439 and **X-Large** is 1440 and wider. Every value below moves with the mode.
+
+#### Screen
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--layout-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
+        <tr><td><code>--layout-pad-x-screen</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Overlay, not the surface grid.</td></tr>
+        <tr><td><code>--layout-min-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
+        <tr><td><code>--layout-max-width-screen</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
+    </tbody>
+</DocsTable>
+
+#### Grid
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--layout-columns</code></td><td>12</td><td>12</td><td>12</td><td>The column count at every width.</td></tr>
+        <tr><td><code>--layout-gutter</code></td><td>16</td><td>16</td><td>16</td><td>The gap between columns, in every grid.</td></tr>
+        <tr><td><code>--layout-width-column</code></td><td>45.33</td><td>47.33</td><td>80.67</td><td>One column of the content grid.</td></tr>
+        <tr><td><code>--layout-width-column-screen</code></td><td>45.33</td><td>66.67</td><td>88</td><td>One column of the screen grid.</td></tr>
+    </tbody>
+</DocsTable>
+
+#### Content
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--layout-max-width-content</code></td><td>1232</td><td>1232</td><td>1232</td><td>The content cap.</td></tr>
+        <tr><td><code>--layout-max-width-reading</code></td><td>864</td><td>864</td><td>864</td><td>The reading cap.</td></tr>
+        <tr><td><code>--layout-min-width-content</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the surface scrolls sideways and the topbar stays.</td></tr>
+        <tr><td><code>--layout-width-content</code></td><td>720</td><td>744</td><td>1144</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1528 screen.</td></tr>
+    </tbody>
+</DocsTable>
+
+#### Frame
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--layout-height-topbar</code></td><td>32</td><td>The topbar row.</td></tr>
+        <tr><td><code>--layout-width-sidebar</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
+        <tr><td><code>--surface-container-pad</code> · <code>--surface-container-stack</code></td><td>8 · 8</td><td>The frame's pad on top, right and bottom, and the gap between its rows.</td></tr>
+        <tr><td><code>--layout-pad-left-container</code></td><td>8 · 0 from 1024</td><td>The left pad of the surface row: 8 while the sidebar floats, 0 once it docks.</td></tr>
+        <tr><td><code>--surface-pad</code></td><td>16 · 16 · 24</td><td>The surface pad at Medium, Large and X-Large. The grid margin is the same token.</td></tr>
+        <tr><td><code>--surface-radius</code></td><td>16</td><td>The surface corners.</td></tr>
+    </tbody>
+</DocsTable>
+
+#### Focused page
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--focused-page-pad-x</code> · <code>--focused-page-pad-y</code></td><td>8</td><td>The frame pad.</td></tr>
+        <tr><td><code>--focused-page-stack-sm</code></td><td>8</td><td>Topbar to surface to footer.</td></tr>
+        <tr><td><code>--focused-page-stack-md</code> · <code>--focused-page-stack-lg</code></td><td>16 · 24</td><td>Larger gaps between the rows.</td></tr>
+        <tr><td><code>--focused-page-inline-md</code></td><td>12</td><td>Between Back, the title and Close.</td></tr>
+        <tr><td><code>--focused-page-inline-sm</code></td><td>8</td><td>Between the footer actions.</td></tr>
+        <tr><td><code>--layout-max-width-reading</code> · <code>--layout-min-width-content</code></td><td>864 · 720</td><td>The content column and the actions column.</td></tr>
+        <tr><td><code>--ds-surface-sunken</code> · <code>--ds-surface</code> · <code>--ds-text</code></td><td>color</td><td>The frame, the surface and the title. They follow Light, Dark and increased contrast.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Content variants
+
+The default frame comes with three contents. **Blank** is one empty slot. **Dashboard** is a page header, metric cards and Sections. **Reading** caps the surface at 864 for long-form text. Each is shown at Large, 1024.
+
+<DocsCanvasShell description={<><strong>content=blank</strong>. Keep the slot wrapper and replace what is inside it with Sections.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--blank" width={1024} height={560} title="Blank page template at 1024" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong>content=dashboard</strong>. Cards reflow to the most per row that keeps their minimum width.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong>content=reading</strong>. The content is capped at <code>--layout-max-width-reading</code> 864 and centered.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layout modes
+
+The mode is set once, on the template. The frame width follows it through `--layout-width-screen`, and everything inside moves with it. The sidebar docks from Large, the surface row's left pad drops to 0, the surface pad grows to 24 at X-Large, and the content lands at 720, 744 and 1144.
+
+<DocsCanvasShell description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 744.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong>X-Large, 1440.</strong> The surface pad is 24 and the content is 1144.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
+</DocsCanvasShell>
+
+#### Sidebar over the page
+
+Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of the frame, opens it over the page. It has the overlay shadow and no scrim, and the page does not move. An outside click, Escape or the pointer leaving closes it. Clicking the control docks it instead.
+
+<DocsCanvasShell description={<><strong>Medium, 768.</strong> The sidebar open over the page.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--sidebar-over-page" width={768} height={560} title="Sidebar open over the page at 768" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Focused page
+
+The focused frame is the page for one task. It has no sidebar toggle, breadcrumb, Help Center or account. The topbar has Back and Close and the task's name, the sections sit in the 864 reading column, and the actions sit in a footer row.
+
+<DocsCanvasShell description={<><strong>frame=focused</strong> at Large, 1024. Back returns to where the person came from. Close leaves the task. The footer stays in place while the surface scrolls.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--focused" width={1024} height={640} title="Focused page at 1024" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><strong>footer? off.</strong> A read-only task, such as a report or a review with nothing to submit, drops the footer. Back can go too when the page opens from a link with no way back. Close then leaves the task.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--focused-read-only" width={1024} height={480} title="Focused page without a footer at 1024" />
+</DocsCanvasShell>
+
+Rules for the focused frame:
+
+- **One task per page.** Name the task in the title ("Add a session note"), not the app area.
+- **Back and Close.** If both would go to the same place, keep Close only.
+- **Actions in the footer.** End-aligned, the primary last, one primary at most.
+- **Sections only in the surface.** Never put a sidebar, a card grid or a table toolbar beside them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### With a drawer
+
+A drawer opens over the page template. The scrim covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the scrim closes it and returns focus to what opened it. The page stays where it was.
+
+<DocsCanvasShell description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. A page opens it from a button and holds its open state itself.</>}>
+    <ModeFrame storyId="foundations-patterns-page-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Usage
+
+- **Two rows.** The topbar runs across the full width, 32 high with no padding of its own. Under it, the sidebar and the surface sit 8 apart.
+- **Container pad.** 8 on top, right and bottom. On the left it is 8 while the sidebar floats and 0 once it docks.
+- **Sidebar.** 240 wide, from the screen edge to the surface. It docks from 1024.
+- **Surface pad.** 16 below 1440 and 24 from 1440. The grid margin is the same token.
+- **Content cap.** 1232. With the sidebar docked it binds from a 1528 screen, and past that the margins grow.
+- **Content minimum.** 720. Narrower, the surface scrolls sideways and the topbar stays.
+- **Set the mode on the template, never inside it.** Sections, Cards and Tables inherit the mode and never carry one of their own.
+
+#### Slots, not variants
+
+A slot is a region left open for real content. The pattern owns the layout, the spacing and the size, and the slot holds what the feature needs.
+
+- **Keep the slot wrapper** and replace the placeholder inside it. A slot is a place for content, not a placeholder to delete.
+- **Slots, not variants.** If a layout is duplicated to handle a variation, that layout needs a slot.
+- **Slots live in** Card (header, body, footer), Modal (body, footer), Section (content, side, actions, tabs) and the page templates (the surface). A table is never a slot shell.
+
+#### Build a real page
+
+A page is built from the top down out of patterns. A Sessions page is a surface that holds a page header, a row of metric cards and a table under a header with tabs.
+
+1. **Surface container.** The topbar, the sidebar and the surface around the page. The template sets the layout mode once for everything inside.
+2. **Section header, level page.** The page title, description and page-level actions. One per page.
+3. **Card, size sm.** Metric tiles. A card shows one piece of information, with the header turned off when the body carries its own title.
+4. **Section header, tabs type.** The tabs are the header's bottom row. They replace a separate tab group above the table.
+5. **Table.** A plain table directly under the header, with no card around it and no toolbar of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <SlotsDo />,
+            doCaption: 'Keep the card attached. The content goes in the body slot, and the card’s own stack sets the spacing.',
+            dontExample: <SlotsDont />,
+            dontCaption: 'Don’t rebuild a card by hand with 24 of extra space added to the chrome. It drifts from the pattern and misses later fixes.',
+        },
+        {
+            doExample: <FocusedTopbarDo />,
+            doCaption: 'Give the task Back and Close and its name. Nothing else competes with the task.',
+            dontExample: <FocusedTopbarDont />,
+            dontCaption: 'Don’t bring the app topbar to a focused page. A sidebar toggle and a breadcrumb invite the person away mid-task.',
+        },
+        {
+            doExample: <FocusedActionsDo />,
+            doCaption: 'End-align the actions in the footer, one primary, last.',
+            dontExample: <FocusedActionsDont />,
+            dontCaption: 'Don’t stack several primary actions or start-align them. The person cannot tell which one finishes the task.',
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Landmarks.** The topbar is the banner, the surface is the one `main`, and the focused footer is a named footer (<code>Page actions</code>).
+- **One page title.** The page has one `h1`. In the default frame it is visually hidden and the breadcrumb shows the place. In the focused frame it is the visible title in the topbar.
+- **Focus order.** In the focused frame it is Back, Close, the content, then the actions. In the default frame the sidebar toggle comes first, then the page.
+- **Names.** Back and Close are buttons with names, and Close keeps its name when the title truncates. Name the Close button for the task, such as "Close note".
+- **Sidebar.** The toggle reports whether the sidebar is open. Hover is never the only way in: the toggle opens and docks it from the keyboard, and Escape closes a floating sidebar.
+- **Drawer.** It is a dialog named by its title. It moves focus inside, keeps Tab there and returns focus to its trigger.
+- **Color.** The frame, the surface and the title use color roles, so they hold their contrast in Light, Dark and increased contrast.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PageTemplatesStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and sidebar. `frame="focused"` fills it with the focused topbar, the reading surface and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. A drawer is a sibling of the page, rendered with the page's own open state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- **Surface container.** The frame, its sidebar behavior and its parts, in detail.
+- **Section.** The page header and the regions that fill the surface.
+- **Modal.** A short decision over the page, instead of the focused frame.
+- **Drawer.** A panel over the page that keeps it in view.
+- **Overlay.** The screen grid and the scrim a drawer or a modal sits in.
+
+</div>
+
+</div>
