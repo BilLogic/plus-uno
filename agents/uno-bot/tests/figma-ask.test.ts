@@ -271,6 +271,28 @@ describe("the reply", () => {
     assert.deepEqual(w.replies()[0]!.message.split("\n"), ["🐐: Filled; Tonal; Outline PRD.", `Source: Goal Setting PRD — ${PRD}`]);
   });
 
+  it("folds a list bulleted with asterisks too", async () => {
+    const w = world({ replies: reads(`Styles:\n* primary\n* secondary\n* tertiary [PRD](${PRD})`) });
+    await ask(w, comment("100", "@uno styles?"));
+    assert.deepEqual(w.replies()[0]!.message.split("\n"), ["🐐: Styles: primary; secondary; tertiary PRD.", `Source: Goal Setting PRD — ${PRD}`]);
+  });
+
+  it("drops a Sources list whole, never folding its labels into the answer's list", async () => {
+    const w = world({ replies: reads(`Fills:\n- filled\n- tonal\n\nSources:\n- [Goal Setting PRD](${PRD})`) });
+    await ask(w, comment("100", "@uno fills?"));
+    assert.deepEqual(w.replies()[0]!.message.split("\n"), ["🐐: Fills: filled; tonal.", `Source: Goal Setting PRD — ${PRD}`]);
+  });
+
+  it("introduces a list under a heading or an unpunctuated lead with a colon, and starts a new sentence after a full stop", async () => {
+    const heading = world({ replies: reads(`## Options\n- filled\n- tonal [PRD](${PRD})`) });
+    await ask(heading, comment("100", "@uno options?"));
+    assert.equal(heading.replies()[0]!.message.split("\n")[0], "🐐: Options: filled; tonal PRD.");
+
+    const sentence = world({ replies: reads(`Use one of these.\n- filled\n- tonal [PRD](${PRD})`) });
+    await ask(sentence, comment("100", "@uno options?"));
+    assert.equal(sentence.replies()[0]!.message.split("\n")[0], "🐐: Use one of these. Filled; tonal PRD.");
+  });
+
   it("says it cut a line it shortened, and never when the answer fits", async () => {
     const long = `${"word ".repeat(80).trim()}. [PRD](${PRD})`;
     const cut = world({ replies: reads(long) });

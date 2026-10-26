@@ -144,20 +144,26 @@ export function plainAnswer(text: string): { lines: string[]; cited: string[]; c
   // one. The labels sit out the markup pass, so a `<` in a title stays.
   const labels: string[] = [];
   const held = text.replace(MD_LINK, (_m, label: string) => `\u0000${labels.push(label.replace(/\\(.)/g, "$1").replace(/\*\*/g, "")) - 1}\u0000`);
-  const plain = toPlainText(held.replace(/\*\*|__/g, "")).replace(/\u0000(\d+)\u0000/g, (_m, i: string) => labels[Number(i)] ?? "");
-  const parts = plain
-    .split("\n")
-    .filter((l) => !/^\s*(```|~~~)/.test(l))
-    .map((l) => {
-      const item = /^\s*(?:[-*•]|\d+[.)])\s+/.test(l);
-      const words = l
-        .replace(/^\s*#+\s+/, "")
-        .replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "")
-        .replace(/\s+/g, " ")
-        .trim();
-      return { item, words };
-    })
-    .filter(({ words }) => words && !/^sources?\b\s*:?/i.test(words));
+  // A `-` or `*` bullet becomes `•` first: the markup pass reads a lone `*`
+  // as emphasis and strips it, which would hide the item.
+  const bulleted = held.replace(/^(\s*)[-*](\s+)/gm, "$1•$2");
+  const plain = toPlainText(bulleted.replace(/\*\*|__/g, "")).replace(/\u0000(\d+)\u0000/g, (_m, i: string) => labels[Number(i)] ?? "");
+  const parts: Array<{ item: boolean; words: string }> = [];
+  // A "Sources:" line goes, and the list under it with it.
+  let inSources = false;
+  for (const l of plain.split("\n")) {
+    if (/^\s*(```|~~~)/.test(l)) continue;
+    const item = /^\s*(?:[-*•]|\d+[.)])\s+/.test(l);
+    const words = l
+      .replace(/^\s*#+\s+/, "")
+      .replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!words) continue;
+    if (!item) inSources = /^sources?\b\s*:?/i.test(words);
+    if (inSources || /^sources?\b\s*:?/i.test(words)) continue;
+    parts.push({ item, words });
+  }
 
   const folded = foldLists(parts);
   const kept = folded.slice(0, MAX_ANSWER_LINES);
@@ -178,8 +184,13 @@ function foldLists(parts: ReadonlyArray<{ item: boolean; words: string }>): stri
   const flush = () => {
     if (run.length) {
       const items = `${run.map((w) => w.replace(/[.;,]+$/, "")).join("; ")}.`;
+      // A lead ending in a colon or dash introduces the items, which run on
+      // after it; a lead with no closing mark (a heading) gets the colon; a
+      // lead that ends a sentence is followed by the items as a new one.
       if (lead === null) out.push(items);
-      else out.push(/[:—-]$/.test(lead) ? `${lead} ${items}` : `${lead} ${items.charAt(0).toUpperCase()}${items.slice(1)}`);
+      else if (/[:—-]$/.test(lead)) out.push(`${lead} ${items}`);
+      else if (/[.!?]$/.test(lead)) out.push(`${lead} ${items.charAt(0).toUpperCase()}${items.slice(1)}`);
+      else out.push(`${lead}: ${items}`);
     } else if (lead !== null) {
       out.push(lead);
     }

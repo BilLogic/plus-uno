@@ -543,6 +543,7 @@ function replyOf(
     return { kind: "answer", lines, source, cut };
   }
   const note = delivery.notes().at(-1);
+  // A question carries no cut line: it names no source to hold the rest.
   if (outcome?.disposition === "asked" && note) return { kind: "question", lines: plainAnswer(note).lines };
   // A "thanks" the turn only acknowledged has nothing to reply.
   if (outcome?.disposition === "reacted") return null;
