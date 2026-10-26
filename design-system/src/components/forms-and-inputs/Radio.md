@@ -23,7 +23,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 | `value` | string or number | — | — |
 | `checked` | bool | — | — |
 | `defaultChecked` | bool | — | — |
-| `size` | enum | `'medium'` | Size variant |
+| `size` | enum | `'medium'` | Small or medium (default). Large is deprecated and draws like medium. |
 | `disabled` | bool | `false` | Disable the radio |
 | `readOnly` | bool | `false` | — |
 | `description` | node | — | — |
@@ -53,6 +53,4 @@ From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these 
 
 Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -20,18 +20,18 @@ authored half (#166), counted rather than assumed.
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [Input](Input.md) | 30 | ✅ | ✅ | ✅ |
 | [InputGroup](InputGroup/index.md) | 24 | ✅ | ✅ | ✅ |
-| [NumberInput](NumberInput.md) | 27 | ✅ | ✕ | ✅ |
-| [Radio](Radio.md) | 17 | ✅ | ✕ | ✅ |
-| [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
+| [NumberInput](NumberInput.md) | 27 | ✅ | ✅ | ✅ |
+| [Radio](Radio.md) | 17 | ✅ | ✅ | ✅ |
+| [Range](Range.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
 | [Switch](Switch.md) | 15 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
-| [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
+| [TreeSelect](TreeSelect.md) | 9 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 23/23 (100%) · Correct/incorrect 15/23 (65%) · Accessibility 23/23 (100%)
+**Authored coverage:** When to use 23/23 (100%) · Correct/incorrect 19/23 (83%) · Accessibility 23/23 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

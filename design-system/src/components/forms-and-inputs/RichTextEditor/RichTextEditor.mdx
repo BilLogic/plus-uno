@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RichTextEditorStories from './RichTextEditor.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RichTextEditor } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,42 +23,129 @@ export const figmaMeta = {
 
 <Title />
 
+A multi-line editor for text whose formatting is part of the meaning: session notes with a list, feedback with emphasis, a description with a link. Value in and out is HTML.
+
 <DocsTabs of={RichTextEditorStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-53278"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Default medium editor and placeholder.</>}>
-    <Canvas of={RichTextEditorStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ol>
+    <li><strong>Toolbar</strong>: text style, format buttons, link and list, set by the toolbar preset.</li>
+    <li><strong>Bold, italic and underline</strong>: a labeled button group.</li>
+    <li><strong>Editable region</strong>: sits on a Text area body, with a placeholder. The value is HTML.</li>
+</ol>
+
+The label sits above the editor.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>names the editor</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>toolbarPreset</code></td><td>enum</td><td><code>compact</code> | <code>full</code></td><td><code>compact</code></td><td>toolbar preset: compact | full</td></tr>
+        <tr><td><code>toolbarButtons</code></td><td>array of names</td><td>picks the buttons by name and implies the full toolbar</td><td>the full set</td><td>not drawn</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td>none</td><td>placeholder</td></tr>
+        <tr><td><code>minHeight</code></td><td>number</td><td>the shortest the editing area gets</td><td>none, and the area is 120 at least</td><td>not drawn</td></tr>
+        <tr><td><code>readOnly</code>, <code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: default | read-only | disabled</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+Focus is a browser state. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--field-min-height-lg</code></td><td>120</td><td>The editing area's least height. It grows with what is typed.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>Compact toolbar with a label and placeholder.</>}>
+    <Canvas of={RichTextEditorStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+### Toolbar preset
+
+<DocsCanvasShell description={<>Compact draws the text-style toggle and five tools. Full draws the default tool set.</>}>
+    <DsCanvasQuiet of={RichTextEditorStories.ToolbarPresets} />
+</DocsCanvasShell>
+
+### States
+
+<DocsCanvasShell description={<>Read-only and disabled both turn editing off and dim the toolbar. Read-only keeps the text legible, and disabled grays it. Focus comes from the browser.</>}>
+    <DsCanvasQuiet of={RichTextEditorStories.States} />
+</DocsCanvasShell>
+
+### Interactive playground
 
 <DocsInteractivePlayground
     of={RichTextEditorStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+    description={<>Use the table below to change props.</>}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <RichTextEditor label="Session notes" placeholder="Add a list, emphasis or a link" minHeight={120} />,
+            doCaption: 'Use it for notes that need structure.',
+            dontExample: <RichTextEditor label="Student name" placeholder="Name" minHeight={120} />,
+            dontCaption: 'Do not use it for one line of plain text. Use Text field.',
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Sanitize the HTML in and out.** The value is written into the editable region as HTML, and <code>onChange</code> returns whatever the browser produced, including pasted markup. Sanitize before you pass a value in and again before you store it.
+- **The editor is built on a deprecated browser API.** Formatting runs through <code>document.execCommand</code>, which works today and whose output differs between browsers: one may wrap a line in a div, another in a paragraph. Do not depend on the shape of the HTML. Store it and render it, or convert it once on save.
+- **A name posts the value.** Giving the editor a <code>name</code> renders a hidden input, so the HTML posts with a plain form.
+- **The label is a span**, not a label element, because an editable region is not a form control for a label to bind to. The region points at it with <code>aria-labelledby</code>.
 
 </div>
 
@@ -73,47 +161,12 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `RichTextEditor` where the formatting is part of the meaning — session notes
-with a list, feedback with emphasis, a description that needs a link. Where it is
-not, a `Textarea` is the smaller, sturdier control.
+Use Rich text editor only where the formatting carries meaning: session notes with a list, feedback with emphasis, a description that needs a link.
 
-`toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the
-buttons by name and implies the full toolbar. `value` and `onChange` are HTML
-strings. Giving it a `name` also renders a hidden input, so the HTML posts with a
-plain form.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### `value` is written to the DOM as HTML.
-
-```jsx
-// Incorrect — the value is assigned to the editable region's innerHTML, so
-// anything a user can influence is executed as markup.
-<RichTextEditor value={note.bodyFromApi} onChange={setBody} />
-
-// Correct — sanitize on the way in, and again on the way out before storing.
-<RichTextEditor value={sanitize(note.bodyFromApi)} onChange={(html) => setBody(sanitize(html))} />
-```
-
-The same applies to what you receive: `onChange` hands you whatever the browser
-produced, which is markup from a paste as much as from the toolbar.
-
-### It is built on a deprecated browser API.
-
-Formatting runs through `document.execCommand`, which every engine now documents
-as deprecated. It works today and its exact output differs between browsers —
-one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of
-the HTML; store it and render it, or convert it once on save.
-
-### Link and image ask with a browser prompt.
-
-Pressing those buttons opens the platform `prompt()` dialog for a URL. It is
-unstyled, it is not translatable, and some environments suppress it. Where that
-matters, leave those two buttons out of `toolbarButtons`.
+- **For plain multi-line text**, use [Text area](?path=/docs/components-forms-and-inputs-text-area--docs). It is the smaller, sturdier control.
+- **For one line**, use [Text field](?path=/docs/components-forms-and-inputs-text-field--docs).
+- **Keep link and image out where a browser prompt will not work.** Those two buttons ask for a URL with the platform's unstyled prompt. Leave them out of the toolbar where that prompt would be suppressed or untranslated.
+- **To show formatted content a person cannot edit**, render the sanitized HTML yourself.
 
 </div>
 
@@ -121,23 +174,10 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Accessibility
 
-- **The editable region announces itself as a multi-line textbox.**
-  `role="textbox"` with `aria-multiline` and `aria-readonly` tracking the flag
-  that turns editing off.
-- **`label` names it, and is effectively required.** The prop renders a `span`
-  above the editor and the region points at it with `aria-labelledby` — a
-  `label` element cannot be used, because `contentEditable` is not a form
-  control for `htmlFor` to bind to. Without a `label` the region is a named role
-  with no name, which axe reports and a screen-reader user hears as nothing.
-- **The toolbar buttons are named.** Each carries an `aria-label` from its
-  definition, and the bold/italic/underline set is a `role="group"` labeled
-  "Bold, italic, and underline". Their pressed state is tracked internally and is
-  not exposed as `aria-pressed`.
-- **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so
-  it is not part of the accessible name and may not be announced at all.
-- **Keep the formatting optional.** Anything that only exists as bold text or a
-  color in the body is invisible to someone hearing the page. Structure it with
-  lists and headings instead.
+- **Label it.** The editing area is announced as a multi-line text box, and the label is what names it. Without a label the area is a named role with no name, and a screen-reader user hears nothing about what it is for.
+- **The toolbar buttons are named.** Each has a name from its definition, and bold, italic and underline form a group labeled "Bold, italic, and underline". Their pressed state is not exposed to assistive technology.
+- **The placeholder is not a name.** It is drawn from an attribute, so it may not be announced at all.
+- **Keep the formatting optional.** Anything that exists only as bold text or a color in the body is invisible to someone hearing the page. Structure content with lists and headings instead.
 
 </div>
 
@@ -145,11 +185,9 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Related
 
-- For plain multi-line text, use `Textarea` — smaller, labeled, and with none
-  of the above.
-- For one line, use `Input`.
-- For displaying formatted content the user cannot edit, render the HTML
-  yourself after sanitizing it.
+- [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for plain multi-line text.
+- [Text field](?path=/docs/components-forms-and-inputs-text-field--docs) for one line.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for how the label is written.
 
 </div>
 

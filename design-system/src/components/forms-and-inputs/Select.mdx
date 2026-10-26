@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Select } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -26,14 +27,15 @@ export const figmaMeta = {
 <Meta of={SelectStories} />
 
 <Title />
-Use a select when someone picks one value, or several, from a list too long to show in full.
+
+A field that opens a list of options, for picking one value or several from a fixed list. Single mode shows the picked value in the field. Multi mode puts a checkbox on each row and keeps the picks visible as removable tags in the field.
 
 <DocsTabs of={SelectStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-33744"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -41,89 +43,168 @@ Use a select when someone picks one value, or several, from a list too long to s
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Single-select with placeholder — default docs entry.</>}>
+<ol>
+    <li><strong>Field</strong>: the box that shows the picked value.</li>
+    <li><strong>Clear</strong>: a filled circle with an ×, shown only when there is a value.</li>
+    <li><strong>Caret</strong>: points up while the list is open.</li>
+    <li><strong>List</strong>: opens 4 under the field and is at least as wide.</li>
+    <li><strong>Row</strong>: one option, with a check on the picked one.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>mode</code></td><td>enum</td><td><code>single</code> | <code>multi</code></td><td><code>single</code></td><td>mode: single | multi | multi (badges)</td></tr>
+        <tr><td><code>displayMode</code></td><td>enum</td><td><code>tags</code> | <code>badges</code> | <code>text</code></td><td><code>tags</code></td><td>multi (badges) is multi with <code>badges</code></td></tr>
+        <tr><td><code>options</code></td><td>array</td><td>a value, a label, and optionally a description, a group and disabled</td><td><code>[]</code></td><td>Dropdown list items</td></tr>
+        <tr><td><code>label</code>, <code>caption</code></td><td>node</td><td>the name and standing help</td><td>none</td><td>drawn by Label and the caption outside the field</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td><code>"Select..."</code></td><td>the field text in Content</td></tr>
+        <tr><td><code>searchable</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>list Header: empty | hint</td></tr>
+        <tr><td><code>creatable</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>list Footer: empty | create row</td></tr>
+        <tr><td><code>clearable</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td>true in multi, true in single unless required</td><td>trailing controls: clear?</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, node</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>state: invalid has no prop yet</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: disabled | read-only</td></tr>
+        <tr><td><code>selectAll</code>, <code>maxSelections</code></td><td>boolean, number</td><td>multi only</td><td>off, no limit</td><td>not drawn</td></tr>
+        <tr><td><code>dependsOn</code></td><td>object</td><td>the field this one waits for</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>medium drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+The field is 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. Open and closed are states of the field, held by the component.
+
+Multi (badges) keeps the older Badge chips for screens that already use them. New work uses multi with tags. Closed, multi collapses extra tags into "+n".
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The field uses the same tokens as [Text field](?path=/docs/components-forms-and-inputs-text-field--docs). The list adds these.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--popover-offset</code></td><td>4</td><td>The gap between the field and its list.</td></tr>
+        <tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>The tallest the list gets before it scrolls.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>Single select with a placeholder.</>}>
     <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Placeholder and value in single-select mode.</>}>
+<DocsCanvasShell description={<>Placeholder and value in single mode.</>}>
     <DsCanvasQuiet of={SelectStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Modes
 
-<div className="sb-ds-doc-section">
-
-## Modes
-
-<DocsCanvasShell description={<>Multi-select with Tags or Badges; searchable and creatable fields take typing.</>}>
+<DocsCanvasShell description={<>Multi mode with tags. Searchable and creatable fields take typing.</>}>
     <DsCanvasQuiet of={SelectStories.Modes} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
-    <DsCanvasQuiet of={SelectStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Enabled, invalid, read-only and disabled.</>}>
+<DocsCanvasShell description={<>Enabled, invalid, read-only and disabled. Hover and the keyboard highlight come from the field and the rows.</>}>
     <DsCanvasQuiet of={SelectStories.InteractionStates} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Dependent fields
+### Dependent fields
 
 <DocsCanvasShell description={<>The teacher waits for a school, and clears when the school changes.</>}>
     <DsCanvasQuiet of={SelectStories.DependentFields} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Long lists
+### Long lists
 
 <DocsCanvasShell description={<>Past 50 options, Recent and Suggested come first, and typing searches the rest.</>}>
     <DsCanvasQuiet of={SelectStories.LongList} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SelectStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={SelectStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <Select
+                    label="Topics"
+                    mode="multi"
+                    options={[
+                        { value: 'fractions', label: 'Fractions' },
+                        { value: 'ratios', label: 'Ratios' },
+                        { value: 'geometry', label: 'Geometry' },
+                    ]}
+                    defaultValue={['fractions', 'ratios']}
+                />
+            ),
+            doCaption: 'Use multi: checkboxes in the list and tags in the field.',
+            dontExample: (
+                <Select
+                    label="Topics"
+                    mode="multi"
+                    displayMode="badges"
+                    options={[
+                        { value: 'fractions', label: 'Fractions' },
+                        { value: 'ratios', label: 'Ratios' },
+                        { value: 'geometry', label: 'Geometry' },
+                    ]}
+                    defaultValue={['fractions', 'ratios']}
+                />
+            ),
+            dontCaption: 'Do not use badge chips in new work. Use multi.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **onChange hands you the value, not an event.** It receives an id in single mode and an array of ids in multi mode, so read the argument directly.
+- **A filter bar commits when the list closes.** In multi mode, pass <code>commitOnClose</code> so <code>onChange</code> fires once when the list closes, instead of refetching on every tick.
+- **A sort or a required pick has no clear.** <code>clearable</code> defaults to true in multi mode and to the opposite of <code>required</code> in single mode. A sort always has a value, so pass <code>clearable=false</code>.
+- **Read-only is not disabled.** Read-only stays focusable and shows the value but cannot open or clear. Disabled leaves the tab order and fades the field.
+- **A dependent field says what it waits for.** Pass <code>dependsOn</code> with the other field's value and a name. Until that value is set, the field is disabled with "Choose" and the name, and it clears whenever the other field changes.
+- **A name submits through hidden inputs**, one per value. <code>required</code> sets the asterisk and marks the field required for assistive technology, but does not block a submit. Drive <code>validation</code> and <code>caption</code> from your own validation.
+- **Long lists load as you go.** <code>loadOptions</code> receives the typed text and an offset and limit, and returns a promise of the options and a total.
 
 </div>
 
@@ -139,95 +220,17 @@ Use a select when someone picks one value, or several, from a list too long to s
 
 ## When to use
 
-Use `Select` when someone picks from a known list and the choice is part of a
-form's data:
+Use Select when someone picks from a known list and the choice is part of a form's data. A Select hides its options until it is opened, so it suits a compact form, and a good default makes the alternatives less prominent.
 
-- 5 to 15 options when space is tight, or when there is a good default.
-- `mode="multi"` for several values, shown as Tags, with a checkbox on each row.
-- `searchable` past about 8 options: typing in the field filters the list.
-- `creatable` when the list may grow: "Create *text*" appears when nothing matches.
+- **Use it for 5 to 15 options when space is tight.** Under 5 options, show them all with [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs).
+- **Pick several with multi mode**, never with a plain dropdown. Each row has a checkbox, and the picks stay visible as tags in the field, so people can check and remove them without reopening the list.
+- **Make long lists searchable.** Past about 8 options, let people type in the field to filter. Above 50, search first and hide Select all. The list stops at 320, about nine rows, so keep it wide and short.
+- **Let people add to the list** with creatable, which offers "Create" when nothing matches.
+- **For actions rather than values**, use [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs). A screen reader announces a value list and a menu differently.
+- **For several values people mostly type and add**, use [Tag input](?path=/docs/components-forms-and-inputs-tag-input--docs).
+- **For a value along a hierarchy**, use [Cascader](?path=/docs/components-forms-and-inputs-cascader--docs) or [Tree select](?path=/docs/components-forms-and-inputs-tree-select--docs).
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### `onChange` hands you the value, not an event.
-
-```jsx
-// Incorrect — there is no event. `onChange` gets an id in single mode and an
-// array of ids in multi mode, so this throws.
-<Select options={grades} onChange={(e) => setGrade(e.target.value)} />
-
-// Correct — take the value straight.
-<Select options={grades} onChange={(value) => setGrade(value)} />
-```
-
-### A filter bar commits when the list closes.
-
-```jsx
-// Incorrect — every tick refetches the table while the person is still choosing.
-<Select mode="multi" options={subjects} value={filters} onChange={refetch} />
-
-// Correct — one commit, when the list closes.
-<Select mode="multi" options={subjects} value={filters} onChange={refetch} commitOnClose />
-```
-
-### A sort, or a required pick, has no clear ×.
-
-`clearable` defaults to true in multi mode and to `!required` in single mode. A
-sort always has a value, so it passes `clearable={false}`. In Figma the clear is
-`_Field Clear` in the `filled?=true` variants.
-
-```jsx
-// Incorrect — the × empties the sort, and the list has no order.
-<Select aria-label="Sort" options={sorts} value={sort} onChange={setSort} />
-
-// Correct — the sort can change but never empty.
-<Select aria-label="Sort" options={sorts} value={sort} onChange={setSort} clearable={false} />
-```
-
-### Read-only is not disabled.
-
-```jsx
-// Incorrect — disabled takes the field out of the tab order and fades it, so
-// a value the person can read but not change looks broken.
-<Select options={terms} value={term} disabled />
-
-// Correct — read-only stays focusable, shows the value, and cannot open or clear.
-<Select options={terms} value={term} readonly />
-```
-
-### A dependent field says what it is waiting for.
-
-```jsx
-// Incorrect — an empty, disabled teacher field, and a stale teacher kept when
-// the school changes.
-<Select options={teachersFor(school)} value={teacher} disabled={!school} />
-
-// Correct — disabled with "Choose a school first" until there is a school, and
-// cleared whenever the school changes.
-<Select
-  label="Teacher"
-  options={teachersFor(school)}
-  value={teacher}
-  onChange={setTeacher}
-  dependsOn={{ value: school, label: 'a school' }}
-/>
-```
-
-### `name` submits through hidden inputs.
-
-```jsx
-// A plain form gets the ids: one hidden input per value, named `name`.
-<form onSubmit={submit}>
-  <Select name="grade" label="Grade" options={grades} required />
-</form>
-```
-
-`required` sets `aria-required` and the label's asterisk. It does not block a
-submit; drive `invalid` and `caption` from your own validation.
+Select draws no label of its own. Give it a label above and, where it helps, a caption below. The placeholder says what to pick and never replaces the label.
 
 </div>
 
@@ -235,27 +238,13 @@ submit; drive `invalid` and `caption` from your own validation.
 
 ## Accessibility
 
-- **The field is a combobox.** A searchable field is an `<input role="combobox">`;
-  a plain one is a `div role="combobox"`. Both carry `aria-expanded`,
-  `aria-controls` while open and `aria-activedescendant` on the highlighted row,
-  so focus never leaves the field.
-- **The list is a listbox.** Each row is a `role="option"` with
-  `aria-selected`, in single mode and multi mode alike. Group headings
-  (Recent, Suggested) label their `role="group"`.
-- **Keys.** Down, Up or Enter opens the list (Space too, on a plain field).
-  The arrow keys, Home and End move; Enter picks; Esc closes and leaves the
-  value alone; Tab closes. Delete clears the value. In multi mode, Backspace in
-  an empty field removes the last value.
-- **Naming.** `label` names the field. Without one, pass `aria-label` or
-  `aria-labelledby`; both reach the combobox. A field with neither falls back
-  to its placeholder.
-- **The clear × is not a tab stop.** It is named "Clear *label*", and Delete
-  does the same from the keyboard. Without `clearable`, neither the × nor
-  Delete empties the field.
-- **`invalid`** sets `aria-invalid`, and `caption` becomes an error announced
-  with `role="alert"` and described by the field.
-- **Tags.** Each Tag's × is named "Remove *value*". Without focus, tags that
-  do not fit collapse into "+n", named "+n more tags".
+- **The field is a combobox.** A searchable field is a text input with the combobox role, and a plain one is a div with it. Both announce whether the list is open and which row is highlighted, so focus never leaves the field.
+- **The list is a listbox.** Each row is an option that announces whether it is selected, in single and multi mode alike. Group headings, such as Recent and Suggested, label their group.
+- **Keys.** Down, Up or Enter opens the list, and Space does too on a plain field. The arrow keys, Home and End move. Enter picks. Esc closes and leaves the value alone. Tab closes. Delete clears the value, and in multi mode Backspace in an empty field removes the last value.
+- **Name it.** The label names the field. Without one, pass an <code>aria-label</code> or <code>aria-labelledby</code>. A field with neither falls back to its placeholder.
+- **The clear × is not a tab stop.** It is named "Clear" followed by the label, and Delete does the same from the keyboard. Where clearing is off, neither empties the field.
+- **Errors are announced.** An invalid field is marked invalid, and its caption becomes an error read out when it appears.
+- **Tags are removable by name.** Each tag's × is named "Remove" followed by the value. Without focus, tags that do not fit collapse into "+n", named "+n more tags".
 
 </div>
 
@@ -263,10 +252,11 @@ submit; drive `invalid` and `caption` from your own validation.
 
 ## Related
 
-- For actions rather than a value, use `Dropdown`.
-- For fewer than five options that all fit on screen, use `ChoiceGroup`.
-- For hierarchical values, use `TreeSelect` or `Cascader`.
-- For several values that people mostly type and add, use `TagInput`.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for fewer than 5 options.
+- [Tag input](?path=/docs/components-forms-and-inputs-tag-input--docs) for several values, or new ones.
+- [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) for an action, not a value.
+- [Cascader](?path=/docs/components-forms-and-inputs-cascader--docs) and [Tree select](?path=/docs/components-forms-and-inputs-tree-select--docs) for a value along a hierarchy.
+- [Date picker](?path=/docs/components-forms-and-inputs-date-picker--docs) for a date or a time.
 
 </div>
 

@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TreeSelectStories from './TreeSelect.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TreeSelect, Cascader } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -40,81 +41,154 @@ export const figmaMeta = {
   ]
 };
 
+export const subjects = [
+  {
+    label: 'Mathematics',
+    value: 'mathematics',
+    children: [
+      { label: 'Fractions', value: 'fractions' },
+      { label: 'Geometry', value: 'geometry', children: [{ label: 'Triangles', value: 'triangles' }] },
+    ],
+  },
+  { label: 'Reading', value: 'reading' },
+];
+
 <Meta of={TreeSelectStories} />
 
 <Title />
+
+A field that opens a hierarchy as an indented tree. Reach for it when people need to see the hierarchy as a whole, pick a parent node itself, or pick several nodes.
 
 <DocsTabs of={TreeSelectStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-44556"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
 
-The trigger is the shared field, and the panel is the shared listbox surface
-holding a flat run of option rows in the `treeitem` role. Each row's Leading
-slot holds the indent (depth × 20px), the toggle and, with `multiple`, a
-checkbox that is partly checked on a parent with some of its nodes picked.
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Empty trigger ready for hierarchical multi-selection.</>}>
+<ol>
+    <li><strong>Field</strong>: shows the placeholder, or the selected labels joined with a comma.</li>
+    <li><strong>Caret</strong>: in the field's trailing slot.</li>
+    <li><strong>List</strong>: a flat run of rows, one per visible node.</li>
+    <li><strong>Indent</strong>: 20 for each level. Root rows have none.</li>
+    <li><strong>Toggle</strong>: collapsed, expanded, or a leaf, which is an empty cell.</li>
+    <li><strong>Checkbox</strong>, with multiple on: after the toggle. A partly checked parent shows the dash.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>strings, or a label, a value, optional children and disabled</td><td><code>[]</code></td><td>the rows, built from each node's depth and children</td></tr>
+        <tr><td><code>value</code></td><td>value or array</td><td>one value, or an array with multiple</td><td>none</td><td>state: filled</td></tr>
+        <tr><td><code>multiple</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>multiple?: false | true</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td><code>"Please select"</code></td><td>not drawn</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: disabled</td></tr>
+    </tbody>
+</DocsTable>
+
+Open is held by the component, and the field is drawn at focus while it is open. Hover on the field comes from the field, and hover on a row is the keyboard highlight.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--plus-option-row-indent-step</code></td><td>20</td><td>The indent for each level of depth.</td></tr>
+        <tr><td><code>--plus-option-row-toggle-size</code></td><td>16</td><td>The expand and collapse toggle.</td></tr>
+        <tr><td><code>--popover-offset</code></td><td>4</td><td>The gap between the field and its list.</td></tr>
+    </tbody>
+</DocsTable>
+
+The field uses the same tokens as [Text field](?path=/docs/components-forms-and-inputs-text-field--docs).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A multiple tree select with a placeholder.</>}>
     <Canvas of={TreeSelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Single and multiple
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Single-select vs multiple with a pre-checked branch.</>}>
+<DocsCanvasShell description={<>Single mode picks one node and closes the list. Multiple adds a checkbox to every row and keeps the tree open while people pick. A fully checked parent stands in for its children in the field.</>}>
     <DsCanvasQuiet of={TreeSelectStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Layout
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Indented tree: each level nests beneath its parent with expand/collapse carets.</>}>
+<DocsCanvasShell description={<>Each level is indented beneath its parent, and the carets expand and collapse branches in place.</>}>
     <DsCanvasQuiet of={TreeSelectStories.Layout} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled: closed field with no interaction.</>}>
+<DocsCanvasShell description={<>Disabled: a closed field with no interaction. Each state exists for single and multiple.</>}>
     <DsCanvasQuiet of={TreeSelectStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TreeSelectStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={TreeSelectStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <TreeSelect multiple options={subjects} value={['fractions']} onChange={() => {}} placeholder="Pick topics at any level" />,
+            doCaption: 'Use it to pick topics at any level, several at once.',
+            dontExample: <Cascader options={subjects} placeholder="Pick a topic" />,
+            dontCaption: 'Do not use a Cascader when a parent is a valid answer.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Value and onChange match the mode.** <code>value</code> is a single value in single mode and an array with <code>multiple</code>, and <code>onChange</code> matches. Options take strings, or a label or text, a value, children and disabled.
+- **Selecting a parent selects its subtree.** In multiple mode, toggling a node toggles every descendant, and a parent shows the dash when only some of its children are selected. The value you receive is the flat list of every selected node, parents included. To keep only leaves, filter the array you are handed.
+- **Values must be unique across the whole tree.** Lookup is a depth-first search by value and selection is a flat set, so the same value under two parents is one node.
+- **The id lands on the input**, so a label pointing at it names the field.
 
 </div>
 
@@ -130,49 +204,17 @@ checkbox that is partly checked on a parent with some of its nodes picked.
 
 ## When to use
 
-Use `TreeSelect` to choose from a nested set where the nesting matters and the
-list is too long to show at once — a subject tree, a folder, an organization.
-`multiple` turns it from one choice into many, with a checkbox on every node and
-a tri-state parent that reflects its descendants.
+Choose Tree select when a parent or several nodes are valid answers, or when people need the hierarchy in view to choose, such as a subject tree, a folder or an organization.
 
-`value` is a single value in single mode and an array in `multiple` mode;
-`onChange` matches. `options` takes strings or `{ label | text, value, children,
-disabled }`.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Selecting a parent selects its subtree.
-
-```jsx
-// In multiple mode, toggling a node toggles every descendant with it, and a
-// parent shows indeterminate when only some of its children are selected. The
-// value you receive is the flat list of every selected node, parents included.
-<TreeSelect multiple options={subjects} value={selected} onChange={setSelected} />
-```
-
-If you only want leaves, filter the array you are handed.
-
-### Expanding is not selecting.
-
-The caret expands and collapses without changing the selection — its click
-handler stops there, and Right and Left do the same from the keyboard. Clicking
-or pressing Enter anywhere else on the row selects it, including on a parent.
-
-### Label it the ordinary way.
-
-`id` lands on the input, so a `label` pointing at it names the field.
-`aria-label` and `aria-labelledby` are forwarded to the same element if you
-would rather not render a label.
-
-### Values must be unique across the whole tree.
-
-Lookup is a depth-first search by value and selection is a flat set, so the same
-value appearing under two parents is one node as far as this component is
-concerned.
+- **A parent node is a valid answer.** Single mode commits any node, parent or leaf.
+- **The answer is a set.** Multiple adds a checkbox to every node, and a partly checked parent shows which branches are partly chosen.
+- **People need the hierarchy in view.** The tree shows siblings and depth together, which a column per level hides.
+- **Keep the tree short to scan.** Every open branch adds rows to scroll past. Keep parents closed until people open them, and lead with search once the tree passes 50 nodes.
+- **Name the parent, not every child.** When every child of a parent is checked, the field shows the parent alone. A partly checked parent shows the dash, so people can see a branch is only partly chosen.
+- **For one leaf along a fixed path**, use [Cascader](?path=/docs/components-forms-and-inputs-cascader--docs).
+- **For one value from a flat list**, use [Select](?path=/docs/components-forms-and-inputs-select--docs).
+- **For several values from a flat list**, use Select in multi mode, or [Tag input](?path=/docs/components-forms-and-inputs-tag-input--docs).
+- **For an action rather than a value**, use [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs).
 
 </div>
 
@@ -180,23 +222,13 @@ concerned.
 
 ## Accessibility
 
-- **The roles are right, and now they are honored.** The input is a `combobox`
-  with `aria-haspopup="tree"`, `aria-expanded` and `aria-controls`; the panel is
-  a `tree`; every node is a `treeitem` with `aria-expanded`, `aria-selected`,
-  `aria-level` and `aria-disabled` where each applies.
-- **The tree walks with the arrow keys.** Down opens it from the field. Up and
-  Down move through the rows that are actually showing; Right opens a branch and
-  then steps into it; Left closes one and then steps out to its parent; Home and
-  End jump; Enter and Space choose.
-- **One tab stop, on the cursor.** Tab leaves the tree rather than walking it,
-  which is what a `tree` promises. Opening starts on the selected node — the
-  reason its ancestors are expanded for you — or on the first row.
-- **Escape closes it and returns focus to the field.** So does choosing, in
-  single mode. In `multiple` mode choosing leaves the panel open, because you are
-  usually about to choose again.
-- **Indeterminate is set on the input, not implied.** A partly selected parent
-  gets the real `indeterminate` property, so it announces as mixed rather than as
-  unchecked.
+- **The roles are announced.** The field is a combobox that says whether the tree is open, the panel is a tree, and every node is a tree item that announces whether it is expanded or selected, its level, and whether it is disabled.
+- **The tree walks with the arrow keys.** Down opens it from the field. Up and Down move through the rows that are showing. Right opens a branch and then steps into it. Left closes one and then steps out to its parent. Home and End jump. Enter and Space choose.
+- **One tab stop, on the cursor.** Tab leaves the tree rather than walking it. Opening starts on the selected node, with its ancestors expanded for you, or on the first row.
+- **Escape closes it and returns focus to the field.** So does choosing, in single mode. In multiple mode choosing leaves the panel open, because people usually choose again.
+- **Expanding is not selecting.** The caret expands and collapses without changing the selection, and Right and Left do the same from the keyboard. Clicking or pressing Enter anywhere else on the row selects it, including a parent.
+- **A partly checked parent is announced as mixed**, not as unchecked.
+- **Name the field.** Point a label at it, or pass an <code>aria-label</code> or <code>aria-labelledby</code>.
 
 </div>
 
@@ -204,10 +236,10 @@ concerned.
 
 ## Related
 
-- For a path down a hierarchy shown as columns, use `Cascader`.
-- For a flat list, use `Select`.
-- For a handful of nested options that all fit on screen, use `ChoiceGroup`
-  under headings.
+- [Cascader](?path=/docs/components-forms-and-inputs-cascader--docs) for one leaf along a single path, each level narrowing the next.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for one value from a flat list, or several in multi mode.
+- [Tag input](?path=/docs/components-forms-and-inputs-tag-input--docs) for several values that people can add to.
+- [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) for an action rather than a value.
 
 </div>
 

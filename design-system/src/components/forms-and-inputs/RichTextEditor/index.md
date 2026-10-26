@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, ToolbarPresets, States, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx`
 

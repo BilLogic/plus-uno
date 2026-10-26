@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RangeStories from './Range.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Range } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,12 +23,14 @@ export const figmaMeta = {
 
 <Title />
 
+A slider for a value whose position in a bounded span matters more than the exact number: volume, opacity, a rough weighting.
+
 <DocsTabs of={RangeStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-56465"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -35,39 +38,108 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
+
+<ol>
+    <li><strong>Value bar</strong>: the filled part of the track and the thumb. Its width is the value.</li>
+    <li><strong>Thumb</strong>: the handle a person drags.</li>
+    <li><strong>Value</strong>: the filled stretch of the track, up to the thumb.</li>
+</ol>
+
+The label sits above the slider and is the only thing that names it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>text that names the slider</td><td>none</td><td>Label text</td></tr>
+        <tr><td><code>showLabel</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>true</code></td><td>not drawn</td></tr>
+        <tr><td><code>min</code>, <code>max</code></td><td>number</td><td>the ends of the span</td><td><code>0</code>, <code>100</code></td><td>not drawn</td></tr>
+        <tr><td><code>step</code></td><td>number</td><td>the increment</td><td><code>1</code></td><td>not drawn</td></tr>
+        <tr><td><code>value</code>, <code>defaultValue</code></td><td>number</td><td>the position</td><td>the minimum</td><td>the width of the value bar</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td><code>size</code> on each part: small | medium | large</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>one state only (default)</td></tr>
+    </tbody>
+</DocsTable>
+
+Every size draws a 32-high control with a 14/20 label. <code>small</code> keeps a thinner track. <code>large</code> is deprecated: it draws like <code>medium</code> and warns in development.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The control row. The track draws inside it, centered, so the thumb has room and the whole row is the hit area.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell attachSourceBelow description={<>Medium slider at a mid-range value.</>}>
     <Canvas of={RangeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
+<DocsCanvasShell description={<>Small and medium. Both are 32 high.</>}>
     <DsCanvasQuiet of={RangeStories.Sizes} />
 </DocsCanvasShell>
 
+Range has one state in Figma. In code, hover and focus come from the browser, with the focus ring on the thumb, and <code>disabled</code> passes through to the input.
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={RangeStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={RangeStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Range label="Volume" defaultValue={60} />,
+            doCaption: 'Use a slider for volume or a rough weighting.',
+            dontExample: <Range label="Score" defaultValue={87} />,
+            dontCaption: 'Do not use a slider for an exact figure such as a score of 87. Use Number input.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **There is no value readout.** The component renders the label and the slider and nothing else. When the number matters, render it beside the slider and keep it in step with <code>onChange</code>.
+- **onChange fires throughout the drag**, not on release, so a controlled slider stays in step with the thumb. Put anything expensive, such as a network call or a chart redraw, behind a debounce or in <code>onBlur</code>.
+- **The filled track is drawn from a custom property** the component sets on the input as the value changes. Style the track by reading <code>--value-percent</code>, not by recomputing the position.
+- **Extra props land on the input**, so <code>aria-describedby</code>, <code>disabled</code> and <code>data-*</code> reach the control that has the role.
 
 </div>
 
@@ -83,40 +155,12 @@ export const figmaMeta = {
 
 ## When to use
 
-- **When the position matters more than the number.** A slider shows where a
-  value sits in its span, which is what makes it good for volume, opacity or a
-  rough weighting and bad for anything the reader has an exact figure for.
-- **When the span is bounded and known.** `min` and `max` default to 0 and 100;
-  a value with no natural ceiling has nowhere to put the right-hand end.
-- **Not for precise entry.** Landing on a specific number by dragging is slow
-  and, on a touch screen, unreliable. Use `NumberInput`.
+Use Range when the position in a known span matters more than the number. Landing on an exact figure by dragging is slow, and on a touch screen it is unreliable.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-- **There is no value readout.** This renders the label and the slider, and
-  nothing else — a reader dragging it sees the track fill and no number. If the
-  figure matters, render it yourself beside the slider and keep it in step with
-  `onChange`.
-- **`onChange` fires throughout the drag, not on release.** The `input` event is
-  forwarded to `onChange` as well as to `onInput`, so a controlled `Range` stays
-  in step with the thumb rather than jumping when the pointer lifts. Anything
-  expensive — a network call, a chart redraw — belongs behind a debounce or in
-  `onBlur`, not in `onChange`.
-- **`showLabel={false}` hides the label; it does not remove it.** A range
-  input carries its value and never its meaning: "49" says nothing about what is
-  being set, so `label` is the only thing that names the control.
-- **The filled part of the track is drawn from a custom property set in
-  JavaScript.** The component writes --value-percent onto the input element as
-  the value changes, and the stylesheet reads it with a 0% fallback. It is
-  deliberately not declared in any stylesheet — nothing static could give it a
-  correct value — so styling the track means reading that property rather than
-  recomputing the position.
-- **Extra props land on the input**, so `aria-describedby`, `disabled`,
-  `data-*` and the rest reach the control that has the role.
+- **Use it for:** volume, opacity or a rough weighting, where the span has a fixed minimum and maximum.
+- **For an exact value**, use [Number input](?path=/docs/components-forms-and-inputs-number-input--docs).
+- **For a choice on a short scale with named points**, use [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) laid out inline.
+- **For stars**, use [Rating](?path=/docs/components-forms-and-inputs-rating--docs).
 
 </div>
 
@@ -124,20 +168,11 @@ export const figmaMeta = {
 
 ## Accessibility
 
-- **A slider needs a `label`, and it is the only thing that names it.** The value
-  is a number: "49" does not say what is being set. Pass `label`, and the
-  component associates it with the input through `useFieldId`, so the pairing
-  holds whether or not you pass an `id`.
-- **`showLabel={false}` hides the label, it does not remove it.** Same contract
-  as `Input`: the label still renders and still names the slider, it is
-  just clipped out of sight. Use it where the design puts the meaning elsewhere
-  — the minus/plus icons flanking a zoom slider, for instance.
-- **Everything else passes through.** `aria-valuetext`, `aria-describedby` and
-  any other `aria-*` reach the input. Reach for `aria-valuetext` when the number
-  is not what a listener needs to hear — "50 percent" rather than "50".
-- **`min`, `max` and `step` are on the input.** They become
-  `aria-valuemin` / `aria-valuemax` implicitly, so a screen reader reports the
-  range without any extra attribute.
+- **Always give it a label.** A value of 49 says nothing about what is being set. The label is the only thing that names the slider.
+- **Hiding the label keeps the name.** <code>showLabel=false</code> clips the label out of sight and keeps it for assistive technology. Use it where the design shows the meaning another way, such as the minus and plus icons on either side of a zoom slider.
+- **Say the value in words when the number is not enough.** Pass <code>aria-valuetext</code>, for example "50 percent", when a listener needs more than "50".
+- **The span is announced.** <code>min</code> and <code>max</code> become the slider's lowest and highest values, so a screen reader reports the span with no extra attribute.
+- **Focus is visible on the thumb.** The 32-high row gives a pointer a generous target.
 
 </div>
 
@@ -145,9 +180,10 @@ export const figmaMeta = {
 
 ## Related
 
-- For an exact value the user types, use `NumberInput`.
-- For a short fixed scale with named points, use `Rating` or `ChoiceGroup`.
-- For how the label and caption pair is written, see *Label & caption*.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for an exact number.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for a choice on a short scale, laid out inline.
+- [Rating](?path=/docs/components-forms-and-inputs-rating--docs) for stars.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for how the label is written.
 
 </div>
 

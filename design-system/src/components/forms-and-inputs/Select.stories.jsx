@@ -130,8 +130,8 @@ const grid = { pointerEvents: 'auto', display: 'grid', gap: 20, gridTemplateColu
 export const Content = {
     render: () => (
         <div className="sb-select-interactive-override" style={grid}>
-            <Select label="Closed, empty" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-            <Select label="Closed, filled" defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select label="Closed, empty" options={sampleOptions} placeholder="Select an option" />
+            <Select label="Closed, filled" defaultValue="option-1" options={sampleOptions} placeholder="Select an option" />
         </div>
     )
 };
@@ -224,7 +224,7 @@ export const Overview = {
                 paddingBottom: 320,
             }}
         >
-            <Select aria-label="Option" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select aria-label="Option" options={sampleOptions} placeholder="Select an option" />
         </div>
     ),
     parameters: {

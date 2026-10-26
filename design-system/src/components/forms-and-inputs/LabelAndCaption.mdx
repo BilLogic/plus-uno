@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Input } from '@/components';
+import { DocsCanvasShell, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -30,12 +31,14 @@ export const figmaMeta = {
 
 <Title />
 
+The two lines that bracket a field: the label above names it, and the caption below helps, warns or explains. Every field component draws them. This page holds the shared parts and the rules for what goes in them.
+
 <DocsTabs of={LabelAndCaptionStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52724"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -43,43 +46,138 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Label row and caption row — two separate typography patterns used together on a field.</>}>
+<h3>Label</h3>
+
+<ol>
+    <li><strong>Label text</strong>, set by <code>label</code>.</li>
+    <li><strong>Required marker</strong>, an asterisk set by <code>required</code>.</li>
+</ol>
+
+<h3>Caption</h3>
+
+<ol>
+    <li><strong>State icon</strong>: a check for success, an alert mark for an error.</li>
+    <li><strong>Caption text</strong>, set by <code>caption</code> or the validation message.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+The fields set these for you. This table shows the Figma property, and the code prop on the field that draws it.
+
+<DocsTable>
+    <thead>
+        <tr><th>Part and property</th><th>Figma values</th><th>Code on the field</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Label · required?</td><td>true | false, default true</td><td><code>required</code></td></tr>
+        <tr><td>Label · label</td><td>text, default "Placeholder"</td><td><code>label</code>, hidden with <code>showLabel=false</code></td></tr>
+        <tr><td>Label · size</td><td>large | small, default small</td><td>follows the field. Every field draws the label at 12/16.</td></tr>
+        <tr><td>Caption · caption</td><td>text</td><td><code>caption</code> for standing help, <code>validationMessage</code> for a message tied to a state</td></tr>
+        <tr><td>Caption · state</td><td>default | success | danger | warning | disabled</td><td>the field's validation: <code>invalid</code> draws danger, <code>success</code> draws success, and standing help draws default</td></tr>
+    </tbody>
+</DocsTable>
+
+Label has no states. The caption takes its state from the field. Figma also draws warning and disabled captions, which the fields do not take.
+
+Text field, Text area, Number input, Select and Tag input take a <code>caption</code> for standing help. File upload and the date pickers render a message only in a validation state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--ds-text</code></td><td>theme role</td><td>The label.</td></tr>
+        <tr><td><code>--ds-text-danger</code></td><td>theme role</td><td>The required asterisk and an error message.</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>theme role</td><td>Standing help and the count.</td></tr>
+        <tr><td><code>--ds-text-success</code></td><td>theme role</td><td>A success message.</td></tr>
+        <tr><td><code>--body-small</code></td><td>12/16</td><td>The text style of the label and the caption.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+These examples draw the label and caption parts as they are in Figma.
+
+<DocsCanvasShell attachSourceBelow description={<>The label row and the caption row, used together on a field.</>}>
     <Canvas of={LabelAndCaptionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Label
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Label copy and optional required asterisk.</>}>
+<DocsCanvasShell description={<>Label copy, with and without the required asterisk.</>}>
     <DsCanvasQuiet of={LabelAndCaptionStories.LabelContent} />
 </DocsCanvasShell>
 
-</div>
+### Caption states
 
-<div className="sb-ds-doc-section">
-
-## Appearance
-
-<DocsCanvasShell description={<>Caption semantic styles: default, success, danger, warning, disabled.</>}>
+<DocsCanvasShell description={<>Default, success, danger, warning and disabled.</>}>
     <DsCanvasQuiet of={LabelAndCaptionStories.CaptionVariants} />
 </DocsCanvasShell>
 
+### Composition
+
+<DocsCanvasShell description={<>Label, native input and caption stacked as a field.</>}>
+    <DsCanvasQuiet of={LabelAndCaptionStories.Layout} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## Do and don't
 
-<DocsCanvasShell description={<>Label, native input, and caption stacked as a field.</>}>
-    <DsCanvasQuiet of={LabelAndCaptionStories.Layout} />
-</DocsCanvasShell>
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Input label="Email address" />,
+            doCaption: 'Name the field.',
+            dontExample: <Input label="Enter your email address" />,
+            dontCaption: 'Do not put an instruction where the name should be.',
+        },
+        {
+            doExample: <Input label="Session date" defaultValue="Jan 3" validation="invalid" validationMessage="Choose a date after today." />,
+            doCaption: 'Say what to do next.',
+            dontExample: <Input label="Session date" defaultValue="Jan 3" validation="invalid" validationMessage="Invalid date." />,
+            dontCaption: 'Do not name the problem only.',
+        },
+        {
+            doExample: <Input label="School" required />,
+            doCaption: 'Mark a required field with the asterisk alone.',
+            dontExample: <Input label="School (required)" />,
+            dontCaption: 'Do not spell out that a field is required in the label.',
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Caption and validation message are separate props.** <code>caption</code> is standing help. <code>validationMessage</code> appears only while <code>validation</code> is set and takes the caption's place.
+- **A neutral line on a field with no caption prop** is text you render. Give it an id and pass <code>aria-describedby</code> to the control.
+- **The required marker sets the field required for assistive technology only.** It does not set the native required attribute or block a submit, so your own validation enforces it.
 
 </div>
 
@@ -95,65 +193,15 @@ export const figmaMeta = {
 
 ## When to use
 
-These are the two lines that bracket a field: the label above it, and the caption
-below. Every field component in this group draws them for you — this page is the
-typography they all share, and the rules for what goes in them.
+Label and caption have no component of their own. Text field, Select, Text area and the other fields render their label and caption, so use the field, not these parts.
 
-A **label** names the field. It is always present, it is short, and it does not
-change. A **caption** is the line under the control that helps, warns or
-explains, and it carries a state: `default`, `success`, `danger`, `warning`,
-`disabled`.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Say what the field is, not what to do with it.
-
-```jsx
-// Incorrect — an instruction where the name should be. It reads badly in a
-// screen reader's list of form fields, where the labels appear without context.
-<Input label="Enter your email address" />
-
-// Correct — the instruction is a caption if it is needed at all.
-<Input label="Email address" />
-```
-
-### A caption is help; a placeholder is not.
-
-A hint written into `placeholder` disappears the moment the user types, which is
-when they need it, and it is low contrast by design. Put help in a caption.
-
-### The neutral caption has no prop on most fields.
-
-```jsx
-// Incorrect — there is no caption or helper prop. Input, NumberInput and
-// FileUpload render a message only in a validation state.
-<Input label="Phone" caption="Include the area code" />
-
-// What exists — a message tied to success or failure.
-<Input label="Phone" validation="invalid"
-       validationMessage="Include the area code." />
-
-// For standing help with no state, render the line yourself under the field,
-// give it an id, and point the control at it.
-<Input label="Phone" aria-describedby="phone-help" />
-<p id="phone-help" className="body3-txt">Include the area code.</p>
-```
-
-### Write the error, not the fact that there is one.
-
-A `danger` caption should say what to do: "Choose a date after today", not
-"Invalid date". The state colors the line; the words do the work.
-
-### The asterisk is decoration.
-
-Across these components the required marker is a `span` beside the label with
-`aria-label="required"`. None of them sets the `required` attribute or
-`aria-required` on the control, so the asterisk is a convention for sighted
-users and your own validation is what enforces it.
+- **Label every field.** The label is the field's name for a screen reader and a click target that focuses it. It is always present, short, and does not change.
+- **Add a caption only when the field has something to say.** A caption helps, warns or explains, and it carries a state. A placeholder is no substitute, because it vanishes once a person types.
+- **Say what the field is, not what to do with it.** Labels appear without context in a screen reader's list of fields. An instruction, if one is needed at all, is a caption.
+- **Write the error, not the fact that there is one.** A danger caption says what to do next, such as "Choose a date after today", not "Invalid date". The state colors the line, and the words do the work.
+- **Mark required fields with the asterisk alone.** The form explains the asterisk once, in a legend. Fields carry no "(required)" or "(optional)" text.
+- **A group of choices is named by its legend**, not by a label. See [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs).
+- **For a message about the whole form rather than one field**, use an alert.
 
 </div>
 
@@ -161,25 +209,13 @@ users and your own validation is what enforces it.
 
 ## Accessibility
 
-- **The label must be associated, not merely adjacent.** The field components do
-  this with `htmlFor` and a shared id. Where you build a field yourself, a label
-  that sits above an input and points at nothing names nothing.
-- **A label for a set of controls is not a `label`.** For radios or a scale, a
-  `label` element would point at one control and clicking it would select that
-  one. `ChoiceGroup` uses a `fieldset` named by its `legend`, and `Rating` a
-  `span` with an id and `aria-labelledby` — those are the patterns to copy.
-- **Validation messages are attached to their fields.** `Input`, `NumberInput`,
-  `FileUpload` and `DateAndTimePicker` give the message an id and point the
-  control at it, and mark an invalid field `aria-invalid`. Your own
-  `aria-describedby` is composed with theirs, not replaced by it.
-- **Standing help is still yours to attach.** There is no `caption` prop, so a
-  neutral line under the field is text you render — give it an id and pass
-  `aria-describedby`, and it will be read before any validation message.
-- **Do not hide the label.** `showLabel={false}` is meant to move pixels, not to
-  remove the name; on `Input` it clips the label and keeps it, which is the
-  behavior to expect.
-- **State is never color alone.** The caption states carry an icon as well as a
-  color, and the words should stand without either.
+- **The label is associated, not merely adjacent.** The field components connect the label to the control. Where you build a field yourself, a label that sits above an input and points at nothing names nothing.
+- **A label for a set of controls is not a label element.** For radios or a scale, a label element would point at one control, and clicking it would select that one. Choice group names its set with a fieldset and legend, and Rating names its row by pointing it at a text label.
+- **Messages are attached to their fields.** The field points at its message, marks an invalid field as invalid, and reads an error out when it appears. Your own description is kept, not replaced.
+- **Standing help is read before a validation message.** A caption on the field is described by the field, so a screen reader reads it with the name.
+- **Do not hide the label.** Hiding it with <code>showLabel=false</code> moves pixels and keeps the name. Do not remove the name.
+- **State is never color alone.** Caption states carry an icon as well as a color, and the words should stand without either.
+- **The asterisk is decoration for sighted people.** It is hidden from assistive technology, which hears the field announced as required instead.
 
 </div>
 
@@ -187,10 +223,8 @@ users and your own validation is what enforces it.
 
 ## Related
 
-- For the fullest treatment of naming a field, including why the label cannot be
-  taken away, see `Input`.
-- For a group of controls under one question, see `ChoiceGroup`.
-- For a message about the whole form rather than one field, use `Alert`.
+- [Text field](?path=/docs/components-forms-and-inputs-text-field--docs), [Select](?path=/docs/components-forms-and-inputs-select--docs), [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) and [File upload](?path=/docs/components-forms-and-inputs-file-upload--docs) draw a label and caption. Use the field, not these parts.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) names a group of choices with a legend.
 
 </div>
 
