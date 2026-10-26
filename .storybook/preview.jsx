@@ -227,7 +227,8 @@ const preview = {
             "Images and icons",
             [
               "Logo",
-              "Tile"
+              "Tile",
+              "Illustrations"
             ],
             "Labels",
             [

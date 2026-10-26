@@ -1,0 +1,67 @@
+/*
+ * Illustration — one of the PLUS illustration characters.
+ *
+ * THE BOX IS THE 1000 x 1000 FIGMA FRAME, scaled to `size`. Everything inside
+ * is placed in percentages of that frame, so a character scales as one piece.
+ * The limbs reach past the frame on most characters, so nothing here clips:
+ * the frame is the layout box, and the safe area around it is the caller's.
+ *
+ * THE BODY is a box filled with its token color and masked by a picture of the
+ * stipple texture. The mask carries only where the texture is; the color is
+ * the token's, so it follows every color and contrast mode.
+ *
+ * THE LINE WORK is inline SVG, filled with the line token.
+ */
+
+/*
+ * Body colors. The five SMART characters take their area's `subtle` step, the
+ * one made for illustration bodies. The seven math characters take an accent
+ * hue at the same strength, and never a SMART hue, so a math character is
+ * never read as a SMART area.
+ */
+$illustration-bodies: (
+    'mastering-content': var(--ds-background-smart-mastering-content-subtle),
+    'advocacy': var(--ds-background-smart-advocacy-subtle),
+    'technology': var(--ds-background-smart-technology-tools-subtle),
+    'relationships': var(--ds-background-smart-relationship-subtle),
+    'social-emotional': var(--ds-background-smart-social-emotional-subtle),
+    'dot': var(--ds-background-accent-red-subtle),
+    'approximately-equal': var(--ds-background-accent-blue-subtle),
+    'root': var(--ds-background-accent-green-subtle),
+    'all': var(--ds-background-accent-purple-subtle),
+    'pi': var(--ds-background-accent-red-subtle),
+    'equal': var(--ds-background-accent-blue-subtle),
+    'divider': var(--ds-background-accent-green-subtle),
+);
+
+.plus-illustration {
+    position: relative;
+    display: inline-block;
+    flex: none;
+    vertical-align: middle;
+    overflow: visible;
+}
+
+.plus-illustration__body {
+    position: absolute;
+    inline-size: 100%;
+    block-size: 100%;
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+}
+
+.plus-illustration__lines {
+    position: absolute;
+    overflow: visible;
+    fill: var(--ds-icon-subtle);
+}
+
+@each $character, $body in $illustration-bodies {
+    .plus-illustration--#{$character} .plus-illustration__body {
+        background-color: $body;
+    }
+}
