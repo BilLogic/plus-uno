@@ -91,8 +91,8 @@ const modalDocsHostStyle = {
     width: '100%',
     maxWidth: 800,
     borderRadius: 12,
-    border: '1px solid var(--color-outline-variant)',
-    background: 'var(--color-surface-container-low)',
+    border: '1px solid var(--ds-border)',
+    background: 'var(--ds-surface-sunken)',
     overflow: 'hidden',
     padding: 16,
 };
@@ -108,10 +108,10 @@ function InlineModalCanvas({ minHeight = 400, modal }) {
 function ContentVariantCanvas({ title, description, minHeight, modal }) {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">
+            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">
                 {title}
             </span>
-            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                 {description}
             </p>
             <InlineModalCanvas minHeight={minHeight} modal={modal} />

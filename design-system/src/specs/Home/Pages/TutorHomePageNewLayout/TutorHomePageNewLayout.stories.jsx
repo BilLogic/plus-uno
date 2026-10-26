@@ -66,7 +66,7 @@ export default {
         layout: 'fullscreen',
         docs: {
             description: {
-                component: 'Today\'s tutor Home rebuilt on the surface container, the 12-column content grid, the Section and Card patterns and the new type scale. Pick MD, LG or XL from the Breakpoint toolbar.',
+                component: 'Today\'s tutor Home rebuilt on the Frame, the 12-column content grid, the Section and Card patterns and the new type scale. Pick MD, LG or XL from the Breakpoint toolbar.',
             },
         },
     },
@@ -76,7 +76,7 @@ export default {
 
 const rect = (el) => el.getBoundingClientRect();
 
-const content = (canvasElement) => canvasElement.querySelector('.plus-surface-container__content');
+const content = (canvasElement) => canvasElement.querySelector('.plus-frame__content');
 
 /** The content grid's children: the blocks, by name. */
 const blocks = (canvasElement) => [...content(canvasElement).children].map((el) => ({ el, name: el.dataset.block || el.className }));

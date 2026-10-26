@@ -49,11 +49,12 @@
     max-width: none;
     padding: var(--popover-pad) !important;
 
-    background-color: var(--color-surface-overlay) !important;
-    border: var(--border-default) solid var(--color-outline-variant) !important;
+    // The overlay pair. Its shadow carries the 1px edge ring (firmer under
+    // increased contrast), so the popup draws no border of its own.
+    background-color: var(--ds-surface-overlay) !important;
+    border: none !important;
     border-radius: var(--popover-radius) !important;
-    // Popovers are Light/3 (elevation.md), the overlay role's shadow.
-    box-shadow: var(--surface-overlay-shadow) !important;
+    box-shadow: var(--ds-shadow-overlay) !important;
 
     &.plus-popover--md {
         width: var(--popover-width-md) !important;
@@ -71,7 +72,7 @@
         border: none !important;
         border-radius: 0 !important;
         background-color: transparent !important;
-        color: var(--color-on-surface) !important;
+        color: var(--ds-text) !important;
         font: var(--heading-xsmall);
 
         // Remove Bootstrap's ::before separator
@@ -87,7 +88,7 @@
         margin: 0 !important;
         border: none !important;
         background-color: transparent !important;
-        color: var(--color-on-surface) !important;
+        color: var(--ds-text) !important;
         font: var(--body-default);
     }
 

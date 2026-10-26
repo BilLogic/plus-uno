@@ -19,11 +19,13 @@ import './SidebarTab.scss';
  * `href` makes the row a link; `external` opens it in a new tab and says so.
  *
  * States, drawn by the stylesheet:
- * - enabled: transparent, on-surface text, on-surface-variant icon
- * - hover: on-surface-state-08 at runtime; primary-state-08 for the docs value
- * - selected: primary-state-16, primary text and icon, `aria-current="page"`
- * - focus: a 2px focus-ring outline and no fill
- * - disabled: muted solid text (not an opacity, so it keeps AA), no tab stop
+ * - enabled: transparent, subtle text and icon
+ * - hover: the neutral subtle hovered fill (pressed: its pressed step)
+ * - selected: the neutral selected fill with selected text and icon, a 2px
+ *   leading bar in the selected border color, and `aria-current="page"`, so
+ *   selection never rests on fill alone
+ * - focus: a 2px focused ring, 2px outside the row, and no fill
+ * - disabled: the disabled text and icon colors, no tab stop
  *
  * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They
  * exist so the design's five states can be laid out side by side in a docs

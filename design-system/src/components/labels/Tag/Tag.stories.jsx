@@ -3,7 +3,9 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
@@ -28,6 +30,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown joined the palette, ten colors in all, so `<Tag color="orange">` renders orange where it was yellow with a deprecation warning. A disabled tag is `text.disabled` on `background.disabled`, and a disabled span tag carries `aria-disabled`.' },
             { date: '2026-10-24', kind: 'changed', summary: "A selected tag is the hue's 16 step, held on hover and press. A pressed × is 12, and a focused × shows the ring with no fill." },
             { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
             { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
@@ -57,15 +60,6 @@ const CLEAR = 'rgba(0, 0, 0, 0)';
 
 /* ----------------------------------------------------------------- stories */
 
-const HUE_TOKEN = {
-    blue: 'technology-tools',
-    green: 'advocacy',
-    purple: 'mastering-content',
-    magenta: 'relationship',
-    yellow: 'social-emotional',
-    teal: 'tertiary',
-};
-
 /** Every color. The hue is on the border and the swatch; the words stay neutral. */
 export const Colors = () => (
     <div style={row}>
@@ -76,42 +70,81 @@ export const Colors = () => (
 );
 
 /**
- * A color name paints the hue it names, on the border and the swatch, and on
- * nothing else. The border is the hue's Border Subtle token (gray's is Outline
- * Variant), the swatch is the hue itself, and the text is the same neutral on
- * every color.
+ * A color name paints the accent it names, on the border and the swatch, and
+ * on nothing else. The border is the accent's subtle border, the swatch its
+ * icon color, and the text is the same neutral on every color.
  */
 Colors.play = async ({ canvasElement }) => {
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const ink = tokenColor(canvasElement, '--ds-text');
+
+        for (const color of TAG_COLORS) {
+            const tag = canvas.getByTestId(color);
+            const swatch = tag.querySelector('[aria-hidden="true"]');
+            const s = getComputedStyle(tag);
+
+            await expect(px(s.height), `${color} is 22 tall`).toBe(22);
+            await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
+            await expect(s.color, `${color} text is neutral`).toBe(ink);
+
+            await expect(s.borderTopColor, `${color} border`)
+                .toBe(tokenColor(canvasElement, `--ds-border-accent-${color}-subtle`));
+
+            const hue = tokenColor(canvasElement, `--ds-icon-accent-${color}`);
+            await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
+            await expect(px(getComputedStyle(swatch).width)).toBe(10);
+            await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
+        }
+
+        // Gray is the one name that is not a hue: a default that drifted into a
+        // color would have every uncolored tag claiming a category nobody gave it.
+        const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
+        const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
+        await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
+    });
+};
+
+/** The three colors added to the palette: plain, selected, and as an agent with initials. */
+const NEW_COLORS = ['orange', 'lime', 'brown'];
+
+export const NewColorsContrast = () => (
+    <div style={row}>
+        {NEW_COLORS.map((color) => (
+            <React.Fragment key={color}>
+                <Tag behavior="selectable" color={color} data-testid={`${color}-tag`}>{color}</Tag>
+                <Tag behavior="selectable" color={color} isSelected data-testid={`${color}-selected`}>{`${color} selected`}</Tag>
+                <Tag type="agent" color={color} data-testid={`${color}-agent`}>{`${color} agent`}</Tag>
+            </React.Fragment>
+        ))}
+    </div>
+);
+
+/**
+ * Orange, lime and brown keep each text and background pair at 4.5:1 or above
+ * in all four modes: the neutral words on the hovered, pressed and selected
+ * fills, and the accent's initials on its avatar fill.
+ */
+NewColorsContrast.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ink = tokenColor(canvasElement, '--color-on-surface');
-
-    for (const color of TAG_COLORS) {
-        const tag = canvas.getByTestId(color);
-        const swatch = tag.querySelector('[aria-hidden="true"]');
-        const s = getComputedStyle(tag);
-
-        await expect(px(s.height), `${color} is 22 tall`).toBe(22);
-        await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
-        await expect(s.color, `${color} text is neutral`).toBe(ink);
-
-        const border = color === 'gray'
-            ? tokenColor(canvasElement, '--color-outline-variant')
-            : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}-border-subtle`);
-        await expect(s.borderTopColor, `${color} border`).toBe(border);
-
-        const hue = color === 'gray'
-            ? tokenColor(canvasElement, '--color-outline')
-            : tokenColor(canvasElement, `--color-${HUE_TOKEN[color]}`);
-        await expect(getComputedStyle(swatch).backgroundColor, `${color} swatch`).toBe(hue);
-        await expect(px(getComputedStyle(swatch).width)).toBe(10);
-        await expect(px(getComputedStyle(swatch).borderTopLeftRadius)).toBe(2);
-    }
-
-    // Gray is the one name that is not a hue: a default that drifted into a
-    // color would have every uncolored tag claiming a category nobody gave it.
-    const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
-    const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
-    await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
+    await inEveryColorMode(async (mode) => {
+        for (const color of NEW_COLORS) {
+            const tag = canvas.getByTestId(`${color}-tag`);
+            const ink = getComputedStyle(tag).color;
+            for (const pseudo of [':hover', ':active']) {
+                const ground = whileForced(tag, pseudo, 'backgroundColor');
+                await expect(contrastRatio(ink, ground), `${mode}: ${color} words ${pseudo}`)
+                    .toBeGreaterThanOrEqual(4.5);
+            }
+            const selected = getComputedStyle(canvas.getByTestId(`${color}-selected`));
+            await expect(contrastRatio(selected.color, selected.backgroundColor), `${mode}: ${color} selected words`)
+                .toBeGreaterThanOrEqual(4.5);
+            const avatar = avatarOf(canvas.getByTestId(`${color}-agent`));
+            const initials = getComputedStyle(avatar.firstElementChild).color;
+            await expect(contrastRatio(initials, getComputedStyle(avatar).backgroundColor), `${mode}: ${color} initials`)
+                .toBeGreaterThanOrEqual(4.5);
+        }
+    });
 };
 
 /** The four behaviors, and the states that change a tag's contents. */
@@ -176,7 +209,7 @@ export const Types = () => (
  */
 Types.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const neutral = tokenColor(canvasElement, '--color-outline-variant');
+    const neutral = tokenColor(canvasElement, '--ds-border-accent-gray-subtle');
 
     for (const id of ['plain', 'person', 'agent', 'team', 'person-photo', 'agent-photo', 'team-photo']) {
         const tag = canvas.getByTestId(id);
@@ -219,11 +252,11 @@ Types.play = async ({ canvasElement }) => {
     await expect(px(getComputedStyle(avatarOf(canvas.getByTestId('person-photo'))).borderTopLeftRadius))
         .toBeGreaterThanOrEqual(8);
 
-    // The color fills the avatar: an agent sits on its hue's Container.
+    // The color fills the avatar: an agent sits on its accent's subtler step.
     await expect(getComputedStyle(avatarOf(canvas.getByTestId('agent'))).backgroundColor)
-        .toBe(tokenColor(canvasElement, '--color-mastering-content-container'));
+        .toBe(tokenColor(canvasElement, '--ds-background-accent-purple-subtler'));
     await expect(getComputedStyle(avatarOf(canvas.getByTestId('person'))).backgroundColor)
-        .toBe(tokenColor(canvasElement, '--color-surface-container-high'));
+        .toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtler'));
 
     // The avatar is decoration: the words name the tag, and the initials do not.
     await expect(within(person).getByText('RC')).toBeInTheDocument();
@@ -348,13 +381,13 @@ export const TypeBehaviors = {
             await expect(within(tag).queryByText(/^[A-Z]{1,2}$/), 'the avatar gives way to the spinner').toBeNull();
             await expect(px(getComputedStyle(avatarOf(tag)).width), 'in the same 16 box').toBe(16);
 
-            // The avatar spinner is Figma's: a 3/4 arc in on-surface-variant,
-            // 12 across, whatever the tag's color.
+            // The avatar spinner is Figma's: a 3/4 arc in the subtle icon
+            // color, 12 across, whatever the tag's color.
             const spinner = avatarOf(tag).firstElementChild;
             const ring = spinner.querySelector('circle');
-            const ink = tokenColor(canvasElement, '--color-on-surface-variant');
+            const ink = tokenColor(canvasElement, '--ds-icon-subtle');
             await expect(px(getComputedStyle(spinner).width), 'a 12 spinner').toBe(12);
-            await expect(getComputedStyle(ring).stroke, 'in on-surface-variant').toBe(ink);
+            await expect(getComputedStyle(ring).stroke, 'in the subtle icon color').toBe(ink);
             await expect(px(getComputedStyle(ring).strokeWidth), 'a 1.8 ring').toBeCloseTo(1.8, 5);
             const [arc, round] = getComputedStyle(ring).strokeDasharray.split(',').map(px);
             await expect(arc / round, 'three quarters of the ring').toBeCloseTo(0.75, 2);
@@ -378,7 +411,7 @@ export const PersonFocusRing = () => (
 
 PersonFocusRing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ring = tokenColor(canvasElement, '--color-focus-ring');
+    const ring = tokenColor(canvasElement, '--ds-border-focused');
 
     await userEvent.tab();
     const tag = canvas.getByRole('button', { name: 'Rosa Chen' });
@@ -512,9 +545,9 @@ export const AvatarEdgeCases = {
 };
 
 /**
- * The avatar's fill. A hued person or team sits on its hue's Container, a gray
- * team on the Technology Tools 08 wash, and a disabled tag's photo stays whole:
- * the image covers the box at full opacity and in full color.
+ * The avatar's fill. A hued person or team sits on its accent's subtler step, a
+ * gray team on the lightest blue, and a disabled tag's photo stays whole: the
+ * image covers the box at full opacity and in full color.
  */
 export const AvatarFills = () => (
     <div style={row}>
@@ -531,12 +564,12 @@ AvatarFills.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const fill = (id) => getComputedStyle(avatarOf(canvas.getByTestId(id))).backgroundColor;
 
-    await expect(fill('team-blue'), 'a blue team fills Technology Tools Container')
-        .toBe(tokenColor(canvasElement, '--color-technology-tools-container'));
-    await expect(fill('person-teal'), 'a teal person fills Tertiary Container')
-        .toBe(tokenColor(canvasElement, '--color-tertiary-container'));
-    await expect(fill('team-gray'), 'a gray team fills the Technology Tools 08 wash')
-        .toBe(tokenColor(canvasElement, '--color-technology-tools-state-08'));
+    await expect(fill('team-blue'), 'a blue team fills the blue subtler step')
+        .toBe(tokenColor(canvasElement, '--ds-background-accent-blue-subtler'));
+    await expect(fill('person-teal'), 'a teal person fills the teal subtler step')
+        .toBe(tokenColor(canvasElement, '--ds-background-accent-teal-subtler'));
+    await expect(fill('team-gray'), 'a gray team fills the lightest blue')
+        .toBe(tokenColor(canvasElement, '--ds-background-accent-blue-subtlest'));
 
     // Disabled grays the tag, never the person: the photo shows as it is.
     const img = canvas.getByTestId('disabled-photo').querySelector('img');
@@ -587,7 +620,7 @@ Selecting.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('button', { name: 'Science', pressed: false })).toBeInTheDocument();
 };
 
-/** The hue's own state layers, in place of a brightness filter. */
+/** The accent's own steps, in place of a brightness filter. */
 export const StateLayers = () => (
     <div style={row}>
         <Tag behavior="selectable" color="blue">Unselected</Tag>
@@ -600,59 +633,62 @@ export const StateLayers = () => (
 );
 
 /**
- * Selectable: hover 08, pressed 12; selected is 16 with a full-hue border, and
- * holds the 16 on hover or press. A link is 08 and 12, and its text underlines
- * on hover and press only. On a removable tag only the × reacts: 08 on hover,
- * 12 pressed, and the tag's own ground never moves.
+ * Selectable: hover is the accent's subtlest step, pressed subtlest pressed;
+ * selected is the subtler step with a full-hue border, held on hover or press.
+ * A link takes the same hover and pressed steps, and its text underlines on
+ * hover and press only. On a removable tag only the × reacts, on the neutral
+ * subtle steps, and the tag's own ground never moves.
  */
 StateLayers.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const t = (token) => tokenColor(canvasElement, token);
-    const bg = 'backgroundColor';
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const t = (token) => tokenColor(canvasElement, token);
+        const bg = 'backgroundColor';
 
-    const unselected = canvas.getByRole('button', { name: 'Unselected' });
-    await expect(getComputedStyle(unselected)[bg], 'rest is outlined only').toBe(CLEAR);
-    await expect(whileForced(unselected, ':hover', bg)).toBe(t('--color-technology-tools-state-08'));
-    await expect(whileForced(unselected, ':active', bg)).toBe(t('--color-technology-tools-state-12'));
+        const unselected = canvas.getByRole('button', { name: 'Unselected' });
+        await expect(getComputedStyle(unselected)[bg], 'rest is outlined only').toBe(CLEAR);
+        await expect(whileForced(unselected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtlest'));
+        await expect(whileForced(unselected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtlest-pressed'));
 
-    const selected = canvas.getByRole('button', { name: 'Selected' });
-    await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
-        .toBe(t('--color-technology-tools'));
-    await expect(getComputedStyle(selected)[bg]).toBe(t('--color-technology-tools-state-16'));
-    await expect(whileForced(selected, ':hover', bg)).toBe(t('--color-technology-tools-state-16'));
-    await expect(whileForced(selected, ':active', bg)).toBe(t('--color-technology-tools-state-16'));
+        const selected = canvas.getByRole('button', { name: 'Selected' });
+        await expect(getComputedStyle(selected).borderTopColor, 'selected border is the full hue')
+            .toBe(t('--ds-border-accent-blue'));
+        await expect(getComputedStyle(selected)[bg]).toBe(t('--ds-background-accent-blue-subtler'));
+        await expect(whileForced(selected, ':hover', bg)).toBe(t('--ds-background-accent-blue-subtler'));
+        await expect(whileForced(selected, ':active', bg)).toBe(t('--ds-background-accent-blue-subtler'));
 
-    const gray = canvas.getByRole('button', { name: 'Gray selected' });
-    await expect(getComputedStyle(gray).borderTopColor).toBe(t('--color-outline'));
-    await expect(getComputedStyle(gray)[bg]).toBe(t('--color-on-surface-variant-state-16'));
+        const gray = canvas.getByRole('button', { name: 'Gray selected' });
+        await expect(getComputedStyle(gray).borderTopColor).toBe(t('--ds-border-accent-gray'));
+        await expect(getComputedStyle(gray)[bg]).toBe(t('--ds-background-accent-gray-subtler'));
 
-    // A plain link: the tag is the link.
-    const link = canvas.getByRole('link', { name: 'Link' });
-    const linkText = within(link).getByText('Link');
-    await expect(whileForced(link, ':hover', bg)).toBe(t('--color-advocacy-state-08'));
-    await expect(whileForced(link, ':active', bg)).toBe(t('--color-advocacy-state-12'));
-    await expect(getComputedStyle(linkText).textDecorationLine, 'no underline at rest').toBe('none');
-    await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('underline');
-    await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('underline');
+        // A plain link: the tag is the link.
+        const link = canvas.getByRole('link', { name: 'Link' });
+        const linkText = within(link).getByText('Link');
+        await expect(whileForced(link, ':hover', bg)).toBe(t('--ds-background-accent-green-subtlest'));
+        await expect(whileForced(link, ':active', bg)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
+        await expect(getComputedStyle(linkText).textDecorationLine, 'no underline at rest').toBe('none');
+        await expect(whileForced(link, ':hover', 'textDecorationLine', linkText)).toBe('underline');
+        await expect(whileForced(link, ':active', 'textDecorationLine', linkText)).toBe('underline');
 
-    // A split link: the tag lights up for its link half, and the text underlines.
-    const split = canvas.getByTestId('split');
-    const splitLink = canvas.getByRole('link', { name: 'Split link' });
-    const splitText = within(splitLink).getByText('Split link');
-    await expect(whileForced(splitLink, ':hover', bg, split)).toBe(t('--color-advocacy-state-08'));
-    await expect(whileForced(splitLink, ':active', bg, split)).toBe(t('--color-advocacy-state-12'));
-    await expect(getComputedStyle(splitText).textDecorationLine).toBe('none');
-    await expect(whileForced(splitLink, ':hover', 'textDecorationLine', splitText)).toBe('underline');
-    await expect(whileForced(splitLink, ':active', 'textDecorationLine', splitText)).toBe('underline');
-    const splitX = canvas.getByRole('button', { name: 'Remove Split link' });
-    await expect(whileForced(splitX, ':hover', bg, split), 'hovering the × does not light the link')
-        .toBe(CLEAR);
+        // A split link: the tag lights up for its link half, and the text underlines.
+        const split = canvas.getByTestId('split');
+        const splitLink = canvas.getByRole('link', { name: 'Split link' });
+        const splitText = within(splitLink).getByText('Split link');
+        await expect(whileForced(splitLink, ':hover', bg, split)).toBe(t('--ds-background-accent-green-subtlest'));
+        await expect(whileForced(splitLink, ':active', bg, split)).toBe(t('--ds-background-accent-green-subtlest-pressed'));
+        await expect(getComputedStyle(splitText).textDecorationLine).toBe('none');
+        await expect(whileForced(splitLink, ':hover', 'textDecorationLine', splitText)).toBe('underline');
+        await expect(whileForced(splitLink, ':active', 'textDecorationLine', splitText)).toBe('underline');
+        const splitX = canvas.getByRole('button', { name: 'Remove Split link' });
+        await expect(whileForced(splitX, ':hover', bg, split), 'hovering the × does not light the link')
+            .toBe(CLEAR);
 
-    const removable = canvas.getByTestId('removable');
-    await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
-    const x = canvas.getByRole('button', { name: 'Remove Removable' });
-    await expect(whileForced(x, ':hover', bg)).toBe(t('--color-on-surface-variant-state-08'));
-    await expect(whileForced(x, ':active', bg)).toBe(t('--color-on-surface-variant-state-12'));
+        const removable = canvas.getByTestId('removable');
+        await expect(whileForced(removable, ':hover', bg), 'a removable tag itself never reacts').toBe(CLEAR);
+        const x = canvas.getByRole('button', { name: 'Remove Removable' });
+        await expect(whileForced(x, ':hover', bg)).toBe(t('--ds-background-neutral-subtle-hovered'));
+        await expect(whileForced(x, ':active', bg)).toBe(t('--ds-background-neutral-subtle-pressed'));
+    });
 };
 
 /* ---------------------------------------------------------------- removing */
@@ -754,7 +790,7 @@ export const FocusRing = () => (
 
 FocusRing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ring = tokenColor(canvasElement, '--color-focus-ring');
+    const ring = tokenColor(canvasElement, '--ds-border-focused');
     const expectRing = async (el, what) => {
         const s = getComputedStyle(el);
         await expect(s.outlineStyle, what).toBe('solid');
@@ -833,8 +869,10 @@ export const LinkWithRemove = {
 /* ---------------------------------------------------------------- disabled */
 
 /**
- * Disabled comes from the field, through `TagContext`: a neutral fill,
- * Secondary (Text), no ×, nothing to focus, and no hover.
+ * Disabled comes from the field, through `TagContext`: background.disabled
+ * with text.disabled words, no ×, nothing to focus, and no hover. A tag that
+ * is a span carries `aria-disabled`, so it reads as an inactive component; a
+ * selectable one is a disabled button.
  */
 export const DisabledInField = () => (
     <div style={row}>
@@ -860,8 +898,8 @@ DisabledInField.play = async ({ canvasElement }) => {
     await userEvent.tab();
     await expect(canvas.getByRole('button', { name: 'After' }), 'no tag takes focus').toHaveFocus();
 
-    const fill = tokenColor(canvasElement, '--color-on-surface-state-12');
-    const text = tokenColor(canvasElement, '--color-secondary-text');
+    const fill = tokenColor(canvasElement, '--ds-background-disabled');
+    const text = tokenColor(canvasElement, '--ds-text-disabled');
     for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link']) {
         const tag = canvas.getByTestId(id);
         await expect(getComputedStyle(tag).backgroundColor, `${id} fill`).toBe(fill);
@@ -869,8 +907,15 @@ DisabledInField.play = async ({ canvasElement }) => {
         await expect(px(getComputedStyle(tag).height)).toBe(22);
     }
 
-    // Selected stays visible when disabled, as a Secondary (Text) border.
-    await expect(getComputedStyle(canvas.getByTestId('selected')).borderTopColor).toBe(text);
+    // A span tag says it is inactive; a selectable one is a disabled button.
+    for (const id of ['read-only', 'removable', 'link']) {
+        await expect(canvas.getByTestId(id), `${id} is aria-disabled`).toHaveAttribute('aria-disabled', 'true');
+    }
+    await expect(canvas.getByTestId('selectable')).toBeDisabled();
+
+    // Selected stays visible when disabled, as a border.bold edge.
+    await expect(getComputedStyle(canvas.getByTestId('selected')).borderTopColor)
+        .toBe(tokenColor(canvasElement, '--ds-border-bold'));
     await expect(getComputedStyle(canvas.getByTestId('read-only')).borderTopColor).toBe(CLEAR);
 
     // A disabled link does not answer a pointer: no state layer, no underline.
@@ -987,7 +1032,7 @@ export const Saving = {
         await expect(args.onRemoveSpy, 'the × waits for the save').not.toHaveBeenCalled();
 
         const spinner = tag.querySelector('[aria-hidden="true"]');
-        const hue = tokenColor(canvasElement, '--color-social-emotional');
+        const hue = tokenColor(canvasElement, '--ds-icon-accent-yellow');
         await expect(getComputedStyle(spinner).borderTopColor, 'the spinner is in the tag hue').toBe(hue);
         await expect(getComputedStyle(spinner).borderBottomColor, 'a 270° arc').toBe(hue);
         await expect(getComputedStyle(spinner).borderLeftColor).toBe(CLEAR);
@@ -1057,8 +1102,8 @@ const thumbnail = {
 const picture = {
     position: 'absolute',
     inset: 0,
-    backgroundImage: 'linear-gradient(135deg, var(--color-social-emotional-container, #ffdea0), '
-        + 'var(--color-tertiary, #0e8175) 45%, var(--color-inverse-surface, #2e3133))',
+    backgroundImage: 'linear-gradient(135deg, var(--ds-background-accent-orange-subtler), '
+        + 'var(--ds-background-accent-teal-bolder) 45%, var(--ds-background-neutral-bold))',
 };
 /* Placed 8 from the corner, as the Figma docs place it. */
 const onPicture = {
@@ -1075,10 +1120,10 @@ const stateLayer = (host, token) => {
     return `linear-gradient(${color}, ${color})`;
 };
 
-/** The 2px surface gap as a computed shadow: under a ×, or stacked on Elevation 2 under a tag. */
+/** The 2px surface gap as a computed shadow: under a ×, or stacked on the overlay shadow under a tag. */
 const surfaceGap = (host, { onElevation = true } = {}) => computedShadow(
     host,
-    `0 0 0 var(--size-element-stroke-lg) var(--color-surface-container-lowest)${onElevation ? ', var(--elevation-light-2)' : ''}`,
+    `0 0 0 var(--size-element-stroke-lg) var(--ds-surface-overlay)${onElevation ? ', var(--ds-shadow-overlay)' : ''}`,
 );
 
 /**
@@ -1091,7 +1136,7 @@ const expectFocusRing = async (host, measured, what, shadow = surfaceGap(host)) 
     await expect(s.outlineStyle, what).toBe('solid');
     await expect(px(s.outlineWidth), what).toBe(2);
     await expect(px(s.outlineOffset), `${what} sits 2px outside`).toBe(2);
-    await expect(s.outlineColor, what).toBe(tokenColor(host, '--color-focus-ring'));
+    await expect(s.outlineColor, what).toBe(tokenColor(host, '--ds-border-focused'));
     await expect(s.boxShadow, `${what}: the shadow under the ring`).toBe(shadow);
 };
 
@@ -1119,17 +1164,17 @@ export const OnImages = () => (
 );
 
 /**
- * Elevated: a solid Surface Container Lowest fill, no border, the Elevation 2
- * shadow and neutral text, with the hue kept on the swatch, still 22 tall. A
- * link's hover and press lay the on-surface 08 and 12 layers over the solid
- * fill rather than replacing it, and its focus ring has a 2px surface gap
- * inside it, so the ring reads on a dark picture.
+ * Elevated: the overlay pair (a solid overlay surface and the overlay shadow),
+ * no border and neutral text, with the hue kept on the swatch, still 22 tall.
+ * A link's hover and press lay the neutral subtle hovered and pressed steps
+ * over the solid fill rather than replacing it, and its focus ring has a 2px
+ * surface gap inside it, so the ring reads on a dark picture.
  */
 OnImages.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const t = (token) => tokenColor(canvasElement, token);
-    const ground = t('--color-surface-container-lowest');
-    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
+    const ground = t('--ds-surface-overlay');
+    const shadow = computedShadow(canvasElement, 'var(--ds-shadow-overlay)');
 
     const tags = [
         canvas.getByTestId('read-only'),
@@ -1145,15 +1190,15 @@ OnImages.play = async ({ canvasElement }) => {
         await expect(px(s.height), `${name} is 22 tall`).toBe(22);
         await expect(s.backgroundColor, `${name} has a solid fill`).toBe(ground);
         await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
-        await expect(s.boxShadow, `${name} has the Elevation 2 shadow`).toBe(shadow);
-        await expect(s.color, `${name} text is neutral`).toBe(t('--color-on-surface'));
+        await expect(s.boxShadow, `${name} has the overlay shadow`).toBe(shadow);
+        await expect(s.color, `${name} text is neutral`).toBe(t('--ds-text'));
     }
     const swatch = canvas.getByTestId('read-only').querySelector('[aria-hidden="true"]');
     await expect(getComputedStyle(swatch).backgroundColor, 'the hue stays on the swatch')
-        .toBe(t('--color-technology-tools'));
+        .toBe(t('--ds-icon-accent-blue'));
     const avatar = canvas.getByTestId('person').querySelector('[aria-hidden="true"]');
     await expect(getComputedStyle(avatar).backgroundColor, 'the color stays on the avatar')
-        .toBe(t('--color-technology-tools-container'));
+        .toBe(t('--ds-background-accent-blue-subtler'));
 
     // Disabled from the field: the solid ground and shadow stay, since the
     // translucent disabled fill would sink into the picture; the words go
@@ -1161,13 +1206,13 @@ OnImages.play = async ({ canvasElement }) => {
     const disabled = canvas.getByTestId('disabled');
     await expect(getComputedStyle(disabled).backgroundColor).toBe(ground);
     await expect(getComputedStyle(disabled).boxShadow).toBe(shadow);
-    await expect(getComputedStyle(disabled).color).toBe(t('--color-secondary-text'));
+    await expect(getComputedStyle(disabled).color).toBe(t('--ds-text-disabled'));
     await expect(whileForced(disabled, ':hover', 'backgroundColor')).toBe(ground);
 
     // Hover and press: the state layer sits over the solid fill, which stays.
     const layer = (token) => stateLayer(canvasElement, token);
     const link = canvas.getByRole('link', { name: 'Open lesson' });
-    for (const [pseudo, token] of [[':hover', '--color-on-surface-state-08'], [':active', '--color-on-surface-state-12']]) {
+    for (const [pseudo, token] of [[':hover', '--ds-background-neutral-subtle-hovered'], [':active', '--ds-background-neutral-subtle-pressed']]) {
         await expect(whileForced(link, pseudo, 'backgroundColor'), `${pseudo} keeps the fill`).toBe(ground);
         await expect(whileForced(link, pseudo, 'backgroundImage'), `${pseudo} layer`).toBe(layer(token));
         await expect(whileForced(link, pseudo, 'boxShadow'), `${pseudo} keeps the shadow`).toBe(shadow);
@@ -1175,8 +1220,8 @@ OnImages.play = async ({ canvasElement }) => {
     const split = canvas.getByTestId('split');
     const splitLink = canvas.getByRole('link', { name: 'Unit 3' });
     await expect(whileForced(splitLink, ':hover', 'backgroundColor', split)).toBe(ground);
-    await expect(whileForced(splitLink, ':hover', 'backgroundImage', split)).toBe(layer('--color-on-surface-state-08'));
-    await expect(whileForced(splitLink, ':active', 'backgroundImage', split)).toBe(layer('--color-on-surface-state-12'));
+    await expect(whileForced(splitLink, ':hover', 'backgroundImage', split)).toBe(layer('--ds-background-neutral-subtle-hovered'));
+    await expect(whileForced(splitLink, ':active', 'backgroundImage', split)).toBe(layer('--ds-background-neutral-subtle-pressed'));
 
     // Focus: the standard ring, 2px outside, with the 2px between it and the
     // tag filled in the surface color.
@@ -1195,9 +1240,9 @@ OnImages.play = async ({ canvasElement }) => {
 
 /**
  * A person, an agent or a team on a picture: the same elevated ground as a
- * plain tag, and the avatar keeps its own fill on it (a person Surface
- * Container High, an agent the AI purple, a team the Technology Tools 08
- * wash). A link's hover, press and focus are a plain elevated link's.
+ * plain tag, and the avatar keeps its own fill on it (a person the gray
+ * subtler step, an agent discovery's AI purple, a team the lightest blue). A
+ * link's hover, press and focus are a plain elevated link's.
  */
 export const ElevatedAvatarTypes = () => (
     <div style={thumbnail}>
@@ -1220,12 +1265,12 @@ export const ElevatedAvatarTypes = () => (
 ElevatedAvatarTypes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const t = (token) => tokenColor(canvasElement, token);
-    const ground = t('--color-surface-container-lowest');
-    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
+    const ground = t('--ds-surface-overlay');
+    const shadow = computedShadow(canvasElement, 'var(--ds-shadow-overlay)');
     const avatarFill = {
-        person: t('--color-surface-container-high'),
-        agent: t('--color-mastering-content-container'),
-        team: t('--color-technology-tools-state-08'),
+        person: t('--ds-background-accent-gray-subtler'),
+        agent: t('--ds-background-discovery-subtler'),
+        team: t('--ds-background-accent-blue-subtlest'),
     };
 
     for (const type of AVATAR_TAG_TYPES) {
@@ -1238,7 +1283,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
             await expect(px(s.height), `${name} is 22 tall`).toBe(22);
             await expect(s.backgroundColor, `${name} has the solid fill`).toBe(ground);
             await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
-            await expect(s.boxShadow, `${name} has the Elevation 2 shadow`).toBe(shadow);
+            await expect(s.boxShadow, `${name} has the overlay shadow`).toBe(shadow);
             await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${name} keeps its avatar fill`)
                 .toBe(avatarFill[type]);
         }
@@ -1249,9 +1294,9 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
         const link = canvas.getByRole('link', { name: `${type} link` });
         await expect(whileForced(link, ':hover', 'backgroundColor'), `${type} hover keeps the fill`).toBe(ground);
         await expect(whileForced(link, ':hover', 'backgroundImage'), `${type} hover layer`)
-            .toBe(layer('--color-on-surface-state-08'));
+            .toBe(layer('--ds-background-neutral-subtle-hovered'));
         await expect(whileForced(link, ':active', 'backgroundImage'), `${type} press layer`)
-            .toBe(layer('--color-on-surface-state-12'));
+            .toBe(layer('--ds-background-neutral-subtle-pressed'));
 
         await userEvent.tab();
         await expect(link).toHaveFocus();
@@ -1260,10 +1305,11 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
 };
 
 /**
- * An elevated tag in a disabled field keeps its solid ground and Elevation 2,
- * since the translucent disabled fill would sink into the picture. Only its
- * content turns Secondary (Text): the label, the swatch, and an avatar drawn
- * as any disabled avatar (the on-surface 12 fill, Secondary initials). No
+ * An elevated tag in a disabled field keeps its solid ground and the overlay
+ * shadow, since the translucent disabled fill would sink into the picture.
+ * Only its content turns disabled: text.disabled for the label, icon.disabled for
+ * the swatch, and an avatar drawn as any disabled avatar (background.disabled,
+ * text.disabled initials). No
  * hover, no press, nothing to focus. Plain read-only and link on every color,
  * and the three avatar types.
  */
@@ -1295,9 +1341,10 @@ export const ElevatedDisabled = () => (
 ElevatedDisabled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const t = (token) => tokenColor(canvasElement, token);
-    const ground = t('--color-surface-container-lowest');
-    const shadow = computedShadow(canvasElement, 'var(--elevation-light-2)');
-    const secondary = t('--color-secondary-text');
+    const ground = t('--ds-surface-overlay');
+    const shadow = computedShadow(canvasElement, 'var(--ds-shadow-overlay)');
+    const secondary = t('--ds-text-disabled');
+    const disabledMark = t('--ds-icon-disabled');
 
     await expect(canvas.queryByRole('link'), 'a disabled link is not a link').toBeNull();
 
@@ -1306,8 +1353,8 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
         await expect(px(s.height), `${what} is 22 tall`).toBe(22);
         await expect(s.backgroundColor, `${what} keeps the solid fill`).toBe(ground);
         await expect(s.borderTopColor, `${what} has no border`).toBe(CLEAR);
-        await expect(s.boxShadow, `${what} keeps the Elevation 2 shadow`).toBe(shadow);
-        await expect(s.color, `${what} text is Secondary (Text)`).toBe(secondary);
+        await expect(s.boxShadow, `${what} keeps the overlay shadow`).toBe(shadow);
+        await expect(s.color, `${what} text is disabled`).toBe(secondary);
         for (const pseudo of [':hover', ':active']) {
             await expect(whileForced(tag, pseudo, 'backgroundColor'), `${what} ${pseudo} fill`).toBe(ground);
             await expect(whileForced(tag, pseudo, 'backgroundImage'), `${what} ${pseudo} has no layer`).toBe('none');
@@ -1319,8 +1366,8 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
         for (const id of [`read-only-${color}`, `link-${color}`]) {
             const tag = canvas.getByTestId(id);
             await expectGround(tag, id);
-            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${id} swatch is Secondary (Text)`)
-                .toBe(secondary);
+            await expect(getComputedStyle(avatarOf(tag)).backgroundColor, `${id} swatch is disabled`)
+                .toBe(disabledMark);
         }
         const label = within(canvas.getByTestId(`link-${color}`)).getByText(`${color} link`);
         await expect(
@@ -1334,15 +1381,15 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
         await expectGround(tag, type);
         const avatar = avatarOf(tag);
         await expect(getComputedStyle(avatar).backgroundColor, `${type} avatar takes the disabled fill`)
-            .toBe(t('--color-on-surface-state-12'));
-        await expect(getComputedStyle(avatar.firstElementChild).color, `${type} initials are Secondary (Text)`)
+            .toBe(t('--ds-background-disabled'));
+        await expect(getComputedStyle(avatar.firstElementChild).color, `${type} initials are disabled`)
             .toBe(secondary);
     }
 };
 
 /**
  * The × of an elevated link has a surface gap inside its focus ring, as the
- * tag's own focus does: a 2px Surface Container Lowest gap, then the 2px ring.
+ * tag's own focus does: a 2px gap in the overlay surface, then the 2px ring.
  * On a plain, agent or team tag the × is radius 2, so the gap's corner is 4
  * and the ring's 6; on a person tag the ×, its gap and its ring are round. A ×
  * off the image keeps the plain ring.
@@ -1432,7 +1479,7 @@ export const ElevatedOnlyReadOnlyAndLink = {
         const warn = spyOn(console, 'warn').mockImplementation(() => {});
         try {
             await userEvent.click(canvas.getByRole('button', { name: 'Mount elevated editable tags' }));
-            const border = tokenColor(canvasElement, '--color-mastering-content-border-subtle');
+            const border = tokenColor(canvasElement, '--ds-border-accent-purple-subtle');
             const removable = canvas.getByTestId('removable');
             const selectable = canvas.getByRole('button', { name: 'Fractions' });
             for (const [tag, name] of [[removable, 'removable'], [selectable, 'selectable']]) {
@@ -1452,9 +1499,9 @@ export const ElevatedOnlyReadOnlyAndLink = {
 /* ------------------------------------------------------------- deprecation */
 
 /**
- * The old names keep working. `orange` is `yellow` (the hue is a 44° yellow),
- * `grey` is `gray`, and `variant="dismissible"` is `behavior="removable"`; each
- * says so in development.
+ * The old names keep working. `grey` is `gray` and `variant="dismissible"` is
+ * `behavior="removable"`; each says so in development. `orange` is no longer
+ * an alias: it is the orange accent, and says nothing.
  */
 export const DeprecatedNames = {
     render: () => {
@@ -1478,13 +1525,13 @@ export const DeprecatedNames = {
         try {
             await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
             await expect(getComputedStyle(canvas.getByTestId('orange')).borderTopColor)
-                .toBe(tokenColor(canvasElement, '--color-social-emotional-border-subtle'));
+                .toBe(tokenColor(canvasElement, '--ds-border-accent-orange-subtle'));
             await expect(canvas.getByRole('button', { name: 'Remove Dismissible' })).toBeInTheDocument();
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="orange" is deprecated'));
+            await expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('color="orange"'));
             const greyAlias = canvas.getByTestId('grey-alias');
             await expect(greyAlias).toHaveClass('plus-tag--gray');
             await expect(getComputedStyle(greyAlias).borderTopColor)
-                .toBe(tokenColor(canvasElement, '--color-outline-variant'));
+                .toBe(tokenColor(canvasElement, '--ds-border-accent-gray-subtle'));
             await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="grey" is deprecated; use "gray"'));
             await expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="dismissible" is deprecated'));
         } finally {

@@ -8,80 +8,128 @@
  * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
  *
- * THE COLOR MAP. Per name: the subtle border, the hue (swatch, spinner and the
- * selected border), the hue's 08, 12 and 16 state layers, and the avatar fill
- * (the hue's Container) for the avatar types. Each hue borrows
- * the curriculum token whose color it names; teal is Tertiary, never Info.
- * Gray is not a hue: its border is Outline Variant, its swatch and selected
- * border are Outline, its state layers are on-surface-variant, and its avatar
- * fill is Surface Container High.
- * The map holds whole `var()` references so the generated docs list them.
+ * THE COLOR MAP. Each name is an accent family, a color with no meaning tied to
+ * it, so a tag never reads as a status. Per name, in order:
  *
- *   blue     technology-tools
- *   green    advocacy
- *   purple   mastering-content
- *   magenta  relationship
- *   yellow   social-emotional
- *   teal     tertiary
+ *   1 the border at rest        border.accent.{hue}.subtle (decorative)
+ *   2 the mark                  icon.accent.{hue}: the swatch and the spinner
+ *   3 the selected border       border.accent.{hue}
+ *   4 hovered                   background.accent.{hue}.subtlest
+ *   5 pressed                   background.accent.{hue}.subtlest.pressed
+ *   6 selected                  background.accent.{hue}.subtler, held under
+ *                               hover and press
+ *   7 the avatar fill           background.accent.{hue}.subtler
+ *   8 the avatar's initials     text.accent.{hue}, the ink made for that fill
+ *
+ * The text stays neutral (`color.text`) on every name: the steps it sits on
+ * are the accent's lightest, made for neutral text. Gray is the accent gray,
+ * which is the neutral ramp. A SMART area is not a hue: it reads the SMART
+ * layer through `StaticBadgeSmart`, so the subject-to-hue pairing lives in the
+ * tokens alone. The map holds whole `var()` references so the generated docs
+ * list them.
  */
 @use '../label-heights' as label;
 
 $tag-colors: (
     'gray': (
-        var(--color-outline-variant, #bec8ca),
-        var(--color-outline, #6f797a),
-        var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08)),
-        var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12)),
-        var(--color-on-surface-variant-state-16, rgba(63, 72, 74, 0.16)),
-        var(--color-surface-container-high, #e7e8eb),
+        var(--ds-border-accent-gray-subtle),
+        var(--ds-icon-accent-gray),
+        var(--ds-border-accent-gray),
+        var(--ds-background-accent-gray-subtlest),
+        var(--ds-background-accent-gray-subtlest-pressed),
+        var(--ds-background-accent-gray-subtler),
+        var(--ds-background-accent-gray-subtler),
+        var(--ds-text-accent-gray),
     ),
     'blue': (
-        var(--color-technology-tools-border-subtle, rgba(0, 92, 189, 0.45)),
-        var(--color-technology-tools, #005cbd),
-        var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08)),
-        var(--color-technology-tools-state-12, rgba(0, 92, 189, 0.12)),
-        var(--color-technology-tools-state-16, rgba(0, 92, 189, 0.16)),
-        var(--color-technology-tools-container, #d7e2ff),
+        var(--ds-border-accent-blue-subtle),
+        var(--ds-icon-accent-blue),
+        var(--ds-border-accent-blue),
+        var(--ds-background-accent-blue-subtlest),
+        var(--ds-background-accent-blue-subtlest-pressed),
+        var(--ds-background-accent-blue-subtler),
+        var(--ds-background-accent-blue-subtler),
+        var(--ds-text-accent-blue),
     ),
     'green': (
-        var(--color-advocacy-border-subtle, rgba(22, 119, 69, 0.45)),
-        var(--color-advocacy, #167745),
-        var(--color-advocacy-state-08, rgba(22, 119, 69, 0.08)),
-        var(--color-advocacy-state-12, rgba(22, 119, 69, 0.12)),
-        var(--color-advocacy-state-16, rgba(22, 119, 69, 0.16)),
-        var(--color-advocacy-container, #b3f1bf),
+        var(--ds-border-accent-green-subtle),
+        var(--ds-icon-accent-green),
+        var(--ds-border-accent-green),
+        var(--ds-background-accent-green-subtlest),
+        var(--ds-background-accent-green-subtlest-pressed),
+        var(--ds-background-accent-green-subtler),
+        var(--ds-background-accent-green-subtler),
+        var(--ds-text-accent-green),
     ),
     'purple': (
-        var(--color-mastering-content-border-subtle, rgba(134, 89, 169, 0.45)),
-        var(--color-mastering-content, #8659a9),
-        var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)),
-        var(--color-mastering-content-state-12, rgba(134, 89, 169, 0.12)),
-        var(--color-mastering-content-state-16, rgba(134, 89, 169, 0.16)),
-        var(--color-mastering-content-container, #f2daff),
+        var(--ds-border-accent-purple-subtle),
+        var(--ds-icon-accent-purple),
+        var(--ds-border-accent-purple),
+        var(--ds-background-accent-purple-subtlest),
+        var(--ds-background-accent-purple-subtlest-pressed),
+        var(--ds-background-accent-purple-subtler),
+        var(--ds-background-accent-purple-subtler),
+        var(--ds-text-accent-purple),
     ),
     'magenta': (
-        var(--color-relationship-border-subtle, rgba(199, 11, 119, 0.45)),
-        var(--color-relationship, #c70b77),
-        var(--color-relationship-state-08, rgba(199, 11, 119, 0.08)),
-        var(--color-relationship-state-12, rgba(199, 11, 119, 0.12)),
-        var(--color-relationship-state-16, rgba(199, 11, 119, 0.16)),
-        var(--color-relationship-container, #ffd9e4),
+        var(--ds-border-accent-magenta-subtle),
+        var(--ds-icon-accent-magenta),
+        var(--ds-border-accent-magenta),
+        var(--ds-background-accent-magenta-subtlest),
+        var(--ds-background-accent-magenta-subtlest-pressed),
+        var(--ds-background-accent-magenta-subtler),
+        var(--ds-background-accent-magenta-subtler),
+        var(--ds-text-accent-magenta),
     ),
     'yellow': (
-        var(--color-social-emotional-border-subtle, rgba(140, 102, 0, 0.45)),
-        var(--color-social-emotional, #8c6600),
-        var(--color-social-emotional-state-08, rgba(140, 102, 0, 0.08)),
-        var(--color-social-emotional-state-12, rgba(140, 102, 0, 0.12)),
-        var(--color-social-emotional-state-16, rgba(140, 102, 0, 0.16)),
-        var(--color-social-emotional-container, #ffdea0),
+        var(--ds-border-accent-yellow-subtle),
+        var(--ds-icon-accent-yellow),
+        var(--ds-border-accent-yellow),
+        var(--ds-background-accent-yellow-subtlest),
+        var(--ds-background-accent-yellow-subtlest-pressed),
+        var(--ds-background-accent-yellow-subtler),
+        var(--ds-background-accent-yellow-subtler),
+        var(--ds-text-accent-yellow),
     ),
     'teal': (
-        var(--color-tertiary-border-subtle, rgba(14, 129, 117, 0.45)),
-        var(--color-tertiary, #0e8175),
-        var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08)),
-        var(--color-tertiary-state-12, rgba(14, 129, 117, 0.12)),
-        var(--color-tertiary-state-16, rgba(14, 129, 117, 0.16)),
-        var(--color-tertiary-container, #85ecd5),
+        var(--ds-border-accent-teal-subtle),
+        var(--ds-icon-accent-teal),
+        var(--ds-border-accent-teal),
+        var(--ds-background-accent-teal-subtlest),
+        var(--ds-background-accent-teal-subtlest-pressed),
+        var(--ds-background-accent-teal-subtler),
+        var(--ds-background-accent-teal-subtler),
+        var(--ds-text-accent-teal),
+    ),
+    'orange': (
+        var(--ds-border-accent-orange-subtle),
+        var(--ds-icon-accent-orange),
+        var(--ds-border-accent-orange),
+        var(--ds-background-accent-orange-subtlest),
+        var(--ds-background-accent-orange-subtlest-pressed),
+        var(--ds-background-accent-orange-subtler),
+        var(--ds-background-accent-orange-subtler),
+        var(--ds-text-accent-orange),
+    ),
+    'lime': (
+        var(--ds-border-accent-lime-subtle),
+        var(--ds-icon-accent-lime),
+        var(--ds-border-accent-lime),
+        var(--ds-background-accent-lime-subtlest),
+        var(--ds-background-accent-lime-subtlest-pressed),
+        var(--ds-background-accent-lime-subtler),
+        var(--ds-background-accent-lime-subtler),
+        var(--ds-text-accent-lime),
+    ),
+    'brown': (
+        var(--ds-border-accent-brown-subtle),
+        var(--ds-icon-accent-brown),
+        var(--ds-border-accent-brown),
+        var(--ds-background-accent-brown-subtlest),
+        var(--ds-background-accent-brown-subtlest-pressed),
+        var(--ds-background-accent-brown-subtler),
+        var(--ds-background-accent-brown-subtler),
+        var(--ds-text-accent-brown),
     ),
 );
 
@@ -105,13 +153,13 @@ $tag-colors: (
      */
     margin: 0;
     padding: 0 var(--size-element-pad-x-xs, 4px);
-    border: var(--size-element-border, 1px) solid var(--plus-tag-border);
+    border: var(--size-element-border, 1px) solid var(--plus-tag-border-rest);
     border-radius: var(--size-element-radius-md, 4px);
     background-color: transparent;
     appearance: none;
 
     /* Neutral text on every color: the hue is on the border and swatch. */
-    color: var(--color-on-surface, #191c1e);
+    color: var(--ds-text);
     font: inherit;
     text-align: left;
     text-decoration: none;
@@ -123,14 +171,16 @@ $tag-colors: (
  * leaves the avatar fill alone, for the avatar types' neutral border below.
  */
 @mixin tag-color-vars($tokens, $with-avatar: true) {
-    --plus-tag-border: #{nth($tokens, 1)};
+    --plus-tag-border-rest: #{nth($tokens, 1)};
     --plus-tag-hue: #{nth($tokens, 2)};
-    --plus-tag-08: #{nth($tokens, 3)};
-    --plus-tag-12: #{nth($tokens, 4)};
-    --plus-tag-16: #{nth($tokens, 5)};
+    --plus-tag-border-selected: #{nth($tokens, 3)};
+    --plus-tag-hovered: #{nth($tokens, 4)};
+    --plus-tag-pressed: #{nth($tokens, 5)};
+    --plus-tag-selected: #{nth($tokens, 6)};
 
     @if $with-avatar {
-        --plus-tag-avatar: #{nth($tokens, 6)};
+        --plus-tag-avatar: #{nth($tokens, 7)};
+        --plus-tag-avatar-ink: #{nth($tokens, 8)};
     }
 }
 
@@ -154,18 +204,19 @@ $tag-colors: (
 }
 
 /*
- * Gray avatars, as the Figma set draws them: a gray agent sits on the
- * Mastering Content Container (the AI purple) and a gray team on Technology
- * Tools 08, so neither reads as a person's neutral disc.
- * The team's state layer at rest is a named exception in
- * guidelines/foundations/color.md.
+ * Gray avatars, as the Figma set draws them: a gray agent sits on discovery
+ * (the AI purple, which no longer borrows a SMART subject) and a gray team on
+ * the lightest blue, so neither reads as a person's neutral disc. Each takes
+ * the ink made for its fill.
  */
 .plus-tag--gray.plus-tag--agent {
-    --plus-tag-avatar: var(--color-mastering-content-container, #f2daff);
+    --plus-tag-avatar: var(--ds-background-discovery-subtler);
+    --plus-tag-avatar-ink: var(--ds-text-discovery);
 }
 
 .plus-tag--gray.plus-tag--team {
-    --plus-tag-avatar: var(--color-technology-tools-state-08, rgba(0, 92, 189, 0.08));
+    --plus-tag-avatar: var(--ds-background-accent-blue-subtlest);
+    --plus-tag-avatar-ink: var(--ds-text-accent-blue);
 }
 
 /* A person is round: the tag, the avatar and the ×. */
@@ -215,10 +266,10 @@ $tag-colors: (
 /*
  * Initials: Lato SemiBold 7, as in Figma. No text style is that small; 7 is
  * the one size that fits two letters in the 16 disc, so it is the disc's size
- * scaled, not a number of its own.
+ * scaled, not a number of its own. The ink is the one made for the disc's fill.
  */
 .plus-tag__initials {
-    color: var(--color-on-surface, #191c1e);
+    color: var(--plus-tag-avatar-ink);
     font-family: var(--type-family-heading);
     font-size: calc(var(--icon-md) * 7 / 16);
     font-weight: var(--type-weight-semibold);
@@ -246,7 +297,7 @@ $tag-colors: (
 
 /* A legend swatch carries any series color, which may sit near the ground. */
 .plus-tag__swatch--custom {
-    box-shadow: inset 0 0 0 1px var(--color-outline-variant, #bec8ca);
+    box-shadow: inset 0 0 0 1px var(--ds-border);
 }
 
 .plus-tag__elem-before {
@@ -268,26 +319,26 @@ $tag-colors: (
 .plus-tag--action:hover,
 .plus-tag--link:not(.plus-tag--split):hover,
 .plus-tag--split:has(> .plus-tag__link:hover) {
-    background-color: var(--plus-tag-08);
+    background-color: var(--plus-tag-hovered);
 }
 
 .plus-tag--selectable:active,
 .plus-tag--action:active,
 .plus-tag--link:not(.plus-tag--split):active,
 .plus-tag--split:has(> .plus-tag__link:active) {
-    background-color: var(--plus-tag-12);
+    background-color: var(--plus-tag-pressed);
 }
 
 /*
- * Selected is a full-color border as well as the 16 fill, so the choice is not
- * carried by a change of lightness alone. It holds the 16 under hover and
- * press: the selectable steps above would otherwise lighten it.
+ * Selected is a full-color border as well as the subtler fill, so the choice is
+ * not carried by a change of lightness alone. It holds the fill under hover
+ * and press: the selectable steps above would otherwise change it.
  */
 .plus-tag--selected,
 .plus-tag--selected:hover,
 .plus-tag--selected:active {
-    border-color: var(--plus-tag-hue);
-    background-color: var(--plus-tag-16);
+    border-color: var(--plus-tag-border-selected);
+    background-color: var(--plus-tag-selected);
 }
 
 /* A link underlines on hover and press only, never at rest. */
@@ -316,7 +367,7 @@ $tag-colors: (
 /* Focus: a 2px Focus Ring 2px outside the tag. */
 .plus-tag:focus-visible,
 .plus-tag--split:has(> .plus-tag__link:focus-visible) {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
 
@@ -341,7 +392,7 @@ $tag-colors: (
     border-radius: var(--size-border-radius-radius-50, 2px);
     appearance: none;
     background: transparent;
-    color: var(--color-on-surface-variant, #3f484a);
+    color: var(--ds-icon-subtle);
     font-size: var(--icon-sm);
     line-height: 1;
     cursor: pointer;
@@ -353,11 +404,11 @@ $tag-colors: (
 }
 
 .plus-tag__remove:hover {
-    background-color: var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08));
+    background-color: var(--ds-background-neutral-subtle-hovered);
 }
 
 .plus-tag__remove:active {
-    background-color: var(--color-on-surface-variant-state-12, rgba(63, 72, 74, 0.12));
+    background-color: var(--ds-background-neutral-subtle-pressed);
 }
 
 /* Round on a person tag, as its host is. */
@@ -367,7 +418,7 @@ $tag-colors: (
 
 /* Focus: a 2px Focus Ring 2px outside the ×, and no fill. */
 .plus-tag__remove:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
 
@@ -397,7 +448,7 @@ $tag-colors: (
 }
 
 /*
- * In an avatar's box the spinner is Figma's: 12 across, in on-surface-variant
+ * In an avatar's box the spinner is Figma's: 12 across, in the subtle icon color
  * on every color, a 3/4 arc with a 1.8 ring. The 1.8 lives in the SVG's
  * stroke-width, a literal because no stroke token is 1.8.
  */
@@ -405,7 +456,7 @@ $tag-colors: (
     display: block;
     width: var(--size-spacing-medium-space-200, 12px);
     height: var(--size-spacing-medium-space-200, 12px);
-    color: var(--color-on-surface-variant, #3f484a);
+    color: var(--ds-icon-subtle);
     stroke: currentColor;
     animation: plus-tag-spin 0.8s linear infinite;
 }
@@ -437,25 +488,29 @@ $tag-colors: (
 /* -------------------------------------------------------------- disabled */
 
 /*
- * Disabled comes from the field. A neutral fill (on-surface 12, as Button),
- * Secondary (Text) for the words and the swatch, no border unless selected,
- * no ×, and no focus: the tag is a span, or a disabled button.
+ * Disabled comes from the field: the one disabled recipe, background.disabled
+ * with text.disabled words, icon.disabled on the swatch, no border unless
+ * selected, no ×, and no focus. The tag is a disabled button, or a span that
+ * Tag marks `aria-disabled`, so it reads as an inactive component, which
+ * WCAG exempts from text contrast. opacity.disabled is for images only, so a
+ * photo avatar stays whole. A selected tag keeps a border.bold edge, so the
+ * choice still shows.
  */
 .plus-tag--disabled,
 .plus-tag--disabled:hover,
 .plus-tag--disabled:active {
     border-color: transparent;
-    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
-    color: var(--color-secondary-text, #3b525f);
+    background-color: var(--ds-background-disabled);
+    color: var(--ds-text-disabled);
     cursor: default;
 }
 
 .plus-tag--disabled .plus-tag__swatch {
-    background-color: var(--color-secondary-text, #3b525f);
+    background-color: var(--ds-icon-disabled);
 }
 
 .plus-tag--disabled.plus-tag--selected {
-    border-color: var(--color-secondary-text, #3b525f);
+    border-color: var(--ds-border-bold);
 }
 
 .plus-tag--disabled .plus-tag__label {
@@ -467,24 +522,22 @@ $tag-colors: (
  * clear ground, so the spinner never sits on a gray disc.
  */
 .plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
-    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
+    background-color: var(--ds-background-disabled);
 }
 
 .plus-tag--disabled .plus-tag__initials {
-    color: var(--color-secondary-text, #3b525f);
+    color: var(--ds-text-disabled);
 }
 
 /* -------------------------------------------------------------- on images */
 
 /*
- * Elevated, for a tag on a photo or a video: a solid Surface Container Lowest
- * fill, no border, the Elevation 2 shadow and neutral text, with the hue kept
- * on the swatch. Read-only and link only; the component never sets the class
- * on anything else. The border turns clear rather than going away, so the tag
- * stays 22 tall.
- *
- * The base tokens, not the `--surface-raised` role pair: that role layer is
- * still an open proposal that no component consumes yet.
+ * Elevated, for a tag on a photo or a video: the overlay pair (the solid
+ * overlay surface and its shadow, the level for anything floating over
+ * content), no border and neutral text, with the hue kept on the swatch.
+ * Read-only and link only; the component never sets the class on anything
+ * else. The border turns clear rather than going away, so the tag stays 22
+ * tall.
  *
  * It sits after disabled on purpose: a disabled tag on a picture keeps its
  * solid ground, since the translucent disabled fill would sink into the image,
@@ -494,30 +547,31 @@ $tag-colors: (
 .plus-tag--elevated.plus-tag--disabled:hover,
 .plus-tag--elevated.plus-tag--disabled:active {
     border-color: transparent;
-    background-color: var(--color-surface-container-lowest, #ffffff);
-    box-shadow: var(--elevation-light-2);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
 }
 
 /*
- * A link's hover and press lay the on-surface 08 and 12 state layers over the
- * solid fill, as Figma stacks them, rather than swapping the fill for the hue's
- * translucent layer. A one-color gradient is how CSS stacks a second fill.
+ * A link's hover and press lay the neutral subtle hovered and pressed steps
+ * (translucent ink) over the solid fill, as Figma stacks them, rather than
+ * swapping the fill for the hue's tint. A one-color gradient is how CSS stacks
+ * a second fill.
  */
 .plus-tag--elevated.plus-tag--link:not(.plus-tag--split):hover,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:hover) {
-    background-color: var(--color-surface-container-lowest, #ffffff);
+    background-color: var(--ds-surface-overlay);
     background-image: linear-gradient(
-        var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08)),
-        var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08))
+        var(--ds-background-neutral-subtle-hovered),
+        var(--ds-background-neutral-subtle-hovered)
     );
 }
 
 .plus-tag--elevated.plus-tag--link:not(.plus-tag--split):active,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:active) {
-    background-color: var(--color-surface-container-lowest, #ffffff);
+    background-color: var(--ds-surface-overlay);
     background-image: linear-gradient(
-        var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12)),
-        var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12))
+        var(--ds-background-neutral-subtle-pressed),
+        var(--ds-background-neutral-subtle-pressed)
     );
 }
 
@@ -531,11 +585,11 @@ $tag-colors: (
  */
 .plus-tag--elevated:focus-visible,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
     box-shadow:
-        0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff),
-        var(--elevation-light-2);
+        0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay),
+        var(--ds-shadow-overlay);
 }
 
 /*
@@ -544,7 +598,7 @@ $tag-colors: (
  * ring is restated for check:focus-ring, as above.
  */
 .plus-tag--elevated .plus-tag__remove:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
-    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface-container-lowest, #ffffff);
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay);
 }

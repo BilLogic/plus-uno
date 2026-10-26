@@ -26,7 +26,7 @@ const Label = ({ text = 'Label', required = true, htmlFor }) => (
         <span
             className="body3-txt"
             style={{
-                color: 'var(--color-on-surface)',
+                color: 'var(--ds-text)',
                 fontFamily: 'Merriweather Sans',
                 fontWeight: 400,
                 lineHeight: 1.667,
@@ -38,7 +38,7 @@ const Label = ({ text = 'Label', required = true, htmlFor }) => (
             <span
                 className="body3-txt"
                 style={{
-                    color: 'var(--color-danger)',
+                    color: 'var(--ds-text-danger)',
                     fontFamily: 'Merriweather Sans',
                     fontWeight: 300,
                     lineHeight: 1.667,
@@ -54,30 +54,31 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
     const getTextColor = () => {
         switch (state) {
             case 'success':
-                return 'var(--color-success-text)';
+                return 'var(--ds-text-success)';
             case 'danger':
-                return 'var(--color-danger-text)';
+                return 'var(--ds-text-danger)';
             case 'warning':
-                return 'var(--color-warning-text)';
+                return 'var(--ds-text-warning)';
             case 'disabled':
+                return 'var(--ds-text)';
             case 'default':
             default:
-                return 'var(--color-on-surface)';
+                return 'var(--ds-text-subtle)';
         }
     };
 
     const getIconColor = () => {
         switch (state) {
             case 'success':
-                return 'var(--color-success)';
+                return 'var(--ds-icon-success)';
             case 'danger':
-                return 'var(--color-danger)';
+                return 'var(--ds-icon-danger)';
             case 'warning':
-                return 'var(--color-warning)';
+                return 'var(--ds-icon-warning)';
             case 'disabled':
             case 'default':
             default:
-                return 'var(--color-on-surface-variant)';
+                return 'var(--ds-icon-subtle)';
         }
     };
 
@@ -224,7 +225,7 @@ export const Layout = () => (
                     placeholder="Enter your email"
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-outline-variant)',
+                        border: '1px solid var(--ds-border)',
                         borderRadius: '4px',
                         fontSize: '14px',
                     }}
@@ -250,10 +251,10 @@ export const Layout = () => (
                     readOnly
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-success)',
+                        border: '1px solid var(--ds-border-success)',
                         borderRadius: '4px',
                         fontSize: '14px',
-                        backgroundColor: 'var(--color-success-state-08)',
+                        backgroundColor: 'var(--ds-background-success)',
                     }}
                 />
                 <Caption text="Username is available!" state="success" icon="circle-check" />
@@ -277,10 +278,10 @@ export const Layout = () => (
                     readOnly
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-danger)',
+                        border: '1px solid var(--ds-border-danger)',
                         borderRadius: '4px',
                         fontSize: '14px',
-                        backgroundColor: 'var(--color-danger-state-08)',
+                        backgroundColor: 'var(--ds-background-danger)',
                     }}
                 />
                 <Caption text="Password must be at least 8 characters long." state="danger" icon="circle-xmark" />
@@ -304,10 +305,10 @@ export const Layout = () => (
                     readOnly
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-warning-border)',
+                        border: '1px solid var(--ds-border-warning)',
                         borderRadius: '4px',
                         fontSize: '14px',
-                        backgroundColor: 'var(--color-warning-state-08)',
+                        backgroundColor: 'var(--ds-background-warning)',
                     }}
                 />
                 <Caption
@@ -335,10 +336,10 @@ export const Layout = () => (
                     disabled
                     style={{
                         padding: '8px 12px',
-                        border: '1px solid var(--color-outline-variant)',
+                        border: '1px solid var(--ds-border)',
                         borderRadius: '4px',
                         fontSize: '14px',
-                        backgroundColor: 'var(--color-surface-container-low)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         opacity: 0.78,
                     }}
                 />

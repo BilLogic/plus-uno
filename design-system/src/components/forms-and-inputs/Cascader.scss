@@ -43,12 +43,12 @@
     overflow: hidden;
 }
 
-// Figma `_Listbox Column`: equal columns split by an outline-variant rule.
+// Figma `_Listbox Column`: equal columns split by a `color.border` rule.
 .plus-listbox-options.plus-cascader-column {
     flex: 1 0 auto;
     min-width: 0;
     overflow-y: auto;
-    border-right: var(--size-element-border) solid var(--color-outline-variant);
+    border-right: var(--size-element-border) solid var(--ds-border);
 
     &:last-child {
         border-right: none;

@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-outline-variant` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-secondary-border` · `--color-secondary-state-08` · `--color-secondary-text` · `--item-height-md` · `--size-element-gap-md` · `--size-element-pad-x-lg` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--size-element-stroke-sm` · `--size-section-gap-sm` · `--type-weight-medium`
+`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--item-height-md` · `--size-element-gap-md` · `--size-element-pad-x-lg` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--size-element-stroke-sm` · `--size-section-gap-sm` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/NavTabs/NavTabs.scss`. Override these through the token layer, never with a literal.
 

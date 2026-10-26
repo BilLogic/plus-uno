@@ -341,7 +341,7 @@ const InSessionPage = () => {
                     allStudents={yourStudents}
                     onClose={closeInsightsModal}
                     onSelectStudent={setSelectedStudent}
-                    containerSelector="#root > .plus-page-layout > .plus-surface-container > .plus-surface-container__row"
+                    containerSelector="#root > .plus-page-layout > .plus-frame > .plus-frame__row"
                 />
             )}
 

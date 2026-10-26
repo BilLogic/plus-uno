@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { px } from '@/storybook-docs/lib/style-probes.js';
 import Radio from './Radio';
 
 export default {
@@ -11,6 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, a dot drawn in `icon.inverse`, the disabled fill, edge and dot, and the focus ring in `border.focused`.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Keyboard focus is the 2px focus-ring role 2px off the radio, replacing the inverse-primary halo. A checked radio keeps its fill and dot on hover.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A labeled radio is a 24 row at every size, its label 14/20.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
@@ -113,7 +115,7 @@ export const Content = () => {
 
     return (
         <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Option labels and a selected value in a named group.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -151,7 +153,7 @@ export const Layout = () => {
 
     return (
         <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Vertical stack is the default layout for a radio group.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -338,30 +340,51 @@ KeyboardFocus.play = async ({ canvasElement }) => {
     await waitFor(() => expect(style.outlineStyle).toBe('solid'));
     await expect(px(style.outlineWidth), 'ring width').toBe(2);
     await expect(px(style.outlineOffset), 'ring gap').toBe(2);
-    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
-    await expect(style.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(style.outlineColor, `${mode}: ring color`).toBe(token('--ds-border-focused'));
+        await expect(style.borderTopColor, `${mode}: the focused edge`).toBe(token('--ds-border-brand'));
+        await expect(style.backgroundColor, `${mode}: the checked fill stays`).toBe(token('--ds-background-selected-bold'));
+    });
 };
 
-/** Hover lays the 08 layer: over the page when unchecked, over the fill when checked. */
+/**
+ * Hover steps the fill: the input's hovered fill and the brand edge when
+ * unchecked, the opaque hovered Lagoon step when checked. The dot is drawn in
+ * `icon.inverse` in every mode, and in `icon.disabled` on a disabled radio.
+ */
 export const HoverStep = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
         <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked />
         <Radio id="radio-hover-2" name="radio-hover" label="Unchecked" value="unchecked" />
+        <Radio id="radio-hover-3" name="radio-hover-disabled" label="Disabled" value="disabled" defaultChecked disabled />
     </div>
 );
 HoverStep.parameters = { docs: { disable: true } };
 HoverStep.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const hovered = (name) => {
-        const radio = canvas.getByRole('radio', { name });
-        radio.style.transition = 'none';
-        return withForcedPseudo(radio, ':hover', () => {
-            const { backgroundColor, backgroundImage } = getComputedStyle(radio);
-            return { backgroundColor, backgroundImage };
-        });
+    const radio = (name) => canvas.getByRole('radio', { name });
+    const paint = (el) => {
+        const { backgroundColor, backgroundImage, borderTopColor } = getComputedStyle(el);
+        return { backgroundColor, backgroundImage, borderTopColor };
     };
-    const checked = hovered('Checked');
-    await expect(checked.backgroundColor, 'the checked fill stays').toBe(tokenColor(canvasElement, '--color-primary'));
-    await expect(checked.backgroundImage).toContain(tokenColor(canvasElement, '--color-shadow-state-08'));
-    await expect(hovered('Unchecked').backgroundColor).toBe(tokenColor(canvasElement, '--color-primary-state-08'));
+    const hovered = (name) => withForcedPseudo(radio(name), ':hover', () => paint(radio(name)));
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const checked = paint(radio('Checked'));
+        await expect(checked.backgroundColor, `${mode}: checked fill`).toBe(token('--ds-background-selected-bold'));
+        await expect(checked.borderTopColor, `${mode}: checked edge`).toBe(token('--ds-border-selected'));
+        await expect(checked.backgroundImage, `${mode}: the dot`).toContain(token('--ds-icon-inverse'));
+        const unchecked = paint(radio('Unchecked'));
+        await expect(unchecked.backgroundColor, `${mode}: unchecked fill`).toBe(token('--ds-background-input'));
+        await expect(unchecked.borderTopColor, `${mode}: unchecked border`).toBe(token('--ds-border-input'));
+        const disabled = paint(radio('Disabled'));
+        await expect(disabled.backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
+        await expect(disabled.borderTopColor, `${mode}: disabled edge`).toBe(token('--ds-border-disabled'));
+        await expect(disabled.backgroundImage, `${mode}: the disabled dot`).toContain(token('--ds-icon-disabled'));
+        const checkedHover = hovered('Checked');
+        await expect(checkedHover.backgroundColor, `${mode}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(checkedHover.backgroundImage, `${mode}: the dot stays`).toContain(token('--ds-icon-inverse'));
+        const uncheckedHover = hovered('Unchecked');
+        await expect(uncheckedHover.backgroundColor, `${mode}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
+        await expect(uncheckedHover.borderTopColor, `${mode}: unchecked hover edge`).toBe(token('--ds-border-brand'));
+    });
 };

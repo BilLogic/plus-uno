@@ -1,39 +1,26 @@
 import React from 'react';
+import { expect } from 'storybook/test';
 import PatternSection from '@/patterns/PatternSection';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '32px' };
-
-const slotContent = (label) => (
-    <div
-        style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--color-outline)',
-            borderRadius: 'var(--size-element-radius-md)',
-            color: 'var(--color-on-surface-variant)',
-        }}
-        className="body1-txt"
-    >
-        {label}
-    </div>
-);
 
 /** Header slot combinations — docs section only */
 function PatternSectionSlotsDemos() {
     return (
         <div style={col}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TITLE ONLY</span>
+                <DemoLabel>TITLE ONLY</DemoLabel>
                 <PatternSection title="Section title" padding="sm">
                     {slotContent('Content slot')}
                 </PatternSection>
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TITLE + DESCRIPTION + ACTIONS</span>
+                <DemoLabel>TITLE + DESCRIPTION + ACTIONS</DemoLabel>
                 <PatternSection
                     title="Section title"
                     description="Optional description that explains what this section contains."
@@ -51,11 +38,11 @@ function PatternSectionSlotsDemos() {
 function PatternSectionCompositionDemo() {
     return (
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FILLED SECTION WITH CARDS</span>
+            <DemoLabel>FILLED SECTION WITH CARDS</DemoLabel>
             <PatternSection
                 title="Section title"
                 description="Sections group related cards, tables, or forms on a page."
-                background="surface-container-low"
+                background="container"
                 padding="sm"
             >
                 <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', flexWrap: 'wrap' }}>
@@ -105,7 +92,7 @@ export default {
         },
         background: {
             control: 'select',
-            options: ['none', 'surface-container-low'],
+            options: ['none', 'container'],
             description: 'Section background token',
             table: { category: 'Design' },
         },
@@ -155,4 +142,24 @@ export const Interactive = {
             {slotContent('Content slot')}
         </PatternSection>
     ),
+};
+
+/** In every color mode a filled section is the translucent well, its title the body text and its description the subtle text. */
+export const ColorModes = {
+    render: () => (
+        <PatternSection title="Section title" description="A short description." background="container">
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const section = canvasElement.querySelector('.plus-pattern-section');
+        const title = canvasElement.querySelector('.plus-pattern-section-title');
+        const description = canvasElement.querySelector('.plus-pattern-section-description');
+        await inEveryColorMode(async (mode) => {
+            await expect(getComputedStyle(section).backgroundColor, `${mode}: the well`).toBe(tokenColor(canvasElement, '--ds-surface-container'));
+            await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
+            await expect(getComputedStyle(description).color, `${mode}: the description`).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
+        });
+    },
 };

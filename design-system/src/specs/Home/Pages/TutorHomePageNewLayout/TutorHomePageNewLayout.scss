@@ -1,5 +1,5 @@
 /**
- * Home on the new layout: four flat Sections on the SurfaceContainer's
+ * Home on the new layout: four flat Sections on the Frame's
  * 12-column content grid, one per row, and the lesson cards inside the last.
  * The rules below the palette lay out what a Section's slots hold.
  */
@@ -54,21 +54,21 @@
     --surface-overlay-shadow: var(--plus-home-new-elevated);
 
     // The sidebar's selected and hover rows are neutral, not blue.
-    .plus-surface-container__sidebar {
+    .plus-frame__sidebar {
         --color-primary-state-16: rgba(55, 53, 47, 0.08);
         --color-primary-state-12: rgba(55, 53, 47, 0.05);
         --color-primary-text: #37352f;
         --color-primary: #37352f;
     }
 
-    .plus-surface-container__surface {
+    .plus-frame__surface {
         box-shadow: var(--plus-home-new-panel-edge);
     }
 }
 /* ======================================================= end one-off */
 
 // Rhythm: generous space between the sections, and no boxes around them.
-.plus-home-new .plus-surface-container__content {
+.plus-home-new .plus-frame__content {
     row-gap: var(--surface-stack-lg);
 }
 

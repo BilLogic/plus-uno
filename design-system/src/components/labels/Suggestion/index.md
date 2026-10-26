@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--color-focus-ring` · `--color-mastering-content-border-subtle` · `--color-mastering-content-state-08` · `--color-mastering-content-state-12` · `--color-mastering-content-text` · `--color-on-surface-state-12` · `--color-outline-variant` · `--color-secondary-text` · `--icon-sm` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--body-small` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--icon-sm` · `--plus-suggestion-height` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg`
 
 From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 

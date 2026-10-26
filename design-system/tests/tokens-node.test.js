@@ -519,11 +519,12 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 78 `var(--color-*, rgba(…))` sites, every one
+   * Measured over the live tree: 38 `var(--color-*, rgba(…))` sites, every one
    * captured, and every one names a defined token and is compared with
-   * alpha on both sides. All 78 agree (81 until 2026-10-24, when a Dropdown
+   * alpha on both sides. All 38 agree (81 until 2026-10-24, when a Dropdown
    * fallback that duplicated its token was dropped and Tag's × lost its focus
-   * fill), because the disagreeing washes were
+   * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
+   * tokens, which carry no fallbacks), because the disagreeing washes were
    * fixed when the capture widened, and the test asserts it: a stale wash
    * here is a failure, not a recount.
    */
@@ -544,7 +545,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(78);
+    expect(washes).toBe(38);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -586,14 +587,16 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // `--color-on-surface-state-12`, its own token, verbatim.
     // 78: Tag's × shows focus as the ring alone, so its two 12 focus fills
     // (plain and elevated) went.
-    expect(withAlpha).toBe(78);
+    // 38: Tag and Suggestion moved onto the --ds- tokens, and their 40 state
+    // and border washes went with the legacy names.
+    expect(withAlpha).toBe(38);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
     // 623: the same three washes, now naming defined tokens, became comparable.
     // 615: the Popover took the Popup pattern's tokens, and its eight hex
     // fallbacks went with the dark header.
-    // 614: PageLayout moved onto the SurfaceContainer frame, and its surface
+    // 614: PageLayout moved onto the Frame pattern, and its surface
     // fill's hex fallback went with the inline styles.
     // 607: Modal.scss moved onto the modal pattern tokens and dropped its seven
     // color fallbacks.
@@ -603,7 +606,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // beside a defined token — Switch's disagreeing `#a8d1ed` twice and the
     // Dropdown item's pressed wash.
     // 595: the state-steps sweep dropped the two focus fills on Tag's ×.
-    expect(comparable).toBe(595);
+    // 514: Tag and Suggestion moved onto the --ds- tokens, which carry no
+    // fallbacks, so their 81 color fallbacks (40 washes) went.
+    expect(comparable).toBe(514);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

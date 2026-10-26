@@ -4,7 +4,7 @@
  * The Specs Top Bar on the foundation Topbar pattern (`@/patterns`): the
  * sidebar toggle, the breadcrumb, Help Center and the user avatar, 32 high.
  * This keeps the Specs prop names (`mode`, `onToggle`) and maps them onto the
- * pattern. Inside PageLayout the SurfaceContainer owns the sidebar state and
+ * pattern. Inside PageLayout the Frame owns the sidebar state and
  * the toggle follows it; standalone, pass `onToggle` to draw the toggle.
  * Figma Spec: node-id=111-227860, 111-227866
  */

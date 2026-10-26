@@ -201,9 +201,9 @@ body {
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
     line-height: var(--font-line-height-150);
-    color: var(--color-on-surface);
-    background-color: unset;
-    background: unset;
+    // Text and its ground move together, so the page flips with the color mode.
+    color: var(--ds-text);
+    background-color: var(--ds-surface);
 }
 
 #root {

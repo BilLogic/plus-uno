@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Select from './Select';
 
 /**
@@ -246,7 +248,7 @@ export const Interactive = {
 
         return (
             <div style={{ maxWidth: '400px' }}>
-                <p className="body3-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body3-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.mode === 'multi'
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')
@@ -276,4 +278,55 @@ export const Interactive = {
         commitOnClose: false,
         selectAll: false,
     }
+};
+
+const COLOR_OPTIONS = [
+    { value: 'algebra', label: 'Algebra' },
+    { value: 'biology', label: 'Biology' },
+    { value: 'chemistry', label: 'Chemistry' },
+];
+
+/**
+ * The placeholder is `text.subtlest` and the caret `icon.subtle`. In the list,
+ * "Select all" draws the input's mark until every option is picked, then the
+ * Lagoon checked mark; picked rows are neutral selection with a Lagoon mark.
+ */
+export const Colors = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
+            <Select label="Subject" options={COLOR_OPTIONS} placeholder="Pick a subject" />
+            <Select label="Subjects" mode="multi" selectAll options={COLOR_OPTIONS} defaultValue={['algebra']} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const placeholder = canvasElement.querySelector('.plus-select-placeholder');
+        const caret = canvasElement.querySelector('.plus-select-caret');
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
+        const all = await waitFor(() => {
+            const el = document.querySelector('.plus-select-all');
+            if (!el) throw new Error('the list has not opened');
+            return el;
+        });
+        const mark = all.querySelector('.plus-select-all-mark');
+        const picked = document.querySelector('.plus-option-row.is-selected');
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(placeholder).color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
+            await expect(getComputedStyle(caret).color, `${mode}: caret`).toBe(token('--ds-icon-subtle'));
+            await expect(getComputedStyle(mark).borderTopColor, `${mode}: select-all mark edge`).toBe(token('--ds-border-input'));
+            await expect(getComputedStyle(mark).backgroundColor, `${mode}: select-all mark fill`).toBe(token('--ds-background-input'));
+            const pickedFill = picked.classList.contains('is-highlighted') ? '--ds-background-selected-hovered' : '--ds-background-selected';
+            await expect(getComputedStyle(picked).backgroundColor, `${mode}: picked row`).toBe(token(pickedFill));
+            await expect(getComputedStyle(picked.querySelector('.plus-option-row-check')).backgroundColor, `${mode}: the picked row's mark`).toBe(token('--ds-background-selected-bold'));
+        });
+        await userEvent.click(all);
+        await waitFor(() => expect(mark).toHaveClass('is-checked'));
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(mark).backgroundColor, `${mode}: checked mark fill`).toBe(token('--ds-background-selected-bold'));
+            await expect(getComputedStyle(mark).borderTopColor, `${mode}: checked mark edge`).toBe(token('--ds-border-selected'));
+            await expect(getComputedStyle(mark).color, `${mode}: checked mark`).toBe(token('--ds-icon-inverse'));
+        });
+        await userEvent.keyboard('{Escape}');
+    },
 };

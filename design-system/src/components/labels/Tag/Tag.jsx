@@ -39,10 +39,12 @@ import './Tag.scss';
 
 /**
  * The color names are categories, never statuses, so there is no `success` or
- * `danger` here. Each name borrows the curriculum hue it names (teal is
- * Tertiary, never Info); the name-to-token map is in `Tag.scss`.
+ * `danger` here, and no red. Each name is the accent family it names, a color
+ * with no meaning tied to it; the name-to-token map is in `Tag.scss`. All ten
+ * are the palette: what a picker offers and a random color draws from.
+ * Orange, lime and brown are also the accents three SMART subjects alias.
  */
-export const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
+export const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown'];
 
 /*
  * A literal array, because the docs generator and check:doc-identifiers read
@@ -71,13 +73,13 @@ export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
 export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operational'];
 
 /** Deprecated names, still accepted, and what each one now means. */
-const DEPRECATED_COLORS = { orange: 'yellow', grey: 'gray' };
+const DEPRECATED_COLORS = { grey: 'gray' };
 
 /**
- * Every name `color` accepts: the seven, then the deprecated aliases. A
- * literal, because the docs generator reads the values from source.
+ * Every name `color` accepts: the ten, then the deprecated alias. A literal,
+ * because the docs generator reads the values from source.
  */
-export const TAG_ACCEPTED_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'grey'];
+export const TAG_ACCEPTED_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown', 'grey'];
 
 /**
  * The color a name draws, or `null` when Tag does not know it. A deprecated
@@ -90,16 +92,18 @@ export const resolveTagColor = (color) => {
 };
 
 /**
- * Each curriculum hue, by its token name, and the Tag color that borrows it.
- * The one place a SMART area or a curriculum Badge style finds its Tag color;
- * the stylesheet's map of color to token is the same pairing read the other way.
+ * Each SMART subject, by its token name, and the accent its SMART tokens alias:
+ * the Tag color a curriculum Badge style draws, and the hue a SMART area's
+ * swatch falls back to. The SMART layer (`color.*.smart.{subject}`) holds the
+ * same pairing in the tokens; a SMART area reads those through
+ * `StaticBadgeSmart`, so this map and the tokens must name the same accent.
  */
 export const TAG_COLOR_OF_CURRICULUM = Object.freeze({
-    'social-emotional': 'yellow',
-    'mastering-content': 'purple',
-    advocacy: 'green',
+    'social-emotional': 'orange',
+    'mastering-content': 'teal',
+    advocacy: 'lime',
     relationship: 'magenta',
-    'technology-tools': 'blue',
+    'technology-tools': 'brown',
 });
 
 /*
@@ -488,15 +492,18 @@ export const Tag = ({
 
     return (
         <>
-            <span {...shared}>
+            <span {...shared} aria-disabled={isDisabled ? 'true' : undefined}>
                 {lead}
                 {labelNode}
                 {removeButton}
                 {/*
-                  * A span has no disabled state a screen reader announces
-                  * (ARIA 1.2 does not support aria-disabled on a generic element), so a
-                  * disabled tag that is not a button says it in words: its
-                  * text is read as "Science, disabled".
+                  * A span has no disabled state a screen reader reliably
+                  * announces (ARIA 1.2 does not support aria-disabled on a
+                  * generic element), so a disabled tag that is not a button
+                  * says it in words: its text is read as "Science, disabled".
+                  * `aria-disabled` is set as well, as NavTabs sets it on a
+                  * disabled tab, so the tag reads as inactive to tools: its
+                  * words are text.disabled, which an inactive component may be.
                   */}
                 {isDisabled && <span className="visually-hidden">, disabled</span>}
             </span>
@@ -514,7 +521,7 @@ Tag.propTypes = {
     behavior: PropTypes.oneOf(TAG_BEHAVIORS),
     /** Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. */
     variant: PropTypes.oneOf(TAG_VARIANTS),
-    /** A category color, on the border and swatch. Never a status. `orange` is a deprecated alias for `yellow`, and `grey` for `gray`. On an avatar type the border is neutral and the color fills the avatar; gray agents fill AI purple and gray teams a Technology Tools 08 wash. */
+    /** A category color: an accent family, on the border and swatch. Never a status. `grey` is a deprecated alias for `gray`. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. */
     color: PropTypes.oneOf(TAG_ACCEPTED_COLORS),
     /** What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. */
     type: PropTypes.oneOf(TAG_TYPES),

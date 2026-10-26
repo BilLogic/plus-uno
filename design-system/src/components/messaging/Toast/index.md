@@ -39,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--color-danger-icon` · `--color-info-icon` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary-icon` · `--color-success-icon` · `--color-surface-container-lowest` · `--color-surface-overlay` · `--color-warning-icon` · `--element-inline-lg` · `--element-inline-md` · `--element-stack-sm` · `--heading-xsmall` · `--icon-md` · `--label-height-md` · `--layout-z-index-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--size-element-radius-md` · `--size-spacing-medium-space-400` · `--surface-overlay-shadow`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--element-inline-lg` · `--element-inline-md` · `--element-stack-sm` · `--heading-xsmall` · `--icon-md` · `--label-height-md` · `--layout-z-index-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--size-element-radius-md` · `--size-spacing-medium-space-400`
 
 From `design-system/src/components/messaging/Toast/Toast.scss`. Override these through the token layer, never with a literal.
 

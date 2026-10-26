@@ -1,0 +1,14 @@
+/**
+ * The default surface's edge, defined once: a ring in `--ds-border-surface`,
+ * transparent except where increased contrast turns the frame white and the
+ * surface needs a line to stand on. A ring, so it takes no room from the pad.
+ * `SURFACE_EDGE` in `patterns/Surface/Surface.jsx` is the same value, for the
+ * stories that measure it.
+ *
+ *     .plus-x__surface {
+ *         @include surface-edge;
+ *     }
+ */
+@mixin surface-edge {
+    box-shadow: 0 0 0 var(--size-surface-border) var(--ds-border-surface);
+}

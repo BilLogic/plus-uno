@@ -4,7 +4,7 @@
  * Two rules from the overlay spec hang off this one count:
  *
  * - **Opening a modal closes a floating sidebar.** The app frame
- *   (`SurfaceContainer`) subscribes and closes a peeking sidebar when an overlay
+ *   (`Frame`) subscribes and closes a peeking sidebar when an overlay
  *   opens. A module-level count rather than a React context, because a modal
  *   does not have to sit under the frame in the tree, and a page should not
  *   have to thread a callback from the frame to each of its modals.

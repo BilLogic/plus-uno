@@ -202,7 +202,7 @@ export const ModalWidths = () => (
 export const ShellMath = () => (
     <div style={wrap}>
         <p className="body1-txt" style={{ marginBottom: 'var(--space-100)' }}>
-            Pages render inside <code>SurfaceContainer</code>: the topbar row, then the sidebar and the surface.
+            Pages render inside <code>Frame</code>: the topbar row, then the sidebar and the surface.
             The content grid is measured from the <strong>surface&rsquo;s inner width</strong>, not the screen:
         </p>
         <pre style={{ backgroundColor: 'var(--color-surface-container-low)', padding: 'var(--space-100)', borderRadius: 'var(--radius-050)', overflow: 'auto', marginBottom: 'var(--space-050)', lineHeight: 1.7 }}>
@@ -216,7 +216,7 @@ Screen grid:    clamp(720, screen − 2 × 24, 1232)  =  720 · 976 · 1232`}
             The sidebar is 240 from the screen edge once it docks at Large; below Large it is closed and the
             surface starts at the container pad. Content is capped at 1232 and never under 720. Ownership is
             layered: the <strong>page frame</strong> owns the width ({code('Screen/width-screen')}) and the
-            spacing / layout <strong>mode</strong>; the <strong>Surface container pattern</strong> fills the
+            spacing / layout <strong>mode</strong>; the <strong>Frame pattern</strong> fills the
             space it is given and carries the content grid and the Content slot.
         </p>
     </div>
