@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SuggestionStories from './Suggestion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Suggestion } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsPreviewCard, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -29,16 +30,17 @@ export const figmaMeta = {
 <Meta of={SuggestionStories} />
 
 <Title />
-A value the system proposes that a person can accept, such as an AI-suggested
-focus area. A button, not a label: it has the same height, padding and radius
-as Tag, so it sits in the tag row where the value will land.
+A suggestion is a value the system proposes that a person can accept, such as
+an AI-suggested focus area. It is a button, not a label: it has the same
+height, padding and radius as Tag, so it sits in the tag row where the value
+will land.
 
 <DocsTabs of={SuggestionStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -50,7 +52,10 @@ as Tag, so it sits in the tag row where the value will land.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<><code>insert</code> adds a value to the field and leads with a plus. <code>prompt</code> sends or fills text and leads with a sparkle wand.</>}>
+Color matters on this page. Switch Color mode and Contrast in the toolbar to
+read the suggestions in light, dark and increased contrast.
+
+<DocsCanvasShell attachSourceBelow description={<>Two types. <code>insert</code> adds a value to the field and leads with a plus. <code>prompt</code> sends or fills text and leads with a sparkle wand.</>}>
     <Canvas of={SuggestionStories.Types} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -58,7 +63,68 @@ as Tag, so it sits in the tag row where the value will land.
 
 <div className="sb-ds-doc-section">
 
-## In a tag row
+## Anatomy
+
+<DocsPreviewCard>
+    <Suggestion label="Ratios" />
+</DocsPreviewCard>
+
+1. **Glyph:** a plus for an insert, a sparkle wand for a prompt. It says which kind of proposal this is.
+2. **Label:** the proposed value's words.
+3. **Dashed edge** in the discovery color, so a suggestion never reads as a value already chosen.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>Values</th><th>Default</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>string</td><td>any text</td><td>required</td><td>The proposed value's words. The accessible name is built from it.</td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td><code>insert</code>, <code>prompt</code></td><td><code>insert</code></td><td>Whether accepting adds a value to the field or sends or fills text.</td></tr>
+        <tr><td><code>value</code></td><td>any</td><td>any value</td><td>the label</td><td>Insert only: what <code>onAccept</code> receives.</td></tr>
+        <tr><td><code>text</code></td><td>string</td><td>any text</td><td>the label</td><td>Prompt only: the text <code>onAccept</code> receives.</td></tr>
+        <tr><td><code>onAccept</code></td><td>function</td><td>none</td><td>none</td><td>Called with the value or the text, then the click event.</td></tr>
+        <tr><td><code>onClick</code></td><td>function</td><td>none</td><td>none</td><td>Fires on press, before <code>onAccept</code>. It never replaces <code>onAccept</code>.</td></tr>
+    </tbody>
+</DocsTable>
+
+Suggestion has no disabled prop, as Tag has none. Hover, pressed and focus are
+the browser's own states, and disabled comes from the field.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--ds-border-discovery</code></td><td>The dashed edge</td></tr>
+        <tr><td><code>--ds-text-discovery</code>, <code>--ds-icon-discovery</code></td><td>The label and the glyph</td></tr>
+        <tr><td><code>--ds-background-discovery</code></td><td>Hover</td></tr>
+        <tr><td><code>--ds-background-discovery-hovered</code></td><td>Pressed</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>The focus ring</td></tr>
+        <tr><td><code>--ds-border</code>, <code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code></td><td>Disabled</td></tr>
+        <tr><td><code>--size-element-pad-x-xs</code>, <code>--size-element-gap-xs</code></td><td>The 4 padding and the 4 gap</td></tr>
+        <tr><td><code>--size-element-radius-md</code></td><td>The 4 corner radius</td></tr>
+    </tbody>
+</DocsTable>
+
+The height of 22 has no token yet.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell description={<>The same 22-tall box as Tag, with its words on the same baseline. Suggestions follow the tags already in the field.</>}>
     <DsCanvasQuiet of={SuggestionStories.InATagRow} />
@@ -68,22 +134,16 @@ as Tag, so it sits in the tag row where the value will land.
     <DsCanvasQuiet of={SuggestionStories.AcceptIntoTags} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same disabled ground, a dashed neutral edge so it still reads as a suggestion, and disabled words. It follows the field, and cannot be focused or accepted.</>}>
-    <DsCanvasQuiet of={SuggestionStories.DisabledBesideTags} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
 <DocsCanvasShell description={<>Rest is a dashed edge on a clear ground. Hover is the discovery ground and pressed its hovered step.</>}>
     <DsCanvasQuiet of={SuggestionStories.StateLayers} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Keyboard focus is a 2px Focus Ring 2px outside the dashed edge. Press Tab to see it.</>}>
+<DocsCanvasShell description={<>Keyboard focus is a 2px ring, 2px outside the dashed edge. Press Tab to see it.</>}>
     <DsCanvasQuiet of={SuggestionStories.FocusRing} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same disabled ground, a dashed neutral edge so it still reads as a suggestion, and disabled words. It follows the field, and cannot be focused or accepted.</>}>
+    <DsCanvasQuiet of={SuggestionStories.DisabledBesideTags} />
 </DocsCanvasShell>
 
 </div>
@@ -104,6 +164,44 @@ as Tag, so it sits in the tag row where the value will land.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Suggestion has no do and don't examples yet.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+The field decides what happens next. The accept handler hands back the value
+(insert) or the text (prompt), and the suggestion does not change itself. The
+field that owns the value adds a Tag, sends the message or fills the text box,
+and stops offering the suggestion.
+
+```jsx
+// Insert hands back the value; the field turns it into a Tag.
+<Suggestion label="Relationships" value="focus-relationships" onAccept={addFocusArea} />
+
+// Prompt hands back the text to send or fill.
+<Suggestion type="prompt" label="Summarize" text="Summarize this session" onAccept={send} />
+```
+
+Inside a disabled Tag group, a suggestion reads the same context a Tag does
+and is disabled with the tags beside it.
+
+```jsx
+<TagGroup label="Focus areas" disabled={!canEdit}>
+  <Tag color="blue">Fractions</Tag>
+  <Suggestion label="Ratios" onAccept={add} />
+</TagGroup>
+```
+
+</div>
+
+
 </div>
 
 </DocsTab>
@@ -116,56 +214,18 @@ as Tag, so it sits in the tag row where the value will land.
 
 ## When to use
 
-Use `Suggestion` when the system proposes a value and a person decides whether
+Use a suggestion when the system proposes a value and a person decides whether
 to take it: an AI-suggested focus area beside the ones already chosen, or a
 suggested question beside a chat box. Put it in the row where the accepted
 value will land, after the tags already there.
 
-Use `Tag` for a value that is already in the field. Use `Button` for an action
-that is not a proposed value, and `AiLabel` to mark content the agent has
-already produced.
+- **A value already in the field:** use Tag, inside a Tag group.
+- **An action that is not a proposed value:** use Button.
+- **Content the agent has already produced:** use AI label.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### The field decides what happens next.
-
-`onAccept` hands back the value (insert) or the text (prompt). The suggestion
-does not change itself; the field that owns the value adds a Tag, sends the
-message or fills the text box, and stops offering the suggestion.
-
-```jsx
-// Incorrect: a Tag styled as a suggestion is not a button, so nobody can
-// accept it with a keyboard.
-<Tag behavior="read-only" color="purple">Relationships</Tag>
-
-// Correct: insert hands back the value; the field turns it into a Tag.
-<Suggestion label="Relationships" value="focus-relationships" onAccept={addFocusArea} />
-
-// Correct: prompt hands back the text to send or fill.
-<Suggestion type="prompt" label="Summarize" text="Summarize this session" onAccept={send} />
-```
-
-### Keep the words short.
-
-A suggestion sits in a tag row, so its label is a value's name, not a
-sentence. For a prompt, pass the full words as `text` and a short `label`.
-
-### Disabled comes from the field or TagGroup.
-
-Disabled comes from a disabled field or `TagGroup` through `TagContext`: inside
-one, a suggestion reads the same value a Tag does and is disabled with the tags
-beside it. Like Tag, it has no `disabled` prop of its own.
-
-```jsx
-<TagGroup label="Focus areas" disabled={!canEdit}>
-  <Tag color="blue">Fractions</Tag>
-  <Suggestion label="Ratios" onAccept={add} />
-</TagGroup>
-```
+The words are short. A suggestion sits in a tag row, so its label is a value's
+name, not a sentence. For a prompt, pass the full words as the text and keep
+the label short.
 
 </div>
 
@@ -174,16 +234,11 @@ beside it. Like Tag, it has no `disabled` prop of its own.
 ## Accessibility
 
 - **A real button.** It takes focus, and Enter or Space accepts it.
-- **Disabled is a disabled button.** It keeps its name, is announced as
-  disabled, is skipped by Tab, and never calls `onAccept`.
-- **Named for what pressing it does.** An insert suggestion is announced as
-  `Add {label}, suggested`, so a screen-reader user knows pressing it adds a
-  value. A prompt is not added to anything, so it is announced as
-  `{label}, suggested`.
-- **The glyph is decorative.** The plus and the sparkle wand are hidden from
-  assistive technology; the name already says what the suggestion does.
-- **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so
-  focus never reads as pressed.
+- **Disabled is a disabled button.** It keeps its name, is announced as disabled, is skipped by Tab and never calls the accept handler.
+- **Named for what pressing it does.** An insert suggestion is announced as "Add Ratios, suggested", so a screen-reader user knows pressing it adds a value. A prompt adds nothing, so it is announced as "Summarize, suggested".
+- **The glyph is decoration.** The plus and the sparkle wand are hidden from assistive technology, since the name already says what the suggestion does.
+- **Focus is a ring, not a fill.** A 2px ring, 2px outside the edge, so focus never reads as pressed.
+- **Contrast:** the label and glyph use the discovery text and icon tokens, never a literal color.
 
 </div>
 
@@ -191,8 +246,9 @@ beside it. Like Tag, it has no `disabled` prop of its own.
 
 ## Related
 
-- For a value already in the field, use `Tag`, inside a `TagGroup`.
-- To mark content the agent produced, use `AiLabel`.
+- [Tag](?path=/docs/components-labels-status-count-tag-tag--docs), inside a [Tag group](?path=/docs/components-labels-status-count-tag-tag-group--docs), for a value already in the field.
+- [AI label](?path=/docs/components-labels-ai-label-ai-label--docs) to mark content the agent produced.
+- [Button](?path=/docs/components-forms-and-inputs-button--docs) for an action that is not a proposed value.
 
 </div>
 

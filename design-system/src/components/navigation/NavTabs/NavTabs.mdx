@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavTabsStories from './NavTabs.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { NavTabs } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsPreviewCard, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,13 +40,15 @@ export const figmaMeta = {
 <Meta of={NavTabsStories} />
 
 <Title />
+Tabs are a row of tabs over one area of the page, each naming a view of it.
+Use them to switch between sibling views without leaving the page.
 
 <DocsTabs of={NavTabsStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-58693"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavTabs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -57,7 +60,10 @@ export const figmaMeta = {
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Standard tabs with disabled item and a tab dropdown.</>}>
+Color matters on this page. Switch Color mode and Contrast in the toolbar to
+read the tabs in light, dark and increased contrast.
+
+<DocsCanvasShell attachSourceBelow description={<>Three tabs, with the first selected. The selected tab is marked by its ink and the bar under it, never by a fill.</>}>
     <Canvas of={NavTabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -65,30 +71,100 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Anatomy
 
-<DocsCanvasShell description={<>Standard tabs, disabled item, and tab dropdown.</>}>
+<DocsPreviewCard>
+    <NavTabs defaultActiveKey="overview">
+        <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+        <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+        <NavTabs.Dropdown title="More" id="anatomy-tabs-more" />
+    </NavTabs>
+</DocsPreviewCard>
+
+1. **Tab row** with its baseline rule.
+2. **Selected tab,** marked by the selected ink and the bar.
+3. **Tab,** one view.
+4. **Tab with a menu,** for a tab that fans out. It works in the navigation mode only.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Figma property</th><th>Code prop</th><th>Type</th><th>Values</th><th>Default</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Tabs · alignment</td><td><code>alignment</code></td><td>enum</td><td><code>left</code>, <code>center</code>, <code>right</code>. Code adds <code>justified</code>, which stretches the tabs to fill the row.</td><td><code>left</code></td></tr>
+        <tr><td>Tabs · tab slot</td><td><code>children</code></td><td>node</td><td><code>NavTabs.Item</code>, <code>NavTabs.Dropdown</code>, and in the tabs mode <code>NavTabs.Panel</code></td><td>none</td></tr>
+        <tr><td>_Tab Item · state</td><td><code>disabled</code> on an item</td><td>boolean</td><td>Hover, pressed and focus are the browser's.</td><td><code>false</code></td></tr>
+        <tr><td>_Tab Item · selected</td><td><code>active</code> on an item, or <code>activeKey</code> on the row</td><td>boolean, or a key</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td></tr>
+        <tr><td>_Tab Dropdown · state</td><td><code>disabled</code> on the dropdown</td><td>boolean</td><td>Hover, pressed and focus are the browser's.</td><td><code>false</code></td></tr>
+        <tr><td>_Tab Dropdown · selected</td><td><code>active</code> on the dropdown</td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td></tr>
+        <tr><td>none</td><td><code>mode</code></td><td>enum</td><td><code>navigation</code>, <code>tabs</code>. The tabs mode renders a tab list. Dropdowns apply in the navigation mode only.</td><td><code>navigation</code></td></tr>
+    </tbody>
+</DocsTable>
+
+These code props have no Figma property:
+
+<DocsTable>
+    <thead>
+        <tr><th>Code prop</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>activeKey</code>, <code>onSelect</code></td><td>A controlled row: the selected key and the handler that changes it.</td></tr>
+        <tr><td><code>defaultActiveKey</code></td><td>An uncontrolled row: the key selected first.</td></tr>
+        <tr><td>Item <code>eventKey</code>, <code>href</code></td><td>What identifies the item. Selection is keyed off one of them.</td></tr>
+        <tr><td>Panel <code>eventKey</code></td><td>The tab a panel belongs to, in the tabs mode.</td></tr>
+        <tr><td>Dropdown <code>title</code>, <code>id</code></td><td>The label on the tab and the id of its menu.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--ds-border</code></td><td>The 1 baseline under the row</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>An unselected tab</td></tr>
+        <tr><td><code>--ds-text-selected</code>, <code>--ds-border-selected</code></td><td>The selected tab's ink and its bar</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-hovered</code></td><td>Hover</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-pressed</code></td><td>Pressed</td></tr>
+        <tr><td><code>--ds-text-disabled</code></td><td>A disabled tab</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>The 2px focus ring, inside the tab</td></tr>
+        <tr><td><code>--size-element-pad-x-lg</code></td><td>The 16 side padding of a tab</td></tr>
+        <tr><td><code>--item-height-md</code></td><td>The 32 height of a tab</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell description={<>Standard tabs with a disabled tab, and a tab with a menu.</>}>
     <DsCanvasQuiet of={NavTabsStories.Content} />
 </DocsCanvasShell>
 
-</div>
+<DocsCanvasShell description={<>Justified tabs stretch to fill the row. Left, center and right align the row inside its container.</>}>
+    <DsCanvasQuiet of={NavTabsStories.Layout} />
+</DocsCanvasShell>
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Pseudo hover, focus, and pressed on inactive and active tabs.</>}>
+<DocsCanvasShell description={<>Hover, focus and pressed on unselected and selected tabs, forced for the demonstration. Focus is a 2px ring inside the tab, with no fill.</>}>
     <DsCanvasQuiet of={NavTabsStories.InteractionStates} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Justified tab distribution.</>}>
-    <DsCanvasQuiet of={NavTabsStories.Layout} />
+<DocsCanvasShell description={<>The same three tabs in each mode. The difference is not visual: the navigation mode is a row of links, and the tabs mode is a tab list with one tab stop, arrow keys and a panel for each tab.</>}>
+    <DsCanvasQuiet of={NavTabsStories.Semantics} />
 </DocsCanvasShell>
 
 </div>
@@ -109,6 +185,47 @@ export const figmaMeta = {
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Tabs has no do and don't examples yet.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+A row is uncontrolled with a default key, or controlled with a key and a
+handler. A controlled row without a handler never moves, and every item needs
+an event key or a link, because selection is keyed off one of them.
+
+```jsx
+<NavTabs activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+</NavTabs>
+```
+
+In the tabs mode, declare each panel beside its tab so the component owns both
+halves of the pointer between them. Only the selected panel renders.
+
+```jsx
+<NavTabs mode="tabs" activeKey={tab} onSelect={setTab}>
+  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
+  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
+  <NavTabs.Panel eventKey="overview">{overview}</NavTabs.Panel>
+  <NavTabs.Panel eventKey="sessions">{sessions}</NavTabs.Panel>
+</NavTabs>
+```
+
+The navigation mode is the default because existing screens use the row as
+navigation, where links are the right element.
+
+</div>
+
+
 </div>
 
 </DocsTab>
@@ -121,51 +238,20 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `NavTabs` for the underlined tab bar that switches between sibling views of
-the same subject — a student's Overview / Sessions / Progress, or the sections of
-an admin page. Compose it from `NavTabs.Item` children, and hang a
-`NavTabs.Dropdown` off the bar when one tab needs to fan out.
+Use tabs for views of the same thing. Each tab shows another view of one
+subject, such as a student's Overview, Sessions and Progress, or the sections
+of an admin page.
 
-It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
-`onSelect`). `alignment` covers left, center, right and `justified`, which
-stretches the tabs to fill the bar.
+- **Moving to a different page or area:** use Sidebar tab or a link, because tabs imply the content stays in place.
+- **Switching views with a lighter, filled look:** use Nav pills.
+- **Moving between headings of one long page:** use Scrollspy.
+- **Filtering a list:** use Select or Choice group. Filters combine, and tabs do not.
+- **More tabs than fit the width:** use Select. The row wraps onto a second line rather than scrolling, which hides which row the reader is on.
 
-</div>
+Two rules keep a row of tabs readable:
 
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### A controlled bar needs `onSelect`, or it will never move.
-
-```jsx
-// Incorrect — activeKey pins the bar and nothing updates it.
-<NavTabs activeKey="overview">
-  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
-  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
-</NavTabs>
-
-// Correct.
-<NavTabs activeKey={tab} onSelect={setTab}>
-  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
-  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
-</NavTabs>
-```
-
-### Give each item an `eventKey` or an `href` — selection is keyed off one of them.
-
-```jsx
-// Incorrect — with neither, there is no key to compare against activeKey, so
-// the item never shows as active and onSelect fires with nothing useful.
-<NavTabs activeKey={tab} onSelect={setTab}>
-  <NavTabs.Item>Overview</NavTabs.Item>
-</NavTabs>
-
-// Correct.
-<NavTabs activeKey={tab} onSelect={setTab}>
-  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
-</NavTabs>
-```
+- **Use the tabs mode when the tabs swap panels in place.** It gives the row tab semantics, arrow keys and one tab stop. Leave the default navigation mode when each tab is a link to its own URL.
+- **Keep labels short and parallel.** One or two words each, in the same form, so the row scans as a set.
 
 </div>
 
@@ -173,74 +259,14 @@ stretches the tabs to fill the bar.
 
 ## Accessibility
 
-- **In the default mode this is a row of links, not a tab widget.** The
-  underlying nav only applies `role="tablist"` — and therefore `role="tab"` and
-  `aria-selected` on each item — when it sits inside a tab container, and
-  `NavTabs` does not provide one. An item with a real `href` renders as an
-  ordinary link; an item with only an `eventKey` renders as an anchor with
-  `role="button"` and `href="#"`. Which is correct for navigation, and is why
-  `mode="tabs"` exists rather than a fix being applied to everyone.
-- **Arrow keys are gated on the same context.** The library's key handler
-  returns immediately when there is no tab context, so left/right arrow
-  navigation does not work in the default mode even if you set `role="tablist"`
-  yourself.
-- **Tab still works in either mode.** In navigation mode every item is focusable
-  and activates with Enter, so the bar is operable by keyboard — it is the
-  *semantics* that are missing, not the operation.
-- **`mode="tabs"` is the WAI-ARIA tabs pattern.** `role="tablist"` on the
-  container, `role="tab"` and `aria-selected` on each item, `aria-controls`
-  pointing at the panel when one is declared, and roving tabindex: one stop for
-  the whole strip, with Left, Right, Home and End moving selection and focus
-  together. Items are real `<button>` elements, so activating one no longer
-  pushes a history entry or moves the scroll position the way `href="#"` did.
-- **Arrow keys skip a disabled tab.** A disabled `<button>` cannot take focus,
-  so landing selection on one would move the selection and strand the focus
-  behind it. If every other tab is disabled, the keys do nothing.
-- **The strip's single tab stop is never lost.** It sits on the selected tab,
-  unless that tab is disabled or `activeKey` names no tab at all — then it falls
-  back to the first enabled one. Each of those cases would otherwise take the
-  whole tablist out of the tab sequence with nothing to see on screen. The stop
-  is decided by `activeKey` alone: `active` on an item is an appearance prop, so
-  marking several items active makes several look selected without giving the
-  strip several places in the tab sequence.
-- **`aria-controls` is omitted rather than dangled.** A tab with no
-  `NavTabs.Panel` gets no pointer at all — an id that is not in the document
-  sends assistive technology to nothing, which is worse than pointing nowhere.
-- **A dropdown is not a tab.** `NavTabs.Dropdown` has no valid ARIA inside a
-  tablist. In `mode="tabs"` it is wrapped presentational so the markup stays
-  valid, and it is left out of the tab set, so the arrow keys walk past it — but
-  a strip that needs an overflow menu wants the default mode, or a `Select`.
-- **`disabled` is honored.** A disabled item loses its `href`, gains
-  `aria-disabled`, and stops responding to clicks — so it drops out of the tab
-  order rather than sitting there as a dead-looking link.
-- **The bar has no name.** Extra props are spread onto the nav element, so
-  `aria-label` is the way to say what this set of tabs is for — especially when
-  a page carries more than one.
-
-### If it must behave as an ARIA tab widget, ask for `mode="tabs"`.
-
-```jsx
-// Incorrect — assuming role="tab" and arrow keys come for free. They do not:
-// by default this renders as a row of links.
-<NavTabs activeKey={tab} onSelect={setTab}>{items}</NavTabs>
-
-// Correct — mode="tabs" supplies role="tablist", aria-selected, roving
-// tabindex and left/right/Home/End. Panels are declared alongside the items so
-// the component owns both halves of the aria-controls pair; only the active
-// one is rendered.
-<NavTabs mode="tabs" activeKey={tab} onSelect={setTab}>
-  <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
-  <NavTabs.Item eventKey="sessions">Sessions</NavTabs.Item>
-  <NavTabs.Panel eventKey="overview">{overview}</NavTabs.Panel>
-  <NavTabs.Panel eventKey="sessions">{sessions}</NavTabs.Panel>
-</NavTabs>
-```
-
-The mode is opt-in rather than the default because three specs under
-`src/specs/Home` render this component as navigation, where anchors are the
-right element and a tablist would be a lie. `NavTabs.test.jsx` asserts the
-navigation markup byte for byte against the markup it rendered before `mode`
-existed.
+- **Tab mode.** The row is a tab list. Each tab announces itself as a tab and says whether it is selected, and points at its panel when one is declared.
+- **Navigation mode.** The row is a set of links. Every item is a tab stop and activates with Enter, so the row works from the keyboard, but screen readers do not announce a tab set.
+- **One tab stop.** In the tabs mode the whole row is a single stop, on the selected tab. Left, Right, Home and End move the selection and the focus together.
+- **Disabled tabs.** Arrow keys skip a disabled tab. A disabled tab cannot be focused or pressed, and it drops out of the tab order.
+- **A tab with a menu is not a tab.** It has no valid tab semantics inside a tab list, so the arrow keys walk past it. A row that needs an overflow menu uses the navigation mode, or a Select.
+- **Name the row.** Pass an accessible name to say what the set of tabs is for, especially when a page carries more than one.
+- **Focus** is a 2px ring inside the tab, never a fill, so focus does not read as pressed.
+- **Contrast.** The selected state does not rest on color alone: the bar under the tab marks it as well as the ink.
 
 </div>
 
@@ -248,12 +274,9 @@ existed.
 
 ## Related
 
-- For navigating to a different page, use `Navbar` or `Breadcrumb` — tabs imply the content stays in place.
-- For a pill-shaped bar, use `NavPills`.
-- For more tabs than fit the width, use `Select` — the strip is `flex-wrap:
-  wrap`, so the overflow becomes a second row of tabs rather than a scroll or
-  an overflow menu, and the row the reader is on stops being obvious.
-- For filtering a list rather than switching between views, use `Select` or `ChoiceGroup` — filters combine, tabs do not.
+- [Nav pills](?path=/docs/components-navigation-tabs-nav-pills-navbar-nav-pills--docs) for switching views with a lighter, filled look.
+- [Sidebar tab](?path=/docs/components-navigation-sidebar-tab--docs) for moving between top-level areas.
+- [Scrollspy](?path=/docs/components-navigation-scrollspy--docs) for moving between headings of one long page.
 
 </div>
 

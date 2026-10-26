@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagStories from './Tag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Tag } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsPreviewCard, DocsTable, DoDontCard, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -13,7 +14,7 @@ export const figmaMeta = {
     },
     "color": {
       "type": "enum",
-      "values": ["gray", "blue", "green", "purple", "magenta", "yellow", "teal"]
+      "values": ["gray", "blue", "green", "purple", "magenta", "yellow", "teal", "orange", "lime", "brown"]
     },
     "type": {
       "type": "enum",
@@ -45,16 +46,18 @@ export const figmaMeta = {
 <Meta of={TagStories} />
 
 <Title />
-Is it a number? Count. Is it the condition something is in, and can that
-condition change? Status. Otherwise, Tag: a subject, a focus area, a person, a
-category.
+A tag names a subject, a focus area, a person, an agent or a team: anything
+that is not a number or a changing condition. It is outlined and a status is
+filled, so a reader tells a category from a meaning without reading the words.
+A row of tags is a Tag group, which owns the gaps, the wrapping, the alignment
+and the disabled state.
 
 <DocsTabs of={TagStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-63570"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Tag"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -66,7 +69,10 @@ category.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The four behaviors: read-only, removable, selectable and link. Every one is 22 tall, outlined, with neutral text and the color on the border and swatch.</>}>
+Color matters on this page. Switch Color mode and Contrast in the toolbar to
+read the tags in light, dark and increased contrast.
+
+<DocsCanvasShell attachSourceBelow description={<>The four behaviors: read-only, removable, selectable and link. Each is 22 tall and outlined, with neutral text and the color on the border and the swatch.</>}>
     <Canvas of={TagStories.Behaviors} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -74,17 +80,108 @@ category.
 
 <div className="sb-ds-doc-section">
 
-## Colors
+## Anatomy
 
-<DocsCanvasShell description={<>Ten colors, the accent families. A tag's color is a category, never a status, so there is no <code>success</code> or <code>danger</code>. Gray is the default.</>}>
-    <DsCanvasQuiet of={TagStories.Colors} />
-</DocsCanvasShell>
+<DocsPreviewCard>
+    <Tag behavior="removable" color="blue" onRemove={() => {}}>Science</Tag>
+</DocsPreviewCard>
+
+1. **Swatch** in the category color. A person, agent or team leads with a 16 avatar instead.
+2. **Label**, as text or children. A label past the maximum width is clipped, with the full text in a tooltip.
+3. **Remove ×**, its own button, named "Remove" and the label.
+4. **Outline**, a neutral border. A selected tag takes the full hue.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Types
+## Properties
+
+Each row names the Figma property and the code prop it maps to. Figma marks
+each default in the value name, such as "gray (default)"; code takes the bare
+value.
+
+<DocsTable>
+    <thead>
+        <tr><th>Figma property</th><th>Code prop</th><th>Type</th><th>Values</th><th>Default</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Tag · label</td><td><code>text</code> or <code>children</code></td><td>node</td><td>any text</td><td>none</td></tr>
+        <tr><td>Tag · count?</td><td><code>count</code></td><td>number or string</td><td>selectable tags only</td><td>none</td></tr>
+        <tr><td>Tag · remove?</td><td><code>onRemove</code></td><td>function</td><td>removable, or a link with its own ×</td><td>none</td></tr>
+        <tr><td>Tag · color</td><td><code>color</code></td><td>enum</td><td><code>gray</code>, <code>blue</code>, <code>green</code>, <code>purple</code>, <code>magenta</code>, <code>yellow</code>, <code>teal</code>, <code>orange</code>, <code>lime</code>, <code>brown</code></td><td><code>gray</code></td></tr>
+        <tr><td>Tag · type</td><td><code>type</code></td><td>enum</td><td><code>plain</code>, <code>person</code>, <code>agent</code>, <code>team</code></td><td><code>plain</code></td></tr>
+        <tr><td>Tag · behavior</td><td><code>behavior</code></td><td>enum</td><td><code>read-only</code>, <code>removable</code>, <code>selectable</code>, <code>link</code></td><td><code>read-only</code></td></tr>
+        <tr><td>Tag · state</td><td><code>isLoading</code> for saving</td><td>boolean</td><td>Hover, pressed and focus are the browser's. Disabled comes from the field.</td><td><code>false</code></td></tr>
+        <tr><td>Tag · selected</td><td><code>isSelected</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td></tr>
+        <tr><td>Tag · elevated</td><td><code>isElevated</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td></tr>
+        <tr><td>Tag group · tags</td><td><code>children</code></td><td>node</td><td>any content</td><td>none</td></tr>
+        <tr><td>Tag group · overflow</td><td><code>overflow</code></td><td>enum</td><td><code>wrap</code>, <code>collapse</code></td><td><code>wrap</code></td></tr>
+        <tr><td>Tag group · alignment</td><td><code>alignment</code></td><td>enum</td><td><code>left</code>, <code>right</code></td><td><code>left</code></td></tr>
+        <tr><td>Tag group · disabled</td><td><code>disabled</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td></tr>
+    </tbody>
+</DocsTable>
+
+Two code names differ from Figma's. <code>grey</code> is a deprecated alias
+for <code>gray</code>, and <code>variant</code> is the deprecated name for
+<code>behavior</code>.
+
+These code props have no Figma property:
+
+<DocsTable>
+    <thead>
+        <tr><th>Code prop</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>avatar</code></td><td>The avatar of a person, agent or team tag: an image source or a node. Missing or broken, it falls back to initials.</td></tr>
+        <tr><td><code>elemBefore</code></td><td>Leading content in place of the swatch, such as an icon. Plain tags only.</td></tr>
+        <tr><td><code>swatchBefore</code></td><td>A swatch color of its own, for a tag acting as a chart legend entry.</td></tr>
+        <tr><td><code>maxWidth</code></td><td>Caps the whole tag. The default is 180.</td></tr>
+        <tr><td><code>href</code>, <code>linkComponent</code></td><td>Where a link tag goes, and the router link to render in place of an anchor.</td></tr>
+        <tr><td><code>onClick</code></td><td>Called when a selectable or link tag is pressed.</td></tr>
+        <tr><td><code>removeLabel</code></td><td>The name of the × when the label is not text.</td></tr>
+        <tr><td>Tag group <code>label</code></td><td>The group's accessible name.</td></tr>
+        <tr><td>Tag group <code>maxVisible</code>, <code>overflowLabel</code>, <code>onOverflowClick</code></td><td>With <code>overflow="collapse"</code>: the most tags shown, the label of the overflow tag, and a replacement for its menu.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--ds-border-accent-COLOR-subtle</code></td><td>The border at rest, one per color</td></tr>
+        <tr><td><code>--ds-icon-accent-COLOR</code></td><td>The swatch, one per color</td></tr>
+        <tr><td><code>--ds-border-accent-COLOR</code></td><td>The border of a selected tag</td></tr>
+        <tr><td><code>--ds-background-accent-COLOR-subtlest</code></td><td>Hover</td></tr>
+        <tr><td><code>--ds-background-accent-COLOR-subtler</code></td><td>Selected</td></tr>
+        <tr><td><code>--ds-text</code></td><td>The label, the same neutral on every color</td></tr>
+        <tr><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code></td><td>A disabled tag</td></tr>
+        <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>An elevated tag on an image</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>The focus ring</td></tr>
+        <tr><td><code>--size-element-pad-x-xs</code>, <code>--size-element-gap-xs</code></td><td>The 4 padding and the 4 gap inside the tag</td></tr>
+        <tr><td><code>--size-element-radius-md</code></td><td>The 4 corner radius</td></tr>
+    </tbody>
+</DocsTable>
+
+In these names, COLOR stands for one of the ten colors. The height of 22, the
+10 swatch and the 16 avatar have no token yet.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+<DocsCanvasShell description={<>Ten colors, the accent families. A tag's color is a category, never a status, so there is no <code>success</code> or <code>danger</code>. Gray is the default. The color picker in Tag input offers the same ten.</>}>
+    <DsCanvasQuiet of={TagStories.Colors} />
+</DocsCanvasShell>
 
 <DocsCanvasShell description={<>A person, an agent or a team leads with a 16 avatar in place of the swatch. A person is round, and so are its tag and its ×; an agent is a hexagon; a team is a square. The border stays neutral and the color fills the avatar.</>}>
     <DsCanvasQuiet of={TagStories.Types} />
@@ -98,29 +195,13 @@ category.
     <DsCanvasQuiet of={TagStories.TypeBehaviors} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Selection
-
-<DocsCanvasShell description={<>A selectable tag is a toggle and publishes <code>aria-pressed</code>. Selected is a full-color border as well as a fill.</>}>
+<DocsCanvasShell description={<>A selectable tag is a toggle. Selected is a full-color border as well as a fill.</>}>
     <DsCanvasQuiet of={TagStories.Selecting} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>States use the accent's own steps: hover is subtlest, pressed subtlest pressed, and selected the subtler step, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
-    <DsCanvasQuiet of={TagStories.StateLayers} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<><code>count</code> adds a small neutral Count to a selectable tag, such as a filter's result count. On any other behavior it is ignored.</>}>
     <DsCanvasQuiet of={TagStories.CountOnSelectable} />
 </DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Removing
 
 <DocsCanvasShell description={<>The × is named from the label, so a row of tags does not expose a row of identical controls.</>}>
     <DsCanvasQuiet of={TagStories.Removing} />
@@ -130,12 +211,6 @@ category.
     <DsCanvasQuiet of={TagStories.LinkWithRemove} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## On images
-
 <DocsCanvasShell description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video: the overlay surface and its shadow, no border and neutral text, with the hue kept on the swatch. Place it 8 from the image corner, never centered over a face or text.</>}>
     <DsCanvasQuiet of={TagStories.OnImages} />
 </DocsCanvasShell>
@@ -144,15 +219,7 @@ category.
     <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled: the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Focus on an elevated link's × has the same 2px surface gap inside its ring as the tag's own focus. A × off the image keeps the plain ring.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedRemoveFocus} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Editing happens off the image, so a removable or selectable tag ignores <code>isElevated</code> and keeps its outline, with a warning in development.</>}>
+<DocsCanvasShell description={<>Editing happens off the image, so a removable or selectable tag ignores <code>isElevated</code> and keeps its outline.</>}>
     <DsCanvasQuiet of={TagStories.ElevatedOnlyReadOnlyAndLink} />
 </DocsCanvasShell>
 
@@ -162,7 +229,13 @@ category.
 
 ## States
 
-<DocsCanvasShell description={<>Focus is a 2px Focus Ring 2px outside the tag, or outside the ×.</>}>
+Every Figma state is drawn on Tag.
+
+<DocsCanvasShell description={<>Hover is the subtlest step of the accent, pressed its pressed step, and selected the subtler step, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
+    <DsCanvasQuiet of={TagStories.StateLayers} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focus is a 2px ring, 2px outside the tag, or outside the ×.</>}>
     <DsCanvasQuiet of={TagStories.FocusRing} />
 </DocsCanvasShell>
 
@@ -170,15 +243,23 @@ category.
     <DsCanvasQuiet of={TagStories.PersonFocusRing} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Focus on an elevated link's × has the same 2px surface gap inside its ring as the tag's own focus. A × off the image keeps the plain ring.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedRemoveFocus} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<>Saving: a spinner replaces the swatch or avatar, so the tag keeps its width, and the × waits for the save.</>}>
     <DsCanvasQuiet of={TagStories.Saving} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Disabled comes from the field through <code>TagContext</code>: a neutral fill, no ×, and nothing to focus.</>}>
+<DocsCanvasShell description={<>Disabled comes from the field or the Tag group: a neutral fill, no ×, and nothing to focus. Tag has no disabled prop.</>}>
     <DsCanvasQuiet of={TagStories.DisabledInField} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
+<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled.</>}>
+    <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ends in an ellipsis, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
     <DsCanvasQuiet of={TagStories.Truncation} />
 </DocsCanvasShell>
 
@@ -200,6 +281,40 @@ category.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+Tag has one do example so far, and no don't.
+
+<div style={{ maxWidth: 420 }}>
+    <DoDontCard tone="do" caption="A subject in its category color.">
+        <Tag color="blue">Science</Tag>
+    </DoDontCard>
+</div>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+Disabled comes from the field, not from a prop. A field or Tag group wraps its
+tags in the context provider, and `useTagContext()` reads the same value from
+inside a custom tag.
+
+```jsx
+<TagContext.Provider value={{ isDisabled: true }}>
+    <Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
+</TagContext.Provider>
+```
+
+`TAG_COLORS` lists the ten colors for a picker, and `resolveTagColor` turns a
+name, including the deprecated alias, into the color Tag draws.
+
+</div>
+
+
 </div>
 
 </DocsTab>
@@ -212,104 +327,28 @@ category.
 
 ## When to use
 
-- **Is it a number?** Count.
-- **Is it the condition something is in, and can that condition change?** Status.
-- **Otherwise** (a subject, a focus area, a person, a category): Tag.
+Use a tag for a subject, a focus area, a person, an agent or a team. To pick
+between the labels, ask in this order:
 
-Who set the value no longer decides. A tag is outlined and a status is filled,
-so a reader tells a category from a meaning without reading the words. Until
-Status lands, a state is a `BadgeVariants` status.
+- **Is it a number?** Use Count.
+- **Is it the condition something is in, and can that condition change?** Use Status.
+- **Is it a value the system proposes?** Use Suggestion.
+- **Otherwise,** use Tag.
 
-</div>
+For several tags in a row, use Tag group. For a labeled field where a person
+picks, creates and removes tags, use Tag input.
 
-<div className="sb-ds-doc-section">
+Four rules shape how a tag is used:
 
-## Usage notes
+- **Color is a category, not a status.** A color names a category on the border and the swatch. A meaning that can change is a Status.
+- **Pick the behavior, not the look.** Choose read-only, removable, selectable or link. A count is for selectable tags only.
+- **Name who owns it with a type.** Person, agent and team lead with a 16 avatar. Leave the avatar out, or let it fail, and initials stand in without moving the tag.
+- **Lift a tag onto an image with the elevated option.** It is for read-only and link tags only, because a value is edited off the image.
 
-### Color is a category, not a status.
+Two rules belong to the field and the group:
 
-```jsx
-// Incorrect — green reads as "went well" beside anything red.
-<Tag color="green">Passed</Tag>
-
-// Correct — pick a color per category and keep it stable, or leave every tag gray.
-<Tag color="blue">Biology</Tag>
-<Tag color="blue">Chemistry</Tag>
-```
-
-### Pick the behavior, not the look.
-
-```jsx
-// Read-only, the default: a value on show.
-<Tag>Grade 4</Tag>
-
-// Removable: a value the person can take out.
-<Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
-
-// Selectable: a filter, with its result count.
-<Tag behavior="selectable" isSelected={on} onClick={toggle} count={12}>Science</Tag>
-
-// Link, and a link with a separate ×.
-<Tag behavior="link" href="/subjects/algebra">Algebra</Tag>
-<Tag behavior="link" href="/subjects/algebra" onRemove={drop}>Algebra</Tag>
-```
-
-`count` is for selectable tags only; anywhere else it is ignored with a warning.
-
-### Name who owns it with a type.
-
-```jsx
-// A person: round, with their photo or their initials.
-<Tag type="person" avatar={user.photoUrl}>Rosa Chen</Tag>
-
-// An agent: a hexagon on the accent's subtler step, so it never reads as a person.
-<Tag type="agent" color="purple">PLUS AI</Tag>
-
-// A team: a square avatar.
-<Tag type="team" avatar={<i className="fa-solid fa-users" />}>Math team</Tag>
-```
-
-`avatar` takes an image source or a node. Leave it out, or let it fail, and
-initials stand in without moving the tag. On a plain tag it is ignored with a
-warning.
-
-### Lift a tag onto an image with `isElevated`.
-
-```jsx
-// A subject on a lesson thumbnail, 8 from the corner.
-<Tag color="blue" isElevated>Algebra</Tag>
-<Tag behavior="link" href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
-```
-
-Read-only and link only: a value is edited off the image. On a removable or
-selectable tag `isElevated` is ignored with a warning.
-
-### Disable the field, not the tag.
-
-There is no `disabled` prop. A field or group that is disabled says so once,
-and every tag inside follows:
-
-```jsx
-<TagContext.Provider value={{ isDisabled: true }}>
-    <Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
-</TagContext.Provider>
-```
-
-`useTagContext()` reads the same value from inside a custom tag.
-
-### Let the group own the gaps.
-
-`Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
-`gap` once for the set.
-
-### Renamed props.
-
-`variant` is now `behavior` (`dismissible` is `removable`) and `grey` is now
-`gray`. The old names still work and warn in development. `orange` was an
-alias for `yellow`; it is now the orange accent, so an old `orange` tag turns
-orange. `operational` has
-no direct replacement: a tag that opens something is `behavior="selectable"`
-with `aria-expanded`.
+- **Disable the field, not the tag.** A disabled field or Tag group says so once, and every tag inside follows.
+- **Let the group own the gaps.** A tag sets no margin. Put more than one tag in a Tag group, which sets the 8 gap and wraps the row or collapses it behind +n.
 
 </div>
 
@@ -317,37 +356,15 @@ with `aria-expanded`.
 
 ## Accessibility
 
-- **A removable tag is not itself a control.** The × is, and a button inside a
-  button is invalid, so the tag is a `span` with one button in it.
-- **The × is named from the label.** It announces `Remove Science`;
-  `removeLabel` overrides that when the label is not text.
-- **Selectable publishes `aria-pressed`**, so the state is not only visible.
-  Selected also changes the border to the full hue, so it does not rest on a
-  change of lightness alone. A selectable tag given `aria-expanded` is a button
-  that opens something, such as TagGroup's `+n`: it publishes the expanded
-  state and no `aria-pressed`.
-- **A link with a × is two tab stops**, link then ×, and pressing the × never
-  follows the link.
-- **Saving is announced once.** The spinner is hidden; a status region beside
-  the tag, outside its name, says "Saving". The × and a link stay focusable
-  but do nothing until the save lands.
-- **A × needs a name.** When the label is not text, pass `removeLabel`, or the
-  × is named only "Remove" and development warns.
-- **An elevated tag's focus ring has a surface gap.** The 2px between the tag
-  (or a link's ×) and the ring is filled in the surface color, so the ring
-  reads on a dark picture.
-- **Disabled tags take no focus, and say they are disabled.** They come from
-  a disabled field. A selectable tag is a native disabled button, announced as
-  disabled. Every other tag is a span, which has no disabled state a screen
-  reader announces, so it ends with visually hidden text and is read as
-  "Science, disabled".
-- **A clipped label keeps its full text** in a tooltip that hover and keyboard
-  focus both reach. On a control the control carries it; on a plain tag the
-  label takes focus while, and only while, it is clipped.
-- **The swatch and the avatar are decoration** and are hidden from assistive
-  technology; an avatar image has empty alt text. The tag's words name the
-  person, agent or team, so the initials are never read out or folded into the
-  ×'s name.
+- **Removable:** the tag is a span with one button in it, because a button inside a button is invalid. The × is named from the label, such as "Remove Science". Pass a remove label when the label is not text.
+- **Selectable:** the tag publishes its pressed state, so selection is not carried by color alone. Selected also changes the border to the full hue.
+- **Link with a ×:** two tab stops, the link and then the ×. Pressing the × never follows the link.
+- **Saving:** announced once as "Saving". The × and a link stay focusable but do nothing until the save lands.
+- **Focus:** a 2px ring, 2px outside the tag. On an elevated tag the gap is filled in the surface color, so the ring reads on a dark picture.
+- **Disabled:** a disabled tag takes no focus and is announced as disabled.
+- **Clipped label:** the full text stays in a tooltip that hover and keyboard focus both reach.
+- **Swatch and avatar:** decoration, hidden from assistive technology. The tag's words name the person, agent or team.
+- **Contrast:** the label is the neutral text token on every color, so the color never decides whether the words can be read.
 
 </div>
 
@@ -355,10 +372,12 @@ with `aria-expanded`.
 
 ## Related
 
-- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
-- For a number on its own, use `Count`.
-- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a state, use `BadgeVariants` until Status lands.
+- [Count](?path=/docs/components-labels-status-count-tag-count--docs) for a number on its own.
+- [Status](?path=/docs/components-labels-status-count-tag-status--docs) for a condition that can change.
+- [Suggestion](?path=/docs/components-labels-ai-label-suggestion--docs) for a value the system proposes, in the same Tag group.
+- [Tag group](?path=/docs/components-labels-status-count-tag-tag-group--docs) for a set of tags: it owns the gaps, the wrapping and the overflow.
+- [Tag input](?path=/docs/components-forms-and-inputs-tag-input--docs) for a labeled field of removable values.
+- [SMART subjects](?path=/docs/components-labels-status-count-tag-smart-subjects--docs) for the five SMART areas, drawn as tags.
 
 </div>
 

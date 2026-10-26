@@ -237,7 +237,8 @@ const preview = {
                 "Status",
                 "Count",
                 "Tag",
-                "Tag group"
+                "Tag group",
+                "SMART subjects"
               ],
               "AI label",
               [
