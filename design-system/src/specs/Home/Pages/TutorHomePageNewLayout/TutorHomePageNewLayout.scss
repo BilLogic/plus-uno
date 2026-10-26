@@ -1,71 +1,10 @@
 /**
  * Home on the new layout: four flat Sections on the Frame's
  * 12-column content grid, one per row, and the lesson cards inside the last.
- * The rules below the palette lay out what a Section's slots hold.
+ * The rules below lay out what a Section's slots hold. Every color is a
+ * --ds- token; the Frame, Surface, Section and Card patterns paint their own
+ * grounds, so this sheet sets only the text, wells and dividers in the slots.
  */
-
-/* ===================================================================
- * ONE-OFF EXPERIMENT: a neutral palette for this page only.
- *
- * Bill asked for the calm neutrals of Claude and Notion, as a one-time look
- * for this review page: direct colors, not tokens. It overrides the custom
- * properties the frame, Sidebar, Topbar, Tabs and Card read, on this page's
- * root only, so nothing global or shared changes. Blue stays on primary
- * buttons, the active tab, links and the chart line. Delete this block to
- * return the page to the system palette.
- * =================================================================== */
-.plus-home-new {
-    // Frame and app background; the content surface.
-    --surface-sunken: #f7f7f5;
-    --color-surface: #f7f7f5;
-    --color-surface-sunken: #f7f7f5;
-    --color-surface-container-low: #f7f7f5;
-    --surface-default: #ffffff;
-    --surface-raised: #ffffff;
-    --surface-overlay: #ffffff;
-    --color-surface-default: #ffffff;
-    --color-surface-raised: #ffffff;
-    --color-surface-overlay: #ffffff;
-    --color-surface-container-lowest: #ffffff;
-
-    // Subtle fill.
-    --color-surface-variant: #f1f1ef;
-    --color-surface-container: #f1f1ef;
-
-    // Lines.
-    --color-outline: rgba(55, 53, 47, 0.09);
-    --color-outline-variant: rgba(55, 53, 47, 0.16);
-
-    // Text: primary and secondary. Secondary is #6f6e69 rather than the brief's
-    // #787774, which is 4.17:1 on the frame and fails AA; #6f6e69 holds 4.5:1
-    // on all three surfaces.
-    --color-on-surface: #37352f;
-    --color-on-surface-variant: #6f6e69;
-
-    // Neutral hover and press washes.
-    --color-on-surface-state-08: rgba(55, 53, 47, 0.05);
-    --color-on-surface-state-12: rgba(55, 53, 47, 0.08);
-    --color-on-surface-state-16: rgba(55, 53, 47, 0.12);
-
-    // The content panel's edge, and the elevation of popups and lifted cards.
-    --surface-radius: 12px;
-    --plus-home-new-panel-edge: 0 0 0 1px rgba(15, 15, 15, 0.05), 0 1px 2px rgba(15, 15, 15, 0.04);
-    --plus-home-new-elevated: 0 0 0 1px rgba(15, 15, 15, 0.05), 0 4px 12px rgba(15, 15, 15, 0.08);
-    --surface-overlay-shadow: var(--plus-home-new-elevated);
-
-    // The sidebar's selected and hover rows are neutral, not blue.
-    .plus-frame__sidebar {
-        --color-primary-state-16: rgba(55, 53, 47, 0.08);
-        --color-primary-state-12: rgba(55, 53, 47, 0.05);
-        --color-primary-text: #37352f;
-        --color-primary: #37352f;
-    }
-
-    .plus-frame__surface {
-        box-shadow: var(--plus-home-new-panel-edge);
-    }
-}
-/* ======================================================= end one-off */
 
 // Rhythm: generous space between the sections, and no boxes around them.
 .plus-home-new .plus-frame__content {
@@ -102,7 +41,7 @@
     block-size: var(--icon-md);
     font-size: var(--icon-md);
     line-height: 1;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtlest);
 }
 
 .plus-home-new__inline--wrap {
@@ -121,26 +60,33 @@
     gap: var(--surface-stack-lg);
 }
 
-// Plain text in a slot, on the type styles.
+// Plain text in a slot, on the type styles. A caption is meta text only, such
+// as a lesson's duration; a note that explains something is secondary text.
 .plus-home-new__body {
     margin: 0;
     font: var(--body-default);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-home-new__secondary {
     margin: 0;
     font: var(--body-default);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-home-new__caption {
     margin: 0;
     font: var(--body-small);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
 }
 
-// The badge: a slim callout row under the page header.
+.plus-home-new__note {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+// The badge: a slim callout row under the page header, a well on the surface.
 .plus-home-new__callout {
     display: flex;
     flex-wrap: wrap;
@@ -148,7 +94,7 @@
     gap: var(--element-inline-md);
     padding: var(--space-075) var(--space-100);
     border-radius: var(--radius-050);
-    background-color: var(--color-surface-variant);
+    background-color: var(--ds-surface-container);
 
     p {
         margin: 0;
@@ -164,7 +110,7 @@
 
 .plus-home-new__callout-title {
     font: var(--heading-xsmall);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-home-new__callout-action {
@@ -194,7 +140,7 @@
     }
 
     & + & {
-        border-inline-start: 1px solid var(--color-outline);
+        border-inline-start: 1px solid var(--ds-border);
     }
 
     p {
@@ -217,17 +163,17 @@
 
         & + & {
             border-inline-start: 0;
-            border-block-start: 1px solid var(--color-outline);
+            border-block-start: 1px solid var(--ds-border);
         }
     }
 }
 
 .plus-home-new__stat-value {
     font: var(--metric-large);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
-// Skills: the chart straight on the surface, its caption under it.
+// Skills: the chart straight on the surface, its note under it.
 .plus-home-new__chart {
     display: flex;
     flex-direction: column;
@@ -248,8 +194,8 @@
     );
     column-gap: var(--layout-gutter);
     // A scroller clips at its padding box. The padding gives each card room for
-    // its border and its hover lift, and the equal negative margin keeps the
-    // cards on the grid's columns.
+    // its raised shadow, and the equal negative margin keeps the cards on the
+    // grid's columns.
     margin: calc(-1 * var(--card-stack-lg));
     padding: var(--card-stack-lg);
     scroll-padding-inline: var(--card-stack-lg);
@@ -272,24 +218,13 @@
     > * {
         flex: 1 1 auto;
     }
-
-    // Lesson cards are flat, a divider-color line around them, and lift on hover.
-    .plus-pattern-card {
-        border-color: var(--color-outline);
-        box-shadow: none;
-        transition: box-shadow 0.15s ease;
-
-        &:hover {
-            box-shadow: var(--plus-home-new-elevated);
-        }
-    }
 }
 
-// A lesson's picture fills the card's width at 16:9.
+// A lesson's picture fills the card's width at 16:9, on a well until it loads.
 .plus-home-new__thumb {
     display: block;
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    background-color: var(--color-surface-variant);
+    background-color: var(--ds-surface-container);
 }

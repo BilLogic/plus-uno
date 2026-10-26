@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, Button, Count, NavTabs, Select, Status, Tag } from '@/components';
+import { Alert, Button, Count, NavTabs, Select, StaticBadgeSmart, Status, Tag } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -66,20 +66,26 @@ const IMPACT_PAGES = [
     ],
 ];
 
-/** The curriculum categories' Tag colors, as today's lesson badges show them. */
-const CATEGORY_COLOR = {
-    'Mastering Content': 'purple',
-    'Socio-Emotional': 'magenta',
-    Advocacy: 'yellow',
-    Relationships: 'teal',
-    'Technology Tools': 'blue',
+/**
+ * Each curriculum category's SMART area. The lesson's tag is that area's
+ * SMART badge, which paints from the subject layer (`color.*.smart.{subject}`),
+ * so the subject-to-hue pairing lives in the tokens alone.
+ */
+const CATEGORY_AREA = {
+    'Mastering Content': 'mastering-content',
+    'Socio-Emotional': 'socio-emotional',
+    Advocacy: 'advocacy',
+    Relationships: 'relationships',
+    'Technology Tools': 'technology-tools',
 };
 
 /** The skills chart's score axis, 0 to 100 in quarters, as the Specs chart draws it. */
 const SCORE_DOMAIN = [0, 100];
 const SCORE_TICKS = [0, 25, 50, 75, 100];
-/** The score line is one of the page's few blue marks: the Primary role. */
-const SCORE_COLOR = 'var(--color-primary)';
+/** The score is the chart's one series, so it takes the brand chart color. */
+const SCORE_COLOR = 'var(--ds-chart-brand)';
+/** The average it is compared against takes the neutral chart color. */
+const AVERAGE_COLOR = 'var(--ds-chart-neutral)';
 
 /** How many lesson cards one view of the strip holds. */
 const lessonsPerView = (width, grid) => cardsPerRow(width, grid, grid.cardMin);
@@ -148,7 +154,9 @@ const infoGlyph = <i className="fa-solid fa-circle-info plus-home-new__glyph" ar
  *   session with its tabs, Your impact with its stats and the Skills
  *   subsection (h3), and Personalized recommendations, whose lesson cards are
  *   the page's only cards.
- * - The page wears a one-off neutral palette, set in its stylesheet.
+ * - Every color is a --ds- token. The patterns and components paint their
+ *   own; the page's stylesheet colors only the text, wells and dividers in
+ *   the slots.
  */
 const TutorHomePageNewLayout = ({
     id,
@@ -328,7 +336,7 @@ const TutorHomePageNewLayout = ({
                                             color: SCORE_COLOR,
                                         }]}
                                     />
-                                    <p className="plus-home-new__caption">Each point represents the average score across 5 sessions.</p>
+                                    <p className="plus-home-new__note">Each point represents the average score across 5 sessions.</p>
                                 </>
                             ) : (
                                 <RadarChart
@@ -338,7 +346,7 @@ const TutorHomePageNewLayout = ({
                                     categories={skillsOverviewData.categories}
                                     series={[
                                         { name: 'Your performance', data: skillsOverviewData.yourPerformance, color: SCORE_COLOR },
-                                        { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, dashStyle: 'Dash' },
+                                        { name: 'Average tutor performance', data: skillsOverviewData.averagePerformance, color: AVERAGE_COLOR, dashStyle: 'Dash' },
                                     ]}
                                 />
                             )}
@@ -377,10 +385,12 @@ const TutorHomePageNewLayout = ({
                                 footer={<Button text="Review" style="secondary" fill="tonal" aria-label={`Review ${lesson.title}`} onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
-                                    <Tag color={CATEGORY_COLOR[lesson.category] ?? 'gray'}>{lesson.category}</Tag>
+                                    {CATEGORY_AREA[lesson.category]
+                                        ? <StaticBadgeSmart type={CATEGORY_AREA[lesson.category]} />
+                                        : lesson.category && <Tag color="gray">{lesson.category}</Tag>}
                                     {lesson.duration && <span className="plus-home-new__caption">{lesson.duration}</span>}
                                     {lesson.inProgress && <Status style="warning" leadingVisual="spinner">In progress</Status>}
-                                    {lesson.aiRecommended && <Status style="info" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
+                                    {lesson.aiRecommended && <Status style="discovery" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
                                 </div>
                             </PatternCard>
                         </li>
@@ -410,7 +420,7 @@ TutorHomePageNewLayout.propTypes = {
     }),
     recommendedLessons: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.string.isRequired,
-        category: PropTypes.oneOf(Object.keys(CATEGORY_COLOR)),
+        category: PropTypes.oneOf(Object.keys(CATEGORY_AREA)),
         title: PropTypes.string.isRequired,
         duration: PropTypes.string,
         /** The card's picture, decorative (empty alt). */
