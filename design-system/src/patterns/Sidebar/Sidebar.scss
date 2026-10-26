@@ -32,11 +32,6 @@
     flex: 1 1 auto;
     gap: var(--element-stack-sm);
     min-height: 0;
-    // Room for a row's focus ring, which sits 2 outside the row (a 2 ring at a
-    // 2 offset): the scroller would clip it otherwise. The negative margin
-    // gives the room back, so every row keeps its place.
-    margin: calc(-2 * var(--size-element-stroke-lg));
-    padding: calc(2 * var(--size-element-stroke-lg));
     overflow-y: auto;
     overscroll-behavior: contain;
 }

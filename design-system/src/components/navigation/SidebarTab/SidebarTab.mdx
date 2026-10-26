@@ -198,8 +198,8 @@ button never nests inside the row's button.
   as well as the neutral selected fill, the selected text and icon, and the
   label in `--type-weight-medium`, so which section you are in is announced, and
   never drawn by fill alone.
-- **Focus is a ring outside the row.** A 2px `--ds-border-focused` ring, 2px
-  out, so it shows on the frame rather than on the row's fill.
+- **Focus is a ring inside the row.** A 2px `--ds-border-focused` ring, drawn
+  2px in from the row's edge, so the sidebar's edge never clips it.
 - **Disabled is announced.** `state="disabled"` sets `aria-disabled`, drops the
   click handler and takes the row out of the tab order.
 - **The disabled color is the system's.** Text and icon take `--ds-text-disabled`

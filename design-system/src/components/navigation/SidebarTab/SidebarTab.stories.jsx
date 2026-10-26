@@ -183,7 +183,7 @@ export const Interactive = {
 /** A row that fits the 240 sidebar's 224 content width. */
 const sidebarWidth = { width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))' };
 
-/** Tabbing onto a row draws the 2px focused ring, 2px outside the row. */
+/** Tabbing onto a row draws the 2px focused ring, 2px inside the row. */
 export const KeyboardFocus = {
     args: { text: 'Reports', icon: 'chart-bar' },
     parameters: { docs: { disable: true } },
@@ -194,7 +194,7 @@ export const KeyboardFocus = {
         await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
         await expect(px(getComputedStyle(row).outlineWidth), 'ring width').toBe(2);
         await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(px(getComputedStyle(row).outlineOffset), 'ring offset, outside the row').toBe(2);
+        await expect(px(getComputedStyle(row).outlineOffset), 'ring offset, inside the row').toBe(-2);
     },
 };
 
@@ -203,7 +203,7 @@ export const KeyboardFocus = {
  * subtle text and icon, hovering moves it to the neutral subtle step, a
  * selected row is the neutral selected fill with the selected text and icon
  * and a medium-weight label, with no leading bar, a disabled row the disabled text,
- * and focus the focused ring 2px outside.
+ * and focus the focused ring 2px inside.
  */
 export const ColorModes = {
     parameters: { docs: { disable: true } },

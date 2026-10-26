@@ -195,7 +195,7 @@ export const KeyboardFocus = {
         await expect(document.activeElement).toBe(first);
         await waitFor(() => expect(getComputedStyle(first).outlineStyle).toBe('solid'));
         await expect(getComputedStyle(first).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(px(getComputedStyle(first).outlineOffset), 'the ring sits outside the row').toBeCloseTo(tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
+        await expect(px(getComputedStyle(first).outlineOffset), 'the ring sits inside the row').toBeCloseTo(-tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
     },
 };
 
