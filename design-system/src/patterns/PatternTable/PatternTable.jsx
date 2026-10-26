@@ -1,11 +1,58 @@
-import React, { useCallback, useState } from 'react';
+import React, { Children, Fragment, isValidElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import './PatternTable.scss';
 
+let toolbarWarned = false;
+
+/**
+ * The table has no toolbar of its own: search, filters, the record count and
+ * bulk actions belong to the Section header above it, where they stay in reach
+ * while the rows scroll. The slot still renders, and says so once.
+ */
+const warnToolbar = () => {
+    if (toolbarWarned || process.env.NODE_ENV === 'production') return;
+    toolbarWarned = true;
+    // eslint-disable-next-line no-console
+    console.warn('[PatternTable] `toolbar` is deprecated: the table has no toolbar of its own. Put search, filters and actions in the Section header above the table.');
+};
+
+/** Children with fragments opened, so a `thead` passed inside one is found. */
+const flatten = (children) => Children.toArray(children).flatMap((child) => (
+    isValidElement(child) && child.type === Fragment ? flatten(child.props.children) : [child]
+));
+
+const isElementOf = (type) => (child) => isValidElement(child) && child.type === type;
+
+/** The rows an empty table drops; the head row, a caption and column groups stay. */
+const isBody = (child) => isElementOf('tbody')(child) || isElementOf('tfoot')(child);
+
+/** How many columns the head row spans, counting each cell's `colSpan`; 1 with no head row. */
+const columnCount = (kept) => {
+    const firstRow = kept.filter(isElementOf('thead'))
+        .flatMap((head) => flatten(head.props.children))
+        .find(isElementOf('tr'));
+    if (!firstRow) return 1;
+    const count = flatten(firstRow.props.children)
+        .filter((cell) => isElementOf('th')(cell) || isElementOf('td')(cell))
+        .reduce((sum, cell) => sum + (Number(cell.props.colSpan) || 1), 0);
+    return Math.max(count, 1);
+};
+
+/** The rendered head row's span, which also counts cells a wrapper component draws. */
+const renderedColumnCount = (table) => {
+    const row = table?.tHead?.rows[0];
+    if (!row) return null;
+    return Array.from(row.cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0) || null;
+};
+
 /**
  * Table pattern for PLUS design system.
- * Table shell: toolbar slot, table children (consumers pass their own
- * thead/tbody), pagination slot, and an empty-state slot. The table itself is
+ * Table shell: table children (consumers pass their own thead/tbody), a
+ * pagination slot under the rows, and an empty-state slot. The table has no
+ * toolbar of its own: the Section header above it carries the title, search,
+ * filters and actions. With `empty`, the header stays and the empty state
+ * takes the body as one message row spanning every column, so the columns
+ * still say what will appear. The table itself is
  * no-fill (transparent): the surrounding card or surface provides the
  * background, and row states are layered over each cell's fill rather than
  * replacing it.
@@ -57,7 +104,24 @@ const PatternTable = ({
         className,
     ].filter(Boolean).join(' ');
 
-    const showEmptyState = empty && emptyState;
+    const hasToolbar = Boolean(toolbar);
+    useEffect(() => {
+        if (hasToolbar) warnToolbar();
+    }, [hasToolbar]);
+
+    const showEmptyState = Boolean(empty && emptyState);
+    // An empty table keeps its head row and swaps its body for the message row.
+    const kept = showEmptyState ? flatten(children).filter((child) => !isBody(child)) : null;
+    // The span is read from the children first, then from the rendered head
+    // row, so a head row drawn by a wrapper component is still spanned.
+    const tableRef = useRef(null);
+    const [measuredSpan, setMeasuredSpan] = useState(null);
+    useLayoutEffect(() => {
+        if (!showEmptyState) return;
+        const span = renderedColumnCount(tableRef.current);
+        setMeasuredSpan((prev) => (prev === span ? prev : span));
+    });
+    const messageSpan = showEmptyState ? (measuredSpan ?? columnCount(kept)) : null;
     const tracksScroll = pinsHeader || stickyColumn;
     // A region that scrolls must be reachable by keyboard: a bounded region
     // scrolls vertically, and a sticky column exists for a table that scrolls
@@ -67,20 +131,29 @@ const PatternTable = ({
     return (
         <div id={id} className={classes} style={style} {...props}>
             {toolbar && <div className="plus-pattern-table-toolbar">{toolbar}</div>}
-            {showEmptyState ? (
-                <div className="plus-pattern-table-empty">{emptyState}</div>
-            ) : (
-                <div
-                    className="plus-pattern-table-scroll"
-                    style={bounded ? { maxHeight } : undefined}
-                    tabIndex={scrollable ? 0 : undefined}
-                    onScroll={tracksScroll ? onScroll : undefined}
-                    data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
-                    data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
-                >
-                    <table className="plus-pattern-table-table">{children}</table>
-                </div>
-            )}
+            <div
+                className="plus-pattern-table-scroll"
+                style={bounded ? { maxHeight } : undefined}
+                tabIndex={scrollable ? 0 : undefined}
+                onScroll={tracksScroll ? onScroll : undefined}
+                data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
+                data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
+            >
+                <table ref={tableRef} className="plus-pattern-table-table">
+                    {showEmptyState ? (
+                        <>
+                            {kept}
+                            <tbody>
+                                <tr className="plus-pattern-table-message-row">
+                                    <td className="plus-pattern-table-message" colSpan={messageSpan}>
+                                        <div className="plus-pattern-table-message-body">{emptyState}</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </>
+                    ) : children}
+                </table>
+            </div>
             {pagination && !showEmptyState && (
                 <div className="plus-pattern-table-pagination">{pagination}</div>
             )}
@@ -90,13 +163,17 @@ const PatternTable = ({
 
 PatternTable.propTypes = {
     id: PropTypes.string,
-    /** Toolbar slot above the table (search, filters, bulk actions) */
+    /**
+     * Deprecated: the table has no toolbar of its own. Put search, filters and
+     * actions in the Section header above the table. Still rendered, with a
+     * one-time development warning.
+     */
     toolbar: PropTypes.node,
-    /** Pagination slot below the table */
+    /** Pagination slot under the rows; hidden while the empty state shows */
     pagination: PropTypes.node,
-    /** Empty-state slot, rendered instead of the table when `empty` is true */
+    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true */
     emptyState: PropTypes.node,
-    /** Show the empty-state slot instead of the table */
+    /** Swap the body rows for the empty-state message row; the head row stays */
     empty: PropTypes.bool,
     /** Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically */
     stickyHeader: PropTypes.bool,
