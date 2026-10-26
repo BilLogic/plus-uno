@@ -13,6 +13,9 @@
     @include screen-grid-width(var(--modal-pad));
     @include screen-grid-width-steps;
 
+    /* Modal/body-min-height: Figma holds the body at 96, one step of the space scale. */
+    --modal-body-min-height: var(--size-spacing-large-space-1200);
+
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
@@ -91,8 +94,21 @@
 /* Body: takes what the header and footer leave and scrolls past the cap */
 .plus-pattern-modal-body {
     flex: 1 1 auto;
-    min-height: 0;
+    min-height: var(--modal-body-min-height);
     overflow-y: auto;
+}
+
+/* Divider: the 1px rule under the header and above the footer, the modal stack on both sides */
+.plus-pattern-modal-divider {
+    flex-shrink: 0;
+    height: var(--size-element-border);
+    background-color: var(--ds-border);
+}
+
+/* A custom header fills the row; the caller lays out its own parts */
+.plus-pattern-modal-header.plus-pattern-modal-header-custom {
+    display: block;
+    min-width: 0;
 }
 
 /* Footer */

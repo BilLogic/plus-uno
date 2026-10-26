@@ -71,6 +71,9 @@ The Modal pads 16 on every side and rounds 12 at every width. The header, body a
 <tr><td><code>width</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code></td><td><code>sm</code></td><td>6, 8 or 10 columns of the screen grid plus 16 on each side.</td></tr>
 <tr><td><code>height</code></td><td>string</td><td><code>hug</code>, <code>fill</code></td><td><code>hug</code></td><td>Hug grows with the content to the cap set by the <a href="?path=/docs/foundations-patterns-overlay--docs">Overlay</a>. Fill always sits at that height.</td></tr>
 <tr><td><code>footer</code></td><td>node</td><td>buttons</td><td>none</td><td>The footer slot. Leaving it out removes the footer.</td></tr>
+<tr><td><code>header</code></td><td>node</td><td>content</td><td>none</td><td>A custom header, Figma's header <code>type</code> custom. It replaces the title and the Close button, so name the dialog with <code>aria-label</code>. Tabs, when set, still sit under it.</td></tr>
+<tr><td><code>divider</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws a 1px rule under the header and, when there is a footer, above it.</td></tr>
+<tr><td><code>loading</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Swaps the body for a Skeleton paragraph and marks the body busy. The header and footer stay.</td></tr>
 <tr><td><code>onClose</code></td><td>function</td><td>none</td><td>none</td><td>Draws the Close button and runs when it is pressed.</td></tr>
 <tr><td><code>tabs</code></td><td>list</td><td>each tab has <code>key</code>, <code>label</code>, <code>content</code> and optional <code>disabled</code></td><td>none</td><td>Puts a tab group under the title. The selected tab's content replaces the body.</td></tr>
 <tr><td><code>activeTab</code></td><td>string or number</td><td>a tab key</td><td>none</td><td>The selected tab, when the caller holds it. Move it from <code>onTabChange</code>.</td></tr>
@@ -89,12 +92,12 @@ Figma's Modal has more options than the code draws.
 <tbody>
 <tr><td><code>width</code></td><td>sm, md, lg</td><td>Same: <code>width</code>.</td></tr>
 <tr><td><code>height</code></td><td>hug, fill</td><td>Same: <code>height</code>.</td></tr>
-<tr><td>Header <code>type</code></td><td>default, custom, tabs</td><td>Default and tabs: <code>title</code> and <code>tabs</code>. Custom is not in code.</td></tr>
+<tr><td>Header <code>type</code></td><td>default, custom, tabs</td><td>Default and tabs: <code>title</code> and <code>tabs</code>. Custom: <code>header</code>, which takes the place of the title row.</td></tr>
 <tr><td><code>description?</code></td><td>on, off</td><td>Not in code. Put a description line in the body or the title.</td></tr>
 <tr><td><code>actions?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>.</td></tr>
-<tr><td><code>divider?</code></td><td>on, off</td><td>Not in code.</td></tr>
-<tr><td><code>loading?</code></td><td>on, off</td><td>Not in code.</td></tr>
+<tr><td><code>divider?</code></td><td>on, off</td><td>Same: <code>divider</code>. A rule under the header and above the footer.</td></tr>
+<tr><td><code>loading?</code></td><td>on, off</td><td>Same: <code>loading</code>. The body shows a skeleton paragraph.</td></tr>
 <tr><td><code>column guide?</code></td><td>on, off</td><td>Figma only. It shows the screen-grid columns for checking alignment and never ships.</td></tr>
 </tbody>
 </DocsTable>
@@ -117,6 +120,7 @@ Figma's Modal has more options than the code draws.
 <tr><td><code>--modal-inline-sm</code></td><td>8</td><td>A token for inline space between controls you place in a slot. The footer binds <code>--size-element-gap-sm</code>, 8, for the space between its buttons.</td></tr>
 <tr><td><code>--modal-inline-md</code></td><td>16</td><td>A token for wider inline space in slot content.</td></tr>
 <tr><td><code>--modal-inline-lg</code></td><td>24</td><td>A token for the widest inline space in slot content.</td></tr>
+<tr><td><code>--modal-body-min-height</code></td><td>96</td><td>The least height the body draws, so a short body or the loading skeleton does not collapse. It aliases the 96 step of the space scale.</td></tr>
 <tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
 <tr><td><code>--layout-width-modal-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width</td><td>The three width steps, per screen size.</td></tr>
 <tr><td><code>--layout-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at. See Tokens on the <a href="?path=/docs/foundations-patterns-overlay--docs">Overlay</a> page.</td></tr>
@@ -152,7 +156,7 @@ Figma's Modal has more options than the code draws.
 
 ### Height
 
-<DocsCanvasShell description={<><strong>Hug</strong>, the default, grows with its content up to the cap, then the body scrolls. Small content keeps no minimum. <strong>Fill</strong> always sits at that height, so a settings or editor Modal never jumps.</>}>
+<DocsCanvasShell description={<><strong>Hug</strong>, the default, grows with its content up to the cap, then the body scrolls. The body never draws shorter than 96, so small content and the loading skeleton keep a floor. <strong>Fill</strong> always sits at that height, so a settings or editor Modal never jumps.</>}>
     <DsCanvasQuiet of={PatternModalStories.Heights} />
 </DocsCanvasShell>
 
@@ -171,6 +175,28 @@ Figma's Modal has more options than the code draws.
 - Keep each label to one or two words on one line. At width <code>sm</code> that is about three tabs. Never wrap or scroll the strip, and never nest a second tab group in the body.
 - One footer serves every tab. Save saves them all, and switching tabs keeps what was typed.
 - Prefer height <code>fill</code> when the views differ in length, so switching tabs never resizes the Modal.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Custom header, divider and loading
+
+<DocsCanvasShell description={<><code>header</code> takes the place of the title row, so the caller owns the title and the Close button and names the dialog with <code>aria-label</code>.</>}>
+    <DsCanvasQuiet of={PatternModalStories.CustomHeader} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>divider</code> draws a 1px rule under the header and above the footer. Turn it on when the body scrolls under a header with tabs.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Divider} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>loading</code> swaps the body for a skeleton paragraph and marks it busy. The header and footer stay, so the Modal keeps its shape while the content arrives. The body floor of 96 keeps the Modal from collapsing.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Loading} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The body never draws shorter than <code>--modal-body-min-height</code>, 96.</>}>
+    <DsCanvasQuiet of={PatternModalStories.BodyMinHeight} />
+</DocsCanvasShell>
 
 </div>
 

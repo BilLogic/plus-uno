@@ -172,6 +172,28 @@ export const LongContent = {
     },
 };
 
+/**
+ * `footer` is Figma's `footer?`: pass the actions and the footer is pinned to the
+ * bottom edge; leave it out and the footer is gone, so read-only details end at the body.
+ */
+export const Footer = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <Inline title="footer on" screenHeight={360}>{details}</Inline>
+            <Inline title="footer off" footer={undefined} screenHeight={360}>{details}</Inline>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const [withFooter, without] = dialogs(canvasElement);
+        const footer = withFooter.querySelector('.plus-pattern-drawer-footer');
+        await expect(footer, 'footer on draws the slot').not.toBeNull();
+        await expect(within(footer).getByRole('button', { name: 'Save changes' })).toBeInTheDocument();
+        await expect(footer.getBoundingClientRect().bottom, 'pinned to the bottom pad')
+            .toBeCloseTo(withFooter.getBoundingClientRect().bottom - tokenLength(canvasElement, '--drawer-pad'), 0);
+        await expect(without.querySelector('.plus-pattern-drawer-footer'), 'footer off draws nothing').toBeNull();
+    },
+};
+
 /** A button opens a real drawer over the page; its focus handling is what the play test checks. */
 const WithTrigger = (args) => {
     const [open, setOpen] = React.useState(false);

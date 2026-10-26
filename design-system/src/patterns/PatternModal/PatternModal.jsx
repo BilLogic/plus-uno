@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NavTabs } from '@/components';
+import { NavTabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '../Overlay';
 import './PatternModal.scss';
@@ -53,12 +53,22 @@ function useDeprecatedSizing(passed) {
  * type=tabs: NavTabs in tabs mode, in the header, so it stays put while only
  * the body scrolls. The body becomes the tab panel, named by the selected tab,
  * and shows that tab's content in place of `children`.
+ *
+ * `header` is Figma's `_Modal header` type=custom: a slot that takes the place
+ * of the title row (the title and the close button), so the caller owns both
+ * and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws
+ * a rule under the header and above the footer, as Figma's `divider?`.
+ * `loading` swaps the body for a Skeleton paragraph and marks it busy, as
+ * Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.
  */
 const PatternModal = ({
     id,
     title,
     onClose,
     footer,
+    header,
+    divider = false,
+    loading = false,
     width = 'sm',
     height = 'hug',
     maxHeight,
@@ -96,7 +106,7 @@ const PatternModal = ({
     // renders a title-less modal has to pass its own `aria-label`, which flows
     // through `...props`.
     const titleId = `${reactId}-title`;
-    const labelledBy = title ? titleId : undefined;
+    const labelledBy = title && !header ? titleId : undefined;
 
     // The body scrolls once the modal reaches its cap, and a scrollable region
     // that holds no focusable content is unreachable by keyboard. A fill modal
@@ -117,7 +127,11 @@ const PatternModal = ({
     const tabId = (key) => `${reactId}-tab-${tabs.findIndex((tab) => tab.key === key)}`;
     const panelId = `${reactId}-panel`;
 
-    const header = (
+    // A custom header takes the place of the title row; the tab group, when
+    // there is one, still sits under it.
+    const headerRow = header ? (
+        <div className="plus-pattern-modal-header plus-pattern-modal-header-custom">{header}</div>
+    ) : (
         <div className="plus-pattern-modal-header">
             {title && <h1 id={titleId} className="plus-pattern-modal-title">{title}</h1>}
             {onClose && (
@@ -151,7 +165,7 @@ const PatternModal = ({
         >
             {tabState ? (
                 <div className="plus-pattern-modal-header-group">
-                    {header}
+                    {headerRow}
                     <NavTabs
                         mode="tabs"
                         className="plus-pattern-modal-tabs"
@@ -172,12 +186,19 @@ const PatternModal = ({
                         ))}
                     </NavTabs>
                 </div>
-            ) : header}
+            ) : headerRow}
+            {divider && <div className="plus-pattern-modal-divider" aria-hidden="true" />}
             <HeadingLevelContext.Provider value={1}>
-                <div ref={bodyRef} className="plus-pattern-modal-body" {...panelProps}>
-                    {tabState ? tabState.content : children}
+                <div
+                    ref={bodyRef}
+                    className="plus-pattern-modal-body"
+                    aria-busy={loading ? 'true' : undefined}
+                    {...panelProps}
+                >
+                    {loading ? <Skeleton preset="paragraph" /> : (tabState ? tabState.content : children)}
                 </div>
             </HeadingLevelContext.Provider>
+            {footer && divider && <div className="plus-pattern-modal-divider" aria-hidden="true" />}
             {footer && <div className="plus-pattern-modal-footer">{footer}</div>}
         </div>
     );
@@ -230,6 +251,15 @@ PatternModal.propTypes = {
     id: PropTypes.string,
     /** Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name */
     title: PropTypes.node,
+    /**
+     * Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row
+     * (the title and the close button), so name the dialog with `aria-label`.
+     */
+    header: PropTypes.node,
+    /** A rule under the header and above the footer, as Figma's `divider?`. Off by default. */
+    divider: PropTypes.bool,
+    /** Swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. Off by default. */
+    loading: PropTypes.bool,
     /** Close handler — renders the close button when provided */
     onClose: PropTypes.func,
     /** Footer slot (typically action buttons) */
