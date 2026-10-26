@@ -5,7 +5,8 @@
  * and below (24 under 640 tall), its child centered. On Atlassian's layers:
  * the scrim at 500 and the layer it holds at 510. A confirm raised from a
  * modal is a second Overlay later in the page, so it reuses 500 / 510 and
- * covers the first.
+ * covers the first. With an edge placement it drops the pad and holds its
+ * child full height at the start or end of the screen, for a drawer.
  */
 
 .plus-pattern-overlay {
@@ -26,6 +27,24 @@
         position: relative;
         z-index: var(--layout-z-index-modal);
     }
+}
+
+/*
+ * Edge placements, for a drawer: no pad, the layer full height at the start
+ * (left in a left-to-right page) or the end (right).
+ */
+.plus-pattern-overlay-placement-start,
+.plus-pattern-overlay-placement-end {
+    padding: 0;
+    align-items: stretch;
+}
+
+.plus-pattern-overlay-placement-start {
+    justify-content: flex-start;
+}
+
+.plus-pattern-overlay-placement-end {
+    justify-content: flex-end;
 }
 
 /*

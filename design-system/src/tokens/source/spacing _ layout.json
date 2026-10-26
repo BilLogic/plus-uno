@@ -353,6 +353,99 @@
       }
     },
     {
+      "id": "VariableID:19858:35",
+      "name": "Drawer/width-drawer-sm",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-width-drawer-sm)"
+      },
+      "valuesByMode": {
+        "19378:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46218"
+        },
+        "19378:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46218"
+        },
+        "19378:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46218"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 384,
+        "19378:2": 512,
+        "19378:3": 640
+      }
+    },
+    {
+      "id": "VariableID:19858:36",
+      "name": "Drawer/width-drawer-md",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-width-drawer-md)"
+      },
+      "valuesByMode": {
+        "19378:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46219"
+        },
+        "19378:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46219"
+        },
+        "19378:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46219"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 507,
+        "19378:2": 677,
+        "19378:3": 848
+      }
+    },
+    {
+      "id": "VariableID:19858:37",
+      "name": "Drawer/width-drawer-lg",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--layout-width-drawer-lg)"
+      },
+      "valuesByMode": {
+        "19378:1": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46220"
+        },
+        "19378:2": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46220"
+        },
+        "19378:3": {
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:19378:46220"
+        }
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 629,
+        "19378:2": 843,
+        "19378:3": 1056
+      }
+    },
+    {
       "id": "VariableID:19378:46221",
       "name": "Surface/pad",
       "variableCollectionId": "VariableCollectionId:19378:46207",

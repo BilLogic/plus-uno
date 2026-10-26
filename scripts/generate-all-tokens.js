@@ -806,6 +806,15 @@ function generateFrameLayersSCSS() {
     for (const { file } of SCALE_COLLECTIONS) {
         for (const v of readSource(file).json.variables) scaleName[v.id] = webName(v.codeSyntax?.WEB);
     }
+    // A frame or layer token may also alias another one, as Drawer/width-drawer-*
+    // alias Modal/width-modal-*: it is written as a var() of that token, so it
+    // follows the target at every mode.
+    const frameLayerName = {};
+    for (const { name: collection } of FRAME_LAYER_COLLECTIONS) {
+        for (const v of readSource(frameLayerFile(collection)).json.variables) {
+            if (v.resolvedType !== 'BOOLEAN') frameLayerName[v.id] = `--${frameLayerToken(collection, v.name)}`;
+        }
+    }
 
     const layout = readSource('size _ layout.json').json;
     const minWidth = layout.variables.find((v) => v.name === 'Breakpoints/min width');
@@ -854,8 +863,9 @@ function generateFrameLayersSCSS() {
             const css = (mode) => {
                 const val = v.valuesByMode[mode.id];
                 if (val?.type === 'VARIABLE_ALIAS') {
-                    if (!scaleName[val.id]) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale exports holds.`);
-                    return `var(${scaleName[val.id]})`;
+                    const target = scaleName[val.id] ?? frameLayerName[val.id];
+                    if (!target) throw new Error(`${file}: ${v.name} aliases ${val.id}, which none of the scale or frame and layer exports holds.`);
+                    return `var(${target})`;
                 }
                 if (typeof val === 'number') {
                     if (NO_LIMIT_FRAME_LAYERS[leaf] === val) return 'none';

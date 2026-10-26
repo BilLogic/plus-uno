@@ -32,6 +32,10 @@
     --layout-width-modal-sm: 384px;
     --layout-width-modal-md: 507px;
     --layout-width-modal-lg: 629px;
+    /* Drawer */
+    --layout-width-drawer-sm: var(--layout-width-modal-sm);
+    --layout-width-drawer-md: var(--layout-width-modal-md);
+    --layout-width-drawer-lg: var(--layout-width-modal-lg);
     /* Surface */
     --surface-pad: var(--space-100);
     --surface-stack-sm: var(--space-100);
@@ -92,6 +96,14 @@
     --modal-inline-md: var(--space-100);
     --modal-inline-lg: var(--space-150);
     --modal-radius: var(--radius-075);
+    /* Drawer */
+    --drawer-pad: var(--space-100);
+    --drawer-stack-sm: var(--space-050);
+    --drawer-stack-md: var(--space-100);
+    --drawer-stack-lg: var(--space-150);
+    --drawer-inline-sm: var(--space-050);
+    --drawer-inline-md: var(--space-100);
+    --drawer-inline-lg: var(--space-150);
     /* Popover */
     --popover-pad: var(--space-100);
     --popover-width-sm: var(--width-2000);
