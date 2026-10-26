@@ -47,6 +47,16 @@ The modal pattern is the dialog shell: a header with the title and close button,
 
 <div className="sb-ds-doc-section">
 
+### Tabs
+
+<DocsCanvasShell description={<><code>tabs</code> puts a tab group under the title, Modal/stack-sm 8 below it, as Figma's <code>_Modal header</code> type=tabs. Each tab is <code>{'{ key, label, content, disabled? }'}</code>. The tabs stay put in the header and only the body scrolls; the body is the selected tab's panel, named by its tab, and shows that tab's <code>content</code> in place of <code>children</code>. Left and Right move between tabs, Home and End jump to the ends. Hold the selection with <code>activeTab</code> and <code>onTabChange</code>, or start it with <code>defaultActiveTab</code>. Use tabs for two to five views of one thing that people open in any order; when the views must be done in order, split the flow into steps instead. Prefer <code>height="fill"</code> when the views differ in length, so switching tabs never resizes the modal.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Tabs} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Interactive playground
 
 <DocsInteractivePlayground
