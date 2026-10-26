@@ -561,7 +561,7 @@
             "notes": "The base shape that Vertical outlined buttons nest, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-56204"
       }
     },
     "ButtonGroup": {
@@ -585,7 +585,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53074"
       }
     },
     "Card": {
@@ -669,7 +669,7 @@
             "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a Columns frame of equal `_Listbox Column`s of `Dropdown list Item` rows; a row with children shows caret-right in Trailing. state default · filled · open · disabled. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` with `OptionRow.Chevron` in Trailing. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-43002"
       }
     },
     "Checkbox": {
@@ -693,7 +693,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-57765"
       }
     },
     "ChoiceGrid": {
@@ -728,7 +728,7 @@
             "notes": "Rebuilt on Form Checkbox and Form Radio Button with a `type` axis and a `_Choice Grid Row` part. The separate CheckBox Grid set (13541:9240) was deleted."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-60819"
       }
     },
     "ChoiceGroup": {
@@ -780,7 +780,7 @@
             "notes": "Four variants, type × orientation. Legend, then a row of Leading text, the Options slot (Form Radio Button or Form Checkbox, at least two) and Trailing text, then Other and Error. Replaces the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717 and Scale Radio Button 13536:6785. Linear Scale stays in the library, deprecated, until the Specs file swaps its six instances."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-53488",
         "deliberate": {
           "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
           "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
@@ -818,7 +818,7 @@
             "notes": "size × state, 12 variants (small (default) 16, medium 20, large 24; rest, hover, pressed, focus). Not drawn by CloseButton: in code the small size is the × inside a removable or link Tag (behavior=\"removable\", or a link with onRemove), and its states are the browser's own :hover, :active and :focus-visible. Medium and large are not built in code yet."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-57608"
       }
     },
     "Collapse": {
@@ -936,7 +936,7 @@
             "notes": "The time half, state × filled? × size: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateAndTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-42637"
       }
     },
     "DatePicker": {
@@ -982,7 +982,7 @@
             "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-41580"
       }
     },
     "Divider": {
@@ -1047,7 +1047,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-55003"
       }
     },
     "FileUpload": {
@@ -1071,7 +1071,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-51566"
       }
     },
     "Footer": {
@@ -1210,7 +1210,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18356-647"
       }
     },
     "Jumbotron": {
