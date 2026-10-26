@@ -47,10 +47,11 @@ const USER = { name: 'John Doe', type: 'lead tutor' };
 
 /**
  * The app frame at full height: a Topbar with `breadcrumbs` and `user`, the
- * tutor Sidebar, and `children` in the surface. Any other prop goes to Frame.
+ * tutor Sidebar, and `children` in the surface. `height` sizes the box the
+ * frame fills (the viewport by default). Any other prop goes to Frame.
  */
-export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, user = USER, children, ...frameProps }) => (
-    <div style={{ height: '100vh' }}>
+export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, user = USER, height = '100vh', children, ...frameProps }) => (
+    <div style={{ height }}>
         <Frame
             topbar={<Topbar breadcrumbs={breadcrumbs} user={user} />}
             sidebar={<Sidebar user="tutor" activeTabId="home" />}

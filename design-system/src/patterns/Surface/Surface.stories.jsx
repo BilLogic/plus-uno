@@ -40,7 +40,8 @@ function SurfaceLevelsDemo() {
 }
 
 export default {
-    title: 'Foundations/Patterns/Surfaces',
+    title: 'Foundations/Patterns/Surface',
+    id: 'foundations-patterns-surfaces',
     component: Surface,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -88,6 +89,20 @@ export const Overview = () => (
 );
 
 export const Levels = () => <SurfaceLevelsDemo />;
+
+/** The padding and radius scales, each step on a bordered default surface. */
+export const Scales = () => (
+    <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+        {['sm', 'md', 'lg'].map((step) => (
+            <div key={step}>
+                <DemoLabel>{`padding ${step}, radius ${step}`}</DemoLabel>
+                <Surface padding={step} radius={step}>
+                    {slotContent('Content slot')}
+                </Surface>
+            </div>
+        ))}
+    </div>
+);
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
 export const ColorModes = {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, Modal, Sidebar } from '@/components';
@@ -10,7 +10,7 @@ import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { SURFACE_EDGE } from '@/patterns/Surface';
 
 /**
- * `Frame` — the app frame: a 32 topbar over a row holding the
+ * Surface container (in code, `Frame`) — the app frame: a 32 topbar over a row holding the
  * sidebar and the surface.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
@@ -47,7 +47,8 @@ const FrameWithSlots = (args) => (
 );
 
 export default {
-    title: 'Foundations/Patterns/Frame',
+    title: 'Foundations/Patterns/Surface container',
+    id: 'foundations-patterns-frame',
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
@@ -57,6 +58,24 @@ export default {
         topbar: { table: { disable: true } },
         sidebar: { table: { disable: true } },
         style: { table: { disable: true } },
+        sidebarDocked: {
+            control: 'select',
+            options: [undefined, true, false],
+            description: 'Overrides the width default: true docks the sidebar, false closes it. Unset follows the breakpoint.',
+            table: { category: 'Design' },
+        },
+        sidebarLabel: {
+            control: 'text',
+            description: 'Accessible name of the sidebar region.',
+            table: { category: 'Accessibility' },
+        },
+        surfaceDirect: {
+            control: 'boolean',
+            description: 'Renders children straight into the surface, with no content box or grid.',
+            table: { category: 'Design' },
+        },
+        contentAs: { control: false, table: { disable: true } },
+        contentClassName: { control: false, table: { disable: true } },
         width: {
             control: 'select',
             options: ['content', 'reading'],
@@ -169,6 +188,72 @@ export const ColorModes = {
 };
 
 export const Reading = { args: { width: 'reading' } };
+
+/**
+ * Docs examples. They render inline at a fixed height, so they follow the
+ * toolbar's color mode like the rest of the page. Hidden from the sidebar.
+ */
+const DOCS_HEIGHT = '420px';
+const DocsFrame = (args) => <FrameWithSlots {...args} height={DOCS_HEIGHT} />;
+
+export const DocsOverview = { render: DocsFrame, parameters: { layout: 'padded' } };
+
+export const DocsReading = { render: DocsFrame, args: { width: 'reading' }, parameters: { layout: 'padded' } };
+
+/**
+ * The sidebar floating: a closed sidebar peeked over the page. The story
+ * hovers the toggle once it mounts, which is what a pointer does.
+ */
+const FrameDemo = ({ peek = false, ...args }) => {
+    const ref = useRef(null);
+    useEffect(() => {
+        if (!peek) return;
+        const toggle = ref.current?.querySelector('.plus-topbar__toggle');
+        toggle?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+    }, [peek]);
+    return (
+        <div ref={ref}>
+            <FrameWithSlots {...args} sidebarDocked={peek ? false : args.sidebarDocked} height={DOCS_HEIGHT} />
+        </div>
+    );
+};
+
+const PeekedFrame = (args) => <FrameDemo {...args} peek />;
+
+/**
+ * One frame per layout mode, one story each: a page holds one landmark of each
+ * kind. The frame docks by the mode it is in; the pads follow the browser width.
+ */
+const atMode = (breakpoint, peek) => ({
+    render: (args) => (
+        <div data-plus-breakpoint={breakpoint}>
+            <FrameDemo {...args} peek={peek} />
+        </div>
+    ),
+    parameters: { layout: 'padded' },
+});
+
+/** sidebar = auto: closed at Medium, docked at Large and X-Large. */
+export const DocsAuto768 = atMode('md', false);
+export const DocsAuto1024 = atMode('lg', false);
+export const DocsAuto1440 = atMode('xl', false);
+
+/** sidebar = floating: a closed sidebar peeked over the page. */
+export const DocsFloating768 = atMode('md', true);
+export const DocsFloating1024 = atMode('lg', true);
+export const DocsFloating1440 = atMode('xl', true);
+
+export const Floating = {
+    render: PeekedFrame,
+    parameters: { layout: 'padded' },
+    play: async ({ canvasElement }) => {
+        const { frame, sidebar } = parts(canvasElement);
+        await waitFor(() => expect(sidebar(), 'the sidebar peeks').not.toBeNull());
+        await expect(getComputedStyle(sidebar()).position).toBe('absolute');
+        await expect(getComputedStyle(sidebar()).boxShadow, 'floating sidebar shadow')
+            .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
+    },
+};
 
 /** A `footer` is a third row: a stack under the surface, at the container pad from the foot, lined up with the surface. */
 export const WithFooter = {

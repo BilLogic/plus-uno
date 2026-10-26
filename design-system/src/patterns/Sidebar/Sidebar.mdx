@@ -1,12 +1,72 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SidebarStories from './Sidebar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SidebarStories} />
 
-<Title />
-The sidebar is the app's **side navigation**: a header with the logo, the top-level items, then sections. A section is a group label, its items and an optional divider; every item is a `SidebarTab`. It mirrors the Figma `_Sidebar` and `_Sidebar section` in Patterns › Surface container, and `Sidebar` fills it with the PLUS content for each role.
+export const propRows = [
+    ['header', 'node', 'none', 'The slot that stays put while the body scrolls: the logo.'],
+    ['items', 'list of items', 'empty', 'The top-level items above the sections, such as Home.'],
+    ['sections', 'list of sections', 'empty', 'Each section is a group label, its items and an optional divider after them.'],
+    ['activeId', 'string', 'none', 'The id of the selected item or open tab. It is marked as the current page.'],
+    ['onSelect', 'function', 'none', 'Called when an item other than an external link is pressed.'],
+    ['openTabs', 'object', 'empty', 'Open tabs by parent item id, most recent first.'],
+    ['onTabSelect', 'function', 'none', 'Called on a plain click of a tab, so the page can show the record. Without it the row is a plain link.'],
+    ['onTabClose', 'function', 'none', 'Called by a tab\'s close button and by Delete or Backspace on a focused tab.'],
+    ['onTabsCloseAll', 'function', 'none', 'Called by the parent\'s Close all.'],
+    ['label', 'string', 'Main', 'The accessible name of the navigation landmark.'],
+];
+
+export const itemProps = [
+    ['id', 'string', 'Required. Unique; activeId, onSelect and openTabs use it.'],
+    ['text', 'string', 'Required. The label. It truncates.'],
+    ['icon', 'string', 'A Font Awesome Free solid name for the 16 icon.'],
+    ['description', 'node', 'A second line under the label. The row grows to 40.'],
+    ['elemAfter', 'node', 'A count or status at the end of the row.'],
+    ['actionsOnHover', 'node', 'Controls shown on hover and focus.'],
+    ['href', 'string', 'Makes the row a link.'],
+    ['external', 'boolean', 'With href: opens a new tab and is never selected.'],
+    ['disabled', 'boolean', 'Announced, and skipped by Tab.'],
+];
+
+export const tokens = [
+    ['--layout-width-sidebar', '240', 'The sidebar width, set by the surface container.'],
+    ['--surface-container-pad', '8', 'The sidebar pads 8 at the sides.'],
+    ['--layout-pad-left-container', '8 at Medium, 0 from Large', 'The surface row\'s left pad: 8 while the sidebar floats, 0 once it docks.'],
+    ['--element-stack-sm', '4', 'The gap between rows, between sections, and between a section\'s items.'],
+    ['--element-pad-y-md, --element-pad-x-sm', '6, 8', 'The header around the logo.'],
+    ['--element-pad-y-md, --element-pad-x-md', '6, 12', 'The section group label.'],
+    ['--heading-xxsmall', '12 semibold', 'The group label type style.'],
+    ['--ds-text-subtlest', 'color', 'The group label color.'],
+    ['--item-height-md', '32', 'The row height. A row with a description is 40.'],
+    ['Logo', 'colored, XS, with text', 'The header content: the colored Logo at size XS, padded 6 and 8.'],
+    ['--icon-md', '16', 'The icon.'],
+];
+
+export const tabTokens = [
+    ['--element-pad-x-md + --icon-md', '12 + 16 = 28', 'The thread column. There is no token for the sum.'],
+    ['--item-height-md', '32', 'The tab surface height.'],
+    ['--element-pad-x-sm', '8', 'The tab surface pad, so its label lines up with the parent\'s at 36.'],
+    ['--element-radius-item-md', '8', 'The tab surface radius.'],
+    ['--ds-background-neutral-subtle-hovered', 'color', 'Hover.'],
+    ['--ds-background-neutral-subtle-pressed', 'color', 'Pressed.'],
+    ['--ds-background-selected', 'color', 'Selected, with --ds-text-selected and a label in --type-weight-medium. There is no leading bar.'],
+    ['--ds-background-selected-hovered', 'color', 'Selected and hovered.'],
+    ['--ds-border-focused', 'color', 'The focus ring: 2px, 2px outside the surface.'],
+    ['--element-stack-sm', '4', 'The gap between tab rows.'],
+    ['--ds-text-subtlest', 'color', 'The "Show N more" label.'],
+    ['Thread position', 'x 20', 'The thread runs under the parent icon\'s center.'],
+    ['Thread stub', 'ends at 24', 'The elbow\'s stub stops 4 before the surface, clear of a focused row\'s ring.'],
+    ['--ds-border', 'color', 'The thread line.'],
+    ['--size-element-stroke-sm', '1', 'The thread line width.'],
+    ['--element-radius-item-sm', '6', 'The thread elbow.'],
+];
+
+<Title>Sidebar</Title>
+The sidebar is the app's side navigation: a header with the logo, the top-level items, then sections. A section is a group label, its items and an optional divider, and every item is a Sidebar tab. It is a part of the surface container. In code, the foundation is `PatternSidebar` and `Sidebar` fills it with the PLUS content for each role.
+
+The examples on this page follow the **Color mode** switch in the toolbar.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
@@ -27,30 +87,138 @@ The sidebar is the app's **side navigation**: a header with the logo, the top-le
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+### When to use it
 
-- **Frame** — fills the Frame's sidebar panel (`--layout-width-sidebar` 240, padded `--surface-container-pad` 8), its rows `--element-stack-sm` 4 apart.
-- **Header** — the logo, padded `--element-pad-y-md` 6 / `--element-pad-x-sm` 8. It sits outside the scroller, so it stays put.
-- **Body** — the top-level items, then the sections. Past the frame's height it scrolls inside the sidebar.
-- **Section label** — `--heading-xxsmall` (12 semibold, Atlassian's menu section style), padded 6 / 12 (`--element-pad-y-md` / `--element-pad-x-md`). It names a `role="group"`; it is not a heading.
-- **Item** — a `SidebarTab`: `--item-height-md` 32, a 16 icon (`--icon-md`), a label that truncates, and the `description`, `elemAfter` and `actionsOnHover` slots.
-- **Divider** — optional, after a section: a `Divider` inset 12.
+Use the sidebar for the app's top-level destinations. Content comes from one config per role: a tutor sees Home, Training and Toolkit, and a supervisor adds Admin. Never draw a second sidebar for a role.
+
+A label truncates at one line. It never wraps or widens the 240 sidebar.
+
+For a place inside a page, use **Tabs**. For one destination on its own, use a link. For the row itself, see the **Sidebar tab** component.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### States
+### Anatomy
 
-<DocsCanvasShell description={<>A selected item carries <code>aria-current="page"</code>; a disabled one is announced and skipped by Tab.</>}>
+1. **Header** is the logo, padded 6 and 8. It sits outside the scroller, so it stays put.
+2. **Body** holds the top-level items, then the sections. Past the frame's height it scrolls inside the sidebar.
+3. **Section label** is a 12 semibold group name, padded 6 and 12. It names a group and is not a heading.
+4. **Item** is a Sidebar tab: at least 32 high, a 16 icon, a label that truncates, and the description, elemAfter and actionsOnHover slots.
+5. **Divider** is optional, after a section: a Divider inset 12.
+
+Rows sit 4 apart, and the sidebar pads 8 at the sides.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>What it does</th>
+        </tr>
+    </thead>
+    <tbody>
+        {propRows.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+                <td>{row[3]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+Each entry in items or in a section's items has these fields. A section also has an id, a title and an optional divider.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Field</th>
+            <th>Type</th>
+            <th>What it does</th>
+        </tr>
+    </thead>
+    <tbody>
+        {itemProps.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+In Figma, the Sidebar has two variants: state = docked | floating, and user = tutor | supervisor. A section has a title, a divider property and a slot for its items. In code, docked or floating comes from the surface container, and the user comes from the config you pass.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        {tokens.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants and states
+
+#### Roles
+
+The content comes from one config per role. A supervisor sees everything a tutor sees, plus the Admin group.
+
+<DocsCanvasShell description={<>The tutor and supervisor sidebars side by side.</>}>
+    <DsCanvasQuiet of={SidebarStories.Supervisor} />
+</DocsCanvasShell>
+
+#### Dividers
+
+<DocsCanvasShell description={<>A section's divider on and off. It sits after the section, inset 12.</>}>
+    <DsCanvasQuiet of={SidebarStories.Dividers} />
+</DocsCanvasShell>
+
+#### Item slots
+
+<DocsCanvasShell description={<>A description, a count in elemAfter, hover actions (hover or focus the Groups row) and a disabled row.</>}>
+    <DsCanvasQuiet of={SidebarStories.ItemSlots} />
+</DocsCanvasShell>
+
+#### Selected and disabled
+
+A selected item is marked as the current page. A disabled one is announced and skipped by Tab.
+
+<DocsCanvasShell description={<>The selected item is marked as the current page, and the disabled item is skipped by Tab.</>}>
     <DsCanvasQuiet of={SidebarStories.DisabledItem} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Extremes
+#### Extremes
 
 <DocsCanvasShell description={<>Long labels and long group labels end in an ellipsis, and the rows stay 32.</>}>
     <DsCanvasQuiet of={SidebarStories.LongLabels} />
@@ -60,34 +228,17 @@ The sidebar is the app's **side navigation**: a header with the logo, the top-le
     <DsCanvasQuiet of={SidebarStories.ManySections} />
 </DocsCanvasShell>
 
-</div>
+#### External links
 
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={SidebarStories.Overview}
-    description={<>Edit the items and sections in the table below; press an item to select it.</>}
-/>
+An external destination is an item with href and external. It opens a new tab, says so to a screen reader, and is never selected.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage
+### Open tabs
 
-- Content is data: pass `items` and `sections`. Which items a role sees belongs in the caller's config, never in a second copy of the markup.
-- A section label is a group's name. Never render it as a heading: the sidebar sits beside every page and would add the same headings to each one.
-- An external destination is an item with `href` and `external`. It opens a new tab, says so, and is never selected.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Open tabs
-
-An opened record, such as a session or a student, becomes a temporary tab under the item it belongs to. Several can be open at once, and each one can be closed. They are open records, not nested pages: Toolkit › Sessions and Toolkit › Students use them first.
+An opened record, such as a session or a student, becomes a temporary tab under the item it belongs to. Several can be open at once, and each one can be closed. They are open records, not nested pages. Toolkit › Sessions and Toolkit › Students use them first.
 
 <DocsCanvasShell description={<>The tutor example: two open sessions, one of them live, and one open student.</>}>
     <DsCanvasQuiet of={SidebarStories.OpenTabs} />
@@ -97,14 +248,49 @@ An opened record, such as a session or a student, becomes a temporary tab under 
     <DsCanvasQuiet of={SidebarStories.OpenTabExtremes} />
 </DocsCanvasShell>
 
-- **Parent** — the item turns into an accordion. Its chevron is a disclosure button (`aria-expanded`, `aria-controls`) that hides and shows the tabs, and the list opens on its own when a tab is opened. The label still opens the item's own page. On hover or focus it shows "Close all".
-- **Tab** — two parts side by side: a 28 thread column (the parent's `--element-pad-x-md` 12 plus its `--icon-md` 16) and a surface, a `SidebarTab` without an icon, `--item-height-md` 32 high, padded `--element-pad-x-sm` 8, so its label lines up with the parent's at 36. The title truncates. A live session shows the green `Count` dot, named "Live". On hover or focus it shows ×, named "Close" plus the title, and Delete or Backspace closes the focused tab.
-- **States** — on the surface only: hover `--ds-background-neutral-subtle-hovered`, pressed `--ds-background-neutral-subtle-pressed`, selected `--ds-background-selected` with `--ds-text-selected` and the label in `--type-weight-medium` (no leading bar), selected and hovered `--ds-background-selected-hovered`, and focus a 2px `--ds-border-focused` ring 2px outside the surface.
-- **Overflow** — the 5 most recent tabs show, then a "Show N more" row on the same surface, in `--ds-text-subtlest`.
-- **Thread** — a `--size-element-stroke-sm` line in `--ds-border` under the parent icon's center (x 20). It hangs from the parent row's bottom edge, through the 4 gap above the first tab, and runs unbroken through the gaps, ending at the last row (which is "Show N more" when it shows) in a `--element-radius-item-sm` 6 elbow whose stub stops at 24, 4 before the surface, clear of a focused row's ring. It never changes with the row's state.
-- **Selection** — opening a record selects its tab. Closing the selected tab selects its parent.
-- **Scope** — the tabs live in `sessionStorage`: they survive a reload and clear when the browser session ends. Call `clearOpenTabs()` at sign-out.
-- **No routing** — nothing in the model reads or writes the URL. Each record keeps its own route in `href`, and the tab links to it; `onTabSelect` gets a plain click, so an app can show the record without a page load.
+#### Parts
+
+1. **Parent** is the item as an accordion. Its chevron is a disclosure button that hides and shows the tabs, and the list opens on its own when a tab is opened. The label still opens the item's own page. On hover or focus it shows "Close all".
+2. **Tab** has two parts side by side: a 28 thread column, and a surface that is a Sidebar tab without an icon. The title truncates. A live session shows a green Count dot named "Live". On hover or focus it shows a close button named "Close" plus the title.
+3. **Show more** is the row after the 5 most recent tabs, "Show N more", in the subtlest text color.
+4. **Thread** is the line that ties the tabs to their parent. It hangs from the parent row and runs unbroken beside every tab. It ends at the last row in a rounded elbow. The last row is "Show N more" when it shows. The thread never changes with the row's state.
+
+#### Open tab tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        {tabTokens.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+#### Open tab states
+
+Rest, hover, pressed, selected, selected and hovered, and focus all draw on the tab's surface. The thread stays the same in every state.
+
+#### Rules
+
+- Opening a record adds its tab under the item it belongs to and selects it.
+- Closing the selected tab selects its parent.
+- The 5 most recent tabs show, then "Show N more". A selected tab older than the five still shows, after them.
+- Tabs are session-scoped. They survive a reload and clear at sign-out or when the browser session ends.
+- Tabs never change routing or deep links. Each record keeps its own route, and the tab links to the page that already shows it. Never duplicate a record's detail to make a tab.
+
+#### For developers
+
+Keep the tabs with `useOpenTabs`, and call `clearOpenTabs()` at sign-out. Nothing in the model reads or writes the URL.
 
 ```jsx
 import PatternSidebar, { useOpenTabs } from '@/patterns/Sidebar';
@@ -128,11 +314,39 @@ tabs.open('sessions', { id: 's1', title: 'Hogwarts · Tue, Sep 9', href: '/toolk
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Accessibility
 
-- For the row itself, use `SidebarTab`.
-- For the frame it docks in, use `Frame`.
-- For the PLUS sidebar with the role content, use `Sidebar`.
+- The sidebar is a navigation landmark. <code>label</code> names it, "Main" by default.
+- A section label names a <code>role="group"</code>. It is not a heading, so the sidebar adds no headings to the page outline.
+- The selected item carries <code>aria-current="page"</code>. A disabled item is announced and skipped by Tab.
+- An external link opens a new tab and says so to a screen reader.
+- Tab reaches each row in order, and the focus ring is 2px in <code>--ds-border-focused</code>, drawn 2px outside the row.
+- A parent's chevron is a button with an expanded state, and it points at the list it shows. Its name reads "Sessions tabs", for example.
+- Each tab's close button is named "Close" plus the title. Delete or Backspace closes the focused tab.
+- A live tab's dot is named "Live", so the row is announced as live.
+- Hover-only controls, such as the close button and Close all, also appear on focus.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SidebarStories.Overview}
+    description={<>Edit the items and sections in the table below. Press an item to select it.</>}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- <a href="?path=/docs/components-navigation-sidebar-tab--docs">Sidebar tab</a> for the row itself.
+- <a href="?path=/docs/foundations-patterns-frame--docs">Surface container</a> for the frame the sidebar docks in or floats over.
+- <a href="?path=/docs/foundations-patterns-topbar--docs">Topbar</a> for the toggle that opens and closes it.
+- <a href="?path=/docs/components-layout-and-structure-divider--docs">Divider</a> for the line between sections.
 
 </div>
 
