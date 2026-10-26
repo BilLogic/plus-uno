@@ -11,9 +11,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Button, CloseButton } from '@/components';
 import { Frame } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
+import './PageLayout.scss';
 
 /**
  * The page's `<h1>` is off-screen, not `display: none` — a hidden-by-display
@@ -40,8 +42,96 @@ const PAGE_TITLE_STYLE = {
     font: 'var(--heading-large)',
 };
 
+/**
+ * `frame="focused"`: the page for one task, with no sidebar. Mirrors the Figma
+ * `Pattern/Page template` frame=focused and its parts `_Focused topbar` and
+ * `_Focused footer`.
+ *
+ * - The Frame with no sidebar and three rows, `--focused-page-stack-sm` 8
+ *   apart inside `--focused-page-pad-y` · `--focused-page-pad-x` 8.
+ * - Topbar (a `header`, the banner), 32 high: Back, a secondary text button
+ *   with `arrow-left`; the title, the page's one visible `h1` at Heading/xsmall,
+ *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
+ *   12 apart.
+ * - Surface (the `main`): the frame's surface at reading width, content capped
+ *   at `--layout-max-width-reading` 864, centered, never under 720. It scrolls
+ *   on its own.
+ * - Footer (a `footer` named by `actionsLabel`): the actions, end-aligned,
+ *   `--focused-page-inline-sm` 8 apart, in a column as wide as the content and
+ *   lined up with it. It stays put while the surface scrolls.
+ *
+ * Focus order follows the DOM: Back, Close, the content, then the actions.
+ */
+const FocusedFrame = ({
+    title,
+    onBack,
+    backHref,
+    backLabel,
+    onClose,
+    closeLabel,
+    actions,
+    actionsLabel,
+    mainClassName,
+    contentDirect,
+    children,
+}) => {
+    const hasBack = Boolean(onBack || backHref);
+    const topbar = (
+        <header className="plus-page-focused__topbar">
+            {hasBack ? (
+                <Button
+                    className="plus-page-focused__back"
+                    style="secondary"
+                    fill="text"
+                    size="medium"
+                    leadingVisual="arrow-left"
+                    text={backLabel}
+                    href={backHref}
+                    onClick={onBack}
+                />
+            ) : null}
+            <h1 className="plus-page-focused__title">{title}</h1>
+            {onClose ? (
+                <CloseButton className="plus-page-focused__close" aria-label={closeLabel} onClick={onClose} />
+            ) : null}
+        </header>
+    );
+    const footer = actions ? (
+        <footer className="plus-page-focused__footer" aria-label={actionsLabel}>
+            <div className="plus-page-focused__actions">{actions}</div>
+        </footer>
+    ) : null;
+
+    return (
+        <Frame
+            topbar={topbar}
+            footer={footer}
+            width="reading"
+            contentAs="main"
+            contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
+            surfaceDirect={contentDirect}
+            style={{ flex: '1 1 auto', minHeight: 0 }}
+        >
+            {children}
+        </Frame>
+    );
+};
+
 const PageLayout = ({
     children,
+    /** `default`: the app frame with the TopBar and Sidebar. `focused`: one task, no sidebar — see FocusedFrame. */
+    frame = 'default',
+    /** Focused: called when Back is pressed. With this or `backHref`, the topbar shows Back. */
+    onBack,
+    /** Focused: where Back goes, as a link. */
+    backHref,
+    backLabel = 'Back',
+    /** Focused: called when Close is pressed. Without it there is no Close. */
+    onClose,
+    closeLabel = 'Close',
+    /** Focused: the footer actions, end-aligned, the primary last. Without them there is no footer. */
+    actions,
+    actionsLabel = 'Page actions',
     sidebarConfig = {},
     topBarConfig = {},
     footerConfig = {},
@@ -61,7 +151,8 @@ const PageLayout = ({
      * `.storybook/page-outline.js` assertion are what make forgetting it red.
      *
      * It is visually hidden because these pages put their name in the TopBar
-     * breadcrumb, not in the content — see the note on PAGE_TITLE_STYLE. A page
+     * breadcrumb, not in the content — see the note on PAGE_TITLE_STYLE. With
+     * `frame="focused"` it is the visible title in the focused topbar instead. A page
      * that DOES render its own visible title heading marks that heading up as
      * the `<h1>` instead and leaves this unset.
      */
@@ -78,6 +169,7 @@ const PageLayout = ({
     sidebarExpanded = false,
 }) => {
     const pageShell = usePageLayoutShell();
+    const focused = frame === 'focused';
     const forceExpanded = sidebarExpanded || Boolean(pageShell?.forceSidebarExpanded);
     const fullscreen = Boolean(pageShell?.fullscreen);
 
@@ -139,7 +231,7 @@ const PageLayout = ({
     return (
         <div
             id={id}
-            className={`plus-page-layout${fullscreen ? ' plus-page-layout--fullscreen' : ''} ${className}`}
+            className={`plus-page-layout${fullscreen ? ' plus-page-layout--fullscreen' : ''}${focused ? ' plus-page-layout--focused' : ''} ${className}`}
             style={{
                 position: 'relative',
                 display: 'flex',
@@ -151,6 +243,22 @@ const PageLayout = ({
                 ...style,
             }}
         >
+            {focused ? (
+                <FocusedFrame
+                    title={title}
+                    onBack={onBack}
+                    backHref={backHref}
+                    backLabel={backLabel}
+                    onClose={onClose}
+                    closeLabel={closeLabel}
+                    actions={actions}
+                    actionsLabel={actionsLabel}
+                    mainClassName={mainClassName}
+                    contentDirect={contentDirect}
+                >
+                    {children}
+                </FocusedFrame>
+            ) : (
             <Frame
                 topbar={topbar}
                 sidebar={sidebar}
@@ -163,6 +271,7 @@ const PageLayout = ({
                 {pageTitle}
                 {children}
             </Frame>
+            )}
 
             {/* Floating content anchored to page frame (e.g. FAB) */}
             {floatingContent && (
@@ -184,6 +293,14 @@ const PageLayout = ({
 
 PageLayout.propTypes = {
     children: PropTypes.node,
+    frame: PropTypes.oneOf(['default', 'focused']),
+    onBack: PropTypes.func,
+    backHref: PropTypes.string,
+    backLabel: PropTypes.string,
+    onClose: PropTypes.func,
+    closeLabel: PropTypes.string,
+    actions: PropTypes.node,
+    actionsLabel: PropTypes.string,
     sidebarConfig: PropTypes.object,
     topBarConfig: PropTypes.object,
     footerConfig: PropTypes.object,

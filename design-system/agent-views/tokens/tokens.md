@@ -180,6 +180,13 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --card-stack-lg
 --card-stack-md
 --card-stack-sm
+--focused-page-inline-md
+--focused-page-inline-sm
+--focused-page-pad-x
+--focused-page-pad-y
+--focused-page-stack-lg
+--focused-page-stack-md
+--focused-page-stack-sm
 --layout-columns
 --layout-gutter
 --layout-height-topbar
