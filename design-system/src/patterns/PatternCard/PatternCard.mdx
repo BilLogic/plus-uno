@@ -52,7 +52,7 @@ When something else fits better:
 ### Anatomy
 
 <DocsCanvasShell attachSourceBelow description={<>Image, header, body and footer, with actions at the end of the header row.</>}>
-    <DsCanvasQuiet of={PatternCardStories.ImageRatios} />
+    <DsCanvasQuiet of={PatternCardStories.Anatomy} />
 </DocsCanvasShell>
 
 1. **Image** is an optional slot above everything else. It runs edge to edge, outside the card pad, and the card radius clips its corners.
@@ -174,8 +174,6 @@ The card owns its pad, its radius and the space between header, body and footer.
 3. Fill the body slot. Space only inside the slot content, with the Card stack tokens, and never add spacing to the card itself.
 4. Add the footer only for actions that commit. Card actions start at the left, under the content.
 
-An empty slot keeps a minimum height, so it still reads as a place to drop content. The content then sets the real height.
-
 <DocsCanvasShell description={<>One card shell, three jobs: a metric tile, a progress display and a session summary. Only the slot content changes.</>}>
     <DsCanvasQuiet of={PatternCardStories.Jobs} />
 </DocsCanvasShell>
@@ -190,7 +188,7 @@ Content picks the size. Choose the smallest card that holds the content without 
 
 - **sm** holds one number or one line. **md** holds a short list or a few lines. **lg** holds a summary with several parts.
 - Visible empty space inside the card means size down. A clipped or crowded body means size up.
-- Height always hugs the content. There is no fixed height per size, and an optional maximum height lets the body scroll.
+- Height always hugs the content. There is no fixed height per size, and an optional maximum height caps it, so the card clips what passes the cap.
 - Every size has a minimum width. A card narrower than its minimum belongs in a smaller size.
 
 <DocsTable>
@@ -222,7 +220,7 @@ A card hugs its content. In a row, it stretches to the tallest card. A card can 
 
 ### Cards in a row
 
-In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. Each size moves between two counts, and they switch between a 1224 and a 1256 screen with the sidebar docked.
+In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. Each size moves between two counts: sm 3 to 4, md 2 to 3 and lg 1 to 2. The count switches between viewport widths of 1224 and 1256 pixels with the sidebar docked.
 
 <DocsTable>
     <thead>
@@ -263,7 +261,7 @@ An image runs edge to edge across the top, outside the card pad, and the card ra
 
 ### Text
 
-The title always truncates to one line with an ellipsis. In <code>text=truncate</code>, the default, the description stops at three lines with an ellipsis. In <code>text=wrap</code> the description has no line limit. A body that passes the height cap is clipped.
+In Figma, the title always truncates to one line with an ellipsis. The <code>text</code> variant sets the description: <code>truncate</code> stops it at three lines with an ellipsis, and <code>wrap</code> has no line limit. Code has no <code>text</code> property and leaves wrapping to CSS. A body that passes the height cap is clipped.
 
 </div>
 
@@ -330,7 +328,7 @@ A card rests on the raised pair, <code>--ds-surface-raised</code> under <code>--
 
 - The title is a heading one level below the section the card sits in: an h3 in a section, an h2 straight on a page.
 - A card that is clickable as a whole needs a role and a tab stop, and it must answer Enter and Space. When the card has one action, put a Button in the footer instead.
-- A loading card is marked busy, and the skeleton bars are hidden from assistive technology.
+- Mark the card <code>aria-busy</code> while it loads. The skeleton bars are hidden from assistive technology.
 - The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
 - Text sits on the raised surface in <code>--ds-text</code> and <code>--ds-text-subtle</code>, which meet contrast in every color mode.
 

@@ -86,7 +86,6 @@ const DemoCaption = ({ children }) => (
             display: 'block',
             marginBottom: 'var(--element-stack-md)',
             font: 'var(--heading-xxsmall)',
-            textTransform: 'uppercase',
             color: 'var(--ds-text-subtle)',
         }}
     >
@@ -390,10 +389,25 @@ export const Elevation = {
 
 /** A static card, a clickable card and a dragged card, for the docs page. */
 export const ElevationStates = () => (
-    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-        <PatternCard title="Static" minWidth={200}>{bodyCopy}</PatternCard>
-        <PatternCard title="Clickable" minWidth={200} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-        <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
+    <div style={{ display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap' }}>
+        <PatternCard title="Static" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
+        <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+        <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" dragging>{bodyCopy}</PatternCard>
+    </div>
+);
+
+/** Every part of a card: image, header with actions, body and footer. */
+export const Anatomy = () => (
+    <div style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <PatternCard
+            image={imagePlaceholder('16:9')}
+            title="Ana Ruiz"
+            description="Algebra I · Thu 4:00 PM"
+            actions={<Button leadingVisual="ellipsis-vertical" style="primary" fill="ghost" size="small" aria-label="More actions" onClick={() => {}} />}
+            footer={viewSession}
+        >
+            {sessionBody}
+        </PatternCard>
     </div>
 );
 
@@ -401,7 +415,7 @@ export const Sizes = () => <PatternCardSizesDemo />;
 
 export const Jobs = () => <CardJobs />;
 
-export const ImageRatios =() => <PatternCardImageDemo />;
+export const ImageRatios = () => <PatternCardImageDemo />;
 
 export const Loading = () => <PatternCardLoadingDemo />;
 

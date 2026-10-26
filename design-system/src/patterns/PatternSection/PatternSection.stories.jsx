@@ -216,6 +216,21 @@ export const Footer = () => (
     </PatternSection>
 );
 
+/** Every part of a section: header with actions and a tabs row, content, side and footer. */
+export const Anatomy = () => (
+    <PatternSection
+        title="Upcoming sessions"
+        description={description}
+        actions={<Actions />}
+        tabs={<Tabs />}
+        layout="split"
+        side={slotContent('Side · span 4')}
+        footer={<Button text="View all" style="primary" fill="text" size="medium" onClick={() => {}} />}
+    >
+        {slotContent('Content · span 8')}
+    </PatternSection>
+);
+
 /** Level comes from nesting: a page title, a section inside it, a subsection inside that. */
 export const Levels = () => (
     <PatternSection level="page" title="Page title" description={description}>

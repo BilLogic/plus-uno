@@ -7,9 +7,9 @@ import { StaticSummary, SummaryAsDynamic, DynamicRoster, RosterAsStatic, TreeHie
 <Meta of={PatternTableStories} />
 
 <Title />
-The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell gives you your own head and rows, a pagination slot under the rows and an empty-state slot.
+The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot.
 
-Static table, Dynamic table and Tree table are planned in code and have no exports yet. Until they land, build any of them in this shell with your own rows.
+Static table, Dynamic table and Tree table are planned components, and they have no exports in code yet.
 
 The examples on this page follow the toolbar's Color mode switch.
 
@@ -42,24 +42,6 @@ Pick the type from what people do with the rows. Ask the questions in order, and
 
 One kind of table per block: a Static, Dynamic or Tree table, never mixed in one Section.
 
-When something else fits better:
-
-- For one object's worth of data, use a Card.
-- For a short list with no columns to compare, use a list.
-- For the region that holds the table, use a Section.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Composition
-
-- A table sits in a Section and spans it. The default frame is plain: no outer frame, no card around it, and no padding of its own. Its first and last cells sit flush with the section edge.
-- The Section header carries the toolbar and the tabs. Search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type.
-- The table has no toolbar of its own. Nothing sits between the Section header and the head row.
-- Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable.
-- Paging stays under the rows, inside the same Section.
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -80,6 +62,18 @@ When something else fits better:
 
 <div className="sb-ds-doc-section">
 
+### Composition
+
+- A table sits in a Section and spans it. The default frame is plain: no outer frame, no card around it, and no padding of its own. Its first and last cells sit flush with the section edge.
+- The Section header carries the toolbar and the tabs. Search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type.
+- The table has no toolbar of its own. Nothing sits between the Section header and the head row.
+- Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable.
+- Paging stays under the rows, inside the same Section.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Properties
 
 <DocsTable>
@@ -95,7 +89,7 @@ When something else fits better:
         <tr><td><code>children</code></td><td>node</td><td>Your own <code>thead</code>, <code>tbody</code> and <code>tfoot</code></td><td>none</td></tr>
         <tr><td><code>pagination</code></td><td>node</td><td>The pager under the rows. It hides while the empty state shows.</td><td>none</td></tr>
         <tr><td><code>empty</code></td><td>boolean</td><td>Swaps the rows for the message row. The head row stays.</td><td><code>false</code></td></tr>
-        <tr><td><code>emptyState</code></td><td>node</td><td>The message row's content, shown when <code>empty</code> is true</td><td>none</td></tr>
+        <tr><td><code>emptyState</code></td><td>node</td><td>The message row's content. It shows only when <code>empty</code> is also true.</td><td>none</td></tr>
         <tr><td><code>stickyHeader</code></td><td>boolean</td><td>Pins the head row while the rows scroll under it. It needs <code>maxHeight</code>.</td><td><code>false</code></td></tr>
         <tr><td><code>stickyColumn</code></td><td>boolean</td><td>Pins the first column while the other columns scroll under it</td><td><code>false</code></td></tr>
         <tr><td><code>maxHeight</code></td><td>number or CSS length</td><td>Bounds the scroll region's height</td><td>none</td></tr>
@@ -164,7 +158,7 @@ Row states are layered over each cell's fill, never swapped for it. A hovered ro
 
 ### Empty state
 
-With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the columns still say what will appear and the Section header stays usable. The message row takes no hover state, and the pager hides with the rows. Say what will appear, and offer the first action.
+With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the columns still say what will appear and the Section header stays usable. The message row takes no hover state, and the pager hides with the rows. The message shows only when <code>emptyState</code> is also set.
 
 <DocsCanvasShell description={<>An empty table: the head row, then an icon, a title, a line of help and the first action.</>}>
     <DsCanvasQuiet of={PatternTableStories.EmptyState} />
@@ -267,9 +261,9 @@ The <code>toolbar</code> slot is deprecated. It still renders above the table, w
 ### Related
 
 - <a target="_top" href="./?path=/docs/foundations-patterns-section--docs">Section</a>: the header types, toolbar and tabs, that sit above every table.
-- <a target="_top" href="./?path=/docs/components-text-and-data-display-table--docs">Table component</a>: today's table primitive, with a set of headers and rows.
+- <a target="_top" href="./?path=/docs/components-text-and-data-display-table--docs">Table component</a>: the table component, with a set of headers and rows.
 - <a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a>: the pager that fills the pagination slot.
-- <a target="_top" href="./?path=/docs/foundations-patterns-card--docs">Card</a>: for one object's worth of data. Never put a table inside a card.
+- <a target="_top" href="./?path=/docs/foundations-patterns-card--docs">Card</a>: a table never sits inside a card.
 - Page templates: the dashboard content shows a Students table in a Section at every breakpoint.
 
 </div>

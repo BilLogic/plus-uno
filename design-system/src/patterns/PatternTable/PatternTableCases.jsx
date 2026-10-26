@@ -6,9 +6,7 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
  * The examples of "Which table?": one pair per table type, each side built
- * from the table pattern and the components a real table would use. They are
- * drawn here with plain cells because the three table components are not in
- * code yet.
+ * from the table pattern and the components a real table would use.
  */
 
 /**
@@ -35,7 +33,7 @@ const SortHead = ({ children, sort, align }) => (
 );
 
 const RowActions = ({ label }) => (
-    <Button leadingVisual="ellipsis" style="default" fill="ghost" size="small" aria-label={label} onClick={() => {}} />
+    <Button leadingVisual="ellipsis" style="primary" fill="ghost" size="small" aria-label={label} onClick={() => {}} />
 );
 
 const Pager = ({ range, pages }) => (
@@ -117,9 +115,9 @@ const RosterSection = () => (
                 selection="2 selected"
                 bulkActions={(
                     <>
-                        <Button text="Message" style="default" fill="ghost" size="small" onClick={() => {}} />
-                        <Button text="Export" style="default" fill="ghost" size="small" onClick={() => {}} />
-                        <Button text="Remove" style="default" fill="ghost" size="small" onClick={() => {}} />
+                        <Button text="Message" style="primary" fill="ghost" size="small" onClick={() => {}} />
+                        <Button text="Export" style="primary" fill="ghost" size="small" onClick={() => {}} />
+                        <Button text="Remove" style="primary" fill="ghost" size="small" onClick={() => {}} />
                     </>
                 )}
                 onClear={() => {}}

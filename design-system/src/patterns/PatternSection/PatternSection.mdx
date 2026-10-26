@@ -51,7 +51,7 @@ When something else fits better:
 ### Anatomy
 
 <DocsCanvasShell attachSourceBelow description={<>A section's parts, top to bottom. A slot is a place you fill with your own content.</>}>
-    <DsCanvasQuiet of={PatternSectionStories.Footer} />
+    <DsCanvasQuiet of={PatternSectionStories.Anatomy} />
 </DocsCanvasShell>
 
 1. **Section header** is a part of its own with a title, a description and an actions slot, and an optional bottom row for tabs or a toolbar. Its level sets the heading size.
@@ -161,7 +161,9 @@ Parts stack Section/stack-md 16 apart. Inside the header, the title row sits Sec
 
 Five types set what the header holds. The type is read from the slots you fill: <code>header</code> makes it custom, <code>toolbar</code> makes it toolbar and <code>tabs</code> makes it tabs. Pass <code>type="tabs-only"</code> to show only the tabs row.
 
-Tabs belong to the section. They are the bottom row of the section header, and each tab's content is the section body. Use tabs for views of the same thing, and keep each label to one or two words. Use tabs only when the page title already names the view. The title then hides visually and stays for screen readers.
+Tabs belong to the section. They are the bottom row of the section header, and each tab's content is the section body. Use tabs for views of the same thing, and keep each label to one or two words. Use the tabs only type when the page title already names the view. The title then hides visually and stays for screen readers.
+
+Actions, tabs and toolbar are slots: drop in buttons, Nav Tabs or a filter row.
 
 <DocsCanvasShell description={<>Default, tabs with "Add view", toolbar in both states, custom and tabs only. In custom and tabs only, the title stays in the page, visually hidden.</>}>
     <DsCanvasQuiet of={PatternSectionStories.HeaderTypes} />
