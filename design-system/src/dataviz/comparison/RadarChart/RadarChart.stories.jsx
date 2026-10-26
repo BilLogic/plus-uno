@@ -100,7 +100,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Line Radar (Default)</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Standard radar with line connections. Good for comparing metrics.
             </p>
             <RadarChart {...budgetData} />
@@ -108,7 +108,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>Filled Area Radar</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Emphasizes the "volume" or overall capability coverage.
             </p>
             <RadarChart {...skillsData} />

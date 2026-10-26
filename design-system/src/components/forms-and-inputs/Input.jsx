@@ -42,7 +42,7 @@ const Input = ({
     size = 'medium',
     disabled = false,
     readOnly,
-    /** @deprecated Prefer `readOnly` — kept for existing call sites */
+    /** @deprecated Prefer readOnly — kept for existing call sites */
     readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
@@ -198,7 +198,7 @@ Input.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.node,

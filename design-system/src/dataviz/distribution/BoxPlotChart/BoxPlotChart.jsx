@@ -38,7 +38,7 @@ const BoxPlotChart = ({
             boxplot: {
                 fillColor: chartTheme.colors[0],
                 lineWidth: 2,
-                medianColor: 'var(--color-on-primary)',
+                medianColor: 'var(--ds-border-inverse)',
                 medianWidth: 3,
                 stemColor: chartTheme.colors[0],
                 stemWidth: 1,

@@ -27,6 +27,9 @@ import { STEPS } from './ramps.mjs';
 
 export const MODES = ['light', 'dark', 'light_ic', 'dark_ic'];
 
+/** SMART subject → the accent hue it aliases. */
+export const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
+
 /** The vendored Atlassian reference tokens, in their published order. */
 export function loadAtlassian({ root = REPO_ROOT } = {}) {
   return JSON.parse(readFileSync(join(root, 'scripts/lib/color/atlassian-tokens.json'), 'utf8')).tokens;
@@ -162,7 +165,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   const SEL_WHY =
     "Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% " +
     '(pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a ' +
-    'non-color cue (a Lagoon bar or a check).';
+    "non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.";
   const overrides = {
     'color.border.focused': [H('lagoon', 700), H('lagoon', 300), H('lagoon', 800), H('lagoon', 300),
       'Two steps darker than Atlassian (500): 5.0:1 on white, and 3:1 on the hovered and selected grounds it sits on. Drawn with a 2px offset, never inset on a fill.'],
@@ -293,9 +296,9 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
 
-  // ---- checked controls and the selected edge are Lagoon; highlight selection stays neutral ----
+  // ---- checked controls and the active tab indicator are Lagoon; highlight selection stays neutral ----
   const SB_WHY =
-    'Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, ' +
+    'Checked checkboxes, radios, switches and the active tab indicator are Lagoon, ' +
     'the same steps as brand.bold; highlight fills and selected text stay neutral ink.';
   for (const suf of ['', '.hovered', '.pressed']) {
     for (const mode of MODES) {
@@ -318,11 +321,17 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   setMode('color.icon.danger', 'light_ic', H('red', 800));
 
   // ---- charts: categorical order chosen for color-vision deficiency (protan and deutan) in both plans ----
+  // Atlassian's order is blue, lime, purple, orange, then darker blue, purple, teal and orange. PLUS keeps blue
+  // first and Atlassian's limit of six, and re-picks the hues and steps so neighbors stay apart.
   const CH_WHY =
-    'PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan ' +
-    'simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.';
-  const CAT = { 1: ['blue', 600, 400], 2: ['yellow', 600, 400], 3: ['magenta', 600, 400], 4: ['brown', 600, 400],
-    5: ['blue', 800, 300], 6: ['purple', 700, 300], 7: ['green', 600, 400], 8: ['orange', 700, 400] };
+    'PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under ' +
+    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. ' +
+    'Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and ' +
+    'pull same-family neighbors together. No red, ' +
+    'which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are ' +
+    'darker reprises of 1 and 4 for overflow past the limit of six.';
+  const CAT = { 1: ['blue', 600, 600], 2: ['yellow', 500, 500], 3: ['magenta', 800, 700], 4: ['orange', 500, 500],
+    5: ['purple', 600, 500], 6: ['lime', 500, 500], 7: ['blue', 800, 700], 8: ['orange', 800, 700] };
   const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];
   for (const [i, [f, l, d]] of Object.entries(CAT)) {
     for (const [suf, dl] of [['', 0], ['.hovered', 1]]) {
@@ -332,9 +341,14 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       setMode(n, 'light', H(f, ls));
       setMode(n, 'dark', H(f, ds));
       setMode(n, 'light_ic', H(f, nxt(ls, 3)));
-      setMode(n, 'dark_ic', H(f, nxt(ds, -1)));
+      setMode(n, 'dark_ic', H(f, nxt(ds, -2)));
       byName[n].deviation = CH_WHY;
     }
+  }
+  // The gray chart mark at the base emphasis keeps 4.5:1 on overlays in dark increased contrast.
+  for (const n of ['color.chart.neutral', 'color.chart.gray.bold']) {
+    setMode(n, 'dark_ic', D(750));
+    byName[n].deviation = 'PLUS increased-contrast fix: darkNeutral.750, half a step past Atlassian, so the mark keeps 4.5:1 on overlays.';
   }
 
   const digitSteps = (f) => Object.keys(pal[f]).filter(isDigits).map(Number).sort((a, b) => a - b);
@@ -380,11 +394,11 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
 
   // ---- SMART subjects: a product layer aliasing the non-role accents. Each subject takes an
   // accent no semantic role uses, so a subject tag never reads as information, success, warning, danger or discovery.
-  const SMART = { 'mastering-content': 'teal', relationship: 'magenta', 'social-emotional': 'orange', advocacy: 'lime', 'technology-tools': 'brown' };
   const SMART_MAP = [
     ['color.background.smart.{s}', 'color.background.accent.{f}.subtler', 'Subject tag and chip fill.'],
     ['color.background.smart.{s}.hovered', 'color.background.accent.{f}.subtler.hovered', 'Hovered subject chip.'],
     ['color.background.smart.{s}.pressed', 'color.background.accent.{f}.subtler.pressed', 'Pressed subject chip.'],
+    ['color.background.smart.{s}.subtle', 'color.background.accent.{f}.subtle', 'Illustration bodies and other mid-strength SMART fills.'],
     ['color.background.smart.{s}.bold', 'color.background.accent.{f}.bolder', 'Bold subject fill (art, a filled badge).'],
     ['color.background.smart.{s}.bold.hovered', 'color.background.accent.{f}.bolder.hovered', 'Hovered bold subject fill.'],
     ['color.background.smart.{s}.bold.pressed', 'color.background.accent.{f}.bolder.pressed', 'Pressed bold subject fill.'],
@@ -398,6 +412,21 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       const n = tn.replace('{s}', subject);
       const r = { ...r0, name: n, atl_light: '—', atl_dark: '—', use: `${use} Aliases the ${fam} accent.`,
         deviation: `PLUS product layer: SMART ${subject} is the ${fam} accent.` };
+      rows.push(r);
+      byName[n] = r;
+    }
+  }
+  // A subject's chart series is its accent hue at the emphasis that keeps S-M-A-R-T neighbors apart
+  // (deltaE >= 8 under protan and deutan, >= 15 for full color vision), in that order.
+  const SMART_CHART = { 'social-emotional': 'bold', 'mastering-content': 'boldest', advocacy: 'bold', relationship: 'boldest', 'technology-tools': 'bold' };
+  for (const [subject, emphasis] of Object.entries(SMART_CHART)) {
+    const fam = SMART[subject];
+    for (const suf of ['', '.hovered']) {
+      const r0 = byName[`color.chart.${fam}.${emphasis}${suf}`];
+      const n = `color.chart.smart.${subject}${suf}`;
+      const r = { ...r0, name: n, atl_light: '—', atl_dark: '—',
+        use: suf ? `Hovered state of color.chart.smart.${subject}.` : `Chart series for the ${subject} subject. Aliases color.chart.${fam}.${emphasis}.`,
+        deviation: `PLUS product layer: SMART ${subject} charts in the ${fam} hue, at ${emphasis} so neighbors in S-M-A-R-T order stay apart.` };
       rows.push(r);
       byName[n] = r;
     }

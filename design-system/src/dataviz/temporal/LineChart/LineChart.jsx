@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * LineChart Component
@@ -19,9 +20,9 @@ const LineChart = ({
     // data: Array of series objects: [{ name: 'Series 1', data: [1, 2, 3] }, ...]
 
     // Automatically apply theme colors if series don't have them
-    const seriesWithTheme = data.map((s, i) => ({
+    const seriesWithTheme = data.map((s, i, all) => ({
         ...s,
-        color: s.color || chartTheme.colors[i % chartTheme.colors.length]
+        color: s.color || seriesColor(i, all.length)
     }));
 
     const options = {

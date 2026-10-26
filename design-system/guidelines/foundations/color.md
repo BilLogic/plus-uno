@@ -56,6 +56,8 @@ any new divergence.
 | Relationship | `--color-relationship` | Pink/Magenta |
 | Technology Tools | `--color-technology-tools` | Blue |
 
+On the new tokens, an illustration body takes `--ds-background-smart-<subject>-subtle`, the mid step between the chip fill and the bold fill.
+
 ```jsx
 <Badge style="social-emotional">Social-Emotional</Badge>
 <Badge style="mastering-content">Mastering Content</Badge>
@@ -154,3 +156,120 @@ A gray Tag of type `team` fills its avatar with
 rule 2. The Figma set binds that variable on every team variant: an 08 wash is
 paler than any Container, so a gray team never reads as a person's neutral
 disc. The avatar is never interactive, so no hover layer stacks on it.
+
+## Data-viz color
+
+Charts take the `--ds-chart-*` tokens, generated with the rest of the `--ds-`
+set (ADR-035), and follow Atlassian's
+[data-visualization color guidance](https://atlassian.design/foundations/color/data-visualization-color)
+where PLUS does not say otherwise below. In code, never name a chart color by
+hand: `design-system/src/dataviz/palette.js` (exported as `chartPalette` from
+`@/components`) says which token does which job, and the Highcharts theme in
+`chartTheme.js` applies it. Every color does one job.
+
+| Job | What it encodes | Use |
+|---|---|---|
+| One series | the data, with nothing to tell apart | `--ds-chart-brand` (`chartPalette.BRAND`); de-emphasized comparison or reference line `--ds-chart-neutral` |
+| Categorical | which series | `--ds-chart-categorical-1` to `-6`, in order (`chartPalette.CATEGORICAL`) |
+| Sequential | how much | one hue's ramp, `chartPalette.sequentialRamp(hue)` |
+| Diverging | which side of a baseline | two hues around a gray midpoint, `chartPalette.divergingRamp(low, high)` |
+| Status | on track, at risk, off track | `--ds-chart-success`, `-warning`, `-danger`, `-information`, `-discovery`, each with `-bold` (`chartPalette.STATUS`) |
+| SMART subject | which subject | `--ds-chart-smart-<subject>` (`chartPalette.SMART`) |
+
+Chart chrome wears text and border tokens, never a chart color: titles and
+legends `--ds-text`, tick labels `--ds-text-subtle`, grid lines and axes
+`--ds-border`, the tooltip `--ds-surface-overlay`, a track `--ds-background-neutral`.
+
+### Categorical order
+
+Assign series in this order, never skipping a slot. Past six, fold the
+smallest into "Other" (Atlassian's limit is five or six); 7 and 8 exist for
+overflow only, as darker reprises of 1 and 4. The theme wraps back to slot 1
+after 8, which repeats a color: group the series before it gets there.
+
+| Slot | Hue | Light | Dark |
+|---:|---|---|---|
+| 1 | blue | 600 | 600 |
+| 2 | yellow | 500 | 500 |
+| 3 | magenta | 800 | 700 |
+| 4 | orange | 500 | 500 |
+| 5 | purple | 600 | 500 |
+| 6 | lime | 500 | 500 |
+| 7 | blue | 800 | 700 |
+| 8 | orange | 800 | 700 |
+
+Neighbors stay apart under protan and deutan simulation (deltaE ≥ 8) and for
+full color vision (deltaE ≥ 15), in both plans, light and dark. The order
+leaves out red, which reads as danger, green, which reads as success, and teal,
+which reads as the brand. Slot 2 is the same yellow as `--ds-chart-warning`,
+as Atlassian's slot 4 is its warning orange: a chart uses either categorical or
+status colors, never both.
+
+### Sequential and diverging ramps
+
+Atlassian publishes no sequential or diverging guidance, so PLUS builds both
+from its chart tokens.
+
+- **Sequential** runs `--ds-background-accent-<hue>-subtler`, then
+  `--ds-chart-<hue>-bold`, `-bolder` and `-boldest`. Each step sits further
+  from the surface than the last, so **the strongest tone is the biggest
+  value**: darker in light mode, lighter in dark.
+- **Diverging** runs one hue's three chart emphases down to
+  `--ds-background-accent-gray-subtler` at the midpoint, then the other hue's
+  back up. The default pair is orange and blue. Never pair red with green.
+- **Sort categories from most to least** (`chartPalette.mostToLeast`), and an
+  ordinal set (grades, stages, tiers) takes one hue's ramp, the strongest tone
+  on the biggest value.
+- A color axis interpolates, so the heatmap and the treemap resolve the ramp's
+  tokens in the current mode (`chartPalette.rampStops`) and again when it
+  changes.
+
+### Status
+
+Use the status tokens only when a value means a status. The `-bold` step is the
+more extreme level of the same status: highest priority on
+`--ds-chart-danger-bold`, high on `--ds-chart-danger`. PLUS success is green and
+warning is yellow, where Atlassian's are lime and orange, so they match the
+`--ds-*-success` and `-warning` roles. Status colors are hard to tell apart with
+a color-vision deficiency, so a status always carries an icon, a label or a
+signed value too.
+
+### SMART subjects
+
+Each subject charts in its accent hue at the emphasis that keeps neighbors in
+S-M-A-R-T order apart: social-emotional orange (bold), mastering content teal
+(boldest), advocacy lime (bold), relationship magenta (boldest), technology
+tools brown (bold). Five subjects is near the categorical limit, so label them
+directly or keep the legend beside the chart.
+
+### Accessibility, light and dark
+
+- Every chart color keeps 3:1 against `--ds-surface`, `--ds-surface-raised` and
+  `--ds-surface-overlay`, and 4.5:1 in increased contrast.
+- Chart colors do not reach 3:1 against each other: separate adjacent marks
+  with a gap or a `--ds-border-inverse` edge. `chartTheme.css` points
+  Highcharts' own separators at that token.
+- Put text beside a mark, not on it. Where a label must sit on a fill (a
+  heatmap cell, a stacked segment), `chartPalette.inkFor` picks `--ds-text` or
+  `--ds-text-inverse`, whichever reads.
+- Never rely on color alone: keep a legend for two or more series, label lines
+  directly where order is not under your control, and give status a label.
+- Each token has its own value in light, dark and both increased-contrast
+  modes; a chart reads the token and does no mapping of its own.
+
+`check:color-system` holds the categorical order, the SMART order, the 3:1
+floor and the ramps; `design-system/tests/dataviz-tokens.test.js` fails on any
+legacy `--color-*` name or color literal under `design-system/src/dataviz/`.
+
+**Do:**
+- One color by default, and more only to tell categories apart.
+- Five or six categories at most; group the rest.
+- Separate adjacent chart colors.
+- Text next to the data, in a text token.
+- A second cue beside every color: a label, a shape, a dash or a pattern.
+
+**Don't:**
+- Add a color that carries no meaning.
+- Mix categorical and status colors in one chart.
+- Put text on a chart color without checking the ink.
+- Build a ramp from two unrelated hues, or a rainbow.

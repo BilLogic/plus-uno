@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { BRAND } from '@/dataviz/palette';
 
 /**
  * GaugeChart Component
@@ -35,7 +36,7 @@ const GaugeChart = ({
             startAngle: -90,
             endAngle: 90,
             background: {
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 innerRadius: '60%',
                 outerRadius: '100%',
                 shape: 'arc'
@@ -45,9 +46,9 @@ const GaugeChart = ({
             min: min,
             max: max,
             stops: [
-                [0.1, color || chartTheme.colors[0]],
-                [0.5, color || chartTheme.colors[0]],
-                [0.9, color || chartTheme.colors[0]]
+                [0.1, color || BRAND],
+                [0.5, color || BRAND],
+                [0.9, color || BRAND]
             ],
             lineWidth: 0,
             tickWidth: 0,
@@ -68,9 +69,9 @@ const GaugeChart = ({
                     borderWidth: 0,
                     useHTML: true,
                     format: `<div style="text-align:center">
-                        <span style="font-size:24px;font-weight:bold;color:var(--color-on-surface)">{y}</span>
+                        <span style="font-size:24px;font-weight:bold;color:var(--ds-text)">{y}</span>
                         <br/>
-                        <span style="font-size:12px;color:var(--color-on-surface-variant)">${label}</span>
+                        <span style="font-size:12px;color:var(--ds-text-subtle)">${label}</span>
                     </div>`
                 }
             }

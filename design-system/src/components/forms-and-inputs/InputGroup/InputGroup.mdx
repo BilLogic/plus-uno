@@ -90,7 +90,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 ## Sizes
 
-<DocsCanvasShell description={<>One height, 32, with the text centered. `small` and `large` are deprecated: they draw like `medium` and warn in development.</>}>
+<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={InputGroupStories.Sizes} />
 </DocsCanvasShell>
 
@@ -156,7 +156,7 @@ what those shorthands build, and can be passed directly.
 
 ```jsx
 // The label is associated with the input, and `id` names the input rather than
-// the group (#329). `showLabel={false}` clips it without removing the name.
+// the group. `showLabel={false}` clips it without removing the name.
 <InputGroup id="amount" label="Amount" leadingVisual="£" />
 
 // For a field whose addon is only an icon or a unit, `Input` is the smaller
@@ -192,7 +192,7 @@ generic names "Toggle option" and "Select option". `"button"` is labeled
 ## Accessibility
 
 - **The input takes the name.** `label` associates through `htmlFor`, `id`
-  lands on the input, and extra props are forwarded there too (#329) — so
+  lands on the input, and extra props are forwarded there too — so
   `aria-describedby` reaches the element it describes.
 - **Addon controls are named generically.** The checkbox and radio addons
   default to "Toggle option" and "Select option"; pass `aria-label` in the object

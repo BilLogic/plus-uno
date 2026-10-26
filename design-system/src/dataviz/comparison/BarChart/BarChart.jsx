@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * BarChart Component
@@ -28,9 +29,9 @@ const BarChart = ({
     animationDelay = 0,
     animationDuration = 900
 }) => {
-    const seriesWithTheme = useMemo(() => series.map((s, i) => ({
+    const seriesWithTheme = useMemo(() => series.map((s, i, all) => ({
         ...s,
-        color: s.color || chartTheme.colors[i % chartTheme.colors.length]
+        color: s.color || seriesColor(i, all.length)
     })), [series]);
 
     // Column: xAxis = categories, yAxis = values. Bar (horizontal): xAxis = values, yAxis = categories.

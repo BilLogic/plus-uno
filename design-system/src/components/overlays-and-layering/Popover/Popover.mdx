@@ -28,7 +28,7 @@ export const figmaMeta = {
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays-and-layering/Popover"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Popover"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -126,7 +126,7 @@ comes nearer than 8 to the screen's edge.
 
 ```jsx
 // A click away and Escape both close it — `rootClose` defaults to true for
-// every trigger but `manual` (#321).
+// every trigger but `manual`.
 <Popover trigger={<Button text="Details" />} title="Session 12">…</Popover>
 
 // With `manual` the caller owns `show`, so nothing dismisses it but the caller.
@@ -140,7 +140,7 @@ comes nearer than 8 to the screen's edge.
 ```jsx
 // Fine — a string trigger renders a real <button className="plus-popover-trigger">,
 // which carries the role, its own text as the accessible name, and Enter/Space.
-// It used to be a `span` with a tabindex: a focus stop that announced nothing (#321).
+// It used to be a `span` with a tabindex: a focus stop that announced nothing.
 <Popover trigger="What is this?">…</Popover>
 
 // Also fine, and what you want when the trigger needs a Button's own styling.
@@ -164,7 +164,7 @@ must be read is content that has to stay put while it is read.
 
 ## Accessibility
 
-- **The trigger announces the popover** (#321). It carries
+- **The trigger announces the popover.** It carries
   `aria-haspopup="dialog"` and an `aria-expanded` that tracks the open state —
   including while the caller drives `show` themselves. Both are applied only to
   a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
@@ -177,7 +177,7 @@ must be read is content that has to stay put while it is read.
   dialog. But that means anything focusable inside it is reached by continuing to
   Tab, which for a bottom-placed popover comes after the rest of the row.
 - **Escape and a click away both close it.** Both come from the same
-  `rootClose` binding, which is on for every trigger but `manual` (#321).
+  `rootClose` binding, which is on for every trigger but `manual`.
 - **Do not put required content in one.** Anything the user must read to finish
   the task belongs on the page. A popover is an aside.
 

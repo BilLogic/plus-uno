@@ -356,3 +356,47 @@ test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, t
     }
   }
 });
+
+/*
+ * The patterns' screen grid (`styles/_screen-grid.scss`) is the same rule for
+ * any layer placed in an Overlay — PatternModal now, a drawer later. At the
+ * three mode widths it has to land on Figma's Modal/width-modal-* too.
+ */
+const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
+
+/** The width the screen-grid mixin computes for a span on a screen `width` wide, with the modal pad. */
+function screenGridWidth(span, width, mode) {
+  const block = SCREEN_GRID_SCSS.match(/@mixin screen-grid-width\(.*\) \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(block, '_screen-grid.scss has no screen-grid-width mixin');
+  const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-overlay-'))].map(([, n, v]) => [n, v.trim()]));
+  local['--plus-overlay-span'] = String(span);
+  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1]?.replace('#{$pad}', 'var(--modal-pad)');
+  assert.ok(formula, 'the screen-grid-width mixin declares no width');
+  const resolve = (expr, depth = 0) => {
+    assert.ok(depth < 10, `${expr} does not resolve`);
+    return expr
+      .replace(/var\(--plus-overlay-screen,\s*100vw\)/g, String(width))
+      .replace(/var\((--[a-z0-9-]+)\)/g, (_, name) => {
+        if (name in local) return `(${resolve(local[name], depth + 1)})`;
+        return String(parseFloat(atMode(name, mode)));
+      });
+  };
+  const clamp = (lo, value, hi) => Math.max(lo, Math.min(value, hi));
+  const calc = (n) => n;
+  return new Function('clamp', 'calc', `return ${resolve(formula)};`)(clamp, calc);
+}
+
+test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440', () => {
+  assert.match(SCREEN_GRID_SCSS, /&-width-sm \{ --plus-overlay-span: 6; \}/);
+  assert.match(SCREEN_GRID_SCSS, /&-width-md \{ --plus-overlay-span: 8; \}/);
+  assert.match(SCREEN_GRID_SCSS, /&-width-lg \{ --plus-overlay-span: 10; \}/);
+  const spans = { sm: 6, md: 8, lg: 10 };
+  for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
+    for (const [size, span] of Object.entries(spans)) {
+      const expected = parseFloat(atMode(`--layout-width-modal-${size}`, mode));
+      const actual = screenGridWidth(span, width, mode);
+      // The column is held to two decimals, so ten columns land within half a pixel of the whole-pixel token.
+      assert.ok(Math.abs(actual - expected) < 0.5, `${size} at ${mode}: _screen-grid.scss ${actual}, Figma ${expected}`);
+    }
+  }
+});

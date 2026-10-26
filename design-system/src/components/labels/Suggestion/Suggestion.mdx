@@ -39,7 +39,7 @@ as Tag, so it sits in the tag row where the value will land.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/labels/Suggestion"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -177,9 +177,9 @@ beside it. Like Tag, it has no `disabled` prop of its own.
 - **Disabled is a disabled button.** It keeps its name, is announced as
   disabled, is skipped by Tab, and never calls `onAccept`.
 - **Named for what pressing it does.** An insert suggestion is announced as
-  "Add {label}, suggested", so a screen-reader user knows pressing it adds a
+  `Add {label}, suggested`, so a screen-reader user knows pressing it adds a
   value. A prompt is not added to anything, so it is announced as
-  "{label}, suggested".
+  `{label}, suggested`.
 - **The glyph is decorative.** The plus and the sparkle wand are hidden from
   assistive technology; the name already says what the suggestion does.
 - **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so

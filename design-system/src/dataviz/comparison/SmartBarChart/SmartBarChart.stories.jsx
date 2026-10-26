@@ -1,5 +1,9 @@
 import React from 'react';
 import SmartBarChart from './SmartBarChart';
+import { BRAND, sequentialRamp } from '@/dataviz/palette';
+
+/** A step of the blue ramp, 0 (lightest) to 3 (strongest). */
+const grade = (step) => `var(${sequentialRamp('blue')[step]})`;
 
 export default {
     title: 'Data visualizations/Comparison/Smart bar chart',
@@ -73,22 +77,24 @@ A smart bar chart helps compare and communicate key patterns in the underlying d
 const defaultData = {
     height: 200,
     data: [
-        { letter: 'A', height: '100', color: 'var(--color-success-container, #ceeaaf)' },
-        { letter: 'B', height: '75', color: 'var(--color-primary-container, #c3e8ff)' },
-        { letter: 'C', height: '50', color: 'var(--color-warning-container, #fcdf8e)' },
-        { letter: 'D', height: '25', color: 'var(--color-danger-container, #ffdad6)' },
-        { letter: 'E', height: '0', color: 'var(--color-neutral-container, #dde3ea)' }
+        // Grades are ordinal: one hue, the strongest tone on the biggest share.
+        { letter: 'A', height: '100', color: grade(3) },
+        { letter: 'B', height: '75', color: grade(2) },
+        { letter: 'C', height: '50', color: grade(1) },
+        { letter: 'D', height: '25', color: grade(0) },
+        { letter: 'E', height: '0', color: grade(0) }
     ]
 };
 
 const weekdayData = {
     height: 300,
     data: [
-        { letter: 'M', height: '40', color: 'var(--color-tertiary-container, #e8deff)' },
-        { letter: 'T', height: '80', color: 'var(--color-secondary-container, #cfe4ff)' },
-        { letter: 'W', height: '60', color: 'var(--color-info-container, #85ecd5)' },
-        { letter: 'T', height: '90', color: 'var(--color-primary-container, #c3e8ff)' },
-        { letter: 'F', height: '20', color: 'var(--color-success-container, #ceeaaf)' }
+        // One series: every day takes the brand chart color.
+        { letter: 'M', height: '40', color: BRAND },
+        { letter: 'T', height: '80', color: BRAND },
+        { letter: 'W', height: '60', color: BRAND },
+        { letter: 'T', height: '90', color: BRAND },
+        { letter: 'F', height: '20', color: BRAND }
     ]
 };
 
@@ -99,7 +105,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Grade Distribution</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows score distribution using filled bars against background context.
             </p>
             <SmartBarChart {...defaultData} />
@@ -107,7 +113,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>Weekly Activity</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Visualizes activity levels across weekdays.
             </p>
             <SmartBarChart {...weekdayData} />
@@ -122,10 +128,10 @@ export const Interactive = {
     args: {
         height: 250,
         data: [
-            { letter: '1', height: '60', color: 'var(--color-primary-container)' },
-            { letter: '2', height: '80', color: 'var(--color-primary-container)' },
-            { letter: '3', height: '45', color: 'var(--color-primary-container)' },
-            { letter: '4', height: '90', color: 'var(--color-primary-container)' }
+            { letter: '1', height: '60', color: BRAND },
+            { letter: '2', height: '80', color: BRAND },
+            { letter: '3', height: '45', color: BRAND },
+            { letter: '4', height: '90', color: BRAND }
         ]
     }
 };

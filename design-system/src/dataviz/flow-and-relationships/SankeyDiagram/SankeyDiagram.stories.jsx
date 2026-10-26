@@ -102,7 +102,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Energy Flow</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows flow from energy sources to sectors.
             </p>
             <SankeyDiagram {...energyData} />
@@ -110,7 +110,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>User Journey Flow</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Tracks user navigation patterns on a website.
             </p>
             <SankeyDiagram {...userFlowData} />

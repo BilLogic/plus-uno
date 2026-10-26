@@ -21,6 +21,7 @@ export { default as TreemapChart } from './part-to-whole/TreemapChart/TreemapCha
 export { default as AreaChart } from './temporal/AreaChart/AreaChart';
 export { default as ComboChart } from './temporal/ComboChart/ComboChart';
 export { default as LineChart } from './temporal/LineChart/LineChart';
+export { default as Sparkline } from './temporal/Sparkline/Sparkline';
 export { default as WaterfallChart } from './temporal/WaterfallChart/WaterfallChart';
 
 // Distribution Charts
@@ -34,3 +35,6 @@ export { default as FunnelChart } from './flow-and-relationships/FunnelChart/Fun
 export { default as NetworkGraph } from './flow-and-relationships/NetworkGraph/NetworkGraph';
 export { default as SankeyDiagram } from './flow-and-relationships/SankeyDiagram/SankeyDiagram';
 export { default as WordCloud } from './flow-and-relationships/WordCloud/WordCloud';
+
+// The data-viz palette: which chart token does which job, and the ramp helpers
+export * as chartPalette from './palette';

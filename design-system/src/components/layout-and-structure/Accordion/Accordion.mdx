@@ -29,7 +29,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Accordion"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Accordion"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -40,7 +40,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Composable children instead of the `items` array.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Composable children instead of the <code>items</code> array.</>}>
     <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -70,7 +70,7 @@ Accordion component for organizing content into collapsible sections. Built on R
 
 ## Behavior
 
-<DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (`alwaysOpen`) and an initial state where every panel starts collapsed (no default active key).</>}>
+<DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (<code>alwaysOpen</code>) and an initial state where every panel starts collapsed (no default active key).</>}>
     <DsCanvasQuiet of={AccordionStories.Behavior} />
 </DocsCanvasShell>
 
@@ -183,7 +183,7 @@ it leaves the accordion with no edge to hold it.
   read both in place and in the heading list. A short noun phrase, not a
   sentence.
 - **`disabled` stops the keyboard too.** The prop reaches the header button as
-  a real `disabled` attribute (#331), so the section is out of the tab order and
+  a real `disabled` attribute, so the section is out of the tab order and
   announced as unavailable rather than merely grayed. It still is not a way to
   withhold content: the body stays in the DOM, so leave the item out if what is
   inside it is not for this reader.

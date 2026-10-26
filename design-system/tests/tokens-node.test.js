@@ -608,7 +608,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 595: the state-steps sweep dropped the two focus fills on Tag's ×.
     // 514: Tag and Suggestion moved onto the --ds- tokens, which carry no
     // fallbacks, so their 81 color fallbacks (40 washes) went.
-    expect(comparable).toBe(514);
+    // 486: the charts moved onto the --ds-chart tokens, and their 28 hex
+    // fallbacks went with the legacy names.
+    expect(comparable).toBe(486);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

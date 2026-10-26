@@ -113,7 +113,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Vertical (Column Chart)</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Default orientation. Best for time-series or short category labels.
             </p>
             <BarChart {...verticalData} />
@@ -121,7 +121,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>Horizontal (Bar Chart)</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Use when category labels are long or you have many categories.
             </p>
             <BarChart {...horizontalData} />
@@ -129,7 +129,7 @@ export const Overview = () => (
 
         <section>
             <h3 style={{ marginBottom: '16px' }}>Grouped (Multi-Series)</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Compare multiple data series side-by-side within each category.
             </p>
             <BarChart {...groupedData} />

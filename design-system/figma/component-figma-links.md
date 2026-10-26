@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-64 docs-page links + 101 style/variant entries across 68 components.
+65 docs-page links + 102 style/variant entries across 69 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -35,6 +35,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Divider | `4992:30871` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871) |
 | Components | Dropdown | `37:4513` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513) |
 | Components | FileUpload | `13337:2288` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288) |
+| Components | Illustration | `19785:489` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489) |
 | Components | Input | `13611:6957` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957) |
 | Components | InputGroup | `3497:19496` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496) |
 | Components | Jumbotron | `3497:19500` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500) |
@@ -118,6 +119,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Dropdown | Dropdown button | `37:4513` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513) | verified |
 | Components | Dropdown | Dropdown List | `9109:14766` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766) | verified |
 | Components | FileUpload | File Upload | `13696:8299` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299) | verified |
+| Components | Illustration | Character | `19786:47743` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743) | verified |
 | Components | Input | _Field | `14841:25919` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919) | unpublished |
 | Components | Input | Input | `39:4802` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802) | verified |
 | Components | InputGroup | _Field | `14841:25919` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919) | unpublished |

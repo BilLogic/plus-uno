@@ -45,11 +45,11 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 - Its name says what a press does: "Close sidebar" while docked, "Open sidebar" otherwise. `aria-expanded` says whether the sidebar is showing.
 - Inside a Frame, the frame owns the sidebar state and hands it to the topbar, so there is one toggle. Standalone, pass `sidebar`, `docked` and `onToggle`; without `onToggle` there is no toggle.
 
-<DocsCanvasShell description={<>Closed: `bars`, and the breadcrumb follows the toggle.</>}>
+<DocsCanvasShell description={<>Closed: <code>bars</code>, and the breadcrumb follows the toggle.</>}>
     <DsCanvasQuiet of={TopbarStories.Closed} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Floating open: `angles-left`, and the breadcrumb still follows the toggle.</>}>
+<DocsCanvasShell description={<>Floating open: <code>angles-left</code>, and the breadcrumb still follows the toggle.</>}>
     <DsCanvasQuiet of={TopbarStories.Floating} />
 </DocsCanvasShell>
 
@@ -63,7 +63,7 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
     <DsCanvasQuiet of={TopbarStories.LongBreadcrumbAt768} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A long name ends in an ellipsis at `--label-max-width`; the role indicator stays.</>}>
+<DocsCanvasShell description={<>A long name ends in an ellipsis at <code>--label-max-width</code>; the role indicator stays.</>}>
     <DsCanvasQuiet of={TopbarStories.LongName} />
 </DocsCanvasShell>
 

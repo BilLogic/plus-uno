@@ -5,8 +5,11 @@
 // Point COLOR_REFERENCE_DIR at the folder that holds `generator/` and `out/` to
 // run it from another checkout.
 //
-// Three departures from the reference are deliberate, and the comparison is
+// Five departures from the reference are deliberate, and the comparison is
 // shaped around them:
+// - PLUS adds tokens the reference never had: `color.background.smart.<subject>.subtle`,
+//   the mid-strength SMART fill for illustration bodies. They are dropped from
+//   our side before comparing, so every reference token still matches.
 // - Descriptions (`use`, `deviation`, Figma `description`) say the rule rather
 //   than the proposal's decision numbers, so names, references and hex are
 //   compared, and description prose is not.
@@ -19,6 +22,10 @@
 //   more variables, with increased-contrast blocks. So every other reference
 //   declaration must appear in our block of the same selector, triplets
 //   compared as numbers.
+// - The chart series moved after the reference was cut: the categorical order
+//   and steps, the SMART chart series, and the gray chart mark in dark
+//   increased contrast (`semantics.mjs` § charts). Those tokens are left out
+//   of every comparison; `check:color-system` holds them instead.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -36,7 +43,27 @@ const VALUE_KEYS = ['name', 'light_ref', 'light', 'dark_ref', 'dark', 'light_ic_
 const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, r[k]])));
 const withoutProse = (value) =>
   JSON.parse(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v)));
+/** Tokens PLUS added after the reference was cut. */
+const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-background-smart-[a-z-]+-subtle: [^\n]*\n/gm;
+const withoutPlusOnly = (spec) => ({
+  ...spec,
+  collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
+});
 /** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
+const CHART_DEPARTURE = /^color\.chart\.(categorical|smart)\.|^color\.chart\.(neutral|gray\.bold)$/;
+const isDeparture = (name) => CHART_DEPARTURE.test(name);
+const keptRows = (rows) => rows.filter((r) => !isDeparture(r.name));
+/** A Figma spec without the departed variables (`color/chart/neutral/default` is `color.chart.neutral`). */
+const keptSpec = (spec) => ({
+  ...spec,
+  collections: spec.collections.map((c) => ({
+    ...c,
+    variables: c.variables.filter((v) => !isDeparture(v.name.replace(/\/default$/, '').replaceAll('/', '.'))),
+  })),
+});
+/** A stylesheet without the departed declarations. */
+const keptCss = (css) => css.split('\n').filter((l) => !/--ds-chart-(categorical|smart)-|--ds-chart-(neutral|gray-bold):/.test(l)).join('\n');
 const blocks = (css) => css.split(/(?<=^\}\n)/m).map((b) => b.trim()).filter(Boolean);
 
 for (const key of ['A', 'B']) {
@@ -47,24 +74,25 @@ for (const key of ['A', 'B']) {
     assert.deepEqual(Object.keys(semantics.palette), Object.keys(ref));
   });
 
-  test(`Plan ${key}: all 518 semantic tokens match, names, refs and hex, in every mode`, { skip }, () => {
+  test(`Plan ${key}: every reference token but the chart departures matches, names, refs and hex, in every mode`, { skip }, () => {
     const { semantics } = buildPlan(key);
     const ref = json(`generator/semantics_${key}.json`);
-    assert.equal(semantics.rows.length, 518);
-    assert.deepEqual(values(semantics.rows), values(ref.rows));
+    const rows = semantics.rows.filter((r) => !PLUS_ONLY_TOKEN.test(r.name));
+    assert.equal(ref.rows.length, 518);
+    assert.deepEqual(values(keptRows(rows)), values(keptRows(ref.rows)));
     assert.deepEqual(withoutProse(semantics.shadows), withoutProse(ref.shadows));
     assert.deepEqual(withoutProse(semantics.opacity), withoutProse(ref.opacity));
   });
 
   test(`Plan ${key}: the Figma spec matches the reference, descriptions aside`, { skip }, () => {
     const { semantics } = buildPlan(key);
-    assert.deepEqual(withoutProse(figmaSpec(key, semantics)), withoutProse(json(`out/${key}/figma-spec.json`)));
+    assert.deepEqual(withoutProse(keptSpec(withoutPlusOnly(figmaSpec(key, semantics)))), withoutProse(keptSpec(json(`out/${key}/figma-spec.json`))));
   });
 
   test(`Plan ${key}: palette and semantic SCSS match byte for byte below the header`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
     for (const file of ['_palette.scss', '_semantic.scss']) {
-      assert.equal(body(files[file]), body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')), file);
+      assert.equal(keptCss(body(files[file]).replace(PLUS_ONLY_SCSS_DECL, '')), keptCss(body(readFileSync(join(REF, `out/${key}/${file}`), 'utf8'))), file);
     }
   });
 

@@ -36,7 +36,7 @@ const NumberInput = ({
     size = 'medium',
     disabled = false,
     readOnly,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
@@ -192,7 +192,7 @@ NumberInput.propTypes = {
     disabled: PropTypes.bool,
     /** Hides the steppers; the value can be read and copied. */
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.node,

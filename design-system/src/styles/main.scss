@@ -37,6 +37,8 @@
 // the legacy token files above, so the alias wins; names that split by CSS
 // property or by element keep their legacy value until the component sweep.
 @use "../tokens/color/legacy-aliases" as *;
+// The card title's type, shared with PatternCard.
+@use "card-title" as *;
 
 // Shared skeleton/shimmer loading style (Sidebar, prototypes)
 @import "skeleton";
@@ -81,7 +83,7 @@
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
 }
 
-// Card type: a Heading/xsmall 14 container title over a Body/default 14
+// Card type: the card title type (`_card-title.scss`) over a Body/default 14
 // description; everything else in the card is Body/default.
 .plus-card {
     font: var(--body-default);
@@ -89,8 +91,7 @@
 }
 
 .plus-card .plus-card-title {
-    margin: 0;
-    font: var(--heading-xsmall);
+    @include card-title-type;
     color: var(--color-on-surface);
 }
 

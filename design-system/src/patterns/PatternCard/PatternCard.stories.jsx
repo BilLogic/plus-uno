@@ -85,7 +85,7 @@ export default {
         style: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Card title (Heading/xsmall)',
+            description: 'Card title, in the card title type',
             table: { category: 'Content' },
         },
         description: {

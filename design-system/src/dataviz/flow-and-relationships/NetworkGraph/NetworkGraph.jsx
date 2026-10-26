@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CHROME } from '@/dataviz/palette';
 
 /**
  * NetworkGraph Component
@@ -25,6 +26,8 @@ const NetworkGraph = ({
         plotOptions: {
             networkgraph: {
                 keys: ['from', 'to'],
+                // A link is a connector, drawn in the bold border like other chart chrome.
+                link: { color: CHROME.link },
                 layoutAlgorithm: {
                     enableSimulation: true,
                     linkLength: 100

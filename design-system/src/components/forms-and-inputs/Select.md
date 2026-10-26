@@ -39,7 +39,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | — |
 | `readOnly` | bool | — | Shows the value, stays focusable, and cannot be changed. |
-| `readonly` | bool | `false` | @deprecated Prefer `readOnly` |
+| `readonly` | bool | `false` | @deprecated Prefer readOnly |
 | `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `info` | node | — | Text for the info tooltip beside the label. |
 | `validation` | enum | `'none'` | The field's validation tone, as on Input: an error, a confirmation, or neither. |

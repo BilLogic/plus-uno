@@ -6558,7 +6558,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use color.background.selected.hovered or color.background.selected.pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6588,7 +6588,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6618,7 +6618,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check). Atlassian presses to 31%.",
+     "description": "The background of an element that is selected and being pressed. Return to color.background.selected or color.background.selected.hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe. Atlassian presses to 31%.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6648,7 +6648,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for primary actions or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6678,7 +6678,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The background of a selected control that uses color.background.selected.bold while it is hovered, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -6708,7 +6708,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "The background of a selected control that uses color.background.selected.bold while it is being pressed, such as a checked checkbox. Pair with color.text.inverse or color.icon.inverse for foreground content. Do not use for an unselected control or keyboard focus alone PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -9290,7 +9290,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply PLUS: Checked checkboxes, radios, switches, the active tab indicator and the selected bar are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
+     "description": "Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use color.border.focused for focus and preserve the selected treatment when both states apply PLUS: Checked checkboxes, radios, switches and the active tab indicator are Lagoon, the same steps as brand.bold; highlight fills and selected text stay neutral ink.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -10653,7 +10653,7 @@
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.text.inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -11493,7 +11493,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a Lagoon bar or a check).",
+     "description": "Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use color.icon.inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus PLUS: Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% (pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12129,7 +12129,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12137,7 +12137,7 @@
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/400"
+       "name": "blue/600"
       },
       "Light IC": {
        "alias": "color / primitives",
@@ -12145,7 +12145,7 @@
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/300"
+       "name": "blue/400"
       }
      }
     },
@@ -12160,7 +12160,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.1 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.1 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12168,7 +12168,7 @@
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/300"
+       "name": "blue/500"
       },
       "Light IC": {
        "alias": "color / primitives",
@@ -12176,7 +12176,7 @@
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/250"
+       "name": "blue/300"
       }
      }
     },
@@ -12191,19 +12191,19 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "yellow/600"
+       "name": "yellow/500"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "yellow/400"
+       "name": "yellow/500"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "yellow/850"
+       "name": "yellow/800"
       },
       "Dark IC": {
        "alias": "color / primitives",
@@ -12222,19 +12222,19 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.2 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.2 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "yellow/700"
+       "name": "yellow/600"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "yellow/300"
+       "name": "yellow/400"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "yellow/900"
+       "name": "yellow/850"
       },
       "Dark IC": {
        "alias": "color / primitives",
@@ -12253,23 +12253,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "magenta/600"
+       "name": "magenta/800"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "magenta/400"
+       "name": "magenta/700"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "magenta/850"
+       "name": "magenta/1000"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "magenta/300"
+       "name": "magenta/500"
       }
      }
     },
@@ -12284,23 +12284,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.3 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.3 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "magenta/700"
+       "name": "magenta/850"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "magenta/300"
+       "name": "magenta/600"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "magenta/900"
+       "name": "magenta/1100"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "magenta/250"
+       "name": "magenta/400"
       }
      }
     },
@@ -12315,23 +12315,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "brown/600"
+       "name": "orange/500"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "brown/400"
+       "name": "orange/500"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "brown/850"
+       "name": "orange/800"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "brown/300"
+       "name": "orange/300"
       }
      }
     },
@@ -12346,23 +12346,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.4 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.4 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "brown/700"
+       "name": "orange/600"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "brown/300"
+       "name": "orange/400"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "brown/900"
+       "name": "orange/850"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "brown/250"
+       "name": "orange/250"
       }
      }
     },
@@ -12377,23 +12377,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "blue/800"
+       "name": "purple/600"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/300"
+       "name": "purple/500"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "blue/1000"
+       "name": "purple/850"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/250"
+       "name": "purple/300"
       }
      }
     },
@@ -12408,23 +12408,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.5 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.5 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "blue/850"
+       "name": "purple/700"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/250"
+       "name": "purple/400"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "blue/1100"
+       "name": "purple/900"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/200"
+       "name": "purple/250"
       }
      }
     },
@@ -12439,23 +12439,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "purple/700"
+       "name": "lime/500"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "purple/300"
+       "name": "lime/500"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "purple/900"
+       "name": "lime/800"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "purple/250"
+       "name": "lime/300"
       }
      }
     },
@@ -12470,23 +12470,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.6 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.6 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "purple/800"
+       "name": "lime/600"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "purple/250"
+       "name": "lime/400"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "purple/1000"
+       "name": "lime/850"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "purple/200"
+       "name": "lime/250"
       }
      }
     },
@@ -12501,23 +12501,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "green/600"
+       "name": "blue/800"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "green/400"
+       "name": "blue/700"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "green/850"
+       "name": "blue/1000"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "green/300"
+       "name": "blue/500"
       }
      }
     },
@@ -12532,23 +12532,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.7 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.7 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "green/700"
+       "name": "blue/850"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "green/300"
+       "name": "blue/600"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "green/900"
+       "name": "blue/1100"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "green/250"
+       "name": "blue/400"
       }
      }
     },
@@ -12563,23 +12563,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "orange/700"
+       "name": "orange/800"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "orange/400"
+       "name": "orange/700"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "orange/900"
+       "name": "orange/1000"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "orange/300"
+       "name": "orange/500"
       }
      }
     },
@@ -12594,23 +12594,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.8 PLUS: PLUS: series 1-4 are blue, yellow, magenta and brown, the set that stays apart under protan and deutan simulation in both plans (deltaE >= 5); no red, which reads as danger, and no teal, which reads as the brand.",
+     "description": "Hovered state of color.chart.categorical.8 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "orange/800"
+       "name": "orange/850"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "orange/300"
+       "name": "orange/600"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "orange/1000"
+       "name": "orange/1100"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "orange/250"
+       "name": "orange/400"
       }
      }
     },
@@ -12811,7 +12811,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "A secondary color for data visualisation or to communicate 'to-do' statues",
+     "description": "A secondary color for data visualisation or to communicate 'to-do' statues PLUS: PLUS increased-contrast fix: darkNeutral.750, half a step past Atlassian, so the mark keeps 4.5:1 on overlays.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12827,7 +12827,7 @@
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "darkNeutral/700"
+       "name": "darkNeutral/750"
       }
      }
     },
@@ -14361,7 +14361,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only",
+     "description": "For data visualisation only PLUS: PLUS increased-contrast fix: darkNeutral.750, half a step past Atlassian, so the mark keeps 4.5:1 on overlays.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -14377,7 +14377,7 @@
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "darkNeutral/700"
+       "name": "darkNeutral/750"
       }
      }
     },
@@ -16582,6 +16582,36 @@
      }
     },
     {
+     "name": "color/background/smart/mastering-content/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-mastering-content-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/mastering-content/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-mastering-content-bold)"
@@ -16847,6 +16877,36 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "magenta/800"
+      }
+     }
+    },
+    {
+     "name": "color/background/smart/relationship/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-relationship-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/900"
       }
      }
     },
@@ -17120,6 +17180,36 @@
      }
     },
     {
+     "name": "color/background/smart/social-emotional/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-social-emotional-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/social-emotional/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-social-emotional-bold)"
@@ -17385,6 +17475,36 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "lime/800"
+      }
+     }
+    },
+    {
+     "name": "color/background/smart/advocacy/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-advocacy-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/900"
       }
      }
     },
@@ -17658,6 +17778,36 @@
      }
     },
     {
+     "name": "color/background/smart/technology-tools/subtle",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-smart-technology-tools-subtle)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "brown/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "brown/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "brown/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "brown/900"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/technology-tools/bold/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-technology-tools-bold)"
@@ -17833,6 +17983,316 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "brown/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/social-emotional/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-social-emotional)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Chart series for the social-emotional subject. Aliases color.chart.orange.bold. PLUS: PLUS product layer: SMART social-emotional charts in the orange hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/social-emotional/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-social-emotional-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.smart.social-emotional. PLUS: PLUS product layer: SMART social-emotional charts in the orange hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/700"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/200"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/mastering-content/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-mastering-content)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Chart series for the mastering-content subject. Aliases color.chart.teal.boldest. PLUS: PLUS product layer: SMART mastering-content charts in the teal hue, at boldest so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/100"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/mastering-content/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-mastering-content-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.smart.mastering-content. PLUS: PLUS product layer: SMART mastering-content charts in the teal hue, at boldest so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/900"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/1100"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/advocacy/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-advocacy)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Chart series for the advocacy subject. Aliases color.chart.lime.bold. PLUS: PLUS product layer: SMART advocacy charts in the lime hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/advocacy/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-advocacy-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.smart.advocacy. PLUS: PLUS product layer: SMART advocacy charts in the lime hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/700"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/200"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/relationship/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-relationship)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Chart series for the relationship subject. Aliases color.chart.magenta.boldest. PLUS: PLUS product layer: SMART relationship charts in the magenta hue, at boldest so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/100"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/relationship/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-relationship-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.smart.relationship. PLUS: PLUS product layer: SMART relationship charts in the magenta hue, at boldest so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/900"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/200"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/1100"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/200"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/technology-tools/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-technology-tools)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Chart series for the technology-tools subject. Aliases color.chart.brown.bold. PLUS: PLUS product layer: SMART technology-tools charts in the brown hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "brown/500"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "brown/600"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "brown/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "brown/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/smart/technology-tools/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-smart-technology-tools-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.smart.technology-tools. PLUS: PLUS product layer: SMART technology-tools charts in the brown hue, at bold so neighbors in S-M-A-R-T order stay apart.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "brown/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "brown/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "brown/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "brown/200"
       }
      }
     },

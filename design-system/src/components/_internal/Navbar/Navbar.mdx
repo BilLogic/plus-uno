@@ -39,7 +39,7 @@ Horizontal navigation bar with a brand slot and a list of links.
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Navbar"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -81,8 +81,8 @@ Horizontal navigation bar with a brand slot and a list of links.
 `--color-inverse-on-surface` (`#f0f1f3`) brand and link text, which is 11.59:1 —
 WCAG AA at any size.
 
-This was settled in #198, which asked whether `dark` was a dark surface or an
-elevation step wearing the wrong name. Three sources agree it is a dark surface:
+The open question was whether `dark` was a dark surface or an elevation step
+wearing the wrong name. Three sources agree it is a dark surface:
 
 - **Figma.** The `background color=dark` variant (component set `72:16462`,
   variant `72:16383`, designer-supplied and verified) binds its fill to
@@ -100,7 +100,7 @@ elevation step wearing the wrong name. Three sources agree it is a dark surface:
   anything else: it was authored that way in the component's first commit
   (`9f352679`) and no commit since has touched it.
 
-The bar looked correct until #153 (PR #197) because `Navbar.jsx` also passed
+The bar used to look correct because `Navbar.jsx` also passed
 react-bootstrap's `bg` prop, whose `.bg-dark` utility carries `!important`.
 Bootstrap's near-black won over the token, hiding the mismatch — and put
 `--color-on-surface` text on `#212529` at 1.11:1. Removing that prop was right;
@@ -109,9 +109,9 @@ the prop: **do not reintroduce `bg`.**
 
 The text overrides in the `dark` rule are load-bearing, not decoration. The
 brand and link colors the light bars use would land at 1.31:1 and 2.48:1 on
-`#2e3133` — the same invisible-text defect #153 removed.
+`#2e3133` — the same invisible-text defect that removing `bg` fixed.
 
-`primary` carries the same kind of override, for the same reason (#219). The bar
+`primary` carries the same kind of override, for the same reason. The bar
 is `--color-primary` (`#0472a8`) and every label on it is `--color-on-primary`
 (`#ffffff`) — 5.28:1, WCAG AA for normal text — which is the pair the Figma
 `background color=primary` variant (`4296:25311`) binds: `_Primary/Primary`
