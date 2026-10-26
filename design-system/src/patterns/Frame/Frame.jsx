@@ -73,6 +73,9 @@ const useWide = (ref) => {
  * - Clicking the toggle docks a closed or peeking sidebar, at any width, and
  *   closes a docked one. Docked below 1024, the surface is narrower than the
  *   content minimum (720), so the surface scrolls sideways.
+ * - A `footer` is a third row under the surface, `--surface-container-stack`
+ *   below it and padded on the left like the surface row, so it lines up with
+ *   the surface. The surface takes what the topbar and the footer leave.
  * - The surface pads `--surface-pad` (16 · 16 · 24) and caps its content at
  *   `--layout-max-width-content` (1232), centered, on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
@@ -87,6 +90,7 @@ const Frame = ({
     contentAs: Content = 'div',
     contentClassName = '',
     surfaceDirect = false,
+    footer,
     className = '',
     style,
     children,
@@ -246,6 +250,8 @@ const Frame = ({
                     )}
                 </div>
             </div>
+
+            {footer ? <div className="plus-frame__footer">{footer}</div> : null}
         </div>
     );
 };
@@ -267,6 +273,8 @@ Frame.propTypes = {
     contentClassName: PropTypes.string,
     /** Render children straight into the surface, with no content box or grid (full-bleed views) */
     surfaceDirect: PropTypes.bool,
+    /** A row under the surface, 8 below it, padded on the left like the surface row (a focused page's actions) */
+    footer: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot */

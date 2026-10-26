@@ -1,0 +1,97 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FocusedPageStories from './FocusedPage.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FocusedPageStories} />
+
+<Title />
+`FocusedPage` is the **page template for one task**: no sidebar, a topbar with Back and Close, the content in a reading column, and the actions in a footer. It is the `Frame` with no sidebar and a footer row. It mirrors the Figma `Pattern/Focused page`, with its parts `_Focused topbar` and `_Focused footer`.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19844-126243"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/FocusedPage"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A session note: two sections in the reading column, Save draft and Submit note in the footer.</>}>
+    <Canvas of={FocusedPageStories.Overview} story={{ inline: false, height: '640px' }} layout="fullscreen" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+- **Frame** — the `Frame` with no sidebar: `--ds-surface-sunken`, pad `--surface-container-pad` 8, and three rows `--surface-container-stack` 8 apart.
+- **Topbar** — a `header`, the page's banner, `--layout-height-topbar` 32. Back on the start (a secondary text `Button` with `arrow-left`), the title in the middle, and Close on the end (the `CloseButton`), `--element-inline-lg` 12 apart. The title is the page's one `h1`, at Heading/xsmall, on one line, truncated when it runs long.
+- **Surface** — the frame's surface at reading width, and the page's `main`: its content is capped at `--layout-max-width-reading` 864, centered, and never under `--layout-min-width-content` 720. A long task scrolls inside it.
+- **Footer** — a `footer` named "Page actions": the actions end-aligned, `--size-element-gap-sm` 8 apart, in a column as wide as the content and lined up with it. It stays put while the surface scrolls.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Behavior
+
+- **Back** returns to where the person came from: pass `onBack`, or `backHref` for a link. **Close** leaves the task: pass `onClose`. Without them there is no Back or no Close; if both would go to the same place, keep Close only.
+- **Focus order** follows the page: Back, Close, the content, then the actions.
+- Without `actions` there is no footer, and the surface takes the space.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Long content
+
+<DocsCanvasShell description={<>The surface scrolls while the topbar and the footer stay put; a long title truncates on one line.</>}>
+    <DsCanvasQuiet of={FocusedPageStories.LongBody} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={FocusedPageStories.Overview}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+- **Use a focused page** for one task that takes more than a screen or a few minutes, which the person finishes or leaves, and where the rest of the app would only distract: writing a session note, setting up a session, reviewing an import.
+- **Use `PageLayout`** when the person moves among pages: browse, compare, come back. It keeps the sidebar and the breadcrumb.
+- **Use a `Modal`** for a short decision or a few fields that keep the page behind them in view. If it scrolls for long or has sections, it is a focused page.
+- **Do** name the task in the title ("Add a session note"), and end the footer with the one primary action.
+- **Don't** add a sidebar, a breadcrumb or the account to a focused page, and don't put several primary actions in the footer.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a page with the sidebar, use `PageLayout`, which fills `Frame` with the PLUS TopBar and Sidebar.
+- For a short task over the page, use `PatternModal`.
+- For the regions inside the content, use `PatternSection`.
+
+</div>
+
+</div>

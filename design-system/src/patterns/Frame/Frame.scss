@@ -61,6 +61,25 @@
     padding-left: var(--surface-container-pad);
 }
 
+/* ------------------------------------------------------------- footer */
+
+// A row under the surface, padded on the left as the surface row is, so what
+// it holds lines up with the surface.
+.plus-frame__footer {
+    display: flex;
+    flex-shrink: 0;
+    min-width: 0;
+    padding-left: var(--layout-pad-left-container);
+}
+
+.plus-frame--docked-narrow .plus-frame__footer {
+    padding-left: var(--space-0);
+}
+
+.plus-frame--undocked-wide .plus-frame__footer {
+    padding-left: var(--surface-container-pad);
+}
+
 /* ------------------------------------------------------------- sidebar */
 
 .plus-frame__sidebar {

@@ -5,6 +5,7 @@
 export { default as Surface, SURFACE_LEVELS } from './Surface';
 export { default as Frame } from './Frame';
 export { useSidebarControl } from './Frame/SidebarControl';
+export { default as FocusedPage } from './FocusedPage';
 export { default as Topbar } from './Topbar';
 export {
     default as PatternSidebar,
