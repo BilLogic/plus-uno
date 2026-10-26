@@ -202,7 +202,7 @@ export const KeyboardFocus = {
  * In every color mode, on the frame's sunken backdrop: a resting row is the
  * subtle text and icon, hovering moves it to the neutral subtle step, a
  * selected row is the neutral selected fill with the selected text and icon
- * and a leading bar in the selected border, a disabled row the disabled text,
+ * and a medium-weight label, with no leading bar, a disabled row the disabled text,
  * and focus the focused ring 2px outside.
  */
 export const ColorModes = {
@@ -222,6 +222,8 @@ export const ColorModes = {
             return el;
         };
         const icon = (el) => el.querySelector('.plus-sidebar-tab__icon');
+        const label = (el) => el.querySelector('.plus-sidebar-tab__label');
+        const weight = (token) => getComputedStyle(canvasElement).getPropertyValue(token).trim();
         const [rest, selected, disabled, focus] = ['Dashboard', 'Lessons', 'Settings', 'Reports'].map(row);
         await inEveryColorMode(async (mode) => {
             const color = (token) => tokenColor(canvasElement, token);
@@ -232,7 +234,9 @@ export const ColorModes = {
             await expect(getComputedStyle(selected).backgroundColor, `${mode}: selected fill`).toBe(color('--ds-background-selected'));
             await expect(getComputedStyle(selected).color, `${mode}: selected text`).toBe(color('--ds-text-selected'));
             await expect(getComputedStyle(icon(selected)).color, `${mode}: selected icon`).toBe(color('--ds-icon-selected'));
-            await expect(getComputedStyle(selected).boxShadow, `${mode}: selected bar`).toContain(color('--ds-border-selected'));
+            await expect(getComputedStyle(selected).boxShadow, `${mode}: no leading bar`).toBe('none');
+            await expect(getComputedStyle(label(selected)).fontWeight, `${mode}: selected label weight`).toBe(weight('--type-weight-medium'));
+            await expect(getComputedStyle(label(rest)).fontWeight, `${mode}: resting label weight`).toBe(weight('--type-weight-regular'));
             await expect(getComputedStyle(disabled).color, `${mode}: disabled text`).toBe(color('--ds-text-disabled'));
             await expect(getComputedStyle(focus).outlineColor, `${mode}: focus ring`).toBe(color('--ds-border-focused'));
         });
