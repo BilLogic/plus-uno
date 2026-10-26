@@ -6,10 +6,9 @@ import './Logo.scss';
  * Logo Component
  * 
  * PLUS brand logo component with multiple styles, sizes, and optional text wordmark.
- * Matches Figma design system specifications.
- * 
- * @param { string } style - Visual style: 'colored', 'filled', or 'outlined'
-            */
+ * Matches Figma design system specifications. Props are documented on
+ * `Logo.propTypes` below.
+ */
 const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...props }) => {
     // Normalize size to lowercase for CSS classes
     const sizeClass = size.toLowerCase();
