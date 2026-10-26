@@ -1,7 +1,6 @@
 import React from 'react';
 
-import StaticBadgeSmart, { SMART_TAG_COLORS } from '@/components/_internal/StaticBadgeSmart';
-import Tag, { TagContext } from '../Tag';
+import { SMART_TAG_COLORS, StaticBadgeSmart, Tag, TagContext } from '@/components';
 
 /**
  * The five SMART subjects as the product draws them: a read-only Tag filled in
@@ -32,7 +31,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--size-element-gap-sm)', alignItems: 'center' };
 
 /** All five subjects, filled in their SMART colors. */
 export const Subjects = () => (
@@ -45,7 +44,7 @@ export const Subjects = () => (
 
 /** Each subject beside the outlined Tag in the accent its colors alias. */
 export const AsTags = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'max-content max-content', gap: '8px 24px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'max-content max-content', gap: 'var(--size-element-gap-sm) var(--size-element-gap-lg)' }}>
         {SUBJECTS.map((type) => (
             <React.Fragment key={type}>
                 <StaticBadgeSmart type={type} />

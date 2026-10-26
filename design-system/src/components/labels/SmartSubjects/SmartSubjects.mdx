@@ -8,10 +8,10 @@ import { StaticBadgeSmart } from '@/components';
 <Meta of={SmartSubjectsStories} />
 
 <Title />
-The five SMART subjects of tutoring (social-emotional, mastering content,
-advocacy, relationships and technology tools), each with a color of its own.
-A subject is drawn as a read-only tag filled in that color, so it reads as a
-category and never as a status.
+A SMART subject is a read-only tag filled in the color of one of the five
+areas of tutoring: Social-Emotional Learning, Mastering Content, Advocacy,
+Relationships and Technology Tools. Each area has a color of its own, so a
+subject reads as a category and never as a status.
 
 <DocsTabs of={SmartSubjectsStories}>
 
@@ -30,7 +30,7 @@ category and never as a status.
 Color matters on this page. Switch Color mode and Contrast in the toolbar to
 read the subjects in light, dark and increased contrast.
 
-<DocsCanvasShell attachSourceBelow description={<>The five subjects. Each is 22 tall, filled in its subject's ground, with the subject's ink on the words and its mark on the swatch.</>}>
+<DocsCanvasShell attachSourceBelow description={<>The five subjects. Each is 22 tall, with the subject's fill, its text color on the label and its mark color on the swatch.</>}>
     <Canvas of={SmartSubjectsStories.Subjects} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -45,8 +45,8 @@ read the subjects in light, dark and increased contrast.
 </DocsPreviewCard>
 
 1. **Swatch,** a 10 square in the subject's mark color.
-2. **Label,** the subject's name, in the subject's ink.
-3. **Ground,** the subject's fill. The border is clear, so the subject is as tall as an outlined tag beside it.
+2. **Label,** the subject's name, in the subject's text color.
+3. **Fill,** the subject's color. The border is clear, so the subject is as tall as an outlined tag beside it.
 
 </div>
 
@@ -66,14 +66,14 @@ read the subjects in light, dark and increased contrast.
 </DocsTable>
 
 A subject is a Tag, so it takes the other Tag props, such as the elevated
-option. A subject has one size, the 22 of a Tag. The <code>size</code> prop is
+option. It has one size, the 22 of a Tag. The <code>size</code> prop is
 deprecated and ignored.
 
 The subjects and the colors behind them:
 
 <DocsTable>
     <thead>
-        <tr><th>Label</th><th>Type</th><th>Token name</th><th>Accent</th></tr>
+        <tr><th>Label</th><th>Type key</th><th>Token name</th><th>Accent</th></tr>
     </thead>
     <tbody>
         <tr><td>Social-Emotional Learning</td><td><code>socio-emotional</code></td><td><code>social-emotional</code></td><td>orange</td></tr>
@@ -84,34 +84,35 @@ The subjects and the colors behind them:
     </tbody>
 </DocsTable>
 
+The type key and the token name differ for two subjects: Social-Emotional
+Learning is <code>socio-emotional</code> in the key and
+<code>social-emotional</code> in the token, and Relationships is
+<code>relationships</code> in the key and <code>relationship</code> in the token.
+
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Tokens
 
-Each subject has its own tokens. In these names, SUBJECT stands for the token
-name in the table above.
+In these names, SUBJECT stands for the token name in the table above.
 
 <DocsTable>
     <thead>
         <tr><th>Token</th><th>Used for</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--ds-background-smart-SUBJECT</code></td><td>The ground of the subject</td></tr>
-        <tr><td><code>--ds-text-smart-SUBJECT</code></td><td>The words, the ink made for that ground</td></tr>
+        <tr><td><code>--ds-background-smart-SUBJECT</code></td><td>The fill of the subject</td></tr>
+        <tr><td><code>--ds-text-smart-SUBJECT</code></td><td>The label, made for that fill</td></tr>
         <tr><td><code>--ds-icon-smart-SUBJECT</code></td><td>The swatch</td></tr>
         <tr><td><code>--ds-border-smart-SUBJECT</code></td><td>The border, should a subject be selectable</td></tr>
-        <tr><td><code>--ds-background-smart-SUBJECT-hovered</code>, <code>-pressed</code></td><td>Hover and pressed steps of the ground</td></tr>
-        <tr><td><code>--ds-background-smart-SUBJECT-subtle</code></td><td>Illustration bodies</td></tr>
-        <tr><td><code>--ds-background-smart-SUBJECT-bold</code>, <code>-bold-hovered</code>, <code>-bold-pressed</code></td><td>A stronger fill of the subject</td></tr>
-        <tr><td><code>--ds-chart-smart-SUBJECT</code>, <code>-hovered</code></td><td>The subject in a chart</td></tr>
     </tbody>
 </DocsTable>
 
-Each token aliases a step of the accent in the last column above, so the
-pairing of subject and color lives in the tokens alone. The SMART colors are
-category colors, not intents, so they sit outside the intent roles.
+Each token aliases a step of the subject's accent, so the pairing of subject
+and color lives in the tokens alone. The SMART colors are category colors, not
+intents. Each subject also has steps for illustration bodies and chart colors,
+which the Illustrations and chart pages use.
 
 </div>
 
@@ -119,11 +120,11 @@ category colors, not intents, so they sit outside the intent roles.
 
 ## Variants and states
 
-<DocsCanvasShell description={<>Beside it, each subject's accent as an outlined Tag. The Tag color for a subject is the accent its SMART tokens alias.</>}>
+<DocsCanvasShell description={<>Beside each subject, the outlined Tag in the accent its SMART tokens alias.</>}>
     <DsCanvasQuiet of={SmartSubjectsStories.AsTags} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A subject is read-only: there is nothing to press and no hover. In a disabled field it takes Tag's disabled look, and the fill steps aside. An elevated subject on an image does the same and keeps the subject's mark on its swatch.</>}>
+<DocsCanvasShell description={<>A subject is read-only: there is nothing to press. In a disabled field it takes Tag's disabled look, and the fill steps aside. An elevated subject on an image does the same and keeps the subject's mark on its swatch.</>}>
     <DsCanvasQuiet of={SmartSubjectsStories.Disabled} />
 </DocsCanvasShell>
 
@@ -147,26 +148,19 @@ category colors, not intents, so they sit outside the intent roles.
 
 <div className="sb-ds-doc-section">
 
-## Do and don't
-
-SMART subjects have no do and don't examples yet.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## For developers
 
-`StaticBadgeSmart` takes the subject as its key. `CompetencyBadge` takes the
-same subject as people write it, such as "Mastering Content", and turns it into
-the key. An unknown value becomes social-emotional.
+`StaticBadgeSmart` is the implementation of a SMART subject. Import it, and
+`SMART_TAG_COLORS`, from `@/components`. It takes the subject as its type key.
+`CompetencyBadge` takes the same subject as people write it, such as
+"Mastering Content", and turns it into the key. An unknown value becomes
+Social-Emotional Learning.
 
 `SMART_TAG_COLORS` maps each key to the Tag color its tokens alias, and
-`TAG_COLOR_OF_CURRICULUM` holds the same pairing by token name. Both must name
-the same accent as the tokens.
+`TAG_COLOR_OF_CURRICULUM`, from `@/components/labels/Tag`, holds the same
+pairing by token name. Both must name the same accent as the tokens.
 
 </div>
-
 
 </div>
 
@@ -198,7 +192,7 @@ therefore never reads as information, success, warning, danger or discovery.
 
 - **The words name the subject.** Color is never the only carrier: each subject says its name, so a reader who cannot tell the colors apart still knows the area.
 - **Not a control.** A subject is a read-only tag, so it takes no focus and has nothing to press.
-- **Contrast.** The ink is the token made for the subject's ground, so the words stay readable on the fill.
+- **Contrast.** The label uses the text token made for the subject's fill, so the words stay readable on it.
 - **Decoration.** The swatch is hidden from assistive technology.
 
 </div>
@@ -210,7 +204,7 @@ therefore never reads as information, success, warning, danger or discovery.
 - [Tag](?path=/docs/components-labels-status-count-tag-tag--docs) for any category that is not a SMART subject, in one of ten colors.
 - [Status](?path=/docs/components-labels-status-count-tag-status--docs) for a condition that can change.
 - [Count](?path=/docs/components-labels-status-count-tag-count--docs) for a number.
-- [Illustration](?path=/docs/components-images-and-icons-illustration--docs) for the five SMART characters, which take the subject's subtle step.
+- [Illustrations](?path=/docs/components-images-and-icons-illustrations--docs) for the five SMART characters, which take the subject's subtle step.
 
 </div>
 

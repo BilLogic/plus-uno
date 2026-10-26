@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NavTabsStories from './NavTabs.stories.jsx';
 import { NavTabs } from '@/components';
@@ -63,7 +63,7 @@ Use them to switch between sibling views without leaving the page.
 Color matters on this page. Switch Color mode and Contrast in the toolbar to
 read the tabs in light, dark and increased contrast.
 
-<DocsCanvasShell attachSourceBelow description={<>Three tabs, with the first selected. The selected tab is marked by its ink and the bar under it, never by a fill.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Three tabs, with the first selected. The selected tab is marked by its text color and the bar under it, never by a fill.</>}>
     <Canvas of={NavTabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -82,7 +82,7 @@ read the tabs in light, dark and increased contrast.
 </DocsPreviewCard>
 
 1. **Tab row** with its baseline rule.
-2. **Selected tab,** marked by the selected ink and the bar.
+2. **Selected tab,** marked by the selected text color and the bar.
 3. **Tab,** one view.
 4. **Tab with a menu,** for a tab that fans out. It works in the navigation mode only.
 
@@ -117,8 +117,10 @@ These code props have no Figma property:
         <tr><td><code>activeKey</code>, <code>onSelect</code></td><td>A controlled row: the selected key and the handler that changes it.</td></tr>
         <tr><td><code>defaultActiveKey</code></td><td>An uncontrolled row: the key selected first.</td></tr>
         <tr><td>Item <code>eventKey</code>, <code>href</code></td><td>What identifies the item. Selection is keyed off one of them.</td></tr>
+        <tr><td>Item <code>onClick</code>, <code>as</code></td><td>Called when the item is pressed, and the element or component the item renders as.</td></tr>
         <tr><td>Panel <code>eventKey</code></td><td>The tab a panel belongs to, in the tabs mode.</td></tr>
         <tr><td>Dropdown <code>title</code>, <code>id</code></td><td>The label on the tab and the id of its menu.</td></tr>
+        <tr><td>Dropdown <code>children</code>, <code>menuVariant</code></td><td>The menu items, and the menu's color variant.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -135,12 +137,17 @@ These code props have no Figma property:
     <tbody>
         <tr><td><code>--ds-border</code></td><td>The 1 baseline under the row</td></tr>
         <tr><td><code>--ds-text-subtle</code></td><td>An unselected tab</td></tr>
-        <tr><td><code>--ds-text-selected</code>, <code>--ds-border-selected</code></td><td>The selected tab's ink and its bar</td></tr>
+        <tr><td><code>--ds-text-selected</code>, <code>--ds-border-selected</code></td><td>The selected tab's text color and its bar</td></tr>
+        <tr><td><code>--size-element-stroke-md</code></td><td>The 2px selected bar</td></tr>
         <tr><td><code>--ds-background-neutral-subtle-hovered</code></td><td>Hover</td></tr>
         <tr><td><code>--ds-background-neutral-subtle-pressed</code></td><td>Pressed</td></tr>
         <tr><td><code>--ds-text-disabled</code></td><td>A disabled tab</td></tr>
         <tr><td><code>--ds-border-focused</code></td><td>The 2px focus ring, inside the tab</td></tr>
         <tr><td><code>--size-element-pad-x-lg</code></td><td>The 16 side padding of a tab</td></tr>
+        <tr><td><code>--size-element-gap-md</code></td><td>The 10 gap between the parts of a tab</td></tr>
+        <tr><td><code>--size-element-radius-md</code></td><td>The 4 radius on a tab's top corners</td></tr>
+        <tr><td><code>--body-default</code>, <code>--type-weight-medium</code></td><td>The label</td></tr>
+        <tr><td><code>--size-section-gap-sm</code></td><td>The 16 between the row and a panel, in the tabs mode</td></tr>
         <tr><td><code>--item-height-md</code></td><td>The 32 height of a tab</td></tr>
     </tbody>
 </DocsTable>
@@ -187,14 +194,6 @@ These code props have no Figma property:
 
 <div className="sb-ds-doc-section">
 
-## Do and don't
-
-Tabs has no do and don't examples yet.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## For developers
 
 A row is uncontrolled with a default key, or controlled with a key and a
@@ -208,8 +207,8 @@ an event key or a link, because selection is keyed off one of them.
 </NavTabs>
 ```
 
-In the tabs mode, declare each panel beside its tab so the component owns both
-halves of the pointer between them. Only the selected panel renders.
+In the tabs mode, declare each panel beside its tab. Only the selected panel
+renders.
 
 ```jsx
 <NavTabs mode="tabs" activeKey={tab} onSelect={setTab}>
@@ -219,9 +218,6 @@ halves of the pointer between them. Only the selected panel renders.
   <NavTabs.Panel eventKey="sessions">{sessions}</NavTabs.Panel>
 </NavTabs>
 ```
-
-The navigation mode is the default because existing screens use the row as
-navigation, where links are the right element.
 
 </div>
 
@@ -245,8 +241,6 @@ of an admin page.
 - **Moving to a different page or area:** use Sidebar tab or a link, because tabs imply the content stays in place.
 - **Switching views with a lighter, filled look:** use Nav pills.
 - **Moving between headings of one long page:** use Scrollspy.
-- **Filtering a list:** use Select or Choice group. Filters combine, and tabs do not.
-- **More tabs than fit the width:** use Select. The row wraps onto a second line rather than scrolling, which hides which row the reader is on.
 
 Two rules keep a row of tabs readable:
 
@@ -259,14 +253,14 @@ Two rules keep a row of tabs readable:
 
 ## Accessibility
 
-- **Tab mode.** The row is a tab list. Each tab announces itself as a tab and says whether it is selected, and points at its panel when one is declared.
+- **Tabs mode.** The row is a tab list. Each tab announces itself as a tab and says whether it is selected, and points at its panel when one is declared.
 - **Navigation mode.** The row is a set of links. Every item is a tab stop and activates with Enter, so the row works from the keyboard, but screen readers do not announce a tab set.
 - **One tab stop.** In the tabs mode the whole row is a single stop, on the selected tab. Left, Right, Home and End move the selection and the focus together.
 - **Disabled tabs.** Arrow keys skip a disabled tab. A disabled tab cannot be focused or pressed, and it drops out of the tab order.
-- **A tab with a menu is not a tab.** It has no valid tab semantics inside a tab list, so the arrow keys walk past it. A row that needs an overflow menu uses the navigation mode, or a Select.
-- **Name the row.** Pass an accessible name to say what the set of tabs is for, especially when a page carries more than one.
+- **A tab with a menu is not a tab.** A menu has no valid place inside a tab list, so the arrow keys walk past it. In the tabs mode a tab with a menu is left out of the tab set.
+- **Name the row.** Pass an <code>aria-label</code> to say what the set of tabs is for, especially when a page carries more than one.
 - **Focus** is a 2px ring inside the tab, never a fill, so focus does not read as pressed.
-- **Contrast.** The selected state does not rest on color alone: the bar under the tab marks it as well as the ink.
+- **Contrast.** The selected state does not rest on color alone: the bar under the tab marks it as well as the text color.
 
 </div>
 

@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagStories from './Tag.stories.jsx';
 import { Tag } from '@/components';
@@ -122,9 +122,7 @@ value.
     </tbody>
 </DocsTable>
 
-Two code names differ from Figma's. <code>grey</code> is a deprecated alias
-for <code>gray</code>, and <code>variant</code> is the deprecated name for
-<code>behavior</code>.
+<code>grey</code> is a deprecated alias for <code>gray</code>.
 
 These code props have no Figma property:
 
@@ -160,7 +158,14 @@ These code props have no Figma property:
         <tr><td><code>--ds-icon-accent-COLOR</code></td><td>The swatch, one per color</td></tr>
         <tr><td><code>--ds-border-accent-COLOR</code></td><td>The border of a selected tag</td></tr>
         <tr><td><code>--ds-background-accent-COLOR-subtlest</code></td><td>Hover</td></tr>
-        <tr><td><code>--ds-background-accent-COLOR-subtler</code></td><td>Selected</td></tr>
+        <tr><td><code>--ds-background-accent-COLOR-subtlest-pressed</code></td><td>Pressed</td></tr>
+        <tr><td><code>--ds-background-accent-COLOR-subtler</code></td><td>Selected, and the avatar fill of a person, agent or team</td></tr>
+        <tr><td><code>--ds-text-accent-COLOR</code></td><td>The initials in an avatar</td></tr>
+        <tr><td><code>--ds-background-discovery-subtler</code>, <code>--ds-text-discovery</code></td><td>The avatar of a gray agent</td></tr>
+        <tr><td><code>--ds-background-accent-blue-subtlest</code>, <code>--ds-text-accent-blue</code></td><td>The avatar of a gray team</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td><td>Hover and pressed on the ×</td></tr>
+        <tr><td><code>--ds-icon-subtle</code></td><td>The × glyph, and the spinner in an avatar</td></tr>
+        <tr><td><code>--ds-border-bold</code></td><td>The border of a selected tag that is disabled</td></tr>
         <tr><td><code>--ds-text</code></td><td>The label, the same neutral on every color</td></tr>
         <tr><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code></td><td>A disabled tag</td></tr>
         <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>An elevated tag on an image</td></tr>
@@ -170,8 +175,8 @@ These code props have no Figma property:
     </tbody>
 </DocsTable>
 
-In these names, COLOR stands for one of the ten colors. The height of 22, the
-10 swatch and the 16 avatar have no token yet.
+In these names, COLOR stands for one of the ten colors. The tag is 22 tall,
+the swatch is 10 and the avatar is 16.
 
 </div>
 
@@ -215,7 +220,7 @@ In these names, COLOR stands for one of the ten colors. The height of 22, the
     <DsCanvasQuiet of={TagStories.OnImages} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A person, agent or team tag takes the same ground, and its avatar keeps its own fill.</>}>
+<DocsCanvasShell description={<>A person, agent or team tag takes the same fill, and its avatar keeps its own fill.</>}>
     <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
 </DocsCanvasShell>
 
@@ -228,8 +233,6 @@ In these names, COLOR stands for one of the ten colors. The height of 22, the
 <div className="sb-ds-doc-section">
 
 ## States
-
-Every Figma state is drawn on Tag.
 
 <DocsCanvasShell description={<>Hover is the subtlest step of the accent, pressed its pressed step, and selected the subtler step, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
     <DsCanvasQuiet of={TagStories.StateLayers} />
@@ -255,7 +258,7 @@ Every Figma state is drawn on Tag.
     <DsCanvasQuiet of={TagStories.DisabledInField} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled.</>}>
+<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid fill and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled.</>}>
     <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
 </DocsCanvasShell>
 
@@ -283,20 +286,6 @@ Every Figma state is drawn on Tag.
 
 <div className="sb-ds-doc-section">
 
-## Do and don't
-
-Tag has one do example so far, and no don't.
-
-<div style={{ maxWidth: 420 }}>
-    <DoDontCard tone="do" caption="A subject in its category color.">
-        <Tag color="blue">Science</Tag>
-    </DoDontCard>
-</div>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## For developers
 
 Disabled comes from the field, not from a prop. A field or Tag group wraps its
@@ -310,7 +299,8 @@ inside a custom tag.
 ```
 
 `TAG_COLORS` lists the ten colors for a picker, and `resolveTagColor` turns a
-name, including the deprecated alias, into the color Tag draws.
+name, including the deprecated alias, into the color Tag draws. Both are
+exported from `@/components/labels/Tag`.
 
 </div>
 
@@ -341,6 +331,13 @@ picks, creates and removes tags, use Tag input.
 Four rules shape how a tag is used:
 
 - **Color is a category, not a status.** A color names a category on the border and the swatch. A meaning that can change is a Status.
+
+<div style={{ maxWidth: 420, margin: '16px 0' }}>
+    <DoDontCard tone="do" caption="A subject in its category color.">
+        <Tag color="blue">Science</Tag>
+    </DoDontCard>
+</div>
+
 - **Pick the behavior, not the look.** Choose read-only, removable, selectable or link. A count is for selectable tags only.
 - **Name who owns it with a type.** Person, agent and team lead with a 16 avatar. Leave the avatar out, or let it fail, and initials stand in without moving the tag.
 - **Lift a tag onto an image with the elevated option.** It is for read-only and link tags only, because a value is edited off the image.

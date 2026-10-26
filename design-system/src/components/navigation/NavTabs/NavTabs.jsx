@@ -4,9 +4,9 @@
  * `mode="navigation"` (the default) is the original component: a thin wrapper
  * over react-bootstrap's `Nav variant="tabs"`. Standalone, that is a NAVIGATION
  * BAR STYLED LIKE TABS — `Nav` only produces tab semantics inside a
- * `Tab.Container`, which this never rendered. Measured on the Overview story
- * before #256: `<div>` with no role, three `<a href="#" role="button">` items,
- * no `aria-selected`, no `aria-controls`, `tabindex="0"` on all three.
+ * `Tab.Container`, which this never rendered. So this mode renders a `<div>`
+ * with no role and `<a href="#" role="button">` items, with no `aria-selected`,
+ * no `aria-controls` and `tabindex="0"` on every item.
  *
  * `mode="tabs"` is the WAI-ARIA tabs pattern, opt-in. Three specs under
  * `src/specs/Home` render this component as navigation today, so tab semantics
@@ -78,7 +78,7 @@ const NavTabsItem = ({
                     {...(tabs.hasPanel(eventKey) ? { 'aria-controls': tabs.panelId(eventKey) } : {})}
                     // Roving tabindex: one stop for the whole strip, arrows move
                     // within it. Every item being a stop is what made a six-tab
-                    // set six stops in the tab sequence before #256.
+                    // set six stops in the tab sequence.
                     tabIndex={rovingStop ? 0 : -1}
                     disabled={disabled}
                     className={`plus-nav-link${selected ? ' active' : ''}`}
@@ -410,7 +410,7 @@ NavTabs.propTypes = {
      * `navigation` keeps the original markup — a react-bootstrap `Nav` of
      * anchors. `tabs` is the WAI-ARIA tabs pattern: `role="tablist"`, real
      * buttons, roving tabindex and arrow keys. Opt-in, because existing callers
-     * use this component as navigation and their markup must not move (#256).
+     * use this component as navigation and their markup must not move.
      */
     mode: PropTypes.oneOf(['navigation', 'tabs']),
     defaultActiveKey: PropTypes.any,

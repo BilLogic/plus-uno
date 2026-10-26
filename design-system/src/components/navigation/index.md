@@ -9,12 +9,12 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Breadcrumb](Breadcrumb/index.md) | 5 | ✅ | ✅ | ✅ |
 | [NavPills](NavPills/index.md) | 7 | ✅ | ✅ | ✅ |
-| [NavTabs](NavTabs/index.md) | 7 | ✅ | ✅ | ✅ |
+| [NavTabs](NavTabs/index.md) | 7 | ✅ | ✕ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
 | [Scrollspy](Scrollspy/index.md) | 9 | ✅ | ✕ | ✅ |
 | [SidebarTab](SidebarTab/index.md) | 14 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/6 (100%) · Correct/incorrect 5/6 (83%) · Accessibility 6/6 (100%)
+**Authored coverage:** When to use 6/6 (100%) · Correct/incorrect 4/6 (67%) · Accessibility 6/6 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

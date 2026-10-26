@@ -58,4 +58,6 @@ From `design-system/src/components/labels/Tag/Tag.scss`. Override these through 
 
 Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Status` · `Suggestion` · `TagGroup`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: correct/incorrect (#166).

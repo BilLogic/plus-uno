@@ -42,6 +42,7 @@ export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner } from '@/components/loading/Spinner';
 export { default as Status } from '@/components/labels/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
+export { SMART_TAG_COLORS } from '@/components/_internal/StaticBadgeSmart';
 
 export { default as Suggestion } from '@/components/labels/Suggestion';
 export { default as Tag } from '@/components/labels/Tag';

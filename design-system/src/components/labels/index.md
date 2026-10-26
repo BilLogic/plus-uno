@@ -12,11 +12,11 @@ authored half (#166), counted rather than assumed.
 | [BadgeVariants](BadgeVariants.md) | 15 | ✅ | ✅ | ✅ |
 | [Count](Count/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Status](Status/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Suggestion](Suggestion/index.md) | 8 | ✅ | ✅ | ✅ |
-| [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
+| [Suggestion](Suggestion/index.md) | 8 | ✅ | ✕ | ✅ |
+| [Tag](Tag/index.md) | 22 | ✅ | ✕ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 8/8 (100%) · Accessibility 8/8 (100%)
+**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 6/8 (75%) · Accessibility 8/8 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
