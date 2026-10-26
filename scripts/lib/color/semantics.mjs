@@ -165,7 +165,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   const SEL_WHY =
     "Selection is neutral, as in Notion, claude.ai and Atlassian's FY27 Finesse override. Ink 10/12/14% " +
     '(pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a ' +
-    'non-color cue (a check, an icon or the medium label weight), never a side stripe.';
+    "non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.";
   const overrides = {
     'color.border.focused': [H('lagoon', 700), H('lagoon', 300), H('lagoon', 800), H('lagoon', 300),
       'Two steps darker than Atlassian (500): 5.0:1 on white, and 3:1 on the hovered and selected grounds it sits on. Drawn with a 2px offset, never inset on a fill.'],
