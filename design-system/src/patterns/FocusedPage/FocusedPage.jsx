@@ -73,6 +73,7 @@ const FocusedPage = ({
 
     return (
         <Frame
+            {...props}
             id={id}
             topbar={topbar}
             width="reading"
@@ -85,7 +86,6 @@ const FocusedPage = ({
             ) : null}
             className={['plus-focused-page', className].filter(Boolean).join(' ')}
             style={style}
-            {...props}
         >
             {children}
         </Frame>

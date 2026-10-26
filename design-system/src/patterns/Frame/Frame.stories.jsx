@@ -170,6 +170,26 @@ export const ColorModes = {
 
 export const Reading = { args: { width: 'reading' } };
 
+/** A `footer` is a third row: a stack under the surface, at the container pad from the foot, lined up with the surface. */
+export const WithFooter = {
+    parameters: { docs: { disable: true } },
+    render: (args) => (
+        <InAppFrame {...args} footer={slot('Footer row', 'var(--height-250)')}>
+            {slot('Content slot')}
+        </InAppFrame>
+    ),
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const { frame, surface } = parts(canvasElement);
+        const footer = frame.querySelector('.plus-frame__footer');
+        await expect(footer, 'the footer row renders').not.toBeNull();
+        await expect(rect(footer).top - rect(surface).bottom, 'a stack under the surface')
+            .toBeCloseTo(tokenLength(frame, '--surface-container-stack'), 0);
+        await expect(rect(frame).bottom - rect(footer).bottom, 'the container pad below it')
+            .toBeCloseTo(tokenLength(frame, '--surface-container-pad'), 0);
+        await expect(rect(footer.firstElementChild).left, 'what it holds lines up with the surface').toBeCloseTo(rect(surface).left, 0);
+    }),
+};
+
 /** 768: the sidebar is closed; hover peeks it, an outside click closes it, a click docks it. */
 export const Medium768 = {
     play: async ({ canvasElement }) => atViewport(768, async () => {

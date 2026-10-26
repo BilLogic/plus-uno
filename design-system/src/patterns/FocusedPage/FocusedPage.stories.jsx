@@ -250,14 +250,32 @@ export const LongBody = {
     }),
 };
 
+/** With `backHref`, Back is an anchor to that address (Button keeps its button role), first in the focus order. */
+export const BackAsLink = {
+    args: { onBack: undefined, backHref: '#sessions' },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const back = canvas.getByRole('button', { name: 'Back' });
+        await expect(back.tagName).toBe('A');
+        await expect(back).toHaveAttribute('href', '#sessions');
+        await expect(canvas.getByRole('banner')).toContainElement(back);
+        document.body.focus();
+        await userEvent.tab();
+        await expect(back).toHaveFocus();
+    },
+};
+
+/** 768: the column is the surface less its pads, 720; the actions line up with it. */
 export const Medium768 = {
     play: async ({ canvasElement }) => withTestViewport(768, HEIGHT, () => expectLayout(canvasElement, 768)),
 };
 
+/** 1024: still under the cap, so the column fills the padded surface. */
 export const Large1024 = {
     play: async ({ canvasElement }) => withTestViewport(1024, HEIGHT, () => expectLayout(canvasElement, 1024)),
 };
 
+/** 1440: the column caps at 864, centered, and the actions cap with it. */
 export const XLarge1440 = {
     play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, () => expectLayout(canvasElement, 1440)),
 };
