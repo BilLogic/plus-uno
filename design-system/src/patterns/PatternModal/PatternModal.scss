@@ -48,6 +48,18 @@
     flex-shrink: 0;
 }
 
+/*
+ * Tabs under the title: the header row, then the tab group Modal/stack-sm 8
+ * below it, as _Modal header type=tabs. The group never shrinks, so the tabs
+ * stay put while the body scrolls under them.
+ */
+.plus-pattern-modal-header-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--modal-stack-sm);
+    flex-shrink: 0;
+}
+
 .plus-pattern-modal-title {
     margin: 0;
     font: var(--heading-medium);

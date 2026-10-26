@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { NavTabs } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '../Overlay';
 import './PatternModal.scss';
@@ -47,6 +48,11 @@ function useDeprecatedSizing(passed) {
  *
  * A dialog is its own page: the title is its h1, at Heading/medium 20, and a
  * section inside it opens at h2.
+ *
+ * `tabs` puts a tab group under the title, as Figma's `_Modal header`
+ * type=tabs: NavTabs in tabs mode, in the header, so it stays put while only
+ * the body scrolls. The body becomes the tab panel, named by the selected tab,
+ * and shows that tab's content in place of `children`.
  */
 const PatternModal = ({
     id,
@@ -58,6 +64,10 @@ const PatternModal = ({
     maxHeight,
     padding,
     gap,
+    tabs,
+    activeTab,
+    defaultActiveTab,
+    onTabChange,
     className = '',
     style,
     children,
@@ -65,6 +75,7 @@ const PatternModal = ({
 }) => {
     const reactId = React.useId();
     useDeprecatedSizing({ padding, gap, maxHeight });
+    const tabState = useTabs(tabs, { activeTab, defaultActiveTab, onTabChange });
 
     const classes = [
         'plus-pattern-modal',
@@ -95,6 +106,39 @@ const PatternModal = ({
     const overflows = useOverflows(bodyRef);
     const bodyScrolls = height === 'fill' || (maxHeight ?? style?.maxHeight) != null || overflows;
 
+    // A new tab is a new page of the body: start it at the top, not wherever
+    // the last tab was scrolled to.
+    React.useLayoutEffect(() => {
+        if (bodyRef.current) bodyRef.current.scrollTop = 0;
+    }, [tabState?.current]);
+
+    // Ids come from the tab's place in the list, not its key, so a key with a
+    // space in it cannot break the aria-labelledby and aria-controls links.
+    const tabId = (key) => `${reactId}-tab-${tabs.findIndex((tab) => tab.key === key)}`;
+    const panelId = `${reactId}-panel`;
+
+    const header = (
+        <div className="plus-pattern-modal-header">
+            {title && <h1 id={titleId} className="plus-pattern-modal-title">{title}</h1>}
+            {onClose && (
+                <button
+                    type="button"
+                    className="plus-pattern-modal-close"
+                    aria-label="Close"
+                    onClick={onClose}
+                >
+                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                </button>
+            )}
+        </div>
+    );
+
+    // The body is the panel of the selected tab: one panel, so only the
+    // selected tab points at it, and it is always a tab stop, as a tab panel is.
+    const panelProps = tabState
+        ? { role: 'tabpanel', id: panelId, 'aria-labelledby': tabId(tabState.current), tabIndex: 0 }
+        : { tabIndex: bodyScrolls ? 0 : undefined };
+
     return (
         <div
             id={id}
@@ -105,26 +149,65 @@ const PatternModal = ({
             aria-labelledby={labelledBy}
             {...props}
         >
-            <div className="plus-pattern-modal-header">
-                {title && <h1 id={titleId} className="plus-pattern-modal-title">{title}</h1>}
-                {onClose && (
-                    <button
-                        type="button"
-                        className="plus-pattern-modal-close"
-                        aria-label="Close"
-                        onClick={onClose}
+            {tabState ? (
+                <div className="plus-pattern-modal-header-group">
+                    {header}
+                    <NavTabs
+                        mode="tabs"
+                        className="plus-pattern-modal-tabs"
+                        activeKey={tabState.current}
+                        onSelect={tabState.select}
+                        aria-labelledby={labelledBy}
                     >
-                        <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                    </button>
-                )}
-            </div>
+                        {tabs.map((tab) => (
+                            <NavTabs.Item
+                                key={tab.key}
+                                eventKey={tab.key}
+                                disabled={tab.disabled}
+                                id={tabId(tab.key)}
+                                {...(tab.key === tabState.current ? { 'aria-controls': panelId } : {})}
+                            >
+                                {tab.label}
+                            </NavTabs.Item>
+                        ))}
+                    </NavTabs>
+                </div>
+            ) : header}
             <HeadingLevelContext.Provider value={1}>
-                <div ref={bodyRef} className="plus-pattern-modal-body" tabIndex={bodyScrolls ? 0 : undefined}>{children}</div>
+                <div ref={bodyRef} className="plus-pattern-modal-body" {...panelProps}>
+                    {tabState ? tabState.content : children}
+                </div>
             </HeadingLevelContext.Provider>
             {footer && <div className="plus-pattern-modal-footer">{footer}</div>}
         </div>
     );
 };
+
+/**
+ * Which tab is selected, controlled by `activeTab` or held here from
+ * `defaultActiveTab`. Null without tabs, so the modal draws as it always has.
+ * A key that names no enabled tab, a controlled one included, shows the first
+ * enabled tab, so the body always holds a panel the strip can reach; the
+ * caller's key is left as it is. Selecting the tab already selected reports
+ * nothing.
+ */
+function useTabs(tabs, { activeTab, defaultActiveTab, onTabChange }) {
+    const [held, setHeld] = React.useState(defaultActiveTab);
+    if (!tabs || tabs.length === 0) return null;
+    const controlled = activeTab !== undefined;
+    const wanted = controlled ? activeTab : held;
+    const enabled = tabs.filter((tab) => !tab.disabled);
+    const current = (enabled.find((tab) => tab.key === wanted) ?? enabled[0] ?? tabs[0]).key;
+    return {
+        current,
+        content: tabs.find((tab) => tab.key === current)?.content,
+        select: (key) => {
+            if (key === current) return;
+            if (!controlled) setHeld(key);
+            onTabChange?.(key);
+        },
+    };
+}
 
 /** True while an element's content is taller than its box. */
 function useOverflows(ref) {
@@ -165,9 +248,27 @@ PatternModal.propTypes = {
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Deprecated: the old Modal/gap-* tokens. The modal stacks Modal/stack-md 16. */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
+    /**
+     * A tab group under the title: `{ key, label, content, disabled? }` per tab.
+     * The tabs stay put in the header and the body, now the tab panel, shows the
+     * selected tab's content in place of `children`. Arrow keys move between
+     * tabs, Home and End jump to the ends.
+     */
+    tabs: PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        label: PropTypes.node.isRequired,
+        content: PropTypes.node,
+        disabled: PropTypes.bool,
+    })),
+    /** The selected tab's key, when the caller holds it; move it from `onTabChange`. */
+    activeTab: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** The tab to start on when the modal holds the selection; the first enabled tab by default. */
+    defaultActiveTab: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Called with the key of the tab a person selects. */
+    onTabChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** Body content slot */
+    /** Body content slot; with `tabs`, the selected tab's `content` takes its place */
     children: PropTypes.node,
 };
 
