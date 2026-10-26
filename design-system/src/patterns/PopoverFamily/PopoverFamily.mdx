@@ -123,7 +123,7 @@ A row has three states: rest, hover and selected. Selected uses neutral ink on t
     <DsCanvasQuiet of={PopoverFamilyStories.Popups} />
 </DocsCanvasShell>
 
-A Popup sits on layer 800 in code, the Tooltip layer. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mounts in the Modal and takes layer 510. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
 
 </div>
 
@@ -179,7 +179,8 @@ The layer numbers are shared with the [Overlay](?path=/docs/foundations-patterns
 </thead>
 <tbody>
 <tr><td>Menu</td><td>400</td><td><code>--layout-z-index-popup</code></td></tr>
-<tr><td>Popup</td><td>800</td><td><code>--layout-z-index-tooltip</code></td></tr>
+<tr><td>Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td></tr>
+<tr><td>Popup from a Modal</td><td>510</td><td><code>--layout-z-index-modal</code></td></tr>
 <tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td></tr>
 <tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td></tr>
 </tbody>
