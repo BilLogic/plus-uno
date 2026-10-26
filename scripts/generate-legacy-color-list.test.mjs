@@ -14,14 +14,14 @@ const ROWS = [
 test('renderList tallies the rows, shortens long name lists and marks holds', () => {
   const out = renderList(ROWS);
   assert.match(out, /^<!-- gen:LEGACY-COMPONENTS -->\n2 components, 6 legacy uses\./);
-  assert.match(out, /\| `labels\/Tag` \| 4 \| 4 names \| held: tags, SMART, Suggestion, NavTabs \|/);
+  assert.match(out, /\| `labels\/Tag` \| 4 \| 4 names \| take \|/);
   assert.match(out, /\| `navigation\/Breadcrumb` \| 2 \| `--color-on-surface-variant` \| take \|/);
   assert.match(out, /<!-- \/gen:LEGACY-COMPONENTS -->$/);
 });
 
 test('holds: the specific row wins over the category, internal composites are taken', () => {
   assert.equal(statusOf('forms-and-inputs/Button'), 'held: Button refresh (Cynthia)');
-  assert.match(statusOf('forms-and-inputs/Radio'), /^held: Forms & Inputs/);
+  assert.equal(statusOf('forms-and-inputs/Radio'), 'take');
   assert.match(statusOf('_internal/Navbar'), /^take: internal composite/);
 });
 

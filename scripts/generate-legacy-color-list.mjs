@@ -36,10 +36,6 @@ const REMEDY = 'Run `npm run generate:legacy-color-list` and commit the guide.';
 /** Who holds a component, first match wins; a component no row matches is "take". */
 export const HOLDS = [
   { match: /^forms-and-inputs\/(Button|ButtonGroup|CloseButton)$/, status: 'held: Button refresh (Cynthia)' },
-  { match: /^forms-and-inputs\//, status: 'held: Forms & Inputs colors in flight; shape with the Button refresh' },
-  { match: /^(navigation\/SidebarTab|_internal\/Sidebar)$/, status: 'held: frame chain' },
-  { match: /^(messaging\/(Modal|Toast)|overlays-and-layering\/(Popover|Tooltip))$/, status: 'held: layers' },
-  { match: /^(labels\/(Tag|Suggestion)|navigation\/NavTabs|_internal\/StaticBadgeSmart)$/, status: 'held: tags, SMART, Suggestion, NavTabs' },
   { match: /^_internal\//, status: 'take: internal composite; verify in the stories that render it' },
 ];
 
