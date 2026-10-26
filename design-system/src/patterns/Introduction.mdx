@@ -5,7 +5,7 @@ import { DocsTable, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 <Meta title="Foundations/Patterns/Introduction" />
 
 export const patterns = [
-    ['Page templates', 'The whole page: the surface container with its content slot, in blank, dashboard and reading variants.', 'Start here for any new page.', 'PageLayout', null],
+    ['Page templates', 'A page template holds the surface container with its content slot.', 'Start here for any new page.', 'PageLayout', null],
     ['Surface container', 'The page frame: a Topbar above a row holding the sidebar and the Surface. Its parts are Topbar, Sidebar and Surface.', 'Every page in the app sits inside one.', 'Frame', 'foundations-patterns-frame'],
     ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'foundations-patterns-section'],
     ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'foundations-patterns-card'],
@@ -31,7 +31,7 @@ The examples on every pattern page follow the **Color mode** switch in the toolb
 
 ### The eight patterns
 
-A slot is a named place in a pattern where you put your own content. Each pattern owns its frame and exposes its slots. Set the layout mode (Medium 768, Large 1024 or X-Large 1440) once on the page template, and everything inside follows it.
+A slot is a named place in a pattern where you put your own content. Each pattern owns its frame and exposes its slots. In Figma the layout mode (Medium 768, Large 1024 or X-Large 1440) is a variable mode, set once on the page template. In code the tokens follow the viewport width.
 
 <DocsTable>
     <thead>

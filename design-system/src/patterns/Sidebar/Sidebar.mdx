@@ -40,6 +40,7 @@ export const tokens = [
     ['--heading-xxsmall', '12 semibold', 'The group label type style.'],
     ['--ds-text-subtlest', 'color', 'The group label color.'],
     ['--item-height-md', '32', 'The row height. A row with a description is 40.'],
+    ['Logo', 'colored, XS, with text', 'The header content: the colored Logo at size XS, padded 6 and 8.'],
     ['--icon-md', '16', 'The icon.'],
 ];
 
@@ -55,6 +56,8 @@ export const tabTokens = [
     ['--ds-border-focused', 'color', 'The focus ring: 2px, 2px outside the surface.'],
     ['--element-stack-sm', '4', 'The gap between tab rows.'],
     ['--ds-text-subtlest', 'color', 'The "Show N more" label.'],
+    ['Thread position', 'x 20', 'The thread runs under the parent icon\'s center.'],
+    ['Thread stub', 'ends at 24', 'The elbow\'s stub stops 4 before the surface, clear of a focused row\'s ring.'],
     ['--ds-border', 'color', 'The thread line.'],
     ['--size-element-stroke-sm', '1', 'The thread line width.'],
     ['--element-radius-item-sm', '6', 'The thread elbow.'],
@@ -87,6 +90,8 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 ### When to use it
 
 Use the sidebar for the app's top-level destinations. Content comes from one config per role: a tutor sees Home, Training and Toolkit, and a supervisor adds Admin. Never draw a second sidebar for a role.
+
+A label truncates at one line. It never wraps or widens the 240 sidebar.
 
 For a place inside a page, use **Tabs**. For one destination on its own, use a link. For the row itself, see the **Sidebar tab** component.
 
@@ -185,6 +190,26 @@ In Figma, the Sidebar has two variants: state = docked | floating, and user = tu
 
 ### Variants and states
 
+#### Roles
+
+The content comes from one config per role. A supervisor sees everything a tutor sees, plus the Admin group.
+
+<DocsCanvasShell description={<>The tutor and supervisor sidebars side by side.</>}>
+    <DsCanvasQuiet of={SidebarStories.Supervisor} />
+</DocsCanvasShell>
+
+#### Dividers
+
+<DocsCanvasShell description={<>A section's divider on and off. It sits after the section, inset 12.</>}>
+    <DsCanvasQuiet of={SidebarStories.Dividers} />
+</DocsCanvasShell>
+
+#### Item slots
+
+<DocsCanvasShell description={<>A description, a count in elemAfter, hover actions (hover or focus the Groups row) and a disabled row.</>}>
+    <DsCanvasQuiet of={SidebarStories.ItemSlots} />
+</DocsCanvasShell>
+
 #### Selected and disabled
 
 A selected item is marked as the current page. A disabled one is announced and skipped by Tab.
@@ -228,7 +253,7 @@ An opened record, such as a session or a student, becomes a temporary tab under 
 1. **Parent** is the item as an accordion. Its chevron is a disclosure button that hides and shows the tabs, and the list opens on its own when a tab is opened. The label still opens the item's own page. On hover or focus it shows "Close all".
 2. **Tab** has two parts side by side: a 28 thread column, and a surface that is a Sidebar tab without an icon. The title truncates. A live session shows a green Count dot named "Live". On hover or focus it shows a close button named "Close" plus the title.
 3. **Show more** is the row after the 5 most recent tabs, "Show N more", in the subtlest text color.
-4. **Thread** is the line that ties the tabs to their parent. It runs under the parent icon's center (x 20), hangs from the parent row's bottom edge, and runs unbroken through the gaps. It ends at the last row in a rounded elbow whose stub stops at 24, 4 before the surface. The last row is "Show N more" when it shows. The thread never changes with the row's state.
+4. **Thread** is the line that ties the tabs to their parent. It hangs from the parent row and runs unbroken beside every tab. It ends at the last row in a rounded elbow. The last row is "Show N more" when it shows. The thread never changes with the row's state.
 
 #### Open tab tokens
 
@@ -284,14 +309,6 @@ tabs.open('sessions', { id: 's1', title: 'Hogwarts · Tue, Sep 9', href: '/toolk
     onTabsCloseAll={(item) => tabs.closeAll(item.id)}
 />
 ```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Do and don't
-
-None. The Figma docs for the Sidebar carry no do and don't pairs. Two rules stand in their place: a section label names a group and is never a heading, so the sidebar adds nothing to each page's outline, and a long label truncates at one line instead of wrapping or widening the 240 sidebar.
 
 </div>
 

@@ -54,7 +54,7 @@ export default {
         },
         breadcrumbs: { description: 'The trail. The last item is the current page.', table: { category: 'Content' } },
         user: { description: 'The signed-in user. A lead tutor shows the Lead indicator.', table: { category: 'Content' } },
-        loading: { control: 'boolean', description: 'Skeletons in place of the breadcrumb and the account. The toggle stays.', table: { category: 'Design' } },
+        loading: { control: 'boolean', description: 'Skeletons in place of the breadcrumb, Help Center and the account. The toggle stays.', table: { category: 'Design' } },
         onToggle: { table: { category: 'Development' } },
         onHelpClick: { table: { category: 'Development' } },
         helpHref: { table: { category: 'Development' } },
@@ -168,7 +168,14 @@ export const NoSidebar = {
 };
 
 /** At 768 a long breadcrumb truncates on one line; Help Center and the avatar stay whole and on screen. */
+const At768 = (Story) => (
+    <div style={{ width: '768px', maxWidth: '100%' }}>
+        <Story />
+    </div>
+);
+
 export const LongBreadcrumbAt768 = {
+    decorators: [At768],
     args: { sidebar: 'closed', docked: false, breadcrumbs: LONG_TRAIL },
     play: async ({ canvasElement }) => withTestViewport(768, 600, async () => {
         const { bar, breadcrumb, help, avatar } = parts(canvasElement);
@@ -185,6 +192,7 @@ export const LongBreadcrumbAt768 = {
 
 /** A long name truncates at the label cap; the avatar keeps its 32 height. */
 export const LongName = {
+    decorators: [At768],
     args: {
         sidebar: 'closed',
         docked: false,

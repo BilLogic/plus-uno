@@ -13,7 +13,8 @@ export const propRows = [
     ['user', 'name, firstChar, type', 'none', 'The signed-in user. The type lead tutor shows the Lead indicator.', 'User avatar'],
     ['helpHref', 'string', 'none', 'The Help Center link. It opens in a new tab.', 'Help Center'],
     ['onHelpClick', 'function', 'none', 'Called when Help Center is pressed.', 'Help Center'],
-    ['loading', 'boolean', 'false', 'Skeletons in place of the breadcrumb and the account. The toggle stays.', 'none'],
+    ['toggleProps', 'object', 'none', 'Extra props for the toggle button, for example aria-controls.', 'none'],
+    ['loading', 'boolean', 'false', 'Skeletons in place of the breadcrumb, Help Center and the account. The toggle stays.', 'none'],
 ];
 
 export const tokens = [
@@ -22,6 +23,7 @@ export const tokens = [
     ['--surface-container-pad', '8', 'The left pad of the start area, so the toggle sits at (8, 8).'],
     ['--element-inline-lg', '12', 'The right pad of the start area, the left pad of the end area, and the gap between Help Center and the avatar.'],
     ['--item-height-md', '32', 'The toggle, Help Center and the avatar.'],
+    ['--image-sm', '24', 'The avatar initial.'],
     ['--label-max-width', '160', 'The avatar name truncates past it.'],
     ['--ds-surface-sunken', 'color', 'The frame\'s fill shows through, because the bar has none of its own.'],
 ];
@@ -54,7 +56,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 Use the Topbar in the surface container's topbar slot, so every page has the same toggle, trail and account in the same place. The frame owns the sidebar state and hands it to the Topbar, so there is one toggle.
 
-For the trail itself, use **Breadcrumb**. For the account, use **User avatar**. For a heading inside the page, use a **Section header**, not the Topbar.
+The trail is always a Breadcrumb and never plain text, so the current page truncates and Help Center and the avatar stay whole at 768. For the account, use the User avatar. For a heading inside the page, use a **Section header**, not the Topbar.
 
 </div>
 
@@ -162,17 +164,9 @@ A long trail truncates on one line, and a long name ends in an ellipsis. Help Ce
 
 #### Loading
 
-<DocsCanvasShell description={<>Skeletons hold the place of the breadcrumb and the account. The toggle stays.</>}>
+<DocsCanvasShell description={<>Skeletons hold the place of the breadcrumb, Help Center and the account. The toggle stays.</>}>
     <DsCanvasQuiet of={TopbarStories.Loading} />
 </DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Do and don't
-
-None. The Figma docs for the Topbar carry no do and don't pairs. The breadcrumb is always a Breadcrumb instance and never plain text, so the current page truncates and Help Center and the avatar stay whole at 768.
 
 </div>
 
@@ -210,7 +204,6 @@ None. The Figma docs for the Topbar carry no do and don't pairs. The breadcrumb 
 - <a href="?path=/docs/foundations-patterns-frame--docs">Surface container</a> for the frame it sits in and the sidebar state it reads.
 - <a href="?path=/docs/foundations-patterns-sidebar--docs">Sidebar</a> for the panel the toggle opens.
 - <a href="?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumbs</a> for the trail itself.
-- <a href="?path=/docs/specs-universal-elements-user-avatar--docs">User avatar</a> for the account.
 
 </div>
 

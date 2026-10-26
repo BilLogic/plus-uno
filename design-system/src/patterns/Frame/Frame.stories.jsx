@@ -204,18 +204,44 @@ export const DocsReading = { render: DocsFrame, args: { width: 'reading' }, para
  * The sidebar floating: a closed sidebar peeked over the page. The story
  * hovers the toggle once it mounts, which is what a pointer does.
  */
-const PeekedFrame = (args) => {
+const FrameDemo = ({ peek = false, ...args }) => {
     const ref = useRef(null);
     useEffect(() => {
+        if (!peek) return;
         const toggle = ref.current?.querySelector('.plus-topbar__toggle');
         toggle?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
-    }, []);
+    }, [peek]);
     return (
         <div ref={ref}>
-            <FrameWithSlots {...args} sidebarDocked={false} height={DOCS_HEIGHT} />
+            <FrameWithSlots {...args} sidebarDocked={peek ? false : args.sidebarDocked} height={DOCS_HEIGHT} />
         </div>
     );
 };
+
+const PeekedFrame = (args) => <FrameDemo {...args} peek />;
+
+/**
+ * One frame per layout mode, one story each: a page holds one landmark of each
+ * kind. The frame docks by the mode it is in; the pads follow the browser width.
+ */
+const atMode = (breakpoint, peek) => ({
+    render: (args) => (
+        <div data-plus-breakpoint={breakpoint}>
+            <FrameDemo {...args} peek={peek} />
+        </div>
+    ),
+    parameters: { layout: 'padded' },
+});
+
+/** sidebar = auto: closed at Medium, docked at Large and X-Large. */
+export const DocsAuto768 = atMode('md', false);
+export const DocsAuto1024 = atMode('lg', false);
+export const DocsAuto1440 = atMode('xl', false);
+
+/** sidebar = floating: a closed sidebar peeked over the page. */
+export const DocsFloating768 = atMode('md', true);
+export const DocsFloating1024 = atMode('lg', true);
+export const DocsFloating1440 = atMode('xl', true);
 
 export const Floating = {
     render: PeekedFrame,

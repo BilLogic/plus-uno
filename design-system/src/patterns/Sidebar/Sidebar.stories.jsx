@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Count, Logo, Status } from '@/components';
+import { Button, Count, Logo, Sidebar as RoleSidebar, Status } from '@/components';
 import PatternSidebar, {
     clearOpenTabs,
     createOpenTabsStore,
@@ -13,6 +13,7 @@ import PatternSidebar, {
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /**
  * `PatternSidebar` — the foundation sidebar: a header (the logo), the
@@ -196,6 +197,72 @@ export const KeyboardFocus = {
         await expect(getComputedStyle(first).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         await expect(px(getComputedStyle(first).outlineOffset), 'the ring sits outside the row').toBeCloseTo(tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
     },
+};
+
+/** The supervisor role adds the Admin group to what a tutor sees. */
+export const Supervisor = {
+    render: () => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+            {['tutor', 'supervisor'].map((user) => (
+                <div key={user}>
+                    <DemoLabel>{user}</DemoLabel>
+                    <Box><RoleSidebar user={user} activeTabId="home" label={`${user} sidebar`} /></Box>
+                </div>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryAllByRole('group', { name: 'Admin' }), 'only the supervisor has Admin').toHaveLength(1);
+    },
+};
+
+const dividerSections = (divider) => [
+    { id: 'training', title: 'Training', divider, items: [{ id: 'lessons', text: 'Lessons', icon: 'book-open' }] },
+    { id: 'toolkit', title: 'Toolkit', items: [{ id: 'sessions', text: 'Sessions', icon: 'calendar-alt' }] },
+];
+
+/** A section's divider is optional: it sits after the section, inset 12. */
+export const Dividers = {
+    render: () => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+            {[true, false].map((divider) => (
+                <div key={String(divider)}>
+                    <DemoLabel>{`divider = ${divider}`}</DemoLabel>
+                    <Box>
+                        <PatternSidebar header={header} items={home} sections={dividerSections(divider)} activeId="home" label={`divider ${divider}`} />
+                    </Box>
+                </div>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelectorAll('.plus-pattern-sidebar__divider'), 'one divider').toHaveLength(1);
+    },
+};
+
+/** The Sidebar tab slots: description, elemAfter, actionsOnHover, and a disabled row. */
+export const ItemSlots = {
+    render: () => (
+        <Box>
+            <PatternSidebar
+                header={header}
+                activeId="described"
+                label="Item slots"
+                items={[
+                    { id: 'described', text: 'Sessions', icon: 'calendar-alt', description: 'Three upcoming this week' },
+                    { id: 'counted', text: 'Students', icon: 'user-graduate', elemAfter: <Count value={3} label="3 new" /> },
+                    {
+                        id: 'actions',
+                        text: 'Groups',
+                        icon: 'users-rectangle',
+                        actionsOnHover: <Button size="small" fill="text" style="secondary" leadingVisual="xmark" aria-label="Close Groups" />,
+                    },
+                    { id: 'off', text: 'Reports', icon: 'chart-pie', disabled: true },
+                ]}
+            />
+        </Box>
+    ),
 };
 
 const many = Array.from({ length: 8 }, (_, s) => ({

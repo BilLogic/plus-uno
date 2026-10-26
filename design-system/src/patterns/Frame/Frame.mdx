@@ -13,6 +13,10 @@ export const propRows = [
     ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Surface width = content | reading'],
     ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the surface, with no content box or grid, for full-bleed views.', 'none'],
     ['contentAs', 'element type', 'div', 'The element for the content box, for example main.', 'none'],
+    ['contentClassName', 'string', 'none', 'An extra class on the content box.', 'none'],
+    ['className', 'string', 'none', 'An extra class on the frame.', 'none'],
+    ['style', 'object', 'none', 'Inline style on the frame.', 'none'],
+    ['id', 'string', 'none', 'The frame\'s id.', 'none'],
     ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Surface content slot'],
 ];
 
@@ -20,15 +24,20 @@ export const tokens = [
     ['--surface-container-pad', '8', '8', '8', 'Pads the frame on the top, right and bottom. The left is 0 so the toggle sits at (8, 8) at every width.'],
     ['--surface-container-stack', '8', '8', '8', 'The gap between the Topbar row and the surface row.'],
     ['--layout-pad-left-container', '8', '0', '0', 'The left pad of the surface row: 8 while the sidebar is closed, 0 once it docks.'],
+    ['--layout-width-screen', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
+    ['--layout-pad-x-screen', '24', '24', '32', 'Pads the screen. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the surface grid.'],
     ['--layout-height-topbar', '32', '32', '32', 'The Topbar height.'],
     ['--layout-width-sidebar', '240', '240', '240', 'The sidebar width, docked or floating.'],
     ['--surface-pad', '16', '16', '24', 'The Surface pad, which is also the grid margin.'],
     ['--surface-radius', '16', '16', '16', 'The Surface corner radius.'],
+    ['--layout-width-content', '720', '744', '1144', 'The content width at each mode, inside the surface pad.'],
+    ['--layout-width-column', '45.33', '47.33', '80.67', 'The width of one content column.'],
     ['--layout-columns', '12', '12', '12', 'The columns in the content grid.'],
     ['--layout-gutter', '16', '16', '16', 'The gap between columns.'],
     ['--layout-max-width-content', '1232', '1232', '1232', 'The content cap.'],
     ['--layout-max-width-reading', '864', '864', '864', 'The content cap for the reading width.'],
     ['--layout-min-width-content', '720', '720', '720', 'The narrowest the content gets. Narrower, the surface scrolls sideways and the Topbar stays.'],
+    ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the frame reads the viewport width and has no token for it.'],
     ['--surface-stack-sm', '16', '16', '16', 'Related sections.'],
     ['--surface-stack-md', '24', '24', '24', 'Sections, and the row gap of the content grid.'],
     ['--surface-stack-lg', '40', '40', '40', 'A new topic.'],
@@ -177,12 +186,32 @@ The sidebar follows the width. At Medium (768) it is closed and the toggle shows
 
 Docked below 1024, the surface is narrower than the content minimum of 720, so it scrolls sideways while the Topbar stays put. Crossing 1024 returns the sidebar to that width's default.
 
+<DocsCanvasShell description={<>Medium · 768: the sidebar is closed and the toggle shows bars.</>}>
+    <Canvas of={FrameStories.DocsAuto768} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Large · 1024: the sidebar docks, 240 wide.</>}>
+    <Canvas of={FrameStories.DocsAuto1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>X-Large · 1440: the sidebar docks, and the surface pad grows to 24 at this browser width.</>}>
+    <Canvas of={FrameStories.DocsAuto1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
 #### sidebar = floating
 
 Hovering the toggle or the left edge of the frame opens a closed sidebar over the page. It uses the overlay fill and shadow, has no scrim, and does not move the page. An outside click, Escape or the pointer leaving closes it.
 
-<DocsCanvasShell description={<>Floating: a closed sidebar peeked over the page. The surface does not move.</>}>
-    <Canvas of={FrameStories.Floating} story={{ inline: true }} layout="padded" sourceState="hidden" />
+<DocsCanvasShell description={<>Medium · 768, floating: a closed sidebar peeked over the page. The surface does not move.</>}>
+    <Canvas of={FrameStories.DocsFloating768} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Large · 1024, floating.</>}>
+    <Canvas of={FrameStories.DocsFloating1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>X-Large · 1440, floating.</>}>
+    <Canvas of={FrameStories.DocsFloating1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 Opening a modal closes a floating sidebar, and a docked sidebar stays. While a modal is open the sidebar does not peek, and Escape closes the modal only.
@@ -200,14 +229,6 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 <DocsCanvasShell description={<>Reading: the content is capped at 864 and centered.</>}>
     <Canvas of={FrameStories.DocsReading} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Do and don't
-
-None. The Figma docs for the surface container carry no do and don't pairs, so the rules above and under Accessibility stand alone.
 
 </div>
 
