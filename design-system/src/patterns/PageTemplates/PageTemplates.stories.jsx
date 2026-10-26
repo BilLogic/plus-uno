@@ -1,8 +1,8 @@
 import React from 'react';
-import { expect, fn, waitFor, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, Input, Textarea } from '@/components';
-import { Frame, PatternCard, PatternDrawer, PatternSection, Topbar } from '@/patterns';
+import { Frame, PatternCard, PatternSection, Topbar } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -116,6 +116,7 @@ export default {
             description: 'Leaves out the sidebar and its toggle.',
             table: { category: 'Design', defaultValue: { summary: 'false' } },
         },
+        drawer: { table: { disable: true } },
         children: { table: { disable: true } },
         actions: { table: { disable: true } },
         onBack: { table: { disable: true } },
@@ -242,35 +243,37 @@ export const FocusedReadOnly = {
 const PageWithDrawer = () => {
     const [open, setOpen] = React.useState(true);
     return (
-        <>
-            <PageLayout title="Sessions" {...pageProps}>
-                <DashboardContent />
-                <div>
-                    <Button text="Open session details" style="secondary" fill="outline" size="small" onClick={() => setOpen(true)} />
-                </div>
-            </PageLayout>
-            <PatternDrawer
-                open={open}
-                width="md"
-                title="Session details"
-                description="Thursday · 4:00–5:00 PM"
-                onClose={() => setOpen(false)}
-                footer={(
+        <PageLayout
+            title="Sessions"
+            {...pageProps}
+            drawer={{
+                open,
+                width: 'md',
+                title: 'Session details',
+                description: 'Thursday · 4:00–5:00 PM',
+                onClose: () => setOpen(false),
+                footer: (
                     <>
                         <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => setOpen(false)} />
                         <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => setOpen(false)} />
                     </>
-                )}
-            >
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                    Ana Ruiz · Algebra I · Grade 9. Last session: reviewed factoring and assigned practice set 3.
-                </p>
-            </PatternDrawer>
-        </>
+                ),
+                children: (
+                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                        Ana Ruiz · Algebra I · Grade 9. Last session: reviewed factoring and assigned practice set 3.
+                    </p>
+                ),
+            }}
+        >
+            <DashboardContent />
+            <div>
+                <Button text="Open session details" style="secondary" fill="outline" size="small" onClick={() => setOpen(true)} />
+            </div>
+        </PageLayout>
     );
 };
 
-/** A drawer open over the page: the scrim covers the frame and the drawer runs the full height at the end edge. */
+/** The `drawer` prop: a drawer open over the page. The scrim covers the frame and the drawer runs the full height at the end edge. */
 export const WithDrawer = {
     render: () => fullHeight(<PageWithDrawer />),
     play: async ({ canvasElement }) => {
@@ -278,6 +281,17 @@ export const WithDrawer = {
         const overlay = drawer.parentElement;
         await expect(drawer.getBoundingClientRect().height, 'full height').toBeCloseTo(overlay.getBoundingClientRect().height, 0);
         await expect(drawer.getBoundingClientRect().right, 'at the end edge').toBeCloseTo(overlay.getBoundingClientRect().right, 0);
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Cancel' }));
+        await waitFor(() => expect(within(canvasElement).queryByRole('dialog'), 'closed through the page\'s own state').toBeNull());
+    },
+};
+
+/** With no `drawer` prop the template draws no drawer. */
+export const WithoutDrawer = {
+    render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    play: async ({ canvasElement }) => {
+        await within(canvasElement).findByRole('main');
+        await expect(within(canvasElement).queryByRole('dialog')).toBeNull();
     },
 };
 
