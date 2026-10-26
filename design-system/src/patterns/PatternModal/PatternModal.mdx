@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternModalStories} />
 
 <Title />
-The modal pattern is the dialog shell: header with title and close button, body slot with internal scroll, and footer slot. Baked-in tokens — `--color-surface-container-high` background, elevation 3, modal radius/padding/gap. Rendered inline for documentation; for a real overlay with backdrop and focus management, use the core Modal component (never ship a modal without a scrim).
+The modal pattern is the dialog shell: header with title and close button, body slot with internal scroll, and footer slot. Baked-in tokens: the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay` (the level every floating layer takes; the blanket under a real modal is what sets it apart from a menu), as the Modal component draws it, and the modal radius, padding and gap. Rendered inline for documentation; for a real overlay with backdrop and focus management, use the core Modal component (never ship a modal without a scrim).
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"

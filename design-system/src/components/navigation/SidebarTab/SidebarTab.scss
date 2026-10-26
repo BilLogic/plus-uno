@@ -1,14 +1,197 @@
 /**
  * SidebarTab Styles
+ *
+ * The BS4 Foundation `Sidebar Tab`: 32 high (Item/height-md), pad-x 12
+ * (Element/pad-x-md), gap 8 (Element/inline-md), radius Element/radius-item-md,
+ * a 16 icon (Icon/md) and a Body/default label. Every length is a token.
  */
 
 .plus-sidebar-tab {
-    &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--color-on-surface-state-08) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
+    width: 100%;
+    min-width: 0;
+    height: var(--item-height-md);
+    box-sizing: border-box;
+    padding: 0 var(--element-pad-x-md);
+    border-radius: var(--element-radius-item-md);
+    background-color: transparent;
+    color: var(--ds-text-subtle);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+
+    // A link row keeps its own color on hover: without this, the link hover
+    // color (`a:hover`) wins over the row's rest color. The selected and
+    // disabled rows restate theirs on hover for the same reason.
+    &:hover {
+        color: var(--ds-text-subtle);
+        text-decoration: none;
     }
 
-    &:focus-visible:not(.plus-sidebar-tab--disabled) {
-        outline: 2px solid var(--color-primary);
-        outline-offset: -2px;
+    &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
+
+    &:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--ds-background-neutral-subtle-pressed);
+    }
+
+    // The ring sits 2px outside the row, on the frame, never inset on the fill.
+    &:focus-visible:not(.plus-sidebar-tab--disabled) {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-lg);
+    }
+}
+
+.plus-sidebar-tab__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    color: var(--ds-icon-subtle);
+
+    i {
+        font-size: var(--icon-md);
+    }
+}
+
+.plus-sidebar-tab__text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.plus-sidebar-tab__label,
+.plus-sidebar-tab__description {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-sidebar-tab__label {
+    font: var(--body-default);
+}
+
+.plus-sidebar-tab__description {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+// A description makes the row two lines: it grows past 32 to 40 (2 + 20 + 16 + 2),
+// as the Figma row does with its min height 32 and pad-y 2.
+.plus-sidebar-tab--with-description {
+    height: auto;
+    min-height: var(--item-height-md);
+    padding-top: var(--element-pad-y-sm);
+    padding-bottom: var(--element-pad-y-sm);
+}
+
+.plus-sidebar-tab__after {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* ------------------------------------------------------------- states */
+
+// Selection is neutral and carries a cue beyond color: the selected fill, the
+// selected text and icon, and the label in the medium weight. The label
+// truncates, so the heavier weight never moves the row. Hover and press on a
+// selected row move up the selected steps.
+.plus-sidebar-tab--hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
+.plus-sidebar-tab--selected {
+    background-color: var(--ds-background-selected);
+    color: var(--ds-text-selected);
+
+    &:hover {
+        color: var(--ds-text-selected);
+    }
+
+    .plus-sidebar-tab__label {
+        font-weight: var(--type-weight-medium);
+    }
+
+    .plus-sidebar-tab__icon {
+        color: var(--ds-icon-selected);
+    }
+}
+
+.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled),
+.plus-sidebar-tab-item:hover > .plus-sidebar-tab--selected:not(.plus-sidebar-tab--disabled) {
+    background-color: var(--ds-background-selected-hovered);
+}
+
+.plus-sidebar-tab--selected:active:not(.plus-sidebar-tab--disabled) {
+    background-color: var(--ds-background-selected-pressed);
+}
+
+.plus-sidebar-tab--focus {
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg);
+}
+
+// The disabled text and icon colors; a disabled row is announced as such
+// (`aria-disabled`) and takes no tab stop.
+.plus-sidebar-tab--disabled {
+    color: var(--ds-text-disabled);
+    cursor: not-allowed;
+
+    &:hover {
+        color: var(--ds-text-disabled);
+    }
+
+    .plus-sidebar-tab__icon {
+        color: var(--ds-icon-disabled);
+    }
+}
+
+/* ------------------------------------------------------------- actions on hover */
+
+// The row and its actions are siblings in this wrapper, so the actions never
+// nest inside the row's button or link. They overlay the row's end and show
+// while the pointer is over the item or anything in it has focus.
+.plus-sidebar-tab-item {
+    position: relative;
+    display: flex;
+    min-width: 0;
+
+    &:hover > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+    }
+
+    &:hover,
+    &:focus-within {
+        // Room for the actions, so the label truncates before it reaches them.
+        > .plus-sidebar-tab {
+            padding-right: calc(var(--element-pad-x-sm) + var(--item-height-sm));
+        }
+
+        .plus-sidebar-tab__after {
+            visibility: hidden;
+        }
+
+        .plus-sidebar-tab__actions {
+            visibility: visible;
+        }
+    }
+}
+
+.plus-sidebar-tab__actions {
+    position: absolute;
+    top: 0;
+    right: var(--element-pad-x-xs);
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-sm);
+    visibility: hidden;
 }

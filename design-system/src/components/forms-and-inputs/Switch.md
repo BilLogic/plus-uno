@@ -9,7 +9,7 @@ Form Switch — Foundations Form Switch Button (Figma `82:16570`). Controlled vi
 
 **Source:** `design-system/src/components/forms-and-inputs/Switch.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Switch.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Switch.mdx`
 
@@ -41,12 +41,12 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-disabled-opacity` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-surface` · `--font-family-body` · `--font-weight-normal` · `--plus-switch-pad` · `--plus-switch-thumb` · `--plus-switch-track-h` · `--plus-switch-track-w` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-primary` · `--color-primary-border` · `--color-primary-container` · `--color-primary-state-08` · `--color-shadow-state-08` · `--color-surface` · `--item-height-sm` · `--plus-switch-pad` · `--plus-switch-thumb` · `--plus-switch-track-h` · `--plus-switch-track-w` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Switch.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

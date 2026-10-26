@@ -4,10 +4,15 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import NumberInput from './NumberInput';
 
 export default {
-    title: 'Components/Forms and inputs/Number Input',
+    title: 'Components/Forms and inputs/Number input',
     component: NumberInput,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The steppers became 24 compact buttons, 4 from the field\'s edge.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -111,7 +116,7 @@ export const Content = () => {
 
     return (
         <div style={{ maxWidth: '800px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 Placeholder and typing in the default field.
             </p>
             <NumberInput
@@ -237,7 +242,7 @@ Interactive.args = {
 
 /**
  * Steppers — in the field's Trailing slot, minus before plus, named for the
- * field they change. Small buttons cut to 22, so the field stays 34 high.
+ * field they change. They are 24 compact buttons, so the field stays 32 high.
  */
 export const Steppers = () => (
     <div style={{ maxWidth: '320px' }}>
@@ -254,8 +259,8 @@ Steppers.play = async ({ canvasElement }) => {
     // Minus comes first in the DOM, as in Figma, and both sit in Trailing.
     await expect(decrease.compareDocumentPosition(increase) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     await expect(decrease.closest('.plus-field__trailing')).not.toBeNull();
-    await expect(Math.round(increase.getBoundingClientRect().height)).toBe(22);
-    await expect(Math.round(field.closest('.plus-field').getBoundingClientRect().height)).toBe(34);
+    await expect(Math.round(increase.getBoundingClientRect().height)).toBe(24);
+    await expect(Math.round(field.closest('.plus-field').getBoundingClientRect().height)).toBe(32);
 
     await userEvent.click(increase);
     await expect(field).toHaveValue('4');

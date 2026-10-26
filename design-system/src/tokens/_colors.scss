@@ -91,7 +91,7 @@
     /* Warning Colors */
     --color-warning: #9f8205;
     --color-warning-text: #5b4a00;
-    --color-on-warning: #ffffff;
+    --color-on-warning: #231b00;
     --color-warning-container: #ffe17a;
     --color-on-warning-container: #231b00;
     --color-warning-border-subtle: rgba(159, 130, 5, 0.45);
@@ -228,10 +228,10 @@
     /* Alternative Surfaces */
     --color-surface-dim: #d9dadd;
     --color-surface-bright: #f9f9fc;
-    --color-scrim: rgba(0, 0, 0, 0.32);
-    --color-disabled-opacity: 0.38;
-    --color-inverse-surface: #2e3133;
-    --color-inverse-on-surface: #f0f1f3;
+    --color-scrim: rgba(0, 0, 0, 0.32); // overridden by color/_legacy-aliases.scss
+    --color-disabled-opacity: 0.38; // overridden by color/_legacy-aliases.scss
+    --color-inverse-surface: #2e3133; // overridden by color/_legacy-aliases.scss
+    --color-inverse-on-surface: #f0f1f3; // overridden by color/_legacy-aliases.scss
 
     /* ============================================
        NEUTRAL STATE LAYERS

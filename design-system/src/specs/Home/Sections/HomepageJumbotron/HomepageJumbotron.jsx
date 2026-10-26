@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import NavTabs from '@/components/navigation/NavTabs';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Divider from '@/components/layout-and-structure/Divider';
-import Badge from '@/components/status-and-loading/Badge';
+import Badge from '@/components/labels/Badge';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
 import './HomepageJumbotron.scss';
 

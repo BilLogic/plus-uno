@@ -14,7 +14,7 @@
 .plus-rating-label {
     margin-bottom: var(--size-element-gap-xs, 4px);
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
     
     .plus-rating-required {
         color: var(--color-danger);
@@ -36,6 +36,7 @@
 }
 
 .plus-rating-comments-label {
+    font: var(--body-default);
     color: var(--color-on-surface);
     text-align: left;
 }
@@ -49,16 +50,17 @@
 }
 
 .plus-rating-item-label {
+    font: var(--body-default);
     color: var(--color-on-surface);
-    font-weight: var(--font-weight-normal);
     text-align: center;
     min-width: 20px;
 }
 
-// Rating Item (Circular Background with Star)
+// Rating Item (Circular Background with Star): a 32 control (`--item-height-md`)
+// drawing a 16 icon (`--icon-md`).
 .plus-rating-item {
-    width: 40px;
-    height: 40px;
+    width: var(--item-height-md);
+    height: var(--item-height-md);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -68,7 +70,7 @@
     transition: all 0.2s ease;
     
     i {
-        font-size: 20px;
+        font-size: var(--icon-md);
         transition: all 0.2s ease;
     }
     

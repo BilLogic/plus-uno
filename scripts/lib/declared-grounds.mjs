@@ -31,7 +31,7 @@
  *
  *  1. GROUND RESOLUTION. For a measured declaration, walk from its own rule
  *     outward through its ancestors. The FIRST rule that has either a
- *     background declaration naming a `--color-*` token or a `@grounds`
+ *     background declaration naming a `--color-*` or `--ds-*` token or a `@grounds`
  *     annotation decides: its background, or its declared grounds (each
  *     measured). A rule with both is decided by its background — that is the
  *     paint directly beneath. If no rule decides, the ground is the page. So a
@@ -78,7 +78,8 @@ import postcss from 'postcss';
 import postcssScss from 'postcss-scss';
 import selectorParser from 'postcss-selector-parser';
 
-import { parseColor, resolveToken } from '../../design-system/src/lib/tokens.mjs';
+import { COLOR_PREFIXES } from '../../design-system/src/lib/tokens-node.mjs';
+import { parseColor, resolveToken, tokenNamePattern, varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { REPO_ROOT } from './corpus.mjs';
 
 /**
@@ -91,7 +92,10 @@ export const NON_TEXT = 3;
 const KINDS = ['grounds', 'contrast'];
 const ANNOTATION = /^@([a-z-]+)\s*:([\s\S]*)$/;
 const BACKGROUND = /^background(-color)?$/;
-const COLOR_TOKEN = /var\(\s*(--color-[a-z0-9-]+)/;
+/** A `var()` naming a color token of either vocabulary, `--color-*` or `--ds-*`. */
+const COLOR_TOKEN = new RegExp(varReferencePattern(COLOR_PREFIXES).source);
+/** A bare color token name, as a `@grounds` list writes it. */
+const COLOR_NAME = tokenNamePattern(COLOR_PREFIXES);
 
 /** The partial that defines an icon glyph, and the mixin in it. */
 export const GLYPH_PARTIAL = 'design-system/src/styles/_icon-glyph.scss';
@@ -214,7 +218,7 @@ export function ruleAt(sheet, offset) {
   return found;
 }
 
-/** The `--color-*` token a rule's own background declaration names, or null. */
+/** The `--color-*` or `--ds-*` token a rule's own background declaration names, or null. */
 function ownBackground(rule) {
   for (const node of rule.nodes ?? []) {
     if (node.type !== 'decl' || !BACKGROUND.test(node.prop)) continue;
@@ -346,8 +350,8 @@ export function groundErrors(declared, values) {
   const errors = [];
   if (!declared.tokens.length) errors.push('declares no grounds');
   for (const token of declared.tokens) {
-    if (!/^--color-[a-z0-9-]+$/.test(token)) {
-      errors.push(`\`${token}\` is not a --color-* token`);
+    if (!COLOR_NAME.test(token)) {
+      errors.push(`\`${token}\` is not a --color-* or --ds-* token`);
     } else if (!parseColor(resolveToken(token, values) ?? '')) {
       errors.push(`\`${token}\` does not resolve to a color in the token files`);
     }

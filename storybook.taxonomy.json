@@ -11,32 +11,38 @@
     "Deprecated/"
   ],
   "componentGroups": {
-    "Actions": [
-      "Button",
-      "Button Group"
-    ],
     "Forms and inputs": [
+      "Button",
+      "Button group",
       "Cascader",
       "Checkbox",
-      "Choice Grid",
-      "Choice Group",
-      "Date Picker",
-      "Date & Time Picker",
-      "Dropdown",
-      "File Upload",
-      "Input",
-      "Input Group",
-      "Label & Caption",
-      "Number Input",
+      "Choice grid",
+      "Choice group",
+      "Date picker",
+      "Date time picker",
+      "Dropdown menu",
+      "File upload",
+      "Input group",
+      "Label & caption",
+      "Number input",
       "Radio",
       "Range",
       "Rating",
-      "Rich Text Editor",
+      "Rich text editor",
       "Select",
-      "Switch",
-      "Tag Input",
-      "Textarea",
-      "Tree Select"
+      "Tag input",
+      "Text area",
+      "Text field",
+      "Toggle",
+      "Tree select"
+    ],
+    "Images and icons": [
+      "Logo",
+      "Tile"
+    ],
+    "Labels": [
+      "Status, count & tag",
+      "AI label"
     ],
     "Layout and structure": [
       "Accordion",
@@ -45,31 +51,32 @@
       "Collapse",
       "Divider",
       "Jumbotron",
-      "List Group",
-      "Media Object",
-      "Scroll Bar"
+      "List group",
+      "Media object",
+      "Scrollbar"
+    ],
+    "Loading": [
+      "Progress bar",
+      "Loading"
     ],
     "Messaging": [
-      "Alert",
+      "Flag",
       "Modal",
-      "Toast"
+      "Section message"
     ],
     "Navigation": [
-      "Breadcrumb",
-      "Nav Tabs & Nav Pills",
+      "Breadcrumbs",
       "Pagination",
       "Scrollspy",
-      "Sidebar Tab"
+      "Sidebar tab",
+      "Tabs, nav pills & navbar"
     ],
-    "Overlays": [
-      "Popover",
+    "Overlays and layering": [
+      "Popup",
       "Tooltip"
     ],
-    "Status and loading": [
-      "Status, Count & Tag",
-      "AI Label",
-      "Progress",
-      "Loading"
+    "Text and data display": [
+      "Table"
     ]
   },
   "specTypeOrder": [
@@ -94,65 +101,80 @@
     "Foundations",
     [
       "Introduction",
-      "Iconography, Logos & Imagery",
-      [
-        "Iconography",
-        "Logos",
-        "Imagery"
-      ],
+      "Iconography",
       "Color",
       "Elevation",
       "Typography",
       "Spacing",
-      "Layout & Grid",
+      "Layout & grid",
       "Patterns",
       [
         "Introduction",
+        "Frame",
+        "Topbar",
+        "Sidebar",
         "Surfaces",
-        "Surface Container",
-        "Card",
         "Section",
-        "Modal",
-        "Table"
+        "Card",
+        "Table",
+        "Modal"
       ],
-      "Tile",
+      "Imagery",
       "Design tokens",
       "Accessibility"
     ],
     "Components",
     [
-      "Actions",
+      "Forms and inputs",
       [
         "Button",
         [
           "Button",
-          "Close Button"
+          "Close button"
         ],
-        "Button Group"
-      ],
-      "Forms and inputs",
-      [
+        "Button group",
         "Cascader",
         "Checkbox",
-        "Choice Grid",
-        "Choice Group",
-        "Date Picker",
-        "Date & Time Picker",
-        "Dropdown",
-        "File Upload",
-        "Input",
-        "Input Group",
-        "Label & Caption",
-        "Number Input",
+        "Choice grid",
+        "Choice group",
+        "Date picker",
+        "Date time picker",
+        "Dropdown menu",
+        "File upload",
+        "Input group",
+        "Label & caption",
+        "Number input",
         "Radio",
         "Range",
         "Rating",
-        "Rich Text Editor",
+        "Rich text editor",
         "Select",
-        "Switch",
-        "Tag Input",
-        "Textarea",
-        "Tree Select"
+        "Tag input",
+        "Text area",
+        "Text field",
+        "Toggle",
+        "Tree select"
+      ],
+      "Images and icons",
+      [
+        "Logo",
+        "Tile"
+      ],
+      "Labels",
+      [
+        "Status, count & tag",
+        [
+          "Status",
+          "Count",
+          "Tag",
+          "Tag group"
+        ],
+        "AI label",
+        [
+          "AI label",
+          "Suggestion"
+        ],
+        "Deprecated"
       ],
       "Layout and structure",
       [
@@ -162,54 +184,46 @@
         "Collapse",
         "Divider",
         "Jumbotron",
-        "List Group",
-        "Media Object",
-        "Scroll Bar"
+        "List group",
+        "Media object",
+        "Scrollbar"
       ],
-      "Messaging",
+      "Loading",
       [
-        "Alert",
-        "Modal",
-        "Toast"
-      ],
-      "Navigation",
-      [
-        "Breadcrumb",
-        "Nav Tabs & Nav Pills",
-        [
-          "Nav Tabs",
-          "Nav Pills",
-          "Navbar"
-        ],
-        "Pagination",
-        "Scrollspy",
-        "Sidebar Tab"
-      ],
-      "Overlays",
-      [
-        "Popover",
-        "Tooltip"
-      ],
-      "Status and loading",
-      [
-        "Status, Count & Tag",
-        [
-          "Status",
-          "Count",
-          "Tag",
-          "Deprecated"
-        ],
-        "AI Label",
-        [
-          "AI Label",
-          "Suggestion"
-        ],
-        "Progress",
+        "Progress bar",
         "Loading",
         [
           "Spinner",
           "Skeleton"
         ]
+      ],
+      "Messaging",
+      [
+        "Flag",
+        "Modal",
+        "Section message"
+      ],
+      "Navigation",
+      [
+        "Breadcrumbs",
+        "Pagination",
+        "Scrollspy",
+        "Sidebar tab",
+        "Tabs, nav pills & navbar",
+        [
+          "Tabs",
+          "Nav pills",
+          "Navbar"
+        ]
+      ],
+      "Overlays and layering",
+      [
+        "Popup",
+        "Tooltip"
+      ],
+      "Text and data display",
+      [
+        "Table"
       ]
     ],
     "Data visualizations",

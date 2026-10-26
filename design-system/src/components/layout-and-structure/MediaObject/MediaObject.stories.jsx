@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import MediaObject from './MediaObject';
 
 export default {
-    title: 'Components/Layout and structure/Media Object',
+    title: 'Components/Layout and structure/Media object',
     component: MediaObject,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -79,7 +79,7 @@ function MediaObjectLayoutDemos() {
     return (
         <>
             <section>
-                <h5>Left alignment (default)</h5>
+                <h2 className="h6">Left alignment (default)</h2>
                 <MediaObject
                     media={<PlaceholderMedia />}
                     heading="Media heading"
@@ -88,7 +88,7 @@ function MediaObjectLayoutDemos() {
                 </MediaObject>
             </section>
             <section>
-                <h5>Right alignment</h5>
+                <h2 className="h6">Right alignment</h2>
                 <MediaObject
                     media={<PlaceholderMedia />}
                     heading="Media heading"
@@ -98,7 +98,7 @@ function MediaObjectLayoutDemos() {
                 </MediaObject>
             </section>
             <section>
-                <h5>Center vertical alignment</h5>
+                <h2 className="h6">Center vertical alignment</h2>
                 <MediaObject
                     media={<PlaceholderMedia />}
                     heading="Center Aligned"
@@ -114,7 +114,7 @@ function MediaObjectLayoutDemos() {
 function MediaObjectSizesDemos() {
     return (
         <section>
-            <h5>Media sizes</h5>
+            <h2 className="h6">Media sizes</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <MediaObject
                     media={<PlaceholderMedia size="48px" text="48" />}
@@ -145,7 +145,7 @@ function MediaObjectSizesDemos() {
 function MediaObjectContentNestedDemo() {
     return (
         <section>
-            <h5>Nested media</h5>
+            <h2 className="h6">Nested media</h2>
             <MediaObject
                 media={<PlaceholderMedia />}
                 heading="Parent Media"

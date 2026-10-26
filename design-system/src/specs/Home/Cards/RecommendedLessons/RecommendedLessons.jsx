@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Divider from '@/components/layout-and-structure/Divider';
 import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
 import './RecommendedLessons.scss';

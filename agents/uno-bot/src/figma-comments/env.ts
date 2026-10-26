@@ -52,7 +52,7 @@ import { ladderChannelsFor } from "../destination/env";
 import { channelMembers } from "../slack/channel-members";
 import { threadStateFor } from "../thread-state/production";
 import type { PendingProposal } from "../thread-state/index";
-import { figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
+import { activePeopleFor, figmaPeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { getBotIdentity } from "../slack/api";
 import { recordProposalEvents, stagedEvent, supersededEvents } from "../usage/index";
 import type { JobContext } from "../scheduled/runs";
@@ -272,6 +272,7 @@ export function triageOn(env: Env, kv: KVNamespace): TriagePorts {
       return (await teams)[fileKey] ?? null;
     },
     people: () => figmaPeopleFor(env),
+    active: activePeopleFor(env),
     channels: channelIdsFor(env),
     async dm(slackId, text) {
       const open = await openConversation(env, slackId);

@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternSectionStories} />
 
 <Title />
-The section pattern is a large structural block for page layout: a title, optional description, an actions slot on the title row, and a content slot. Standard section padding and gap tokens are baked in; basic sections are never elevated. It mirrors the Section slot component in Figma.
+The section pattern is a large structural block for page layout: a title, optional description, an actions slot on the title row, an optional tabs row under it (`tabs`), and a content slot. `level="page"` makes it the page header: an h1 at Heading/large, with the sections it holds as h2s. Standard section padding and gap tokens are baked in; basic sections are never elevated. It mirrors the Section slot component in Figma.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
@@ -39,7 +39,7 @@ The section pattern is a large structural block for page layout: a title, option
 
 ### Composition
 
-<DocsCanvasShell description={<>A filled section (<code>--color-surface-container-low</code>) grouping card shells.</>}>
+<DocsCanvasShell description={<>A filled section (<code>background="container"</code>, the translucent <code>--ds-surface-container</code> well) grouping card shells.</>}>
     <DsCanvasQuiet of={PatternSectionStories.Composition} />
 </DocsCanvasShell>
 
@@ -67,7 +67,7 @@ The section pattern is a large structural block for page layout: a title, option
 ## Related
 
 - For one object rather than a region, use `Card`.
-- For a region that needs a fill of its own, give it `--surface-container` — see `Surface`. A section is transparent by default and the page shows through.
+- For a region that needs a fill of its own, give it `background="container"` (`--ds-surface-container`), or see `Surface`. A section is transparent by default and the page shows through.
 - For how a section's content lines up across breakpoints, see **Layout & Grid**; the section carries the padding, the grid carries the columns.
 
 </div>

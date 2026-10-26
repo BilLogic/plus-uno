@@ -16,7 +16,7 @@
         flex-shrink: 0;
         height: 28px !important;
         min-height: 28px !important;
-        border-radius: var(--element-radius-sm, 2px);
+        border-radius: var(--size-border-radius-radius-50);
 
         // Override small button padding to match Figma (4px vertical, 8px horizontal)
         padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px) !important;

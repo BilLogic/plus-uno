@@ -1,16 +1,18 @@
 /**
  * Modal pattern (Patterns/Modal)
- * Inline modal shell — surface-container-high background, elevation 3,
+ * Inline modal shell, drawn as the Modal component draws one: the overlay
+ * pair (elevation.surface.overlay with elevation.shadow.overlay, the level
+ * every floating layer takes; the blanket under a real modal sets it apart),
  * modal radius/padding/gap tokens, internal body scroll.
  */
 
 .plus-pattern-modal {
     display: flex;
     flex-direction: column;
-    background-color: var(--color-surface-container-high);
-    color: var(--color-on-surface);
+    background-color: var(--ds-surface-overlay);
+    color: var(--ds-text);
     border-radius: var(--size-modal-radius-md);
-    box-shadow: var(--elevation-light-4); /* semantic level 3 (modals) maps to Light/4 per token-mapping.md */
+    box-shadow: var(--ds-shadow-overlay);
     overflow: hidden; // keep scrolling body clipped to the radius
 }
 
@@ -51,7 +53,8 @@
 
 .plus-pattern-modal-title {
     margin: 0;
-    color: var(--color-on-surface);
+    font: var(--heading-medium);
+    color: var(--ds-text);
     min-width: 0;
 }
 
@@ -64,15 +67,15 @@
     background: transparent;
     border: none;
     border-radius: var(--size-element-radius-md);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     cursor: pointer;
 
     &:hover {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:active {
-        background-color: var(--color-on-surface-state-16);
+        background-color: var(--ds-background-neutral-subtle-pressed);
     }
 }
 

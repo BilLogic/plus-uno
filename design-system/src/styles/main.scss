@@ -15,8 +15,28 @@
 @use "../tokens/primitives" as *;
 @use "../tokens/spacing_semantics" as *;
 @use "../tokens/layout" as *;
+// The new scales, beside the old size tokens; see the header of _scales.scss.
+@use "../tokens/scales" as *;
+@use "../tokens/frame_layers" as *;
 @use "../tokens/fonts" as *;
 @use "../tokens/elevation" as *;
+// The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs),
+// beside the old ones until the components move over. Each mode is a selector
+// on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
+// (more, no-preference, auto); no attribute is light at standard contrast. The
+// Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
+// react-bootstrap follows the mode; it overrides Bootstrap's own `:root` block,
+// so every entry imports Bootstrap's compiled CSS before this file. Regenerate,
+// never edit: `npm run generate:color-tokens`.
+@use "../tokens/color/palette" as *;
+@use "../tokens/color/semantic" as *;
+@use "../tokens/color/elevation" as *;
+@use "../tokens/color/bootstrap-bridge" as *;
+// Legacy names the migration map gives one target, pointed at the `--ds-*`
+// token so untouched components follow the palette and the modes. Must follow
+// the legacy token files above, so the alias wins; names that split by CSS
+// property or by element keep their legacy value until the component sweep.
+@use "../tokens/color/legacy-aliases" as *;
 
 // Shared skeleton/shimmer loading style (Sidebar, prototypes)
 @import "skeleton";
@@ -25,13 +45,13 @@
 // Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
 // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
 // Prototypes and any app that imports main.scss get styles only for uncommented components.
-@import "../components/actions/Button/Button";
+@import "../components/forms-and-inputs/Button/Button";
 @import "../components/navigation/Breadcrumb/Breadcrumb";
-@import "../components/status-and-loading/Badge/Badge";
+@import "../components/labels/Badge/Badge";
 
 @import "../components/layout-and-structure/Divider/Divider";
 
-@import "../components/actions/ButtonGroup/ButtonGroup";
+@import "../components/forms-and-inputs/ButtonGroup/ButtonGroup";
 // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
 @import "../components/forms-and-inputs/Dropdown/Dropdown";
 
@@ -42,11 +62,42 @@
     --plus-card-pad-y: 0px;
     margin: 0;
     overflow: hidden; // clip image to card border-radius
-    background-color: var(--color-surface-container-lowest);
+    // Flat at rest (elevation.md): the page's own fill on a 1px outline-variant
+    // border, and no shadow. The raised shadow is for a clickable card while it
+    // is hovered or dragged.
+    background-color: var(--surface-raised);
+    border-color: var(--color-outline-variant);
+    box-shadow: none;
+    transition: box-shadow 0.15s ease;
+}
+
+// The lift, Light/2 through the raised role's shadow.
+.plus-card--clickable:hover,
+.plus-card--dragging {
+    box-shadow: var(--surface-raised-shadow);
 }
 
 .plus-card .plus-card-content {
     padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
+}
+
+// Card type: a Heading/xsmall 14 container title over a Body/default 14
+// description; everything else in the card is Body/default.
+.plus-card {
+    font: var(--body-default);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-title {
+    margin: 0;
+    font: var(--heading-xsmall);
+    color: var(--color-on-surface);
+}
+
+.plus-card .plus-card-subtitle {
+    margin: 0 0 var(--element-stack-md);
+    font: var(--body-default);
+    color: var(--color-on-surface-variant);
 }
 
 // Image always flush to top/left/right edges regardless of card padding size
@@ -121,12 +172,12 @@
 @import "../components/layout-and-structure/Collapse/Collapse";
 @import "../components/layout-and-structure/Jumbotron/Jumbotron";
 @import "../components/layout-and-structure/MediaObject/MediaObject";
-@import "../components/status-and-loading/Progress/Progress";
-@import "../components/status-and-loading/Spinner/Spinner";
+@import "../components/loading/Progress/Progress";
+@import "../components/loading/Spinner/Spinner";
 @import "../components/_internal/LoadingGif/LoadingGif";
-@import "../components/overlays/Popover/Popover";
+@import "../components/overlays-and-layering/Popover/Popover";
 @import "../components/navigation/Pagination/Pagination";
-@import "../components/overlays/Tooltip/Tooltip";
+@import "../components/overlays-and-layering/Tooltip/Tooltip";
 @import "../components/messaging/Toast/Toast";
 @import "../components/navigation/Scrollspy/Scrollspy";
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
@@ -150,9 +201,9 @@ body {
     font-family: var(--font-family-body);
     font-weight: var(--font-weight-normal);
     line-height: var(--font-line-height-150);
-    color: var(--color-on-surface);
-    background-color: unset;
-    background: unset;
+    // Text and its ground move together, so the page flips with the color mode.
+    color: var(--ds-text);
+    background-color: var(--ds-surface);
 }
 
 #root {
@@ -302,8 +353,40 @@ body {
     align-items: center;
     justify-content: center;
     color: var(--color-on-surface-variant, #3f484a);
-    font-size: var(--font-size-body3, 10px);
+    font: var(--body-small);
     box-sizing: border-box;
+}
+
+// Bootstrap's layers, on the layer scale
+// Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
+// popover 1070, tooltip 1080) sit above a modal's scrim (500). Each moves to
+// Atlassian's layer for what it is. Bootstrap's modal and backdrop are set by
+// the Modal component itself.
+.dropdown-menu {
+    --bs-dropdown-zindex: var(--layout-z-index-popup);
+}
+
+.toast-container {
+    --bs-toast-zindex: var(--layout-z-index-flag);
+}
+
+.popover {
+    --bs-popover-zindex: var(--layout-z-index-tooltip);
+}
+
+.tooltip {
+    --bs-tooltip-zindex: var(--layout-z-index-tooltip);
+}
+
+// A sticky header is a card (100); a fixed bar is navigation (200).
+.sticky-top,
+.sticky-bottom {
+    z-index: var(--layout-z-index-card);
+}
+
+.fixed-top,
+.fixed-bottom {
+    z-index: var(--layout-z-index-navigation);
 }
 
 // Modal Boundary Utility

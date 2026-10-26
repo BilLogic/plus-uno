@@ -52,7 +52,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_TOKEN_PATHS, COLOR_VALUE_PREFIXES, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   composite,
   contrast,
@@ -66,25 +66,32 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
 export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
-export const BUTTON_SCSS = 'design-system/src/components/actions/Button/Button.scss';
+export const BUTTON_SCSS = 'design-system/src/components/forms-and-inputs/Button/Button.scss';
 
-/** The page a button sits on when its own fill draws no ground. */
+/**
+ * The page a button sits on when its own fill draws no ground. Still the
+ * legacy page while every component paints on it; it moves to `--ds-surface`
+ * when the pages do.
+ */
 export const PAGE_TOKEN = '--color-surface';
 
 /** WCAG AA for body text. Buttons are body text; none of ours is 24px regular. */
 export const AA_TEXT = 4.5;
 
 /**
- * Every `--color-*: value;` in the token stylesheet, as a Map.
+ * Every color token in the given stylesheet text, as a Map: `--color-*`,
+ * `--ds-*` and the `--palette-*` ramps the `--ds-*` tokens alias.
  *
- * The `--color-` narrowing is the whole difference from the module's
+ * The narrowing to color is the whole difference from the module's
  * `readTokens`: this check resolves colors, and a color that resolved through
- * a spacing token would be a different defect wearing this check's name.
+ * a spacing token would be a different defect wearing this check's name. The
+ * FIRST definition wins, so a `--ds-*` token reads its light value, the first
+ * block its generated file writes.
  *
  * @param {string} source
  */
 export function tokenValues(source) {
-  return readTokens(source, { prefix: '--color-' });
+  return readTokens(source, { prefix: COLOR_VALUE_PREFIXES });
 }
 
 /**
@@ -235,9 +242,21 @@ export function findings(themes, values, verdicts = {}) {
   return found;
 }
 
-/** Reads the repo. Separated so every function above stays testable on strings. */
+/**
+ * Reads the repo. Separated so every function above stays testable on strings.
+ *
+ * The values are the legacy color file, then the generated `--palette-*` and
+ * `--ds-*` sets, so a theme map naming `--ds-background-brand-bold` resolves it
+ * exactly as it resolves `--color-primary`. The legacy file is required, as it
+ * always was; the generated ones are read when they are there.
+ */
 export function readRepo(root = REPO_ROOT) {
-  const tokens = fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8');
+  const tokens = [
+    fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'),
+    ...COLOR_TOKEN_PATHS.map((file) => path.join(root, file))
+      .filter((file) => fs.existsSync(file))
+      .map((file) => fs.readFileSync(file, 'utf8')),
+  ].join('\n');
   const button = fs.readFileSync(path.join(root, BUTTON_SCSS), 'utf8');
   return { values: tokenValues(tokens), themes: themeMap(button) };
 }

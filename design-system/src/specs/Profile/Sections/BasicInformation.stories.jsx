@@ -56,8 +56,8 @@
 import React from 'react';
 import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
 import Input from '@/components/forms-and-inputs/Input';
-import Button from '@/components/actions/Button/Button';
-import Tooltip from '@/components/overlays/Tooltip/Tooltip';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
 
 export default {

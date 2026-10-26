@@ -40,13 +40,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-12` · `--color-primary-state-16` · `--font-line-height-body3` · `--font-size-body3` · `--font-weight-normal` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
+`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-12` · `--color-primary-state-16` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

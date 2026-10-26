@@ -62,10 +62,7 @@
         padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
         background-color: var(--color-surface) !important;
         color: var(--color-on-surface-variant) !important;
-        font-family: var(--font-family-header);
-        font-size: var(--font-size-h6);
-        font-weight: var(--font-weight-title);
-        line-height: var(--font-line-height-h6);
+        font: var(--heading-small);
         box-shadow: none !important;
         border: none !important;
         text-align: left;
@@ -147,10 +144,7 @@
         padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
         background-color: var(--color-surface);
         color: var(--color-on-surface-variant);
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body1);
-        font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body1);
+        font: var(--body-large);
         border-top: var(--size-card-border-sm) solid var(--color-outline-variant);
         text-align: left;
     }

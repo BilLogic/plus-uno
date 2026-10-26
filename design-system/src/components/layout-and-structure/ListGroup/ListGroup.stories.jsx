@@ -1,10 +1,10 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ListGroup from './ListGroup';
-import { Badge } from '@/components/status-and-loading/Badge';
+import { Badge } from '@/components/labels/Badge';
 
 export default {
-    title: 'Components/Layout and structure/List Group',
+    title: 'Components/Layout and structure/List group',
     component: ListGroup,
     tags: ['!dev', '!autodocs'],
     subcomponents: { 'ListGroup.Item': ListGroup.Item },

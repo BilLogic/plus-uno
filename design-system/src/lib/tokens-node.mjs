@@ -127,8 +127,48 @@ import { resolveToken, tokenDeclarationPattern } from './tokens.mjs';
  */
 export const TOKEN_DIR = 'design-system/src/tokens';
 
-/** `_primitives.scss` carries a DO NOT USE DIRECTLY banner; callers rank on it. */
-const PRIMITIVES_FILE = '_primitives.scss';
+/**
+ * Where the generated color tokens live (ADR-035): the `--palette-*` ramps, the
+ * `--ds-*` semantic and elevation tokens in four modes, the Bootstrap bridge and
+ * the Figma spec, all written by `npm run generate:color-tokens`.
+ */
+export const COLOR_TOKEN_DIR = `${TOKEN_DIR}/color`;
+
+/**
+ * The stylesheets in `COLOR_TOKEN_DIR` that DEFINE tokens. The Bootstrap bridge
+ * is not one: it points Bootstrap's own `--bs-*` properties at `--ds-*`, which
+ * makes it a consumer of the tokens, and reading it as a definition would mint
+ * a `--bs-` family nobody styles with.
+ */
+export const COLOR_PALETTE_FILE = '_palette.scss';
+export const COLOR_SEMANTIC_FILE = '_semantic.scss';
+export const COLOR_ELEVATION_FILE = '_elevation.scss';
+export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_ELEVATION_FILE];
+
+/** The same files, repo-relative, for a check that reads them by path. */
+export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
+
+/**
+ * The two color vocabularies, while they coexist: the legacy Material roles
+ * (`--color-*`) and the Atlassian-shaped semantic tokens (`--ds-*`). A check
+ * that reads color reads both until the legacy set is retired, and names this
+ * list rather than spelling the pair itself.
+ */
+export const COLOR_PREFIXES = ['--color-', '--ds-'];
+
+/**
+ * What a color VALUE can resolve through: both vocabularies and the ramps the
+ * `--ds-*` tokens alias. A check resolving `--ds-text` has to be able to follow
+ * it to `--palette-neutral-1000`, and a component never names the ramps.
+ */
+export const COLOR_VALUE_PREFIXES = [...COLOR_PREFIXES, '--palette-'];
+
+/**
+ * Files that carry primitives, which a component never names; callers rank on
+ * it. `_primitives.scss` says DO NOT USE DIRECTLY in its banner, and the
+ * palette is the color equivalent.
+ */
+const PRIMITIVE_FILES = new Set(['_primitives.scss', `color/${COLOR_PALETTE_FILE}`]);
 
 /**
  * The token stylesheets, sorted by name and read whole.
@@ -140,7 +180,11 @@ const PRIMITIVES_FILE = '_primitives.scss';
  *
  * FLAT, and the glob is what makes it flat: `tokens/*` matches one segment, so
  * `tokens/source/` — the Figma exports the SCSS is GENERATED from — is not
- * read, and reading both would count every token twice.
+ * read, and reading both would count every token twice. The one directory
+ * read below it is `tokens/color/`, by name and only its `COLOR_TOKEN_FILES`:
+ * the generated color tokens live there because a generator owns the whole
+ * directory, and a token the corpus cannot see is a token no check can.
+ * They come after the flat sheets, so `file` reads `color/_semantic.scss`.
  *
  * FORGIVING, not `strict`. A token directory that is not there comes back
  * empty rather than throwing: every check over this corpus already has a floor
@@ -152,7 +196,10 @@ const PRIMITIVES_FILE = '_primitives.scss';
  * @returns {{path: string, file: string, text: string}[]} `path` root-relative
  */
 export function tokenSources({ root = REPO_ROOT } = {}) {
-  return documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).map((rel) => ({
+  const color = documents(`${COLOR_TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).filter((rel) =>
+    COLOR_TOKEN_FILES.includes(rel.slice(COLOR_TOKEN_DIR.length + 1)),
+  );
+  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color].map((rel) => ({
     path: rel,
     file: rel.slice(TOKEN_DIR.length + 1),
     text: text(rel, { root }),
@@ -183,7 +230,8 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
  *
  * @param {object} [options]
  * @param {string} [options.root]
- * @param {string} [options.prefix] e.g. `--color-`; defaults to every token
+ * @param {string|string[]} [options.prefix] e.g. `--color-`, or a list such
+ *        as `COLOR_PREFIXES`; defaults to every token
  * @param {'first'|'last'} [options.precedence]
  * @returns {Map<string, TokenEntry>}
  */
@@ -208,16 +256,17 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
     }
   }
 
+  const prefixes = Array.isArray(prefix) ? prefix : [prefix];
   const corpus = new Map();
   for (const [name, value] of raw) {
-    if (!name.startsWith(prefix)) continue;
+    if (!prefixes.some((p) => name.startsWith(p))) continue;
     const literal = resolveToken(name, raw);
     corpus.set(name, {
       raw: value,
       value: literal ?? value,
       resolved: literal !== undefined,
       file: files.get(name),
-      primitive: files.get(name) === PRIMITIVES_FILE,
+      primitive: PRIMITIVE_FILES.has(files.get(name)),
       family: familyOf(name),
     });
   }
@@ -238,11 +287,17 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * corpus. Minting a family means adding a row.
  */
 export const FAMILIES = [
-  { family: 'color', prefix: '--color-', what: 'every color value and role' },
+  { family: 'color', prefix: '--color-', what: 'the legacy color values and roles, until the `--ds-` set replaces them' },
+  {
+    family: 'ds',
+    prefix: '--ds-',
+    what: 'the Atlassian-shaped color, elevation and opacity tokens, generated per mode (ADR-035)',
+  },
+  { family: 'palette', prefix: '--palette-', what: 'the color ramps the `--ds-` tokens alias; never named by a component' },
   {
     family: 'surface',
     prefix: '--surface-',
-    what: 'a surface: its color and, separately, its shadow',
+    what: 'a surface: its color and, separately, its shadow; the surface and surface container pad, stack and radius',
   },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
@@ -253,10 +308,39 @@ export const FAMILIES = [
     prefix: '--font-letter-spacing-',
     what: 'tracking per type step',
   },
-  { family: 'type', prefix: '--type-', what: 'the `font` shorthand for a type step' },
-  { family: 'size', prefix: '--size-', what: 'spacing, radius, borders and component metrics' },
+  { family: 'line-height', prefix: '--line-height-', what: 'line height primitives, by rem × 100' },
+  { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },
+  { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
+  { family: 'metric', prefix: '--metric-', what: 'a metric text style: the `font` shorthand' },
+  { family: 'code', prefix: '--code', what: 'the code text style, relative to the text around it' },
+  {
+    family: 'type',
+    prefix: '--type-',
+    what: 'the typography family and weight variables, and the older `font` shorthands per type step',
+  },
+  { family: 'size', prefix: '--size-', what: 'the old spacing, radius, border and component metrics, and the size primitives (`--size-200`)' },
+  { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
+  { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
+  { family: 'stroke', prefix: '--stroke-', what: 'the stroke-width primitives' },
+  { family: 'element', prefix: '--element-', what: 'what the parts of components share' },
+  { family: 'height', prefix: '--height-', what: 'the common height scale' },
+  { family: 'width', prefix: '--width-', what: 'the common width scale' },
+  { family: 'item', prefix: '--item-', what: 'control heights, 24 and 32' },
+  { family: 'row', prefix: '--row-height-', what: 'table and list row heights (not `--row-`, which a component-local `--row-index` uses)' },
+  { family: 'label', prefix: '--label-', what: 'Tag, Status and Count sizes' },
+  { family: 'field', prefix: '--field-', what: 'field widths and multi-line minimums' },
+  { family: 'icon', prefix: '--icon-', what: 'drawn icon sizes' },
+  { family: 'image', prefix: '--image-', what: 'avatar and tile sizes' },
+  { family: 'border', prefix: '--border-', what: 'stroke widths by state' },
   { family: 'elevation', prefix: '--elevation-', what: 'the shadow ladder' },
   { family: 'layout', prefix: '--layout-', what: 'app-shell measurements' },
+  { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
+  { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
+  { family: 'table', prefix: '--table-', what: 'table cell pad, footer pad-x, tree indent, minimum title width and radius' },
+  { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
+  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
+  { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
+  { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
 ];
@@ -266,7 +350,7 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
 
 /**
  * Which family a token NAME is in, or null for a name in none — a
- * component-local custom property such as `--table-cell-x`, which is correct
+ * component-local custom property such as `--dropdown-cell-x`, which is correct
  * code and not a token (see `check:size-fallbacks` on why it is not a finding).
  *
  * @param {string} name
@@ -274,7 +358,11 @@ const BY_LENGTH = [...FAMILIES].sort((a, b) => b.prefix.length - a.prefix.length
  */
 export function familyOf(name) {
   if (typeof name !== 'string') return null;
-  const family = BY_LENGTH.find((f) => name.startsWith(f.prefix) && name.length > f.prefix.length);
+  // A prefix ending in `-` opens a family; one without names a family of one
+  // token, matched whole (`--code`).
+  const family = BY_LENGTH.find((f) =>
+    f.prefix.endsWith('-') ? name.startsWith(f.prefix) && name.length > f.prefix.length : name === f.prefix,
+  );
   return family ? family.family : null;
 }
 

@@ -5,7 +5,7 @@ import FileUpload from './FileUpload';
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
 export default {
-    title: 'Components/Forms and inputs/File Upload',
+    title: 'Components/Forms and inputs/File upload',
     component: FileUpload,
     tags: ['!dev', '!autodocs'],
     parameters: {

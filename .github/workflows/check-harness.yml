@@ -21,7 +21,8 @@ name: check:harness
 #      postcss-selector-parser plus their transitive dependencies, each at the
 #      version package-lock.json resolves, into the runner's temp directory and
 #      linked into `node_modules` (0–1s). What it buys: those two checks and
-#      their tests in `test:scripts` can run at all.
+#      their tests in `test:scripts` can run at all. sass rides the same
+#      install, for the state-step and elevation tests that compile SCSS.
 # This header read "EXACTLY ONE `npm ci`" and 34–38s until the second install
 # landed, and before that "NO `npm ci`, DELIBERATELY" for three weeks after the
 # first one did — a file arguing for a number forty lines above the step that
@@ -111,11 +112,18 @@ jobs:
       # `node_modules`: a name there is a package this job did not expect,
       # and shadowing it would be a silent change of what the checks run
       # against.
-      - name: Install the stylesheet parser for the contrast checks
+      #
+      # sass is the compiler the state-step and elevation tests in
+      # `test:scripts` read compiled stylesheets with. Its one optional
+      # dependency, @parcel/watcher, serves `sass --watch` alone and ships a
+      # binary per platform, which a flat install of named pins cannot take: so
+      # those pins are dropped and `--omit=optional` keeps npm from reaching
+      # for them.
+      - name: Install the stylesheet parser and compiler for the style checks
         run: |
-          pins=$(node scripts/lock-closure.mjs postcss postcss-scss postcss-selector-parser)
+          pins=$(node scripts/lock-closure.mjs postcss postcss-scss postcss-selector-parser sass | tr ' ' '\n' | grep -v '^@parcel/watcher' | tr '\n' ' ')
           echo "Pinned: $pins"
-          npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts $pins
+          npm install --prefix "$RUNNER_TEMP/grounds" --no-save --no-audit --no-fund --ignore-scripts --omit=optional $pins
           mkdir -p node_modules
           for dir in "$RUNNER_TEMP"/grounds/node_modules/*; do
             case "$(basename "$dir")" in
@@ -123,6 +131,8 @@ jobs:
               *) set -- "$dir" ;;
             esac
             for pkg in "$@"; do
+              # A scope npm left empty (the omitted @parcel one) matches nothing.
+              [ -e "$pkg" ] || continue
               name=${pkg#"$RUNNER_TEMP/grounds/node_modules/"}
               case " $pins " in
                 *" $name@"*) ;;

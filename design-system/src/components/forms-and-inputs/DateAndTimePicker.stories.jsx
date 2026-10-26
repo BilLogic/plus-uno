@@ -3,10 +3,14 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import DateAndTimePicker from './DateAndTimePicker';
 
 export default {
-    title: 'Components/Forms and inputs/Date & Time Picker',
+    title: 'Components/Forms and inputs/Date time picker',
     component: DateAndTimePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'Both fields became 32, their text centered and their side padding 12, with a 24 AM/PM menu.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -83,9 +87,9 @@ export default {
 
 const contentVariantCard = {
     padding: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
     borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
+    background: 'var(--ds-surface-container)',
 };
 
 export const Overview = () => (
@@ -103,7 +107,7 @@ export const Content = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <section>
             <h6 className="h6 mb-2">Without section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)', marginBottom: '12px' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)', marginBottom: '12px' }}>
                 Compact row: date and time only.
             </p>
             <div style={contentVariantCard}>
@@ -112,7 +116,7 @@ export const Content = () => (
         </section>
         <section>
             <h6 className="h6 mb-2">With section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)', marginBottom: '12px' }}>
+            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)', marginBottom: '12px' }}>
                 “Date” and “Time” captions above each control.
             </p>
             <div style={contentVariantCard}>
@@ -228,7 +232,7 @@ export const Interactive = (args) => {
                     style={{
                         marginTop: '16px',
                         padding: '12px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '4px',
                     }}
                 >

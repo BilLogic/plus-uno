@@ -28,7 +28,7 @@ const CHAT_PANEL_DURATION = 0.36;
 
 /**
  * Tutor Admin with integrated Research Assistant.
- * Content lives inside PageLayout's plus-page-content-wrapper. When chat is expanded,
+ * Content lives inside PageLayout's surface (.plus-frame__surface). When chat is expanded,
  * children render directly in content-wrapper (no main) at 100% width/height.
  */
 export function TutorAdminWithChatView(): React.ReactElement {

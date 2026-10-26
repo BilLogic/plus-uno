@@ -6,6 +6,8 @@
 
 .plus-form-checkbox-wrapper {
     display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
     align-items: center;
     width: 100%;
 
@@ -19,6 +21,12 @@
 }
 
 .plus-form-checkbox {
+    // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
+    // Only a labeled control is a row: without a label React-Bootstrap drops
+    // `.form-check`, and the bare mark keeps its own size.
+    &.form-check {
+        min-height: var(--item-height-sm);
+    }
 
     // Target the Form.Check container
     .form-check-input {
@@ -34,9 +42,9 @@
         padding: 0;
         margin: 0;
         margin-right: var(--size-element-gap-sm, 8px); // Spacing between checkbox and label
-        border: var(--size-element-stroke-md, 2px) solid var(--color-primary-border);
+        border: var(--size-element-stroke-md, 2px) solid var(--ds-border-input);
         border-radius: var(--size-element-radius-sm, 2px);
-        background-color: var(--color-surface-container-lowest);
+        background-color: var(--ds-background-input);
         cursor: pointer;
         transition: all 0.2s;
         position: relative;
@@ -53,7 +61,7 @@
             height: calc(var(--layout-control-checkbox) - 4px);
             clip-path: polygon(26% 43%, 14% 57%, 49% 85%, 90% 26%, 75% 16%, 46% 59%);
             transform: translate(-50%, -50%) scale(0);
-            background-color: var(--color-on-primary);
+            background-color: var(--ds-icon-inverse);
             transition: transform 0.2s;
         }
 
@@ -66,20 +74,21 @@
             width: 10px;
             height: 2px;
             transform: translate(-50%, -50%) scale(0);
-            background-color: var(--color-on-primary);
+            background-color: var(--ds-icon-inverse);
             transition: transform 0.2s;
         }
 
         // Unchecked state
         &:not(:checked):not(:indeterminate) {
-            background-color: var(--color-surface-container-lowest);
-            border-color: var(--color-outline-variant);
+            background-color: var(--ds-background-input);
+            border-color: var(--ds-border-input);
         }
 
-        // Checked state
+        // Checked state: Lagoon, the checked-control fill, edged in
+        // `border.selected`, the same color, so the box reads as one shape.
         &:checked:not(:indeterminate) {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary-border);
+            background-color: var(--ds-background-selected-bold);
+            border-color: var(--ds-border-selected);
         }
 
         &:checked:not(:indeterminate)::before {
@@ -88,8 +97,8 @@
 
         // Indeterminate state (dash/minus)
         &:indeterminate {
-            background-color: var(--color-primary);
-            border-color: var(--color-primary-border);
+            background-color: var(--ds-background-selected-bold);
+            border-color: var(--ds-border-selected);
         }
 
         &:indeterminate::after {
@@ -100,51 +109,66 @@
             transform: translate(-50%, -50%) scale(0);
         }
 
-        // Hover state
+        // Hover state: the input's hovered fill, edged in the brand border.
         &:hover:not(:disabled):not(:indeterminate) {
-            border-color: var(--color-primary-border);
-            background-color: var(--color-primary-state-08);
+            border-color: var(--ds-border-brand);
+            background-color: var(--ds-background-input-hovered);
         }
 
-        &:checked:hover:not(:disabled):not(:indeterminate) {
-            background-color: var(--color-primary-state-12);
-        }
-
+        // A checked or mixed box keeps its mark on hover, and its fill steps to
+        // the named hovered step, opaque, under the mark drawn by `::before`
+        // and `::after`. The edge takes the same step: there is no hovered
+        // border role, and `check:intent-roles` bars only the resting `.bold`
+        // fill from an edge.
+        &:checked:hover:not(:disabled):not(:indeterminate),
         &:indeterminate:hover:not(:disabled) {
-            background-color: var(--color-primary-state-12);
+            background-color: var(--ds-background-selected-bold-hovered);
+            border-color: var(--ds-background-selected-bold-hovered);
         }
 
-        // Focus state
+        // Focus state: the focus ring, 2px wide and 2px off the box, as Button
+        // and Radio draw it. A pointer focus draws nothing.
         &:focus {
             outline: none;
-            box-shadow: 0 0 0 2px var(--color-focus-ring);
+            box-shadow: none;
         }
 
-        // Disabled state
+        &:focus-visible {
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+            outline-offset: var(--size-element-stroke-lg);
+        }
+
+        // Disabled state: Atlassian's disabled colors, under the disabled fade.
         &:disabled {
-            opacity: 0.38;
+            opacity: var(--ds-opacity-disabled);
             cursor: not-allowed;
-            border-color: var(--color-outline-variant);
-            background-color: var(--color-surface-variant);
+            border-color: var(--ds-border-disabled);
+            background-color: var(--ds-background-disabled);
         }
 
+        // A disabled checked or mixed box keeps the disabled fill and edge;
+        // its mark is `icon.disabled`.
         &:disabled:checked,
         &:disabled:indeterminate {
-            background-color: var(--color-outline-variant);
-            border-color: var(--color-outline-variant);
+            background-color: var(--ds-background-disabled);
+            border-color: var(--ds-border-disabled);
+
+            &::before,
+            &::after {
+                background-color: var(--ds-icon-disabled);
+            }
         }
     }
 
     // Label styling
     .form-check-label {
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         cursor: pointer;
         user-select: none;
         flex: 1;
         padding-left: 0;
         margin: 0;
-        font-family: var(--font-family-body);
-        font-weight: var(--font-weight-normal);
+        font: var(--body-default);
         display: flex;
         align-items: center;
     }
@@ -152,15 +176,15 @@
 
 // Required indicator
 .plus-form-checkbox-required-asterisk {
-    color: var(--color-danger);
+    color: var(--ds-text-danger);
     margin-left: 2px;
-    font-weight: 400;
+    font-weight: var(--type-weight-regular);
 }
 
 // Disabled wrapper state
 .plus-form-checkbox-disabled {
     .form-check-label {
-        opacity: 0.38;
+        opacity: var(--ds-opacity-disabled);
         cursor: not-allowed;
     }
 }
@@ -185,21 +209,4 @@
     }
 }
 
-.plus-form-checkbox-large {
-    .plus-form-checkbox .form-check-input {
-        width: 20px;
-        height: 20px;
-        min-width: 20px;
-        min-height: 20px;
-
-        &::before {
-            width: calc(20px - 4px);
-            height: calc(20px - 4px);
-        }
-
-        &::after {
-            width: 12px;
-            height: 2px;
-        }
-    }
-}
+// `large` is deprecated and draws like `medium`, so it has no rule of its own.

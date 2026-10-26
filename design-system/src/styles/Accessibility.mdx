@@ -49,7 +49,7 @@ display size is not a section: `<p className="h4">Answered Correctly</p>` in
 `LessonsDetailPage` is how that text gets heading type without taking an outline
 slot, and the score beside it is `<p className="h1">` for the same reason. The
 values in `MetricsCard` and `TrainingProgressCard` read the same way — the class
-carries the whole appearance, so the tag has no work left to do (#244).
+carries the whole appearance, so the tag has no work left to do.
 
 Dropping a heading is not free. It can **create** a skip where none existed:
 `h2, h3, h4` with the `h3` taken out becomes `h2` → `h4`. Read the page's
@@ -60,8 +60,8 @@ The docs view used to break this separation. `.sbdocs h1 / h2 / h3–h6 { …
 canvases — `.docs-story` sits inside `.sbdocs` — and forced every heading a
 component rendered to one of three docs sizes, so `<h3 className="h6">` drew at
 28px instead of 16px and the preview was not showing the component. Those rules
-are now fenced with `:not(:where(.docs-story *))` and apply to MDX prose only
-(#244). Any new `.sbdocs hN` rule needs the same fence.
+are now fenced with `:not(:where(.docs-story *))` and apply to MDX prose only.
+Any new `.sbdocs hN` rule needs the same fence.
 
 </div>
 
@@ -77,7 +77,7 @@ twice, or a lesson's completion screen, legitimately shows more than one.)
 `heading-order` flags a heading that jumps more than one level below its
 predecessor. The **first** heading on a page has no predecessor, so a page whose
 whole outline reads `h4 → h4 → h4` satisfies the rule and still has no top. That
-was 111 of 114 page stories before #243.
+was 111 of 114 page stories before the page-outline check was added.
 
 `page-has-heading-one` is the rule for exactly this, and it never runs here: axe
 evaluates its page-level rules only when the run context is the whole document,
@@ -113,7 +113,7 @@ down in `scripts/check-page-outline.mjs` rather than inferred.
 **Adding the `<h1>` moves everything under it.** An `h1` followed by an `h4` is
 a three-level skip, so a page that used to run `h4 → h4` has to become
 `h2 → h3` — tag only, class kept, nothing changes on screen. Two consequences,
-both of which bit during #243:
+both of which bit when the page-outline check was first applied:
 
 - A component that lands at two depths takes its level as a prop.
   `SectionTitle` is an `h3` under a page's own header and an `h2` on the
@@ -138,22 +138,23 @@ Never place `on-surface` colors on accent fills or vice versa — always use the
 <div className="sb-ds-doc-section">
 ### Focus states
 
-Per the Pattern System's universal interaction logic, focus is an **additive
-overlay** — it never replaces the base fill:
+Focus is shown by the **focus ring**, never by a fill:
 
-- Overlay `on-surface` at **12% opacity** (`--color-on-surface-state-12`) on top of the base fill.
-- Change the border to **Inverse Primary** (`--color-inverse-primary`).
+- A 2px outline in `--color-focus-ring` (`--size-element-stroke-lg`), 2px off a
+  control's edge (Button, Checkbox, Radio) or inside a row or tab.
+- The base fill stays as it is; no state layer is added for focus.
 - Component opacity stays at 100%.
 
-This gives every interactive element (buttons, cards, table rows, list items) a
-visible, consistent focus indicator in both themes.
+The ring holds 3:1 against the ground it sits on (`check:focus-ring`), so every
+interactive element (buttons, cards, table rows, list items) has a visible,
+consistent focus indicator.
 </div>
 
 <div className="sb-ds-doc-section">
 ### Disabled states
 
-Disabled components are set to **38% total opacity**
-(`--color-disabled-opacity: 0.38`), applied to the whole component rather than
+Disabled components are set to **40% total opacity**
+(`--color-disabled-opacity`, which points at `opacity.disabled`, 0.4), applied to the whole component rather than
 recoloring individual parts. Disabled elements are not focus targets.
 </div>
 

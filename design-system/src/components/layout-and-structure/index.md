@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Accordion](Accordion/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Card](Card/index.md) | 19 | ✅ | ✅ | ✅ |
+| [Card](Card/index.md) | 20 | ✅ | ✅ | ✅ |
 | [Carousel](Carousel/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Collapse](Collapse/index.md) | 12 | ✅ | ✅ | ✅ |
 | [Divider](Divider/index.md) | 7 | ✅ | ✅ | ✅ |

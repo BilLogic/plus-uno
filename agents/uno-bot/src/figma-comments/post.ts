@@ -11,15 +11,15 @@
 // handed over the same way.
 //
 // THE SECTION, on that message: a line per file for its owner — the card's
-// design owner tagged once in the opener, or the file's creator by Figma
-// handle — then a card per decision, numbered across the message, each with
-// Review and Open comment, sharing the carousel's ten with the other sections
+// design owner, tagged once in the opener when still active on Team Members,
+// else nobody, never a Figma handle (#1361) — then a card per decision,
+// numbered across the message, each with Review and Open comment, sharing the carousel's ten with the other sections
 // and the sweep's fixes. Once the message is up, each card it showed is its
 // own proposal, staged as one item of the message (`itemProposal`):
 //   • its own slot, so every decision is live at once and decided on its own;
 //   • 24 weekday hours (`cardExpiresAt`), with no re-ping when it lapses;
-//   • confirmers: its file's cards' Contributors; a file with no card, its
-//     place's members, read at the hand-over;
+//   • confirmers: its file's cards' Contributors still active; a file with
+//     no card, or none active, its place's members, read at the hand-over;
 //   • its own words at the gate, and `refuseRevision`, which points a turn at
 //     Review's Needs changes (`./revise.ts`) instead of letting it stage a
 //     near-copy beside the card.
@@ -55,7 +55,8 @@ import { decisionCard, decisionCardWords, decisionItem, decisionParent, noPrdLin
 import { commentUrl } from "./draft";
 import { handOverUnanswered } from "./triage";
 import { resolveDestination, routeFinding, teamNamed } from "../destination/index";
-import { operationsOf, type DecisionFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
+import { activeOwner, operationsOf, type DecisionFile, type FileOwner, type QueuedDecision, type QueuedFile, type SweepFigmaComments } from "./queue";
+import { activeAmong } from "../usage/roles";
 import { cardTtlMs } from "../card-expiry";
 
 /** A card that failed to stage says this in its place. */
@@ -134,6 +135,9 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
   if (!queued.length) return finish("handled", null);
 
   const members = new Map<string, Promise<string[] | null>>();
+  // Who is active this morning: an owner or confirmer queued days earlier is
+  // checked again, and one who has left since is dropped.
+  const active = await deps.people.active();
   let replies = MAX_NO_PRD_REPLIES;
   const byPlace = new Map<string, HandedFile[]>();
   for (const file of queued) {
@@ -148,7 +152,8 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
       notes.push(`the channel the posting ladder names for ${file.fileKey} is not configured, so it waits`);
       continue;
     }
-    let confirmers = file.confirmers;
+    const owner = activeOwner(file.owner, active);
+    let confirmers = activeAmong(file.confirmers, active);
     if (!confirmers.length) {
       if (!members.has(channel)) members.set(channel, slack.members(channel));
       const read = await members.get(channel)!;
@@ -163,7 +168,7 @@ export async function postFigmaDecisions(job: ScheduledJob, deps: SweepDeps): Pr
     const told = waiting.filter((d) => !operationsOf(d).length).slice(0, replies);
     replies -= told.length;
     if (!cardable.length && !told.length) continue;
-    byPlace.set(channel, [...(byPlace.get(channel) ?? []), { fileKey: file.fileKey, title: file.title, url: file.url, owner: file.owner, confirmers, cardable, told }]);
+    byPlace.set(channel, [...(byPlace.get(channel) ?? []), { fileKey: file.fileKey, title: file.title, url: file.url, owner, confirmers, cardable, told }]);
     handed.push({ ...file, decisions: waiting });
     cards += cardable.length;
   }
@@ -186,11 +191,7 @@ async function placeOfFile(fc: SweepFigmaComments, file: QueuedFile): Promise<st
   const pillars = file.pillars ?? [];
   // The file's team is read only when no card pillar has a channel: then it decides.
   const team = pillars.some((p) => teamNamed(p)) ? null : ((await fc.triage?.fileTeam(file.fileKey)) ?? null);
-  const { destination } = routeFinding({
-    evidence: null,
-    card: pillars.length ? { pillars, designOwner: file.owner && "slack" in file.owner ? file.owner.slack : null } : null,
-    figmaFile: { team, creatorHandle: file.owner && "figma" in file.owner ? file.owner.figma : null },
-  });
+  const { destination } = routeFinding({ evidence: null, card: pillars.length ? { pillars } : null, figmaFile: { team } });
   return resolveDestination(destination, fc.slack?.channels ?? { plusDesign: fc.slack?.channel })?.channel ?? null;
 }
 
@@ -198,12 +199,6 @@ async function placeOfFile(fc: SweepFigmaComments, file: QueuedFile): Promise<st
 function numbered(value: FigmaDecisionsHanded): Array<{ n: number; file: HandedFile; d: QueuedDecision }> {
   let n = 0;
   return value.files.flatMap((file) => file.cardable.map((d) => ({ n: (n += 1), file, d })));
-}
-
-/** Whom a file's cards are for, as the opener names them: a Figma handle,
- *  since a Slack owner has a bullet of their own. */
-function handleOf(owner: FileOwner | null): string | null {
-  return owner && "figma" in owner ? owner.figma : null;
 }
 
 /**
@@ -232,13 +227,11 @@ export function figmaDecisionsSection(fc: SweepFigmaComments, date: string, now:
         // Each told decision's reply, an edit when a card did not stage, and
         // each card that shows, a staging.
         cost: (shown) => ({ subrequests: value.files.reduce((sum, f) => sum + f.told.length, 0) + 1, d1Queries: shown.length * 3 }),
-        says(ids, person) {
+        says(ids) {
           return value.files
             .flatMap((file) => {
               const count = all.filter((e) => e.file === file && ids.includes(e.d.commentId)).length;
-              if (!count) return [];
-              const handle = person === null ? handleOf(file.owner) : null;
-              return [`${handle ? `${escapeSlackText(handle)}, ` : ""}${decisionParent(file, count)}`];
+              return count ? [decisionParent(file, count)] : [];
             })
             .join(" ");
         },

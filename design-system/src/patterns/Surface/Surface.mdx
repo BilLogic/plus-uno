@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={SurfaceStories} />
 
 <Title />
-The surface is the base background layer of the application shell. It is a bare tokenized container: pick a surface level, padding scale, radius scale, border, and elevation — everything else is a content slot you fill. It mirrors the Surface slot component in Figma.
+The surface is the base background layer of the application shell. It is a bare tokenized container: pick an elevation level, padding scale, radius scale and border — everything else is a content slot you fill. A level is a fill and its shadow together, so a surface never wears one without the other. It mirrors the Surface slot component in Figma.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
@@ -19,7 +19,7 @@ The surface is the base background layer of the application shell. It is a bare 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Default surface: <code>--color-surface</code> background, surface padding tokens, no elevation.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Default surface: <code>--ds-surface</code>, surface padding tokens, no shadow, edged by <code>--ds-border-surface</code>.</>}>
     <Canvas of={SurfaceStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,20 +27,10 @@ The surface is the base background layer of the application shell. It is a bare 
 
 <div className="sb-ds-doc-section">
 
-### Surface levels
+### Elevation levels
 
-<DocsCanvasShell description={<>All six surface color tokens, from <code>surface</code> to <code>surface-container-highest</code>. Never use hex codes for backgrounds — always one of these levels.</>}>
+<DocsCanvasShell description={<>The four levels, lowest to highest: <code>sunken</code> (the frame's backdrop), <code>default</code> (the page), <code>raised</code> (a card) and <code>overlay</code> (anything over the UI). Each pairs its fill with its shadow; in dark, a level gets lighter as it rises.</>}>
     <DsCanvasQuiet of={SurfaceStories.Levels} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Elevation
-
-<DocsCanvasShell description={<>Elevation is additive layering via <code>--elevation-light-1…5</code>. Base surfaces are usually flat (elevation 0).</>}>
-    <DsCanvasQuiet of={SurfaceStories.Elevation} />
 </DocsCanvasShell>
 
 </div>
@@ -67,9 +57,9 @@ The surface is the base background layer of the application shell. It is a bare 
 ## Related
 
 - For a surface with a shape already agreed — padding, radius, slots — use `Card`.
-- For which shadow goes with which surface, see **Elevation**; the `--surface-*` role tokens pair a fill with the shadow it must be used with.
+- For which shadow goes with which surface, see **Elevation**; each `--ds-surface-*` fill pairs with the `--ds-shadow-*` it must be used with.
 - For which fill to reach for, see **Colors** → surface roles.
-- For the Main region of the app shell, use `Surface container`.
+- For the Main region of the app shell, use `Frame`.
 
 </div>
 

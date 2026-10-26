@@ -1,0 +1,109 @@
+/*
+ * Progress Component Styles
+ * Per design system tokens - no hardcoded values
+ * Supports sizes (sm/md/lg) and themed bar colors
+ */
+
+.plus-progress,
+.progress {
+    display: flex;
+    height: var(--size-element-gap-md); // Default medium height
+    width: 100%;
+    background-color: var(--color-surface-container-high);
+    border-radius: var(--size-element-radius-full);
+    overflow: hidden;
+
+    // --- PROGRESS BAR ---
+    .plus-progress-bar,
+    .progress-bar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+        font: var(--body-small);
+        border-radius: var(--size-element-radius-full);
+        transition: width 0.3s ease;
+    }
+
+    // --- SIZE VARIANTS ---
+    &.plus-progress-small {
+        height: var(--size-element-gap-sm);
+
+        .plus-progress-bar,
+        .progress-bar {
+            font-size: var(--font-size-075);
+        }
+    }
+
+    &.plus-progress-large {
+        height: var(--size-element-gap-lg);
+
+        .plus-progress-bar,
+        .progress-bar {
+            font-size: var(--font-size-0875);
+        }
+    }
+
+    // --- THEME VARIANTS ---
+    .plus-progress-bar-primary,
+    .progress-bar-primary {
+        background-color: var(--color-primary);
+        color: var(--color-on-primary);
+    }
+
+    .plus-progress-bar-secondary,
+    .progress-bar-secondary {
+        background-color: var(--color-secondary);
+        color: var(--color-on-secondary);
+    }
+
+    .plus-progress-bar-success,
+    .progress-bar-success {
+        background-color: var(--color-success);
+        color: var(--color-on-success);
+    }
+
+    .plus-progress-bar-danger,
+    .progress-bar-danger {
+        background-color: var(--color-danger);
+        color: var(--color-on-danger);
+    }
+
+    .plus-progress-bar-warning,
+    .progress-bar-warning {
+        background-color: var(--color-warning);
+        color: var(--color-on-warning);
+    }
+
+    .plus-progress-bar-info,
+    .progress-bar-info {
+        background-color: var(--color-info);
+        color: var(--color-on-info);
+    }
+
+    // --- STRIPED ---
+    .progress-bar-striped {
+        background-image: linear-gradient(45deg,
+                rgba(255, 255, 255, 0.15) 25%,
+                transparent 25%,
+                transparent 50%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0.15) 75%,
+                transparent 75%,
+                transparent);
+        background-size: var(--size-element-gap-lg) var(--size-element-gap-lg);
+    }
+
+    // --- ANIMATED ---
+    .progress-bar-animated {
+        animation: progress-bar-stripes 1s linear infinite;
+    }
+}
+
+@keyframes progress-bar-stripes {
+    0% {
+        background-position-x: var(--size-element-gap-lg);
+    }
+}

@@ -1,0 +1,230 @@
+/**
+ * Home on the new layout: four flat Sections on the Frame's
+ * 12-column content grid, one per row, and the lesson cards inside the last.
+ * The rules below lay out what a Section's slots hold. Every color is a
+ * --ds- token; the Frame, Surface, Section and Card patterns paint their own
+ * grounds, so this sheet sets only the text, wells and dividers in the slots.
+ */
+
+// Rhythm: generous space between the sections, and no boxes around them.
+.plus-home-new .plus-frame__content {
+    row-gap: var(--surface-stack-lg);
+}
+
+// Page header: the actions sit right of the title, and under it below 1024.
+@media (max-width: 1023.98px) {
+    .plus-home-new__header > .plus-pattern-section-header .plus-pattern-section-title-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+// Primitives side by side in a slot.
+.plus-home-new__inline {
+    display: flex;
+    align-items: center;
+    gap: var(--element-inline-md);
+    min-width: 0;
+}
+
+.plus-home-new__inline--tight {
+    gap: var(--element-inline-sm);
+}
+
+// A decorative glyph beside text (the tab info marks): the 16 icon box,
+// centered on the label. Doubled class: a glyph rule elsewhere sets icons to 12.
+.plus-home-new__glyph.plus-home-new__glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: var(--icon-md);
+    block-size: var(--icon-md);
+    font-size: var(--icon-md);
+    line-height: 1;
+    color: var(--ds-icon-subtlest);
+}
+
+.plus-home-new__inline--wrap {
+    flex-wrap: wrap;
+}
+
+// Primitives stacked in a slot; a section's parts are further apart.
+.plus-home-new__stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-md);
+    min-width: 0;
+}
+
+.plus-home-new__stack--section {
+    gap: var(--surface-stack-lg);
+}
+
+// Plain text in a slot, on the type styles. A caption is meta text only, such
+// as a lesson's duration; a note that explains something is secondary text.
+.plus-home-new__body {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+.plus-home-new__secondary {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+.plus-home-new__caption {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtlest);
+}
+
+.plus-home-new__note {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+// The badge: a slim callout row under the page header, a well on the surface.
+.plus-home-new__callout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--element-inline-md);
+    padding: var(--space-075) var(--space-100);
+    border-radius: var(--radius-050);
+    background-color: var(--ds-surface-container);
+
+    p {
+        margin: 0;
+    }
+}
+
+// The badge art takes the row's height, the small button's.
+.plus-home-new__callout-art {
+    display: block;
+    block-size: var(--size-200);
+    inline-size: auto;
+}
+
+.plus-home-new__callout-title {
+    font: var(--heading-xsmall);
+    color: var(--ds-text);
+}
+
+.plus-home-new__callout-action {
+    margin-inline-start: auto;
+}
+
+// Your impact: one strip of stats split by 1px dividers; they stack below 1024.
+.plus-home-new__stats {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.plus-home-new__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--card-stack-sm);
+    min-width: 0;
+    padding-inline: var(--space-150);
+
+    &:first-child {
+        padding-inline-start: 0;
+    }
+
+    & + & {
+        border-inline-start: 1px solid var(--ds-border);
+    }
+
+    p {
+        margin: 0;
+    }
+}
+
+@media (max-width: 1023.98px) {
+    .plus-home-new__stats {
+        grid-auto-flow: row;
+    }
+
+    .plus-home-new__stat {
+        padding-inline: 0;
+        padding-block: var(--space-075);
+
+        &:first-child {
+            padding-block-start: 0;
+        }
+
+        & + & {
+            border-inline-start: 0;
+            border-block-start: 1px solid var(--ds-border);
+        }
+    }
+}
+
+.plus-home-new__stat-value {
+    font: var(--metric-large);
+    color: var(--ds-text);
+}
+
+// Skills: the chart straight on the surface, its note under it.
+.plus-home-new__chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-lg);
+    min-width: 0;
+}
+
+// The lesson strip: N cards per view, N from homeGrid.js, each on whole
+// columns because N divides 12 and the strip's gap is the grid gutter.
+.plus-home-new__lessons {
+    --plus-home-new-cards-per-view: 1;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: calc(
+        (100% - (var(--plus-home-new-cards-per-view) - 1) * var(--layout-gutter))
+        / var(--plus-home-new-cards-per-view)
+    );
+    column-gap: var(--layout-gutter);
+    // A scroller clips at its padding box. The padding gives each card room for
+    // its raised shadow, and the equal negative margin keeps the cards on the
+    // grid's columns.
+    margin: calc(-1 * var(--card-stack-lg));
+    padding: var(--card-stack-lg);
+    scroll-padding-inline: var(--card-stack-lg);
+    list-style: none;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.plus-home-new__lesson {
+    display: flex;
+    min-width: 0;
+    scroll-snap-align: start;
+
+    > * {
+        flex: 1 1 auto;
+    }
+}
+
+// A lesson's picture fills the card's width at 16:9, on a well until it loads.
+.plus-home-new__thumb {
+    display: block;
+    inline-size: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background-color: var(--ds-surface-container);
+}

@@ -25,7 +25,7 @@ export const ConfirmationAlert = ({
     <div
         style={{
             backgroundColor: 'var(--color-warning-state-16)',
-            border: '1px solid var(--color-warning)',
+            border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             display: 'flex',
@@ -132,7 +132,7 @@ const TimeWarningAlert = ({ onClose }) => (
     <div
         style={{
             backgroundColor: 'var(--color-warning-state-08)',
-            border: '1px solid var(--color-warning)',
+            border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             display: 'flex',

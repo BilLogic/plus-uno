@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 
 /**
  * ResponsiveFrame — the display well for spec Pages & Sections in Storybook docs.

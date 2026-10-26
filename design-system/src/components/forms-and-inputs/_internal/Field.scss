@@ -1,12 +1,26 @@
+@use '../../labels/label-heights' as label;
+
 /**
  * _Field — one look for every text-like field.
  *
- * One 1px border (`--size-element-border`) in outline-variant on one fill
- * (`--color-surface`). Hover turns the border inverse-primary. Focus draws a
- * 2px ring (`--size-element-stroke-lg`) inside the box in the focus-ring
- * color; hover and focus are both blue, so the width is what tells them
- * apart. Figma draws its stroke inside the box, so the border is taken out of
- * the padding here and the heights match the library: 28 · 34 · 40.
+ * One 1px border (`--size-element-border`) in `border.input` on one fill,
+ * `background.input`. Hover turns the border `border.focused`. Focus draws
+ * the focus ring, 2px (`--size-element-stroke-lg`) and 2px off the box onto
+ * the surface, in `border.focused`: the ring is never drawn inset. Hover and
+ * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
+ * placeholder `text.subtlest`, helper text `text.subtle`, read-only
+ * `background.neutral`. Figma draws its stroke inside the box, so the border
+ * is taken out of the padding here.
+ *
+ * A single-line field is one height, 32 (`--item-height-md`, the height a
+ * button shares), with its content centered and side padding 12. A button in
+ * a slot is the 24 compact button, centered, 4 from the box's edge. A
+ * multi-line field starts at 80 and grows; a field whose tags wrap starts at
+ * 32 and grows.
+ *
+ * `small` and `large` are deprecated and draw like `medium`; their classes
+ * stay so call sites that target them keep matching. Each host warns in
+ * development.
  */
 
 .plus-field-stack {
@@ -19,7 +33,7 @@
 // The box fades itself; the stack fades only what sits around it, so a
 // disabled field fades once.
 .plus-field-stack--disabled > :not(.plus-field) {
-    opacity: var(--color-disabled-opacity);
+    opacity: var(--ds-opacity-disabled);
 }
 
 .plus-field-label-row {
@@ -30,15 +44,12 @@
 
 .plus-field-label {
     margin-bottom: 0;
-    color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    color: var(--ds-text);
+    font: var(--body-small);
 }
 
 .plus-field-required {
-    color: var(--color-danger-text);
+    color: var(--ds-text-danger);
     margin-left: var(--size-element-gap-xs);
 }
 
@@ -61,13 +72,12 @@
     padding: 0;
     border: 0;
     background: none;
-    color: var(--color-on-surface-variant);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    color: var(--ds-icon-subtle);
+    font: var(--body-small);
     cursor: help;
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: var(--size-element-border);
         border-radius: var(--size-element-radius-sm);
     }
@@ -80,41 +90,34 @@
     gap: var(--size-element-gap-md);
     width: 100%;
     box-sizing: border-box;
-    border: var(--size-element-border) solid var(--color-outline-variant);
+    border: var(--size-element-border) solid var(--ds-border-input);
     border-radius: var(--size-element-radius-sm);
-    background-color: var(--color-surface);
-    color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-weight: var(--font-weight-normal);
+    background-color: var(--ds-background-input);
+    color: var(--ds-text);
     cursor: text;
     transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
 
-    // Medium is the default.
-    padding:
-        calc(var(--size-element-pad-y-md) - var(--size-element-border))
-        calc(var(--size-element-pad-x-md) - var(--size-element-border));
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    // One height at every size: the content centers in it, so nothing pads
+    // the top and bottom.
+    height: var(--item-height-md);
+    padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
+    font: var(--body-default);
 
-    &--small {
-        padding:
-            calc(var(--size-element-pad-y-sm) - var(--size-element-border))
-            calc(var(--size-element-pad-x-sm) - var(--size-element-border));
-        gap: var(--size-element-gap-sm);
-        font-size: var(--font-size-body3);
-        line-height: var(--font-line-height-body3);
-    }
-
-    &--large {
-        padding:
-            calc(var(--size-element-pad-y-lg) - var(--size-element-border))
-            calc(var(--size-element-pad-x-lg) - var(--size-element-border));
-        font-size: var(--font-size-body1);
-        line-height: var(--font-line-height-body1);
-    }
-
+    // Several lines (Text area): 80 at least, growing with its rows, and the
+    // first line sits where a single-line field's text does.
     &--multiline {
         align-items: flex-start;
+        height: auto;
+        min-height: var(--field-min-height-sm);
+        padding-block: calc(var(--element-pad-y-md) - var(--size-element-border));
+    }
+
+    // Tags that wrap (Tag field, a multi Select): one row of tags is 32, and
+    // each wrapped row adds to it.
+    &--grow {
+        height: auto;
+        min-height: var(--item-height-md);
+        padding-block: calc((var(--item-height-md) - #{label.$tag-height}) / 2 - var(--size-element-border));
     }
 }
 
@@ -125,34 +128,42 @@
     align-items: center;
 }
 
-// The slots are one text line high, whatever sits in them, so a stepper or an
-// addon button never makes the field taller than its text.
+// The text area fills the box, so its resize handle sits at the box's corner.
+.plus-field--multiline .plus-field__content {
+    align-self: stretch;
+    align-items: stretch;
+}
+
 .plus-field .plus-field__leading,
 .plus-field .plus-field__trailing {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     gap: var(--size-element-gap-xs);
-    height: 1lh;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     white-space: nowrap;
 
-    // A small button in a slot is cut to the line: 22 high in a medium field,
-    // so the field stays 34. Figma does the same with a height override.
+    // A button in a slot is the 24 compact button, whatever size it was given.
     .plus-btn.btn {
-        height: 100%;
-        min-height: 0;
-        padding-top: 0;
-        padding-bottom: 0;
+        height: var(--item-height-sm);
     }
 
     // Steppers and icon-only buttons are square.
     .plus-btn.btn.plus-field-stepper,
     .plus-btn.btn.plus-btn--icon-only {
-        width: auto;
-        aspect-ratio: 1 / 1;
+        width: var(--item-height-sm);
         padding: 0;
     }
+}
+
+// A button at the box's edge sits 4 from it, as it does from the top and the
+// bottom: it takes back the rest of the side padding.
+.plus-field .plus-field__leading > .plus-btn:first-child {
+    margin-inline-start: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
+}
+
+.plus-field .plus-field__trailing > .plus-btn:last-child {
+    margin-inline-end: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
 }
 
 // The control fills the content slot and draws nothing of its own: the box is
@@ -173,7 +184,7 @@
     line-height: inherit;
 
     &::placeholder {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtlest);
         opacity: 1;
     }
 
@@ -197,39 +208,39 @@ textarea.plus-field__control {
 
 .plus-field:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--valid),
 .plus-field--hover {
-    border-color: var(--color-inverse-primary);
+    border-color: var(--ds-border-focused);
 }
 
 .plus-field:focus-within,
 .plus-field--focus {
-    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-    outline-offset: calc(var(--size-element-stroke-lg) * -1);
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg);
 }
 
 .plus-field--invalid {
-    border-color: var(--color-danger-border);
+    border-color: var(--ds-border-danger);
 
     &:focus-within {
-        outline-color: var(--color-danger-border);
+        outline-color: var(--ds-border-danger);
     }
 }
 
 .plus-field--valid {
-    border-color: var(--color-success-border);
+    border-color: var(--ds-border-success);
 
     &:focus-within {
-        outline-color: var(--color-success-border);
+        outline-color: var(--ds-border-success);
     }
 }
 
 .plus-field--readonly {
-    background-color: var(--color-surface-variant);
+    background-color: var(--ds-background-neutral);
     cursor: default;
 }
 
 .plus-field--disabled {
-    opacity: var(--color-disabled-opacity);
-    color: var(--color-on-surface-variant);
+    opacity: var(--ds-opacity-disabled);
+    color: var(--ds-text-subtle);
     cursor: not-allowed;
 }
 
@@ -246,7 +257,7 @@ textarea.plus-field__control {
     &:hover:not(.plus-field--disabled):not(.plus-field--readonly),
     &.plus-field--hover {
         border-color: transparent;
-        background-color: var(--color-surface-container);
+        background-color: var(--ds-background-neutral-subtle-hovered);
 
         .plus-field__trailing {
             visibility: visible;
@@ -258,7 +269,7 @@ textarea.plus-field__control {
     &.plus-field--focus,
     &.plus-field--invalid,
     &.plus-field--valid {
-        background-color: var(--color-surface);
+        background-color: var(--ds-background-input);
 
         .plus-field__trailing {
             visibility: visible;
@@ -268,24 +279,24 @@ textarea.plus-field__control {
     // The border comes back under the same 2px ring as the standard field.
     &:focus-within,
     &.plus-field--focus {
-        border-color: var(--color-outline-variant);
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-        outline-offset: calc(var(--size-element-stroke-lg) * -1);
+        border-color: var(--ds-border-input);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-lg);
     }
 
     &.plus-field--invalid {
-        border-color: var(--color-danger-border);
+        border-color: var(--ds-border-danger);
 
         &:focus-within {
-            outline-color: var(--color-danger-border);
+            outline-color: var(--ds-border-danger);
         }
     }
 
     &.plus-field--valid {
-        border-color: var(--color-success-border);
+        border-color: var(--ds-border-success);
 
         &:focus-within {
-            outline-color: var(--color-success-border);
+            outline-color: var(--ds-border-success);
         }
     }
 
@@ -308,8 +319,7 @@ textarea.plus-field__control {
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--size-element-gap-sm);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
 }
 
 .plus-field-caption__message {
@@ -320,36 +330,36 @@ textarea.plus-field__control {
 
     i {
         flex-shrink: 0;
-        font-size: var(--font-size-body3);
+        font-size: var(--icon-sm);
     }
 
     &--help {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
     &--invalid {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
     }
 
     &--success {
-        color: var(--color-success-text);
+        color: var(--ds-text-success);
     }
 }
 
 .plus-field-caption__count {
     flex-shrink: 0;
     margin-left: auto;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font-variant-numeric: tabular-nums;
 
     &--over {
-        color: var(--color-danger-text);
+        color: var(--ds-text-danger);
     }
 }
 
 // "saving…" in Trailing while a subtle field's save runs.
 .plus-field-saving {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font-style: italic;
 }
 

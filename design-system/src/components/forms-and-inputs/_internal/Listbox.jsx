@@ -10,9 +10,9 @@ import React, {
 } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Spinner from '@/components/status-and-loading/Spinner/Spinner';
+import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
-import { useAnchoredPopup } from './anchorPlacement';
+import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
 import './Listbox.scss';
 
 /** Past this many options, only the rows on screen are drawn. */
@@ -58,12 +58,13 @@ const isTextEntry = (target) => target instanceof HTMLElement
  * Listbox — the internal option list (Figma `_Listbox`). It is the panel under
  * a field for picking a value, and it is not exported from the barrel.
  *
- * - **Surface:** `--color-surface-overlay`, as tall as its rows up to 300px, then the body scrolls.
+ * - **Surface:** `elevation.surface.overlay` with `elevation.shadow.overlay`, as tall as its rows up to 300px, then the body scrolls.
  * - **Slots:** `header` (a hint or a search field), the body of rows, and `footer`.
  * - **Rows:** `OptionRow` for every option, group heading and the Create row.
  *   `rowActions` draws a row's own controls (a drag handle, a "…") over the
  *   highlighted row.
  * - **Placement:** with `anchorRef` it renders in a portal on `document.body`
+ *   (or in the modal its field sits in, so it takes the modal's layer)
  *   and follows the popup placement rule through `useAnchoredPopup`: at least
  *   as wide as the anchor, flipped above it when there isn't room below, and
  *   right-aligned when it would run past the viewport. Without one it renders
@@ -447,7 +448,7 @@ const Listbox = ({
 
     return (
         <>
-            {open && (anchorRef ? createPortal(surface, document.body) : surface)}
+            {open && (anchorRef ? createPortal(surface, popupLayerOf(anchorRef)) : surface)}
             <div className="visually-hidden" role="status" aria-live="polite">{open ? announcement : ''}</div>
         </>
     );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from '@/components/messaging/Modal';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Select from '@/components/forms-and-inputs/Select';
 import Textarea from '@/components/forms-and-inputs/Textarea';
 import Switch from '@/components/forms-and-inputs/Switch';
@@ -47,7 +47,7 @@ const CallOffAlert = ({ onClose }) => (
     <div
         style={{
             backgroundColor: 'var(--color-warning-state-16)',
-            border: '1px solid var(--color-warning)',
+            border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             display: 'flex',

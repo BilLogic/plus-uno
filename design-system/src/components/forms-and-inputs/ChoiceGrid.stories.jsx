@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import ChoiceGrid from './ChoiceGrid';
 
 export default {
-    title: 'Components/Forms and inputs/Choice Grid',
+    title: 'Components/Forms and inputs/Choice grid',
     component: ChoiceGrid,
     tags: ['!dev', '!autodocs'],
     parameters: {

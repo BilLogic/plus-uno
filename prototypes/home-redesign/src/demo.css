@@ -98,12 +98,12 @@ body {
 
 /* Hide scrollbars on the main content area; scrolling still enabled. */
 #home-redesign-page .plus-page-main,
-#home-redesign-page .plus-page-content-wrapper {
+#home-redesign-page .plus-frame__surface {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+#home-redesign-page .plus-frame__surface::-webkit-scrollbar {
   display: none;
 }

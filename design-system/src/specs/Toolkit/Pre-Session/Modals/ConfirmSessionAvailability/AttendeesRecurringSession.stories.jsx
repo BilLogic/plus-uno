@@ -1,8 +1,8 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 import { AttendanceRosterRow } from '@/specs/Toolkit/Pre-Session/Elements/PopupModalAttendanceRoster.stories';
 import { AvailableButton, UnavailableButton } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorsButton.stories';
 import { Recurring_Session } from '@/specs/Toolkit/Pre-Session/Cards/TutorViewSessionManagement.stories';

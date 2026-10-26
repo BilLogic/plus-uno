@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 import './LessonListSection.scss';
 

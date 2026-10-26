@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import { Dropdown } from 'react-bootstrap';
-import Button from '@/components/actions/Button/Button';
-import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
+import { useDeprecatedFieldSize } from '../../../lib/useDeprecatedLargeSize';
 
 const FULL_DEFAULT_BUTTONS = [
     'bold', 'italic', 'underline', 'strikethrough',
@@ -91,6 +92,7 @@ const RichTextEditor = ({
     onBlur,
     ...props
 }) => {
+    useDeprecatedFieldSize('RichTextEditor', size);
     const fieldId = useFieldId(id);
     const editorId = `${fieldId}-editor`;
     const labelId = label ? `${fieldId}-label` : undefined;
@@ -260,7 +262,7 @@ const RichTextEditor = ({
               * (#206). The editor points back at this id.
               */}
             {label && (
-                <span id={labelId} className="plus-rich-text-editor-label body2-txt">
+                <span id={labelId} className="plus-rich-text-editor-label">
                     {label}
                 </span>
             )}
@@ -294,7 +296,7 @@ const RichTextEditor = ({
                                         key={opt.value}
                                         eventKey={opt.value}
                                         active={blockFormat === opt.value}
-                                        className="body3-txt"
+                                        className="plus-rich-text-editor-block-option"
                                     >
                                         {opt.label}
                                     </Dropdown.Item>
@@ -321,7 +323,7 @@ const RichTextEditor = ({
             <div
                 ref={editorRef}
                 id={editorId}
-                className="plus-rich-text-editor-content body3-txt"
+                className="plus-rich-text-editor-content"
                 contentEditable={!readOnly && !disabled}
                 /*
                  * #329. `textbox` with `aria-multiline` is what a contentEditable

@@ -2,15 +2,18 @@
 
 # Forms and inputs
 
-20 components. Each row links to the generated facts; the three columns after it are the
+23 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
+| [Button](Button/index.md) | 20 | ✅ | ✅ | ✅ |
+| [ButtonGroup](ButtonGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 20 | ✅ | ✕ | ✅ |
+| [CloseButton](CloseButton/index.md) | 4 | ✅ | ✅ | ✅ |
 | [DateAndTimePicker](DateAndTimePicker.md) | 28 | ✅ | ✕ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
@@ -28,7 +31,7 @@ authored half (#166), counted rather than assumed.
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 20/20 (100%) · Correct/incorrect 12/20 (60%) · Accessibility 20/20 (100%)
+**Authored coverage:** When to use 23/23 (100%) · Correct/incorrect 15/23 (65%) · Accessibility 23/23 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

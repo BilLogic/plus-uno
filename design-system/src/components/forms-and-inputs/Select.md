@@ -9,7 +9,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 **Source:** `design-system/src/components/forms-and-inputs/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive, Colors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select.mdx`
 
@@ -39,7 +39,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | — |
 | `readOnly` | bool | — | Shows the value, stays focusable, and cannot be changed. |
-| `readonly` | bool | `false` | @deprecated Prefer `readOnly` |
+| `readonly` | bool | `false` | @deprecated Prefer readOnly |
 | `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `info` | node | — | Text for the info tooltip beside the label. |
 | `validation` | enum | `'none'` | The field's validation tone, as on Input: an error, a confirmation, or neither. |
@@ -74,12 +74,12 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-variant` · `--color-outline` · `--color-primary` · `--color-primary-border` · `--color-secondary-text` · `--font-family-body` · `--font-line-height-body2` · `--font-line-height-body3` · `--font-size-body2` · `--font-size-body3` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--font-weight-normal` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--body-small` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--font-size-body2` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--icon-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Select.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -9,7 +9,7 @@ import type { DevLinkRegistry } from "../src/figma-links/links";
 
 const REGISTRY: DevLinkRegistry = {
   components: {
-    Button: { code: { source: "design-system/src/components/actions/Button/Button.jsx" } },
+    Button: { code: { source: "design-system/src/components/forms-and-inputs/Button/Button.jsx" } },
     Checkbox: { code: { source: "design-system/src/components/forms-and-inputs/Checkbox.jsx" } },
     Footer: { code: { source: "design-system/src/specs/Universal/Sections/Footer/Footer.jsx" } },
   },
@@ -56,8 +56,8 @@ describe("the merged-PR feed", () => {
       pulls: [pull(1300, "2026-10-14T10:00:00Z")],
       files: {
         1300: [
-          "design-system/src/components/actions/Button/Button.jsx",
-          "design-system/src/components/actions/Button/Button.stories.jsx",
+          "design-system/src/components/forms-and-inputs/Button/Button.jsx",
+          "design-system/src/components/forms-and-inputs/Button/Button.stories.jsx",
           "design-system/src/components/forms-and-inputs/Checkbox.scss",
         ],
       },
@@ -82,7 +82,7 @@ describe("the merged-PR feed", () => {
   it("a PR already seen names nothing and its files are not read", async () => {
     const w = world({
       pulls: [pull(1302, "2026-10-14T10:00:00Z")],
-      files: { 1302: ["design-system/src/components/actions/Button/Button.jsx"] },
+      files: { 1302: ["design-system/src/components/forms-and-inputs/Button/Button.jsx"] },
       mark: { mergedAt: "2026-10-14T10:00:00Z", number: 1302 },
     });
     const { summary, through } = await readMergedPrs(w.deps);
@@ -104,7 +104,7 @@ describe("the merged-PR feed", () => {
   it("a first run marks the newest merge and names nothing", async () => {
     const w = world({
       pulls: [pull(1305, "2026-10-14T11:00:00Z"), pull(1304, "2026-10-14T10:00:00Z")],
-      files: { 1305: ["design-system/src/components/actions/Button/Button.jsx"] },
+      files: { 1305: ["design-system/src/components/forms-and-inputs/Button/Button.jsx"] },
       mark: null,
     });
     const fed = await readMergedPrs(w.deps);
@@ -135,7 +135,7 @@ describe("the merged-PR feed", () => {
   it("a full page that does not reach back to the mark says PRs merged in the gap may be missed", async () => {
     const w = world({
       pulls: [pull(1331, "2026-10-14T12:00:00Z")],
-      files: { 1331: ["design-system/src/components/actions/Button/Button.jsx"] },
+      files: { 1331: ["design-system/src/components/forms-and-inputs/Button/Button.jsx"] },
       full: "2026-10-14T09:00:00Z",
     });
     const { summary, prs } = await readMergedPrs(w.deps);

@@ -299,7 +299,7 @@ test('onConfirm is not a DOM event, onChange is', () => {
 
 test('propTypes enums are read off the real Button', () => {
   const source = fs.readFileSync(
-    path.join(REPO_ROOT, 'design-system/src/components/actions/Button/Button.jsx'),
+    path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs/Button/Button.jsx'),
     'utf8',
   );
   const props = new Map(parsePropTypes(source, 'Button').map((p) => [p.name, p.enumValues]));
@@ -310,7 +310,7 @@ test('propTypes enums are read off the real Button', () => {
 
 test('an enum named by a constant is read, not skipped — the #276 blind spot', () => {
   const source = fs.readFileSync(
-    path.join(REPO_ROOT, 'design-system/src/components/status-and-loading/Tag/Tag.jsx'),
+    path.join(REPO_ROOT, 'design-system/src/components/labels/Tag/Tag.jsx'),
     'utf8',
   );
   const props = new Map(parsePropTypes(source, 'Tag').map((p) => [p.name, p.enumValues]));
@@ -353,14 +353,14 @@ test('the commented props of the real Tag and BadgeVariants all survive', () => 
   const read = (p) => fs.readFileSync(path.join(REPO_ROOT, p), 'utf8');
 
   const tag = parsePropTypes(
-    read('design-system/src/components/status-and-loading/Tag/Tag.jsx'), 'Tag',
+    read('design-system/src/components/labels/Tag/Tag.jsx'), 'Tag',
   ).map((p) => p.name);
   for (const name of ['elemBefore', 'swatchBefore', 'maxWidth', 'href', 'isSelected', 'onClick']) {
     assert.ok(tag.includes(name), `Tag.${name} was dropped`);
   }
 
   const badge = parsePropTypes(
-    read('design-system/src/components/status-and-loading/BadgeVariants.jsx'), 'BadgeVariants',
+    read('design-system/src/components/labels/BadgeVariants.jsx'), 'BadgeVariants',
   ).map((p) => p.name);
   for (const name of ['spacing', 'color', 'iconBefore', 'maxWidth', 'label']) {
     assert.ok(badge.includes(name), `BadgeVariants.${name} was dropped`);

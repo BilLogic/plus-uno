@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 
 /**
  * Engagement Badge Component

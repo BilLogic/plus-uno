@@ -2,7 +2,7 @@ import React from 'react';
 import Table from '@/components/_internal/Table';
 
 export default {
-    title: 'Components/Layout and structure/Table',
+    title: 'Components/Text and data display/Table',
     component: Table,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './MediaObject.scss';
 
 const MediaObject = ({
@@ -43,14 +44,16 @@ const MediaObject = ({
      * that the row does anything.
      */
     const styles = onClick ? { cursor: 'pointer' } : {};
+    // The heading is one level below the section the media object sits in.
+    const Heading = headingTag(useHeadingLevel() + 1);
 
     return (
         <div className={containerClasses} onClick={onClick} {...props} style={{ ...styles, ...props.style }}>
             {!isRight && renderMedia()}
 
             <div className="media-body plus-media-body">
-                {heading && <h6 className="mt-0 plus-media-heading">{heading}</h6>}
-                <div className="plus-media-content body1-txt">
+                {heading && <Heading className="mt-0 plus-media-heading">{heading}</Heading>}
+                <div className="plus-media-content">
                     {children}
                 </div>
             </div>

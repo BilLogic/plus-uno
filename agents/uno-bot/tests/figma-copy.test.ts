@@ -49,7 +49,7 @@ import {
 import type { GateNote } from "../src/turn/index";
 import { STANDING_TOO } from "../src/sweep/capture-lines";
 import { decisionCard, decisionCardWords, decisionItem, decisionParent, rewordInstead, whichOne } from "../src/figma-comments/copy";
-import type { QueuedDecision } from "../src/figma-comments/queue";
+import type { FileOwner, QueuedDecision } from "../src/figma-comments/queue";
 import { figmaReplyText, type FigmaReply } from "../src/figma-ask/copy";
 import {
   DEV_LINKS_REVISION_REFUSAL,
@@ -462,7 +462,8 @@ describe("the comment-decision thread (#886 § 3.5)", () => {
     assert.equal(one, "1 comment in <https://www.figma.com/design/GoalFile1|Goal Setting / Card 2482 / Sarah> reads like a decision.");
     passesChecklist(one);
     assert.deepEqual(decisionItem(1, base, COMMENT, { slack: "U0AAAAAA1" }).owners, [{ slack: "U0AAAAAA1" }]);
-    assert.deepEqual(decisionItem(1, base, COMMENT, { figma: "bea" }).owners, [{ name: "bea" }], "a Figma handle, never tagged");
+    // An owner queued by Figma handle before #1361 is nobody: never named.
+    assert.equal(decisionItem(1, base, COMMENT, { figma: "bea" } as unknown as FileOwner).owners, undefined, "a Figma handle, never named");
     assert.equal(decisionItem(1, base, COMMENT, null).owners, undefined);
   });
 

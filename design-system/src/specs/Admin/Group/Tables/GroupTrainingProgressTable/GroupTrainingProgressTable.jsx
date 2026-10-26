@@ -9,7 +9,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart/StaticBadgeSmart';
 import './GroupTrainingProgressTable.scss';
 

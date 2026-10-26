@@ -1,13 +1,13 @@
 /**
  * Section pattern (Patterns/Section)
- * Large structural page block — no-fill or surface-container-low, section
- * padding/gap tokens, never elevated.
+ * Large structural page block — no fill, or the translucent container well,
+ * section padding/gap tokens, never elevated.
  */
 
 .plus-pattern-section {
     display: flex;
     flex-direction: column;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* Background */
@@ -15,8 +15,9 @@
     background-color: transparent;
 }
 
-.plus-pattern-section-bg-surface-container-low {
-    background-color: var(--color-surface-container-low);
+// A well: translucent, so it reads on whatever surface it sits on.
+.plus-pattern-section-bg-container {
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-section-radius-md);
 }
 
@@ -50,8 +51,16 @@
     gap: var(--size-section-gap-lg);
 }
 
-/* Header row: heading block + actions slot */
+/* `_Section header`: the title row, then the tabs row when there is one */
 .plus-pattern-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+/* Title row: heading block + actions slot */
+.plus-pattern-section-title-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -67,12 +76,28 @@
 
 .plus-pattern-section-title {
     margin: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
+}
+
+/* The page header: Heading/large 24. */
+.plus-pattern-section-title--page {
+    font: var(--heading-large);
+}
+
+/* A section on a page: Heading/medium 20/24. */
+.plus-pattern-section-title--section {
+    font: var(--heading-medium);
+}
+
+/* A section inside a section: Heading/small 16/20. */
+.plus-pattern-section-title--subsection {
+    font: var(--heading-small);
 }
 
 .plus-pattern-section-description {
     margin: 0;
-    color: var(--color-on-surface-variant);
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
 }
 
 .plus-pattern-section-actions {
@@ -80,6 +105,10 @@
     align-items: center;
     gap: var(--size-element-gap-sm);
     flex-shrink: 0;
+}
+
+.plus-pattern-section-tabs {
+    min-width: 0;
 }
 
 .plus-pattern-section-content {

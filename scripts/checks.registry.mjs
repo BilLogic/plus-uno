@@ -304,7 +304,17 @@ export const CHECKS = [
     module: 'scripts/check-color-fallbacks.mjs',
     baseline: 'scripts/baselines/color-fallback-baseline.json',
     guards:
-      'the literal beside a color token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the color. Static and sub-second, which is why it composes here while the browser checks do not.',
+      'the literal beside a color token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the color. It reads the generated `--ds-*` set beside `--color-*`, so a misspelled `--ds-*` name is caught the same way; that a `--ds-*` token carries no fallback at all is the rule of check:ds-fallbacks. Static and sub-second, which is why it composes here while the browser checks do not.',
+  },
+  {
+    name: 'check:ds-fallbacks',
+    script: 'node scripts/check-ds-fallbacks.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ds-fallbacks.mjs',
+    floors: { MIN_FILES: 1300 },
+    guards:
+      "no `--ds-*` color token written with a fallback — `var(--ds-text, #172b4d)`, `var(--ds-surface, white)` or `var(--ds-border, var(--color-outline-variant))` alike. The legacy `--color-*` set carries its fallbacks as recorded debt, which check:color-fallbacks can only stop growing; the Atlassian-shaped set (ADR-035) starts with none, so the count starts at zero and every fallback fails. A `--ds-*` token has a value in each of four modes, and a fallback is a fifth, unmoded color that paints only when the token sheet has already failed. Searches what check:color-fallbacks searches, through the same lister and the same capture read over whole files (so a use written across lines counts), skipping the generated color files that define the tokens.",
   },
   {
     name: 'check:size-fallbacks',
@@ -338,6 +348,16 @@ export const CHECKS = [
       "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:color-fallbacks applies to color, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
   },
   {
+    name: 'check:font-size-literals',
+    script: 'node scripts/check-font-size-literals.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-font-size-literals.mjs',
+    floors: { MIN_FILES: 200 },
+    guards:
+      "no component, pattern or shared style in `design-system/src/styles` setting a raw font size. Text takes a text style (`font: var(--body-default)`) and an icon glyph an icon size (`--icon-md`); a number written in the component is a size the type scale cannot move. Moving to the Atlassian scale found 27: `font-size: 7px` on a tag's initials, 16 / 14 / 12 px in two snackbars, `1.5em` and `0.8em` on icons, and literal fallbacks such as `var(--font-size-body3, 12px)` that paint the old size whenever the token is missing. A `calc()` that scales a token is derived and passes; an identifier in a JSX style is a runtime value and is skipped. Hard gate, no baseline: the count is zero.",
+  },
+  {
     name: 'check:figma-scopes',
     script: 'node scripts/check-figma-scopes.mjs',
     pkg: 'root',
@@ -356,7 +376,7 @@ export const CHECKS = [
     floors: { MIN_FILES: 150 },
     baseline: 'scripts/baselines/intent-role-adoption.json',
     guards:
-      "the vocabulary of every intent-colored EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL color that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record — each driven through `scripts/lib/ratchet.mjs`, which has owned both directions since #601. 0.1s, measured 2026-08-29.",
+      "the vocabulary of every intent-colored EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL color that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record — each driven through `scripts/lib/ratchet.mjs`, which has owned both directions since #601. 0.1s, measured 2026-08-29. Since 2026-10-24 it holds a second set, `mixedStates`: a hover or pressed color mixed by hand (`color-mix()` with black or white, or a brightness filter) where `foundations/color.md` rule 2 asks for a state layer; Button and Dropdown moved onto `--color-shadow-state-NN` laid over the fill, which composites to the same color, and five uses in three files remain recorded, a reason each.",
   },
   {
     name: 'check:focus-ring',
@@ -425,6 +445,33 @@ export const CHECKS = [
     module: 'scripts/check-token-generation.mjs',
     guards:
       "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 color tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
+  },
+  {
+    name: 'check:color-system',
+    script: 'node scripts/check-color-system.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-color-system.mjs',
+    guards:
+      "the generated color system keeping its promises in BOTH plans and all four modes (light, dark and each with increased contrast): text, icon and edge contrast on the grounds they are drawn on; every accent family's tag text, bold fill and icon; meta text, links, focus and field edges on hovered, selected and overlay grounds, alphas composited first; no base, hovered and pressed triple sharing a value and the selection ladder staying ordered; status tints reading against the page and the sunken frame; categorical chart series 1-4 staying apart under protan and deutan simulation; the accent teal never reading as Lagoon; and PLAN PARITY, every semantic token mapped to the same primitive reference in every plan, because a plan is primitive values only and a mapping that forks per plan is a second semantic layer nobody decided. Builds each plan through the generator's own pipeline (scripts/lib/color/), so it judges what would be emitted, not a copy. Each finding names the check, the plan and the mode. It also holds the LEGACY MAP (scripts/lib/color/legacy-map.mjs): every legacy color name used in design-system/ and prototypes/ has a migration-map row, and every alias the map generates names a token the generator emits, because the alias sheet repaints every untouched component that uses the name.",
+  },
+  {
+    name: 'check:color-tokens',
+    script: 'node scripts/generate-color-tokens.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-color-tokens.mjs',
+    guards:
+      'the generated color token files in design-system/src/tokens/color/ (palette, semantic, elevation and Bootstrap bridge SCSS plus the Figma spec) against the active plan and the generator. Drift means a hand edit or a plan change that was never regenerated.',
+  },
+  {
+    name: 'check:legacy-color-list',
+    script: 'node scripts/generate-legacy-color-list.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-legacy-color-list.mjs',
+    guards:
+      'the list of components still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components (scripts/lib/color/legacy-components.mjs). Interns pick their next component from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
   },
   {
     name: 'check:atlassian-benchmark',
@@ -514,6 +561,21 @@ export const CHECKS = [
       + 'that half is `check:docs-chrome`, in a browser.',
   },
   {
+    name: 'check:storybook-categories',
+    script: 'node scripts/check-storybook-categories.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-storybook-categories.mjs',
+    floors: { MIN_FILES: 90 },
+    guards:
+      "that component folders and Storybook titles keep Atlassian's categories. Every folder " +
+      'under `design-system/src/components/` is a category in kebab case (or `_internal`), every ' +
+      'component story is titled `Components/<category>/…` with its own folder\'s category, every ' +
+      'segment after it is sentence case, the taxonomy lists the categories in Atlassian\'s order, ' +
+      'and no tracked file names a retired folder. Storybook renders a stale title as a group of ' +
+      'its own, so a story copied from an older file would otherwise bring the old group back.',
+  },
+  {
     name: 'check:page-outline',
     script: 'node scripts/check-page-outline.mjs',
     pkg: 'root',
@@ -546,7 +608,7 @@ export const CHECKS = [
   },
   {
     name: 'test:scripts',
-    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs',
+    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',

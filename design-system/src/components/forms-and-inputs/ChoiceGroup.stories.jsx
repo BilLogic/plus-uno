@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import ChoiceGroup from './ChoiceGroup';
 
 export default {
-    title: 'Components/Forms and inputs/Choice Group',
+    title: 'Components/Forms and inputs/Choice group',
     component: ChoiceGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -10,7 +10,7 @@ import DateAndTimePicker from './DateAndTimePicker';
  * differs, the other person's time.
  */
 export default {
-    title: 'Components/Forms and inputs/Date and time picker behavior',
+    title: 'Components/Forms and inputs/Date time picker behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
@@ -54,10 +54,10 @@ BothHalvesAreTheSharedField.play = async ({ canvasElement }) => {
     for (const box of boxes) await expect(box).toHaveClass('plus-field--invalid');
     await expect(within(invalid).getByRole('textbox', { name: 'Session end Date' })).toHaveAttribute('aria-invalid', 'true');
 };
-
+/** The date half opens the shared calendar, 4px under the date field (which sits clear of the 8 screen gap). */
 /** The date half opens the shared calendar, 4px under the date field. */
 export const CalendarOpensFourPixelsBelow = () => (
-    <div style={{ maxWidth: '296px' }}>
+    <div style={{ maxWidth: '296px', marginLeft: '16px' }}>
         <DateAndTimePicker label="Session time" dateValue="2026-10-21" timeZone="America/New_York" />
     </div>
 );

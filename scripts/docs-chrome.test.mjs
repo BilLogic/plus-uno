@@ -1,7 +1,7 @@
 /**
  * The three docs-chrome assertions from #263, and the numbers they were built
  * from. Every fixture below is a real measurement taken in a running Storybook
- * against Components/Actions/Button, not an invented shape:
+ * against Components/Forms and inputs/Button, not an invented shape:
  *
  *   viewport   props table   wrapper   docs body (scroll/client)
  *   1440px     749           750       1140 / 1140
@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import { chromeFailures, measureScript } from './docs-chrome.mjs';
 
 const page = (over = {}) => ({
-  page: 'components-actions-button--docs',
+  page: 'components-forms-and-inputs-button-button--docs',
   width: 1440,
   bodyScroll: 1140,
   bodyClient: 1140,
@@ -192,7 +192,7 @@ test('every failure is reported, not just the first', () => {
     page({ width: 1440 }),
   ]);
   assert.equal(f.length, 3);
-  assert.ok(f.every((l) => l.startsWith('components-actions-button--docs @ 768px')));
+  assert.ok(f.every((l) => l.startsWith('components-forms-and-inputs-button-button--docs @ 768px')));
 });
 
 /* ----------------------------------------------------------- the measurement */

@@ -73,7 +73,35 @@ export const EDGE = new RegExp(
   'g',
 );
 
-const BASE = new RegExp(`var\\(\\s*(--color-(?:${INTENTS.join('|')}))\\s*[,)]`, 'g');
+/**
+ * The same rule in the `--ds-` vocabulary (ADR-035). Atlassian names a role's
+ * fill and its edge separately — `--ds-background-danger-bold` and
+ * `--ds-border-danger` — so the fill on an edge is the base standing in for the
+ * role, exactly as `--color-danger` is. Only the bold fill counts: a subtle
+ * fill on an edge is a different (pale) color, not a role skipped, and its
+ * `-hovered` / `-pressed` steps are states of the fill. `neutral` has no
+ * `--ds-border-neutral` role to name, so it is not one of these.
+ *
+ * ONE VOCABULARY. The PLUS intent a theme-map row is keyed by maps to the role
+ * it became under ADR-035: primary is `brand` (Lagoon), info is `information`
+ * (it moved to blue so it stops reading as brand), and danger, success and
+ * warning keep their names. Secondary and tertiary have no role there.
+ * `DS_ROLES` is derived from that map plus the two roles no PLUS intent
+ * became, so the two lists cannot drift apart.
+ */
+const DS_ROLE_OF = { primary: 'brand', danger: 'danger', success: 'success', warning: 'warning', info: 'information' };
+const DS_ROLES = [...Object.values(DS_ROLE_OF), 'discovery', 'selected'];
+
+const BASE = new RegExp(
+  `var\\(\\s*(--color-(?:${INTENTS.join('|')})|--ds-background-(?:${DS_ROLES.join('|')})-bold)\\s*[,)]`,
+  'g',
+);
+
+/** The edge role a base stands in for: `--color-danger-border`, `--ds-border-danger`. */
+function roleOf(token) {
+  const ds = /^--ds-background-([a-z]+)-bold$/.exec(token);
+  return ds ? `--ds-border-${ds[1]}` : `${token}-border`;
+}
 
 export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
   // `tokens/` DEFINES the roles; `--color-danger-border: var(--color-danger)`
@@ -99,8 +127,126 @@ export function edgeUses(files, root = REPO_ROOT) {
           property,
           kind,
           token: token[1],
-          role: `${token[1]}-border`,
+          role: roleOf(token[1]),
         });
+      }
+    }
+  }
+  return uses;
+}
+
+/**
+ * A STATE COLOR MIXED BY HAND (`foundations/color.md` rule 2: "Use state
+ * layers for interaction — never hardcode hover/active colors").
+ *
+ * `color-mix(in srgb, var(--color-primary), black 8%)` and
+ * `filter: brightness(0.92)` are both a hover color computed at the call site.
+ * The system already names that darkening: `--color-shadow-state-08/12/16`
+ * are the black washes at 8, 12 and 16%, and laid over the fill as a
+ * `background-image` they composite to the same color the mix produced. A
+ * mix with `transparent` is an alpha, not a darkening, and is not counted.
+ * Comments are stripped first, so a sentence about the old mix is not a use.
+ */
+export const MIXED = /color-mix\([^;{}]*?(?<![-\w])(?:black|white)(?![-\w(])|filter\s*:\s*brightness\(/g;
+
+/**
+ * Blank out comments, keeping every newline so line numbers hold. A `//`
+ * after `:` or `(` is a URL (`https://`, `url(//cdn…)`), not a comment.
+ */
+const stripComments = (source) =>
+  source
+    .replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:(])\/\/[^\n]*/g, (c, lead) => lead + ' '.repeat(c.length - lead.length));
+
+/** Hand-mixed state colors, one entry per occurrence. */
+export function mixedUses(files, root = REPO_ROOT) {
+  const uses = [];
+  for (const file of files) {
+    const source = stripComments(fs.readFileSync(path.join(root, file), 'utf8'));
+    for (const match of source.matchAll(MIXED)) {
+      uses.push({ file, line: source.slice(0, match.index).split('\n').length, kind: 'mix' });
+    }
+  }
+  return uses;
+}
+
+/** `{ [file]: { mix } }` — what the `mixedStates` record is compared against. */
+export function mixCounts(uses) {
+  const out = {};
+  for (const use of uses) {
+    out[use.file] = out[use.file] ?? { mix: 0 };
+    out[use.file].mix += 1;
+  }
+  return out;
+}
+
+/** The verdicts on the `mixedStates` set, worded. */
+export function mixFailures(uses, { failures: verdicts = [], stale = [], unreviewed = [] } = {}) {
+  const found = [];
+  for (const verdict of verdicts) {
+    if (verdict.kind === 'new') {
+      const lines = uses.filter((u) => u.file === verdict.key).map((u) => u.line);
+      found.push(
+        `${verdict.key} mixes a state color by hand and is not in the baseline: line ${lines.join(', ')}. ` +
+          'Lay `--color-shadow-state-08/12/16` (or the role\'s own `-state-NN`) over the fill instead.',
+      );
+      continue;
+    }
+    const lines = uses.filter((u) => u.file === verdict.key).map((u) => u.line).join(', ');
+    found.push(
+      verdict.kind === 'rose'
+        ? `${verdict.key} has ${verdict.count} hand-mixed state color(s), up from ${verdict.recorded} (line ${lines}). Use a state layer.`
+        : `${verdict.key} has ${verdict.count} hand-mixed state color(s), down from ${verdict.recorded} — ` +
+          'the ratchet moved and the record did not. Lower the baseline to match.',
+    );
+  }
+  for (const { key } of stale) {
+    found.push(`${key} is recorded under mixedStates and no longer mixes a state color. Delete its entry.`);
+  }
+  for (const key of unreviewed) {
+    found.push(`${key} is recorded under mixedStates without a reason. Say why, or move it onto a state layer.`);
+  }
+  return found;
+}
+
+/**
+ * A ROLE SLOT IN A THEME MAP. Button and Dropdown carry their intent colors as
+ * quoted Sass maps — `'danger': ('--color-danger', …, '--color-danger-border')`,
+ * or in the new words `('--ds-background-danger-bold', …, '--ds-border-danger')`
+ * — and the edge is painted from `var(#{$col-border})` far from the name, so
+ * `edgeUses` cannot see which token a map row hands its edge. The map says
+ * which slot is the edge: a slot where any intent row names its own `-border`
+ * role. An intent row that puts its BASE in that slot is a use, and each one is
+ * a finding outright. There is no record of these, and none is expected,
+ * because a map row is one string to change.
+ */
+const MAP_ROW = /'([\w-]+)'\s*:\s*\(([^()]*)\)/g;
+
+export function themeMapUses(files, root = REPO_ROOT) {
+  const uses = [];
+  for (const file of files) {
+    const source = stripComments(fs.readFileSync(path.join(root, file), 'utf8'));
+    const rows = [];
+    for (const match of source.matchAll(MAP_ROW)) {
+      if (!INTENTS.includes(match[1])) continue;
+      const slots = [...match[2].matchAll(/'([^']*)'/g)].map((m) => m[1].trim());
+      rows.push({ intent: match[1], slots, line: source.slice(0, match.index).split('\n').length });
+    }
+    // Either vocabulary names the edge: `--color-danger-border` or `--ds-border-danger`.
+    const edgeSlots = new Set();
+    for (const { intent, slots } of rows) {
+      const role = DS_ROLE_OF[intent];
+      slots.forEach((slot, i) => {
+        if (slot === `--color-${intent}-border` || (role && slot === `--ds-border-${role}`)) edgeSlots.add(i);
+      });
+    }
+    for (const { intent, slots, line } of rows) {
+      const role = DS_ROLE_OF[intent];
+      const bases = [`--color-${intent}`, ...(role ? [`--ds-background-${role}-bold`] : [])];
+      for (const i of edgeSlots) {
+        if (bases.includes(slots[i])) {
+          uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: roleOf(slots[i]) });
+        }
       }
     }
   }

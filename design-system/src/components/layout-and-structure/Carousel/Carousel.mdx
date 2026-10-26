@@ -30,7 +30,7 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Carousel"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Carousel"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -105,7 +105,7 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 ```jsx
 // A string that is not an image path renders escaped. Markup in it appears as
 // characters on the slide rather than as elements, which is what makes it safe
-// to pass content you did not write (#316).
+// to pass content you did not write.
 <Carousel slides={[{ content: review.body }]} />
 
 // Prefer an element anyway — it is the only way to style a slide.
@@ -130,7 +130,7 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 
 ```jsx
 // Setting an interval starts the rotation AND renders a play/pause button, so
-// the movement can be stopped without a mouse (#333). Leaving it off is still
+// the movement can be stopped without a mouse. Leaving it off is still
 // the better default — a carousel nobody asked to move is a carousel people
 // read half of.
 <Carousel interval={4000} slides={slides} />
@@ -156,7 +156,7 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 - **Autoplay comes with its pause control.** Anything that moves for more than
   five seconds must be pausable, and `pause="hover"` covers a mouse and nothing
   else. Setting an `interval` renders a play/pause button, named for what
-  pressing it will do and reachable by keyboard (#333). It appears only when
+  pressing it will do and reachable by keyboard. It appears only when
   there is autoplay to pause.
 - **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
   so a page of carousels contributes a flat run of `h5`s to the outline.

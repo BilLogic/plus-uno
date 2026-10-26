@@ -42,6 +42,17 @@ Use `<Table>` inside a `<Card>`. Never write raw `<table>` HTML.
 <Table columns={columns} data={data} />
 ```
 
+### Choosing a table
+
+Pick the type before the parts. A row that nests under another makes a
+**Tree table**, even when people also act on it. Otherwise, anything people do
+to the table makes it a **Dynamic table**: sort, filter, select (bulk actions
+included), paginate, expand a row, use a row action, freeze a column, or wait
+through loading and empty states. Everything else is a **Static table**: a fixed
+grid people read, where a link in a cell is fine and rows rest or are
+highlighted. Hover, pressed, focus and selected rows belong to Dynamic and Tree
+tables.
+
 ## Modals
 
 Three variants, one component:
@@ -68,7 +79,7 @@ When a view has no data, show three things — never a blank panel and never a b
 
 ## Loading
 
-- **Cards and lists** — `Skeleton`, composed to the real card's dimensions, with `aria-busy="true"` on the loading region and a visually hidden `role="status"` label beside it (not inside it), mounted empty, whose text is set after mount to say what is loading and set again to announce the arrival. Inside a loading container every label is a plain text bar; the label presets are for one label loading on its own. The rules are on Skeleton's docs page (`design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx`).
+- **Cards and lists** — `Skeleton`, composed to the real card's dimensions, with `aria-busy="true"` on the loading region and a visually hidden `role="status"` label beside it (not inside it), mounted empty, whose text is set after mount to say what is loading and set again to announce the arrival. Inside a loading container every label is a plain text bar; the label presets are for one label loading on its own. The rules are on Skeleton's docs page (`design-system/src/components/loading/Skeleton/Skeleton.mdx`).
 - **Inline actions** (button click, form submit) — spinner inside the button, button disabled.
 - **Full-page transitions** — centered spinner with a label.
 

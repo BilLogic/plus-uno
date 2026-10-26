@@ -38,6 +38,41 @@ test('tokenValues reads the color tokens and only those', () => {
   assert.equal(values.has('--space-2'), false, 'a spacing token is not a color this check can resolve');
 });
 
+test('tokenValues reads both color vocabularies and the ramps --ds- tokens alias', () => {
+  const values = tokenValues(
+    ':root { --color-primary: #123456; --ds-text-brand: var(--palette-lagoon-800); --palette-lagoon-800: #106972; --space-2: 8px; }',
+  );
+  assert.equal(values.get('--color-primary'), '#123456');
+  assert.equal(values.get('--ds-text-brand'), 'var(--palette-lagoon-800)');
+  assert.equal(values.get('--palette-lagoon-800'), '#106972');
+  assert.equal(values.has('--space-2'), false);
+});
+
+test('a theme map written in --ds- tokens is swept like a --color- one', () => {
+  const values = tokenValues(`:root {
+    --color-surface: #f9f9fc;
+    --palette-lagoon-700: #147b84;
+    --palette-neutral-0: #ffffff;
+    --palette-lagoon-100: #e6f4f5;
+    --palette-lagoon-800: #106972;
+    --palette-yellow-300: #f5e08a;
+    --ds-background-brand-bold: var(--palette-lagoon-700);
+    --ds-text-inverse: var(--palette-neutral-0);
+    --ds-background-brand-subtlest: var(--palette-lagoon-100);
+    --ds-text-brand: var(--palette-lagoon-800);
+    --ds-text-warning: var(--palette-yellow-300);
+  }`);
+  const themes = themeMap(`
+$btn-themes: (
+    'brand': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-background-brand-subtlest', '--ds-text-brand'),
+    'pale': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-background-brand-subtlest', '--ds-text-warning')
+);`);
+  const rows = sweep(themes, values);
+  assert.equal(rows.filter((row) => row.ratio === null).length, 0, 'every --ds- slot resolves through its palette alias');
+  assert.deepEqual(measured(themes, values).contrast, ['pale/tonal', 'pale/outline', 'pale/ghost', 'pale/text']);
+  assert.deepEqual(measured(themes, values).duplicates, ['brand+pale']);
+});
+
 test('themeMap reads the map rather than a copy of it', () => {
   const themes = themeMap(`
 $btn-themes: (
@@ -146,18 +181,34 @@ test('an unresolvable token is reported, not scored', () => {
   assert.match(findings(themes, values)[0], /cannot resolve --missing/);
 });
 
-test('against the real repo, it finds exactly what #312 measured in a browser', () => {
+test('against the real repo, every label clears AA and the one duplicate is info', () => {
   const { values, themes } = readRepo();
   const rows = sweep(themes, values);
 
   // Every combination resolves — no token in the map is missing.
   assert.equal(rows.filter((row) => row.ratio === null).length, 0);
 
-  // The one failure, at the value the browser sweep reported.
-  const failures = rows.filter((row) => row.ratio < 4.5);
-  assert.deepEqual(failures.map((row) => `${row.style}/${row.fill}`), ['warning/filled']);
-  assert.equal(failures[0].ratio, 3.7);
+  // No failures. Filled warning was the one at 3.70:1 with a white label; it
+  // takes the ink now and keeps its yellow, and the tightest row is that one.
+  assert.deepEqual(rows.filter((row) => row.ratio < 4.5), []);
+  const warning = rows.find((row) => row.style === 'warning' && row.fill === 'filled');
+  assert.equal(warning.ratio, 4.62);
 
-  // And the one duplicate.
+  // And the one duplicate, kept: info is an alias of tertiary by decision.
   assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
+});
+
+test('against the real repo, the generated --ds- tokens resolve beside the legacy ones', () => {
+  const { values } = readRepo();
+  const theme = {
+    style: 'brand',
+    main: '--ds-background-brand-bold',
+    onMain: '--ds-text-inverse',
+    state: '--ds-background-brand-subtlest',
+    text: '--ds-text-brand',
+  };
+  for (const fill of ['filled', 'tonal', 'outline']) {
+    assert.equal(combination(theme, fill, values).unresolved, undefined, `${fill} resolves`);
+  }
+  assert.ok(values.has('--color-primary'), 'the legacy set is still read');
 });

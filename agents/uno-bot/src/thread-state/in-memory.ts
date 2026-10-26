@@ -32,7 +32,8 @@ import {
   cardExpiryOwed,
   cardExpiriesToTake,
   replacedByOf,
-  decidedLive,
+  closedKept,
+  recordKept,
   expiredCardEdit,
   REPORT_GRACE_MS,
   changedReport,
@@ -89,6 +90,9 @@ interface ProposalRecord {
    *  card exists to be named. Readable, and out of reach of every lookup that
    *  can lead to an execution. */
   retired?: boolean;
+  /** When it was retired or replaced: kept for View for `DECIDED_TTL_MS`
+   *  from here (`recordKept`, #1362). */
+  closedAt?: number;
   /** Picks kept on the card's Review pop-up, by user id (`keepPick`). */
   kept?: Record<string, Record<string, string>>;
   /** Claimed with what was decided: `proposal` is the decided card, kept for
@@ -230,6 +234,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
         if (rec.proposal.channel !== proposal.channel) continue;
         if (proposalSlot(rec.proposal) !== slot) continue;
         rec.supersededBy = proposal.proposalTs;
+        rec.closedAt ??= now();
         // Reported only if this staging is what took it out of reach.
         if (!rec.retired) retired.push(rec.proposal.proposalTs);
       }
@@ -245,12 +250,23 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
     },
 
     // Retire without consuming — the counterpart to the claim, and why the two
-    // are different methods is on the interface (#583).
-    async retireProposal(proposalTs) {
+    // are different methods is on the interface (#583). With a mark, the card
+    // closes as decided, kept for View like a won claim's (#1362).
+    async retireProposal(proposalTs, closed) {
       const rec = proposals.get(proposalTs);
       if (!rec || rec.decided || rec.retired || rec.supersededBy) return { retired: false };
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) return { retired: false };
+      if (closed) {
+        proposals.set(proposalTs, {
+          proposal: decidedPayload(rec.proposal, {}),
+          createdAt: rec.createdAt,
+          decided: decidedNoteOf(structuredClone(closed)),
+          decidedAt: now(),
+        });
+        return { retired: true };
+      }
       rec.retired = true;
+      rec.closedAt = now();
       delete rec.kept;
       return { retired: true };
     },
@@ -288,12 +304,14 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
       // Decided: kept for View for its own lifetime from the decision, then
       // gone as a claimed card is.
       if (rec.decided) {
-        if (!decidedLive(rec, rec.proposal, now())) {
+        if (!recordKept(rec, rec.proposal, now())) {
           proposals.delete(proposalTs);
           return { state: "none" };
         }
-        return { state: "none", decided: structuredClone(decidedOf(rec.proposal, rec.decided)) };
+        return { state: "none", decided: structuredClone(decidedOf(rec.proposal, rec.decided, rec.decidedAt)) };
       }
+      // Replaced or aged out, the card is kept for View past its close too.
+      const kept = { decided: structuredClone(closedKept(rec, rec.proposal)) };
       // A live successor beats the TTL — the ordering, and the third card it
       // stops the person from asking for, are in `ProposalLookup`.
       if (rec.supersededBy && successorIsLive(rec.supersededBy)) {
@@ -303,12 +321,14 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
           (next) => !next.decided && !next.retired && now() - next.createdAt <= proposalTtlMs(next.proposal),
           (next) => next.proposal,
         );
-        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy), ...kept };
       }
       if (now() - rec.createdAt > proposalTtlMs(rec.proposal)) {
-        // Kept while its expiry edit is owed, so the edit still finds it.
-        if (!cardExpiryOwed(rec, rec.proposal, now())) proposals.delete(proposalTs);
-        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal) };
+        // Kept for View past its close, and while its expiry edit is owed, so
+        // the edit still finds it; gone after both.
+        const keep = recordKept(rec, rec.proposal, now());
+        if (!keep && !cardExpiryOwed(rec, rec.proposal, now())) proposals.delete(proposalTs);
+        return { state: "expired", ...ownTtl(rec.proposal), ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...(keep ? kept : {}) };
       }
       if (rec.supersededBy || rec.retired) {
         // A replacement that no longer waits is still named (story 18).
@@ -320,7 +340,7 @@ export function createInMemoryThreadState(deps: ThreadStateDeps = {}): ThreadSta
               (next) => next.proposal,
             )
           : {};
-        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy) };
+        return { state: "superseded", ...ownWords(rec.proposal), ...ownText(rec.proposal), ...ownOperations(rec.proposal), ...structuredClone(replacedBy), ...kept };
       }
       return { state: "found", proposal: withLiveMark(rec.proposal, now()), createdAt: rec.createdAt, ...(rec.kept ? { kept: structuredClone(rec.kept) } : {}) };
     },

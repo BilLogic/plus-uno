@@ -1,0 +1,158 @@
+/**
+ * Frame pattern (Patterns/Frame): the app frame.
+ * Mirrors the Figma `Pattern/Surface container`, `_Topbar`, `_Sidebar` and
+ * `Pattern/Surface`. Every length is a Layout, Surface container or Surface
+ * token; the per-breakpoint values come from the tokens' own media queries.
+ */
+
+@use '../../styles/surface-edge' as *;
+
+.plus-frame {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--surface-container-stack);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    box-sizing: border-box;
+    // Pad 8 top, right and bottom and 0 on the left: the Topbar pads its own
+    // left, so the toggle sits at (8, 8) whatever the sidebar is doing.
+    padding: var(--surface-container-pad) var(--surface-container-pad) var(--surface-container-pad) var(--space-0);
+    background-color: var(--ds-surface-sunken);
+    color: var(--ds-text);
+}
+
+/* ------------------------------------------------------------- topbar */
+
+.plus-frame__topbar {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-width: 0;
+    height: var(--layout-height-topbar);
+}
+
+// The Topbar's start, which holds the toggle, stays above a floating sidebar,
+// so the toggle never moves and stays pressable. The layer goes on the start
+// area, not the button: a page-reveal transform on the start makes it a
+// stacking context, and a z-index inside one would not reach the sidebar.
+.plus-frame__topbar .plus-topbar__start {
+    position: relative;
+    z-index: calc(var(--layout-z-index-navigation) + 1);
+}
+
+/* ------------------------------------------------------------- row */
+
+.plus-frame__row {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    // 8 while the sidebar is closed, 0 once it docks (the sidebar carries its own).
+    padding-left: var(--layout-pad-left-container);
+}
+
+// The token assumes the width's default; these follow the user's choice instead.
+.plus-frame--docked-narrow .plus-frame__row {
+    padding-left: var(--space-0);
+}
+
+.plus-frame--undocked-wide .plus-frame__row {
+    padding-left: var(--surface-container-pad);
+}
+
+/* ------------------------------------------------------------- sidebar */
+
+.plus-frame__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+    width: var(--layout-width-sidebar);
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+// Docked, the sidebar ends in a divider on its right. It sits flush against the
+// surface, so where increased contrast draws the surface edge, that ring lies
+// over this line rather than beside it: one line, never two.
+.plus-frame__sidebar--docked {
+    position: static;
+    flex-shrink: 0;
+    padding: 0 var(--surface-container-pad);
+    border-right: var(--size-element-stroke-sm) solid var(--ds-border);
+}
+
+// Floating: over the page, from the top of the frame, with a shadow and no scrim.
+// The fill and shadow are Figma's Surface roles/surface-overlay pairing. It is on
+// the navigation layer (200), under popups (400) and a modal's scrim (500); the
+// toggle (one above) and the hover edge (one below) sit either side of it.
+.plus-frame__sidebar--floating {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: var(--layout-z-index-navigation);
+    padding: var(--surface-container-pad);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+// The toggle sits in this space, so the sidebar's first row starts under the topbar.
+.plus-frame__topbar-space {
+    flex-shrink: 0;
+    height: var(--layout-height-topbar);
+}
+
+// The hover strip that peeks a closed sidebar: the frame's left edge beside the
+// surface row. The topbar's corner belongs to the toggle, which peeks on its own,
+// so a pointer resting in the screen's top-left corner opens nothing.
+.plus-frame__edge {
+    position: absolute;
+    top: calc(var(--surface-container-pad) + var(--layout-height-topbar));
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--layout-z-index-navigation) - 1);
+    width: var(--surface-container-pad);
+}
+
+/* ------------------------------------------------------------- surface */
+
+.plus-frame__surface {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    padding: var(--surface-pad);
+    overflow: auto;
+    border-radius: var(--surface-radius);
+    background-color: var(--ds-surface);
+    @include surface-edge;
+}
+
+// The 12-column content grid, capped and centered; never narrower than 720,
+// so a narrow surface scrolls sideways instead.
+.plus-frame__content {
+    display: grid;
+    grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+    column-gap: var(--layout-gutter);
+    row-gap: var(--surface-stack-md);
+    align-content: start;
+    flex: 1 0 auto;
+    width: 100%;
+    min-width: var(--layout-min-width-content);
+    max-width: var(--layout-max-width-content);
+    margin-inline: auto;
+    box-sizing: border-box;
+
+    > * {
+        grid-column: 1 / -1;
+        min-width: 0;
+    }
+}
+
+.plus-frame__content--reading {
+    max-width: var(--layout-max-width-reading);
+}

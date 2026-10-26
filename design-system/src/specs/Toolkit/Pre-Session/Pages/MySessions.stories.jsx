@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
@@ -496,7 +496,7 @@ export const WithModals = (args) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
-                    zIndex: 1000
+                    zIndex: 'var(--layout-z-index-scrim)'
                 }}>
                     {renderModal()}
                 </div>

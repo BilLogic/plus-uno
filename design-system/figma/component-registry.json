@@ -14,7 +14,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Accordion/Accordion.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Accordion",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Accordion",
         "source": "design-system/src/components/layout-and-structure/Accordion/Accordion.jsx",
         "storybookId": "components-layout-and-structure-accordion--docs"
       },
@@ -35,12 +35,12 @@
     },
     "AiLabel": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/AiLabel/AiLabel.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/AiLabel",
-        "source": "design-system/src/components/status-and-loading/AiLabel/AiLabel.jsx",
-        "storybookId": "components-status-and-loading-ai-label-ai-label--docs",
+        "mdxPath": "design-system/src/components/labels/AiLabel/AiLabel.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiLabel",
+        "source": "design-system/src/components/labels/AiLabel/AiLabel.jsx",
+        "storybookId": "components-labels-ai-label-ai-label--docs",
         "props": {
           "origin": {
             "type": "enum",
@@ -70,7 +70,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally (#269) rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
+            "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"
@@ -81,9 +81,9 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Alert/Alert.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Alert",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Alert",
         "source": "design-system/src/components/messaging/Alert/Alert.jsx",
-        "storybookId": "components-messaging-alert--docs"
+        "storybookId": "components-messaging-section-message--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -102,12 +102,12 @@
     },
     "Badge": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Badge/Badge.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Badge",
-        "source": "design-system/src/components/status-and-loading/Badge/Badge.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-deprecated-badge--docs",
+        "mdxPath": "design-system/src/components/labels/Badge/Badge.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Badge",
+        "source": "design-system/src/components/labels/Badge/Badge.jsx",
+        "storybookId": "components-labels-deprecated-badge--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -204,9 +204,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Breadcrumb",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Breadcrumb",
         "source": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx",
-        "storybookId": "components-navigation-breadcrumb--docs"
+        "storybookId": "components-navigation-breadcrumbs--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -225,12 +225,12 @@
     },
     "Button": {
       "code": {
-        "import": "@/components/actions",
+        "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/actions/Button/Button.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/Button",
-        "source": "design-system/src/components/actions/Button/Button.jsx",
-        "storybookId": "components-actions-button-button--docs",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Button/Button.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Button",
+        "source": "design-system/src/components/forms-and-inputs/Button/Button.jsx",
+        "storybookId": "components-forms-and-inputs-button-button--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -566,12 +566,12 @@
     },
     "ButtonGroup": {
       "code": {
-        "import": "@/components/actions",
+        "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/actions/ButtonGroup/ButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/ButtonGroup",
-        "source": "design-system/src/components/actions/ButtonGroup/ButtonGroup.jsx",
-        "storybookId": "components-actions-button-group--docs"
+        "mdxPath": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/ButtonGroup",
+        "source": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx",
+        "storybookId": "components-forms-and-inputs-button-group--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -593,7 +593,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Card/Card.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Card",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card",
         "source": "design-system/src/components/layout-and-structure/Card/Card.jsx",
         "storybookId": "components-layout-and-structure-card--docs"
       },
@@ -626,7 +626,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Carousel/Carousel.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Carousel",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Carousel",
         "source": "design-system/src/components/layout-and-structure/Carousel/Carousel.jsx",
         "storybookId": "components-layout-and-structure-carousel--docs"
       },
@@ -789,12 +789,12 @@
     },
     "CloseButton": {
       "code": {
-        "import": "@/components/actions",
+        "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/actions/CloseButton/CloseButton.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/actions/CloseButton",
-        "source": "design-system/src/components/actions/CloseButton/CloseButton.jsx",
-        "storybookId": "components-actions-button-close-button--docs"
+        "mdxPath": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/CloseButton",
+        "source": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx",
+        "storybookId": "components-forms-and-inputs-button-close-button--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -826,7 +826,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Collapse/Collapse.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Collapse",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Collapse",
         "source": "design-system/src/components/layout-and-structure/Collapse/Collapse.jsx",
         "storybookId": "components-layout-and-structure-collapse--docs"
       },
@@ -847,12 +847,12 @@
     },
     "Count": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Count/Count.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Count",
-        "source": "design-system/src/components/status-and-loading/Count/Count.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-count--docs",
+        "mdxPath": "design-system/src/components/labels/Count/Count.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Count",
+        "source": "design-system/src/components/labels/Count/Count.jsx",
+        "storybookId": "components-labels-status-count-tag-count--docs",
         "props": {
           "appearance": {
             "type": "enum",
@@ -990,7 +990,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Divider/Divider.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Divider",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Divider",
         "source": "design-system/src/components/layout-and-structure/Divider/Divider.jsx",
         "storybookId": "components-layout-and-structure-divider--docs"
       },
@@ -1016,7 +1016,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
         "source": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx",
-        "storybookId": "components-forms-and-inputs-dropdown--docs"
+        "storybookId": "components-forms-and-inputs-dropdown-menu--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1107,7 +1107,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Input.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Input.jsx",
-        "storybookId": "components-forms-and-inputs-input--docs"
+        "storybookId": "components-forms-and-inputs-text-field--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1173,7 +1173,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Jumbotron",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Jumbotron",
         "source": "design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.jsx",
         "storybookId": "components-layout-and-structure-jumbotron--docs"
       },
@@ -1229,7 +1229,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/ListGroup/ListGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ListGroup",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/ListGroup",
         "source": "design-system/src/components/layout-and-structure/ListGroup/ListGroup.jsx",
         "storybookId": "components-layout-and-structure-list-group--docs"
       },
@@ -1261,9 +1261,9 @@
         "import": "@/assets/Logo",
         "export": "default",
         "mdxPath": "design-system/src/assets/Logo/Logo.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/assets/Logo",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/assets/Logo",
         "source": "design-system/src/assets/Logo/Logo.jsx",
-        "storybookId": "foundations-iconography-logos-imagery-logos--docs",
+        "storybookId": "components-images-and-icons-logo--docs",
         "props": {
           "style": {
             "type": "enum",
@@ -1345,7 +1345,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/MediaObject/MediaObject.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/MediaObject",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/MediaObject",
         "source": "design-system/src/components/layout-and-structure/MediaObject/MediaObject.jsx",
         "storybookId": "components-layout-and-structure-media-object--docs"
       },
@@ -1377,7 +1377,7 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Modal",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal",
         "source": "design-system/src/components/messaging/Modal/Modal.jsx",
         "storybookId": "components-messaging-modal--docs"
       },
@@ -1401,9 +1401,9 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/_internal/Navbar/Navbar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Navbar",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Navbar",
         "source": "design-system/src/components/_internal/Navbar/Navbar.jsx",
-        "storybookId": "components-navigation-nav-tabs-nav-pills-navbar--docs",
+        "storybookId": "components-navigation-tabs-nav-pills-navbar-navbar--docs",
         "props": {
           "backgroundColor": {
             "type": "enum",
@@ -1475,9 +1475,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/NavPills/NavPills.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavPills",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavPills",
         "source": "design-system/src/components/navigation/NavPills/NavPills.jsx",
-        "storybookId": "components-navigation-nav-tabs-nav-pills-nav-pills--docs"
+        "storybookId": "components-navigation-tabs-nav-pills-navbar-nav-pills--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1517,9 +1517,9 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/NavTabs/NavTabs.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavTabs",
         "source": "design-system/src/components/navigation/NavTabs/NavTabs.jsx",
-        "storybookId": "components-navigation-nav-tabs-nav-pills-nav-tabs--docs"
+        "storybookId": "components-navigation-tabs-nav-pills-navbar-tabs--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1576,13 +1576,13 @@
           },
           {
             "id": "field",
-            "name": "Form",
+            "name": "_Field",
             "componentSetNodeId": "14841:25919",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "The part this component is built on, still named Form in the Figma file: one box with Leading, Content and Trailing slots, 3 sizes × 7 states (21 variants). In code it is `_internal/Field.jsx`, which is not exported from the barrel, so `unpublished` is its settled state: a part to build on, not a component to place."
+            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
@@ -1686,7 +1686,7 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Pagination/Pagination.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Pagination",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Pagination",
         "source": "design-system/src/components/navigation/Pagination/Pagination.jsx",
         "storybookId": "components-navigation-pagination--docs"
       },
@@ -1707,12 +1707,12 @@
     },
     "Popover": {
       "code": {
-        "import": "@/components/overlays",
+        "import": "@/components/overlays-and-layering",
         "export": "default",
-        "mdxPath": "design-system/src/components/overlays/Popover/Popover.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Popover",
-        "source": "design-system/src/components/overlays/Popover/Popover.jsx",
-        "storybookId": "components-overlays-popover--docs"
+        "mdxPath": "design-system/src/components/overlays-and-layering/Popover/Popover.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Popover",
+        "source": "design-system/src/components/overlays-and-layering/Popover/Popover.jsx",
+        "storybookId": "components-overlays-and-layering-popup--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1731,12 +1731,12 @@
     },
     "Progress": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/loading",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Progress/Progress.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Progress",
-        "source": "design-system/src/components/status-and-loading/Progress/Progress.jsx",
-        "storybookId": "components-status-and-loading-progress--docs"
+        "mdxPath": "design-system/src/components/loading/Progress/Progress.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Progress",
+        "source": "design-system/src/components/loading/Progress/Progress.jsx",
+        "storybookId": "components-loading-progress-bar--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1864,9 +1864,9 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/ScrollBar",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/ScrollBar",
         "source": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx",
-        "storybookId": "components-layout-and-structure-scroll-bar--docs"
+        "storybookId": "components-layout-and-structure-scrollbar--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1890,7 +1890,7 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Scrollspy/Scrollspy.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/Scrollspy",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Scrollspy",
         "source": "design-system/src/components/navigation/Scrollspy/Scrollspy.jsx",
         "storybookId": "components-navigation-scrollspy--docs"
       },
@@ -1976,7 +1976,7 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/SidebarTab/SidebarTab.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/SidebarTab",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/SidebarTab",
         "source": "design-system/src/components/navigation/SidebarTab/SidebarTab.jsx",
         "storybookId": "components-navigation-sidebar-tab--docs"
       },
@@ -1997,12 +1997,12 @@
     },
     "Skeleton": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/loading",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Skeleton/Skeleton.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Skeleton",
-        "source": "design-system/src/components/status-and-loading/Skeleton/Skeleton.jsx",
-        "storybookId": "components-status-and-loading-loading-skeleton--docs",
+        "mdxPath": "design-system/src/components/loading/Skeleton/Skeleton.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Skeleton",
+        "source": "design-system/src/components/loading/Skeleton/Skeleton.jsx",
+        "storybookId": "components-loading-loading-skeleton--docs",
         "props": {
           "shape": {
             "type": "enum",
@@ -2099,12 +2099,12 @@
     },
     "Spinner": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/loading",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Spinner/Spinner.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Spinner",
-        "source": "design-system/src/components/status-and-loading/Spinner/Spinner.jsx",
-        "storybookId": "components-status-and-loading-loading-spinner--docs"
+        "mdxPath": "design-system/src/components/loading/Spinner/Spinner.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Spinner",
+        "source": "design-system/src/components/loading/Spinner/Spinner.jsx",
+        "storybookId": "components-loading-loading-spinner--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2147,12 +2147,12 @@
     },
     "Status": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Status/Status.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Status",
-        "source": "design-system/src/components/status-and-loading/Status/Status.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-status--docs",
+        "mdxPath": "design-system/src/components/labels/Status/Status.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Status",
+        "source": "design-system/src/components/labels/Status/Status.jsx",
+        "storybookId": "components-labels-status-count-tag-status--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -2206,12 +2206,12 @@
     },
     "Suggestion": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Suggestion/Suggestion.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Suggestion",
-        "source": "design-system/src/components/status-and-loading/Suggestion/Suggestion.jsx",
-        "storybookId": "components-status-and-loading-ai-label-suggestion--docs",
+        "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
+        "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
+        "storybookId": "components-labels-ai-label-suggestion--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -2233,7 +2233,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's TagContext, never a prop."
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
@@ -2246,7 +2246,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Switch.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Switch.jsx",
-        "storybookId": "components-forms-and-inputs-switch--docs"
+        "storybookId": "components-forms-and-inputs-toggle--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2268,9 +2268,9 @@
         "import": "@/components",
         "export": "default",
         "mdxPath": "design-system/src/components/_internal/Table/Table.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Table",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table",
         "source": "design-system/src/components/_internal/Table/Table.jsx",
-        "storybookId": "components-layout-and-structure-table--docs",
+        "storybookId": "components-text-and-data-display-table--docs",
         "props": {
           "density": {
             "type": "enum",
@@ -2295,111 +2295,47 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "normal-borderless",
-            "name": "Table/Normal Borderless",
-            "componentSetNodeId": "10:473",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-473",
-            "codeDefaults": {
-              "density": "md",
-              "bordered": false
-            },
-            "variantProps": {
-              "size": "cellRole",
-              "style": "cellStyle",
-              "icon": "trailingIcon"
-            },
-            "variantValueMap": {
-              "size": {
-                "head": "header cell",
-                "body": "body cell"
-              }
-            },
-            "source": "designer-supplied",
-            "status": "verified"
+            "id": "static-table-page",
+            "name": "Static table (page)",
+            "componentSetNodeId": "17156:122",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122",
+            "source": "manual",
+            "status": "docs-page",
+            "notes": "The Static table page: the Static table set and the shared _Table parts it is built from."
           },
           {
-            "id": "small-borderless",
-            "name": "Table/Small Borderless",
-            "componentSetNodeId": "10:507",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-507",
-            "codeDefaults": {
-              "density": "sm",
-              "bordered": false
-            },
-            "variantProps": {
-              "size": "cellRole",
-              "style": "cellStyle",
-              "icon": "trailingIcon"
-            },
-            "variantValueMap": {
-              "size": {
-                "head": "header cell",
-                "body": "body cell"
-              }
-            },
-            "source": "designer-supplied",
-            "status": "verified"
+            "id": "dynamic-table-page",
+            "name": "Dynamic table (page)",
+            "componentSetNodeId": "19685:27042",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
+            "source": "manual",
+            "status": "docs-page",
+            "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
           },
           {
-            "id": "normal-border",
-            "name": "Table/Normal Border",
-            "componentSetNodeId": "10:502",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-502",
-            "codeDefaults": {
-              "density": "md",
-              "bordered": true
-            },
-            "variantProps": {
-              "type": "cellRole",
-              "style": "cellStyle",
-              "icon": "trailingIcon"
-            },
-            "variantValueMap": {
-              "type": {
-                "head": "header cell",
-                "body": "body cell"
-              }
-            },
-            "source": "designer-supplied",
-            "status": "verified",
-            "notes": "Note the variant group is named `type` here, not `size` as in the borderless sets."
-          },
-          {
-            "id": "contextual-color",
-            "name": "Table/Contextual Color",
-            "componentSetNodeId": "10:721",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-721",
-            "variantProps": {
-              "state": null,
-              "style": null
-            },
-            "source": "designer-supplied",
-            "status": "no-code-equivalent",
-            "notes": "Row state (disabled/focused/hovered/pressed) x semantic style (error/info/primary/success/warning). Code has no prop for this — apply it per cell via the cell object's `className`."
-          },
-          {
-            "id": "background-color",
-            "name": "Table/Background Color",
-            "componentSetNodeId": "10:722",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-722",
-            "variantProps": {
-              "color": null
-            },
-            "source": "designer-supplied",
-            "status": "no-code-equivalent",
-            "notes": "11 tinted row backgrounds including the SMART competency colors. Code has no prop — apply per cell via `className`."
+            "id": "tree-table-page",
+            "name": "Tree table (page)",
+            "componentSetNodeId": "19685:27043",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
+            "source": "manual",
+            "status": "docs-page",
+            "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
       }
     },
     "Tag": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Tag/Tag.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tag",
-        "source": "design-system/src/components/status-and-loading/Tag/Tag.jsx",
-        "storybookId": "components-status-and-loading-status-count-tag-tag--docs",
+        "mdxPath": "design-system/src/components/labels/Tag/Tag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Tag",
+        "source": "design-system/src/components/labels/Tag/Tag.jsx",
+        "storybookId": "components-labels-status-count-tag-tag--docs",
         "props": {
           "behavior": {
             "type": "enum",
@@ -2464,6 +2400,50 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
       }
     },
+    "TagGroup": {
+      "code": {
+        "import": "@/components/labels",
+        "export": "default",
+        "mdxPath": "design-system/src/components/labels/TagGroup/TagGroup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/TagGroup",
+        "source": "design-system/src/components/labels/TagGroup/TagGroup.jsx",
+        "storybookId": "components-labels-status-count-tag-tag-group--docs",
+        "props": {
+          "overflow": {
+            "type": "enum",
+            "values": [
+              "wrap",
+              "collapse"
+            ]
+          },
+          "alignment": {
+            "type": "enum",
+            "values": [
+              "left",
+              "right"
+            ]
+          },
+          "disabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "tag-group",
+            "name": "TagGroup",
+            "componentSetNodeId": "17878:1713",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
+          }
+        ]
+      }
+    },
     "TagInput": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -2523,7 +2503,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/Textarea.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
-        "storybookId": "components-forms-and-inputs-textarea--docs",
+        "storybookId": "components-forms-and-inputs-text-area--docs",
         "props": {
           "size": {
             "type": "enum",
@@ -2562,7 +2542,7 @@
             },
             "status": "verified",
             "verifiedAt": "2026-10-15",
-            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a short textarea is `rows={1}` in code and an instance resized to 34 high in Figma. `rows` is code-only: Figma sets the height by resizing the instance."
+            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a text area is 80 high at least and grows from there. `rows` is code-only: Figma sets the height by resizing the instance."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
@@ -2570,12 +2550,12 @@
     },
     "Tile": {
       "code": {
-        "import": "@/components/status-and-loading",
+        "import": "@/components/images-and-icons",
         "export": "default",
-        "mdxPath": "design-system/src/components/status-and-loading/Tile/Tile.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/status-and-loading/Tile",
-        "source": "design-system/src/components/status-and-loading/Tile/Tile.jsx",
-        "storybookId": "foundations-tile--docs",
+        "mdxPath": "design-system/src/components/images-and-icons/Tile/Tile.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Tile",
+        "source": "design-system/src/components/images-and-icons/Tile/Tile.jsx",
+        "storybookId": "components-images-and-icons-tile--docs",
         "props": {
           "content": {
             "type": "enum",
@@ -2646,9 +2626,9 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Toast/Toast.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Toast",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Toast",
         "source": "design-system/src/components/messaging/Toast/Toast.jsx",
-        "storybookId": "components-messaging-toast--docs"
+        "storybookId": "components-messaging-flag--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2667,12 +2647,12 @@
     },
     "Tooltip": {
       "code": {
-        "import": "@/components/overlays",
+        "import": "@/components/overlays-and-layering",
         "export": "default",
-        "mdxPath": "design-system/src/components/overlays/Tooltip/Tooltip.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/overlays/Tooltip",
-        "source": "design-system/src/components/overlays/Tooltip/Tooltip.jsx",
-        "storybookId": "components-overlays-tooltip--docs"
+        "mdxPath": "design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Tooltip",
+        "source": "design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx",
+        "storybookId": "components-overlays-and-layering-tooltip--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",

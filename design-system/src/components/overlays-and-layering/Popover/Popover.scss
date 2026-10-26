@@ -1,0 +1,119 @@
+/*
+ * Popover Component Styles: the Popover family's Popup.
+ *
+ * STRUCTURE:
+ * .popover (one surface: fill, border, radius, shadow, pad)
+ *   ├── .popover-header (the title, heading.xsmall)
+ *   └── .popover-body (body 14/20)
+ */
+
+// Storybook Overview: inline panel next to trigger (not positioned by Popper)
+.plus-popover-overview-static {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    // The popup sits Popover/offset 4 from its trigger.
+    gap: var(--popover-offset);
+    padding: var(--size-spacing-medium-space-400);
+
+    .plus-popover.popover {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        margin: 0 !important;
+    }
+}
+
+// ===== MAIN CONTAINER =====
+// The Popover family's Popup (Figma Pattern/Popup): one surface, no scrim and
+// no arrow. Pad Popover/pad 16, radius Popover/radius 12, and a fixed width
+// tier, Popover/width-sm · md · lg (320 · 400 · 480). The title and body stack
+// Element/stack-md 8 apart on the popup's own fill.
+.popover,
+.plus-popover {
+    --bs-popover-max-width: none;
+
+    // Reset Bootstrap defaults
+    margin: 0 !important;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-md);
+    width: var(--popover-width-sm) !important;
+    max-width: none;
+    padding: var(--popover-pad) !important;
+
+    // The overlay pair. Its shadow carries the 1px edge ring (firmer under
+    // increased contrast), so the popup draws no border of its own.
+    background-color: var(--ds-surface-overlay) !important;
+    border: none !important;
+    border-radius: var(--popover-radius) !important;
+    box-shadow: var(--ds-shadow-overlay) !important;
+
+    &.plus-popover--md {
+        width: var(--popover-width-md) !important;
+    }
+
+    &.plus-popover--lg {
+        width: var(--popover-width-lg) !important;
+    }
+
+    // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
+    .popover-header,
+    .plus-popover-title {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background-color: transparent !important;
+        color: var(--ds-text) !important;
+        font: var(--heading-xsmall);
+
+        // Remove Bootstrap's ::before separator
+        &::before {
+            display: none !important;
+        }
+    }
+
+    // ===== BODY: body 14/20 =====
+    .popover-body,
+    .plus-popover-body {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background-color: transparent !important;
+        color: var(--ds-text) !important;
+        font: var(--body-default);
+    }
+
+    // No arrow: a popup sits Popover/offset 4 from its trigger instead.
+    .popover-arrow {
+        display: none !important;
+    }
+}
+/*
+ * #321. The button a TEXT trigger becomes.
+ *
+ * `<Popover trigger="Learn more">` used to render a `span` with `tabIndex="0"`
+ * — a tab stop with no role and no name. It is a real `button` now, so this
+ * rule exists to make a button look like the text it replaced: no chrome, the
+ * surrounding type, and the pointer of something you click.
+ *
+ * The focus ring is NOT reset. That is the one piece of browser chrome worth
+ * keeping, and it is the reason a keyboard user can see where they are.
+ */
+.plus-popover-trigger {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    cursor: pointer;
+}

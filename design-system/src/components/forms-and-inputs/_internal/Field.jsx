@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Tooltip from '../../overlays/Tooltip/Tooltip';
+import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 import './Field.scss';
 
 /**
@@ -28,6 +28,7 @@ const Field = ({
     valid = false,
     busy = false,
     multiline = false,
+    grow = false,
     state,
     leading,
     trailing,
@@ -46,6 +47,7 @@ const Field = ({
         valid && !invalid && 'plus-field--valid',
         busy && 'plus-field--busy',
         multiline && 'plus-field--multiline',
+        grow && !multiline && 'plus-field--grow',
         state && state !== 'default' && `plus-field--${state}`,
         className,
     ].filter(Boolean).join(' ');
@@ -82,7 +84,10 @@ const Field = ({
 };
 
 Field.propTypes = {
-    /** small → Body/B3, medium → Body/B2, large → Body/B1. */
+    /**
+     * `medium` draws 32 and is the default. `small` and `large` are
+     * deprecated: they draw like `medium`, and the host warns in development.
+     */
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     /** Borderless at rest, for editing in place. Editing looks the same as the standard field. */
     subtle: PropTypes.bool,
@@ -92,8 +97,10 @@ Field.propTypes = {
     valid: PropTypes.bool,
     /** Something is happening in Trailing ("saving…"), so a subtle field keeps it on show. */
     busy: PropTypes.bool,
-    /** The content is several lines (Textarea): slots align to the top. */
+    /** The content is several lines (Textarea): slots align to the top, and the box starts at 80 and grows. */
     multiline: PropTypes.bool,
+    /** The content wraps (tags in a Tag field): the box starts at 32 and grows with each row. */
+    grow: PropTypes.bool,
     /** Draws a live state still, for documentation. Live hover and focus need nothing. */
     state: PropTypes.oneOf(['default', 'hover', 'focus']),
     leading: PropTypes.node,

@@ -65,15 +65,15 @@ body {
 }
 
 /* Admin demo mode: hide sidebar and give content full width in focused mode. */
-#home-redesign-page.admin-frame-focused .plus-page-main-container {
+#home-redesign-page.admin-frame-focused .plus-frame__row {
   gap: 0 !important;
 }
 
-#home-redesign-page.admin-frame-focused .plus-page-sidebar-wrapper {
+#home-redesign-page.admin-frame-focused .plus-frame__sidebar {
   display: none !important;
 }
 
-#home-redesign-page.admin-frame-focused .plus-page-content-wrapper {
+#home-redesign-page.admin-frame-focused .plus-frame__surface {
   width: 100%;
   flex-basis: 100%;
 }
@@ -81,12 +81,12 @@ body {
 
 /** Hide scrollbars on main content area; scrolling still enabled (same as reference). */
 #home-redesign-page .plus-page-main,
-#home-redesign-page .plus-page-content-wrapper {
+#home-redesign-page .plus-frame__surface {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+#home-redesign-page .plus-frame__surface::-webkit-scrollbar {
   display: none;
 }

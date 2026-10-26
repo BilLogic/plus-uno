@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 
 /**
  * StudentTag — a "PLUS Tag": a tonal pill labeling a student on one dimension

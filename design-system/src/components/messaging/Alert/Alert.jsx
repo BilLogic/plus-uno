@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import RBAlert from 'react-bootstrap/Alert';
-import CloseButton from '@/components/actions/CloseButton';
+import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import './Alert.scss';
 
 /** The six styles, as the Figma Alert set names them. */
@@ -45,7 +45,7 @@ const Alert = ({
     children,
     leadingVisual = true,
     dismissible = true,
-    /** @deprecated Prefer `dismissible` — kept for existing call sites */
+    /** @deprecated Prefer dismissible — kept for existing call sites */
     dismissable,
     onDismiss,
     className = '',
@@ -71,7 +71,7 @@ const Alert = ({
     // strut in that line's text style gives each column exactly one line of
     // height; the icon stays a 20px square (the column's width) and the button
     // 24×24 whatever the text size.
-    const firstLineClass = title ? 'h4' : 'body2-txt';
+    const firstLineClass = title ? 'plus-alert-strut--title' : 'plus-alert-strut--text';
     const strut = <span className={`plus-alert-strut ${firstLineClass}`} aria-hidden="true">{'\u200B'}</span>;
 
     // `true` (the default) is the style's own icon; a string is a Font Awesome
@@ -98,8 +98,8 @@ const Alert = ({
             )}
 
             <div className="plus-alert-content">
-                {title && <RBAlert.Heading className="plus-alert-title h4">{title}</RBAlert.Heading>}
-                <div className="plus-alert-text body2-txt">{children}</div>
+                {title && <RBAlert.Heading className="plus-alert-title">{title}</RBAlert.Heading>}
+                <div className="plus-alert-text">{children}</div>
             </div>
 
             {canDismiss && (
@@ -127,7 +127,7 @@ Alert.propTypes = {
     leadingVisual: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.node]),
     /** Whether the alert can be dismissed */
     dismissible: PropTypes.bool,
-    /** @deprecated Prefer `dismissible` */
+    /** @deprecated Prefer dismissible */
     dismissable: PropTypes.bool,
     /** Callback when alert is dismissed */
     onDismiss: PropTypes.func,

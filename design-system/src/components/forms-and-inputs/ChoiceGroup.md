@@ -52,13 +52,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-on-surface` · `--layout-control-checkbox` · `--layout-control-radio` · `--size-element-gap-md` · `--size-element-gap-sm`
+`--body-default` · `--body-small` · `--color-danger` · `--color-on-surface` · `--layout-control-checkbox` · `--layout-control-radio` · `--size-element-gap-md` · `--size-element-gap-sm`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGroup.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

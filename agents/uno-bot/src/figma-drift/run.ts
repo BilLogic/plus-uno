@@ -89,7 +89,7 @@ import { cachedReads, checkDecision, isFigmaKind, type FileReads } from "./check
 import type { FrameJudge } from "./judge";
 import { draftIntake, matchPillar, pillarCandidates } from "./draft";
 import { askGroupOf, type FileDriftFinding } from "./finding";
-import { slackPersonOfFigma, type FigmaPeople } from "../usage/roles";
+import { isActive, isActiveName, NOBODY_ACTIVE, slackPersonOfFigma, type ActivePeople, type FigmaPeople } from "../usage/roles";
 import { cardExpiresAt, cardLiveAt } from "../card-expiry";
 
 /** Reports with cards per morning; files whose card would be past it wait. */
@@ -247,8 +247,11 @@ export interface DriftPostDeps {
   /** The Roadmap's Product Pillar options, or null when unread. */
   pillarOptions(): Promise<string[] | null>;
   /** The Team Members directory's Figma user id → Slack id map, so a card can
-   *  name its file's publisher. Without one, no publisher is named. */
+   *  name its file's publisher. Without one, no publisher is named on a card. */
   figmaPeople?(): Promise<FigmaPeople>;
+  /** Who may be tagged or named (`../usage/roles.ts` `isActive`), read once a
+   *  run. Without it, nobody is: no publisher is named anywhere. */
+  active?(): Promise<ActivePeople>;
   config: ChannelIds & { unoBot?: string };
   meter?: { headroom(): { subrequests: number; d1Queries: number } };
   now(): number;
@@ -591,6 +594,7 @@ async function handCards(ctx: HandCtx, t: ThreadPlan): Promise<void> {
   }
   let options: Promise<string[] | null> | undefined;
   let people: Promise<FigmaPeople> | undefined;
+  let active: Promise<ActivePeople> | undefined;
   const cards: DriftCard[] = [];
   for (const [i, d] of groups.entries()) {
     const f = d.here;
@@ -610,10 +614,12 @@ async function handCards(ctx: HandCtx, t: ThreadPlan): Promise<void> {
             }),
           )
         : { pillar: null, note: null };
-    const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher, permalinks });
-    // A publisher the directory maps is named on the card and may
-    // decide it; one it does not map is named on the intake alone.
-    const publisherSlack =
+    // A publisher the directory maps to someone active is named on the card
+    // and may decide it; one it does not map is named on the intake alone,
+    // and only by an active row's name. Someone who has left PLUS, or has no
+    // row, is named nowhere (#1361).
+    const live = publisher ? await (active ??= deps.active ? deps.active() : Promise.resolve(NOBODY_ACTIVE)) : NOBODY_ACTIVE;
+    const mapped =
       publisher?.userId && deps.figmaPeople
         ? slackPersonOfFigma(
             publisher.userId,
@@ -623,6 +629,9 @@ async function handCards(ctx: HandCtx, t: ThreadPlan): Promise<void> {
             }),
           )
         : null;
+    const publisherSlack = mapped && isActive(mapped, live) ? mapped : null;
+    const nameable = publisher && (publisherSlack || isActiveName(publisher.handle, live)) ? publisher : null;
+    const intake = draftIntake({ findings: d.all, pillar: choice.pillar, publisher: nameable, permalinks });
     const named = publisherSlack && publisher ? { slackId: publisherSlack, handle: publisher.handle } : null;
     cards.push({
       group: d.group,
@@ -927,8 +936,9 @@ export interface DriftRecheckDeps {
   figma?: Pick<FigmaClient, "versions" | "nodes">;
   /** Without one, no decision is ever found shown. */
   judge?: FrameJudge;
-  /** Take a card's proposal out of reach; false when it was no longer live. */
-  retire(proposalTs: string): Promise<boolean>;
+  /** Take a card's proposal out of reach, closed as withdrawn with `why`, so
+   *  View still draws it; false when it was no longer live. */
+  retire(proposalTs: string, why: string): Promise<boolean>;
   /** Edit a message in place: a report redrawn, or the pointers' new text. */
   edit(channel: string, ts: string, message: ReportMessage): Promise<void>;
   /** Where each report's record is kept, and its cards' states land. */
@@ -1114,7 +1124,7 @@ async function withdrawCard(
   const key = itemProposalKey(item.messageTs, item.id);
   let retired = false;
   try {
-    retired = await deps.retire(key);
+    retired = await deps.retire(key, note);
   } catch (err) {
     swallowed(err, "retire");
     // Looked at again next run, rather than kept as caught up with its card
@@ -1156,7 +1166,7 @@ async function withdrawLegacyCard(ask: LiveAsk, deps: DriftRecheckDeps, withdraw
   let retired = false;
   try {
     card = await deps.legacyCard(ask.channel, ask.threadTs);
-    if (card) retired = await deps.retire(card.proposalTs);
+    if (card) retired = await deps.retire(card.proposalTs, text);
   } catch (err) {
     swallowed(err, "legacy card");
     return;

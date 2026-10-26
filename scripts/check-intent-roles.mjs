@@ -26,7 +26,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
-import { REPO_ROOT, counts, edgeUses, failures, stylesheets } from './intent-roles.mjs';
+import {
+  REPO_ROOT,
+  counts,
+  edgeUses,
+  failures,
+  mixCounts,
+  mixFailures,
+  mixedUses,
+  stylesheets,
+  themeMapUses,
+} from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
 
@@ -45,6 +55,7 @@ const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warni
 export const REMEDY =
   '  -> An intent color on an edge names the role: `var(--color-danger-border)`,\n' +
   `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
+  '     In the --ds- words: `var(--ds-border-danger)`, not `var(--ds-background-danger-bold)`.\n' +
   `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
 
 // The corpus walk, the edge uses and the roles file are the same read for both
@@ -55,6 +66,8 @@ const inputs = byRoot((repoRoot) => {
   return {
     files,
     uses: edgeUses(files, repoRoot),
+    mixed: mixedUses(files, repoRoot),
+    mapped: themeMapUses(files, repoRoot),
     // A vanished roles file is the floor case, not a crash (#611).
     roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
@@ -73,7 +86,19 @@ const inputs = byRoot((repoRoot) => {
  * UNREVIEWED would produce a record the check immediately fails on, which is
  * the honest outcome and still not a thing worth offering.
  */
-const gate = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
+const gate = (repoRoot) => openRatchet({ file: BASELINE, set: 'files', repoRoot });
+
+/*
+ * THE SECOND SET: state colors mixed by hand. Rule 2 of
+ * `design-system/guidelines/foundations/color.md` — state layers for hover
+ * and pressed, never a hand-mixed color — had no gate, and the 2026-10-24
+ * audit of the patterns and the Popover family found eleven `color-mix(…,
+ * black N%)` and brightness filters in Button and Dropdown. They now lay
+ * `--color-shadow-state-NN` over the fill, which composites to the same
+ * color. The remainder is recorded under `mixedStates`, a reason each, and
+ * ratchets in both directions like the edges.
+ */
+const mixGate = (repoRoot) => openRatchet({ file: BASELINE, set: 'mixedStates', repoRoot });
 
 /**
  * A REASON THAT IS TOO SHORT TO BE ONE. The module's own test is that a reason
@@ -92,8 +117,17 @@ const reasonless = (ratchet) => {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, uses, roles } = inputs(repoRoot);
+  const { files, uses, mixed, mapped, roles } = inputs(repoRoot);
   const found = [];
+
+  // A theme-map row that hands its edge slot the base. Held at zero, no record.
+  for (const use of mapped) {
+    found.push({
+      message:
+        `${use.file}:${use.line} — the '${use.intent}' row of a theme map puts ${use.token} in its edge ` +
+        `slot (slot ${use.slot}, where another row names its -border role). Use ${use.role}.`,
+    });
+  }
 
   if (files.length < MIN_FILES) {
     found.push({
@@ -127,12 +161,22 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       unreviewed: reasonless(ratchet),
     }).map((message) => ({ message })),
   );
+
+  const mixes = mixGate(repoRoot);
+  const mixSide = mixCounts(mixed);
+  found.push(
+    ...mixFailures(mixed, {
+      failures: mixes.failures(mixSide),
+      stale: mixes.stale(mixSide),
+      unreviewed: reasonless(mixes),
+    }).map((message) => ({ message })),
+  );
   return found;
 }
 
 /** The green line, which carries the remainder and what the baseline records. */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { files, uses } = inputs(repoRoot);
+  const { files, uses, mixed } = inputs(repoRoot);
   const remaining = uses.length;
   // `migrated` and `recordedAt` are ENVELOPE, not set: the ratchet does not own
   // them, and `envelope()` is how a check reads the record's unowned half (#601).
@@ -141,7 +185,8 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   const record = gate(repoRoot);
   return (
     `${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
-    `all recorded (${record.envelope('migrated')} migrated ${record.envelope('recordedAt')})`
+    `all recorded (${record.envelope('migrated')} migrated ${record.envelope('recordedAt')}); ` +
+    `${mixed.length} hand-mixed state color(s) remain, all recorded`
   );
 }
 

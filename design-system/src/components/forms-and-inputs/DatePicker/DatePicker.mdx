@@ -103,7 +103,7 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 ## Sizes
 
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
+<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={DatePickerStories.Sizes} />
 </DocsCanvasShell>
 
@@ -233,7 +233,7 @@ value yourself.
   unavailable rather than doing nothing.
 - **A day announces its whole date.** Each button is named with the weekday,
   day, month and year in the reader's locale, carries `aria-pressed` when it is
-  the chosen day, and `aria-current="date"` when it is today (#331). The header's
+  the chosen day, and `aria-current="date"` when it is today. The header's
   month and year are no longer the only context.
 - **Adjacent-month days are dimmed, not unreadable.** They measure 7.66:1
   against the calendar surface — still lighter than the current month's 13.98:1,

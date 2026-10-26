@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Switch from './Switch';
 
 export default {
-    title: 'Components/Forms and inputs/Switch',
+    title: 'Components/Forms and inputs/Toggle',
     component: Switch,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-24', kind: 'changed', summary: 'Keyboard focus is the 2px focus ring 2px off the track, as on Checkbox and Radio; a pointer focus draws none.' },
+            { date: '2026-10-24', kind: 'changed', summary: 'Hover lays the 08 state layer over the track: primary 08 when off, shadow 08 over the fill when on.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'A labeled switch is a 24 row at every size, its label 14/20, with one track geometry.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -160,4 +167,20 @@ ReadOnly.play = async ({ canvasElement }) => {
     await expect(control.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(control);
     await expect(control.checked).toBe(true);
+};
+
+/** Keyboard focus: the focus-ring role, 2px wide and 2px off the track, as on Checkbox and Radio. */
+export const KeyboardFocus = () => <Switch id="switch-focus" label="Send reminders" defaultChecked />;
+KeyboardFocus.parameters = { docs: { disable: true } };
+KeyboardFocus.play = async ({ canvasElement }) => {
+    const control = within(canvasElement).getByRole('switch', { name: 'Send reminders' });
+    control.style.transition = 'none';
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(control);
+    const style = getComputedStyle(control);
+    await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+    await expect(px(style.outlineWidth), 'ring width').toBe(2);
+    await expect(px(style.outlineOffset), 'ring gap').toBe(2);
+    await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+    await expect(style.boxShadow, 'no second ring').toBe('none');
 };

@@ -1,15 +1,21 @@
 ---
-summary: Which input to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group
+summary: Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the forms-and-inputs group -->
 
-# Forms and inputs — which input to use
+# Forms and inputs — which input or button to use
 
 Generated facts (props, defaults, coverage) are in
 `design-system/src/components/forms-and-inputs/index.md`. How the fields sit
 together on a surface is `design-system/guidelines/composition/forms.md`; this
 file is about picking one.
+
+The group follows Atlassian's Forms and inputs category, so it holds the
+buttons too. Storybook titles components with Atlassian's display names,
+while the code export keeps its own: `Input` is Text field, `Textarea`
+is Text area, `Switch` is Toggle, `Dropdown` is Dropdown menu, and
+`DateAndTimePicker` is Date time picker.
 
 ## Which input to use
 
@@ -159,6 +165,58 @@ The menu-backed fields that do carry a full ARIA pattern are `Cascader`
 `treeitem`) and `DatePicker`'s trigger (`combobox` → `dialog`). Where the list
 is short enough, `ChoiceGroup` beats all of them: every option is a native
 radio or checkbox.
+
+## Buttons
+
+### Button or ButtonGroup
+
+**`Button`** for a single action. It is the only one of the two that carries a
+click handler, and it is what the rest of the system composes when it
+needs an action: `Modal` and `Jumbotron` build their footers from
+`primaryButton` / `secondaryButton`, `Card` from `actionButton`, `InputGroup`
+from `InputGroup.Button`. Pass `href` when the
+action is really navigation — the component forwards it and renders an anchor,
+which keeps middle-click and open-in-new-tab working.
+
+**`ButtonGroup`** for two or more actions that read as one control — a toolbar
+above a table, a vertical stack of related commands. It pushes `size`, `style`
+and `fill` down to its children so those props are declared once. Give it
+`ariaLabel`: it renders `role="group"`, and an unnamed group adds a boundary a
+screen reader cannot explain.
+
+### When it is not an action at all
+
+The recurring mistake with buttons is using a button for something that is not
+an action:
+
+| You want | Reach for | Not |
+|---|---|---|
+| A value the user picks | `Select`, `ChoiceGroup` | Buttons with `active` |
+| A menu of things to do | `Dropdown` | A Button that opens a div |
+| Switching between views | `NavTabs`, `NavPills` | A ButtonGroup of two |
+| A setting that applies now | `Switch` | A toggle Button |
+| A status on a row | `Status` | A tiny disabled Button |
+
+`active` on a `Button` adds a CSS class and nothing else. A row of buttons where
+one is `active` looks like a segmented control and announces as three unrelated
+buttons. If you genuinely need a toggle, declare it: unknown props are spread
+onto the rendered element, so `aria-pressed` passes straight through — through a
+button config's `props` object when you are inside a `ButtonGroup`.
+
+### Two things that catch people
+
+**The style lists differ.** `Button` accepts thirteen `style` values, including
+the five SMART curriculum domains (`social-emotional`, `mastering-content`,
+`advocacy`, `relationship`, `technology-tools`) and `default`. `ButtonGroup`
+accepts seven — no `default`, no domains. Its `fill` list is four; `Button`'s is
+five, the extra one being `text`. Set the narrow ones per button.
+
+**Icon-only buttons are small.** With no `text` and no children, `Button`
+renders a square: 28×28 at `small`, 36×36 at `medium`, 48×48 at `large`. Only
+`large` clears the 44×44 minimum in
+`design-system/guidelines/foundations/accessibility.md`, and none of them get an
+accessible name on their own — a string `leadingVisual` renders as an
+`aria-hidden` icon.
 
 ## Related
 

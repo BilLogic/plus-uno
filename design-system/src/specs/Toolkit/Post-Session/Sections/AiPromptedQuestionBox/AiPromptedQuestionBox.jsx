@@ -1,7 +1,7 @@
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import Textarea from '@/components/forms-and-inputs/Textarea';
-import Spinner from '@/components/status-and-loading/Spinner';
+import Spinner from '@/components/loading/Spinner';
 import { PRIVACY_WARNING } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 import SparkleIcon from './SparkleIcon';
 

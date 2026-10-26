@@ -135,6 +135,7 @@ import {
 } from "./rules";
 import type { CardTodoDetector } from "./todo";
 import type { GapNotes } from "../usage/gap-notes";
+import { isActive as isActivePerson, isActiveName, type ActivePeople } from "../usage/roles";
 import { CARD_WINDOW_WORDS, MAX_CARD_TTL_MS, cardExpiresAt } from "../card-expiry";
 
 /** New card follow-ups one end of day keeps; the rest wait a night. */
@@ -180,6 +181,9 @@ export interface CardPeople {
   slackIdForNotionUser(notionUserId: string, name?: string): Promise<string | null>;
   slackIdForName(name: string): Promise<string | null>;
   notionUserForSlack(slackUserId: string): Promise<string | null>;
+  /** Who may be tagged or named (`../usage/roles.ts` `isActive`), read once
+   *  for the life of the object; nobody when the read fails. */
+  active(): Promise<ActivePeople>;
 }
 
 export interface FollowThroughConfig extends ChannelIds {
@@ -220,7 +224,7 @@ export interface ScanSkips {
 
 export interface ScanDeps extends Pick<JobContext, "runDate"> {
   reads: Pick<CardReads, "activeCards" | "lastCommentAt" | "botUserId">;
-  people: Pick<CardPeople, "slackIdForNotionUser">;
+  people: Pick<CardPeople, "slackIdForNotionUser" | "active">;
   store: CommitmentStore;
   skips?: ScanSkips;
   config: FollowThroughConfig;
@@ -326,8 +330,9 @@ async function scanCard(
     skips[id] = now + SKIP_RECHECK_MS;
     return null;
   }
-  const { people, unmatched, unnamed } = await ownersOf(card, condition, deps.people);
+  const { people, unmatched, unnamed, inactive } = await ownersOf(card, condition, deps.people);
   const who = condition === "unowned" ? "creator" : "Contributor";
+  if (inactive.length) console.warn(`[follow-through] ${card.pageId}: ${who} not active on Team Members, so not asked: ${inactive.join(", ")}`);
   // Logged by name — or by Notion user id, for one with no name — and never
   // dropped silently. Only names reach the card; an id stays in the log.
   const missing = [...unmatched, ...unnamed];
@@ -337,7 +342,10 @@ async function scanCard(
   }
   if (!people.length) {
     // Never a default to the lead: nobody to ask is no message.
-    notes.push(`${card.pageId}: no ${who} found in Slack${missing.length ? `: ${missing.join(", ")}` : ""}`);
+    // Only people who have left: say so. Anyone else unmatched: not in Slack.
+    const onlyLeft = inactive.length > 0 && missing.length === 0;
+    const none = onlyLeft ? "active on Team Members" : `found in Slack${missing.length ? `: ${missing.join(", ")}` : ""}`;
+    notes.push(`${card.pageId}: no ${who} ${none}`);
     skips[id] = now + SKIP_RECHECK_MS;
     return null;
   }
@@ -398,30 +406,40 @@ export function cardPlace(card: Pick<ActiveCard, "url" | "title" | "pillars">, c
 }
 
 /** F4 asks the card's creator; F5 its Contributors, in the card's order —
- *  each through the directory, then by name. Who neither found is `unmatched`
- *  by name, or `unnamed` by Notion user id when Notion gave no name — a
- *  creator always, since the card does not carry their name. */
+ *  each through the directory, then by name, and only someone active on
+ *  Team Members (#1361). Who neither found is `unmatched` by name — only an
+ *  active row's name, since the card names them — or `unnamed` by Notion
+ *  user id when Notion gave no name, a creator always, since the card does
+ *  not carry their name. Someone who has left PLUS, or has no row, is
+ *  `inactive`: logged, never asked or named. */
 async function ownersOf(
   card: ActiveCard,
   condition: CardCondition,
   people: ScanDeps["people"],
-): Promise<{ people: string[]; unmatched: string[]; unnamed: string[] }> {
+): Promise<{ people: string[]; unmatched: string[]; unnamed: string[]; inactive: string[] }> {
+  const active = await people.active();
   if (condition === "unowned") {
-    if (!card.creatorId) return { people: [], unmatched: [], unnamed: [] };
-    const creator = await people.slackIdForNotionUser(card.creatorId);
-    return { people: creator ? [creator] : [], unmatched: [], unnamed: creator ? [] : [card.creatorId] };
+    if (!card.creatorId) return { people: [], unmatched: [], unnamed: [], inactive: [] };
+    const found = await people.slackIdForNotionUser(card.creatorId);
+    if (found && isActivePerson(found, active)) return { people: [found], unmatched: [], unnamed: [], inactive: [] };
+    // Logged by Notion user id either way: the card does not carry the creator's name.
+    return { people: [], unmatched: [], unnamed: found ? [] : [card.creatorId], inactive: found ? [card.creatorId] : [] };
   }
   const ids: string[] = [];
   const unmatched: string[] = [];
   const unnamed: string[] = [];
+  const inactive: string[] = [];
   for (const c of card.contributors) {
     const id = await people.slackIdForNotionUser(c.id, c.name);
-    if (id) {
+    const name = c.name.trim();
+    if (id && isActivePerson(id, active)) {
       if (!ids.includes(id)) ids.push(id);
-    } else if (c.name.trim()) unmatched.push(c.name.trim());
+    } else if (name && isActiveName(name, active)) unmatched.push(name);
+    // Found in Slack but not active: logged as inactive, by name or by id.
+    else if (name || id) inactive.push(name || c.id);
     else unnamed.push(c.id);
   }
-  return { people: ids, unmatched, unnamed };
+  return { people: ids, unmatched, unnamed, inactive };
 }
 
 // ── End of day: card to-dos (F3) ─────────────────────────────────────────────
@@ -602,7 +620,7 @@ export interface ReadNote {
 export function cardTodoNoteHook(
   deps: Pick<TodoDeps, "detector" | "store" | "now" | "dryRun" | "runDate"> & {
     config: FollowThroughConfig;
-    people: Pick<CardPeople, "slackIdForName">;
+    people: Pick<CardPeople, "slackIdForName" | "active">;
   },
 ): (note: ReadNote) => Promise<void> {
   return async (note) => {
@@ -615,7 +633,9 @@ export function cardTodoNoteHook(
       for (const t of found.todos) {
         const entry = note.entries[Number(t.messageTs.split(".")[0]) - 1];
         if (!entry) continue;
-        const assignee = t.assigneeName ? await deps.people.slackIdForName(t.assigneeName) : null;
+        // An assignee who is not active is nobody: the note's takers are asked.
+        const assigneeId = t.assigneeName ? await deps.people.slackIdForName(t.assigneeName) : null;
+        const assignee = assigneeId && isActivePerson(assigneeId, await deps.people.active()) ? assigneeId : null;
         todos.push({ blockId: entry.id, assignee, what: t.what });
       }
       const meetingAt = Math.min(...note.entries.map((e) => e.at).filter(Number.isFinite));

@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { Button, Count, Status } from '@/components';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
-    title: 'Components/Navigation/Sidebar Tab',
+    title: 'Components/Navigation/Sidebar tab',
     component: SidebarTab,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -19,6 +24,11 @@ export default {
         text: { control: 'text', table: { category: 'Content' } },
         leadingVisual: { control: 'boolean', table: { category: 'Content' } },
         trailingVisual: { control: 'boolean', table: { category: 'Content' } },
+        description: { control: 'text', table: { category: 'Content' } },
+        elemAfter: { control: false, table: { category: 'Content' } },
+        actionsOnHover: { control: false, table: { category: 'Content' } },
+        href: { control: 'text', table: { category: 'Behavior' } },
+        external: { control: 'boolean', table: { category: 'Behavior' } },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -40,10 +50,10 @@ export default {
 
 const sidebarSurface = {
     display: 'inline-flex',
-    backgroundColor: 'var(--color-surface-container)',
+    backgroundColor: 'var(--ds-surface-sunken)',
     padding: '12px',
     borderRadius: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: 'var(--size-element-border) solid var(--ds-border)',
 };
 
 export const InSidebar = () => {
@@ -77,6 +87,19 @@ InSidebar.parameters = {
         disable: true
     }
 };
+/** Each row is the 32 item height, pads 12 at the sides, and draws a 16 icon. */
+InSidebar.play = async ({ canvasElement }) => {
+    const rows = within(canvasElement).getAllByRole('button');
+    for (const row of rows) {
+        const style = getComputedStyle(row);
+        await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(px(style.paddingLeft), 'pad-x').toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md'), 0);
+        await expect(px(style.borderTopLeftRadius), 'radius').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-md'), 0);
+        const icon = row.querySelector('i');
+        await expect(icon.parentElement.getBoundingClientRect().width, 'icon box').toBeCloseTo(tokenLength(canvasElement, '--icon-md'), 0);
+        await expect(px(getComputedStyle(icon).fontSize), 'icon size').toBeCloseTo(tokenLength(canvasElement, '--icon-md'), 0);
+    }
+};
 
 export const Default = {
     args: {
@@ -105,6 +128,11 @@ export const Selected = {
         text: 'Dashboard',
         icon: 'home',
         state: 'selected',
+    },
+    /** The selected row says which page you are on, not only how it looks. */
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: 'Dashboard' });
+        await expect(row).toHaveAttribute('aria-current', 'page');
     },
 };
 
@@ -148,4 +176,199 @@ export const Interactive = {
         trailingVisual: false,
     },
     render: (args) => <SidebarTab {...args} />,
+};
+
+/* ------------------------------------------------------------- slots and behavior */
+
+/** A row that fits the 240 sidebar's 224 content width. */
+const sidebarWidth = { width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))' };
+
+/** Tabbing onto a row draws the 2px focused ring, 2px outside the row. */
+export const KeyboardFocus = {
+    args: { text: 'Reports', icon: 'chart-bar' },
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: 'Reports' });
+        await userEvent.tab();
+        await expect(document.activeElement).toBe(row);
+        await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
+        await expect(px(getComputedStyle(row).outlineWidth), 'ring width').toBe(2);
+        await expect(getComputedStyle(row).outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(px(getComputedStyle(row).outlineOffset), 'ring offset, outside the row').toBe(2);
+    },
+};
+
+/**
+ * In every color mode, on the frame's sunken backdrop: a resting row is the
+ * subtle text and icon, hovering moves it to the neutral subtle step, a
+ * selected row is the neutral selected fill with the selected text and icon
+ * and a medium-weight label, with no leading bar, a disabled row the disabled text,
+ * and focus the focused ring 2px outside.
+ */
+export const ColorModes = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ ...sidebarSurface, ...sidebarWidth, flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <SidebarTab text="Dashboard" icon="house" />
+            <SidebarTab text="Lessons" icon="book-open" state="selected" />
+            <SidebarTab text="Settings" icon="gear" state="disabled" />
+            <SidebarTab text="Reports" icon="chart-bar" state="focus" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = (name) => {
+            const el = within(canvasElement).getByText(name).closest('.plus-sidebar-tab');
+            el.style.transition = 'none';
+            return el;
+        };
+        const icon = (el) => el.querySelector('.plus-sidebar-tab__icon');
+        const label = (el) => el.querySelector('.plus-sidebar-tab__label');
+        const weight = (token) => getComputedStyle(canvasElement).getPropertyValue(token).trim();
+        const [rest, selected, disabled, focus] = ['Dashboard', 'Lessons', 'Settings', 'Reports'].map(row);
+        await inEveryColorMode(async (mode) => {
+            const color = (token) => tokenColor(canvasElement, token);
+            await expect(getComputedStyle(rest).color, `${mode}: resting text`).toBe(color('--ds-text-subtle'));
+            await expect(getComputedStyle(icon(rest)).color, `${mode}: resting icon`).toBe(color('--ds-icon-subtle'));
+            await expect(withForcedPseudo(rest, ':hover', () => getComputedStyle(rest).backgroundColor), `${mode}: hover`)
+                .toBe(color('--ds-background-neutral-subtle-hovered'));
+            await expect(getComputedStyle(selected).backgroundColor, `${mode}: selected fill`).toBe(color('--ds-background-selected'));
+            await expect(getComputedStyle(selected).color, `${mode}: selected text`).toBe(color('--ds-text-selected'));
+            await expect(getComputedStyle(icon(selected)).color, `${mode}: selected icon`).toBe(color('--ds-icon-selected'));
+            await expect(getComputedStyle(selected).boxShadow, `${mode}: no leading bar`).toBe('none');
+            await expect(getComputedStyle(label(selected)).fontWeight, `${mode}: selected label weight`).toBe(weight('--type-weight-medium'));
+            await expect(getComputedStyle(label(rest)).fontWeight, `${mode}: resting label weight`).toBe(weight('--type-weight-regular'));
+            await expect(getComputedStyle(disabled).color, `${mode}: disabled text`).toBe(color('--ds-text-disabled'));
+            await expect(getComputedStyle(focus).outlineColor, `${mode}: focus ring`).toBe(color('--ds-border-focused'));
+        });
+    },
+};
+
+/** A label longer than the row ends in an ellipsis; the row stays 32. */
+export const LongLabel = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Session reflections and post-session feedback for every student" icon="clipboard" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button');
+        const label = row.querySelector('.plus-sidebar-tab__label');
+        await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        await expect(getComputedStyle(label).textOverflow).toBe('ellipsis');
+        await expect(label.scrollWidth, 'the label overflows and is clipped').toBeGreaterThan(label.clientWidth);
+    },
+};
+
+/** An optional second line under the label, in Body small. */
+export const WithDescription = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Sessions" icon="calendar-alt" description="3 upcoming this week" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByRole('button', { name: /Sessions/ });
+        const description = within(row).getByText('3 upcoming this week');
+        await expect(description).toHaveClass('plus-sidebar-tab__description');
+        await expect(getComputedStyle(description).font, 'Body small').toBe(probe(canvasElement, 'font', 'var(--body-small)'));
+        // 2 + 20 + 16 + 2: the Figma row's min height 32 grows to 40.
+        await expect(row.getBoundingClientRect().height, 'grows to 40').toBeCloseTo(
+            2 * tokenLength(canvasElement, '--element-pad-y-sm') + tokenLength(canvasElement, '--line-height-125') + tokenLength(canvasElement, '--line-height-100'), 0,
+        );
+    },
+};
+
+/** `elemAfter` holds a count, a badge or a status at the end of the row. */
+export const WithElemAfter = {
+    render: () => (
+        <div style={{ ...sidebarWidth, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <SidebarTab text="Sessions" icon="calendar-alt" elemAfter={<Count value={3} label="3 upcoming" />} />
+            <SidebarTab text="Students" icon="user-graduate" elemAfter={<Status style="success">Live</Status>} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const rows = within(canvasElement).getAllByRole('button');
+        for (const row of rows) {
+            await expect(row.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+            await expect(row.querySelector('.plus-sidebar-tab__after'), 'the slot renders').not.toBeNull();
+        }
+        await expect(within(rows[1]).getByText('Live')).toBeInTheDocument();
+    },
+};
+
+const onRowClick = fn();
+const onMore = fn();
+
+/**
+ * `actionsOnHover` shows on hover and while the row has focus. The actions are
+ * the row's siblings, not its children, so a button never nests in a button
+ * and pressing an action does not open the row.
+ */
+export const WithActionsOnHover = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab
+                text="Sessions"
+                icon="calendar-alt"
+                onClick={onRowClick}
+                elemAfter={<Count value={3} label="3 upcoming" />}
+                actionsOnHover={<Button style="default" fill="ghost" size="small" leadingVisual="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        onRowClick.mockClear();
+        onMore.mockClear();
+        const canvas = within(canvasElement);
+        const row = canvas.getByRole('button', { name: /^Sessions/ });
+        const actions = canvasElement.querySelector('.plus-sidebar-tab__actions');
+        await expect(row.contains(actions), 'actions sit beside the row, not inside it').toBe(false);
+        // At rest means no pointer over the item: the runner's real pointer can
+        // be left wherever the last story put it.
+        if (!actions.parentElement.matches(':hover')) {
+            await expect(getComputedStyle(actions).visibility, 'hidden at rest').toBe('hidden');
+        }
+
+        await userEvent.tab();
+        await expect(document.activeElement).toBe(row);
+        await waitFor(() => expect(getComputedStyle(actions).visibility, 'shown while the row has focus').toBe('visible'));
+
+        await userEvent.tab();
+        const more = canvas.getByRole('button', { name: 'More actions for Sessions' });
+        await expect(document.activeElement).toBe(more);
+        await userEvent.click(more);
+        await expect(onMore).toHaveBeenCalledTimes(1);
+        await expect(onRowClick).not.toHaveBeenCalled();
+    },
+};
+
+/** An external destination is a link that opens a new tab, and says so. */
+export const ExternalLink = {
+    render: () => (
+        <div style={sidebarWidth}>
+            <SidebarTab text="Slack" icon="arrow-up-right-from-square" href="https://slack.com/" external />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const link = within(canvasElement).getByRole('link', { name: /Slack/ });
+        await expect(link).toHaveAttribute('href', 'https://slack.com/');
+        await expect(link).toHaveAttribute('target', '_blank');
+        await expect(link.getAttribute('rel')).toContain('noopener');
+        await expect(link).toHaveAccessibleName(/opens in a new tab/i);
+        await expect(link.getBoundingClientRect().height, 'row height').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+    },
+};
+
+/** A disabled row is announced, takes no tab stop and ignores a press. */
+export const DisabledIsInert = {
+    render: () => <SidebarTab text="Settings" icon="cog" state="disabled" onClick={onRowClick} />,
+    parameters: { docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        onRowClick.mockClear();
+        const row = within(canvasElement).getByRole('button', { name: 'Settings' });
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(row).toHaveAttribute('tabindex', '-1');
+        await userEvent.click(row);
+        await expect(onRowClick).not.toHaveBeenCalled();
+    },
 };

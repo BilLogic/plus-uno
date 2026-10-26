@@ -86,15 +86,15 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`design-system/guidelines/components/actions.md`](design-system/guidelines/components/actions.md) | Which action component to reach for — Button and ButtonGroup, and what neither of them is |
 | [`design-system/guidelines/components/changelog.md`](design-system/guidelines/components/changelog.md) | How a component records what changed about it — starting empty on 2026-08-26, never backfilled |
-| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
+| [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
+| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status, Count, Tag, TagGroup, Suggestion and AI label — and the deprecated Badge it replaces |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | Nine container components sorted by what is being contained, plus the three pairs that get confused |
+| [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
 | [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Six navigation components sorted by what the user is moving between |
-| [`design-system/guidelines/components/overlays.md`](design-system/guidelines/components/overlays.md) | Tooltip or Popover — hover description versus click-triggered content |
+| [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popover (Popup) — hover description versus click-triggered content |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
-| [`design-system/guidelines/components/status-and-loading.md`](design-system/guidelines/components/status-and-loading.md) | Badge, Progress or Spinner — labeling state versus showing work in flight |
 | [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
 | [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
@@ -111,6 +111,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/accessibility.md`](design-system/guidelines/foundations/accessibility.md) | WCAG 2.1 AA is the minimum bar for all PLUS interfaces |
 | [`design-system/guidelines/foundations/border.md`](design-system/guidelines/foundations/border.md) | Border widths and their semantic tokens |
+| [`design-system/guidelines/foundations/color-migration.md`](design-system/guidelines/foundations/color-migration.md) | How to move one component from the legacy color tokens onto the --ds- tokens, end to end |
 | [`design-system/guidelines/foundations/color.md`](design-system/guidelines/foundations/color.md) | The PLUS Design System follows Material Design 3 color guidance |
 | [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
 | [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
@@ -119,7 +120,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/elevation.md`](design-system/guidelines/foundations/elevation.md) | Elevation creates visual hierarchy through shadows |
-| [`design-system/guidelines/foundations/grid.md`](design-system/guidelines/foundations/grid.md) | The PLUS Design System uses a fluid 12-column grid that adapts to the container width |
+| [`design-system/guidelines/foundations/grid.md`](design-system/guidelines/foundations/grid.md) | PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Overlay layer for modals and overlays, the content grid inside the surface and the only grid a page frame carries |
 | [`design-system/guidelines/foundations/iconography.md`](design-system/guidelines/foundations/iconography.md) | This design system uses FontAwesome Free icons via the string shorthand |
 | [`design-system/guidelines/foundations/illustrations.md`](design-system/guidelines/foundations/illustrations.md) | Illustration style, when to reach for one, and where the assets live |
 | [`design-system/guidelines/foundations/logos.md`](design-system/guidelines/foundations/logos.md) | The PLUS marks, their clear space, and their permitted variants |
@@ -186,10 +187,11 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md`](docs/adr/028-a-tier-is-model-plus-thinking-level-moving-together.md) | On the Gemini lane a tier is one named configuration of model PLUS thinking level — chill low, default medium, grind high — reversing the 2026-08-07 call to pin one dial; attribution comes from changing one tier at a time (2026-09-04) |
 | [`docs/adr/029-in-place-block-replacement-behind-the-gate.md`](docs/adr/029-in-place-block-replacement-behind-the-gate.md) | uno-bot may rewrite a named Notion block in place — keyed by a block id plus the last-edited stamp seen at read, behind the ✅ gate — relaxing the append-only rule that made every correction a contradicting section at the bottom of the page (2026-09-15) |
 | [`docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md`](docs/adr/030-the-usage-record-lives-in-d1-not-analytics-engine.md) | uno-bot's per-turn usage record is a D1 (SQLite) database, uno-bot-usage, rather than Workers Analytics Engine — rows are updated after the turn, every metric is re-runnable SQL, and nothing may be sampled or expire mid-window; with what the database is for and what it never stores (2026-09-29) |
-| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14) |
+| [`docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md`](docs/adr/031-a-run-with-no-requester-is-bounded-by-its-evidence.md) | A scheduled run has no requester whose visibility bounds it, so each finding's own evidence does — a private channel's finding stays in it, a group DM's goes back to it and leaves only as a reworded note on a separate share card someone there ✅s, and mixed evidence is private (2026-09-29); a file in one of the six PLUS Figma teams counts like a public design channel (amended 2026-09-30, #891); a finding with no thread goes to its team's channel, by the card's pillar else the Figma file's team, before #plus-design (amended 2026-10-14); it names only a design owner active on Team Members, never a Figma file's creator (amended 2026-10-19, #1361) |
 | [`docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md`](docs/adr/032-a-cron-may-read-with-a-persons-own-token-only-for-them.md) | A scheduled job with no requester may read with a person's own Slack token only after that person opted in, only after the live token's granted scopes check out, and only to tell that person — in their DM with uno-bot, never anyone else — keeping a permalink, a due time and a state and nothing of the message (2026-09-30) |
 | [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
 | [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; it may delete through the delete RPCs, and every row it causes in authoring_changes reads author uno-bot; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
+| [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -218,6 +220,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-147 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+149 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

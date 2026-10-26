@@ -38,8 +38,8 @@ import { fakeProvider, type FakeProvider } from "../src/agent/providers/fake";
 import type { FigmaNode } from "../src/integrations/figma-reading";
 import { githubInert, matchPillar, NEUTRAL_SETTLED } from "../src/figma-drift/draft";
 import { answersLegacyDriftCard, fileKeyOf, LEGACY_DRIFT_KEY } from "../src/figma-drift/finding";
-import { itemProposalKey, itemText, settleItem, type ReportMessage } from "../src/slack/decision-cards";
-import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
+import { itemProposalKey, settleItem, type ReportMessage } from "../src/slack/decision-cards";
+import { runReviewDecision, runReviewOpen, type ReviewDoorDeps } from "../src/slack/review-door";
 import { recordingDelivery } from "../src/turn/index";
 import { proposalReplyThread, type PendingProposal } from "../src/thread-state/index";
 import { recordingViews } from "./helpers/recording-slack";
@@ -48,6 +48,8 @@ import { renderGateNote } from "../src/slack/gate-note";
 import { proposalEvent, recordProposalEvents } from "../src/usage/index";
 import { messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { mentionCount, notified } from "./helpers/notified";
+import { activeFrom, EVERYONE_ACTIVE } from "./helpers/team";
+import type { ActivePeople } from "../src/usage/roles";
 import { at, DESIGN, memoryRunStorage, msg, notionPage, sweepHarness, ts, UNO_BOT, type SweepHarness } from "./helpers/sweep-harness";
 import { cardExpiresAt } from "../src/card-expiry";
 
@@ -215,7 +217,7 @@ const NOT_SHOWN = JSON.stringify({ shows: false, confidence: 0.9 });
 function morning(
   h: SweepHarness,
   drifts: InMemoryDriftStore,
-  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string> } = {},
+  opts: FileOpts & { options?: string[] | null; dryRun?: boolean; judge?: string[]; figmaPeople?: Record<string, string>; active?: ActivePeople } = {},
 ): {
   deps: DriftPostDeps;
   run(): Promise<Awaited<ReturnType<typeof runDriftAsks>>>;
@@ -253,6 +255,7 @@ function morning(
     now: () => h.clock.now,
     ...(opts.dryRun ? { dryRun: true } : {}),
     ...(opts.figmaPeople ? { figmaPeople: async () => opts.figmaPeople! } : {}),
+    active: async () => opts.active ?? EVERYONE_ACTIVE,
   };
   const hooks: { stage: DriftSectionDeps["stage"] } = {
     async stage(proposal, channelKind) {
@@ -452,6 +455,43 @@ describe("a Figma drift at the morning run", () => {
     const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
     assert.deepEqual(proposal!.confirmers, ["U0BEA", "U0STARTER", "U0ADE"]);
     assert.match(JSON.stringify(proposal!.operations), /Last published by cy<designs>/);
+  });
+
+  it("names a publisher only while their Team Members row is active: never one who left, or one with no row (#1361)", async () => {
+    const publisher = { handle: "Cy Diaz", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" };
+    for (const [active, onCard] of [
+      [activeFrom([{ name: "Cy Diaz", slack: "U0CY" }]), true],
+      [activeFrom([{ name: "Cy Diaz", slack: "U0CY", affiliation: "Past Collaborators" }]), false],
+      [activeFrom([], [{ id: "U0CY", real_name: "Cy Diaz" }]), false],
+    ] as const) {
+      const t = await sweptRecap();
+      const m = morning(t.h, t.drifts, { publisher, figmaPeople: { "1105000000000000003": "U0CY" }, active });
+      await m.run();
+      const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+      if (onCard) {
+        assert.match(cardsOf(m.posted[0]!.blocks)[0]!.subtitle!.text, /published by Cy Diaz/);
+        assert.ok(proposal!.confirmers?.includes("U0CY"));
+        assert.match(JSON.stringify(proposal!.operations), /Last published by Cy Diaz/);
+      } else {
+        assert.doesNotMatch(JSON.stringify(m.posted), /Cy Diaz/, "not on the card");
+        assert.ok(!proposal!.confirmers?.includes("U0CY"), "and no say");
+        assert.doesNotMatch(JSON.stringify(proposal!.operations), /Last published by/, "not on the intake either");
+      }
+    }
+  });
+
+  it("names a publisher the directory does not map on the intake only by an active row's name", async () => {
+    for (const [active, named] of [
+      [activeFrom([{ name: "Cy Diaz" }]), true],
+      [activeFrom([{ name: "Cy Diaz", affiliation: "Past Collaborators" }]), false],
+      [activeFrom([]), false],
+    ] as const) {
+      const t = await sweptRecap();
+      const m = morning(t.h, t.drifts, { publisher: { handle: "Cy Diaz", at: "2026-09-20T10:00:00Z", id: "1105000000000000003" }, figmaPeople: {}, active });
+      await m.run();
+      const [proposal] = await t.h.threadState.getProposalsByChannel(DESIGN);
+      assert.equal(/Last published by Cy Diaz/.test(JSON.stringify(proposal!.operations)), named);
+    }
   });
 
   it("names no one for a file with no named version", async () => {
@@ -817,8 +857,9 @@ function recheck(
     store: drifts,
     figma,
     judge: typeof opts.judge === "function" ? opts.judge : modelFrameJudge(provider),
-    async retire(ts) {
-      return (await h.threadState.retireProposal(ts)).retired;
+    // As the Worker binds it (`figma-drift/env.ts`): closed as withdrawn, with why.
+    async retire(ts, why) {
+      return (await h.threadState.retireProposal(ts, { decision: "withdrawn", reason: why })).retired;
     },
     async edit(channel, ts, message) {
       edits.push({ channel, ts, text: message.text, blocks: message.blocks });
@@ -980,7 +1021,11 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.equal(card!.subtitle!.text, "Updated Sep 30. Nothing to do.");
     assert.deepEqual(labels(card!), ["Open in Figma"], "no Review: nothing left to decide");
     assert.equal(m.posted.length, 1, "edited, not replied to");
-    assert.notEqual((await h.threadState.getProposalByTs(key)).state, "found", "retired: no Approve can file it");
+    const look = await h.threadState.getProposalByTs(key);
+    assert.notEqual(look.state, "found", "retired: no Approve can file it");
+    // Kept as withdrawn, with what its card now says, so its draft is never lost (#1362).
+    assert.ok(look.state === "none" && look.decided);
+    assert.deepEqual([look.decided.decision, look.decided.reason], ["withdrawn", "Updated Sep 30. Nothing to do."]);
     const events = await h.proposalEvents.eventsOf(key);
     assert.deepEqual(events.map((e) => [e.event, e.via, e.actorId]), [
       ["staged", "worker", null],
@@ -1425,9 +1470,10 @@ describe("a drift card decided in Review", () => {
     await m.run();
     const [report] = m.posted;
     const updates: Array<{ ts: string; message: { blocks: unknown[] } }> = [];
+    const views = recordingViews({ alreadyOpen: ["V1"] });
     const deps: ReviewDoorDeps = {
       threadState: h.threadState,
-      views: recordingViews({ alreadyOpen: ["V1"] }).client,
+      views: views.client,
       delivery: () => recordingDelivery(),
       applyVerdict: async () => [],
       updateCard: async (_channel, ts, message) => void updates.push({ ts, message }),
@@ -1444,7 +1490,12 @@ describe("a drift card decided in Review", () => {
     assert.equal(card!.subtitle!.text, "Rejected by <@U0BEA>");
     assert.equal(card!.body!.text, "Nothing written. Reason: Already updated");
     assert.deepEqual(labels(card!), ["View", "Open in Figma"]);
-    assert.match(itemText((await h.threadState.getReport(report!.ts))!, "drift-1") ?? "", /Reason: Already updated$/, "View shows it too");
+    // View draws the draft it was decided on, with the reason (#1362).
+    await runReviewOpen({ triggerId: "T", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "drift-1"), userId: "U0ADE", item: { messageTs: report!.ts, id: "drift-1" } }, deps);
+    const view = JSON.stringify(views.calls.at(-1)!.view);
+    assert.match(view, /"text":"Rejected\."/);
+    assert.match(view, /: Already updated/, "View shows the reason too");
+    assert.doesNotMatch(view, /Nothing written\. Reason/, "from the draft, not the card's words");
   });
 });
 

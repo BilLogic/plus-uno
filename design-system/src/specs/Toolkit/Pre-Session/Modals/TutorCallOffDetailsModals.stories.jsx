@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
 
 import {
     CloseButton,
@@ -163,7 +163,7 @@ export const PreReview_WithdrawRequest = () => (
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,
-                            color: 'var(--color-warning)'
+                            color: 'var(--color-warning-icon)'
                         }}
                     />
 

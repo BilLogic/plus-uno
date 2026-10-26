@@ -1,6 +1,6 @@
 import React from 'react';
 import PatternModal from '@/patterns/PatternModal';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 
 const modalFrame = { maxWidth: '480px', width: '100%' };
 
@@ -31,7 +31,7 @@ const footerActions = (
 function PatternModalScrollDemo() {
     return (
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MAX HEIGHT + INTERNAL SCROLL</span>
+            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">MAX HEIGHT + INTERNAL SCROLL</span>
             <div style={modalFrame}>
                 <PatternModal
                     title="Scrollable modal"

@@ -86,7 +86,7 @@ import { proposalCardBlocks, renderProposalCard } from "../slack/proposal-render
 import { refusedForBlocks } from "../slack/delivery";
 import { parseSlackCanvasId } from "../slack/canvas-reference";
 import { threadStateFor } from "../thread-state/production";
-import { notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
+import { activePeopleFor, notionPeopleFor, proposalEventLogFor, teamRolesFor } from "../usage/production";
 import { executeReadSource } from "../tools/read-source";
 import { figmaCommentsFor } from "../figma-comments/env";
 import { FIGMA_DECISIONS_SECTION, type FigmaDecisionsHanded } from "../figma-comments/post";
@@ -263,6 +263,7 @@ async function sweepDepsFor(
           return null;
         }
       },
+      active: activePeopleFor(env),
     },
     detector: { detect: (input) => measured(() => detector.detect(input)) },
     capture: {
@@ -340,9 +341,10 @@ async function sweepDepsFor(
         return (await threadStateFor(env).getProposalsByChannel(channel)).filter((p) => !!p.sweepRun);
       },
       async withdraw(channel, ts, text, cardKey, proposalKeys) {
-        // Out of reach first: a report that says it didn't go through can't be decided.
+        // Out of reach first: a report that says it didn't go through can't be
+        // decided. Closed as withdrawn, so View still draws each fix.
         const store = threadStateFor(env);
-        for (const key of proposalKeys) await store.retireProposal(key);
+        for (const key of proposalKeys) await store.retireProposal(key, { decision: "withdrawn", reason: text });
         await updateMessage(env, {
           channel,
           ts,

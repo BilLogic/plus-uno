@@ -7,7 +7,8 @@ summary: Six navigation components sorted by what the user is moving between
 # Navigation — which component to reach for
 
 Six components: `Breadcrumb`, `NavTabs`, `NavPills`, `SidebarTab`, `Pagination`,
-`Scrollspy`. Generated facts are in
+`Scrollspy`. Storybook titles `Breadcrumb` and `NavTabs` with
+Atlassian's names, Breadcrumbs and Tabs. Generated facts are in
 `design-system/src/components/navigation/index.md`. Sort them by what the user is
 moving between.
 

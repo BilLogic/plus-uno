@@ -45,7 +45,8 @@ import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
  *
  * THE BORDERS ARE REPOINTED NOW. 111 of the 137 border declarations moved onto
  * `-border` on 2026-08-29, and `npm run check:intent-roles` keeps them there;
- * the remaining 26 are recorded with a reason in
+ * the warning edges followed on 2026-10-24, when warning's icon and border were
+ * settled on #715c00, and what remains is recorded with a reason in
  * `scripts/baselines/intent-role-adoption.json`. Six of the seven roles alias their
  * base, so those 111 changed no pixel — what changed is that an edge now says
  * it is an edge, and the value can move for edges alone. The `-icon` roles
@@ -234,9 +235,10 @@ export const RolesAndBars = () => {
                 against a bar that is written down. Every <code>-border</code> keeps the base, where
                 3:1 is the right bar.
                 <strong> Warning is the exception</strong>: its base falls to 2.87:1 on the darkest
-                ground, under even the border bar, so its <em>border</em> takes
-                <code> #715c00</code> — the value Figma records as <code>Warning/Warning Border</code>.
-                Its icon needs no exception.
+                ground, under even the border bar, so its <em>border</em> and its <em>icon</em> take
+                <code> #715c00</code> — the value Figma records as <code>Warning/Warning Border</code>,
+                which <code>Warning/Warning Icon</code> aliases. It measures 6.50:1 on white and
+                5.02:1 on the darkest ground.
             </p>
             <Matrix rows={icon} bar={AA_NON_TEXT} caption="`-icon`" />
             <Matrix rows={border} bar={AA_NON_TEXT} caption="`-border`" />

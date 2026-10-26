@@ -60,7 +60,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 ## Slots
 
-<DocsCanvasShell description={<>Addons sit in the field's Leading and Trailing slots and draw no box of their own. Buttons are small and cut to the line, so the field stays 34 high.</>}>
+<DocsCanvasShell description={<>Addons sit in the field's Leading and Trailing slots and draw no box of their own. Buttons are the 24 compact button with 4 around them, so the field stays 32 high.</>}>
     <DsCanvasQuiet of={InputGroupStories.AddonsInSlots} />
 </DocsCanvasShell>
 
@@ -80,7 +80,7 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 ## Sizes
 
-<DocsCanvasShell description={<>Small, medium, and large input groups.</>}>
+<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={InputGroupStories.Sizes} />
 </DocsCanvasShell>
 
@@ -132,7 +132,7 @@ one border, so they read as one control.
 `leadingVisual` and `trailingVisual` each take one addon or an array of them
 (Trailing holds two at most): an element, a string shorthand, or an object like
 `{ type: 'button', text: 'Go', onClick }`. Button and dropdown addons are always
-the small size, cut to the field's line, so the field keeps its height. The subcomponents —
+the 24 compact size, centered with 4 around them, so the field stays 32. The subcomponents —
 `InputGroup.Text`, `.Icon`, `.Button`, `.Dropdown`, `.Checkbox`, `.Radio` — are
 what those shorthands build, and can be passed directly.
 
@@ -146,7 +146,7 @@ what those shorthands build, and can be passed directly.
 
 ```jsx
 // The label is associated with the input, and `id` names the input rather than
-// the group (#329). `showLabel={false}` clips it without removing the name.
+// the group. `showLabel={false}` clips it without removing the name.
 <InputGroup id="amount" label="Amount" leadingVisual="£" />
 
 // For a field whose addon is only an icon or a unit, `Input` is the smaller
@@ -182,7 +182,7 @@ generic names "Toggle option" and "Select option". `"button"` is labeled
 ## Accessibility
 
 - **The input takes the name.** `label` associates through `htmlFor`, `id`
-  lands on the input, and extra props are forwarded there too (#329) — so
+  lands on the input, and extra props are forwarded there too — so
   `aria-describedby` reaches the element it describes.
 - **Addon controls are named generically.** The checkbox and radio addons
   default to "Toggle option" and "Select option"; pass `aria-label` in the object

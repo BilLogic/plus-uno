@@ -9,7 +9,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button/Button';
+import { useOpenTabs } from '@/patterns';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import StudentsTable from '@/specs/Admin/Student/Tables/StudentsTable/StudentsTable';
 import StudentOverviewSection from '@/specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection';
@@ -46,6 +47,8 @@ const StudentAdminPage = ({
     onSchoolFilterChange,
     onDateFilterChange,
     onModalChange,
+    openTabParent,
+    openTabHref,
     className = '',
     ...props
 }) => {
@@ -53,6 +56,7 @@ const StudentAdminPage = ({
     const [modalTab, setModalTab] = useState(modalVariant);
     const [selectedStudent, setSelectedStudent] = useState(null);
     const modalBoundaryRef = useRef(null);
+    const openTabs = useOpenTabs();
 
     // Sync modal state with props
     useEffect(() => {
@@ -80,9 +84,42 @@ const StudentAdminPage = ({
     const entriesStart = (currentPage - 1) * 10 + 1;
     const entriesEnd = Math.min(currentPage * 10, totalEntries);
 
+    /*
+     * With `openTabParent`, an opened student is also an open tab under that
+     * sidebar item, and the selected tab is what this page shows: selecting the
+     * tab (here or from another page) opens that student's modal, and closing
+     * the modal or the tab hands the selection back to the parent. The modal is
+     * the same StudentModal either way; nothing about the detail is copied.
+     */
+    const tabPrefix = openTabParent ? `${openTabParent}:` : null;
+    const openedId = tabPrefix && openTabs.selectedId?.startsWith(tabPrefix)
+        ? openTabs.selectedId.slice(tabPrefix.length)
+        : null;
+    const shownByTab = useRef(false);
+    useEffect(() => {
+        if (!tabPrefix) return;
+        const student = openedId ? displayStudents.find((s) => String(s.id) === openedId) : null;
+        if (student) {
+            setSelectedStudent(student);
+            setShowModal(true);
+            shownByTab.current = true;
+        } else if (openedId) {
+            // The tab names a student this list does not hold: nothing to show,
+            // so the selection goes back to the parent rather than hang.
+            openTabs.select(openTabParent);
+        } else if (shownByTab.current) {
+            setShowModal(false);
+            shownByTab.current = false;
+        }
+        // The selection drives this; displayStudents is re-derived every render.
+    }, [tabPrefix, openedId]);
+
     const handleStudentClick = (student) => {
         setSelectedStudent(student);
         setShowModal(true);
+        if (openTabParent) {
+            openTabs.open(openTabParent, { id: String(student.id), title: student.name, href: openTabHref });
+        }
         if (onStudentClick) {
             onStudentClick(student);
         }
@@ -93,6 +130,10 @@ const StudentAdminPage = ({
 
     const handleModalHide = () => {
         setShowModal(false);
+        if (openedId) {
+            shownByTab.current = false;
+            openTabs.select(openTabParent);
+        }
         if (onModalChange) {
             onModalChange(false, modalTab);
         }
@@ -118,7 +159,7 @@ const StudentAdminPage = ({
 
     const sidebarConfig = {
         user: 'supervisor',
-        activeTab: 'students',
+        activeTab: openTabParent || 'students',
     };
 
     // When containModal is set, the modal portal is mounted inside this wrapper
@@ -279,6 +320,14 @@ StudentAdminPage.propTypes = {
     onDateFilterChange: PropTypes.func,
     /** Callback when modal state changes (open, variant) */
     onModalChange: PropTypes.func,
+    /**
+     * Sidebar item that opened students belong to, e.g. `toolkit-students`.
+     * When set, opening a student adds an open tab under it, and selecting that
+     * tab reopens the student. Toolkit › Students uses this page as its stand-in.
+     */
+    openTabParent: PropTypes.string,
+    /** The route the open tabs link to: where this page lives, e.g. `/toolkit/students` */
+    openTabHref: PropTypes.string,
     /** Additional CSS classes */
     className: PropTypes.string,
 };

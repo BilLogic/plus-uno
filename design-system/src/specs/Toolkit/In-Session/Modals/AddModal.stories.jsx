@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import Button from '@/components/actions/Button';
+import Button from '@/components/forms-and-inputs/Button';
 import Select from '@/components/forms-and-inputs/Select';
 
 export default {

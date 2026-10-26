@@ -1,7 +1,7 @@
 import React from 'react';
-import Badge from '@/components/status-and-loading/Badge';
-import Tag from '@/components/status-and-loading/Tag';
-import TagGroup from '@/components/status-and-loading/TagGroup';
+import Badge from '@/components/labels/Badge';
+import Tag from '@/components/labels/Tag';
+import TagGroup from '@/components/labels/TagGroup';
 
 /**
  * A multi Select's picked values inside the field: Tags in a TagGroup

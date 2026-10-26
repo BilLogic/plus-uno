@@ -22,7 +22,7 @@
  *     gone, which is why Code renders a real props table.
  *
  * THE URL. The addon tabs put the active tab in the MANAGER's query string —
- * `?path=/docs/components-actions-button-button--docs&tab=plus-usage`, with Examples
+ * `?path=/docs/components-forms-and-inputs-button-button--docs&tab=plus-usage`, with Examples
  * being the ABSENCE of the param. Measured, not assumed. Those URLs have been
  * shared, so this reads and writes that same param in that same window, and
  * `TABS` keeps the same `plus-*` ids. A `tab` value matching no registered addon
@@ -70,7 +70,7 @@ function readTabParam(win) {
 function writeTabParam(win, id) {
   try {
     // Edited as TEXT, not through `URLSearchParams`. Storybook writes
-    // `?path=/docs/components-actions-button-button--docs` with the slashes unencoded;
+    // `?path=/docs/components-forms-and-inputs-button-button--docs` with the slashes unencoded;
     // a round-trip through `URL` re-encodes them to `%2F`, and while the page
     // still loads, the link a reader copies stops matching the one Storybook
     // produced. Every parameter that is not `tab` keeps its exact bytes.
@@ -138,6 +138,23 @@ function CodeTabPanel({ of }) {
   );
 }
 
+/**
+ * A summary is a plain string authored with markdown inline code
+ * (`components/changelog.md`), so the backtick spans render as `<code>` here
+ * rather than as literal backticks.
+ */
+function renderInlineCode(text) {
+  return String(text)
+    .split(/(`[^`]+`)/)
+    .map((part, i) =>
+      part.length > 2 && part.startsWith('`') && part.endsWith('`') ? (
+        <code key={i}>{part.slice(1, -1)}</code>
+      ) : (
+        part
+      ),
+    );
+}
+
 /** The Changelog tab. Entries come from the story meta, newest first. */
 function ChangelogTabPanel({ entries }) {
   return (
@@ -150,7 +167,7 @@ function ChangelogTabPanel({ entries }) {
               <time dateTime={entry.date}>{entry.date}</time>
               {entry.kind ? <span className="sb-ds-changelog__kind">{entry.kind}</span> : null}
             </dt>
-            <dd>{entry.summary}</dd>
+            <dd>{renderInlineCode(entry.summary)}</dd>
           </React.Fragment>
         ))}
       </dl>

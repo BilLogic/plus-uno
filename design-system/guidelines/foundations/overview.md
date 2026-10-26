@@ -27,6 +27,11 @@ topic, which today only `content/` does.
 | [border.md](border.md) | ✕ | Border widths |
 | [radius.md](radius.md) | ✕ | Corner radius scale |
 
+One file sits outside the fourteen slots on purpose:
+[color-migration.md](color-migration.md), the step-by-step guide for moving a
+component onto the `--ds-` color tokens. It lives only as long as the sweep
+does and is deleted when its generated list of components is empty.
+
 **8 of 14 authored, 1 partial, 5 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no

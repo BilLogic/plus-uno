@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 
 /**
  * Replicates Design System - Web App Specs node 1687-163680: "Manage Assignment" popup.
@@ -48,7 +48,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 1050,
+                zIndex: 'var(--layout-z-index-scrim)',
                 padding: '24px'
             }}
             onClick={(e) => e.target === e.currentTarget && onClose?.()}

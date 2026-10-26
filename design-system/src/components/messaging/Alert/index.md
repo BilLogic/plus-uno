@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-` · `--color-on-surface` · `--font-size-fa-h4-solid` · `--font-weight-medium` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-gap-sm` · `--size-element-stroke-xl` · `--size-modal-radius-sm`
+`--body-default` · `--color-` · `--color-on-surface` · `--font-size-fa-h4-solid` · `--heading-small` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-element-gap-sm` · `--size-element-stroke-xl` · `--size-modal-radius-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Alert/Alert.scss`. Override these through the token layer, never with a literal.
 

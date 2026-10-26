@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import Button from '@/components/actions/Button/Button';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import Badge from '@/components/labels/Badge/Badge';
 import Alert from '@/components/messaging/Alert/Alert';
-import Progress from '@/components/status-and-loading/Progress/Progress';
+import Progress from '@/components/loading/Progress/Progress';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
 import Input from '@/components/forms-and-inputs/Input';
 import { RecommendedLessons } from '@/specs/Home/Cards';
@@ -322,18 +322,18 @@ export default function MonthlyReportContent() {
             style.id = styleId;
             style.textContent = `
                 #spa-shell .plus-page-main::-webkit-scrollbar,
-                #spa-shell .plus-page-content-wrapper::-webkit-scrollbar,
+                #spa-shell .plus-frame__surface::-webkit-scrollbar,
                 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-                #home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar,
+                #home-redesign-page .plus-frame__surface::-webkit-scrollbar,
                 .monthly-report-page-scroller::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
                     background: transparent !important;
                 }
                 #spa-shell .plus-page-main,
-                #spa-shell .plus-page-content-wrapper,
+                #spa-shell .plus-frame__surface,
                 #home-redesign-page .plus-page-main,
-                #home-redesign-page .plus-page-content-wrapper,
+                #home-redesign-page .plus-frame__surface,
                 .monthly-report-page-scroller {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;

@@ -5,9 +5,9 @@ import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
 import { SessionDateInput } from '@/specs/Toolkit/Pre-Session/Elements/NewFormDateInput.stories';
 import { SessionTimeInput } from '@/specs/Toolkit/Pre-Session/Elements/NewFormTimeInput.stories';
 import { Stepper } from '@/specs/Toolkit/Pre-Session/Elements/Steppers.stories';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 import { CancelButton, SaveChangesButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
 export default {

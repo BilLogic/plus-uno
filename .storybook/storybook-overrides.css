@@ -256,13 +256,13 @@ html {
 .sbdocs .docs-story:has(.responsive-frame-root) {
     display: flex !important;
     flex-direction: column !important;
-    min-height: 720px !important;
+    min-height: 720px !important; /* the docs well height, not a design-system size */
 }
 
 .sbdocs .docs-story:has(.responsive-frame-root) > div[scale="1"] {
-    height: 720px !important;
-    min-height: 720px !important;
-    max-height: 720px !important;
+    height: 720px !important; /* the docs well height */
+    min-height: 720px !important; /* the docs well height */
+    max-height: 720px !important; /* the docs well height */
     padding: 0 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -518,7 +518,7 @@ a.sbdocs-a {
  * D1 of #263 — the props table is wider than its column, and Storybook's wrapper
  * does not scroll.
  *
- * Measured on Components/Actions/Button, the same page at four widths:
+ * Measured on Components/Forms and inputs/Button, the same page at four widths:
  *
  *   viewport   table   wrapper   docs body (scroll/client)
  *   1440px     749     750       1140 / 1140
@@ -937,7 +937,7 @@ a.sbdocs-a {
  * `margin-top: -40px` — so the card's bottom 40px is the buttons' band, not
  * breathing room.
  *
- * Measured on Components/Actions/Button, both attached roots:
+ * Measured on Components/Forms and inputs/Button, both attached roots:
  *
  *              actions row?   border T/R/B/L   radius        above/below demo
  *   Overview   yes            1/1/0/1          12/12/0/0     41px / 0px
@@ -1143,4 +1143,30 @@ a.sbdocs-a {
 .sb-ds-changelog__adopted {
     color: var(--color-on-surface-variant, #43474e);
     font-size: var(--font-size-body2, 14px);
+}
+
+/*
+ * Color modes: the canvas follows the mode.
+ *
+ * The Color mode toolbar sets `data-color-mode` on <html> (see
+ * design-system/src/storybook-docs/lib/color-modes.js). A story that paints no
+ * background of its own would otherwise sit on white in dark mode, so in dark
+ * (chosen, or auto under an OS dark preference) the preview body and each
+ * docs-page story block take the page surface, and the text on it moves with
+ * it to color.text (the light rule above pins the legacy ink). The docs page
+ * paints its own background over the body, so its prose stays as it is. Light
+ * is untouched: these selectors match nothing there.
+ */
+html[data-color-mode="dark"] body,
+html[data-color-mode="dark"] .docs-story {
+  background: var(--ds-surface) !important;
+  color: var(--ds-text) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html[data-color-mode="auto"] body,
+  html[data-color-mode="auto"] .docs-story {
+    background: var(--ds-surface) !important;
+    color: var(--ds-text) !important;
+  }
 }

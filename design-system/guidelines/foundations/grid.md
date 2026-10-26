@@ -1,13 +1,22 @@
 ---
-summary: The PLUS Design System uses a fluid 12-column grid that adapts to the container width
+summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Overlay layer for modals and overlays, the content grid inside the surface and the only grid a page frame carries
 ---
 
 <!-- Tier: 2 -->
 
 # Grid
 
-The PLUS Design System uses a **fluid 12-column grid** that adapts to the container width.
-Source of truth: `design-system/src/tokens/_layout.scss`.
+PLUS has **two grids**, both 12 columns (`--layout-columns`) with gutter 16
+(`--layout-gutter`):
+
+- **The screen grid** spans the screen and lives on the Overlay layer only.
+  Modals and overlays size from it.
+- **The content grid** sits inside the surface. Page content aligns to it, and
+  it is the only grid a page frame carries.
+
+Source of truth: the `spacing / layout` collection in Figma, generated into
+`design-system/src/tokens/_frame_layers.scss`. Its modes are Medium (768px) ·
+Large (1024px) · X-Large (1440px); values below are listed in that order.
 
 ## Breakpoints
 
@@ -18,69 +27,115 @@ Source of truth: `design-system/src/tokens/_layout.scss`.
 | `--breakpoint-xl-min` | 1440px |
 | `--breakpoint-xxl-min` | 1920px |
 
-## App shell tokens
+PLUS is desktop only: design and build at 768px and up. A frame changes
+breakpoint by switching its `spacing / layout` mode, never by hand-editing its
+grid.
+
+## The screen grid
+
+Twelve columns across the screen, inside the screen pad, **centered and capped
+at 1232**. It ignores the sidebar, so an overlay sits in the same place whether
+the sidebar is docked or closed.
+
+The screen grid belongs to the **Overlay layer**: in a design file it is set on
+that layer, so it shows when the overlay shows and hides with it. A page frame
+carries the content grid alone. Code draws no grid at all; the Modal reads the
+screen-grid tokens below to size itself.
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-sidebar-width` | 164px | SideNav fixed width (Large and up) |
-| `--layout-grid-gap` | 8px | Content-grid gutter; the `--col-*` spans assume it |
-| `--size-surface-pad-x` | 32px | Content surface horizontal padding |
-| `--size-surface-container-pad-x` | `--size-spacing-medium-space-300` | Outer layout horizontal padding |
+| `--layout-width-screen` | 768 · 1024 · 1440 | The screen each mode is worked at |
+| `--layout-pad-x-screen` | 24 · 24 · 32 | Screen pad, the container pad plus the surface pad |
+| `--layout-width-column-screen` | 45.33 · 66.67 · 88 | One screen-grid column |
 
-## Column spans
+The grid is `clamp(720, screen − 2 × 24, 1232)` wide: 720 · 976 · 1232 at the
+three modes. From 1440 the pad is 32, but there the grid is already at its cap
+with either pad, so the width depends on the screen alone. Past a 1280 screen
+the grid stops growing and centers.
 
-Columns are declared per breakpoint as `--col-1` … `--col-12`, not computed at
-use site. Read the value; do not re-derive it.
+## The content grid
 
-| Column | Medium (768px) | Large (1024px) | X-Large (1440px) |
-|:---|---:|---:|---:|
-| `--col-1` | 48.67px | 55px | 89.67px |
-| `--col-4` | 218.67px | 244px | 382.67px |
-| `--col-6` | 332px | 370px | 578px |
-| `--col-12` | 672px | 748px | 1164px |
+Twelve columns inside the surface, after the sidebar and the surface pad have
+taken their share. Page content (cards, tables, forms, charts) aligns to it.
+
+| Token | Value | Description |
+|:---|:---|:---|
+| `--layout-width-content` | 720 · 744 · 1144 | Content width at each mode's screen |
+| `--layout-width-column` | 45.33 · 47.33 · 80.67 | One content-grid column |
+| `--layout-max-width-content` / `--layout-max-width-reading` | 1232 / 864 | Content cap, centered past it; the reading cap for long-form text |
+| `--layout-min-width-content` | 720 | Content minimum; the surface scrolls sideways under it |
+
+At X-Large the content width is
+`1440 − 240 sidebar, from the screen edge − 8 container pad − 2 × 24 surface pad` = 1144.
+At Medium the sidebar is closed, so the surface starts at the container pad and
+content holds its 720 minimum.
 
 ```css
-/* correct — read the declared span */
-width: var(--col-6);
+/* correct — the content grid from its tokens */
+display: grid;
+grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
+gap: var(--layout-gutter);
 
-/* incorrect — there is no --layout-col-1-width, and hand-derived
-   calc() drifts from _layout.scss the first time a value changes */
-width: calc((100% - (11 * 8px)) / 12);
+/* a child spans whole columns */
+grid-column: span 4;
 ```
 
-## Desktop only
+The per-mode widths step at each breakpoint rather than follow the screen.
+Code that needs the exact width at any screen lays out on the grid itself, as
+above, instead of reading `--layout-width-column`.
 
-MD 768 / LG 1024 / XL 1440 are the designed breakpoints, defined as **modes** on
-the Figma `size / layout` variable collection and as `--breakpoint-*-min` in
-`design-system/src/tokens/_layout.scss`. Design and build at 768px and up.
+## Modal widths
 
-## The two grids (Figma)
+A modal spans **6 · 8 · 10 screen-grid columns**, plus the gutters between them,
+plus its own pad of 16 (`--modal-pad`) on each side:
 
-Both are single mode-adaptive Figma styles, with values bound to `size / layout`
-variables — switch the frame's mode rather than hand-editing or detaching.
+`width = n × --layout-width-column-screen + (n − 1) × --layout-gutter + 2 × --modal-pad`
 
-| Style | Columns | Gutter | Margin / offset | Carried by |
-|:---|:---|:---|:---|:---|
-| `Grid/Viewport (adaptive)` | 12 | 12 / 16 / 16 | 16 / 32 / 32 | full-page frames without the shell |
-| `Grid/Adaptive (12-col)` | 12 | 8px (`--layout-grid-gap`) | offset = `Surface/pad-x` 32 | `Pattern/Surface container` — the content grid |
+| Width | Columns | Medium | Large | X-Large | Token |
+|:---|---:|---:|---:|---:|:---|
+| `sm` | 6 | 384 | 512 | 640 | `--layout-width-modal-sm` |
+| `md` | 8 | 507 | 677 | 848 | `--layout-width-modal-md` |
+| `lg` | 10 | 629 | 843 | 1056 | `--layout-width-modal-lg` |
 
-Column spans come from `Columns/col-1…12` in Figma = `--col-*` in code, and they
-assume the 8px content gutter. Main content width at breakpoint minimums is
-672 / 748 / 1164 — at XL that is `1440 − 32 outer − 164 SideNav − 16 gap − 64 surface pad`.
+The tokens are rounded to a whole pixel. `Modal.scss` works the same formula
+out continuously from the screen width, so a modal grows with the screen
+between breakpoints, stops growing past a 1280 screen, never shrinks below its
+Medium width and ignores the sidebar. The frame and layer token test pins the
+formula to `--layout-width-column-screen` at 768, 1024 and 1440.
+
+Pass `width="sm" | "md" | "lg"` to `<Modal>`; a fixed pixel width ignores the
+screen grid. The modal itself, its overlay and its pads: the Modal component
+docs.
+
+## App shell tokens
+
+The `Frame` pattern draws, from the same file:
+
+| Token | Value | Description |
+|:---|:---|:---|
+| `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
+| `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
+| `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-surface row: 8 while the sidebar is closed, 0 once it docks |
+| `--surface-container-pad` / `--surface-container-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
+| `--surface-pad` | 16 · 16 · 24 | Surface pad, the content grid's margin |
 
 ## Ownership layering
 
-- The **page frame** owns width (bound to `Breakpoints/min width`) and the mode.
-- `Pattern/Surface container` runs on auto mode and **fills** the width it is given: `--color-surface`, Surface-tier pad 32/24, gap 24, radius 16. It carries the grid and the Content slot.
-- **SideNav** is 164px (`--layout-sidebar-width`); its visibility binds to the `Display/*` booleans and it collapses at MD.
+- The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
+- `Pattern/Surface container` (`Frame` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the content grid and the Content slot.
+- The **sidebar** docks by `Sidebar/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
+- The **Overlay layer** sits above the frame and carries the screen grid; the
+  grid shows and hides with the overlay.
 
-## Grid rules
+## The legacy spec-page grid
 
-1. **Container context** — column tokens are relative to their parent container's width, not the viewport.
-2. **Gap handling** — use `gap: var(--layout-grid-gap)` so the gutter tracks `_layout.scss`.
+`--layout-grid-gap` (8) and `--col-1` … `--col-12` in `_layout.scss` are an
+older grid: 12 columns with an 8 gutter on a 672 · 748 · 1164 content width.
+Only the spec pages under `design-system/src/specs/` read them. New work uses
+the screen and content grid tokens above.
 
 ## Related
 
-- `../composition/layout.md` — the page skeletons this grid carries
+- `../composition/layout.md` — the page skeletons the content grid carries
 - `spacing.md` — padding and gap scales inside a surface
 - `../figma/component-alignment.md` — placing library instances against these grids

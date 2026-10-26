@@ -56,13 +56,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-danger` · `--color-danger-text` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-primary` · `--color-primary-text` · `--color-success` · `--color-success-text` · `--font-line-height-body2` · `--font-size-body2` · `--font-weight-medium` · `--font-weight-normal` · `--font-weight-semibold-2` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--body-small` · `--ds-border-focused` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--item-height-sm` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/DateAndTimePicker.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

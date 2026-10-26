@@ -3,7 +3,7 @@
 
 # Textarea
 
-`rows` sets the height; a one-line textarea is `rows={1}`. With `maxLength`, the caption counts characters on the right. With `subtle`, it reads as plain text until hovered or edited, shows Save and Cancel while editing, and stays open when it loses focus.
+The field is 80 high at least, and `rows` grows it from there. With `maxLength`, the caption counts characters on the right. With `subtle`, it reads as plain text until hovered or edited, shows Save and Cancel while editing, and stays open when it loses focus.
 
 **Import:** `import { Textarea } from '@/components';`
 
@@ -56,6 +56,6 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

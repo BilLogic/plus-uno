@@ -1,0 +1,98 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TopbarStories from './Topbar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={TopbarStories} />
+
+<Title />
+The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the start, the page's **breadcrumb** in the middle, and **Help Center** and the **account** at the end. It mirrors the Figma `_Topbar` and the Specs Top Bar, and it sits in the `topbar` slot of `Frame`.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46512"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Topbar"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Docked: the start area is the sidebar's width, so the breadcrumb starts where the surface does.</>}>
+    <DsCanvasQuiet of={TopbarStories.Overview} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+- **Row** — `--layout-height-topbar` 32. It has no fill of its own; the frame's `--ds-surface-sunken` shows through.
+- **Start** — padded `--surface-container-pad` 8 on the left, so the toggle sits at the container pad. Docked, it is `--layout-width-sidebar` 240 wide; otherwise it hugs the toggle and pads `--element-inline-lg` 12 before the breadcrumb.
+- **Toggle** — a primary tonal Button at the 32 size, icon only.
+- **Middle** — a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
+- **End** — Help Center (a secondary text Button with `circle-question`) and the UserAvatar at `size="md"`, `--element-inline-lg` 12 apart and 12 after the breadcrumb.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### The toggle
+
+- It shows `angles-left` while the sidebar is open, docked or floating, and `bars` while it is closed.
+- Its name says what a press does: "Close sidebar" while docked, "Open sidebar" otherwise. `aria-expanded` says whether the sidebar is showing.
+- Inside a Frame, the frame owns the sidebar state and hands it to the topbar, so there is one toggle. Standalone, pass `sidebar`, `docked` and `onToggle`; without `onToggle` there is no toggle.
+
+<DocsCanvasShell description={<>Closed: <code>bars</code>, and the breadcrumb follows the toggle.</>}>
+    <DsCanvasQuiet of={TopbarStories.Closed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Floating open: <code>angles-left</code>, and the breadcrumb still follows the toggle.</>}>
+    <DsCanvasQuiet of={TopbarStories.Floating} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Long content
+
+<DocsCanvasShell description={<>A long trail truncates on one line; Help Center and the avatar stay whole.</>}>
+    <DsCanvasQuiet of={TopbarStories.LongBreadcrumbAt768} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A long name ends in an ellipsis at <code>--label-max-width</code>; the role indicator stays.</>}>
+    <DsCanvasQuiet of={TopbarStories.LongName} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TopbarStories.Overview}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the frame it sits in, and the sidebar state it reads, use `Frame`.
+- For a whole page, use `PageLayout`, whose TopBar renders this pattern.
+- For the trail itself, see `Breadcrumb`; for the account, `UserAvatar`.
+
+</div>
+
+</div>

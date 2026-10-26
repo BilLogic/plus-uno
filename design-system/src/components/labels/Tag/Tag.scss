@@ -1,0 +1,604 @@
+/*
+ * Tag — a category, outlined.
+ *
+ * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
+ * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
+ * 22 is a local custom property set from `_label-heights.scss`, as Count does.
+ * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
+ * spinner inside it (space-200) are Figma-bound spacing and radius
+ * primitives, because no Element token names them.
+ *
+ * THE COLOR MAP. Each name is an accent family, a color with no meaning tied to
+ * it, so a tag never reads as a status. Per name, in order:
+ *
+ *   1 the border at rest        border.accent.{hue}.subtle (decorative)
+ *   2 the mark                  icon.accent.{hue}: the swatch and the spinner
+ *   3 the selected border       border.accent.{hue}
+ *   4 hovered                   background.accent.{hue}.subtlest
+ *   5 pressed                   background.accent.{hue}.subtlest.pressed
+ *   6 selected                  background.accent.{hue}.subtler, held under
+ *                               hover and press
+ *   7 the avatar fill           background.accent.{hue}.subtler
+ *   8 the avatar's initials     text.accent.{hue}, the ink made for that fill
+ *
+ * The text stays neutral (`color.text`) on every name: the steps it sits on
+ * are the accent's lightest, made for neutral text. Gray is the accent gray,
+ * which is the neutral ramp. A SMART area is not a hue: it reads the SMART
+ * layer through `StaticBadgeSmart`, so the subject-to-hue pairing lives in the
+ * tokens alone. The map holds whole `var()` references so the generated docs
+ * list them.
+ */
+@use '../label-heights' as label;
+
+$tag-colors: (
+    'gray': (
+        var(--ds-border-accent-gray-subtle),
+        var(--ds-icon-accent-gray),
+        var(--ds-border-accent-gray),
+        var(--ds-background-accent-gray-subtlest),
+        var(--ds-background-accent-gray-subtlest-pressed),
+        var(--ds-background-accent-gray-subtler),
+        var(--ds-background-accent-gray-subtler),
+        var(--ds-text-accent-gray),
+    ),
+    'blue': (
+        var(--ds-border-accent-blue-subtle),
+        var(--ds-icon-accent-blue),
+        var(--ds-border-accent-blue),
+        var(--ds-background-accent-blue-subtlest),
+        var(--ds-background-accent-blue-subtlest-pressed),
+        var(--ds-background-accent-blue-subtler),
+        var(--ds-background-accent-blue-subtler),
+        var(--ds-text-accent-blue),
+    ),
+    'green': (
+        var(--ds-border-accent-green-subtle),
+        var(--ds-icon-accent-green),
+        var(--ds-border-accent-green),
+        var(--ds-background-accent-green-subtlest),
+        var(--ds-background-accent-green-subtlest-pressed),
+        var(--ds-background-accent-green-subtler),
+        var(--ds-background-accent-green-subtler),
+        var(--ds-text-accent-green),
+    ),
+    'purple': (
+        var(--ds-border-accent-purple-subtle),
+        var(--ds-icon-accent-purple),
+        var(--ds-border-accent-purple),
+        var(--ds-background-accent-purple-subtlest),
+        var(--ds-background-accent-purple-subtlest-pressed),
+        var(--ds-background-accent-purple-subtler),
+        var(--ds-background-accent-purple-subtler),
+        var(--ds-text-accent-purple),
+    ),
+    'magenta': (
+        var(--ds-border-accent-magenta-subtle),
+        var(--ds-icon-accent-magenta),
+        var(--ds-border-accent-magenta),
+        var(--ds-background-accent-magenta-subtlest),
+        var(--ds-background-accent-magenta-subtlest-pressed),
+        var(--ds-background-accent-magenta-subtler),
+        var(--ds-background-accent-magenta-subtler),
+        var(--ds-text-accent-magenta),
+    ),
+    'yellow': (
+        var(--ds-border-accent-yellow-subtle),
+        var(--ds-icon-accent-yellow),
+        var(--ds-border-accent-yellow),
+        var(--ds-background-accent-yellow-subtlest),
+        var(--ds-background-accent-yellow-subtlest-pressed),
+        var(--ds-background-accent-yellow-subtler),
+        var(--ds-background-accent-yellow-subtler),
+        var(--ds-text-accent-yellow),
+    ),
+    'teal': (
+        var(--ds-border-accent-teal-subtle),
+        var(--ds-icon-accent-teal),
+        var(--ds-border-accent-teal),
+        var(--ds-background-accent-teal-subtlest),
+        var(--ds-background-accent-teal-subtlest-pressed),
+        var(--ds-background-accent-teal-subtler),
+        var(--ds-background-accent-teal-subtler),
+        var(--ds-text-accent-teal),
+    ),
+    'orange': (
+        var(--ds-border-accent-orange-subtle),
+        var(--ds-icon-accent-orange),
+        var(--ds-border-accent-orange),
+        var(--ds-background-accent-orange-subtlest),
+        var(--ds-background-accent-orange-subtlest-pressed),
+        var(--ds-background-accent-orange-subtler),
+        var(--ds-background-accent-orange-subtler),
+        var(--ds-text-accent-orange),
+    ),
+    'lime': (
+        var(--ds-border-accent-lime-subtle),
+        var(--ds-icon-accent-lime),
+        var(--ds-border-accent-lime),
+        var(--ds-background-accent-lime-subtlest),
+        var(--ds-background-accent-lime-subtlest-pressed),
+        var(--ds-background-accent-lime-subtler),
+        var(--ds-background-accent-lime-subtler),
+        var(--ds-text-accent-lime),
+    ),
+    'brown': (
+        var(--ds-border-accent-brown-subtle),
+        var(--ds-icon-accent-brown),
+        var(--ds-border-accent-brown),
+        var(--ds-background-accent-brown-subtlest),
+        var(--ds-background-accent-brown-subtlest-pressed),
+        var(--ds-background-accent-brown-subtler),
+        var(--ds-background-accent-brown-subtler),
+        var(--ds-text-accent-brown),
+    ),
+);
+
+.plus-tag {
+    --plus-tag-height: #{label.$tag-height};
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    box-sizing: border-box;
+    height: var(--plus-tag-height);
+    /* The cap from `maxWidth`, still clamped by a container narrower than it. */
+    max-width: min(var(--plus-tag-max, 180px), 100%);
+    min-width: 0;
+    vertical-align: middle;
+
+    /*
+     * No margin: TagGroup owns the gaps between tags, so there is nothing to
+     * switch off when a parent sets `gap`.
+     */
+    margin: 0;
+    padding: 0 var(--size-element-pad-x-xs, 4px);
+    border: var(--size-element-border, 1px) solid var(--plus-tag-border-rest);
+    border-radius: var(--size-element-radius-md, 4px);
+    background-color: transparent;
+    appearance: none;
+
+    /* Neutral text on every color: the hue is on the border and swatch. */
+    color: var(--ds-text);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/*
+ * One entry of the map as the tag's custom properties. `$with-avatar: false`
+ * leaves the avatar fill alone, for the avatar types' neutral border below.
+ */
+@mixin tag-color-vars($tokens, $with-avatar: true) {
+    --plus-tag-border-rest: #{nth($tokens, 1)};
+    --plus-tag-hue: #{nth($tokens, 2)};
+    --plus-tag-border-selected: #{nth($tokens, 3)};
+    --plus-tag-hovered: #{nth($tokens, 4)};
+    --plus-tag-pressed: #{nth($tokens, 5)};
+    --plus-tag-selected: #{nth($tokens, 6)};
+
+    @if $with-avatar {
+        --plus-tag-avatar: #{nth($tokens, 7)};
+        --plus-tag-avatar-ink: #{nth($tokens, 8)};
+    }
+}
+
+@each $name, $tokens in $tag-colors {
+    .plus-tag--#{$name} {
+        @include tag-color-vars($tokens);
+    }
+}
+
+/* ------------------------------------------------------------ avatar types */
+
+/*
+ * A person, an agent or a team: the border and state layers are neutral on
+ * every color, because the avatar already says who it is and a hued border
+ * would claim a category as well. The color moves into the avatar's fill.
+ */
+.plus-tag--person,
+.plus-tag--agent,
+.plus-tag--team {
+    @include tag-color-vars(map-get($tag-colors, 'gray'), $with-avatar: false);
+}
+
+/*
+ * Gray avatars, as the Figma set draws them: a gray agent sits on discovery
+ * (the AI purple, which no longer borrows a SMART subject) and a gray team on
+ * the lightest blue, so neither reads as a person's neutral disc. Each takes
+ * the ink made for its fill.
+ */
+.plus-tag--gray.plus-tag--agent {
+    --plus-tag-avatar: var(--ds-background-discovery-subtler);
+    --plus-tag-avatar-ink: var(--ds-text-discovery);
+}
+
+.plus-tag--gray.plus-tag--team {
+    --plus-tag-avatar: var(--ds-background-accent-blue-subtlest);
+    --plus-tag-avatar-ink: var(--ds-text-accent-blue);
+}
+
+/* A person is round: the tag, the avatar and the ×. */
+.plus-tag--person {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
+/* The 16 avatar in the swatch's place. */
+.plus-tag__avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--size-spacing-medium-space-300, 16px);
+    height: var(--size-spacing-medium-space-300, 16px);
+    overflow: hidden;
+    background-color: var(--plus-tag-avatar);
+}
+
+.plus-tag__avatar--person {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
+/* Radius 2: a primitive, because no Element radius token is 2. */
+.plus-tag__avatar--team {
+    border-radius: var(--size-border-radius-radius-50, 2px);
+}
+
+/* A hexagon 13.86 wide in the 16 box, pointed top and bottom, as in Figma. */
+.plus-tag__avatar--agent {
+    clip-path: polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+}
+
+/* While saving, the box stays and holds the spinner, with no fill. */
+.plus-tag__avatar--saving {
+    background-color: transparent;
+}
+
+.plus-tag__avatar-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/*
+ * Initials: Lato SemiBold 7, as in Figma. No text style is that small; 7 is
+ * the one size that fits two letters in the 16 disc, so it is the disc's size
+ * scaled, not a number of its own. The ink is the one made for the disc's fill.
+ */
+.plus-tag__initials {
+    color: var(--plus-tag-avatar-ink);
+    font-family: var(--type-family-heading);
+    font-size: calc(var(--icon-md) * 7 / 16);
+    font-weight: var(--type-weight-semibold);
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+.plus-tag__label {
+    font: var(--body-small);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+}
+
+/* The swatch: 10 square, radius 2, in the hue. */
+.plus-tag__swatch {
+    flex: none;
+    width: var(--size-spacing-small-space-150, 10px);
+    height: var(--size-spacing-small-space-150, 10px);
+    border-radius: var(--size-border-radius-radius-50, 2px);
+    background-color: var(--plus-tag-hue);
+}
+
+/* A legend swatch carries any series color, which may sit near the ground. */
+.plus-tag__swatch--custom {
+    box-shadow: inset 0 0 0 1px var(--ds-border);
+}
+
+.plus-tag__elem-before {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+}
+
+/* ------------------------------------------------------------ interactive */
+
+/* Selectable (and the deprecated operational) tag: the tag is the button. */
+.plus-tag--selectable,
+.plus-tag--action {
+    appearance: none;
+    cursor: pointer;
+}
+
+.plus-tag--selectable:hover,
+.plus-tag--action:hover,
+.plus-tag--link:not(.plus-tag--split):hover,
+.plus-tag--split:has(> .plus-tag__link:hover) {
+    background-color: var(--plus-tag-hovered);
+}
+
+.plus-tag--selectable:active,
+.plus-tag--action:active,
+.plus-tag--link:not(.plus-tag--split):active,
+.plus-tag--split:has(> .plus-tag__link:active) {
+    background-color: var(--plus-tag-pressed);
+}
+
+/*
+ * Selected is a full-color border as well as the subtler fill, so the choice is
+ * not carried by a change of lightness alone. It holds the fill under hover
+ * and press: the selectable steps above would otherwise change it.
+ */
+.plus-tag--selected,
+.plus-tag--selected:hover,
+.plus-tag--selected:active {
+    border-color: var(--plus-tag-border-selected);
+    background-color: var(--plus-tag-selected);
+}
+
+/* A link underlines on hover and press only, never at rest. */
+.plus-tag--link {
+    cursor: pointer;
+}
+
+.plus-tag--link:not(.plus-tag--split):hover .plus-tag__label,
+.plus-tag--link:not(.plus-tag--split):active .plus-tag__label,
+.plus-tag__link:hover .plus-tag__label,
+.plus-tag__link:active .plus-tag__label {
+    text-decoration: underline;
+}
+
+/* The link half of a link with a separate ×. The outer tag draws the box. */
+.plus-tag__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs, 4px);
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    outline: none;
+}
+
+/* Focus: a 2px Focus Ring 2px outside the tag. */
+.plus-tag:focus-visible,
+.plus-tag--split:has(> .plus-tag__link:focus-visible) {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+}
+
+/* --------------------------------------------------------------- remove × */
+
+/*
+ * The Remove button, small: 16 square, 12px ×, radius 2. Only the × reacts on
+ * a removable tag. It is neutral on every color, since the hue belongs to the
+ * border and the swatch.
+ */
+.plus-tag__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--size-spacing-medium-space-300, 16px);
+    height: var(--size-spacing-medium-space-300, 16px);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: var(--size-border-radius-radius-50, 2px);
+    appearance: none;
+    background: transparent;
+    color: var(--ds-icon-subtle);
+    font-size: var(--icon-sm);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.plus-tag__remove > i {
+    font-size: var(--icon-sm);
+    line-height: 1;
+}
+
+.plus-tag__remove:hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
+.plus-tag__remove:active {
+    background-color: var(--ds-background-neutral-subtle-pressed);
+}
+
+/* Round on a person tag, as its host is. */
+.plus-tag--person .plus-tag__remove {
+    border-radius: var(--size-element-radius-full, 999px);
+}
+
+/* Focus: a 2px Focus Ring 2px outside the ×, and no fill. */
+.plus-tag__remove:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+}
+
+/* ---------------------------------------------------------------- saving */
+
+.plus-tag--loading,
+.plus-tag--loading .plus-tag__remove {
+    cursor: progress;
+}
+
+/*
+ * The spinner takes the swatch's box exactly, so saving keeps the width. In an
+ * avatar's box it is 12, inset 2, as Figma draws it.
+ */
+.plus-tag__spinner {
+    flex: none;
+    box-sizing: border-box;
+    width: var(--size-spacing-small-space-150, 10px);
+    height: var(--size-spacing-small-space-150, 10px);
+    border: var(--size-element-stroke-md, 1.5px) solid transparent;
+    /* Three quarters of the ring: a 270° arc. */
+    border-top-color: var(--plus-tag-hue);
+    border-right-color: var(--plus-tag-hue);
+    border-bottom-color: var(--plus-tag-hue);
+    border-radius: var(--size-element-radius-full, 999px);
+    animation: plus-tag-spin 0.8s linear infinite;
+}
+
+/*
+ * In an avatar's box the spinner is Figma's: 12 across, in the subtle icon color
+ * on every color, a 3/4 arc with a 1.8 ring. The 1.8 lives in the SVG's
+ * stroke-width, a literal because no stroke token is 1.8.
+ */
+.plus-tag__avatar-spinner {
+    display: block;
+    width: var(--size-spacing-medium-space-200, 12px);
+    height: var(--size-spacing-medium-space-200, 12px);
+    color: var(--ds-icon-subtle);
+    stroke: currentColor;
+    animation: plus-tag-spin 0.8s linear infinite;
+}
+
+@keyframes plus-tag-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-tag__spinner,
+    .plus-tag__avatar-spinner {
+        animation-duration: 2.4s;
+    }
+}
+
+/* Heard once, never seen: the spinner is the visible half. */
+.plus-tag__status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* -------------------------------------------------------------- disabled */
+
+/*
+ * Disabled comes from the field: the one disabled recipe, background.disabled
+ * with text.disabled words, icon.disabled on the swatch, no border unless
+ * selected, no ×, and no focus. The tag is a disabled button, or a span that
+ * Tag marks `aria-disabled`, so it reads as an inactive component, which
+ * WCAG exempts from text contrast. opacity.disabled is for images only, so a
+ * photo avatar stays whole. A selected tag keeps a border.bold edge, so the
+ * choice still shows.
+ */
+.plus-tag--disabled,
+.plus-tag--disabled:hover,
+.plus-tag--disabled:active {
+    border-color: transparent;
+    background-color: var(--ds-background-disabled);
+    color: var(--ds-text-disabled);
+    cursor: default;
+}
+
+.plus-tag--disabled .plus-tag__swatch {
+    background-color: var(--ds-icon-disabled);
+}
+
+.plus-tag--disabled.plus-tag--selected {
+    border-color: var(--ds-border-bold);
+}
+
+.plus-tag--disabled .plus-tag__label {
+    text-decoration: none;
+}
+
+/*
+ * A disabled avatar's fill and initials follow the tag's own. Saving keeps its
+ * clear ground, so the spinner never sits on a gray disc.
+ */
+.plus-tag--disabled .plus-tag__avatar:not(.plus-tag__avatar--saving) {
+    background-color: var(--ds-background-disabled);
+}
+
+.plus-tag--disabled .plus-tag__initials {
+    color: var(--ds-text-disabled);
+}
+
+/* -------------------------------------------------------------- on images */
+
+/*
+ * Elevated, for a tag on a photo or a video: the overlay pair (the solid
+ * overlay surface and its shadow, the level for anything floating over
+ * content), no border and neutral text, with the hue kept on the swatch.
+ * Read-only and link only; the component never sets the class on anything
+ * else. The border turns clear rather than going away, so the tag stays 22
+ * tall.
+ *
+ * It sits after disabled on purpose: a disabled tag on a picture keeps its
+ * solid ground, since the translucent disabled fill would sink into the image,
+ * and takes only the disabled text and swatch.
+ */
+.plus-tag--elevated,
+.plus-tag--elevated.plus-tag--disabled:hover,
+.plus-tag--elevated.plus-tag--disabled:active {
+    border-color: transparent;
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+/*
+ * A link's hover and press lay the neutral subtle hovered and pressed steps
+ * (translucent ink) over the solid fill, as Figma stacks them, rather than
+ * swapping the fill for the hue's tint. A one-color gradient is how CSS stacks
+ * a second fill.
+ */
+.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):hover,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:hover) {
+    background-color: var(--ds-surface-overlay);
+    background-image: linear-gradient(
+        var(--ds-background-neutral-subtle-hovered),
+        var(--ds-background-neutral-subtle-hovered)
+    );
+}
+
+.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):active,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:active) {
+    background-color: var(--ds-surface-overlay);
+    background-image: linear-gradient(
+        var(--ds-background-neutral-subtle-pressed),
+        var(--ds-background-neutral-subtle-pressed)
+    );
+}
+
+/*
+ * Focus: the standard ring 2px outside the tag, with the 2px between them
+ * filled in the surface color, so the ring reads on a dark picture. The gap is
+ * a spread shadow under the outline, so it follows the tag's corners.
+ *
+ * The ring is restated rather than inherited: check:focus-ring scores each
+ * rule on its own strongest indicator, and the white gap alone would fail it.
+ */
+.plus-tag--elevated:focus-visible,
+.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+    box-shadow:
+        0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay),
+        var(--ds-shadow-overlay);
+}
+
+/*
+ * The × of an elevated link takes the same gap on focus: 2px of the surface
+ * color between the × and its ring, so the ring reads on a dark picture. The
+ * ring is restated for check:focus-ring, as above.
+ */
+.plus-tag--elevated .plus-tag__remove:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay);
+}

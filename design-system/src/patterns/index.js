@@ -3,7 +3,19 @@
 // consumers fill the slots.
 
 export { default as Surface, SURFACE_LEVELS } from './Surface';
-export { default as SurfaceContainer } from './SurfaceContainer';
+export { default as Frame } from './Frame';
+export { useSidebarControl } from './Frame/SidebarControl';
+export { default as Topbar } from './Topbar';
+export {
+    default as PatternSidebar,
+    useOpenTabs,
+    clearOpenTabs,
+    createOpenTabsStore,
+    getOpenTabsStore,
+    OpenTabsProvider,
+    OPEN_TABS_STORAGE_KEY,
+    SIDEBAR_RECENT_TABS,
+} from './Sidebar';
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection } from './PatternSection';
 export { default as PatternModal } from './PatternModal';

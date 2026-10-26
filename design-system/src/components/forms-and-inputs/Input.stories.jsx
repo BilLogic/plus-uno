@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Input from './Input';
 
 export default {
-    title: 'Components/Forms and inputs/Input',
+    title: 'Components/Forms and inputs/Text field',
     component: Input,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component: 'Textual form controls like inputs. The labeled text input box allows users to enter textual inputs and receive validation feedback with message.'
@@ -459,4 +464,25 @@ Subtle.play = async ({ canvasElement, args }) => {
     await expect(input).toHaveValue('fail');
     await expect(input.getAttribute('aria-invalid')).toBe('true');
     await expect(box.classList.contains('plus-field--invalid')).toBe(true);
+};
+
+/** Helper text is `text.subtle`; an invalid message is `text.danger` on a `border.danger` field. */
+export const CaptionColors = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
+        <Input id="caption-help" label="Email" caption="We only use it for reminders." />
+        <Input id="caption-invalid" label="Phone" validation="invalid" validationMessage="Enter a 10-digit number" />
+    </div>
+);
+CaptionColors.parameters = { docs: { disable: true } };
+CaptionColors.play = async ({ canvasElement }) => {
+    const help = canvasElement.querySelector('.plus-field-caption__message--help');
+    const invalid = canvasElement.querySelector('.plus-field-caption__message--invalid');
+    const invalidBox = within(canvasElement).getByRole('textbox', { name: 'Phone' }).closest('.plus-field');
+    const label = canvasElement.querySelector('.plus-field-label');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(label).color, `${mode}: label`).toBe(token('--ds-text'));
+        await expect(getComputedStyle(help).color, `${mode}: helper text`).toBe(token('--ds-text-subtle'));
+        await expect(getComputedStyle(invalid).color, `${mode}: invalid message`).toBe(token('--ds-text-danger'));
+        await expect(getComputedStyle(invalidBox).borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+    });
 };

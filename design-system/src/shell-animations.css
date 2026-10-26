@@ -17,24 +17,24 @@
 }
 
 /* TopBar reveal: per-section staggered animation (left → center → right) */
-.plus-page-reveal .shell-reveal .plus-topbar .topbar-left-section,
-.plus-page-reveal .shell-reveal .plus-topbar .topbar-center-section,
-.plus-page-reveal .shell-reveal .plus-topbar .topbar-right-section {
+.plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__start,
+.plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__middle,
+.plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__end {
     opacity: 0;
     transform: translateY(24px);
 }
 
-.plus-page-reveal .shell-reveal.has-entered .plus-topbar .topbar-left-section {
+.plus-page-reveal .shell-reveal.has-entered .plus-topbar .plus-topbar__start {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-.plus-page-reveal .shell-reveal.has-entered .plus-topbar .topbar-center-section {
+.plus-page-reveal .shell-reveal.has-entered .plus-topbar .plus-topbar__middle {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 280ms;
 }
 
-.plus-page-reveal .shell-reveal.has-entered .plus-topbar .topbar-right-section {
+.plus-page-reveal .shell-reveal.has-entered .plus-topbar .plus-topbar__end {
     animation: revealIn 1.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 560ms;
 }
@@ -141,9 +141,9 @@
 /* Accessibility: respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
 
-    .plus-page-reveal .shell-reveal .plus-topbar .topbar-left-section,
-    .plus-page-reveal .shell-reveal .plus-topbar .topbar-center-section,
-    .plus-page-reveal .shell-reveal .plus-topbar .topbar-right-section,
+    .plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__start,
+    .plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__middle,
+    .plus-page-reveal .shell-reveal .plus-topbar .plus-topbar__end,
     .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
     .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-home-tab,
     .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-section-title,
@@ -155,12 +155,12 @@
 }
 
 /* No Animation State (for persistent shell navigation) */
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-left-section,
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-center-section,
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-right-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-left-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-center-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-right-section,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__start,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__middle,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__end,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__start,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__middle,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__end,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-logo,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-home-tab,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-section-title,
@@ -175,12 +175,12 @@
 }
 
 /* No Animation State (for persistent shell navigation) */
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-left-section,
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-center-section,
-.plus-page-reveal .shell-reveal.no-animation .plus-topbar .topbar-right-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-left-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-center-section,
-.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .topbar-right-section,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__start,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__middle,
+.plus-page-reveal .shell-reveal.no-animation .plus-topbar .plus-topbar__end,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__start,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__middle,
+.plus-page-reveal .shell-reveal.no-animation.has-entered .plus-topbar .plus-topbar__end,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-logo,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-home-tab,
 .plus-page-reveal .plus-page-sidebar-wrapper.shell-reveal.no-animation .plus-sidebar .plus-sidebar-section-title,

@@ -3,7 +3,7 @@
 
 # TagInput
 
-Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…" that opens the option's menu: its name, Delete, and Tag's seven colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
+Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A "Create *text*" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into "+n"; with focus they wrap, up to three rows, then scroll.
 
 **Import:** `import { TagInput } from '@/components';`
 
@@ -40,7 +40,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 | `onChange` | func | — | `(tags)`: the new list, after any add or remove. |
 | `onRename` | func | — | `(value, name)`: an option was renamed from its "…" menu. Store the new name on the option. A picked tag made from it takes the name too. |
 | `onDelete` | func | — | `(value)`: an option was deleted from its "…" menu. Remove it from `options`; a picked tag made from it is removed with it. |
-| `onColorChange` | func | — | `(value, color)`: an option was given another of Tag's seven colors from its "…" menu. Store it on the option. |
+| `onColorChange` | func | — | `(value, color)`: an option was given another of Tag's ten colors from its "…" menu. Store it on the option. |
 | `onReorder` | func | — | `(fromIndex, toIndex)`: an option was moved by its handle, by drag or by the keyboard. Both are places in `options`; move the option there. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
@@ -55,12 +55,12 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--color-outline-variant` · `--font-line-height-body3` · `--font-size-body3` · `--layout-width-option-menu` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-sm`
+`--body-small` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--layout-width-option-menu` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-sm`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1,7 +1,7 @@
 import React from 'react';
-import ButtonGroup from '@/components/actions/ButtonGroup';
-import Button from '@/components/actions/Button';
-import Badge from '@/components/status-and-loading/Badge';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button';
+import Badge from '@/components/labels/Badge';
 
 // Import CTA button components from Tutor View
 import {

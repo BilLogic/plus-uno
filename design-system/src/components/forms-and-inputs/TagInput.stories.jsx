@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Input from './Input';
 import TagInput from './TagInput';
 
@@ -15,9 +16,16 @@ import TagInput from './TagInput';
  */
 
 export default {
-    title: 'Components/Forms and inputs/Tag Input',
+    title: 'Components/Forms and inputs/Tag input',
     component: TagInput,
     tags: ['!dev', '!autodocs'],
+    parameters: {
+        changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'The color menu and a new tag\'s random color cover Tag\'s ten colors: orange, lime and brown joined.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The field became 32 with one row of tags, growing as they wrap.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
+    },
 };
 
 const TOPICS = [
@@ -83,7 +91,7 @@ const Owned = ({ onCreateSpy, initialOptions = TOPICS, ...props }) => {
     );
 };
 
-const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
+const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown'];
 
 /**
  * When nothing matches, Create is highlighted and Enter creates the tag. The
@@ -229,7 +237,7 @@ export const PasteSplitsOnCommas = {
     },
 };
 
-/** Each pasted tag gets one of Tag's seven colors, reported with its value. */
+/** Each pasted tag gets one of Tag's ten colors, reported with its value. */
 export const PastedTagsGetTagColors = {
     args: { onCreateSpy: fn() },
     render: (args) => <div style={stack}><Owned {...args} initialOptions={[]} /></div>,
@@ -314,16 +322,16 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * The small field fits its tags: every tag, "+n" included, is Tag's one
- * height, 22, and sits inside the field's border at any width, and the field
- * stays as tall as a small Input.
+ * The field fits its tags: every tag, "+n" included, is Tag's one height, 22,
+ * and sits inside the field's border at any width, and the field stays as tall
+ * as an Input. `small` is deprecated and draws like `medium`, so the two match.
  */
-const SMALL_WIDTHS = [160, 200, 240, 280, 360];
+const WIDTHS = [160, 200, 240, 280, 360];
 
 export const SmallFitsItsTags = () => (
     <div style={stack}>
         <Input label="Small input" size="small" />
-        {SMALL_WIDTHS.map((width) => (
+        {WIDTHS.map((width) => (
             <div key={width} style={{ width }}>
                 <TagInput label={`Topics at ${width}`} size="small" options={TOPICS} defaultTags={MANY} />
             </div>
@@ -335,7 +343,7 @@ SmallFitsItsTags.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const smallInput = canvas.getByRole('textbox', { name: 'Small input' }).closest('.plus-field');
     const smallHeight = smallInput.getBoundingClientRect().height;
-    for (const width of SMALL_WIDTHS) {
+    for (const width of WIDTHS) {
         const list = canvas.getByRole('list', { name: `Selected: Topics at ${width}` });
         await within(list).findByRole('button', { name: /^\+\d+ more tags?$/ });
 
@@ -432,6 +440,21 @@ Invalid.play = async ({ canvasElement }) => {
     await expect(input).toHaveAttribute('aria-invalid', 'true');
     await expect(input).toHaveAccessibleDescription('Pick at least one topic');
     await expect(canvas.getByRole('alert')).toHaveTextContent('Pick at least one topic');
+
+    const box = input.closest('.plus-field');
+    const message = canvasElement.querySelector('.plus-field-caption__message--invalid');
+    await userEvent.click(input);
+    const hint = await waitFor(() => {
+        const el = document.querySelector('.plus-tag-input__hint');
+        if (!el) throw new Error('the list has not opened');
+        return el;
+    });
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box).borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+        await expect(getComputedStyle(message).color, `${mode}: invalid message`).toBe(token('--ds-text-danger'));
+        await expect(getComputedStyle(hint).color, `${mode}: the list's hint`).toBe(token('--ds-text-subtle'));
+    });
+    await userEvent.keyboard('{Escape}');
 };
 
 /** Disabled: every tag is disabled, with no × and no entry. */
@@ -574,7 +597,7 @@ export const OptionMenuDeletes = {
 };
 
 /**
- * The menu lists Tag's seven colors with the current one checked. A click
+ * The menu lists Tag's ten colors with the current one checked. A click
  * picks one; so do the arrow keys and Enter from the name field.
  */
 export const OptionMenuChangesColor = {
@@ -587,7 +610,7 @@ export const OptionMenuChangesColor = {
         const menu = await body.findByRole('listbox', { name: 'Options for Decision recall' });
         const colors = within(within(menu).getByRole('group', { name: 'Color' })).getAllByRole('option');
         await expect(colors.map((row) => row.textContent)).toEqual(
-            ['Gray', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal']
+            ['Gray', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal', 'Orange', 'Lime', 'Brown']
         );
         await expect(within(menu).getByRole('option', { name: 'Purple' })).toHaveAttribute('aria-selected', 'true');
 

@@ -9,7 +9,7 @@ Label, field and caption: the caption shows a validation message (or standing he
 
 **Source:** `design-system/src/components/forms-and-inputs/Input.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive, Anatomy, CaptionErrorAndCount, Autofill, Search, Subtle
+**Stories:** `design-system/src/components/forms-and-inputs/Input.stories.jsx` — Overview, Content, Styles, Sizes, InteractionStates, Interactive, Anatomy, CaptionErrorAndCount, Autofill, Search, Subtle, CaptionColors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Input.mdx`
 
@@ -58,6 +58,6 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

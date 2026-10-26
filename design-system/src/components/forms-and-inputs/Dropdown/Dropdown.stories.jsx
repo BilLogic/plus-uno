@@ -5,11 +5,14 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Dropdown from './Dropdown';
 
 export default {
-    title: 'Components/Forms and inputs/Dropdown',
+    title: 'Components/Forms and inputs/Dropdown menu',
     component: Dropdown,
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'The menu moved to the new color tokens: the overlay surface and shadow (whose 1px ring replaces the border), neutral hover and pressed steps, and a selected row in neutral ink (background.selected with text.selected) rather than the primary state layer. The multi-select box is the input fill and stroke, Lagoon when checked. The toggles keep their colors until Button\'s appearances land.' },
+            { date: '2026-10-24', kind: 'changed', summary: 'The menu lifts on Light/3, as every floating layer without a scrim. A focused row shows the focus ring and no fill. Toggles take Button\'s steps: hover 08, pressed 12.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The menu became the Popover family\'s Menu: rows of 32 (24 for `size="small"`) inset 4 on their own radius, 160 to 320 wide, at most 320 tall with a cut row, and 8 from the screen edge. A selected row is the primary state layer 08 with primary text; items took `description` for a second line.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Menu rows matched Figma: the multi-select checkbox became the `_Form Checkbox Button` box, a selected row took the primary-container 16 ground with a stroke-xl left edge, and a row with no leading visual lost its leading gap.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Escape inside an open menu closed it, returned focus to the toggle once it had closed, and stopped propagating, so an enclosing Modal no longer closed on the same key.' },
             { date: '2026-09-29', kind: 'added', summary: 'Items took `href` (and `linkComponent`) to render as a link, `isToggle` to report `selected` as `aria-pressed`, `isStatic` for a row that is not a control, and `isBusy` for an item still working.' },
@@ -113,9 +116,9 @@ const contentItems = [
 const dropdownCol = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '700px' };
 const contentVariantCard = {
     padding: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
     borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
+    background: 'var(--ds-surface-sunken)',
 };
 
 function DropdownContentDemos() {
@@ -420,7 +423,7 @@ const openAndMeasure = async (canvasElement, name) => {
 };
 
 /**
- * The popup placement rule: the menu opens `--size-element-gap-xs` below its
+ * The popup placement rule: the menu opens `--popover-offset` below its
  * toggle, with its left edge on the toggle's left edge.
  */
 export const PlacementBelow = () => (
@@ -430,7 +433,7 @@ export const PlacementBelow = () => (
 );
 
 PlacementBelow.play = async ({ canvasElement }) => {
-    const gap = tokenLength(canvasElement, '--size-element-gap-xs');
+    const gap = tokenLength(canvasElement, '--popover-offset');
     const { toggle, menu } = await openAndMeasure(canvasElement, 'Opens below');
     await expect(menu.top - toggle.bottom, 'the gap below the toggle').toBeCloseTo(gap, 0);
     await expect(menu.left, 'left edges line up').toBeCloseTo(toggle.left, 0);
@@ -438,7 +441,7 @@ PlacementBelow.play = async ({ canvasElement }) => {
 
 /**
  * With no room below, the menu flips above its toggle and keeps the same
- * `--size-element-gap-xs` gap.
+ * `--popover-offset` gap.
  */
 export const PlacementFlippedAbove = () => (
     <div style={{ height: '100vh', display: 'flex', alignItems: 'flex-end', padding: '240px 24px 0', boxSizing: 'border-box' }}>
@@ -447,20 +450,20 @@ export const PlacementFlippedAbove = () => (
 );
 
 PlacementFlippedAbove.play = async ({ canvasElement }) => {
-    const gap = tokenLength(canvasElement, '--size-element-gap-xs');
+    const gap = tokenLength(canvasElement, '--popover-offset');
     const { toggle, menu } = await openAndMeasure(canvasElement, 'Opens above');
     await expect(menu.bottom, 'the menu flipped above').toBeLessThanOrEqual(toggle.top);
     await expect(toggle.top - menu.bottom, 'the gap above the toggle').toBeCloseTo(gap, 0);
     await expect(menu.left, 'left edges line up').toBeCloseTo(toggle.left, 0);
 };
 
-/** The menu's floor: a short toggle still gets a menu wide enough to read. */
-const MENU_MIN_WIDTH = 200;
+/** The menu's floor, Popover/min-width-menu: a short toggle still gets a menu wide enough to read. */
+const MENU_MIN_WIDTH = 160;
 
-/** A short toggle's menu stays at the 200px floor. */
+/** A short toggle's menu of short rows stays at the 160 floor. */
 export const PlacementWidthFloor = () => (
     <div style={{ padding: '24px 24px 240px' }}>
-        <Dropdown buttonText="Go" items={basicItems} />
+        <Dropdown buttonText="Go" items={[{ text: 'Edit' }, { text: 'Copy' }]} />
     </div>
 );
 
@@ -487,12 +490,12 @@ PlacementWidthFollowsAWideToggle.play = async ({ canvasElement }) => {
 
 /**
  * The rows as Figma's Dropdown list Item set draws them. A row with no
- * leading visual starts its words at the padding. A selected row is the
- * primary-container 16 ground with a primary-container stroke on its left
- * edge. A multi-select row leads with the `_Form Checkbox Button` box:
- * an on-primary box with a primary-border stroke when unchecked, a primary
- * box with an on-primary check when checked, and a surface box with an
- * on-surface stroke on a disabled row. The box is decorative: the row says
+ * leading visual starts its words at the padding. A selected row is neutral
+ * ink, background.selected with text.selected, and no bar on its left edge.
+ * A multi-select row leads with the `_Form Checkbox Button` box: the input
+ * fill with the input stroke when unchecked, a selected-bold (Lagoon) box
+ * with an inverse check when checked, and the unchecked box dimmed with its
+ * row when disabled. The box is decorative: the row says
  * whether it is on through `aria-pressed`.
  */
 export const MenuRows = () => (
@@ -523,18 +526,17 @@ MenuRows.play = async ({ canvasElement }) => {
     for (const name of ['Plain', 'Chosen']) {
         const item = row(name);
         const inset = words(item).getBoundingClientRect().left - item.getBoundingClientRect().left;
-        await expect(inset, `${name} starts at the padding`).toBeCloseTo(length('--size-element-pad-x-md'), 0);
+        await expect(inset, `${name} starts at the padding`).toBeCloseTo(length('--element-pad-x-md'), 0);
     }
 
-    // Selected: the primary-container 16 ground and a primary-container
-    // stroke of stroke-xl on the left edge. Read once, outside the wait, so
-    // the probe does not wake the wait's own mutation observer.
-    const selectedGround = color('--color-primary-container-state-16');
+    // Selected: neutral ink, background.selected with text.selected, and no
+    // left bar. Read once, outside the wait, so the probe does not wake the
+    // wait's own mutation observer.
+    const selectedGround = color('--ds-background-selected');
     await waitFor(() => expect(getComputedStyle(row('Chosen')).backgroundColor, 'selected ground')
         .toBe(selectedGround));
-    const rail = getComputedStyle(row('Chosen'), '::before');
-    await expect(px(rail.width), 'the left stroke is stroke-xl').toBe(length('--size-element-stroke-xl'));
-    await expect(rail.backgroundColor, 'the left stroke is primary-container').toBe(color('--color-primary-container'));
+    await expect(getComputedStyle(row('Chosen')).color, 'selected text').toBe(color('--ds-text-selected'));
+    await expect(getComputedStyle(row('Chosen'), '::before').content, 'no left bar').toBe('none');
 
     // The checkbox: a 12px box (Figma's fixed frame) with radius-50 corners.
     const off = checkboxOf(row('Unchecked'));
@@ -550,25 +552,27 @@ MenuRows.play = async ({ canvasElement }) => {
     await expect(row('Unchecked'), 'the row carries the state').toHaveAttribute('aria-pressed', 'false');
     await expect(row('Checked')).toHaveAttribute('aria-pressed', 'true');
 
-    // Unchecked: on-primary with a primary-border stroke, and no check.
+    // Unchecked: the input fill with the input stroke, and no check.
     const offStyle = getComputedStyle(off);
-    await expect(offStyle.backgroundColor, 'unchecked fill').toBe(color('--color-on-primary'));
+    await expect(offStyle.backgroundColor, 'unchecked fill').toBe(color('--ds-background-input'));
     await expect(px(offStyle.borderTopWidth), 'unchecked stroke width').toBe(length('--size-element-stroke-sm'));
-    await expect(offStyle.borderTopColor, 'unchecked stroke').toBe(color('--color-primary-border'));
+    await expect(offStyle.borderTopColor, 'unchecked stroke').toBe(color('--ds-border-input'));
     await expect(off.querySelector('svg'), 'no check while off').toBeNull();
 
-    // Checked: a primary box with no stroke and an on-primary check.
+    // Checked: a selected-bold (Lagoon) box with no stroke and an inverse check.
     const onStyle = getComputedStyle(on);
-    await expect(onStyle.backgroundColor, 'checked fill').toBe(color('--color-primary'));
+    await expect(onStyle.backgroundColor, 'checked fill').toBe(color('--ds-background-selected-bold'));
     await expect(px(onStyle.borderTopWidth), 'no stroke when checked').toBe(0);
     const check = on.querySelector('svg');
     await expect(check, 'a check is drawn').not.toBeNull();
-    await expect(getComputedStyle(check).color, 'the check is on-primary').toBe(color('--color-on-primary'));
+    await expect(getComputedStyle(check).color, 'the check is inverse').toBe(color('--ds-icon-inverse'));
 
-    // Disabled: surface with an on-surface stroke.
+    // Disabled: the unchecked box, dimmed with its row (opacity.disabled).
     const disabledStyle = getComputedStyle(disabled);
-    await expect(disabledStyle.backgroundColor, 'disabled fill').toBe(color('--color-surface'));
-    await expect(disabledStyle.borderTopColor, 'disabled stroke').toBe(color('--color-on-surface'));
+    await expect(disabledStyle.backgroundColor, 'disabled fill').toBe(color('--ds-background-input'));
+    await expect(disabledStyle.borderTopColor, 'disabled stroke').toBe(color('--ds-border-input'));
+    const unavailable = getComputedStyle(row('Unavailable'));
+    await expect(Number(unavailable.opacity), 'the row dims').toBe(Number(unavailable.getPropertyValue('--ds-opacity-disabled')));
 };
 
 export const Interactive = {

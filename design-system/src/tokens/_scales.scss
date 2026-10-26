@@ -1,0 +1,130 @@
+/**
+ * Scale Tokens
+ * Generated from the spacing / primitives and spacing / foundations collections in Figma.
+ * Each name is the variable's WEB code syntax; an alias is a var() of its target.
+ */
+
+:root {
+
+    /* spacing / primitives (hidden in Figma; point semantic tokens at these, not components) */
+    /* Space */
+    --space-0: 0px;
+    --space-00625: 1px;
+    --space-0125: 2px;
+    --space-025: 4px;
+    --space-0375: 6px;
+    --space-050: 8px;
+    --space-0625: 10px;
+    --space-075: 12px;
+    --space-0875: 14px;
+    --space-100: 16px;
+    --space-125: 20px;
+    --space-150: 24px;
+    --space-200: 32px;
+    --space-250: 40px;
+    --space-300: 48px;
+    --space-400: 64px;
+    --space-500: 80px;
+    --space-03125: 5px;
+    /* Radius */
+    --radius-0125: var(--space-0125);
+    --radius-025: var(--space-025);
+    --radius-0375: var(--space-0375);
+    --radius-050: var(--space-050);
+    --radius-0625: var(--space-0625);
+    --radius-075: var(--space-075);
+    --radius-0875: var(--space-0875);
+    --radius-100: var(--space-100);
+    --radius-full: 9999px;
+    --radius-03125: var(--space-03125);
+    /* Stroke */
+    --stroke-1: var(--space-00625);
+    --stroke-2: var(--space-0125);
+    /* Size */
+    --size-075: var(--space-075);
+    --size-100: var(--space-100);
+    --size-125: var(--space-125);
+    --size-150: var(--space-150);
+    --size-200: var(--space-200);
+    --size-250: var(--space-250);
+    --size-300: var(--space-300);
+    --size-500: var(--space-500);
+    --size-750: 120px;
+    --size-1000: 160px;
+    --size-1400: 224px;
+    --size-1500: 240px;
+    --size-1900: 304px;
+    --size-2000: 320px;
+    --size-2500: 400px;
+    --size-3000: 480px;
+    --size-4500: 720px;
+    --size-5400: 864px;
+    --size-7700: 1232px;
+    --size-4000: 640px;
+
+    /* spacing / foundations */
+    /* Size */
+    --height-100: var(--size-100);
+    --height-125: var(--size-125);
+    --height-150: var(--size-150);
+    --height-200: var(--size-200);
+    --height-250: var(--size-250);
+    --height-300: var(--size-300);
+    --height-500: var(--size-500);
+    --height-750: var(--size-750);
+    --height-2000: var(--size-2000);
+    --width-500: var(--size-500);
+    --width-1000: var(--size-1000);
+    --width-1400: var(--size-1400);
+    --width-1500: var(--size-1500);
+    --width-2000: var(--size-2000);
+    --width-2500: var(--size-2500);
+    --width-3000: var(--size-3000);
+    --width-1900: var(--size-1900);
+    --item-height-sm: var(--height-150);
+    --item-height-md: var(--height-200);
+    --row-height-sm: var(--height-200);
+    --row-height-md: var(--height-250);
+    --row-height-lg: var(--height-300);
+    --label-height-sm: var(--height-100);
+    --label-height-md: var(--height-125);
+    --label-max-width: var(--width-1000);
+    --field-width-xs: var(--width-500);
+    --field-width-sm: var(--width-1000);
+    --field-width-md: var(--width-1500);
+    --field-width-lg: var(--width-2000);
+    --field-width-xl: var(--width-3000);
+    --field-min-height-sm: var(--height-500);
+    --field-min-height-lg: var(--height-750);
+    --icon-sm: var(--size-075);
+    --icon-md: var(--size-100);
+    --icon-lg: var(--size-150);
+    --image-xxs: var(--size-100);
+    --image-xs: var(--size-125);
+    --image-sm: var(--size-150);
+    --image-md: var(--size-200);
+    --image-lg: var(--size-250);
+    --image-xl: var(--size-300);
+    /* Element */
+    --element-pad-x-xs: var(--space-025);
+    --element-pad-x-sm: var(--space-050);
+    --element-pad-x-md: var(--space-075);
+    --element-pad-y-sm: var(--space-0125);
+    --element-pad-y-md: var(--space-0375);
+    --element-stack-sm: var(--space-025);
+    --element-stack-md: var(--space-050);
+    --element-stack-lg: var(--space-075);
+    --element-inline-sm: var(--space-025);
+    --element-inline-md: var(--space-050);
+    --element-inline-lg: var(--space-075);
+    --element-radius-sm: var(--radius-0125);
+    --element-radius-md: var(--radius-025);
+    --element-radius-lg: var(--radius-050);
+    --element-radius-item-sm: var(--radius-0375);
+    --element-radius-item-md: var(--radius-050);
+    --element-radius-full: var(--radius-full);
+    /* Border */
+    --border-default: var(--stroke-1);
+    --border-selected: var(--stroke-2);
+    --border-focused: var(--stroke-2);
+}

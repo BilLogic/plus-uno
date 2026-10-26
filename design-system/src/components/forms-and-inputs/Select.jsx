@@ -9,6 +9,7 @@ import useOptionSource from './_internal/useOptionSource';
 import useStagedValue from './_internal/useStagedValue';
 import useFieldId from './useFieldId';
 import './Select.scss';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 export { SEARCH_FIRST_ABOVE };
 
@@ -75,6 +76,7 @@ const Select = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('Select', size);
     const multi = mode === 'multi';
     // A required single pick cannot be emptied; multi and optional fields can.
     const canClear = clearable ?? (multi || !required);
@@ -425,6 +427,7 @@ const Select = ({
                 <Field
                     ref={fieldRef}
                     size={size}
+                    grow={multi && lineWrap}
                     disabled={isDisabled}
                     readOnly={isReadOnly}
                     {...tones.field}
@@ -517,7 +520,7 @@ Select.propTypes = {
     disabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     /** Shows an asterisk on the label and sets `aria-required`. */
     required: PropTypes.bool,

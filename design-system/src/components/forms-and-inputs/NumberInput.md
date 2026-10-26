@@ -30,7 +30,7 @@ Empty is not 0: an empty field stays empty, and stepping from it starts at 0 (or
 | `size` | enum | `'medium'` | — |
 | `disabled` | bool | `false` | Disable the number input |
 | `readOnly` | bool | — | Make the input read-only. Hides the steppers. |
-| `readonly` | bool | — | @deprecated Prefer `readOnly` |
+| `readonly` | bool | — | @deprecated Prefer readOnly |
 | `validation` | enum | `'none'` | Validation state of the input |
 | `validationMessage` | node | — | Validation message to display |
 | `min` | number | — | Minimum value |
@@ -55,7 +55,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

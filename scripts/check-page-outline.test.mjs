@@ -101,7 +101,7 @@ test('the two page predicates agree, in both directions', () => {
     'Specs/Admin/Overview',
     'Specs/Universal/Overview',
     'Specs/Home/Sections/Students Overview',
-    'Components/Status and loading/Badge',
+    'Components/Labels/Badge',
     'Specs/Universal/Sections/Top Bar',
   ];
   for (const t of cases) assert.equal(IS_PAGE(t), isPageTitle(t), t);
@@ -110,7 +110,7 @@ test('the two page predicates agree, in both directions', () => {
 test('a fragment story is not a page', () => {
   // The reason the population is a decision and not "every story". An `<h1>` in
   // a Badge story would be wrong — the story is not a document.
-  assert.equal(isPageTitle('Components/Status and loading/Badge'), false);
+  assert.equal(isPageTitle('Components/Labels/Badge'), false);
   assert.equal(isPageTitle('Specs/Home/Sections/Students Overview'), false);
 });
 

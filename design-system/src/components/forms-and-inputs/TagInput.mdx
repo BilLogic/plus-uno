@@ -91,15 +91,15 @@ from a list or adds, such as the topics a session covers.
     <DsCanvasQuiet of={TagInputStories.CollapsesWithoutFocus} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>At `maxTags`, Create hides and the list says why.</>}>
+<DocsCanvasShell description={<>At <code>maxTags</code>, Create hides and the list says why.</>}>
     <DsCanvasQuiet of={TagInputStories.PickLimit} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Option menu: with `onRename`, `onDelete` or `onColorChange`, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's seven colors.</>}>
+<DocsCanvasShell description={<>Option menu: with <code>onRename</code>, <code>onDelete</code> or <code>onColorChange</code>, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's ten colors.</>}>
     <DsCanvasQuiet of={TagInputStories.OptionMenu} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Reordering: with `onReorder`, each row has a handle. Drag it, or Tab to it and press Space; the arrows move the row and a line marks where it lands.</>}>
+<DocsCanvasShell description={<>Reordering: with <code>onReorder</code>, each row has a handle. Drag it, or Tab to it and press Space; the arrows move the row and a line marks where it lands.</>}>
     <DsCanvasQuiet of={TagInputStories.Reordering} />
 </DocsCanvasShell>
 
@@ -109,7 +109,7 @@ from a list or adds, such as the topics a session covers.
 
 ## Appearance
 
-<DocsCanvasShell description={<>Size variants: small, medium and large.</>}>
+<DocsCanvasShell description={<>The field is 32 high with one row of tags and grows as they wrap. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={TagInputStories.Sizes} />
 </DocsCanvasShell>
 
@@ -131,7 +131,7 @@ from a list or adds, such as the topics a session covers.
     <DsCanvasQuiet of={TagInputStories.Disabled} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Controlled: with `onChange` or `onRemove` the × removes the tag; with neither there is no ×.</>}>
+<DocsCanvasShell description={<>Controlled: with <code>onChange</code> or <code>onRemove</code> the × removes the tag; with neither there is no ×.</>}>
     <DsCanvasQuiet of={TagInputStories.Controlled} />
 </DocsCanvasShell>
 
@@ -315,6 +315,7 @@ On a row's handle and in its menu:
 ## Related
 
 - For one value rather than a set, use `Tag`.
+- For the set without a field around it, use `TagGroup`.
 - For several values from a fixed list, use `Select mode="multi"`.
 
 </div>

@@ -8,8 +8,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Table, Form } from 'react-bootstrap';
-import Button from '@/components/actions/Button/Button';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import Badge from '@/components/labels/Badge/Badge';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import Switch from '@/components/forms-and-inputs/Switch';
 import './StudentModal.scss';

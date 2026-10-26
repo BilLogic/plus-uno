@@ -5,7 +5,7 @@
 
 // `_Field Affix`: "$", ".00", "https://". Quieter than the value.
 .plus-field-affix {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 // A checkbox or radio addon sits on the text line with no box around it.
@@ -45,16 +45,25 @@
     margin: 0;
 }
 
-// The small Dropdown button, cut to the field's line like the button addons.
+// The Dropdown addon is 24, like the button addons, and centers in the field.
 .plus-input-group-dropdown {
     display: inline-flex;
-    height: 100%;
+    align-items: center;
 
     .pdropdown,
     .dropdown-toggle {
-        height: 100%;
+        height: var(--item-height-sm);
         min-height: 0;
         padding-top: 0;
         padding-bottom: 0;
     }
+}
+
+// At the box's edge it sits 4 from it, as a button addon does.
+.plus-field__leading > .plus-input-group-dropdown:first-child {
+    margin-inline-start: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
+}
+
+.plus-field__trailing > .plus-input-group-dropdown:last-child {
+    margin-inline-end: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
 }

@@ -30,7 +30,7 @@ slots: text affixes ("$", ".00"), a checkbox or radio, an icon, small buttons an
 | `size` | enum | `'medium'` | Size variant of the input group |
 | `disabled` | bool | `false` | Disable the input group |
 | `readOnly` | bool | — | Make the input read-only |
-| `readonly` | bool | — | @deprecated Prefer `readOnly` |
+| `readonly` | bool | — | @deprecated Prefer readOnly |
 | `validation` | enum | `'none'` | — |
 | `validationMessage` | node | — | — |
 | `leadingVisual` | arrayOf | — | One addon, or an array of them, for the Leading slot. |
@@ -52,7 +52,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant` · `--layout-control-checkbox`
+`--ds-text-subtle` · `--element-pad-x-md` · `--element-pad-x-xs` · `--item-height-sm` · `--layout-control-checkbox`
 
 From `design-system/src/components/forms-and-inputs/InputGroup/InputGroup.scss`. Override these through the token layer, never with a literal.
 
@@ -135,6 +135,6 @@ Implemented as `InputGroupDropdown`.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

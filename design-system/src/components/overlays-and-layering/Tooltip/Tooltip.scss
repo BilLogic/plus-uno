@@ -1,0 +1,46 @@
+/*
+ * Tooltip Component Styles: the Popover family's Tooltip (Figma
+ * Pattern/Tooltip). body.small 12/16 on the inverse surface, pad-y
+ * Popover/pad-y-tooltip 4, pad-x Element/pad-x-sm 8, radius
+ * Popover/radius-tooltip 6, and it wraps past Popover/max-width-tooltip 240.
+ * Its fill is color.background.neutral.bold with color.text.inverse, so it
+ * flips with the mode. No arrow: it sits Popover/offset 4 from its trigger,
+ * lifted by elevation.shadow.overlay like every floating layer without a scrim.
+ *
+ * Every size draws the one tooltip; `size` is kept so no call site breaks.
+ */
+
+.tooltip {
+
+    &.plus-tooltip-default,
+    &.plus-tooltip-small,
+    &.plus-tooltip-large {
+        // Bootstrap tooltip variables
+        --bs-tooltip-bg: var(--ds-background-neutral-bold);
+        --bs-tooltip-color: var(--ds-text-inverse);
+        --bs-tooltip-border-radius: var(--popover-radius-tooltip);
+        --bs-tooltip-opacity: 1;
+        --bs-tooltip-padding-x: var(--element-pad-x-sm);
+        --bs-tooltip-padding-y: var(--popover-pad-y-tooltip);
+        --bs-tooltip-max-width: var(--popover-max-width-tooltip);
+        // Bootstrap pads the tooltip by the arrow's height to make room for
+        // it; with no arrow the offset alone sets the distance.
+        --bs-tooltip-arrow-height: 0px;
+        --bs-tooltip-arrow-width: 0px;
+        --bs-tooltip-margin: 0;
+
+        padding: 0;
+
+        .tooltip-arrow {
+            display: none;
+        }
+
+        // A floating layer without a scrim: the overlay shadow.
+        .tooltip-inner {
+            box-sizing: border-box;
+            font: var(--body-small);
+            text-align: left;
+            box-shadow: var(--ds-shadow-overlay);
+        }
+    }
+}

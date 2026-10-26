@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../actions/Button/Button';
+import Button from './Button/Button';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 const toText = (value) => (value === undefined || value === null ? '' : String(value));
 
@@ -35,7 +36,7 @@ const NumberInput = ({
     size = 'medium',
     disabled = false,
     readOnly,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
@@ -52,6 +53,7 @@ const NumberInput = ({
     onDecrement,
     ...props
 }) => {
+    useDeprecatedFieldSize('NumberInput', size);
     /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
     const isReadOnly = readOnly !== undefined ? readOnly : Boolean(readonly);
@@ -190,7 +192,7 @@ NumberInput.propTypes = {
     disabled: PropTypes.bool,
     /** Hides the steppers; the value can be read and copied. */
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.node,

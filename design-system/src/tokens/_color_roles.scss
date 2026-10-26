@@ -49,26 +49,26 @@
  *
  * WARNING IS THE EXCEPTION and the reason this file has values in it at all.
  * The base falls to 2.87:1 on `--color-surface-container-highest`, under even
- * the 3:1 bar, so warning's border takes #715c00 — which is not an invented
- * color: it is the value Figma records as `Warning/Warning Border`. It measures
- * 6.50:1 on white and 5.02:1 at its worst, clearing both bars everywhere.
+ * the 3:1 bar, so warning's border AND its icon take #715c00, the value Figma
+ * records as `Warning/Warning Border` (`Warning/Warning Icon` aliases it). It
+ * measures 6.50:1 on white and 5.02:1 at its worst, clearing both bars on every
+ * surface step. The warning fill and container keep their values; a filled
+ * warning takes `--color-on-warning`, the ink, at 4.62:1, so the yellow stays
+ * yellow.
  *
  * THE BORDERS HAVE USERS NOW; THE ICONS DO NOT. On 2026-08-29 the scan behind
  * `npm run check:intent-roles` found 137 declarations painting a border or an
  * outline from an intent BASE, and 111 of them were moved onto `-border` in one
  * pass. Six of the seven roles alias their base, so those 111 changed no pixel —
  * what changed is that an edge now SAYS it is an edge, and the value can move
- * for edges alone. Twenty-six remain, each recorded with a reason in
- * `scripts/baselines/intent-role-adoption.json`:
+ * for edges alone. The warning edges moved once warning's value was decided,
+ * and those did change pixels: #9f8205 to #715c00. What remains is recorded
+ * with a reason in `scripts/baselines/intent-role-adoption.json`:
  *
  *   25  focus rings, all `--color-primary`. A focus indicator is its own role —
  *       Atlassian names `color.border.focused` beside `color.border` — and no
  *       `--color-X-focus-ring` exists here. Renaming them to `-border` would
  *       assert an equivalence nobody has decided.
- *    1  the warning border on the supervisor alert, the ONE site whose
- *       migration would change a pixel. The base measures 3.70:1 on that
- *       ground, clearing the 3:1 non-text bar, so there is no defect there to
- *       fix — only the choice #312 has not made.
  *
  * The `-icon` roles still have no users: an icon color is usually set by
  * `color:` on a glyph, which `check:text-contrast` already measures against the
@@ -80,13 +80,13 @@
  */
 
 :root {
-    /* Every -icon resolves to its -text color: 6.70:1 at worst, clearing the
-       4.5:1 text bar as well as the 3:1 icon one. Every -border keeps the base,
-       whose worst ratio is noted beside it. */
+    /* Every -icon but warning's resolves to its -text color: 6.70:1 at worst,
+       clearing the 4.5:1 text bar as well as the 3:1 icon one. Every -border
+       but warning's keeps the base, whose worst ratio is noted beside it. */
 
     /* Primary — border base 4.08 at worst. */
     --color-primary-icon: var(--color-primary-text);
-    --color-primary-border: var(--color-primary);
+    --color-primary-border: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /* Secondary — border base 5.44. */
     --color-secondary-icon: var(--color-secondary-text);
@@ -108,11 +108,10 @@
 
     /* Warning — the one exception. The base (#9f8205) measures 2.87:1 on
        --color-surface-container-highest, under even the 3:1 border bar, so the
-       BORDER takes #715c00: the value of Figma's Warning/Warning Border, 5.02:1
-       at its worst. The icon needs no exception, since
-       --color-warning-text is 6.70:1 at its worst like every other. */
-    --color-warning-icon: var(--color-warning-text);
+       border and the icon take #715c00: Figma's Warning/Warning Border, which
+       Warning/Warning Icon aliases. 6.50:1 on white, 5.02:1 at its worst. */
     --color-warning-border: #715c00;
+    --color-warning-icon: var(--color-warning-border);
 
     /* Info — aliases tertiary, as every other info token does. */
     --color-info-icon: var(--color-info-text);
@@ -141,7 +140,7 @@
      * without hunting 29 call sites, and so `check:focus-ring` has one name to
      * hold them to.
      */
-    --color-focus-ring: var(--color-primary);
+    --color-focus-ring: var(--color-primary); // overridden by color/_legacy-aliases.scss
 
     /*
      * THE FOCUS RING ON A COLORED GROUND — Figma `Focus/Focus Ring Inverse`.
@@ -158,7 +157,7 @@
      * Colors/surface) but is not yet in figma-variables-snapshot.json; refresh
      * with `npm run snapshot:figma-variables`.
      */
-    --color-focus-ring-inverse: var(--color-surface);
+    --color-focus-ring-inverse: var(--color-surface); // overridden by color/_legacy-aliases.scss
 
     /*
      * SURFACE ROLES UNDER THEIR FIGMA NAMES — `Surface roles/surface-*`.

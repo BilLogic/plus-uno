@@ -175,9 +175,12 @@ export interface ReviewDecisionRequest {
 }
 
 /** Open the pop-up on a card: loading first, then the draft or why there is
- *  none to decide. A decided card whose record still keeps it (View) is drawn
- *  as its draft, read-only, under who decided it; one whose record does not
- *  shows its outcome alone. */
+ *  none to decide. A card that closed — decided, answered, noted, withdrawn,
+ *  replaced or out of time — is drawn from the draft its record keeps (View),
+ *  read-only, under how it closed, who closed it and when (#1362). Only a card
+ *  closed before its record kept the draft shows its outcome alone: an item
+ *  of a report its words off the report's record, any other card the outcome
+ *  its message ends with. */
 export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoorDeps): Promise<void> {
   const card: ReviewedCard = { channel: request.channel, ts: request.messageTs };
   const viewId = await deps.views.open(request.triggerId, loadingView(card));
@@ -190,11 +193,14 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
     standingConfirmers: deps.standingConfirmers,
   });
   console.log(`[review] opened ${request.channel}/${request.messageTs} by=${request.userId} state=${look.state}`);
-  // An item no longer live: its words come off the report's record, and one
-  // whose time ran out is shown closed on its card from now on.
-  const item = request.item && look.state !== "live" ? await reportItem(request.channel, request.item, deps) : null;
-  const view = look.state === "gone" && look.decided
-    ? draftView(card, look.decided.proposal, { mayDecide: false, confirmers: [], decided: look.decided })
+  // The draft a closed card's record keeps, when it keeps one.
+  const kept = look.state === "live" ? undefined : look.decided;
+  // An item no longer live: its report redrawn, so one whose time ran out is
+  // shown closed on its card from now on — and, when nothing was kept, its
+  // words read off the report's record.
+  const item = request.item && look.state !== "live" ? await reportItem(request.channel, request.item, deps, !kept) : null;
+  const view = kept
+    ? draftView(card, kept.proposal, { mayDecide: false, confirmers: [], decided: kept })
     : item
     ? decidedView(card, item, look.state === "live" ? undefined : closedTitle(look))
     :
@@ -228,12 +234,20 @@ async function itemClosesAt(proposal: PendingProposal, deps: ReviewDoorDeps): Pr
   return record && Number.isFinite(postedAt) ? { closesAt: postedAt + record.ttlMs } : {};
 }
 
-/** An item's words for View, off its report's record — redrawing the
- *  report's message first, so an item whose time ran out reads as closed. */
-async function reportItem(channel: string, item: { messageTs: string; id: string }, deps: ReviewDoorDeps): Promise<string | null> {
+/** An item's words for View, off its report's record, when `words` asks for
+ *  them: only for an item closed before its record kept the draft. The
+ *  report's message is redrawn first either way, so an item whose time ran
+ *  out reads as closed. */
+async function reportItem(
+  channel: string,
+  item: { messageTs: string; id: string },
+  deps: ReviewDoorDeps,
+  words: boolean,
+): Promise<string | null> {
   const now = (deps.now ?? Date.now)();
   const message = await currentReport(deps.threadState, item.messageTs, now).catch(() => null);
   if (message) await deps.updateCard(channel, item.messageTs, message);
+  if (!words) return null;
   const record = await deps.threadState.getReport(item.messageTs).catch(() => null);
   return record ? itemText(record, item.id) : null;
 }

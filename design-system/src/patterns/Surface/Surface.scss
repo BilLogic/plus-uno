@@ -1,37 +1,35 @@
 /**
  * Surface pattern (Patterns/Surfaces)
- * Bare tokenized surface — level, padding, radius, border, elevation.
- * All values come from design tokens; no hardcoded colors/radius/spacing/shadows.
+ * Bare tokenized surface — elevation level, padding, radius, border.
+ * Each level is a fill and its shadow, as a pair; every value is a token.
  */
+
+@use '../../styles/surface-edge' as *;
 
 .plus-pattern-surface {
     display: block;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
-/* Levels */
-.plus-pattern-surface-level-surface {
-    background-color: var(--color-surface);
+/* Levels: a fill and its shadow, always together */
+.plus-pattern-surface-level-sunken {
+    background-color: var(--ds-surface-sunken);
 }
 
-.plus-pattern-surface-level-surface-container-lowest {
-    background-color: var(--color-surface-container-lowest);
+// The page: no shadow, only the surface edge.
+.plus-pattern-surface-level-default {
+    background-color: var(--ds-surface);
+    @include surface-edge;
 }
 
-.plus-pattern-surface-level-surface-container-low {
-    background-color: var(--color-surface-container-low);
+.plus-pattern-surface-level-raised {
+    background-color: var(--ds-surface-raised);
+    box-shadow: var(--ds-shadow-raised);
 }
 
-.plus-pattern-surface-level-surface-container {
-    background-color: var(--color-surface-container);
-}
-
-.plus-pattern-surface-level-surface-container-high {
-    background-color: var(--color-surface-container-high);
-}
-
-.plus-pattern-surface-level-surface-container-highest {
-    background-color: var(--color-surface-container-highest);
+.plus-pattern-surface-level-overlay {
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
 }
 
 /* Padding scale — md is the canonical Surface padding token pair.
@@ -73,26 +71,17 @@
 
 /* Border */
 .plus-pattern-surface-bordered {
-    border: var(--size-surface-border) solid var(--color-outline); /* outer perimeter = outline */
+    border: var(--size-surface-border) solid var(--ds-border-bold);
 }
 
-/* Elevation */
-.plus-pattern-surface-elevation-1 {
-    box-shadow: var(--elevation-light-1);
+// A bordered default surface draws its border instead of the edge ring, never both.
+.plus-pattern-surface-level-default.plus-pattern-surface-bordered {
+    box-shadow: none;
 }
 
-.plus-pattern-surface-elevation-2 {
-    box-shadow: var(--elevation-light-2);
-}
-
-.plus-pattern-surface-elevation-3 {
-    box-shadow: var(--elevation-light-3);
-}
-
-.plus-pattern-surface-elevation-4 {
-    box-shadow: var(--elevation-light-4);
-}
-
-.plus-pattern-surface-elevation-5 {
-    box-shadow: var(--elevation-light-5);
+/* The page's h1: Heading/large 24/28, the top of the page outline. */
+.plus-pattern-surface-title {
+    margin: 0 0 var(--surface-stack-md);
+    font: var(--heading-large);
+    color: var(--ds-text);
 }

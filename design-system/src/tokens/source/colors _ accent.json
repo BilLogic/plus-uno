@@ -704,17 +704,15 @@
       "resolvedType": "COLOR",
       "valuesByMode": {
         "10132:0": {
-          "r": 1,
-          "g": 1,
-          "b": 1,
-          "a": 1
+          "type": "VARIABLE_ALIAS",
+          "id": "VariableID:803:24382"
         }
       },
       "resolvedValuesByMode": {
         "10132:0": {
-          "r": 1,
-          "g": 1,
-          "b": 1,
+          "r": 0.137255,
+          "g": 0.105882,
+          "b": 0,
           "a": 1
         }
       }
@@ -3301,13 +3299,13 @@
       "valuesByMode": {
         "10132:0": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:10244:46102"
+          "id": "VariableID:17563:41"
         }
       },
       "resolvedValuesByMode": {
         "10132:0": {
-          "r": 0.356863,
-          "g": 0.290196,
+          "r": 0.443137,
+          "g": 0.360784,
           "b": 0,
           "a": 1
         }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { ChoiceGroup, Select } from '@/components';
 
 /**
@@ -270,7 +270,7 @@ export const RequestTutorOffCanvas = ({
                 flexDirection: 'column',
                 gap: 'var(--size-card-gap, 16px)',
                 padding: 'var(--size-card-pad-y-lg, 24px) var(--size-card-pad-x-lg, 24px)',
-                zIndex: 1200,
+                zIndex: 'var(--layout-z-index-dialog)',
                 boxSizing: 'border-box',
             }}
         >

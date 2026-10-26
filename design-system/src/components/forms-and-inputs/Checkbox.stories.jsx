@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { px } from '@/storybook-docs/lib/style-probes.js';
 import Checkbox from './Checkbox';
 
 export default {
@@ -8,6 +11,12 @@ export default {
     component: Checkbox,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, the disabled fill, edge and mark, and the focus ring in `border.focused`.' },
+            { date: '2026-10-24', kind: 'changed', summary: 'A checked box keeps its fill and check on hover, under the shadow 08 layer. Keyboard focus is the 2px focus ring 2px off the box; a pointer focus draws none.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'A labeled checkbox is a 24 row at every size, its label 14/20.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+        ],
         docs: {
             description: {
                 component:
@@ -74,9 +83,9 @@ export default {
 const pageWrap = { maxWidth: '600px' };
 const contentVariantCard = {
     padding: '12px',
-    border: '1px solid var(--color-outline-variant)',
+    border: '1px solid var(--ds-border)',
     borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
+    background: 'var(--ds-surface-container)',
 };
 
 function CheckboxContentDemos() {
@@ -84,7 +93,7 @@ function CheckboxContentDemos() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Longer descriptive copy used in forms and filters.
                 </p>
                 <div style={contentVariantCard}>
@@ -93,7 +102,7 @@ function CheckboxContentDemos() {
             </section>
             <section>
                 <h6 className="h6" style={{ marginBottom: '8px' }}>Required indicator</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Adds a required marker next to the label.
                 </p>
                 <div style={contentVariantCard}>
@@ -256,4 +265,67 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
     const box = canvas.getByRole('checkbox', { name: 'Email reminders' });
     const desc = canvasElement.ownerDocument.getElementById(box.getAttribute('aria-describedby'));
     await expect(desc.textContent).toBe('Sent the evening before.');
+};
+
+/** Keyboard focus: the focus-ring role, 2px wide and 2px off the box's edge. */
+export const KeyboardFocus = () => <Checkbox id="checkbox-focus" label="Send reminders" defaultChecked />;
+KeyboardFocus.parameters = { docs: { disable: true } };
+KeyboardFocus.play = async ({ canvasElement }) => {
+    const box = within(canvasElement).getByRole('checkbox', { name: 'Send reminders' });
+    box.style.transition = 'none';
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(box);
+    const style = getComputedStyle(box);
+    await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+    await expect(px(style.outlineWidth), 'ring width').toBe(2);
+    await expect(px(style.outlineOffset), 'ring gap').toBe(2);
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(style.outlineColor, `${mode}: ring color`).toBe(token('--ds-border-focused'));
+    });
+};
+
+/**
+ * Hover on a checked box keeps its check and steps its Lagoon fill and edge to
+ * the opaque hovered step; an unchecked box takes the input's hovered fill and
+ * the brand edge. A disabled checked box takes the disabled fill, edge and mark.
+ */
+export const HoverStep = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <Checkbox id="checkbox-hover" label="Checked" defaultChecked />
+        <Checkbox id="checkbox-hover-off" label="Unchecked" />
+        <Checkbox id="checkbox-hover-disabled" label="Disabled" defaultChecked disabled />
+    </div>
+);
+HoverStep.parameters = { docs: { disable: true } };
+HoverStep.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const box = canvas.getByRole('checkbox', { name: 'Checked' });
+    const off = canvas.getByRole('checkbox', { name: 'Unchecked' });
+    const disabled = canvas.getByRole('checkbox', { name: 'Disabled' });
+    const check = () => getComputedStyle(box, '::before');
+    const resting = { transform: check().transform };
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(box).backgroundColor, `${mode}: checked fill`).toBe(token('--ds-background-selected-bold'));
+        await expect(getComputedStyle(box).borderTopColor, `${mode}: checked edge`).toBe(token('--ds-border-selected'));
+        await expect(check().backgroundColor, `${mode}: the check`).toBe(token('--ds-icon-inverse'));
+        await expect(getComputedStyle(off).backgroundColor, `${mode}: unchecked fill`).toBe(token('--ds-background-input'));
+        await expect(getComputedStyle(off).borderTopColor, `${mode}: unchecked border`).toBe(token('--ds-border-input'));
+        await expect(getComputedStyle(disabled).backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
+        await expect(getComputedStyle(disabled).borderTopColor, `${mode}: disabled edge`).toBe(token('--ds-border-disabled'));
+        await expect(getComputedStyle(disabled, '::before').backgroundColor, `${mode}: disabled check`).toBe(token('--ds-icon-disabled'));
+        const hovered = withForcedPseudo(box, ':hover', () => {
+            const { backgroundColor, borderTopColor } = getComputedStyle(box);
+            return { backgroundColor, borderTopColor, transform: check().transform, color: check().backgroundColor };
+        });
+        await expect(hovered.backgroundColor, `${mode}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(hovered.borderTopColor, `${mode}: the hovered edge`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(hovered.transform, 'the check stays drawn at its resting size').toBe(resting.transform);
+        await expect(hovered.color, `${mode}: the check keeps its inverse color`).toBe(token('--ds-icon-inverse'));
+        const offHovered = withForcedPseudo(off, ':hover', () => {
+            const { backgroundColor, borderTopColor } = getComputedStyle(off);
+            return { backgroundColor, borderTopColor };
+        });
+        await expect(offHovered.backgroundColor, `${mode}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
+        await expect(offHovered.borderTopColor, `${mode}: unchecked hover edge`).toBe(token('--ds-border-brand'));
+    });
 };

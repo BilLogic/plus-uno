@@ -41,6 +41,7 @@ import type {
   CheckStart,
   CheckState,
   CutOffNoteReport,
+  ClosedMark,
   DecidedMark,
   DecisionReportRecord,
   Execution,
@@ -114,9 +115,10 @@ export function createDurableObjectThreadState(
     },
 
     // Retire, as distinct from claim: the record stays readable so a ✅ on the
-    // replaced card can be told it was replaced (#583).
-    retireProposal(proposalTs: string): Promise<{ retired: boolean }> {
-      return hop().retireProposal(proposalTs, now());
+    // replaced card can be told it was replaced (#583). With a mark it closes
+    // the card as decided, for View (#1362).
+    retireProposal(proposalTs: string, closed?: ClosedMark): Promise<{ retired: boolean }> {
+      return hop().retireProposal(proposalTs, now(), closed);
     },
 
     // Needs changes' lock: one hop, so of two racing presses one marks it.

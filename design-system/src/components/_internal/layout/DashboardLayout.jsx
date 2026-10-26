@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Row, Col, Navbar, Nav, Image } from 'react-bootstrap';
-import { Button } from '@/components/actions/Button';
+import { Button } from '@/components/forms-and-inputs/Button';
 
 const DashboardLayout = ({ children }) => {
     return (

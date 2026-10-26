@@ -1,12 +1,12 @@
 {
-  "measured": "2026-10-22",
+  "measured": "2026-10-24",
   "suite": {
-    "storyFiles": 430,
-    "tests": 1444
+    "storyFiles": 439,
+    "tests": 1577
   },
-  "violatingStories": 45,
+  "violatingStories": 41,
   "rules": {
-    "color-contrast": 41,
+    "color-contrast": 37,
     "scrollable-region-focusable": 2,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
@@ -74,12 +74,6 @@
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories.jsx::CTA (Tutor View) Buttons": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories.jsx::Submit Request Button": [
-      "color-contrast"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/SessionManagementSnackbar.stories.jsx::All Variations": [
       "color-contrast"
     ],
@@ -132,12 +126,6 @@
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Tables/MySessions.stories.jsx::Row States": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Lessons/Elements/Toast/Toast.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Lessons/Elements/Toast/Toast.stories.jsx::Overview": [
       "color-contrast"
     ],
     "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::Interactive": [

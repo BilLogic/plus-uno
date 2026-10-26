@@ -104,6 +104,18 @@ A fundamental design primitive (color palette, type scale, grid).
 A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
 _Avoid_: bare "replica", "screenshot"
 
+**Static table**:
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Planned in code as `StaticTable`, built on today's `Table` primitive (`_internal/Table`); which type to use is `design-system/guidelines/composition/surfaces.md` § Choosing a table.
+_Avoid_: "basic table", bare "table" for this type
+
+**Dynamic table**:
+Any table people act on: sorting, filtering, selection, paging, row expansion or row actions. Planned in code as `DynamicTable`.
+_Avoid_: "data table", "interactive table"
+
+**Tree table**:
+A table whose rows nest under parent rows. Planned in code as `TreeTable`.
+_Avoid_: "table tree", "nested table"
+
 ### Estates
 
 **uno-blueprint**:
@@ -198,7 +210,7 @@ The Slack plan a person watches while a turn's lookups run: a **task card** per 
 _Avoid_: "plan stream", "progress surface", "steps"
 
 **result table**:
-The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; not a Markdown table.
+The sortable table beneath an answer, filled by code from one lookup's rows on fields the model picked. One per answer; a Slack answer table, not a Markdown table and not one of the design-system table types.
 _Avoid_: "card table", "data table"
 
 **source** / **Sources box**:

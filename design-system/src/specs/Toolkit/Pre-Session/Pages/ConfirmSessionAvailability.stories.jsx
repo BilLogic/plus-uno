@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { TableRow, TableHeaderRow } from '../Tables/MySessions.stories';
@@ -188,7 +188,7 @@ export const Overview = () => (
                 bottom: 'var(--size-section-gap-lg)',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                zIndex: 1000
+                zIndex: 'var(--layout-z-index-flag)'
             }}
         >
             <SessionAvailabilitySnackbar 
@@ -280,7 +280,7 @@ const InteractiveRender = (args) => {
                         bottom: 'var(--size-section-gap-lg)',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        zIndex: 1000
+                        zIndex: 'var(--layout-z-index-flag)'
                     }}
                 >
                     <SessionAvailabilitySnackbar

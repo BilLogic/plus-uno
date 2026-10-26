@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 
 import { checkFile, readTabs } from './check-docs-tabs.mjs';
 
-const COMPONENT = 'design-system/src/components/actions/Button/Button.mdx';
+const COMPONENT = 'design-system/src/components/forms-and-inputs/Button/Button.mdx';
 const FOUNDATION = 'design-system/src/styles/Colors.mdx';
 
 const section = (heading) => `<div className="sb-ds-doc-section">\n\n## ${heading}\n\nbody\n\n</div>`;

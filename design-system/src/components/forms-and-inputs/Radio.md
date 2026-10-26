@@ -9,7 +9,7 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard
+**Stories:** `design-system/src/components/forms-and-inputs/Radio.stories.jsx` — Overview, Content, Layout, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio.mdx`
 
@@ -45,13 +45,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-inverse-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-surface-variant` · `--font-family-body` · `--font-weight-normal` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

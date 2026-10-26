@@ -16,61 +16,37 @@ export const figmaMeta = {
     "hover": { "type": "boolean" },
     "bordered": { "type": "boolean" }
   },
-  "modelNote": "Figma models table CELLS (variant `size`/`type` = body vs head); code models the WHOLE table via `headers` + `rows`. A set therefore maps to the cells this component renders, not to a single instance — pick the set from `density` + `bordered`, then the cell variant from whether it is a header or body cell.",
+  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. Neither the Dynamic nor the Tree table has a component of its own in code (PatternTable carries part of Dynamic table's behavior: the sticky header and column, paging and the empty state), so the three pages are listed here as docs pages, not as sets to write back to.",
   "sets": [
     {
-      "id": "normal-borderless",
-      "name": "Table/Normal Borderless",
-      "componentSetNodeId": "10:473",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-473",
-      "codeDefaults": { "density": "md", "bordered": false },
-      "variantProps": { "size": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
-      "variantValueMap": { "size": { "head": "header cell", "body": "body cell" } },
-      "source": "designer-supplied",
-      "status": "verified"
+      "id": "static-table-page",
+      "name": "Static table (page)",
+      "componentSetNodeId": "17156:122",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122",
+      "source": "manual",
+      "status": "docs-page",
+      "notes": "The Static table page: the Static table set and the shared _Table parts it is built from."
     },
     {
-      "id": "small-borderless",
-      "name": "Table/Small Borderless",
-      "componentSetNodeId": "10:507",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-507",
-      "codeDefaults": { "density": "sm", "bordered": false },
-      "variantProps": { "size": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
-      "variantValueMap": { "size": { "head": "header cell", "body": "body cell" } },
-      "source": "designer-supplied",
-      "status": "verified"
+      "id": "dynamic-table-page",
+      "name": "Dynamic table (page)",
+      "componentSetNodeId": "19685:27042",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
+      "source": "manual",
+      "status": "docs-page",
+      "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
     },
     {
-      "id": "normal-border",
-      "name": "Table/Normal Border",
-      "componentSetNodeId": "10:502",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-502",
-      "codeDefaults": { "density": "md", "bordered": true },
-      "variantProps": { "type": "cellRole", "style": "cellStyle", "icon": "trailingIcon" },
-      "variantValueMap": { "type": { "head": "header cell", "body": "body cell" } },
-      "source": "designer-supplied",
-      "status": "verified",
-      "notes": "Note the variant group is named `type` here, not `size` as in the borderless sets."
-    },
-    {
-      "id": "contextual-color",
-      "name": "Table/Contextual Color",
-      "componentSetNodeId": "10:721",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-721",
-      "variantProps": { "state": null, "style": null },
-      "source": "designer-supplied",
-      "status": "no-code-equivalent",
-      "notes": "Row state (disabled/focused/hovered/pressed) x semantic style (error/info/primary/success/warning). Code has no prop for this — apply it per cell via the cell object's `className`."
-    },
-    {
-      "id": "background-color",
-      "name": "Table/Background Color",
-      "componentSetNodeId": "10:722",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-722",
-      "variantProps": { "color": null },
-      "source": "designer-supplied",
-      "status": "no-code-equivalent",
-      "notes": "11 tinted row backgrounds including the SMART competency colors. Code has no prop — apply per cell via `className`."
+      "id": "tree-table-page",
+      "name": "Tree table (page)",
+      "componentSetNodeId": "19685:27043",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
+      "source": "manual",
+      "status": "docs-page",
+      "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
     }
   ]
 };
@@ -86,7 +62,8 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/_internal/Table"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -162,7 +139,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 - **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
 - **Per-cell control** — pass `{ content, align, colSpan, className }` instead of a bare value when a cell needs alignment or spanning.
-- **Density** maps to the `--size-table-cell-*` token family, matching `Pattern/Table` in Figma.
+- **Density** maps to the `--size-table-cell-*` token family.
 
 </div>
 

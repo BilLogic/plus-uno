@@ -33,7 +33,8 @@ design-system/src/specs/Home/
 └── Pages/
     ├── TutorHomePageSkillsOverview/
     ├── TutorHomePageSkillsProgress/
-    └── TutorHomePageSkillsOverviewDifferentLayout/
+    ├── TutorHomePageSkillsOverviewDifferentLayout/
+    └── TutorHomePageNewLayout/  # Home (new layout): the same content on the Frame and content grid
 ```
 
 ## Figma mapping
@@ -56,6 +57,7 @@ design-system/src/specs/Home/
 | Sections · Homepage Jumbotron | `Sections/HomepageJumbotron` |
 | Sections · Students Overview (Bottom Section) | `Sections/StudentsOverviewSection` |
 | Pages · Skills (Home Page) | `Pages/TutorHomePageSkillsOverview` (+ Progress / Different Layout variants) |
+| BS4 Foundation · Patterns › Page templates · Home (tutor) | `Pages/TutorHomePageNewLayout` (Home (new layout), for review beside the pages above) |
 
 ## Removed / archived vs Figma
 

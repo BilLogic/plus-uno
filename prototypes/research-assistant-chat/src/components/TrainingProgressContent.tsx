@@ -5,9 +5,9 @@
 import React, { useState } from 'react';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore – plus-ds JSX components
-import Button from '@/components/actions/Button/Button';
+import Button from '@/components/forms-and-inputs/Button/Button';
 // @ts-ignore
-import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 // @ts-ignore
 import Pagination from '@/components/navigation/Pagination/Pagination';
 // @ts-ignore

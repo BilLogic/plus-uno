@@ -253,3 +253,74 @@ test('@grounds: a bad declaration fails the whole check', () => {
     done();
   }
 });
+
+/*
+ * THE `--ds-` PREFIX. The Atlassian-shaped tokens live in `tokens/color/` and a
+ * ring written with them is measured the way a `--color-*` one is: the token is
+ * followed through its `--palette-*` alias to a value, on the ground its rule
+ * paints, which may itself be a `--ds-*` token.
+ */
+test('a --ds-border-focused ring is read and measured, and clears 3:1 on the page', () => {
+  assert.ok(VALUES.has('--ds-border-focused'), 'the --ds- tokens are part of what the check reads');
+  assert.ok(ratio('--ds-border-focused', '--color-surface', VALUES) >= 3);
+  const root = corpus({ [A]: '.x:focus-visible { outline: 2px solid var(--ds-border-focused); }\n' });
+  const entries = indicators(focusRules([A], root), VALUES);
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].best.token, '--ds-border-focused');
+  assert.equal(invisible(entries).size, 0);
+});
+
+test('a --ds- background is a ground, and a --ds- token is a valid @grounds entry', () => {
+  const painted = corpus({
+    [A]: '.x:focus-visible { background-color: var(--ds-background-brand-bold); outline: 2px solid var(--ds-border-inverse); }\n',
+  });
+  const entries = indicators(focusRules([A], painted), VALUES);
+  assert.equal(entries[0].best.ground, '--ds-background-brand-bold');
+  assert.equal(invisible(entries).size, 0);
+
+  const declared = corpus({ [A]: inverseRing('--ds-background-brand-bold --color-primary') });
+  assert.deepEqual(declarationErrors([A], declared, VALUES), []);
+  assert.deepEqual(
+    indicators(focusRules([A], declared), VALUES)[0].grounds.map((g) => g.ground).sort(),
+    ['--color-primary', '--ds-background-brand-bold'],
+  );
+});
+
+const DS_SEMANTIC =
+  ':root { --ds-border-focused: var(--palette-lagoon-700); --ds-border-input: var(--palette-lagoon-100); }\n';
+
+const dsFocusTree = (ring, semantic = DS_SEMANTIC) => ({
+  'design-system/src/tokens/_colors.scss': ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; }\n',
+  'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
+  'design-system/src/tokens/color/_palette.scss':
+    ':root { --palette-lagoon-700: #147b84; --palette-lagoon-100: #e6f4f5; }\n',
+  'design-system/src/tokens/color/_semantic.scss': semantic,
+  [A]: `.a:focus { outline: 2px solid var(${ring}); }\n`,
+  'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
+});
+
+test('an invisible --ds- ring in a fixture tree is a finding, named by its --ds- token', () => {
+  const { root, done } = policyTree(dsFocusTree('--ds-border-input'));
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /strongest focus affordance/.test(message) && /--ds-border-input/.test(message)),
+      `expected an invisible-ring finding, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('a ring on --ds-border-focused needs the color directory to define it', () => {
+  const { root, done } = policyTree(dsFocusTree('--ds-border-focused', ':root {}\n'));
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /no longer defines --ds-border-focused/.test(message)),
+      `expected the vanished --ds- role, got:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});

@@ -35,7 +35,7 @@ import '@/styles/globals.scss';
 - `design-system/src/components/forms-and-inputs/index.js` (also re-exported from the components barrel)
 
 **Out of new files:** file-level and category-folder paths
-(`@/components/actions/Button/Button`), `_internal/` paths, and the `@plus-ds`
+(`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
 alias.
 
 **What the code actually does**, so the rule is read for what it is rather than
@@ -81,7 +81,16 @@ Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
 
 - Never edit generated token files (`_colors.scss`, `_spacing.scss`, etc.) directly
 - Always run `generate:tokens` after `sync:tokens`
-- Token source is Figma, not the SCSS files
+- Token source is Figma, not the SCSS files — for every family except the
+  Atlassian-shaped color set below
+
+```
+scripts/lib/color/plans/plan-*.json → npm run generate:color-tokens → design-system/src/tokens/color/ → Figma (figma-spec.json)
+```
+
+- The color set (`--ds-*`, `--palette-*`) runs the other way: the plan files
+  are the source, and Figma is downstream, pushed from the generated
+  `figma-spec.json` (ADR-035)
 
 ## Git
 

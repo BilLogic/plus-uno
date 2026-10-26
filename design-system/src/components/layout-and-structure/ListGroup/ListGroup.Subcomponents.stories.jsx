@@ -1,9 +1,9 @@
 import React from 'react';
 import ListGroup from './ListGroup';
-import Badge from '@/components/status-and-loading/Badge/Badge';
+import Badge from '@/components/labels/Badge/Badge';
 
 export default {
-    title: 'Components/Layout and structure/List Group',
+    title: 'Components/Layout and structure/List group',
     component: ListGroup.Item,
     tags: ['!dev'],
     parameters: {

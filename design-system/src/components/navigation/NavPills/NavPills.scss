@@ -30,15 +30,14 @@
         &.pseudo-pressed > .nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed > .plus-nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed > .plus-nav-item-pill:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
         }
 
         &.pseudo-focus > .nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus > .plus-nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus > .plus-nav-item-pill:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         &.pseudo-hover > .nav-link.active,
@@ -62,7 +61,7 @@
         &.pseudo-pressed > .nav-link[aria-current="page"],
         &.pseudo-pressed > .plus-nav-link[aria-current="page"],
         &.pseudo-pressed > .plus-nav-item-pill[aria-current="page"] {
-            background-color: var(--color-primary-state-16) !important;
+            background-color: var(--color-primary-state-12) !important;
         }
 
         &.pseudo-focus > .nav-link.active,
@@ -74,9 +73,8 @@
         &.pseudo-focus > .nav-link[aria-current="page"],
         &.pseudo-focus > .plus-nav-link[aria-current="page"],
         &.pseudo-focus > .plus-nav-item-pill[aria-current="page"] {
-            background-color: var(--color-primary-state-12) !important;
-            outline: 2px solid var(--color-primary) !important;
-            outline-offset: 2px !important;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring) !important;
+            outline-offset: var(--size-element-stroke-lg) !important;
         }
     }
 
@@ -92,14 +90,16 @@
         // Pill shape
         border: var(--size-element-stroke-sm, 1px) solid transparent;
         border-radius: var(--size-element-radius-md, 4px);
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px);
+        // 32 like a medium button (`--item-height-md`), the label centered.
+        box-sizing: border-box;
+        height: var(--item-height-md);
+        padding: 0 var(--size-element-pad-x-lg, 16px);
         box-shadow: none;
 
-        // Typography
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body1, 16px);
-        font-weight: var(--font-weight-normal, 400);
-        line-height: var(--font-line-height-body1, 1.5);
+        // Typography: a tab label is Body/default at the medium weight, like a
+        // button label.
+        font: var(--body-default);
+        font-weight: var(--type-weight-medium);
         text-decoration: none;
 
         // Default state - transparent background
@@ -125,17 +125,20 @@
 
         // PRESSED state
         &:active:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--color-on-surface-state-12);
         }
 
-        // FOCUS state
+        // FOCUS state: the ring alone, 2px off the pill.
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         // ACTIVE/SELECTED state - PRIMARY PILL OUTLINE + PRIMARY STATE LAYERS (Figma)
+        //
+        // The primary border carries selection, as the underline does on a
+        // tab, so a selected pill rests unfilled and takes the hover and
+        // pressed steps over that.
         //
         // React-Bootstrap sometimes marks selected state via attributes (aria-selected / aria-current),
         // depending on usage (tabs vs links vs pills). Style all of them.
@@ -146,7 +149,7 @@
             background-color: transparent !important;
             border: var(--size-element-stroke-sm, 1px) solid var(--color-primary-border) !important;
             color: var(--color-primary-text) !important;
-            font-weight: var(--font-weight-body1-regular, var(--font-weight-normal, 400));
+            font-weight: var(--type-weight-medium);
             border-radius: var(--size-element-radius-md, 4px) !important;
             box-shadow: none !important;
             outline: none !important;
@@ -156,13 +159,14 @@
             }
 
             &:active {
-                background-color: var(--color-primary-state-16) !important;
+                background-color: var(--color-primary-state-12) !important;
             }
 
+            // The ring beats the `outline: none` above, or a selected pill
+            // would show no focus at all.
             &:focus-visible {
-                background-color: var(--color-primary-state-12) !important;
-                outline: 2px solid var(--color-primary);
-                outline-offset: 2px;
+                outline: var(--size-element-stroke-lg) solid var(--color-focus-ring) !important;
+                outline-offset: var(--size-element-stroke-lg) !important;
             }
         }
 
@@ -186,19 +190,21 @@
             gap: var(--size-element-gap-md, 10px);
             border: var(--size-element-stroke-sm, 1px) solid transparent;
             border-radius: var(--size-element-radius-md, 4px);
-            padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px);
+            // The same 32 as a tab, so a dropdown tab lines up with its neighbors.
+            box-sizing: border-box;
+            height: var(--item-height-md);
+            padding: 0 var(--size-element-pad-x-lg, 16px);
             background-color: transparent;
             color: var(--color-on-surface);
-            font-family: var(--font-family-body);
-            font-size: var(--font-size-body1, 16px);
-            font-weight: var(--font-weight-normal, 400);
+            font: var(--body-default);
+            font-weight: var(--type-weight-medium);
 
             &:hover {
                 background-color: var(--color-on-surface-state-08);
             }
 
             &:active {
-                background-color: var(--color-on-surface-state-16);
+                background-color: var(--color-on-surface-state-12);
             }
 
             &.show,

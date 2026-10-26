@@ -3,13 +3,13 @@
 
 # SidebarTab
 
-Sidebar navigation tab with state-based styling. Per Figma spec: node-id=111-227838 Colors per Figma: - enabled: transparent bg, on-surface text, ON-SURFACE-VARIANT icon (#3f484a) - hover: primary-12 bg, primary-text color (#00547e), primary icon (#0472a8) - selected: primary-16 bg, primary-text color (#00547e), primary icon (#0472a8) - disabled: transparent bg, on-surface text, 0.38 opacity - focus: primary-12 bg, primary-text color, 2px outline `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They exist so the design's five states can be laid out side by side in a docs canvas — the real hover and focus appearances come from CSS on the rendered element and need no prop at all. Wiring them to real events is the mistake this note exists to prevent: `onMouseEnter={() => setState('hover')}` re-renders the row on every pointer move, and it still does not follow the keyboard, because a focus that arrives by Tab never touches the pointer handler. Leave `state` on `enabled` or `selected` in an application and let the stylesheet do the rest.
+One row of a side navigation, matching the BS4 Foundation `Sidebar Tab` (node 17118:127). A 32 row (`--item-height-md`) padded 12 at the sides, with a 16 icon box and a Body/default 14/20 label that truncates. Slots, after Atlassian's side-nav item: - `description`: a second line in Body/small. The row grows past 32 to hold it. - `elemAfter`: a count, a badge or a status at the end of the row. - `actionsOnHover`: controls (⋯, ×) that show on hover and while the row has focus. They render beside the row, never inside it, so a button does not nest in a button and pressing an action does not open the row. `href` makes the row a link; `external` opens it in a new tab and says so. States, drawn by the stylesheet: - enabled: transparent, subtle text and icon - hover: the neutral subtle hovered fill (pressed: its pressed step) - selected: the neutral selected fill with selected text and icon, the label in the medium weight, and `aria-current="page"`, so selection never rests on fill alone - focus: a 2px focused ring, 2px outside the row, and no fill - disabled: the disabled text and icon colors, no tab stop `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They exist so the design's five states can be laid out side by side in a docs canvas — the real hover and focus appearances come from CSS on the rendered element and need no prop at all. Wiring them to real events is the mistake this note exists to prevent: `onMouseEnter={() => setState('hover')}` re-renders the row on every pointer move, and it still does not follow the keyboard, because a focus that arrives by Tab never touches the pointer handler. Leave `state` on `enabled` or `selected` in an application and let the stylesheet do the rest.
 
 **Import:** `import { SidebarTab } from '@/components';`
 
 **Source:** `design-system/src/components/navigation/SidebarTab/SidebarTab.jsx`
 
-**Stories:** `design-system/src/components/navigation/SidebarTab/SidebarTab.stories.jsx` — InSidebar, Default, Overview, Selected, Hover, Disabled, NoIcon, WithTrailingIcon, Interactive
+**Stories:** `design-system/src/components/navigation/SidebarTab/SidebarTab.stories.jsx` — InSidebar, Default, Overview, Selected, Hover, Disabled, NoIcon, WithTrailingIcon, Interactive, KeyboardFocus, ColorModes, LongLabel, WithDescription, WithElemAfter, WithActionsOnHover, ExternalLink, DisabledIsInert
 
 **Storybook page:** `design-system/src/components/navigation/SidebarTab/SidebarTab.mdx`
 
@@ -17,11 +17,16 @@ Sidebar navigation tab with state-based styling. Per Figma spec: node-id=111-227
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | string (required) | — | — |
-| `icon` | string | — | — |
-| `state` | enum | `'enabled'` | — |
-| `leadingVisual` | bool | `true` | — |
-| `trailingVisual` | bool | `false` | — |
+| `text` | string (required) | — | The label. It truncates with an ellipsis past the row's width. |
+| `icon` | string | — | Font Awesome Free solid name for the 16 leading icon, e.g. `house` |
+| `state` | enum | `'enabled'` | `hover` and `focus` are documentation values; drive only `enabled`, `selected` and `disabled`. |
+| `leadingVisual` | bool | `true` | Show the leading icon |
+| `trailingVisual` | bool | `false` | Older placeholder glyph at the end of the row. Prefer `elemAfter`, which wins when both are set. |
+| `description` | node | — | A second line under the label, in Body/small |
+| `elemAfter` | node | — | A count, badge or status at the end of the row |
+| `actionsOnHover` | node | — | Controls shown on hover and focus, rendered beside the row (never inside it) |
+| `href` | string | — | Makes the row a link |
+| `external` | bool | `false` | With `href`: open in a new tab, announced as "(opens in a new tab)" |
 | `id` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
@@ -35,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-state-08` · `--color-primary`
+`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--element-inline-md` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/SidebarTab/SidebarTab.scss`. Override these through the token layer, never with a literal.
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Button from '@/components/actions/Button/Button';
-import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '../Cards/OverviewCard.stories';
 import { CallOffsTableRow, CallOffsTableHeaderRow } from '../Tables/CallOffsTable.stories';
@@ -443,7 +443,7 @@ export const WithModals = (args) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
-                    zIndex: 1000
+                    zIndex: 'var(--layout-z-index-scrim)'
                 }}>
                     {renderModal()}
                 </div>

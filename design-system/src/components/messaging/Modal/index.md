@@ -9,7 +9,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Content, Layout, Types, Interactive, Overview
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -18,11 +18,18 @@ Universal modal component for creating dialog windows that overlay the main cont
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `title` | string | — | — |
+| `title` | string | — | The dialog's h1, and its accessible name. |
+| `description` | node | — | A line under the title, read as the dialog's description. |
 | `ariaLabel` | string | — | The dialog's accessible name when it has no visible `title`. |
 | `body` | string or node | — | — |
-| `type` | enum | `'default'` | Modal type |
+| `height` | enum | `'hug'` | Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap |
+| `type` | enum | `'default'` | Deprecated: use height |
 | `showBottomButtons` | bool | `true` | Show bottom buttons |
+| `showCloseButton` | bool | `true` | The header's close button. Off for a dialog that has to be answered. |
+| `headerActions` | node | — | Icon buttons in the header, before the close button. |
+| `footer` | node | — | Custom footer actions in place of the two buttons, aligned right. |
+| `dividers` | bool | `false` | A rule under the header and over the footer. |
+| `loading` | bool | `false` | Skeleton bars in place of the body while its content loads. |
 | `show` | bool | `false` | — |
 | `backdrop` | bool or string | `true` | — |
 | `keyboard` | bool | `true` | — |
@@ -33,18 +40,20 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `enforceFocus` | bool | — | — |
 | `autoFocus` | bool | — | — |
 | `restoreFocus` | bool | — | — |
-| `primaryButton` | shape | — | — |
-| `secondaryButton` | shape | — | — |
+| `primaryButton` | buttonShape | — | — |
+| `secondaryButton` | buttonShape | — | — |
 | `onClose` | func | — | — |
-| `paddingSize` | enum | — | — |
-| `gapSize` | enum | — | — |
-| `radiusSize` | enum | `'md'` | — |
-| `width` | number or string | `340` | Modal width |
+| `paddingSize` | enum | — | Deprecated: the old Modal/pad- tokens. The modal pads Modal/pad 16. |
+| `gapSize` | enum | — | Deprecated: the old Modal/gap- tokens. The modal stacks Modal/stack-md 16. |
+| `radiusSize` | enum | — | Deprecated: the old Modal/radius- tokens. The modal's radius is Modal/radius 12. |
+| `width` | enum | `'sm'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `children` | node | — | — |
 
 ## Variants
+
+**`height`** — `hug` · `fill`
 
 **`type`** — `default` · `scrollable`
 
@@ -56,11 +65,13 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **`radiusSize`** — `sm` · `md` · `lg`
 
+**`width`** — `sm` · `md` · `lg`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface` · `--color-on-surface-variant` · `--color-outline-variant` · `--color-primary` · `--color-surface` · `--color-surface-container-highest` · `--elevation-light-2` · `--font-weight-semibold-2` · `--size-element-gap-md` · `--size-element-radius-md` · `--size-modal-gap-lg` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-lg` · `--size-modal-pad-x-md` · `--size-modal-pad-x-sm` · `--size-modal-pad-y-lg` · `--size-modal-pad-y-md` · `--size-modal-pad-y-sm` · `--size-modal-radius-lg` · `--size-modal-radius-md` · `--size-modal-radius-sm`
+`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-blanket` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--element-inline-sm` · `--element-radius-md` · `--element-stack-md` · `--element-stack-sm` · `--heading-medium` · `--icon-md` · `--item-height-md` · `--layout-columns` · `--layout-gutter` · `--layout-max-height-modal` · `--layout-max-width-content` · `--layout-min-width-content` · `--layout-z-index-modal` · `--layout-z-index-scrim` · `--modal-inline-sm` · `--modal-pad` · `--modal-radius` · `--modal-stack-md` · `--overlay-pad-x` · `--overlay-pad-y` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-modal-gap-lg` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-lg` · `--size-modal-pad-x-md` · `--size-modal-pad-x-sm` · `--size-modal-pad-y-lg` · `--size-modal-pad-y-md` · `--size-modal-pad-y-sm` · `--size-modal-radius-lg` · `--size-modal-radius-md` · `--size-modal-radius-sm` · `--space-150`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

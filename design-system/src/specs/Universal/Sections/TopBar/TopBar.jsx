@@ -1,85 +1,48 @@
 /**
  * TopBar Component
- * 
- * Top navigation bar with sidebar control, breadcrumbs, and user avatar.
+ *
+ * The Specs Top Bar on the foundation Topbar pattern (`@/patterns`): the
+ * sidebar toggle, the breadcrumb, Help Center and the user avatar, 32 high.
+ * This keeps the Specs prop names (`mode`, `onToggle`) and maps them onto the
+ * pattern. Inside PageLayout the Frame owns the sidebar state and
+ * the toggle follows it; standalone, pass `onToggle` to draw the toggle.
  * Figma Spec: node-id=111-227860, 111-227866
  */
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Breadcrumb from '@/components/navigation/Breadcrumb';
-import { UserAvatar } from '../../Elements';
-import Button from '@/components/actions/Button';
-import './TopBar.scss';
-
-/** Collapsed left section width (toggle button only); matches PageLayout motion. */
-const TOPBAR_LEFT_COLLAPSED_WIDTH = 52;
-const TOPBAR_LEFT_EXPANDED_WIDTH = 164; // matches --layout-sidebar-width / SideNav width
+import { Topbar } from '@/patterns';
 
 const TopBar = ({
     mode = 'expanded',
     onToggle,
     breadcrumbs = [{ text: 'Home', href: '#' }, { text: 'Page' }],
     user = null,
+    onHelpClick,
+    helpHref,
+    loading = false,
     className = '',
     style,
-    ...props
-}) => {
-    const handleToggle = () => {
-        if (onToggle) {
-            onToggle(mode === 'expanded' ? 'collapsed' : 'expanded');
-        }
-    };
-
-    // Numeric width so CSS can transition; aligns with sidebar (164px when expanded).
-    const leftSectionWidth = mode === 'expanded' ? TOPBAR_LEFT_EXPANDED_WIDTH : TOPBAR_LEFT_COLLAPSED_WIDTH;
-
-    return (
-        <div
-            className={`plus-topbar ${className}`}
-            style={style}
-            {...props}
-        >
-            {/* Left: Sidebar Control */}
-            <div
-                className="topbar-left-section"
-                style={{ width: leftSectionWidth }}
-            >
-                <Button
-                    className="topbar-toggle-btn"
-                    style="primary" // Logic handled by class override, but keeping semantically primary
-                    fill="tonal"    // Logic handled by class override
-                    leadingVisual={<i className={`fas fa-${mode === 'expanded' ? 'angles-left' : 'bars'}`} />}
-                    onClick={handleToggle}
-                    aria-label={mode === 'expanded' ? "Collapse sidebar" : "Expand sidebar"}
-                />
-            </div>
-
-            {/* Center: Breadcrumbs */}
-            <div className="topbar-center-section">
-                <Breadcrumb items={breadcrumbs} />
-            </div>
-
-            {/* Right: User Avatar & Notification */}
-            <div className="topbar-right-section">
-                {user && (
-                    <UserAvatar
-                        firstChar={user.name?.charAt(0) || 'U'}
-                        name={user.name || 'User'}
-                        counter={user.counter}
-                        counterValue={user.counterValue}
-                        type={user.type}
-                    />
-                )}
-            </div>
-        </div>
-    );
-};
+    id,
+}) => (
+    <Topbar
+        id={id}
+        className={className}
+        style={style}
+        sidebar={mode === 'expanded' ? 'open' : 'closed'}
+        onToggle={onToggle ? () => onToggle(mode === 'expanded' ? 'collapsed' : 'expanded') : undefined}
+        breadcrumbs={breadcrumbs}
+        user={user}
+        onHelpClick={onHelpClick}
+        helpHref={helpHref}
+        loading={loading}
+    />
+);
 
 TopBar.propTypes = {
     /** Current sidebar mode */
     mode: PropTypes.oneOf(['expanded', 'collapsed']),
-    /** Callback when toggle button is clicked, receives new mode */
+    /** Callback when toggle button is clicked, receives new mode. Without it, no toggle is drawn. */
     onToggle: PropTypes.func,
     /** Breadcrumb items array */
     breadcrumbs: PropTypes.arrayOf(PropTypes.shape({
@@ -93,8 +56,15 @@ TopBar.propTypes = {
         counterValue: PropTypes.number,
         type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin'])
     }),
+    /** Called when Help Center is pressed */
+    onHelpClick: PropTypes.func,
+    /** Help Center link; opens in a new tab */
+    helpHref: PropTypes.string,
+    /** Skeletons in place of the breadcrumb and the account; the toggle stays */
+    loading: PropTypes.bool,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    id: PropTypes.string,
 };
 
 export default TopBar;

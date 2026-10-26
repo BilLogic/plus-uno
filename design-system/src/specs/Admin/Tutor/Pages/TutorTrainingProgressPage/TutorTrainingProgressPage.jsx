@@ -8,8 +8,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/actions/Button/Button';
-import ButtonGroup from '@/components/actions/ButtonGroup/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import NavTabs from '@/components/navigation/NavTabs/NavTabs';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import OverviewCard from '@/specs/Universal/Cards/OverviewCard/OverviewCard';

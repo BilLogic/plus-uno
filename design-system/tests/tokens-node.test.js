@@ -49,6 +49,8 @@ import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
+  COLOR_PREFIXES,
+  COLOR_TOKEN_DIR,
   FAMILIES,
   TOKEN_DIR,
   colorKey,
@@ -159,9 +161,37 @@ describe('the corpus — where tokens live, answered once and read through the o
 
   it('does not read `tokens/source/`, the Figma export the SCSS is generated from', () => {
     for (const source of tokenSources()) {
-      expect(source.file).not.toMatch(/\//);
-      expect(source.file).toMatch(/\.(scss|css)$/);
+      // The one directory read below the flat sheets is the generated color set.
+      expect(source.file).toMatch(/^(color\/)?[^/]+\.(scss|css)$/);
+      expect(source.file.startsWith('source/')).toBe(false);
     }
+  });
+
+  it('reads the generated color tokens, and not the Bootstrap bridge that consumes them', () => {
+    const files = tokenSources().map((s) => s.file);
+    expect(files).toContain('color/_semantic.scss');
+    expect(files).toContain('color/_palette.scss');
+    expect(files).not.toContain('color/_bootstrap-bridge.scss');
+
+    const corpus = tokenCorpus({ prefix: COLOR_PREFIXES });
+    // A `--ds-` token is an alias of a ramp step, followed to its hex.
+    expect(corpus.get('--ds-border-focused').raw).toMatch(/^var\(--palette-/);
+    expect(corpus.get('--ds-border-focused').value).toMatch(/^#[0-9a-f]{6}$/);
+    expect(corpus.get('--ds-border-focused').file).toBe('color/_semantic.scss');
+    expect(corpus.has('--color-primary')).toBe(true);
+    expect([...corpus.keys()].some((name) => name.startsWith('--bs-'))).toBe(false);
+    expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
+  });
+
+  it('reads the color directory from the root it is given', () => {
+    const root = mkdtempSync(join(tmpdir(), 'tokens-node-color-'));
+    mkdirSync(join(root, COLOR_TOKEN_DIR), { recursive: true });
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_palette.scss'), ':root { --palette-teal-700: #147d6a; }');
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_semantic.scss'), ':root { --ds-text-brand: var(--palette-teal-700); }');
+    writeFileSync(join(root, COLOR_TOKEN_DIR, '_bootstrap-bridge.scss'), ':root { --bs-primary: var(--ds-text-brand); }');
+
+    expect(tokenSources({ root }).map((s) => s.file)).toEqual(['color/_palette.scss', 'color/_semantic.scss']);
+    expect(tokenCorpus({ root }).get('--ds-text-brand').value).toBe('#147d6a');
   });
 
   /*
@@ -242,7 +272,7 @@ describe('the family map — one statement of which family a name is in', () => 
   });
 
   it('answers null rather than guessing for a name in no family', () => {
-    expect(familyOf('--table-cell-x')).toBe(null);
+    expect(familyOf('--dropdown-cell-x')).toBe(null);
     expect(familyOf('not-a-token')).toBe(null);
     expect(familyOf(undefined)).toBe(null);
   });
@@ -444,12 +474,23 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * #f9f9fc and paired with the six surface overlays; 426 when the four
    * `--color-surface-default|overlay|raised|sunken` roles arrived as aliases
    * of solid neutrals already in the corpus and brought 15 pairs with their
-   * overlays, every one of the new pairs touching one of the four. The number is asserted
+   * overlays, every one of the new pairs touching one of the four; 430 when
+   * `--overlay-scrim` arrived as black at 38% beside the other black
+   * washes; 427 when `--color-on-warning` left white for the solid container
+   * ink and took its three pairs with the white washes along. The number is asserted
    * rather than logged because a migrating caller's exposure is this number,
    * and a drift in it is news either way.
+   *
+   * THE GENERATED COLOR SET IS LEFT OUT. When `tokens/color/` joined the corpus
+   * its `--ds-` and `--palette-` tokens took the count to 1543, and that number
+   * moves with every plan regenerated. Their exposure is nil: a `--ds-` token
+   * is never written with a fallback (`check:ds-fallbacks`), so no comparison
+   * either fallback check makes can reach one. What is counted is the legacy
+   * set, which is the set the exposure is about.
    */
-  it('differs from the normalizer on 426 live token pairs', () => {
+  it('differs from the normalizer on 427 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
+      .filter((entry) => !entry.file.startsWith('color/'))
       .map((entry) => entry.value)
       .filter((value) => normalizeColor(value) !== null);
 
@@ -461,7 +502,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(426);
+    expect(pairs).toBe(427);
   });
 
   /*
@@ -478,9 +519,12 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 85 `var(--color-*, rgba(…))` sites, every one
+   * Measured over the live tree: 38 `var(--color-*, rgba(…))` sites, every one
    * captured, and every one names a defined token and is compared with
-   * alpha on both sides. All 85 agree, because the disagreeing washes were
+   * alpha on both sides. All 38 agree (81 until 2026-10-24, when a Dropdown
+   * fallback that duplicated its token was dropped and Tag's × lost its focus
+   * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
+   * tokens, which carry no fallbacks), because the disagreeing washes were
    * fixed when the capture widened, and the test asserts it: a stale wash
    * here is a failure, not a recount.
    */
@@ -501,7 +545,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(85);
+    expect(washes).toBe(38);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -536,12 +580,35 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // (`surface-container-hover`, `surface-container-active`,
     // `primary-state-04`) now name the on-surface and primary state layers,
     // so they are compared here rather than skipped.
-    expect(withAlpha).toBe(85);
+    // 81: UserAvatar moved its inline styles into its stylesheet, on the
+    // tokens alone, and the Specs copy became an adapter over it, so four
+    // state-layer washes went with them.
+    // 80: the Dropdown item's pressed wash dropped a fallback that repeated
+    // `--color-on-surface-state-12`, its own token, verbatim.
+    // 78: Tag's × shows focus as the ring alone, so its two 12 focus fills
+    // (plain and elevated) went.
+    // 38: Tag and Suggestion moved onto the --ds- tokens, and their 40 state
+    // and border washes went with the legacy names.
+    expect(withAlpha).toBe(38);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
     // 623: the same three washes, now naming defined tokens, became comparable.
-    expect(comparable).toBe(623);
+    // 615: the Popover took the Popup pattern's tokens, and its eight hex
+    // fallbacks went with the dark header.
+    // 614: PageLayout moved onto the Frame pattern, and its surface
+    // fill's hex fallback went with the inline styles.
+    // 607: Modal.scss moved onto the modal pattern tokens and dropped its seven
+    // color fallbacks.
+    // 600: UserAvatar and its Specs copy dropped their inline styles, and
+    // seven color fallbacks (four washes, three hex) with them.
+    // 597: the 2026-10-24 color-rules audit dropped three fallbacks that sat
+    // beside a defined token — Switch's disagreeing `#a8d1ed` twice and the
+    // Dropdown item's pressed wash.
+    // 595: the state-steps sweep dropped the two focus fills on Tag's ×.
+    // 514: Tag and Suggestion moved onto the --ds- tokens, which carry no
+    // fallbacks, so their 81 color fallbacks (40 washes) went.
+    expect(comparable).toBe(514);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

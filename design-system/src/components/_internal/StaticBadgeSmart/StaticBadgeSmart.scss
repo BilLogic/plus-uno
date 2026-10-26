@@ -1,0 +1,67 @@
+/*
+ * A SMART area: a read-only Tag filled in its subject's SMART colors.
+ *
+ * THE SMART LAYER. Each subject has its own tokens, `color.*.smart.{subject}`,
+ * which alias an accent no role uses, so a subject never reads as information,
+ * success, warning, danger or discovery. The area reads them, never the accent
+ * underneath, so the subject-to-hue pairing lives in the tokens alone:
+ *
+ *   ground     background.smart.{subject}
+ *   words      text.smart.{subject}, the ink made for that ground
+ *   swatch     icon.smart.{subject}
+ *   selected   border.smart.{subject}, should an area ever be selectable
+ *
+ * The border turns clear rather than going away, so the area stays 22 tall
+ * beside outlined tags. A disabled or elevated area keeps Tag's own recipe for
+ * those, so the fill steps aside for them; an elevated area keeps the
+ * subject's mark on its swatch, as an elevated tag keeps its hue. Each subject
+ * is written out in full so the generated docs list its tokens.
+ */
+
+.plus-smart-badge--mastering-content {
+    --plus-smart-ground: var(--ds-background-smart-mastering-content);
+    --plus-smart-ink: var(--ds-text-smart-mastering-content);
+    --plus-smart-mark: var(--ds-icon-smart-mastering-content);
+    --plus-smart-edge: var(--ds-border-smart-mastering-content);
+}
+
+.plus-smart-badge--relationship {
+    --plus-smart-ground: var(--ds-background-smart-relationship);
+    --plus-smart-ink: var(--ds-text-smart-relationship);
+    --plus-smart-mark: var(--ds-icon-smart-relationship);
+    --plus-smart-edge: var(--ds-border-smart-relationship);
+}
+
+.plus-smart-badge--social-emotional {
+    --plus-smart-ground: var(--ds-background-smart-social-emotional);
+    --plus-smart-ink: var(--ds-text-smart-social-emotional);
+    --plus-smart-mark: var(--ds-icon-smart-social-emotional);
+    --plus-smart-edge: var(--ds-border-smart-social-emotional);
+}
+
+.plus-smart-badge--advocacy {
+    --plus-smart-ground: var(--ds-background-smart-advocacy);
+    --plus-smart-ink: var(--ds-text-smart-advocacy);
+    --plus-smart-mark: var(--ds-icon-smart-advocacy);
+    --plus-smart-edge: var(--ds-border-smart-advocacy);
+}
+
+.plus-smart-badge--technology-tools {
+    --plus-smart-ground: var(--ds-background-smart-technology-tools);
+    --plus-smart-ink: var(--ds-text-smart-technology-tools);
+    --plus-smart-mark: var(--ds-icon-smart-technology-tools);
+    --plus-smart-edge: var(--ds-border-smart-technology-tools);
+}
+
+/* The subject's mark and edge, in every state: an elevated area keeps it on the swatch. */
+.plus-tag.plus-smart-badge {
+    --plus-tag-hue: var(--plus-smart-mark);
+    --plus-tag-border-selected: var(--plus-smart-edge);
+}
+
+.plus-tag.plus-smart-badge:not(.plus-tag--disabled):not(.plus-tag--elevated) {
+    --plus-tag-border-rest: transparent;
+
+    background-color: var(--plus-smart-ground);
+    color: var(--plus-smart-ink);
+}

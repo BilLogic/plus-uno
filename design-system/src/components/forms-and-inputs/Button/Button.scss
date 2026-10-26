@@ -1,0 +1,417 @@
+@use "sass:map";
+@use "sass:list";
+@use "sass:string";
+
+/* 
+ * Button Component Styles
+ * Strictly implements Design System tokens using Sass maps for 
+ * extensive Style x Variant matrix.
+ */
+
+// The hover and pressed STATE LAYER (foundations/color.md rule 2): a shadow
+// state token laid over the fill as a gradient. A registered color property,
+// so the layer fades in over the same 0.2s the fill used to.
+@property --plus-btn-state-layer {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: transparent;
+}
+
+.plus-btn {
+    // Layout
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    width: fit-content;
+    position: relative;
+
+    // RBButton always adds `.btn` (Bootstrap uses display: inline-block). Keep flex layout.
+    &.btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    // Default Shape & Typography
+    // Consistent height with Outline (borders on all variants, transparent by default)
+    border: var(--size-element-border) solid transparent;
+    border-radius: var(--size-element-radius-md);
+
+    // Typography handled by utility classes
+    text-align: center;
+    white-space: nowrap;
+    text-decoration: none;
+
+    cursor: pointer;
+    background-image: linear-gradient(var(--plus-btn-state-layer), var(--plus-btn-state-layer));
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, --plus-btn-state-layer 0.2s;
+
+    // --- STATES ---
+
+    // `loading` is excluded from the DISABLED APPEARANCE on purpose (#264).
+    //
+    // Button.jsx sets `disabled={disabled || loading}` so a loading button is
+    // genuinely :disabled — it cannot be clicked and it announces as disabled,
+    // which is right. But inheriting the disabled LOOK repainted the ground to
+    // --color-on-surface-state-12 (near-white) and dimmed everything to 0.38,
+    // while the spinner below kept the variant's on-main color: white on
+    // near-white at 38%, i.e. an empty gray box. Measured on the docs States
+    // demo before this change.
+    //
+    // A loading button therefore keeps its own ground, and the spinner is drawn
+    // on the color it was designed against.
+    &:disabled:not(.plus-btn--loading),
+    &.disabled:not(.plus-btn--loading) {
+        opacity: var(--color-disabled-opacity);
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    // Active / Pressed
+    &.active,
+    &:active {
+        // Visual feedback for click
+        transform: translateY(1px);
+    }
+
+    // Keyboard focus is the focus ring alone, 2px wide and 2px off the edge,
+    // the gap Checkbox and Radio keep. `.btn` in the selector outranks
+    // Bootstrap's `.btn:focus-visible`, which drops the outline.
+    &.btn:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: var(--size-element-stroke-lg);
+    }
+
+    // Block logic
+    &--block {
+        display: flex;
+        width: 100%;
+    }
+
+    // Loading logic
+    &--loading {
+        pointer-events: none;
+        color: transparent !important;
+
+
+
+        .plus-btn-visual {
+            opacity: 0;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            width: 1em;
+            height: 1em;
+            top: calc(50% - 0.5em);
+            left: calc(50% - 0.5em);
+
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.75s linear infinite;
+
+            // The fallback for a style with no entry in $btn-themes, which is
+            // NOT hypothetical: Button.jsx advertises 13 `style` values and the
+            // map below implements 8. The five category styles
+            // (social-emotional, mastering-content, advocacy, relationship,
+            // technology-tools) therefore render on the unthemed near-white
+            // ground, and the old fallback of --color-on-primary put a WHITE
+            // spinner on it — 1.04:1, measured across all 25 of their
+            // style x fill combinations.
+            //
+            // A themed style overrides this from its own block below, so this
+            // value only ever applies where the ground is the light default.
+            // The missing themes are a separate defect (#304).
+            color: var(--color-on-surface);
+        }
+    }
+
+
+    // --- SIZES ---
+    // Two heights: `medium` 32 and `small` 24 compact. `large` is deprecated and
+    // draws like `medium` (Button.jsx warns in development); its class stays so
+    // call sites that target `.plus-btn--large` keep matching.
+    //
+    // The height is set, not summed from padding: the 1px border every fill
+    // draws would otherwise make 2 + 20 + 2 a 26. Content centers in it.
+    // Map: Size Name -> (Height, Pad-X, Radius, Gap)
+    $btn-sizes: (
+        'small': ('--item-height-sm', '--element-pad-x-sm', '--size-element-radius-sm', '--element-inline-sm'),
+        'medium': ('--item-height-md', '--element-pad-x-md', '--size-element-radius-md', '--element-inline-md'),
+        'large': ('--item-height-md', '--element-pad-x-md', '--size-element-radius-md', '--element-inline-md')
+    );
+
+@each $size, $config in $btn-sizes {
+    // RBButton adds `.btn` — include it so padding always wins over Bootstrap’s `.btn` rule.
+    &.plus-btn--#{$size}.btn {
+        box-sizing: border-box;
+        height: var(string.unquote(list.nth($config, 1)));
+        padding: 0 var(string.unquote(list.nth($config, 2)));
+        border-radius: var(string.unquote(list.nth($config, 3)));
+        gap: var(string.unquote(list.nth($config, 4)));
+    }
+
+    // An icon-only button is square.
+    &.plus-btn--icon-only.plus-btn--#{$size}.btn {
+        width: var(string.unquote(list.nth($config, 1)));
+    }
+}
+
+// Every label is Body/default at the medium weight, and every icon draws at
+// 16, at every size. The `.btn` in the selector beats the typography
+// classes' `.h3 .fa-solid` icon sizing, so a button inside a heading keeps
+// its 16 icon.
+&.btn .plus-btn-text {
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
+}
+
+&.btn .plus-btn-visual {
+    font-size: var(--icon-md);
+
+    i,
+    .fa-solid,
+    .fa-regular,
+    .fa-brands {
+        font-size: inherit;
+    }
+}
+
+// --- ICON ONLY ---
+&.plus-btn--icon-only.btn {
+    padding: 0;
+
+    .plus-btn-visual--leading,
+    .plus-btn-visual--trailing {
+        margin: 0;
+    }
+}
+
+
+// --- COLOR THEMES CONFIGURATION ---
+// Using EXPLICIT STRINGS to avoid Sass interpretation issues
+// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer, 7:Border
+// An outline takes the intent's `-border` role (`_color_roles.scss`), not its
+// base. Warning's border role is #715c00 rather than its base, so a warning
+// outline is the one whose edge differs from its fill.
+// `default` and the five category styles have no border role and keep the base.
+$btn-themes: (
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container', '--color-primary-border'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container', '--color-secondary-border'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container', '--color-tertiary-border'),
+    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container', '--color-success-border'),
+    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning-border'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container', '--color-danger-border'),
+    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container', '--color-info-border'),
+    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface', '--color-surface-container-high'),
+
+    // The five category styles (#304). `Button.jsx` has advertised all thirteen
+    // in its `oneOf` since it was written, while this map implemented eight — so
+    // `style="advocacy"` rendered the unthemed near-white ground in every state,
+    // measured at 1.04:1 across all 25 of its style x fill combinations.
+    //
+    // WHY ADDING THEM RATHER THAN NARROWING THE PROP, which #304's acceptance
+    // allows equally: `Badge` already ships all twelve of the same vocabulary,
+    // each with its own color, measured. Narrowing here would leave two
+    // components in one design system disagreeing about what the vocabulary IS —
+    // `<Badge style="advocacy">` pink and `<Button style="advocacy">` not a
+    // thing. Badge is also the working precedent that these tokens render.
+    //
+    // No new tokens: every one of the thirty slots below already existed.
+    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--color-social-emotional-state-08', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container', '--color-social-emotional'),
+    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container', '--color-mastering-content'),
+    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--color-advocacy-state-08', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container', '--color-advocacy'),
+    'relationship': ('--color-relationship', '--color-on-relationship', '--color-relationship-state-08', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container', '--color-relationship'),
+    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--color-technology-tools-state-08', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container', '--color-technology-tools')
+);
+
+// --- VARIANTS (Fill Types) ---
+
+// --- BUTTON VARIANTS GENERATION ---
+@each $theme, $config in $btn-themes {
+    $col-main: string.unquote(list.nth($config, 1));
+    $col-on-main: string.unquote(list.nth($config, 2));
+    $col-state: string.unquote(list.nth($config, 3));
+    $col-text: string.unquote(list.nth($config, 4));
+    $col-container: string.unquote(list.nth($config, 5));
+    $col-on-container: string.unquote(list.nth($config, 6));
+    $col-border: string.unquote(list.nth($config, 7));
+    // The pressed step of the same layer: `--color-x-state-08` → `-state-12`.
+    $col-state-pressed: string.unquote(string.slice($col-state, 1, -3) + '12');
+
+    &--#{$theme} {
+
+        // 1. FILLED
+        &.plus-btn--filled {
+            background-color: var($col-main);
+            color: var($col-on-main);
+
+            // The shadow state layer over the fill, hover 08 and pressed 12,
+            // without dimming the label, the icon or the focus ring with it.
+            &:hover {
+                --plus-btn-state-layer: var(--color-shadow-state-08);
+            }
+
+            &.active,
+            &:active {
+                --plus-btn-state-layer: var(--color-shadow-state-12);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-on-main);
+            }
+
+            // Disabled: neutral bg at 12%, secondary text color, NO border
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
+                background-color: var(--color-on-surface-state-12);
+                border-color: transparent;
+                color: var(--color-secondary-text);
+                --plus-btn-state-layer: transparent;
+            }
+        }
+
+        // 2. TONAL (state-layer bg at 8%, text-safe color). The resting 08 is
+        // the documented tonal exception in foundations/color.md.
+        &.plus-btn--tonal {
+            background-color: var($col-state);
+            border-color: transparent;
+            color: var($col-text);
+
+            // The shadow state layer over the tonal fill, hover 08 and pressed 12.
+            &:hover {
+                --plus-btn-state-layer: var(--color-shadow-state-08);
+            }
+
+            &.active,
+            &:active {
+                --plus-btn-state-layer: var(--color-shadow-state-12);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+
+            // Disabled: neutral bg at 12%, on-surface-variant text
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
+                background-color: var(--color-on-surface-state-12);
+                --plus-btn-state-layer: transparent;
+                color: var(--color-on-surface-variant);
+            }
+        }
+
+        // 3. OUTLINE
+        &.plus-btn--outline {
+            background-color: transparent;
+            border-color: var($col-border);
+            color: var($col-text);
+
+            &:hover {
+                background-color: var($col-state);
+            }
+
+            &.active,
+            &:active {
+                background-color: var($col-state-pressed);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+
+            // Disabled: neutral outline border, on-surface text
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
+                background-color: transparent;
+                border-color: var(--color-outline);
+                color: var(--color-on-surface);
+            }
+        }
+
+        // 4. GHOST / TEXT
+        &.plus-btn--ghost,
+        &.plus-btn--text {
+            background-color: transparent;
+            border-color: transparent;
+            color: var($col-text);
+
+            &:hover {
+                background-color: var($col-state);
+            }
+
+            &.active,
+            &:active {
+                background-color: var($col-state-pressed);
+            }
+
+            &.plus-btn--loading::after {
+                color: var($col-text);
+            }
+
+            // Disabled: no bg/border, secondary text
+            &:disabled:not(.plus-btn--loading),
+            &.disabled:not(.plus-btn--loading) {
+                background-color: transparent;
+                border-color: transparent;
+                color: var(--color-secondary-text);
+            }
+        }
+    }
+}
+
+
+// --- VERTICAL LAYOUT ---
+&.plus-btn--vertical.btn {
+    // A vertical button stacks its icon over its label, so it is not a
+    // single-line control and keeps the height its content gives it.
+    height: auto;
+    padding-top: var(--element-pad-y-md);
+    padding-bottom: var(--element-pad-y-md);
+    flex-direction: column;
+    gap: var(--size-element-gap-md);
+
+    .plus-btn-visual--leading {
+        margin-right: 0;
+        margin-bottom: var(--size-element-gap-sm);
+        font-size: var(--icon-lg);
+    }
+}
+
+// --- ELEMENTS ---
+&-text {
+    // Typography utility classes (like .h6) often set an explicit color.
+    // We ensure the button's theme color always wins.
+    color: inherit;
+}
+
+&-visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    flex-shrink: 0;
+
+    // Icon should not carry extra width from FA defaults
+    i {
+        width: auto;
+        line-height: inherit;
+    }
+
+    // Spacing comes from `.plus-btn` flex `gap` (per size); avoid doubling with margins.
+    &--leading,
+    &--trailing {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -264,6 +264,10 @@ describe("the read-only view, for someone who can't decide", () => {
   });
 });
 
+
+/** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 9:13 AM ET". */
+const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M ET`;
+
 describe("a decided card, opened from View", () => {
   async function decided(decision: "confirm" | "cancel", over: Partial<PendingProposal> = {}, note?: string) {
     const h = harness(await store(over));
@@ -278,7 +282,7 @@ describe("a decided card, opened from View", () => {
     assert.deepEqual(view.blocks.map((b) => b.type).slice(0, 4), ["alert", "rich_text", "header", "card"]);
     assert.equal(view.blocks[0]!.level, "success");
     assert.deepEqual(view.blocks[0]!.text, { type: "plain_text", text: "Approved." });
-    assert.equal(richText(view.blocks[1]), `Approved by <@${BILL}> to post in <#C0SANDBOX1>.`);
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Approved by <@${BILL}> on ${WHEN} to post in <#C0SANDBOX1>\.$`));
     assert.equal(view.blocks.find((b) => b.type === "card")!.body!.text, SHAREOUT.summary);
     assert.equal(inputs(view).length, 0);
     assert.equal(view.submit, undefined);
@@ -304,20 +308,21 @@ describe("a decided card, opened from View", () => {
     const { view } = await decided("cancel", {}, "Wrong channel");
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
     assert.equal(view.blocks[0]!.text!.text, "Rejected.");
-    assert.equal(richText(view.blocks[1]), `Rejected by <@${BILL}>: Wrong channel.`);
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Rejected by <@${BILL}> on ${WHEN}: Wrong channel\.$`));
     assert.equal(view.blocks[2]!.type, "header");
   });
 
   it("keeps a long reason whole and as typed, since rich text needs no escaping", async () => {
     const reason = "R&D <maybe> ".repeat(30).trim();
     const { view } = await decided("cancel", {}, reason);
-    assert.equal(richText(view.blocks[1]), `Rejected by <@${BILL}>: ${reason}.`);
+    assert.ok(richText(view.blocks[1]).endsWith(`: ${reason}.`), "the reason whole, as typed");
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Rejected by <@${BILL}> on ${WHEN}: `));
     assert.ok(texts(view).every((t) => t.length <= 3000));
   });
 
   it("says who a batch of DMs went to", async () => {
     const { view } = await decided("confirm", TWO_DMS);
-    assert.equal(richText(view.blocks[1]), `Approved by <@${BILL}> to send to <@${BRYAN}> and <@${COCO}>.`);
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Approved by <@${BILL}> on ${WHEN} to send to <@${BRYAN}> and <@${COCO}>\.$`));
     assert.equal(view.blocks[2]!.text!.text, "Send 2 DMs");
     assert.equal(inputs(view).length, 0);
   });
@@ -401,29 +406,33 @@ describe("after a decision, and closed", () => {
     assert.equal(view.title.text, "Review share-out");
   });
 
-  it("answers an expired card with a warning, then what to do", async () => {
+  it("answers an expired card with a warning, when it closed and what to do, over the draft it closed on", async () => {
     let t = 1_760_540_000_000;
     const now = () => t;
     const h = harness(await store({}, now), now);
     t += cardTtlMs(t) + 1;
     await runReviewOpen(open(BILL), h.deps);
     const view = lastView(h);
-    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]).slice(0, 2), [["alert", "warning"], ["rich_text", undefined]]);
     assert.equal(view.blocks[0]!.text!.text, "Expired.");
-    assert.equal(view.blocks[1]!.text!.text, "Ask again for a fresh card.");
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Closed on ${WHEN}\. Ask again for a fresh card\.$`));
+    assert.equal(view.blocks.find((b) => b.type === "card")!.body!.text, SHAREOUT.summary, "the draft, kept for View (#1362)");
+    assert.equal(inputs(view).length, 0);
     assert.equal(view.submit, undefined);
     assert.equal(view.title.text, "Review share-out", "titled for its tool, read in the same lookup");
   });
 
-  it("answers a replaced card with a warning, then where the newer one is", async () => {
+  it("answers a replaced card with a warning, when, and where the newer one is, over the draft it replaced", async () => {
     const threadState = await store();
     await threadState.putProposal({ ...CARD, proposalTs: "1760540000.000200" });
     const h = harness(threadState);
     await runReviewOpen(open(BILL), h.deps);
     const view = lastView(h);
-    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]), [["alert", "warning"], ["section", undefined]]);
+    assert.deepEqual(view.blocks.map((b) => [b.type, b.level]).slice(0, 2), [["alert", "warning"], ["rich_text", undefined]]);
     assert.equal(view.blocks[0]!.text!.text, "This proposal was replaced by a newer one.");
-    assert.match(view.blocks[1]!.text!.text, /newest card in the thread/);
+    assert.match(richText(view.blocks[1]), new RegExp(String.raw`^Replaced on ${WHEN}\. Review the newest card in the thread instead\.$`));
+    assert.equal(view.blocks.find((b) => b.type === "card")!.body!.text, SHAREOUT.summary, "the draft, kept for View (#1362)");
+    assert.equal(inputs(view).length, 0);
     assert.equal(view.title.text, "Review share-out");
   });
 

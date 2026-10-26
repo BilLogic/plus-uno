@@ -44,10 +44,10 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 
     &.plus-select-placeholder {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtlest);
     }
 }
 
@@ -63,7 +63,7 @@
     gap: var(--size-element-gap-sm);
 }
 
-// One step smaller than the caret, in Outline at rest and On Surface Variant on hover.
+// One step smaller than the caret, `icon.subtlest` at rest and `icon.subtle` on hover.
 .plus-select-clear {
     display: inline-flex;
     align-items: center;
@@ -76,18 +76,18 @@
 
     .fa-solid {
         // @contrast: non-text
-        color: var(--color-outline);
+        color: var(--ds-icon-subtlest);
         font-size: var(--font-size-fa-body3-solid);
     }
 
     &:hover .fa-solid {
         // @contrast: non-text
-        color: var(--color-on-surface-variant);
+        color: var(--ds-icon-subtle);
     }
 }
 
 .plus-select-caret {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
     font-size: var(--font-size-fa-body2-solid);
     cursor: pointer;
 }
@@ -102,19 +102,17 @@
     padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
     border: 0;
     background: none;
-    color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body2);
-    line-height: var(--font-line-height-body2);
+    color: var(--ds-text);
+    font: var(--body-default);
     text-align: left;
     cursor: pointer;
 
     &:hover {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: calc(var(--size-element-stroke-lg) * -1);
     }
 }
@@ -126,24 +124,23 @@
     justify-content: center;
     width: var(--font-size-body2);
     height: var(--font-size-body2);
-    border: var(--size-element-border) solid var(--color-outline);
+    border: var(--size-element-border) solid var(--ds-border-input);
+    background-color: var(--ds-background-input);
     border-radius: var(--size-element-radius-sm);
-    font-size: var(--font-size-body3);
+    font-size: var(--icon-sm);
 
     &.is-checked {
-        border-color: var(--color-primary-border);
-        background-color: var(--color-primary);
-        color: var(--color-on-primary);
+        border-color: var(--ds-border-selected);
+        background-color: var(--ds-background-selected-bold);
+        color: var(--ds-icon-inverse);
     }
 }
 
 .plus-select-hint {
     display: block;
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
-    color: var(--color-on-surface-variant);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body3);
-    line-height: var(--font-line-height-body3);
+    color: var(--ds-text-subtle);
+    font: var(--body-small);
 }
 
 // ── displayMode="badges": the older Badge chips, kept for existing screens ──
@@ -158,11 +155,8 @@
 
     .plus-badge {
         flex-shrink: 0;
-        font-family: var(--font-family-body);
-        font-size: var(--font-size-body2);
-        font-weight: var(--font-weight-normal);
-        line-height: var(--font-line-height-body2);
-        color: var(--color-secondary-text);
+        font: var(--body-default);
+        color: var(--ds-text-subtle);
         border: none;
 
         &.plus-badge--dismissible {

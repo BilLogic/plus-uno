@@ -72,7 +72,7 @@ export const TABBED_EXCEPTIONS = ['design-system/src/styles/DesignTokens.mdx'];
 
 /**
  * Whether a repo-relative MDX path is a docs page that gets a tab strip.
- * @param {string} file A repo-relative path, e.g. `design-system/src/components/actions/Button/Button.mdx`.
+ * @param {string} file A repo-relative path, e.g. `design-system/src/components/forms-and-inputs/Button/Button.mdx`.
  * @returns {boolean}
  */
 export function isTabbedDocsPage(file) {

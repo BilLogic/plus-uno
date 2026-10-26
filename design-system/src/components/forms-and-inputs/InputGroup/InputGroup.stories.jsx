@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import InputGroup from './InputGroup';
 
 export default {
-    title: 'Components/Forms and inputs/Input Group',
+    title: 'Components/Forms and inputs/Input group',
     component: InputGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {
+        changelog: [
+            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'Button and dropdown addons became 24, 4 from the field\'s edge.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+        ],
         docs: {
             description: {
                 component: 'Input Group component extends form controls by adding text, checkbox, radio, icon, button, or dropdown addons on either side of textual inputs. Supports multiple addons on each side and various size variants.'
@@ -107,7 +113,7 @@ export const Content = () => {
         <div style={docsCol}>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE INPUT GROUP</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Text addon on the left with an icon addon on the right.
                 </p>
                 <InputGroup
@@ -281,8 +287,8 @@ Interactive.args = {
 
 /**
  * AddonsInSlots — addons go in the field's Leading and Trailing slots and
- * draw no box of their own. Buttons are small and cut to the line, so the
- * field stays 34 high; a side takes one addon or an array.
+ * draw no box of their own. Buttons are the 24 compact button, so the field
+ * stays 32 high; a side takes one addon or an array.
  */
 export const AddonsInSlots = () => (
     <div style={docsCol}>
@@ -323,15 +329,39 @@ AddonsInSlots.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(addon).borderTopStyle).toBe('none');
     }
 
-    // Two buttons in Trailing, small and 22 high, and the field stays 34.
+    // An affix is quieter than the value, and the box is the shared field's colors.
+    const affix = price.querySelector('.plus-field-affix');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(affix).color, `${mode}: affix`).toBe(token('--ds-text-subtle'));
+        await expect(getComputedStyle(price).borderTopColor, `${mode}: border`).toBe(token('--ds-border-input'));
+        await expect(getComputedStyle(price).backgroundColor, `${mode}: fill`).toBe(token('--ds-background-input'));
+    });
+
+    // The focus ring sits 2px off the box; nothing around an input group clips it.
+    const input = canvas.getByRole('textbox', { name: 'Invite by email' });
+    input.focus();
+    const field = input.closest('.plus-field');
+    const ring = parseFloat(getComputedStyle(field).outlineOffset) + parseFloat(getComputedStyle(field).outlineWidth);
+    await expect(ring, 'the ring reaches 4px past the box').toBe(4);
+    const r = field.getBoundingClientRect();
+    for (let el = field.parentElement; el && el !== canvasElement.parentElement; el = el.parentElement) {
+        const { overflowX, overflowY } = getComputedStyle(el);
+        if (overflowX === 'visible' && overflowY === 'visible') continue;
+        const c = el.getBoundingClientRect();
+        await expect(r.left - ring >= c.left && r.right + ring <= c.right && r.top - ring >= c.top && r.bottom + ring <= c.bottom,
+            `${el.className || el.tagName} clips the focus ring`).toBe(true);
+    }
+    input.blur();
+
+    // Two buttons in Trailing, small and 24 high, and the field stays 32.
     const invite = box('Invite by email');
     const buttons = within(invite.querySelector('.plus-field__trailing')).getAllByRole('button');
     await expect(buttons.map((button) => button.textContent)).toEqual(['Copy', 'Send']);
     for (const button of buttons) {
         await expect(button.classList.contains('plus-btn--small')).toBe(true);
-        await expect(Math.round(button.getBoundingClientRect().height)).toBe(22);
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(24);
     }
-    await expect(Math.round(invite.getBoundingClientRect().height)).toBe(34);
+    await expect(Math.round(invite.getBoundingClientRect().height)).toBe(32);
 
     // A checkbox addon is named and sits in Leading.
     const agree = box('Agreement note');

@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/status-and-loading/Tag';
-import TagGroup from '@/components/status-and-loading/TagGroup';
-import Button from '@/components/actions/Button';
+import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/labels/Tag';
+import TagGroup from '@/components/labels/TagGroup';
+import Button from '@/components/forms-and-inputs/Button';
 import Input from './Input';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /**
  * The status names the chips used to take, kept as deprecated aliases for the
@@ -25,7 +26,7 @@ const TAG_INPUT_COLOR_ALIASES = {
 /** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
 const ACCEPTED_COLORS = [...TAG_ACCEPTED_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
 
-/** Tag's seven colors as the option menu names them. */
+/** Tag's ten colors as the option menu names them. */
 const COLOR_NAMES = {
     gray: 'Gray',
     blue: 'Blue',
@@ -34,6 +35,9 @@ const COLOR_NAMES = {
     magenta: 'Magenta',
     yellow: 'Yellow',
     teal: 'Teal',
+    orange: 'Orange',
+    lime: 'Lime',
+    brown: 'Brown',
 };
 
 /** The option menu's Delete row; no Tag color has this name. */
@@ -69,7 +73,7 @@ const tagColorOf = (color) => {
     return 'gray';
 };
 
-/** A new tag's color: one of Tag's seven, gray included, picked at random. */
+/** A new tag's color: one of Tag's ten, gray included, picked at random. */
 const randomColor = () => TAG_COLORS[Math.floor(Math.random() * TAG_COLORS.length)];
 
 /** The text a tag or an option shows. */
@@ -100,7 +104,7 @@ let temporaryIds = 0;
  *
  * People can tidy the options where they pick them, as in Notion. With
  * `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…"
- * that opens the option's menu: its name, Delete, and Tag's seven colors.
+ * that opens the option's menu: its name, Delete, and Tag's ten colors.
  * With `onReorder`, each row has a handle to drag, or to pick up with Space
  * and move with the arrows. Without these handlers neither appears.
  *
@@ -140,6 +144,7 @@ const TagInput = ({
     style,
     ...props
 }) => {
+    useDeprecatedFieldSize('TagInput', size);
     const [internalTags, setInternalTags] = useState(defaultTags);
     const isControlled = Array.isArray(tags);
     const currentTags = isControlled ? tags : internalTags;
@@ -698,6 +703,7 @@ const TagInput = ({
             >
                 <Field
                     size={size}
+                    grow
                     disabled={disabled}
                     readOnly={readOnly}
                     {...toneProps(tone).field}
@@ -931,7 +937,7 @@ TagInput.propTypes = {
      */
     onDelete: PropTypes.func,
     /**
-     * `(value, color)`: an option was given another of Tag's seven colors
+     * `(value, color)`: an option was given another of Tag's ten colors
      * from its "…" menu. Store it on the option.
      */
     onColorChange: PropTypes.func,

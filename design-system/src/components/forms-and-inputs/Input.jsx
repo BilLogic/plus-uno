@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import useInlineEdit from './_internal/useInlineEdit';
+import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /** A string visual is a Font Awesome class; `'dropdown'` is the caret. */
 const renderVisual = (visual) => {
@@ -41,7 +42,7 @@ const Input = ({
     size = 'medium',
     disabled = false,
     readOnly,
-    /** @deprecated Prefer `readOnly` — kept for existing call sites */
+    /** @deprecated Prefer readOnly — kept for existing call sites */
     readonly,
     validation = 'none', // 'none', 'invalid', 'success'
     validationMessage,
@@ -59,6 +60,7 @@ const Input = ({
     onKeyDown,
     ...props
 }) => {
+    useDeprecatedFieldSize('Input', size);
     /** One id for the label and the input — see `useFieldId`. */
     const fieldId = useFieldId(id);
     /** Prefer `readOnly`; honor legacy `readonly` when explicitly passed */
@@ -196,7 +198,7 @@ Input.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.node,

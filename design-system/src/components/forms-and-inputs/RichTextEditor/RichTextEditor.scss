@@ -19,18 +19,8 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    &.plus-rich-text-editor-small {
-        --rte-content-pad-x: var(--size-element-pad-x-sm);
-        --rte-content-pad-y: var(--size-element-pad-y-sm);
-    }
-
-    &.plus-rich-text-editor-large {
-        --rte-toolbar-height: calc(
-            var(--size-spacing-medium-space-300) + var(--size-spacing-medium-space-400)
-        );
-        --rte-content-pad-x: var(--size-section-pad-x-md);
-        --rte-content-pad-y: var(--size-section-pad-y-md);
-    }
+    // `small` and `large` are deprecated and draw like `medium`; their classes
+    // stay so call sites that target them keep matching.
 
     &.plus-rich-text-editor--full {
         max-width: none;
@@ -67,14 +57,15 @@
     box-shadow: none;
     cursor: pointer;
     color: var(--color-on-surface);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-body3);
-    font-weight: var(--font-weight-normal);
-    line-height: var(--font-line-height-body3);
+    font: var(--body-small);
     border-radius: var(--size-element-radius-md);
 
     &:hover:not(:disabled) {
-        background-color: var(--color-surface-container-high-state-08);
+        background-color: var(--color-on-surface-state-08);
+    }
+
+    &:active:not(:disabled) {
+        background-color: var(--color-on-surface-state-12);
     }
 
     &:disabled {
@@ -83,8 +74,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
-        outline-offset: 2px;
+        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+        outline-offset: var(--size-element-stroke-lg);
     }
 }
 
@@ -108,8 +99,14 @@
         box-shadow: none;
         background-color: transparent;
 
+        // The steps of a secondary ghost button, whose icons these are: the
+        // transparent rest above would otherwise drop Button's own.
         &:hover:not(:disabled):not(.active) {
-            background-color: var(--color-surface-container-high-state-08);
+            background-color: var(--color-secondary-state-08);
+        }
+
+        &:active:not(:disabled):not(.active) {
+            background-color: var(--color-secondary-state-12);
         }
 
         &.active {
@@ -118,8 +115,8 @@
         }
 
         &:focus-visible {
-            outline: var(--size-border-stroke-stroke-150) solid var(--color-primary);
-            outline-offset: 2px;
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: var(--size-element-stroke-lg);
         }
 
         &:disabled,
@@ -159,14 +156,33 @@
         padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
         color: var(--color-on-surface);
 
-        &:hover,
-        &:focus {
+        &:hover {
             background-color: var(--color-on-surface-state-08);
         }
 
+        &:active {
+            background-color: var(--color-on-surface-state-12);
+        }
+
+        // A menu is a dense list, so the current block is primary 08 (color.md).
+        // It holds the 08 under hover and press, as Dropdown's selected item does.
         &.active {
-            background-color: var(--color-primary-state-16);
+            background-color: var(--color-primary-state-08);
             color: var(--color-primary-text);
+        }
+
+        // Bootstrap fills a focused item; here focus is the ring alone.
+        &:focus:not(:hover):not(:active):not(.active) {
+            background-color: transparent;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:focus-visible {
+            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
     }
 }
@@ -199,17 +215,17 @@
 }
 
 .plus-rich-text-editor-content {
+    font: var(--body-default);
     flex: 1 1 auto;
-    min-height: calc(
-        var(--size-spacing-large-space-900) + var(--size-spacing-large-space-600)
-    );
+    // 120 at least, growing with what is typed.
+    min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
     outline: none;
     color: var(--color-on-surface);
     background-color: var(--color-surface);
     box-sizing: border-box;
     border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
 
     &:focus {
         outline: none;
@@ -223,7 +239,7 @@
     text-align: center;
     color: var(--color-on-surface-variant);
     pointer-events: none;
-    font-weight: var(--font-weight-normal);
+    font-weight: var(--type-weight-regular);
 }
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,
@@ -231,4 +247,10 @@
     background-color: var(--color-surface-container-low);
     color: var(--color-on-surface-variant);
     cursor: default;
+}
+
+/* The field's label, and the block menu's options: Body/default 14/20. */
+.plus-rich-text-editor-label,
+.plus-rich-text-editor-block-option {
+    font: var(--body-default);
 }

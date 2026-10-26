@@ -19,13 +19,13 @@
 /* Sidebar: no overrides – match reference tutor-training-progress-page exactly. */
 
 #home-redesign-page .plus-page-main,
-#home-redesign-page .plus-page-content-wrapper {
+#home-redesign-page .plus-frame__surface {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
 
 #home-redesign-page .plus-page-main::-webkit-scrollbar,
-#home-redesign-page .plus-page-content-wrapper::-webkit-scrollbar {
+#home-redesign-page .plus-frame__surface::-webkit-scrollbar {
     display: none;
 }
 
@@ -99,153 +99,69 @@
 
 /* Shell loading: TopBar + Sidebar use same reveal as content (opacity + translateY, 1.3s, 280ms stagger). */
 /* TopBar: per-section reveal (left, center, right) – same motion as content. */
-#home-redesign-page .shell-reveal .plus-topbar .topbar-left-section,
-#home-redesign-page .shell-reveal .plus-topbar .topbar-center-section,
-#home-redesign-page .shell-reveal .plus-topbar .topbar-right-section {
+#home-redesign-page .shell-reveal .plus-topbar .plus-topbar__start,
+#home-redesign-page .shell-reveal .plus-topbar .plus-topbar__middle,
+#home-redesign-page .shell-reveal .plus-topbar .plus-topbar__end {
     opacity: 0;
     transform: translateY(24px);
 }
 
-#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-left-section {
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__start {
     animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-center-section {
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__middle {
     animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 200ms;
 }
 
-#home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-right-section {
+#home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__end {
     animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 400ms;
 }
 
-/* Sidebar: per-item reveal (logo, Home, section titles, tabs) – same motion as content. */
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
+/* Sidebar: per-block reveal (logo, Home, then each section) – same motion as content. */
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-pattern-sidebar__header,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-pattern-sidebar__body > * {
     opacity: 0;
     transform: translateY(24px);
 }
 
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo {
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__header,
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > * {
     animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: 0ms;
 }
 
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > :nth-child(1) {
     animation-delay: 200ms;
 }
 
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 400ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > :nth-child(2) {
     animation-delay: 600ms;
 }
 
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 800ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > :nth-child(3) {
     animation-delay: 1000ms;
 }
 
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1200ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > :nth-child(n+4) {
     animation-delay: 1400ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1600ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 1800ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2000ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2200ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2400ms;
-}
-
-#home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
-    animation: revealIn 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-    animation-delay: 2600ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
 
-    #home-redesign-page .shell-reveal .plus-topbar .topbar-left-section,
-    #home-redesign-page .shell-reveal .plus-topbar .topbar-center-section,
-    #home-redesign-page .shell-reveal .plus-topbar .topbar-right-section,
-    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-left-section,
-    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-center-section,
-    #home-redesign-page .shell-reveal.has-entered .plus-topbar .topbar-right-section,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar .plus-sidebar-logo,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar>.plus-sidebar-tab,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar .plus-sidebar-logo,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar>.plus-sidebar-tab,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(3) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(4) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-section-title,
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(2),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(3),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(4),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(5),
-    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-sidebar-section:nth-of-type(5) .plus-sidebar-tab:nth-of-type(6) {
+    #home-redesign-page .shell-reveal .plus-topbar .plus-topbar__start,
+    #home-redesign-page .shell-reveal .plus-topbar .plus-topbar__middle,
+    #home-redesign-page .shell-reveal .plus-topbar .plus-topbar__end,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__start,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__middle,
+    #home-redesign-page .shell-reveal.has-entered .plus-topbar .plus-topbar__end,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-pattern-sidebar__header,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal .plus-pattern-sidebar__body > *,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__header,
+    #home-redesign-page .plus-page-sidebar-wrapper.shell-reveal.has-entered .plus-pattern-sidebar__body > * {
         animation: none;
         opacity: 1;
         transform: none;
@@ -264,11 +180,11 @@
 }
 
 /* Monthly report needs visible overflow for card elevation and horizontal training carousel */
-#home-redesign-page.monthly-report-page-scroller .plus-page-main-container {
+#home-redesign-page.monthly-report-page-scroller .plus-frame__row {
     overflow: visible;
 }
 
-#home-redesign-page.monthly-report-page-scroller .plus-page-content-wrapper {
+#home-redesign-page.monthly-report-page-scroller .plus-frame__surface {
     overflow: visible;
 }
 

@@ -162,12 +162,35 @@ describe("Review on one item of a report", () => {
     assert.equal(two.body.text, "Nothing written.");
   });
 
-  it("shows a rejected item's reason in View once its proposal is gone", async () => {
+  it("keeps a rejected item's draft, and View draws it read-only with the reason, never the card's words (#1362)", async () => {
     const store = await staged();
     const { deps, views } = harness(store);
     await runReviewDecision(decide("c2", "cancel", "the library is ahead on purpose"), deps);
+    const look = await store.getProposalByTs(itemProposal(MSG, "c2").proposalTs);
+    assert.ok(look.state === "none" && look.decided, "the item's draft is kept, as a card's of its own is");
+    assert.deepEqual([look.decided.decision, look.decided.reason], ["cancel", "the library is ahead on purpose"]);
     await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: itemProposal(MSG, "c2").proposalTs, userId: "U0BILL", item: { messageTs: MSG, id: "c2" } }, deps);
-    assert.match(JSON.stringify(views.calls.at(-1)!.view), /Rejected by <@U0BILL>\\nNothing written\. Reason: the library is ahead on purpose/);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; text?: { text: string } }>; submit?: unknown };
+    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
+    const json = JSON.stringify(view);
+    assert.match(json, /: the library is ahead on purpose/);
+    assert.match(json, /New 2/, "the draft that was decided");
+    assert.doesNotMatch(json, /Nothing written/, "not the card's after-state words");
+    assert.equal(view.submit, undefined);
+  });
+
+  it("keeps an approved item's draft, and View draws it read-only under the approval (#1362)", async () => {
+    const store = await staged();
+    const { deps, views } = harness(store);
+    await runReviewDecision(decide("c1", "confirm"), deps);
+    const look = await store.getProposalByTs(itemProposal(MSG, "c1").proposalTs);
+    assert.ok(look.state === "none" && look.decided);
+    assert.equal(look.decided.decision, "confirm");
+    await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: itemProposal(MSG, "c1").proposalTs, userId: "U0BILL", item: { messageTs: MSG, id: "c1" } }, deps);
+    const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
+    assert.deepEqual([view.blocks[0]!.level, view.blocks[0]!.text!.text], ["success", "Approved."]);
+    assert.match(JSON.stringify(view), /New 1/);
+    assert.doesNotMatch(JSON.stringify(view), /Written: Page says 1/);
   });
 
   it("closes an item whose time ran out, on its card, when it is next pressed", async () => {
@@ -180,6 +203,7 @@ describe("Review on one item of a report", () => {
     assert.equal(one!.subtitle!.text, "Closed, no decision");
     assert.deepEqual(one!.actions.map((a) => a.text.text), ["View", "Open"]);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /Closed, no decision/);
+    assert.match(JSON.stringify(views.calls.at(-1)!.view), /New 1/, "the draft it closed on, kept for View (#1362)");
     // Titled for its tool, which the lookup that found it closed named.
     assert.equal((views.calls.at(-1)!.view as { title: { text: string } }).title.text, "Review page update");
   });
@@ -309,6 +333,28 @@ describe("a card's own answers in the Review pop-up", () => {
     const [one] = cards(updates.at(-1)!.message.blocks);
     assert.equal(one!.subtitle!.text, "Still on it · <@U0BILL>");
     assert.equal(one!.body.text, "Nothing written. Checked again Oct 30.");
+  });
+
+  it("keeps the draft an own answer decided, and View draws it read-only as answered, never the card's words (#1362)", async () => {
+    const cases = [
+      ["drop", "confirm", /Archived/],
+      ["still", "cancel", /New 1/],
+    ] as const;
+    for (const [choice, decision, drafted] of cases) {
+      const store = await withOwn();
+      const { deps, views } = harness(store);
+      await runReviewDecision({ ...decide("c1", "confirm"), choice }, deps);
+      const look = await store.getProposalByTs(itemProposal(MSG, "c1").proposalTs);
+      assert.ok(look.state === "none" && look.decided, `${choice}: kept`);
+      assert.equal(look.decided.decision, decision, choice);
+      const view = (await openOn(deps, views, "c1")) as { blocks: Array<{ type: string; text?: { text: string } }>; submit?: unknown };
+      assert.equal(view.blocks[0]!.text!.text, "Answered.", choice);
+      const json = JSON.stringify(view);
+      assert.match(json, drafted, `${choice}: the draft as decided, its answer's args in place`);
+      assert.doesNotMatch(json, /Checked again Oct 30/, `${choice}: not the card's after-state words`);
+      assert.equal(view.submit, undefined, choice);
+      assert.equal(view.blocks.filter((b) => b.type === "input").length, 0, choice);
+    }
   });
 
   it("an answer the card does not offer changes nothing", async () => {

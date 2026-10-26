@@ -9,10 +9,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Badge from '@/components/status-and-loading/Badge/Badge';
-import Button from '@/components/actions/Button/Button';
+import Badge from '@/components/labels/Badge/Badge';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
-import Progress from '@/components/status-and-loading/Progress/Progress';
+import Progress from '@/components/loading/Progress/Progress';
 import './MonthlyReportsListPage.scss';
 
 // Mock data for monthly reports
@@ -55,13 +55,13 @@ export default function MonthlyReportsListPage() {
             style.id = styleId;
             style.textContent = `
                 #monthly-reports-list-page .plus-page-main::-webkit-scrollbar,
-                #monthly-reports-list-page .plus-page-content-wrapper::-webkit-scrollbar {
+                #monthly-reports-list-page .plus-frame__surface::-webkit-scrollbar {
                     display: none !important;
                     width: 0 !important;
                     background: transparent !important;
                 }
                 #monthly-reports-list-page .plus-page-main,
-                #monthly-reports-list-page .plus-page-content-wrapper {
+                #monthly-reports-list-page .plus-frame__surface {
                     scrollbar-width: none !important;
                     -ms-overflow-style: none !important;
                 }

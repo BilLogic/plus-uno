@@ -21,8 +21,9 @@
  *                                                          finding, joined `key|member`
  *   counts      a11y `rules`, atlassian `ours`,            key → number
  *               negation `scopes.*.counts`
- *   entries     intent-role `files`, text-contrast         key → object with one
- *               `findings`, undefined-token `tokens`       or more NAMED numbers
+ *   entries     intent-role `files` and `mixedStates`,     key → object with one
+ *               text-contrast `findings`, undefined-       or more NAMED numbers
+ *               token `tokens`
  *   reasons     focus-ring/icon-button-name `exceptions`   key → the reason itself
  *   scalar      glossary `proseLines`, negation's per-     no keyed set at all:
  *               scope `docs`/`total`, undefined-token      named numbers on the
@@ -48,6 +49,8 @@
  *   sets      one or more ratcheted containers. A record with two sets (a11y,
  *             button-contrast, color-fallback) has two rows here and each is
  *             the other's unowned sibling.
+ *             intent-role (since 2026-10-24) declares its two sets in one row
+ *             instead, and its check opens each by name.
  *
  * SET SHAPE.
  *   name      how a check asks for it.
@@ -186,6 +189,16 @@ export const SHAPES = [
         // BOTH directions: a count below the record is a finding too, because a
         // baseline describing code that no longer exists has stopped being
         // readable.
+        direction: 'both',
+      },
+      {
+        // A hover or pressed color mixed by hand — `color-mix()` with black or
+        // white, or a brightness filter — where a state layer token belongs.
+        name: 'mixedStates',
+        at: 'mixedStates',
+        form: 'entries',
+        fields: ['mix'],
+        reason: { in: 'why' },
         direction: 'both',
       },
     ],

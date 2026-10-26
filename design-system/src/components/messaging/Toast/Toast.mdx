@@ -28,7 +28,7 @@ export const figmaMeta = {
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/messaging/Toast"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Toast"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -53,7 +53,7 @@ export const figmaMeta = {
     <DsCanvasQuiet of={ToastStories.Styles} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code>, <code>inverse</code> on every header color.</>}>
+<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code> in its default tone, last in the flag's row.</>}>
     <DsCanvasQuiet of={ToastStories.Dismiss} />
 </DocsCanvasShell>
 
@@ -140,22 +140,23 @@ Turning it off with `autohide={false}` leaves a toast that never goes away.
   `aria-live="polite"`, so a success toast waits for the screen reader to finish
   what it is saying. Every style is `aria-atomic`, so the toast is read as one
   message.
-- **A five-second timeout is a timing limit.** Content that disappears on its own
-  has to be dismissible or extendable to satisfy WCAG's timing rule. The close
-  button is what does that here, which is why it is on by default.
+- **An eight-second timeout is a timing limit.** Success and info flags close
+  after 8 seconds; warning and danger stay until they are dismissed, because
+  they ask for something to be done. Content that disappears on its own has to
+  be dismissible or extendable to satisfy WCAG's timing rule. The close button
+  is what does that here, which is why it is on by default.
 - **Announcement needs the region to already exist.** A toast mounted at the same
   moment as its container may not be announced at all. Render `ToastContainer`
   with the page and put toasts into it.
 - **The close button is named "Close".** It is the shared `CloseButton` in its
-  `inverse` tone on every header color: a fixed 24×24 target whose × is
-  `aria-hidden`. The × and its focus ring are at least 3:1 on each header; the
-  tightest ground is recorded in `CloseButton`'s accessibility notes.
+  default tone on the flag's surface, with an `aria-hidden` ×. The × and its
+  focus ring are at least 3:1 on that surface.
 - **The style icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
-- **The warning header is a known contrast exception.** Its title and timestamp
-  use the same content color as the other headers, `--color-on-warning`, at
-  3.70:1 on the Warning fill, below AA's 4.5:1 for text; this is accepted and
-  recorded, so do not darken them. The icon and × pass as non-text (3:1).
+- **Every flag is one surface.** The style shows in the 16 icon's color
+  alone; the flag is `--ds-surface-overlay` with `--ds-shadow-overlay`, the
+  title `--ds-text` and the message `--ds-text-subtle` on every style, so no
+  style needs a contrast exception.
 
 </div>
 

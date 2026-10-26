@@ -6,7 +6,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Alert, { ALERT_ICONS, ALERT_STYLES } from './Alert';
 
 export default {
-    title: 'Components/Messaging/Alert',
+    title: 'Components/Messaging/Section message',
     component: Alert,
     tags: ['!dev', '!autodocs'],
     parameters: {
@@ -214,8 +214,8 @@ DismissPlacement.play = async ({ canvasElement }) => {
         const alert = canvas.getByTestId(id);
         const button = within(alert).getByRole('button', { name: 'Close alert' });
         const rect = button.getBoundingClientRect();
-        await expect(Math.round(rect.width), `${id}: width`).toBe(24);
-        await expect(Math.round(rect.height), `${id}: height`).toBe(24);
+        await expect(Math.round(rect.width), `${id}: width`).toBe(32);
+        await expect(Math.round(rect.height), `${id}: height`).toBe(32);
         await expect(getComputedStyle(button.querySelector('i')).fontSize, `${id}: icon`).toBe('16px');
 
         const line = firstLine(alert.querySelector(lineOwner));
