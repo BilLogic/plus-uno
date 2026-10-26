@@ -1,4 +1,15 @@
 import React from 'react';
+import googleIconSrc from './images/auth-providers/google-icon.svg';
+import cleverImageSrc from './images/auth-providers/clever-image.png';
+import unclaimedV1ThumbnailSrc from './images/tutor-badges/unclaimed-v1-thumbnail.png';
+import unclaimedV1ModalSrc from './images/tutor-badges/unclaimed-v1-modal.png';
+import unclaimedV1FullSrc from './images/tutor-badges/unclaimed-v1-full.png';
+import claimedV1ThumbnailSrc from './images/tutor-badges/claimed-v1-thumbnail.png';
+import claimedV1ModalSrc from './images/tutor-badges/claimed-v1-modal.png';
+import claimedV1FullSrc from './images/tutor-badges/claimed-v1-full.png';
+import claimedV2ThumbnailSrc from './images/tutor-badges/claimed-v2-thumbnail.png';
+import claimedV2ModalSrc from './images/tutor-badges/claimed-v2-modal.png';
+import claimedV2FullSrc from './images/tutor-badges/claimed-v2-full.png';
 
 export default {
     title: 'Foundations/Imagery',
@@ -9,12 +20,14 @@ export const AuthProviders = () => {
     const assets = [
         {
             name: 'Google Icon',
-            file: '/assets/images/auth-providers/google-icon.svg',
+            file: '@/assets/images/auth-providers/google-icon.svg',
+            src: googleIconSrc,
             description: 'Google auth provider logo used for Google sign-in buttons.',
         },
         {
             name: 'Clever Image',
-            file: '/assets/images/auth-providers/clever-image.png',
+            file: '@/assets/images/auth-providers/clever-image.png',
+            src: cleverImageSrc,
             description: 'Clever auth provider image used for Clever sign-in buttons.',
         },
     ];
@@ -51,7 +64,7 @@ export const AuthProviders = () => {
                             borderRadius: '8px',
                             border: '1px solid var(--color-outline-variant)'
                         }}>
-                            <img src={asset.file} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+                            <img src={asset.src} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                         </div>
                         <div className="body1-txt">{asset.name}</div>
                         <code>{asset.file}</code>
@@ -68,57 +81,66 @@ export const TutorBadges = () => {
         // Unclaimed Badges
         {
             name: 'Unclaimed Badge - Thumbnail',
-            file: '/assets/images/tutor-badges/unclaimed-v1-thumbnail.png',
+            file: '@/assets/images/tutor-badges/unclaimed-v1-thumbnail.png',
+            src: unclaimedV1ThumbnailSrc,
             description: 'Thumbnail version of the unclaimed tutor badge placeholder.',
             category: 'Unclaimed'
         },
         {
             name: 'Unclaimed Badge - Modal',
-            file: '/assets/images/tutor-badges/unclaimed-v1-modal.png',
+            file: '@/assets/images/tutor-badges/unclaimed-v1-modal.png',
+            src: unclaimedV1ModalSrc,
             description: 'Modal version of the unclaimed tutor badge placeholder.',
             category: 'Unclaimed'
         },
         {
             name: 'Unclaimed Badge - Full',
-            file: '/assets/images/tutor-badges/unclaimed-v1-full.png',
+            file: '@/assets/images/tutor-badges/unclaimed-v1-full.png',
+            src: unclaimedV1FullSrc,
             description: 'Full-size version of the unclaimed tutor badge placeholder.',
             category: 'Unclaimed'
         },
         // Claimed Badges V1
         {
             name: 'Claimed Badge V1 - Thumbnail',
-            file: '/assets/images/tutor-badges/claimed-v1-thumbnail.png',
+            file: '@/assets/images/tutor-badges/claimed-v1-thumbnail.png',
+            src: claimedV1ThumbnailSrc,
             description: 'Thumbnail version of the claimed tutor badge (Version 1).',
             category: 'Claimed V1'
         },
         {
             name: 'Claimed Badge V1 - Modal',
-            file: '/assets/images/tutor-badges/claimed-v1-modal.png',
+            file: '@/assets/images/tutor-badges/claimed-v1-modal.png',
+            src: claimedV1ModalSrc,
             description: 'Modal version of the claimed tutor badge (Version 1).',
             category: 'Claimed V1'
         },
         {
             name: 'Claimed Badge V1 - Full',
-            file: '/assets/images/tutor-badges/claimed-v1-full.png',
+            file: '@/assets/images/tutor-badges/claimed-v1-full.png',
+            src: claimedV1FullSrc,
             description: 'Full-size version of the claimed tutor badge (Version 1).',
             category: 'Claimed V1'
         },
         // Claimed Badges V2
         {
             name: 'Claimed Badge V2 - Thumbnail',
-            file: '/assets/images/tutor-badges/claimed-v2-thumbnail.png',
+            file: '@/assets/images/tutor-badges/claimed-v2-thumbnail.png',
+            src: claimedV2ThumbnailSrc,
             description: 'Thumbnail version of the claimed tutor badge (Version 2).',
             category: 'Claimed V2'
         },
         {
             name: 'Claimed Badge V2 - Modal',
-            file: '/assets/images/tutor-badges/claimed-v2-modal.png',
+            file: '@/assets/images/tutor-badges/claimed-v2-modal.png',
+            src: claimedV2ModalSrc,
             description: 'Modal version of the claimed tutor badge (Version 2).',
             category: 'Claimed V2'
         },
         {
             name: 'Claimed Badge V2 - Full',
-            file: '/assets/images/tutor-badges/claimed-v2-full.png',
+            file: '@/assets/images/tutor-badges/claimed-v2-full.png',
+            src: claimedV2FullSrc,
             description: 'Full-size version of the claimed tutor badge (Version 2).',
             category: 'Claimed V2'
         },
@@ -165,7 +187,7 @@ export const TutorBadges = () => {
                                         padding: '16px'
                                     }}>
                                         <img 
-                                            src={asset.file} 
+                                            src={asset.src} 
                                             alt={asset.name} 
                                             style={{ 
                                                 maxWidth: '100%', 

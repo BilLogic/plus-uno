@@ -164,7 +164,7 @@ or pressing Enter anywhere else on the row selects it, including on a parent.
 
 ### Label it the ordinary way.
 
-`id` lands on the input (#323), so a `label` pointing at it names the field.
+`id` lands on the input, so a `label` pointing at it names the field.
 `aria-label` and `aria-labelledby` are forwarded to the same element if you
 would rather not render a label.
 
@@ -187,7 +187,7 @@ concerned.
 - **The tree walks with the arrow keys.** Down opens it from the field. Up and
   Down move through the rows that are actually showing; Right opens a branch and
   then steps into it; Left closes one and then steps out to its parent; Home and
-  End jump; Enter and Space choose (#323).
+  End jump; Enter and Space choose.
 - **One tab stop, on the cursor.** Tab leaves the tree rather than walking it,
   which is what a `tree` promises. Opening starts on the selected node — the
   reason its ancestors are expanded for you — or on the first row.

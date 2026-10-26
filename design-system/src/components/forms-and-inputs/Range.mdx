@@ -106,7 +106,7 @@ export const figmaMeta = {
   in step with the thumb rather than jumping when the pointer lifts. Anything
   expensive — a network call, a chart redraw — belongs behind a debounce or in
   `onBlur`, not in `onChange`.
-- **`showLabel={false}` hides the label; it does not remove it (#213).** A range
+- **`showLabel={false}` hides the label; it does not remove it.** A range
   input carries its value and never its meaning: "49" says nothing about what is
   being set, so `label` is the only thing that names the control.
 - **The filled part of the track is drawn from a custom property set in
@@ -129,7 +129,7 @@ export const figmaMeta = {
   component associates it with the input through `useFieldId`, so the pairing
   holds whether or not you pass an `id`.
 - **`showLabel={false}` hides the label, it does not remove it.** Same contract
-  as `Input` (#213): the label still renders and still names the slider, it is
+  as `Input`: the label still renders and still names the slider, it is
   just clipped out of sight. Use it where the design puts the meaning elsewhere
   — the minus/plus icons flanking a zoom slider, for instance.
 - **Everything else passes through.** `aria-valuetext`, `aria-describedby` and

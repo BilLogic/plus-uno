@@ -134,7 +134,7 @@ Scotland"), rather than expecting the intermediate click to commit.
 ### Label it the ordinary way.
 
 ```jsx
-// `id` lands on the input (#323), so a label pointing at it names the field.
+// `id` lands on the input, so a label pointing at it names the field.
 <label htmlFor="region">Region</label>
 <Cascader id="region" options={regions} value={path} onChange={setPath} />
 
@@ -153,7 +153,7 @@ string values.
 The columns preview on hover, which is a pointer convenience and not the only
 route: Down opens the menu, Up and Down walk a column, Right opens the child
 column and steps into it, Left goes back to the row that opened it, Enter
-commits a leaf, and Escape closes and returns focus to the field (#323).
+commits a leaf, and Escape closes and returns focus to the field.
 Disabled options are stepped over rather than landed on.
 
 </div>
