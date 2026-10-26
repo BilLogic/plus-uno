@@ -8,6 +8,7 @@ import React from 'react';
  *
  * The frame scales down to fit a narrower docs column, and it follows the
  * toolbar's Color mode and Contrast switches through the attributes on <html>.
+ * Put it in a `DocsCanvasShell` so it takes the page's example chrome.
  */
 
 const readModes = () => {
@@ -41,11 +42,13 @@ export const ModeFrame = ({ storyId, width, height, title }) => {
     const modes = useModes();
     const wrapRef = React.useRef(null);
     const [scale, setScale] = React.useState(1);
-    React.useEffect(() => {
+    // Read the column width before the first paint, so the frame never shows unscaled.
+    React.useLayoutEffect(() => {
         const el = wrapRef.current;
-        if (!el || typeof ResizeObserver === 'undefined') return undefined;
+        if (!el) return undefined;
         const read = () => setScale(Math.min(1, el.clientWidth / width));
         read();
+        if (typeof ResizeObserver === 'undefined') return undefined;
         const observer = new ResizeObserver(read);
         observer.observe(el);
         return () => observer.disconnect();
@@ -54,7 +57,8 @@ export const ModeFrame = ({ storyId, width, height, title }) => {
     const globals = `plusColorMode:${modes.color};plusContrastMode:${modes.contrast}`;
     const src = `iframe.html?id=${storyId}&viewMode=story&globals=${globals}`;
     return (
-        <div ref={wrapRef} style={{ width: '100%', height: height * scale }}>
+        // The scaled iframe keeps its layout width, so the wrapper clips it to the column.
+        <div ref={wrapRef} style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>
             <iframe
                 title={title}
                 src={src}
@@ -63,10 +67,8 @@ export const ModeFrame = ({ storyId, width, height, title }) => {
                 loading="lazy"
                 style={{
                     display: 'block',
-                    boxSizing: 'content-box',
-                    border: '1px solid var(--ds-border)',
-                    borderRadius: 'var(--radius-100)',
-                    background: 'var(--ds-surface-sunken)',
+                    boxSizing: 'border-box',
+                    border: 0,
                     transform: `scale(${scale})`,
                     transformOrigin: 'top left',
                 }}

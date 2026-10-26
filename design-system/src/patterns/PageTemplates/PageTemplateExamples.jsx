@@ -50,15 +50,25 @@ export const FocusedActionsDo = () => (
     </div>
 );
 
-/** Don't: several primary actions, start-aligned in the content. */
+/** Don't: several primary actions, start-aligned in the footer. */
 export const FocusedActionsDont = () => (
     <div style={box}>
-        <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}}>
-            <div style={{ display: 'flex', gap: 'var(--space-100)' }}>
-                <Button style="primary" fill="filled" text="Submit note" />
-                <Button style="primary" fill="filled" text="Save draft" />
-                <Button style="primary" fill="filled" text="Send to lead" />
-            </div>
+        <PageLayout
+            frame="focused"
+            title="Add a session note"
+            style={{ height: '100%' }}
+            onBack={() => {}}
+            onClose={() => {}}
+            actions={(
+                // An auto end margin moves the group to the start of the end-aligned footer.
+                <div style={{ display: 'flex', gap: 'var(--space-050)', marginRight: 'auto' }}>
+                    <Button style="primary" fill="filled" text="Submit note" />
+                    <Button style="primary" fill="filled" text="Save draft" />
+                    <Button style="primary" fill="filled" text="Discard" />
+                </div>
+            )}
+        >
+            {slotContent('Content slot: Sections')}
         </PageLayout>
     </div>
 );
@@ -78,17 +88,30 @@ export const SlotsDo = () => (
     </HeadingLevelContext.Provider>
 );
 
-/** Don't: the card is rebuilt by hand, with 24 of extra space added to the chrome. */
+/** Don't: the card is rebuilt by hand, with 24 of extra space added to the chrome (the labeled spacer). */
 export const SlotsDont = () => (
     <div
         style={{
-            padding: 'var(--space-300)',
+            padding: '0 var(--space-100) var(--space-100)',
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-surface-raised)',
             boxShadow: 'var(--ds-shadow-raised)',
         }}
     >
-        <p style={{ margin: '0 0 var(--space-100)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Next session</p>
+        <div
+            style={{
+                height: 'var(--space-150)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--ds-background-danger-subtler)',
+                color: 'var(--ds-text)',
+                font: 'var(--body-small)',
+            }}
+        >
+            24 added by hand
+        </div>
+        <p style={{ margin: 'var(--space-100) 0 var(--space-050)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Next session</p>
         {nextSession}
     </div>
 );
