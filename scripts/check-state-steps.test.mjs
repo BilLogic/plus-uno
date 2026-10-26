@@ -113,7 +113,8 @@ const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
 /**
  * The frame chain's navigation is on the new color tokens: hover and press move
  * up the neutral subtle steps, selection is the neutral selected fill (its
- * hovered and pressed steps above it) with a leading bar, and focus is the
+ * hovered and pressed steps above it) with a medium-weight label and no
+ * leading bar, and focus is the
  * focused ring 2px outside the row (DS_RING_OUTSIDE, above), with no fill.
  */
 test('SidebarTab: neutral hover and press, neutral selection with its own steps, focus a ring outside with no fill', () => {
@@ -126,9 +127,13 @@ test('SidebarTab: neutral hover and press, neutral selection with its own steps,
   expectRule(TAB, '.plus-sidebar-tab--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(TAB, '.plus-sidebar-tab--selected', {
     'background-color': layer('--ds-background-selected'),
-    'box-shadow': `inset var(--size-element-stroke-lg) 0 0 ${layer('--ds-border-selected')}`,
     color: layer('--ds-text-selected'),
   });
+  assert.ok(
+    !('box-shadow' in declarations(sheet(TAB), '.plus-sidebar-tab--selected')),
+    `${TAB}: ".plus-sidebar-tab--selected" draws a box-shadow; selection is shown by fill, text, icon and weight, with no leading bar`,
+  );
+  expectRule(TAB, '.plus-sidebar-tab--selected .plus-sidebar-tab__label', { 'font-weight': layer('--type-weight-medium') });
   expectRule(TAB, '.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled)', {
     'background-color': layer('--ds-background-selected-hovered'),
   });
