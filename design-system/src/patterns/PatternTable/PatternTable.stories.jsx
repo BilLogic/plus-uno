@@ -238,9 +238,10 @@ export const RowStates = {
             // State is the whole row, never a stripe on its leading edge: the
             // first cell draws the same single layer as the rest, and the
             // checkbox carries the cue that does not rest on color.
-            await expect(layers(selectedLeading), `${mode}: no leading bar`).toBe(layers(selectedRole));
-            await expect(layers(selectedLeading), `${mode}: no leading bar`).not.toContain(color('--ds-border-selected'));
+            await expect(layers(selectedLeading), `${mode}: the leading cell matches the row`).toBe(layers(selectedRole));
+            await expect(layers(selectedLeading), `${mode}: no selected edge on the leading cell`).not.toContain(color('--ds-border-selected'));
             await expect(getComputedStyle(selectedLeading).boxShadow, `${mode}: no inset bar`).toBe('none');
+            await expect(getComputedStyle(selectedLeading, '::before').content, `${mode}: no bar drawn before the cell`).toBe('none');
             await expect(canvas.getByLabelText('Select Casey Rivera'), `${mode}: the selected row's checkbox`).toBeChecked();
             await expect(withForcedPseudo(selected.closest('tr'), ':hover', () => layers(selectedRole)), `${mode}: a hovered selected row`)
                 .toContain(color('--ds-background-selected-hovered'));

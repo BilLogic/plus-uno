@@ -480,8 +480,12 @@ test('PatternTable: row states are layered over the cell fill — neutral subtle
   expectRule(file, `${row}[aria-selected=true]:active`, { [state]: layer('--ds-background-selected-pressed') });
   // State is the whole row, never a stripe on one edge: no cell of a selected
   // row draws a layer of its own over the row's state.
-  const css = sheet(file).toString();
-  assert.ok(!css.includes('--ds-border-selected'), `${file}: a selected row draws a leading bar`);
+  sheet(file).walkRules((rule) => {
+    if (!rule.selector.includes('aria-selected')) return;
+    rule.walkDecls((decl) => {
+      assert.ok(!decl.value.includes('--ds-border-selected'), `${file}: "${rule.selector}" draws a selected edge`);
+    });
+  });
   const leading = declarations(sheet(file), `${row}[aria-selected=true] > :first-child`) ?? {};
   assert.ok(!('background-image' in leading) && !('box-shadow' in leading), `${file}: a selected row's leading cell draws an edge`);
   for (const selector of [`${row}:hover`, `${row}:active`, `${row}[aria-selected=true]`]) {
