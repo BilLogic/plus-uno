@@ -77,7 +77,7 @@ twice, or a lesson's completion screen, legitimately shows more than one.)
 `heading-order` flags a heading that jumps more than one level below its
 predecessor. The **first** heading on a page has no predecessor, so a page whose
 whole outline reads `h4 → h4 → h4` satisfies the rule and still has no top. That
-was 111 of 114 page stories before the rule below was added.
+was 111 of 114 page stories before the page-outline check was added.
 
 `page-has-heading-one` is the rule for exactly this, and it never runs here: axe
 evaluates its page-level rules only when the run context is the whole document,
@@ -113,7 +113,7 @@ down in `scripts/check-page-outline.mjs` rather than inferred.
 **Adding the `<h1>` moves everything under it.** An `h1` followed by an `h4` is
 a three-level skip, so a page that used to run `h4 → h4` has to become
 `h2 → h3` — tag only, class kept, nothing changes on screen. Two consequences,
-both of which bit when the rule was first applied:
+both of which bit when the page-outline check was first applied:
 
 - A component that lands at two depths takes its level as a prop.
   `SectionTitle` is an `h3` under a page's own header and an `h2` on the

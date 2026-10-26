@@ -45,7 +45,7 @@ const Alert = ({
     children,
     leadingVisual = true,
     dismissible = true,
-    /** @deprecated Prefer `dismissible` — kept for existing call sites */
+    /** @deprecated Prefer dismissible — kept for existing call sites */
     dismissable,
     onDismiss,
     className = '',
@@ -127,7 +127,7 @@ Alert.propTypes = {
     leadingVisual: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.node]),
     /** Whether the alert can be dismissed */
     dismissible: PropTypes.bool,
-    /** @deprecated Prefer `dismissible` */
+    /** @deprecated Prefer dismissible */
     dismissable: PropTypes.bool,
     /** Callback when alert is dismissed */
     onDismiss: PropTypes.func,

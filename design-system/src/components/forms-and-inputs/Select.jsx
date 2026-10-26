@@ -520,7 +520,7 @@ Select.propTypes = {
     disabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     /** Shows an asterisk on the label and sets `aria-required`. */
     required: PropTypes.bool,

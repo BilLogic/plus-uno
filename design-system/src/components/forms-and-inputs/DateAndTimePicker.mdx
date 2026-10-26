@@ -206,8 +206,8 @@ Date and time pickers let people select a date or range of dates and/or a time f
   "Time" — off their section headings, or off a fallback `aria-label` when
   `showSectionLabels` is off. Both are true of the control and useless as a
   field name: two such pickers on one screen are indistinguishable.
-- **A caption you render above the field cannot be its name.** The common case —
-  one visible "Session time" over a start and an end picker —
+- **A caption you render above the field cannot be its name.** The case this guards
+  against — one visible "Session time" over a start and an end picker —
   has no `htmlFor` that works, because one `<label for>` reaches one control and
   there are two fields under it. Give each picker its own `label` with
   `showLabel={false}`, and let the caption name the pair: put it in an element

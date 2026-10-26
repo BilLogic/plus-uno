@@ -217,7 +217,8 @@ a matching icon.
   rendered either way and always carries `htmlFor`; `showLabel={false}` only
   clips it out of sight with `.plus-field-label--hidden`. So a field that has a
   `label` has an accessible name whether or not you show it, and turning the
-  label off costs nothing but the pixels. See *Why `showLabel` cannot take the name away* below.
+  label off costs nothing but the pixels. See *Why `showLabel` cannot take the
+  name away* below.
 - **`required` shows an asterisk and sets `aria-required`.** The asterisk is
   hidden from assistive technology, which hears "required" from the input. The
   form explains the asterisk once, in a legend above the fields; there are no
@@ -269,8 +270,8 @@ a matching icon.
 ## Why `showLabel` cannot take the name away
 
 `showLabel={false}` used to skip rendering the label entirely, which raised
-the question of whether that mode should exist at all, since a component that makes "no
-accessible name" easy keeps producing the defect. The 37 call sites answered it,
+the question of whether that mode should exist at all, since a component that
+makes "no accessible name" easy keeps producing the defect. The 37 call sites answered it,
 and they were not one population:
 
 - **17 pass a real `label` string and then switch it off** — the whole Login

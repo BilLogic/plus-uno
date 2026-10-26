@@ -86,7 +86,7 @@ const InputGroup = ({
     size = 'medium',
     disabled = false,
     readOnly,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly,
     validation = 'none',
     validationMessage,
@@ -372,7 +372,7 @@ InputGroup.propTypes = {
     size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
-    /** @deprecated Prefer `readOnly` */
+    /** @deprecated Prefer readOnly */
     readonly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'success']),
     validationMessage: PropTypes.node,
