@@ -181,6 +181,7 @@ const preview = {
               "Sidebar",
               "Card",
               "Section",
+              "Overlay",
               "Modal",
               "Table"
             ],

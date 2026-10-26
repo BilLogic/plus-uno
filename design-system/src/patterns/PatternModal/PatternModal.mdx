@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternModalStories} />
 
 <Title />
-The modal pattern is the dialog shell: header with title and close button, body slot with internal scroll, and footer slot. Baked-in tokens: the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay` (the level every floating layer takes; the blanket under a real modal is what sets it apart from a menu), as the Modal component draws it, and the modal radius, padding and gap. Rendered inline for documentation; for a real overlay with backdrop and focus management, use the core Modal component (never ship a modal without a scrim).
+The modal pattern is the dialog shell: a header with the title and close button, a body slot and a footer slot, placed in an `Overlay` that carries the scrim. Its width is a step of the screen grid and its height hugs or fills to the screen less 128. It draws the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay`, as the Modal component does, with Modal/pad 16, Modal/stack-md 16 and Modal/radius 12. The pattern is drawn inline here; for a real dialog with focus management, use the core Modal component.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
@@ -19,7 +19,7 @@ The modal pattern is the dialog shell: header with title and close button, body 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Header with title + close, body children, and footer actions slot.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A <code>width="sm"</code>, <code>height="hug"</code> modal in an inline <code>Overlay</code> at the 1024 screen: the scrim, pad 16 at the sides and 64 above and below, the modal centered.</>}>
     <Canvas of={PatternModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,10 +27,20 @@ The modal pattern is the dialog shell: header with title and close button, body 
 
 <div className="sb-ds-doc-section">
 
-### Scrolling
+### Width
 
-<DocsCanvasShell description={<>With <code>maxHeight</code> set, the body slot scrolls internally while header and footer stay pinned.</>}>
-    <DsCanvasQuiet of={PatternModalStories.Scrolling} />
+<DocsCanvasShell description={<><code>sm</code>, <code>md</code> and <code>lg</code> span 6, 8 and 10 columns of the screen grid plus 16 on each side: 384, 507 and 629 at 768, 512, 677 and 843 at 1024, 640, 848 and 1056 at 1440. The width grows with the screen, never shrinks, and the sidebar never changes it.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Widths} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Height
+
+<DocsCanvasShell description={<><code>hug</code>, the default, grows with its content up to the screen less 128, then the body scrolls. <code>fill</code> always sits at that height, so a settings or editor modal never jumps.</>}>
+    <DsCanvasQuiet of={PatternModalStories.Heights} />
 </DocsCanvasShell>
 
 </div>

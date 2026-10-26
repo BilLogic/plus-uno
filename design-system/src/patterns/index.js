@@ -18,5 +18,6 @@ export {
 } from './Sidebar';
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection } from './PatternSection';
+export { default as Overlay, OVERLAY_WIDTHS, OVERLAY_HEIGHTS, OVERLAY_SPANS } from './Overlay';
 export { default as PatternModal } from './PatternModal';
 export { default as PatternTable } from './PatternTable';
