@@ -138,6 +138,23 @@ function CodeTabPanel({ of }) {
   );
 }
 
+/**
+ * A summary is a plain string authored with markdown inline code
+ * (`components/changelog.md`), so the backtick spans render as `<code>` here
+ * rather than as literal backticks.
+ */
+function renderInlineCode(text) {
+  return String(text)
+    .split(/(`[^`]+`)/)
+    .map((part, i) =>
+      part.length > 2 && part.startsWith('`') && part.endsWith('`') ? (
+        <code key={i}>{part.slice(1, -1)}</code>
+      ) : (
+        part
+      ),
+    );
+}
+
 /** The Changelog tab. Entries come from the story meta, newest first. */
 function ChangelogTabPanel({ entries }) {
   return (
@@ -150,7 +167,7 @@ function ChangelogTabPanel({ entries }) {
               <time dateTime={entry.date}>{entry.date}</time>
               {entry.kind ? <span className="sb-ds-changelog__kind">{entry.kind}</span> : null}
             </dt>
-            <dd>{entry.summary}</dd>
+            <dd>{renderInlineCode(entry.summary)}</dd>
           </React.Fragment>
         ))}
       </dl>
