@@ -54,7 +54,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-surface-container` · `--ds-text` · `--ds-text-subtle` · `--element-inline-md` · `--heading-large` · `--layout-gutter` · `--layout-pad-x-screen` · `--section-min-width-main` · `--section-stack-lg` · `--section-stack-md` · `--size-element-gap-xs` · `--surface-stack-lg` · `--width-2500`
+`--body-default` · `--ds-surface-container` · `--ds-text` · `--ds-text-subtle` · `--element-inline-md` · `--heading-large` · `--layout-gutter` · `--layout-pad-x-screen` · `--section-min-width-main` · `--section-stack-md` · `--size-element-gap-xs` · `--surface-stack-lg` · `--width-2500`
 
 From `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.scss`. Override these through the token layer, never with a literal.
 

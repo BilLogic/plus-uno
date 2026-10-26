@@ -189,11 +189,16 @@ export const SidebarOverPage = {
 
 /* ------------------------------------------------------------- focused page */
 
+/** Stacked fields sit Element/gap-md apart (forms.md § Spacing rules). */
+const fieldStack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' };
+
 const NoteForm = () => (
     <>
         <PatternSection title="Session details" description="What the student worked on today.">
-            <Input label="Topic" placeholder="e.g. Solving two-step equations" />
-            <Textarea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
+            <div style={fieldStack}>
+                <Input label="Topic" placeholder="e.g. Solving two-step equations" />
+                <Textarea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
+            </div>
         </PatternSection>
         <PatternSection title="Follow-up">
             <Input label="Next step" placeholder="e.g. Practice set 4" />
