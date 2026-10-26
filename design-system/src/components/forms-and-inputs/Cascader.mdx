@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CascaderStories from './Cascader.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Cascader, TreeSelect } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -24,12 +25,14 @@ export const figmaMeta = {
 
 <Title />
 
+A field that picks one leaf from a hierarchy, one column per level, where each choice narrows the next: school, then grade, then class. Use it when the answer is always a leaf at the end of a single path.
+
 <DocsTabs of={CascaderStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-43002"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -37,59 +40,165 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Empty field ready for hierarchical selection.</>}>
+<ol>
+    <li><strong>Field</strong>: shows the placeholder, or the chosen path joined with " / ".</li>
+    <li><strong>Caret</strong>: the field's trailing icon, a caret-down.</li>
+    <li><strong>Menu</strong>: the open list, holding one or more columns.</li>
+    <li><strong>Column</strong>: one per level. Its rows are options.</li>
+    <li><strong>Row with children</strong>: ends in a caret-right. The selected fill marks the path so far.</li>
+    <li><strong>Leaf row</strong>: has no caret. Choosing it commits the path and closes the menu.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>strings, or objects with <code>text</code> or <code>label</code>, <code>value</code>, <code>children</code> and <code>disabled</code>, nested by <code>children</code></td><td>empty</td><td>Columns: one _Listbox Column per level</td></tr>
+        <tr><td><code>value</code></td><td>array</td><td>the path of values, root first</td><td>empty</td><td>state=filled</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>called with the path when a leaf is chosen</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td>"Please select"</td><td>not drawn</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state=disabled</td></tr>
+        <tr><td><code>id</code></td><td>string</td><td>lands on the input, so a label can point at it</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+Whether the menu is open is internal. Figma draws it as state=open. Hover on the field comes from the browser, and hover on a row is the keyboard highlight.
+
+Depth is not a property. Add a column in Figma, or nest options one level deeper in code.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The field is the shared field box, and the menu is the shared listbox, so Select, Tree select and Date picker take the same tokens.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the field.</td></tr>
+        <tr><td><code>--ds-background-input</code>, <code>--ds-border-input</code></td><td>theme role</td><td>The fill and border of the field at rest.</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>theme role</td><td>The border and ring while the menu is open.</td></tr>
+        <tr><td><code>--ds-opacity-disabled</code></td><td>theme role</td><td>The fade on a disabled field.</td></tr>
+        <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>theme role</td><td>The menu's surface and shadow.</td></tr>
+        <tr><td><code>--ds-border</code></td><td>theme role</td><td>The line between columns.</td></tr>
+        <tr><td><code>--popover-offset</code></td><td>4</td><td>The gap between the field and the menu.</td></tr>
+        <tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>The tallest a column grows before it scrolls.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>An empty field ready for a choice.</>}>
     <Canvas of={CascaderStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Content
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Empty vs pre-filled path in the trigger.</>}>
+<DocsCanvasShell description={<>An empty field, and a field with a chosen path.</>}>
     <DsCanvasQuiet of={CascaderStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Columns
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Multi-column menu: one column per hierarchy level.</>}>
+<DocsCanvasShell description={<>One column per level of the hierarchy.</>}>
     <DsCanvasQuiet of={CascaderStories.Layout} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled: closed field with no interaction.</>}>
+<DocsCanvasShell description={<>Disabled: a closed field that takes no interaction.</>}>
     <DsCanvasQuiet of={CascaderStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={CascaderStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={CascaderStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ width: 320 }}>
+                    <Cascader
+                        id="cascader-do"
+                        value={['lincoln', 'g9', 'alg1']}
+                        onChange={() => {}}
+                        options={[
+                            { text: 'Lincoln High', value: 'lincoln', children: [
+                                { text: 'Grade 9', value: 'g9', children: [{ text: 'Algebra I', value: 'alg1' }, { text: 'Biology', value: 'bio' }] },
+                                { text: 'Grade 10', value: 'g10', children: [{ text: 'Geometry', value: 'geo' }] },
+                            ] },
+                            { text: 'Roosevelt Middle', value: 'roosevelt', children: [
+                                { text: 'Grade 7', value: 'g7', children: [{ text: 'Pre-algebra', value: 'prealg' }] },
+                            ] },
+                        ]}
+                    />
+                </div>
+            ),
+            doCaption: 'School, then grade, then class: every answer is a leaf.',
+            dontExample: (
+                <div style={{ width: 320 }}>
+                    <TreeSelect
+                        id="cascader-dont"
+                        value="alg1"
+                        onChange={() => {}}
+                        options={[
+                            { text: 'Lincoln High', value: 'lincoln', children: [
+                                { text: 'Grade 9', value: 'g9', children: [{ text: 'Algebra I', value: 'alg1' }, { text: 'Biology', value: 'bio' }] },
+                                { text: 'Grade 10', value: 'g10', children: [{ text: 'Geometry', value: 'geo' }] },
+                            ] },
+                            { text: 'Roosevelt Middle', value: 'roosevelt', children: [
+                                { text: 'Grade 7', value: 'g7', children: [{ text: 'Pre-algebra', value: 'prealg' }] },
+                            ] },
+                        ]}
+                    />
+                </div>
+            ),
+            dontCaption: 'A tree when only a leaf is a valid answer.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **<code>onChange</code> fires only on a leaf.** Choosing a branch opens the next column and reports nothing, so a partial path is never a value. If a branch is a legitimate answer, give it a child that says so, such as "All of Scotland".
+- **Label it the ordinary way.** <code>id</code> lands on the input, so a label pointing at it names the field. <code>aria-label</code> works too, because extra props go to the same input.
+- **A falsy option value falls through to the text.** The value is read as <code>value</code>, then <code>text</code>, then <code>label</code>, so a value of 0 or an empty string resolves to the label. Use non-empty string values.
+- **Hover previews; the keyboard walks.** Down opens the menu. Up and Down walk a column. Right opens the child column and steps into it, and Left goes back to the row that opened it. Enter commits a leaf, and Escape closes the menu and returns focus to the field. Disabled options are stepped over.
 
 </div>
 
@@ -105,56 +214,12 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Cascader` to pick one path down a shallow hierarchy where each level narrows
-the next — region then city, subject then topic. The columns are the point: the
-user sees where they are in the tree while they choose.
+Use a Cascader when every answer is one leaf and each level narrows the next, as school, then grade, then class. Its value is the whole path, root to leaf. It cannot stop at a parent or hold more than one.
 
-`value` is the path as an array of values, root first, and `onChange` gives you
-the same. `options` takes strings or `{ text | label, value, children, disabled }`
-objects, nested by `children`.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### `onChange` fires only on a leaf.
-
-```jsx
-// Choosing a branch opens the next column and reports nothing. Only an option
-// with no children commits the path and calls onChange — so a partial path is
-// not a value this component can return.
-<Cascader options={regions} value={path} onChange={setPath} />
-```
-
-If a branch is a legitimate answer, give it a child that says so ("All of
-Scotland"), rather than expecting the intermediate click to commit.
-
-### Label it the ordinary way.
-
-```jsx
-// `id` lands on the input, so a label pointing at it names the field.
-<label htmlFor="region">Region</label>
-<Cascader id="region" options={regions} value={path} onChange={setPath} />
-
-// `aria-label` works too — extra props are forwarded to the same input.
-<Cascader aria-label="Region" options={regions} value={path} onChange={setPath} />
-```
-
-### A falsy option `value` falls through to the text.
-
-The value of an option is read as `option.value || option.text || option.label`,
-so `{ value: 0 }` and `{ value: '' }` resolve to the label instead. Use non-empty
-string values.
-
-### Hover previews; the keyboard walks.
-
-The columns preview on hover, which is a pointer convenience and not the only
-route: Down opens the menu, Up and Down walk a column, Right opens the child
-column and steps into it, Left goes back to the row that opened it, Enter
-commits a leaf, and Escape closes and returns focus to the field.
-Disabled options are stepped over rather than landed on.
+- **The answer is always one leaf.** If stopping at a parent is a valid answer, or the answer is a set, use [Tree select](?path=/docs/components-forms-and-inputs-tree-select--docs).
+- **Keep columns short.** Each column is a scrolling list the pointer travels down, so keep levels few and lists short.
+- **Show the whole path in the field.** Once filled, the field reads the path joined with " / ", so people can check every level without opening the menu again.
+- **For a flat list**, use [Select](?path=/docs/components-forms-and-inputs-select--docs) for 5 to 15 values, and [Radio](?path=/docs/components-forms-and-inputs-radio--docs) for fewer than 5.
 
 </div>
 
@@ -162,19 +227,11 @@ Disabled options are stepped over rather than landed on.
 
 ## Accessibility
 
-- **The trigger says what it opens.** `role="combobox"` with
-  `aria-haspopup="listbox"`, `aria-expanded`, and `aria-controls` naming the menu
-  while it is open.
-- **Each column is a named listbox.** The first is "Options"; the rest are named
-  for the row that opened them, so a screen-reader user hears which branch they
-  are inside rather than a second unnamed list.
-- **One tab stop, and it moves with you.** The open menu holds a single tab stop
-  on the cursor, so Tab leaves the menu rather than walking it — the arrow keys
-  are what walk it, which is the listbox contract.
-- **Escape closes it and gives focus back to the field.** So does choosing a
-  leaf. Nothing strands focus in a menu that is no longer there.
-- **Disabled options are skipped, not refused.** Arrow keys step over them, so a
-  keyboard user never lands somewhere that will not respond.
+- **The field says what it opens.** It has the role combobox with a listbox popup, an expanded state, and a link to the menu while it is open.
+- **Each column is a named listbox.** The first is "Options". The rest are named for the row that opened them, so a screen reader user hears which branch they are inside rather than a second unnamed list.
+- **One tab stop, and it moves with you.** The open menu holds a single tab stop on the highlighted row, so Tab leaves the menu and the arrow keys walk it.
+- **Escape closes it and gives focus back to the field.** So does choosing a leaf. Nothing strands focus in a menu that is no longer there.
+- **Disabled options are skipped.** Arrow keys step over them, so a keyboard user never lands somewhere that will not respond.
 
 </div>
 
@@ -182,11 +239,10 @@ Disabled options are stepped over rather than landed on.
 
 ## Related
 
-- For the same hierarchy shown as one expanding tree, or for choosing more than
-  one branch, use `TreeSelect`.
-- For a flat list of options, use `Select`.
-- For a hierarchy the user browses rather than selects from, use `Accordion` or
-  `SidebarTab`.
+- [Tree select](?path=/docs/components-forms-and-inputs-tree-select--docs) for a parent node, several nodes, or the whole hierarchy in view.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for one value from a flat list.
+- [Radio](?path=/docs/components-forms-and-inputs-radio--docs) for fewer than 5 options.
+- [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) for an action rather than a value.
 
 </div>
 

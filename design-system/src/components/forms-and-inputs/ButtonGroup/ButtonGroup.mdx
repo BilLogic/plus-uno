@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonGroupStories from './ButtonGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,14 +22,15 @@ export const figmaMeta = {
 <Meta of={ButtonGroupStories} />
 
 <Title />
-Buttons can be grouped together as individual segments of related actions.
+
+Two to five related buttons joined into one control, side by side or stacked. Use it when the actions belong together, such as views of one thing or steps on one item.
 
 <DocsTabs of={ButtonGroupStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53074"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/ButtonGroup"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -36,79 +38,122 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Compose with child <code>Button</code> elements instead of the <code>buttons</code> array when you need more custom content.</>}>
+<ol>
+    <li><strong>Group</strong>: joins the segments and rounds only the outer corners.</li>
+    <li><strong>First segment</strong>: a Button.</li>
+    <li><strong>Middle segment</strong>: a Button.</li>
+    <li><strong>Last segment</strong>: a Button.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>buttons</code>, children</td><td>array, Button nodes</td><td>one config per segment, or Button children. Children win when both are given.</td><td>none</td><td>buttons: a slot of Button instances</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>style</code></td><td>enum</td><td><code>primary</code> | <code>secondary</code> | <code>tertiary</code> | <code>success</code> | <code>warning</code> | <code>danger</code> | <code>info</code></td><td><code>primary</code></td><td>primary | secondary | tertiary</td></tr>
+        <tr><td><code>fill</code></td><td>enum</td><td><code>filled</code> | <code>tonal</code> | <code>outline</code> | <code>ghost</code></td><td><code>tonal</code></td><td>not drawn. Figma draws one fill.</td></tr>
+        <tr><td><code>vertical</code></td><td>boolean</td><td>stack the segments</td><td><code>false</code></td><td>alignment: horizontal | vertical</td></tr>
+        <tr><td><code>block</code></td><td>boolean</td><td>full width</td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>ariaLabel</code></td><td>string</td><td>the group's accessible name</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+Each entry in <code>buttons</code> takes <code>text</code>, <code>onClick</code>, <code>size</code>, <code>style</code>, <code>fill</code>, <code>leadingVisual</code>, <code>trailingVisual</code>, <code>disabled</code>, <code>active</code> and <code>href</code>. Its <code>props</code> object is spread onto the Button.
+
+<code>large</code> is deprecated and draws like <code>medium</code>. Figma still draws a large size.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The segments are Buttons, so they take the Button tokens. The group adds one.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--size-element-radius-md</code></td><td>4</td><td>The outer corners of the group at medium.</td></tr>
+        <tr><td><code>--size-element-radius-sm</code></td><td>4</td><td>The outer corners of the group at small.</td></tr>
+        <tr><td><code>--item-height-md</code>, <code>--item-height-sm</code></td><td>32, 24</td><td>The height of each segment, from Button.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A group of three tonal segments built from the <code>buttons</code> array.</>}>
     <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Content
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Use child <code>Button</code> elements for custom per-segment content and visuals.</>}>
+<DocsCanvasShell description={<>Child Button elements give each segment its own content and visuals.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Children} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Behavior
+### Number of segments
 
 <DocsCanvasShell description={<>Connected groups with two through five segments.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Counts} />
 </DocsCanvasShell>
 
-</div>
+### Patterns
 
-<div className="sb-ds-doc-section">
-
-## Patterns
-
-<DocsCanvasShell description={<>Common grouped patterns like pagination controls, toolbars, and segmented toggles.</>}>
+<DocsCanvasShell description={<>Pagination controls, toolbars and segmented toggles.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Patterns} />
 </DocsCanvasShell>
 
-</div>
+### Sizes
 
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Medium (32, the default) and small (24 compact, for table rows and inline toolbars). Large is deprecated and draws like medium.</>}>
+<DocsCanvasShell description={<>Medium is 32 high and the default. Small is 24 high, for table rows and inline toolbars. Large is deprecated and draws like medium.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### Alignment
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Horizontal default versus vertical stacking.</>}>
+<DocsCanvasShell description={<>Horizontal by default, or stacked with <code>vertical</code>.</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Layout} />
 </DocsCanvasShell>
 
+Figma draws one state, default. Each segment is a Button and takes its hover, pressed, focus and disabled states from it.
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={ButtonGroupStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## For developers
 
-<DocsInteractivePlayground
-    of={ButtonGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
+- **Pass the buttons either way.** Use the <code>buttons</code> array of configs, or Button children. Children win when both are given.
+- **The group hands its <code>size</code>, <code>style</code> and <code>fill</code> down** to every child that does not set its own. Children are cloned and not checked, so a non-Button child receives those props too.
+- **Group-level <code>style</code> is a narrower set than Button's.** The five pillar styles are not valid on the group. Keep the group on a semantic style and override <code>style</code> on one segment.
+- **Show a selected segment with <code>aria-pressed</code>.** <code>active</code> adds a class and nothing else, so declare the state through a config's <code>props</code> object: <code>props: aria-pressed</code> set to whether that segment is chosen.
 
 </div>
 
@@ -124,54 +169,12 @@ Buttons can be grouped together as individual segments of related actions.
 
 ## When to use
 
-Use `ButtonGroup` when two or more actions belong together and should read as one
-control — a toolbar above a table, a pair of view switches, a vertical stack of
-related commands. It applies `size`, `style` and `fill` down to its children so
-the group stays visually consistent without repeating those props on every
-button.
+Use a Button group when a few actions work on the same thing. Join two to five peer actions on one object, such as Day, Week and Month on a calendar. A single action is a [Button](?path=/docs/components-forms-and-inputs-button-button--docs), and picking one value from a short scale is a [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs).
 
-Pass the buttons either way: an array of configs via `buttons`, or `Button`
-children. Children win when both are given.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### A group of buttons is not a selection.
-
-```jsx
-// Incorrect — looks like a segmented control, announces as three buttons in a
-// group with no selected state.
-<ButtonGroup ariaLabel="Date range" buttons={[
-  { text: 'Week', active: range === 'week', onClick: () => setRange('week') },
-  { text: 'Month', active: range === 'month', onClick: () => setRange('month') },
-]} />
-
-// Correct — `props` on a button config is spread onto the Button, and Button
-// spreads unknown props onto the element, so the state can be declared.
-<ButtonGroup ariaLabel="Date range" buttons={[
-  { text: 'Week', active: range === 'week', onClick: () => setRange('week'),
-    props: { 'aria-pressed': range === 'week' } },
-  { text: 'Month', active: range === 'month', onClick: () => setRange('month'),
-    props: { 'aria-pressed': range === 'month' } },
-]} />
-```
-
-### Group-level style is a narrower set than Button's.
-
-```jsx
-// Incorrect — `social-emotional` is a valid Button style but not a valid
-// ButtonGroup style, so this trips a propTypes warning.
-<ButtonGroup style="social-emotional" buttons={actions} />
-
-// Correct — keep the group on a semantic style and override per button.
-<ButtonGroup style="secondary" buttons={[
-  { text: 'Social-emotional', style: 'social-emotional' },
-  { text: 'Advocacy', style: 'advocacy' },
-]} />
-```
+- **Group only actions that belong together.** A group says its buttons act on the same thing. Unrelated actions side by side belong in separate Buttons with space between them.
+- **Keep it to two to five segments.** One segment is just a Button. Past five, the labels shrink and the group reads as a toolbar, so use a menu for the rest.
+- **Use one style and size across the group.** The segments share their style and size from the group. Restyle one segment only to show the selected one.
+- **Place dialog and card footer buttons directly.** The connected treatment implies the actions are alternatives.
 
 </div>
 
@@ -179,32 +182,10 @@ children. Children win when both are given.
 
 ## Accessibility
 
-- **The group is a named container, nothing more.** It renders `role="group"` by
-  default, and `ariaLabel` is the only prop that names it. An unnamed group
-  is worse than no group, because it adds a boundary with no explanation.
-- **`role="group"` does not imply arrow keys.** Tab moves between the buttons,
-  one stop each. That is correct for a toolbar of actions and wrong for a
-  segmented picker — which is the reason a picker belongs elsewhere.
-- **`active` is presentational.** It adds the `active` class and nothing else.
-  Toggle state has to be declared with `aria-pressed`, passed through a button
-  config's `props` object.
-- **Children are cloned, not validated.** Any element child has `size`, `style`
-  and `fill` injected unless it already sets them. Non-`Button` children still
-  get those props, which React will warn about if they reach a DOM element.
-- **The buttons keep their own rules.** Sizing, icon-only naming and the
-  disabled behavior described on the `Button` page all still apply inside a
-  group.
-
-### Name the group.
-
-```jsx
-// Incorrect — role="group" with no name. A screen reader announces "group"
-// and the user has to infer what the three buttons belong to.
-<ButtonGroup buttons={rowActions} />
-
-// Correct — `ariaLabel` becomes the group's aria-label.
-<ButtonGroup ariaLabel="Session actions" buttons={rowActions} />
-```
+- **Name the group.** The group has the role group, and <code>ariaLabel</code> is the only prop that names it. An unnamed group adds a boundary with no explanation, and a screen reader announces only "group".
+- **Tab moves between the buttons**, one stop each. That suits a toolbar of actions and not a segmented picker, which is the reason a picker belongs in a Choice group.
+- **A selected segment needs <code>aria-pressed</code>.** A row of buttons announces no selected state on its own.
+- **The buttons keep their own rules.** Sizing, icon-only naming and the disabled behavior on the Button page all still apply inside a group.
 
 </div>
 
@@ -212,10 +193,10 @@ children. Children win when both are given.
 
 ## Related
 
-- For a dialog or card footer, place buttons directly — the group's connected treatment implies the actions are alternatives.
-- For one answer from several, use `ChoiceGroup`.
-- For switching between panels of content, use `NavTabs`.
-- For the full color palette, use individual `Button`s; the group deliberately offers a narrower set.
+- [Button](?path=/docs/components-forms-and-inputs-button-button--docs) for a single action.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for choosing one option from a short set.
+- [Tabs](?path=/docs/components-navigation-tabs-nav-pills-navbar-tabs--docs) for switching between panels of content within a page.
+- [Nav pills](?path=/docs/components-navigation-tabs-nav-pills-navbar-nav-pills--docs) for switching views within a page.
 
 </div>
 

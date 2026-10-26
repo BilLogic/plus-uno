@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ChoiceGroupStories from './ChoiceGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ChoiceGroup, Radio } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -53,14 +54,17 @@ export const figmaMeta = {
 <Meta of={ChoiceGroupStories} />
 
 <Title />
-Use a choice group when a user answers one question by picking one option, or any number of options, from a short list they can see in full.
+
+A question with its set of choices under one legend: radios for one answer, checkboxes for any number. Stacked is the default. Inline lays the choices in a row, and with end labels it becomes a scale.
+
+Figma documents this component on two pages. **Multiple choice** covers the group as a whole. **Scale** covers the inline group with end labels, and it has no component of its own. This page covers both: the Multiple choice sections come first, and the Scale sections follow, under their own headings. The Scale page is in [Figma](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-64686).
 
 <DocsTabs of={ChoiceGroupStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-53488"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -68,37 +72,111 @@ Use a choice group when a user answers one question by picking one option, or an
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
+
+Multiple choice:
+
+<ol>
+    <li><strong>Legend</strong>: the question, set by <code>legend</code>.</li>
+    <li><strong>Options</strong>: Radios or Checkboxes, at least two.</li>
+    <li><strong>Group error</strong>: one message for the whole group, set by <code>error</code>.</li>
+    <li><strong>Other (please specify)</strong>: an answer with its own text box, set by <code>other</code>.</li>
+</ol>
+
+Scale:
+
+<ol>
+    <li><strong>Legend</strong>: the question.</li>
+    <li><strong>Leading label</strong>: the low end, set by <code>leadingText</code>.</li>
+    <li><strong>Options</strong>: one Radio per point.</li>
+    <li><strong>Trailing label</strong>: the high end, set by <code>trailingText</code>.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>legend</code></td><td>node</td><td>the question. Names the group.</td><td>none</td><td>label?: true | false</td></tr>
+        <tr><td><code>type</code></td><td>enum</td><td><code>radio</code> | <code>checkbox</code></td><td><code>radio</code></td><td>type: radio | checkbox</td></tr>
+        <tr><td><code>orientation</code></td><td>enum</td><td><code>stacked</code> | <code>inline</code></td><td><code>stacked</code></td><td>orientation: stacked | inline</td></tr>
+        <tr><td><code>options</code></td><td>array</td><td>strings, or objects with <code>value</code>, <code>label</code>, <code>description</code>, <code>disabled</code>, <code>id</code> and <code>reveal</code></td><td>empty</td><td>Options: a slot of Radio or Checkbox, at least 2</td></tr>
+        <tr><td><code>value</code>, <code>defaultValue</code></td><td>value, array</td><td>radio: one value or none. Checkbox: an array.</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>receives the next answer: a value for radios, an array for checkboxes</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>leadingText</code>, <code>trailingText</code></td><td>node</td><td>the scale ends</td><td>none</td><td>leadingText? and trailingText?, with their text</td></tr>
+        <tr><td><code>other</code></td><td>object</td><td><code>label</code>, <code>value</code>, <code>inputLabel</code>, <code>placeholder</code>, <code>text</code>, <code>defaultText</code> and <code>onTextChange</code></td><td>none</td><td>other?: true | false</td></tr>
+        <tr><td><code>appearance</code></td><td>enum</td><td><code>plain</code> | <code>card</code></td><td><code>plain</code></td><td>set on each option, not on the group</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td>marks the legend</td><td><code>false</code></td><td>Legend required?</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn. Each option carries its own states.</td></tr>
+        <tr><td><code>error</code></td><td>node</td><td>one error for the group</td><td>none</td><td>error?: true | false</td></tr>
+    </tbody>
+</DocsTable>
+
+<code>large</code> is deprecated and draws like <code>medium</code>. Each option carries its own states on Checkbox and Radio. In code, <code>disabled</code> on the group passes to every option.
+
+Figma's Scale page lists <code>orientation</code>, <code>leadingText</code> and <code>trailingText</code> as not yet in code, and names the code component Multiple choice. Code has all three, on the component named Choice group.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+Each option is a Radio or a Checkbox, so it takes their tokens. The group adds spacing and the error color.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--size-element-gap-sm</code>, <code>--size-element-gap-md</code></td><td>see Spacing</td><td>The gap between options, and between the legend and the options.</td></tr>
+        <tr><td><code>--layout-control-checkbox</code>, <code>--layout-control-radio</code></td><td>18, 12</td><td>The checkbox box and the radio dot. A description is indented to line up under the label.</td></tr>
+        <tr><td><code>--color-on-surface</code></td><td>theme role</td><td>The legend.</td></tr>
+        <tr><td><code>--color-danger</code></td><td>theme role</td><td>The group error.</td></tr>
+        <tr><td><code>--body-default</code>, <code>--body-small</code></td><td>14/20, 12/16</td><td>The legend, and the scale end labels.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell attachSourceBelow description={<>One question, three answers, pick one.</>}>
     <Canvas of={ChoiceGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Type
+### Type
 
 <DocsCanvasShell description={<>Radio (pick one) and checkbox (pick any).</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.Types} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
+### Orientation
 
 <DocsCanvasShell description={<>Stacked and inline.</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.Orientation} />
 </DocsCanvasShell>
 
+### Scale
+
 <DocsCanvasShell description={<>A numbered scale: inline radios between a leading and a trailing end label.</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.ScaleEnds} />
 </DocsCanvasShell>
+
+### Other and follow-ups
 
 <DocsCanvasShell description={<>An "Other" answer with its own text box. Typing in it chooses it.</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.Other} />
@@ -108,21 +186,13 @@ Use a choice group when a user answers one question by picking one option, or an
     <DsCanvasQuiet of={ChoiceGroupStories.Reveal} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Appearance
+### Appearance
 
 <DocsCanvasShell description={<>Descriptions under each option, plain and as cards.</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.Descriptions} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
+### States
 
 <DocsCanvasShell description={<>Disabled, read-only radios and read-only checkboxes.</>}>
     <DsCanvasQuiet of={ChoiceGroupStories.States} />
@@ -132,21 +202,83 @@ Use a choice group when a user answers one question by picking one option, or an
     <DsCanvasQuiet of={ChoiceGroupStories.Validation} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={ChoiceGroupStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={ChoiceGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+### Multiple choice
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <ChoiceGroup
+                    id="choice-do"
+                    legend="How often should we meet?"
+                    options={['Weekly', 'Every two weeks', 'Monthly']}
+                />
+            ),
+            doCaption: 'One legend over its options.',
+            dontExample: (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                    <Radio id="choice-dont-1" name="choice-dont" label="Weekly" />
+                    <Radio id="choice-dont-2" name="choice-dont" label="Every two weeks" />
+                    <Radio id="choice-dont-3" name="choice-dont" label="Monthly" />
+                </div>
+            ),
+            dontCaption: 'Loose radios with no question.',
+        },
+    ]}
 />
+
+### Scale
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <ChoiceGroup
+                    id="scale-do"
+                    legend="How likely are you to recommend PLUS?"
+                    orientation="inline"
+                    options={['1', '2', '3', '4', '5']}
+                    leadingText="Not likely"
+                    trailingText="Very likely"
+                />
+            ),
+            doCaption: 'A short scale with both ends labeled.',
+            dontExample: (
+                <ChoiceGroup
+                    id="scale-dont"
+                    legend="How likely are you to recommend PLUS?"
+                    options={['1', '2', '3', '4', '5']}
+                />
+            ),
+            dontCaption: 'A stacked list for a one-to-five scale.',
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **The value is the answer.** A radio group's value is one option value, or none while unanswered. A checkbox group's is an array. <code>onChange</code> receives the next answer and not an event. Pass <code>value</code> to control the group, or <code>defaultValue</code> to let it hold its own.
+- **A radio group starts unanswered.** Pre-choosing the first option makes a real answer of 1 indistinguishable from no answer. Pass <code>defaultValue</code> only when the default is itself an answer.
+- **Options can be strings or objects.** A string is its own value and label. An object takes <code>value</code> and <code>label</code>, and optionally <code>description</code>, <code>disabled</code>, <code>id</code> and <code>reveal</code>, which is content shown under the option while it is chosen.
+- **"Other" is an answer with a text box.** <code>other</code> adds a last choice, with the value "other" unless you pass one, and a text box beside it. Typing in the box chooses it. Keep the typed text in your own state.
+- **<code>appearance</code> and <code>required</code> belong to the group.** <code>appearance="card"</code> draws every choice as a bordered tile. For radios, <code>required</code> also sets <code>required</code> on each radio. For checkboxes the group cannot enforce it, so check it on submit and show the failure once, with <code>error</code>.
 
 </div>
 
@@ -162,57 +294,18 @@ Use a choice group when a user answers one question by picking one option, or an
 
 ## When to use
 
-Use `ChoiceGroup` for one question whose answers fit on screen — about two to
-seven. `type="radio"` (the default) takes one answer, `type="checkbox"` any
-number. Past that, or when space is short, use `Select`.
+Use a Choice group for fewer than five answers a person should see at once. Under five, show them all: radios for one answer and checkboxes for several, so a person compares them at a glance without opening anything. From five to fifteen answers use [Select](?path=/docs/components-forms-and-inputs-select--docs), which saves space. Past fifteen, use a list that shows more of them. When several questions share the same answers, use a [Choice grid](?path=/docs/components-forms-and-inputs-choice-grid--docs) and do not repeat the group.
 
-It is also the numbered scale: `orientation="inline"` with `leadingText` and
-`trailingText` for the two ends.
+- **Ask one question per group.** The legend is the question and the options are its answers. A screen reader reads the legend with each option, so the question is never lost.
+- **Stack the options unless they form a scale.** A stacked list scans fastest. Use inline only for a short ordered scale, and label its ends with <code>leadingText</code> and <code>trailingText</code>.
+- **Use a radio for one answer and a checkbox for several.** If a person may pick more than one, or none, use <code>type="checkbox"</code>. Otherwise use radios, and preselect nothing unless there is a safe default.
+- **Offer "Other" only when the list cannot be complete.** <code>other</code> adds a text field for an answer you did not list. If the list is complete, leave it off.
 
-</div>
+### Scale
 
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### The value is the answer.
-
-A radio group's value is one option value, or `null` while unanswered; a
-checkbox group's is an array. `onChange` hands you the next answer, not an
-event. Pass `value` to control it or `defaultValue` to let it hold its own.
-
-```jsx
-const [subject, setSubject] = useState(null);
-<ChoiceGroup legend="Subject" options={subjects} value={subject} onChange={setSubject} />
-
-const [days, setDays] = useState([]);
-<ChoiceGroup type="checkbox" legend="Available days" options={weekdays} value={days} onChange={setDays} />
-```
-
-### A radio group starts unanswered.
-
-Nothing is chosen until someone chooses. Pre-choosing the first option makes a
-real answer of 1 indistinguishable from no answer; pass `defaultValue` only when
-the default is itself an answer.
-
-### Options can be strings or objects.
-
-A string is its own value and label. An object takes `value` and `label`, and
-optionally `description`, `disabled`, `id` and `reveal` — content shown under the
-option while it is chosen, such as the date range for "during a date period".
-
-### "Other" is an answer with a text box.
-
-`other={{ label, placeholder, text, onTextChange }}` adds a last choice (value
-`'other'` unless you pass `value`) and a text box beside it. Typing in the box
-chooses it. Keep the typed text in your own state.
-
-### `appearance` and `required` belong to the group.
-
-`appearance="card"` draws every choice as a bordered tile. `required` puts the
-mark on the legend; for radios it also sets `required` on each radio, and for
-checkboxes the group cannot enforce it, so check it on submit. Show the
-failure with `error`, once, for the group.
+- **Keep it short and ordered.** Use five to seven points, lowest on the left. A longer scale reads as noise.
+- **Label both ends.** Numbers alone do not say which end is good. Name the low and high ends with the leading and trailing text.
+- **Set the scale on this component.** A scale is a Choice group with <code>orientation="inline"</code> and end labels. Figma's older Linear scale and Scale options are deprecated.
 
 </div>
 
@@ -220,21 +313,12 @@ failure with `error`, once, for the group.
 
 ## Accessibility
 
-- **The legend names the group.** It is a real `fieldset` and `legend`. A radio
-  group takes `role="radiogroup"`, which can carry `aria-required` and
-  `aria-readonly`; a checkbox group stays a `group`, and each box carries its own
-  `aria-readonly`. With no visible question, pass `aria-label`.
-- **Scale ends describe the group.** `leadingText` and `trailingText` are joined
-  to the group with `aria-describedby`, so they are read once for the question
-  rather than attached to the first and last option.
-- **One error, announced.** `error` renders with `role="alert"` and the group
-  points at it with `aria-describedby`.
-- **Descriptions describe, labels name.** Each option's `description` is wired to
-  its control with `aria-describedby`.
-- **Read-only stays reachable.** `readOnly` keeps every choice in the tab order at
-  full contrast and ignores clicks and keys; `disabled` takes them out.
-- **Ids never collide.** Without an `id`, the group generates its own base for
-  option ids and the radio `name`, so two groups on one page stay independent.
+- **The legend names the group.** The group is a real fieldset and legend. A radio group has the role radiogroup, which can carry required and read-only. A checkbox group stays a group, and each box carries its own read-only. With no visible question, pass <code>aria-label</code>.
+- **Scale ends describe the group.** <code>leadingText</code> and <code>trailingText</code> are joined to the group, so they are read once for the question and not attached to the first and last option.
+- **One error, announced.** <code>error</code> is announced as an alert when it appears, and the group points at it.
+- **Descriptions describe and labels name.** Each option's <code>description</code> is wired to its control.
+- **Read-only stays reachable.** <code>readOnly</code> keeps every choice in the tab order at full contrast and ignores clicks and keys. <code>disabled</code> takes them out.
+- **Ids never collide.** Without an <code>id</code>, the group generates its own base for option ids and the radio name, so two groups on one page stay independent.
 
 </div>
 
@@ -242,10 +326,11 @@ failure with `error`, once, for the group.
 
 ## Related
 
-- For one independent yes or no, use `Checkbox`; for a setting that applies at once, use `Switch`.
-- For the same question asked of several rows, use `ChoiceGrid`.
-- For a long list of options, use `Select`.
-- For a star rating, use `Rating`.
+- [Choice grid](?path=/docs/components-forms-and-inputs-choice-grid--docs) for the same question across several rows.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for many options.
+- [Checkbox](?path=/docs/components-forms-and-inputs-checkbox--docs) for a single opt-in, and [Toggle](?path=/docs/components-forms-and-inputs-toggle--docs) for a setting that applies at once.
+- [Rating](?path=/docs/components-forms-and-inputs-rating--docs) for stars and a quick one-to-five judgment.
+- [Range](?path=/docs/components-forms-and-inputs-range--docs) for a position on a continuous span.
 
 </div>
 

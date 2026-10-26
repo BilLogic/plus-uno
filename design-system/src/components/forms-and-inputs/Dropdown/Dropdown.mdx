@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DropdownStories from './Dropdown.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Dropdown, Button } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -38,14 +39,15 @@ export const figmaMeta = {
 <Meta of={DropdownStories} />
 
 <Title />
-Toggle contextual overlays for displaying lists of links and more with the Bootstrap dropdown plugin.
+
+A button that opens a menu of actions: a row's overflow menu, a "more" button, a set of export formats. It is not a field. A value the person picks belongs in a Select.
 
 <DocsTabs of={DropdownStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-55003"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Dropdown"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -53,69 +55,193 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Closed and open states for single-button and split-button dropdowns, aligned to the core Figma content examples.</>}>
+<ol>
+    <li><strong>Trigger</strong>: the button that opens the menu, set by <code>buttonText</code>. Name it with <code>ariaLabel</code> when it holds only an icon.</li>
+    <li><strong>Menu</strong>: the list of rows that opens under the trigger.</li>
+    <li><strong>Item</strong>: one action per row, set by <code>items</code>.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>buttonText</code></td><td>string, node</td><td>the trigger's text, or an icon</td><td>none</td><td>Dropdown button text</td></tr>
+        <tr><td><code>ariaLabel</code></td><td>string</td><td>the trigger's accessible name</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>items</code></td><td>array</td><td>the rows, in order. Each row is a button, a link, an on and off item, a static row or a header.</td><td>none</td><td>List Item Slot: one row</td></tr>
+        <tr><td><code>style</code></td><td>enum</td><td><code>primary</code> | <code>secondary</code> | <code>success</code> | <code>danger</code> | <code>warning</code> | <code>info</code> | <code>default</code></td><td><code>default</code></td><td>style, default primary</td></tr>
+        <tr><td><code>fill</code></td><td>enum</td><td><code>outline</code> | <code>ghost</code></td><td><code>outline</code></td><td>not drawn</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>default</code> | <code>large</code></td><td><code>default</code></td><td>size: small | medium | large, default small</td></tr>
+        <tr><td><code>split</code></td><td>boolean</td><td>a label half and a caret half</td><td><code>false</code></td><td>split?: false | true</td></tr>
+        <tr><td><code>direction</code></td><td>enum</td><td><code>dropdown</code> | <code>dropup</code> | <code>dropleft</code> | <code>dropright</code></td><td><code>dropdown</code></td><td>direction</td></tr>
+        <tr><td><code>isOpen</code>, <code>onToggle</code></td><td>boolean, function</td><td>hold the menu open or shut from outside. Pass both, or neither.</td><td>closed</td><td>open?: false | true</td></tr>
+        <tr><td><code>toggle</code></td><td>node</td><td>a control of your own in place of the built-in trigger</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+Each item takes <code>text</code>, an optional second line in <code>description</code>, <code>disabled</code>, <code>selected</code>, <code>header</code>, <code>divider</code>, <code>leadingIcon</code>, <code>trailingIcon</code>, <code>counter</code>, <code>onClick</code> and <code>keepOpen</code>. A link takes <code>href</code>. An on and off row takes <code>isToggle</code>, a plain text row takes <code>isStatic</code>, and a row still working takes <code>isBusy</code>.
+
+The rows are the shared option row. Its states, default, hover, pressed, dragging, selected and disabled, are documented with the option list on the Select page, and hover is also the keyboard-highlighted row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code>, <code>--item-height-sm</code></td><td>32, 24</td><td>The height of a menu row, and of the trigger at each size.</td></tr>
+        <tr><td><code>--popover-pad-menu</code></td><td>4</td><td>The inset of the rows inside the menu.</td></tr>
+        <tr><td><code>--popover-radius-menu-md</code></td><td>12</td><td>The corners of the menu.</td></tr>
+        <tr><td><code>--popover-min-width-menu</code>, <code>--popover-max-width-menu</code></td><td>160, 320</td><td>The menu's narrowest and widest.</td></tr>
+        <tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>The tallest the menu grows before it scrolls.</td></tr>
+        <tr><td><code>--popover-offset</code></td><td>4</td><td>The gap between the trigger and the menu.</td></tr>
+        <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>theme role</td><td>The menu's surface and shadow.</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td><td>theme role</td><td>A row on hover and when pressed.</td></tr>
+        <tr><td><code>--ds-background-selected</code>, <code>--ds-text-selected</code></td><td>theme role</td><td>A selected row.</td></tr>
+        <tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>theme role</td><td>A row's label and its description.</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>theme role</td><td>The focus ring.</td></tr>
+        <tr><td><code>--ds-opacity-disabled</code></td><td>theme role</td><td>A disabled row or trigger.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>Closed and open, for a single button and a split button.</>}>
     <Canvas of={DropdownStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Content
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Single and split triggers in closed and open states.</>}>
+<DocsCanvasShell description={<>Single and split triggers, closed and open.</>}>
     <DsCanvasQuiet of={DropdownStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Style
 
-<div className="sb-ds-doc-section">
-
-## Appearance
-
-<DocsCanvasShell description={<>Semantic roles for the trigger, matching the Dropdown variants frame in Figma (outline default; ghost shown as the alternate treatment).</>}>
+<DocsCanvasShell description={<>The semantic styles for the trigger. Outline is the default, and ghost is the alternate treatment.</>}>
     <DsCanvasQuiet of={DropdownStories.StyleVariants} />
 </DocsCanvasShell>
 
-</div>
+### Sizes
 
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Small, default, and large triggers.</>}>
+<DocsCanvasShell description={<>Small, default and large triggers.</>}>
     <DsCanvasQuiet of={DropdownStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### Split and direction
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Split button and menu opening direction.</>}>
+<DocsCanvasShell description={<>A split button, and the direction the menu opens.</>}>
     <DsCanvasQuiet of={DropdownStories.Layout} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={DropdownStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={DropdownStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ minHeight: 40 }}>
+                    <Dropdown
+                        id="dropdown-do-actions"
+                        buttonText="Actions"
+                        items={[
+                            { text: 'Export', onClick: () => {} },
+                            { text: 'Duplicate', onClick: () => {} },
+                            { text: 'Delete', onClick: () => {} },
+                        ]}
+                    />
+                </div>
+            ),
+            doCaption: 'Actions: export, duplicate, delete.',
+            dontExample: (
+                <div style={{ minHeight: 40 }}>
+                    <Dropdown
+                        id="dropdown-dont-sort"
+                        buttonText="Sort by"
+                        items={[
+                            { text: 'Newest first', onClick: () => {} },
+                            { text: 'Oldest first', onClick: () => {} },
+                        ]}
+                    />
+                </div>
+            ),
+            dontCaption: 'Sort by is a value, so use a Select.',
+        },
+        {
+            doExample: (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-sm)' }}>
+                    <Button text="Save" />
+                    <Dropdown
+                        id="dropdown-do-split"
+                        toggle={<Button fill="outline" leadingVisual="caret-down" aria-label="More ways to save" />}
+                        items={[
+                            { text: 'Save as…', onClick: () => {} },
+                            { text: 'Save a copy', onClick: () => {} },
+                        ]}
+                    />
+                </div>
+            ),
+            doCaption: 'Save, with Save as in the menu.',
+            dontExample: (
+                <Dropdown
+                    id="dropdown-dont-split"
+                    split
+                    buttonText="Share"
+                    items={[
+                        { text: 'Copy link', onClick: () => {} },
+                        { text: 'Invite by email', onClick: () => {} },
+                    ]}
+                />
+            ),
+            dontCaption: 'No main action to split from.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Controlled mode needs both halves.** <code>isOpen</code> without <code>onToggle</code> freezes the menu, because nothing ever sets it back to closed. Pass both, or pass neither and let the component own its state.
+- **It stores no selection.** The trigger keeps its own text. <code>selected</code> is a display flag per row that you keep in sync by hand, which is why a value the person picks belongs in a Select.
+- **It places itself.** The menu flips up when there is no room below, right-aligns when a left-aligned menu would run off the edge, never comes nearer than 8 to the screen's edge, and remeasures on scroll and resize.
+- **The menu is the Popover family's menu.** Rows are 32, or 24 with the small size, inset 4, in a menu 160 to 320 wide that stops at 320 tall and scrolls. A description adds a second line and the row grows to hold it.
+- **The label half of a split button carries no handler.** It takes no prop for one. For a real main action, place a Button beside a Dropdown that holds the extra options.
+- **Rows can be links and toggles.** An item with <code>href</code> is a real link, and <code>linkComponent</code> swaps in a router's. An item with <code>isToggle</code> publishes <code>selected</code> as pressed, and <code>keepOpen</code> leaves the menu open after it.
 
 </div>
 
@@ -131,60 +257,11 @@ Toggle contextual overlays for displaying lists of links and more with the Boots
 
 ## When to use
 
-Use `Dropdown` for a menu of *actions* hanging off a control — a row's overflow
-menu, a "more" button, a set of export formats. Items are described as data
-(`items`), each with its own `onClick`, and the menu closes after a click unless
-that item opts out.
+Use a Dropdown menu for a menu of actions, and not a picker. It stores no selection and its trigger keeps its own text. A value the person picks belongs in a [Select](?path=/docs/components-forms-and-inputs-select--docs).
 
-It is the only component in `forms-and-inputs` that places itself: the menu
-flips up when there is no room below and right-aligns when a left-aligned menu
-would run off the edge, never coming nearer than 8 to the screen's edge, and
-remeasures on scroll and resize.
-
-The menu is the Popover family's Menu: rows of 32 (24 with `size="small"`),
-inset 4, a menu 160 to 320 wide that stops at 320 tall and scrolls, its cut row
-showing there is more. An item's `description` adds a second line, and the row
-grows to hold it.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Controlled mode needs both halves.
-
-```jsx
-// Incorrect — `isOpen` without `onToggle` freezes the component. The user's
-// clicks are reported to nobody, so nothing ever sets `open` back to false.
-<Dropdown isOpen={open} buttonText="Actions" items={items} />
-
-// Correct — take the state, and take the callback that moves it.
-<Dropdown isOpen={open} onToggle={setOpen} buttonText="Actions" items={items} />
-
-// Also correct — let the component own its own open state.
-<Dropdown buttonText="Actions" items={items} />
-```
-
-### A menu of actions is not a picker.
-
-```jsx
-// Incorrect — the selection is not stored anywhere. `selected` is a per-item
-// display flag the caller has to keep in sync by hand, and the trigger keeps
-// showing "Sort by".
-<Dropdown
-  buttonText="Sort by"
-  items={[{ text: 'Newest', onClick: () => setSort('newest') }]}
-/>
-
-// Correct — a value the user picks belongs in Select.
-<Select
-  id="sort"
-  options={[{ value: 'newest', label: 'Newest' }]}
-  value={sort}
-  onChange={setSort}
-/>
-```
+- **Split only when the main action is the common one.** The left half runs the main action and the caret opens the alternatives.
+- **Name an icon-only trigger.** When <code>buttonText</code> is an icon, pass <code>ariaLabel</code>. Otherwise the button has no name.
+- **Pass both halves when you control it.** <code>isOpen</code> needs <code>onToggle</code>. Or pass neither.
 
 </div>
 
@@ -192,65 +269,15 @@ grows to hold it.
 
 ## Accessibility
 
-- **The toggle is well formed.** It is a real `button` with `aria-haspopup` and
-  a live `aria-expanded`. In `split` mode it also gets an `aria-label` built
-  from `buttonText` plus the word "options", which is why the toggle half of a
-  split button renders no visible text.
-- **The menu is not an ARIA menu.** The container is a plain div and each item is
-  a `button` (or a link, for an item with `href`); there is no `role="menu"` or `role="menuitem"` and no arrow-key
-  navigation. Items are reached by tabbing, which works but does not match the
-  menu pattern a screen-reader user expects.
-- **Escape closes it.** Pressing Escape anywhere in an open dropdown closes the
-  menu and puts focus back on the toggle: the caret button, on whichever side
-  of a split button it sits, or the control inside a custom `toggle`. A custom
-  toggle with nothing focusable in it returns focus to whatever had it when the
-  menu opened, if that is still on the page, and otherwise leaves focus alone.
-  Focus moves only once the menu has closed: a caller that controls `isOpen`
-  and keeps it open leaves focus where it was, and the refused Escape is then
-  forgotten (on the next key, a focus move, or a render with the menu still
-  open), so a later close by the caller does not pull focus to the toggle.
-  A click outside, bound to `mousedown`, also closes it.
-- **Escape stops at the dropdown.** Escape inside an open dropdown does not
-  propagate, so an enclosing Modal or panel stays open: the first Escape
-  closes the menu, the next one reaches the Modal.
-- **A custom `toggle` brings its own keyboard access.** The node you pass is
-  wrapped in a `div` with an `onClick` and no role or tabindex, so a control
-  inside it (a `Button`, a Tag) is what a keyboard user presses, and Enter or
-  Space on it opens the menu. Escape then returns focus to that control. A
-  plain `span` is clickable and nothing else, so pass a control, or use the
-  built-in toggle.
-- **Links and toggles say what they are.** An item with `href` is a real
-  link (`linkComponent` for a router's), so it is announced as a link and can
-  open in a new tab. An item with `isToggle` is a button that reports
-  `selected` as `aria-pressed`; `keepOpen` leaves the menu open after it.
-  Give it `multiSelectCheckbox` and `multiSelectChecked` to lead with the
-  multi-select checkbox, which is decorative, since `aria-pressed` already
-  says whether it is on.
-- **A selected row is shown by color.** `selected` gives the row neutral ink,
-  `--ds-background-selected` with `--ds-text-selected`, as Pattern/Menu draws it. Color is all
-  that marks it, so a row that switches on and off should also be an
-  `isToggle` item, which says so through `aria-pressed`. A row with no
-  leading visual starts its words at the padding.
-- **A static row is not a control.** An item with `isStatic` is a plain row
-  with no button role: it is not focusable, and pressing it leaves the menu
-  open. An item with `isBusy` (with `disabled`) is still working and reports
-  `aria-busy`.
-- **Icons are decorative — mostly.** The multi-select checkbox,
-  `leadingIcon` and `trailingIcon` are all `aria-hidden`. The
-  submenu caret is not, so an icon font glyph there can leak into the item's
-  announced name. Keep the item's meaning in `text` either way.
-
-### Give the split treatment a real button when the label must act.
-
-```jsx
-// Incorrect — clicking "Save" does nothing. The label half of a split button
-// carries no handler and takes no prop for one.
-<Dropdown split buttonText="Save" items={saveOptions} />
-
-// Correct — a real Button beside a Dropdown for the extra options.
-<Button text="Save" onClick={save} />
-<Dropdown buttonText="Save options" items={saveOptions} />
-```
+- **The trigger is well formed.** It is a real button that announces a popup and a live expanded state. A split button also gets a name built from <code>buttonText</code> and the word "options", which is why the caret half shows no text.
+- **The menu is not an ARIA menu.** The container is a plain element and each item is a button, or a link for an item with <code>href</code>. There is no menu role and no arrow-key navigation. Items are reached by tabbing, which works but does not match the menu pattern a screen reader user expects.
+- **Escape closes it and returns focus to the trigger.** That is the caret button on either side of a split button, or the control inside a custom trigger. A custom trigger with nothing focusable in it returns focus to whatever had it when the menu opened, if that is still on the page. A click outside also closes it.
+- **Escape stops at the dropdown.** The first Escape closes the menu and the next one reaches an enclosing Modal, so the Modal stays open.
+- **A custom trigger brings its own keyboard access.** The node you pass is wrapped in an element that is not itself focusable. Pass a control, such as a Button, for Enter and Space to open the menu.
+- **Links and toggles say what they are.** A link item is announced as a link and can open in a new tab. A toggle item reports <code>selected</code> as pressed. The multi-select checkbox is decoration, since pressed already says whether it is on.
+- **A selected row is shown by color.** Color is all that marks it, so a row that switches on and off should also be a toggle item, which says so to assistive technology.
+- **A static row is not a control.** It is not focusable, and pressing it leaves the menu open. A busy row, which is disabled, reports that it is busy.
+- **Icons are decorative, mostly.** The multi-select checkbox, the leading icon and the trailing icon are hidden from assistive technology. The submenu caret is not, so an icon font glyph there can leak into the item's announced name. Keep the item's meaning in its text.
 
 </div>
 
@@ -258,9 +285,9 @@ grows to hold it.
 
 ## Related
 
-- To hold a form value, use `Select` — a dropdown menu is a set of actions, not a field.
-- For a long list the user needs to search, use `Select` with filtering.
-- For rich content anchored to a trigger, use `Popover`.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for a value the person picks, and for a long list they need to search, with filtering.
+- [Popup](?path=/docs/components-overlays-and-layering-popup--docs) for rich content anchored to a trigger.
+- [Button](?path=/docs/components-forms-and-inputs-button-button--docs) for a main action beside a menu of alternatives.
 
 </div>
 

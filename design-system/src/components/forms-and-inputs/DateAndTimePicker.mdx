@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TimePickerStories from './DateAndTimePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DateAndTimePicker } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -33,14 +34,15 @@ export const figmaMeta = {
 <Meta of={TimePickerStories} />
 
 <Title />
-Date and time pickers let people select a date or range of dates and/or a time from a visual calendar and time list.
+
+A labeled date and time, for scheduling something such as a session. Times are stored in UTC and shown in the viewer's time zone, which the caption under the time names. Turn the date off to ask for a time on its own.
 
 <DocsTabs of={TimePickerStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-42637"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -48,79 +50,177 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Compact date and time row with field label.</>}>
+<ol>
+    <li><strong>Label</strong>: names the whole field.</li>
+    <li><strong>Section labels</strong>: Date and Time.</li>
+    <li><strong>Date</strong>: a Date picker, opening the same calendar.</li>
+    <li><strong>Time</strong>: a field for hours and minutes, HH:MM.</li>
+    <li><strong>AM/PM</strong>: a small menu in the time field's trailing slot.</li>
+    <li><strong>Time zone</strong>: a caption naming the viewer's zone.</li>
+    <li><strong>Message</strong>: a caption shown only when validation is not none.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code>, <code>showLabel</code></td><td>node, boolean</td><td>the field's name</td><td>none, <code>true</code></td><td>label?: true | false</td></tr>
+        <tr><td><code>showSectionLabels</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>true</code></td><td>section labels?</td></tr>
+        <tr><td><code>showDate</code></td><td>boolean</td><td>turn off for a time on its own</td><td><code>true</code></td><td>date?</td></tr>
+        <tr><td><code>showTimeZone</code></td><td>boolean</td><td>name the viewer's zone under the time</td><td><code>true</code></td><td>time zone?, with no property listed</td></tr>
+        <tr><td><code>dateValue</code>, <code>timeValue</code></td><td>string</td><td>an ISO date, YYYY-MM-DD, and a time as "02:30 PM" or "14:30"</td><td>none</td><td>filled?: false | true</td></tr>
+        <tr><td><code>datePlaceholder</code>, <code>timePlaceholder</code></td><td>string</td><td>any text</td><td>MM/DD/YY, __ : __</td><td>the field text on the instance</td></tr>
+        <tr><td><code>timeZone</code>, <code>otherTimeZone</code>, <code>otherPerson</code></td><td>string</td><td>IANA zones such as <code>America/New_York</code>, and who the other person is, such as "the student"</td><td>the browser's zone</td><td>time zone, as Same zone and Zones differ</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, string</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>validation: none | invalid | success</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>required? on the exposed Label</td></tr>
+        <tr><td><code>disabled</code>, <code>readonly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: disabled | read-only</td></tr>
+        <tr><td><code>minDate</code>, <code>maxDate</code>, <code>calendarAlign</code></td><td>date, enum</td><td>as on Date picker, passed to the date half</td><td>none, <code>left</code></td><td>drawn on the Date picker page</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>called with the date, the time and the moment in UTC</td><td>none</td><td>Figma lists the date and time only</td></tr>
+    </tbody>
+</DocsTable>
+
+Both fields are 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. The AM/PM menu is 24, like a button in a field.
+
+Whether the calendar or the AM/PM list is open is internal. Figma draws it as the date open and time open states. Hover exists only in code, from the browser.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+Both halves are the shared field box, and the calendar is the Date picker's, so they take the Date picker tokens.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the date and time fields.</td></tr>
+        <tr><td><code>--item-height-sm</code></td><td>24</td><td>The AM/PM menu button.</td></tr>
+        <tr><td><code>--ds-background-input</code>, <code>--ds-border-input</code></td><td>theme role</td><td>The fill and border of each field at rest.</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>theme role</td><td>The focus ring.</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>theme role</td><td>The time zone caption.</td></tr>
+        <tr><td><code>--ds-text-danger</code>, <code>--ds-text-success</code></td><td>theme role</td><td>An error message and a success message.</td></tr>
+        <tr><td><code>--ds-icon-danger</code>, <code>--ds-icon-success</code></td><td>theme role</td><td>The icon beside each message.</td></tr>
+        <tr><td><code>--layout-calendar-day-md</code></td><td>36</td><td>The side of a calendar day.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A compact date and time row with a field label.</>}>
     <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Content
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Field label and optional Date/Time section labels.</>}>
+<DocsCanvasShell description={<>The field label and the optional Date and Time section labels.</>}>
     <DsCanvasQuiet of={TimePickerStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Validation
 
-<div className="sb-ds-doc-section">
-
-## Validation & feedback
-
-<DocsCanvasShell description={<>Invalid and success validation.</>}>
+<DocsCanvasShell description={<>Invalid and success, with a message.</>}>
     <DsCanvasQuiet of={TimePickerStories.Styles} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
+### Sizes
 
 <DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. The AM/PM menu is 24, like a button in a field.</>}>
     <DsCanvasQuiet of={TimePickerStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, disabled, and read-only.</>}>
+<DocsCanvasShell description={<>Default, disabled and read-only.</>}>
     <DsCanvasQuiet of={TimePickerStories.InteractionStates} />
 </DocsCanvasShell>
 
-</div>
+### Time zones
 
-<div className="sb-ds-doc-section">
-
-## Time zones
-
-<DocsCanvasShell description={<>The viewer’s zone, and the other person’s time when it differs.</>}>
+<DocsCanvasShell description={<>The viewer's zone, and the other person's time when it differs.</>}>
     <DsCanvasQuiet of={TimePickerStories.TimeZones} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TimePickerStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={TimePickerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ width: 320 }}>
+                    <DateAndTimePicker
+                        id="datetime-do"
+                        label="Session start"
+                        timeZone="America/Los_Angeles"
+                        otherTimeZone="America/New_York"
+                        otherPerson="the student"
+                        dateValue="2026-10-21"
+                        timeValue="01:00 PM"
+                    />
+                </div>
+            ),
+            doCaption: "The viewer's zone, and the student's time when it differs.",
+            dontExample: (
+                <div style={{ width: 320 }}>
+                    <DateAndTimePicker
+                        id="datetime-dont"
+                        label="Session start"
+                        showTimeZone={false}
+                        dateValue="2026-10-21"
+                        timeValue="01:00 PM"
+                    />
+                </div>
+            ),
+            dontCaption: 'A time with no zone.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **<code>onChange</code> does not hand you an event.** It is called with the date, the time and the moment in UTC, as plain strings, or null for a half that is not yet complete. Store the UTC value and not the date and time, which are only what the viewer saw. Every other field in this group forwards a DOM event, so this is the one place <code>event.target.value</code> is undefined.
+- **The time stays null until both hours and minutes are present.** A reader part-way through typing produces a date and a null time, because "09:" is not a time.
+- **The hour shown is a 12-hour hour.** <code>timeValue</code> accepts either form: "02:30 PM" is used as given, and "14:30" is split into 02:30 and PM. Midnight and noon both read as 12, and only the period tells them apart.
+- **The hour field refuses what the control cannot show.** It takes 0 to 12, not 0 to 23, because an AM/PM control sits beside it. Zero is allowed so a leading zero can be typed on the way to 05.
+- **Changing AM/PM reports even without a date.** The change is reported with a null date and is not dropped.
+- **Times are stored in UTC and shown in the viewer's zone.** <code>timeZone</code> is the viewer's IANA zone and defaults to the browser's. Pass <code>otherTimeZone</code> and <code>otherPerson</code> when someone else will read the time, and the caption adds theirs. Daylight saving is handled per date, so 4:00 PM in November is an hour later in UTC than in October.
+- **The calendar opens 4 below the date field**, left-aligned and flipping above when there is no room. The AM/PM menu opens the same 4 below its button.
+- **Extra props go to the wrapper and not to either input.** The wrapper carries the group's role and name, so your <code>aria-describedby</code> lands where it can help. A forwarded <code>aria-invalid</code> therefore marks the group and not the inputs, so use <code>validation</code>, which marks the inputs themselves.
 
 </div>
 
@@ -136,53 +236,11 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 ## When to use
 
-- **When a moment needs both halves.** A session start is a date *and* a time,
-  and splitting it across two fields makes the reader hold the pair together
-  themselves. Where only one half matters, use `DatePicker`.
-- **`showDate={false}` gives a time-only control** without reaching for a
-  different component, which keeps the time half's parsing and its AM/PM
-  behavior rather than reimplementing them beside it.
-- **Not for a duration.** This picks a point, not a length. Two of these, or a
-  `NumberInput` of minutes, says what a single one cannot.
+Use a Date time picker when the answer is a day and a time, such as when a session starts. Turn <code>showDate</code> off when the day is already known and only the time is asked. For a day alone, use [Date picker](?path=/docs/components-forms-and-inputs-date-picker--docs). For a start from a short list of open slots, a [Select](?path=/docs/components-forms-and-inputs-select--docs) of those slots is quicker. For a length of time, use [Number input](?path=/docs/components-forms-and-inputs-number-input--docs).
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-- **`onChange` does not hand you an event.** It is called with
-  `{ date, time, utc }` — plain strings, or `null` for a half that is not yet
-  complete. `utc` is the moment as ISO 8601 in UTC, worked out in `timeZone`;
-  store that, not `date` and `time`, which are only what the viewer saw. Every other field in this group forwards a DOM event, so this is
-  the one place `event.target.value` will be undefined.
-- **`time` stays `null` until both hours and minutes are present.** A reader
-  part-way through typing produces `{ date: '03/14/26', time: null }`, which is
-  the honest report: `09:` is not a time.
-- **The hour shown is a 12-hour hour.** `timeValue` accepts either form —
-  `"02:30 PM"` is used as given, and `"14:30"` is split into `02:30` and `PM`.
-  Midnight and noon are the two that do not follow the modulo and both read as
-  `12`, with only the period telling them apart.
-- **The hour field refuses what the control cannot show.** It takes 0 to 12, not
-  0 to 23, because an AM/PM control sits beside it. Zero is inside the bound so
-  a leading zero can be typed on the way to `05`.
-- **Changing AM/PM reports, with or without a date.** The event carries
-  `date: null` when no date has been picked yet, rather than staying silent
-  about a change the reader can see.
-- **Times are stored in UTC and shown in the viewer's zone.** `timeZone` is the
-  viewer's IANA zone and defaults to the browser's. The caption under the time
-  names it — "Eastern Time (ET)" — unless `showTimeZone={false}`. Pass
-  `otherTimeZone` and `otherPerson` when someone else will read the time, and
-  the caption adds theirs: "Pacific Time (PT) · 4:00 PM for the student (ET)".
-  Daylight saving is handled per date, so a 4:00 PM in November is an hour later
-  in UTC than one in October.
-- **The calendar opens 4px below the date field.** It is the same calendar as
-  `DatePicker`, `--size-element-gap-xs` below, left-aligned, flipping above when
-  there is no room. The AM/PM menu opens the same 4px below its button.
-- **Extra props go to the wrapper, not to the two inputs.** The wrapper
-  is the element that carries the group's role and name, so a caller's
-  `aria-describedby` lands where it can help. They go on last, so a caller's
-  `aria-labelledby` overrides the generated one.
+- **Name the time zone.** Show the viewer's zone in the caption whenever a time is shown. When the other person in a session is in a different zone, add their time, so neither of you has to convert.
+- **Store UTC and show local.** Save the moment in UTC and convert it for each viewer. Never save the time as typed, because the same 4:00 PM is a different moment in another zone.
+- **Check it when the field loses focus.** Validate the date and time against the allowed span when focus leaves the field and not on every keystroke, and say what is allowed in the message.
 
 </div>
 
@@ -190,60 +248,13 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 ## Accessibility
 
-- **`label` names the field, not either input.** The field renders two controls,
-  and one `<label for>` names one control, so `label` labels a `role="group"`
-  around both. Each input is then named off that plus its section
-  heading — `<field> Date` and `<field> Time` — which is what tells them apart
-  once they are read out of context.
-- **`showLabel={false}` hides the label, it does not remove it.** The label is
-  rendered either way and always carries `htmlFor`; `showLabel={false}` only
-  clips it out of sight with `.plus-datetime-label-hidden`, so the group and
-  both inputs keep their names and the layout does not move. This matches
-  `Input` — see *Why `showLabel` cannot take the name away* in the Input docs.
-- **A field with no `label` still has no name.** `showLabel` decides whether the
-  label is *seen*; passing no `label` is what leaves the field unnamed. Then
-  there is no group either, and the two inputs are called just "Date" and
-  "Time" — off their section headings, or off a fallback `aria-label` when
-  `showSectionLabels` is off. Both are true of the control and useless as a
-  field name: two such pickers on one screen are indistinguishable.
-- **A caption you render above the field cannot be its name.** The case this guards
-  against — one visible "Session time" over a start and an end picker —
-  has no `htmlFor` that works, because one `<label for>` reaches one control and
-  there are two fields under it. Give each picker its own `label` with
-  `showLabel={false}`, and let the caption name the pair: put it in an element
-  with an `id` and point a wrapping `role="group"` at it with
-  `aria-labelledby`. `Specs/Toolkit/Pre-Session/Elements/New Form Time Input` is
-  the worked example, and its `play` block is the regression cover.
-- **Never hand the same `id` to two pickers.** Ids are derived once per instance
-  (`useFieldId`), so omitting `id` is safe and unique. Repeating one is not: both
-  fields' labels and `aria-labelledby` targets then collide, and every label on
-  the page lands on whichever control the browser reached first.
-- **`validation` marks both inputs.** Both halves are `_Field`, so
-  `validation="invalid"` draws both boxes in the error state and sets
-  `aria-invalid` on both inputs, and the message is the shared field caption,
-  announced as an alert, which describes the group. `required` renders a `*`
-  span marked `aria-label="required"`. Props this component does not name, such
-  as your own `aria-describedby`, are forwarded; the rule for where they land is
-  the next bullet.
-- **Forwarded props go to the wrapper, which is the group — not to either
-  input.** Anything this component does not name in its own signature is spread
-  onto the outer `<div>`, the same element that carries `role="group"` and the
-  field's name. One target, because this field renders two inputs plus an
-  AM/PM control and a prop split across them would land somewhere the caller did
-  not choose. The wrapper is the right one of the four: it is what `data-testid`
-  means by "this field", and it is what `aria-describedby` is about — a
-  description of the field describes the field, not its date half. The spread is
-  last, so a caller's `aria-labelledby` wins over the generated one, matching
-  `Input`. One dependency worth knowing: the wrapper is only a `group` when the
-  field has a `label`, per the third bullet above, so a description forwarded to
-  an unlabeled picker lands on a plain `<div>` and is announced by nothing.
-  Pass a `label` — with `showLabel={false}` if it should not be seen.
-- **What that rule costs you: a forwarded `aria-invalid` marks the group, not
-  the inputs.** It is the honest consequence of one spread target, and the
-  reason to use `validation` instead, which marks the inputs themselves.
-- **The time-zone caption is part of the description.** It is linked through
-  `aria-describedby` after any description you pass, so a reader hears the zone
-  along with the field.
+- **The label names the field and not either input.** The field has two controls, and one label can name only one control, so the label names a group around both. Each input is then named from that plus its section heading, "Session start Date" and "Session start Time", which tells them apart when read out of context.
+- **Hiding the label keeps the name.** <code>showLabel</code> set to false clips the label out of sight and keeps it for assistive technology, so the layout does not move.
+- **A field with no label has no name.** Then there is no group either, and the inputs are called just "Date" and "Time". Two such pickers on one screen are indistinguishable. Pass a label, and hide it if it should not be seen.
+- **A caption you draw above the field cannot be its name.** For one visible "Session time" over a start and an end picker, give each picker its own label with <code>showLabel</code> false. Then point a wrapping group at the caption with <code>aria-labelledby</code>.
+- **Never give the same id to two pickers.** Ids are derived once per instance, so leaving <code>id</code> out is safe. Repeating one makes every label on the page land on whichever control the browser reached first.
+- **Validation marks both inputs.** The invalid state is set on both inputs, and the message is announced as an alert and describes the group. Required draws an asterisk named "required".
+- **The time zone caption is part of the description.** It follows any description you pass, so a reader hears the zone along with the field.
 
 </div>
 
@@ -251,9 +262,10 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 ## Related
 
-- For a date with no time alongside it, use `DatePicker`.
-- For a value the user types rather than picks, use `Input`.
-- For how the label and caption pair is written, see *Label & caption*.
+- [Date picker](?path=/docs/components-forms-and-inputs-date-picker--docs) for a day only.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for one of a few open slots.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for a length of time.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for how labels and captions are written.
 
 </div>
 

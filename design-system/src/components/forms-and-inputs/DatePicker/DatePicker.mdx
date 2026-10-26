@@ -2,7 +2,9 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DatePickerStories from './DatePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { useState } from 'react';
+import { DatePicker } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -42,16 +44,21 @@ export const figmaMeta = {
 
 <Meta of={DatePickerStories} />
 
+export const RangeExample = () => {
+    const [range, setRange] = useState(['2026-10-12', '2026-10-25']);
+    return <DatePicker id="datepicker-do" range value={range} onChange={setRange} />;
+};
+
 <Title />
-Use a date picker when a user needs to select a date or a date range.
-Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (not a Select caret).
+
+A date field that opens a month calendar. Use it when the answer is a day, such as a session date, or, with a range, a span of days such as a report period. People can type the date or pick it, and days outside the earliest and latest allowed dates cannot be picked.
 
 <DocsTabs of={DatePickerStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-41580"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -59,79 +66,165 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Medium field with placeholder — a click or Down opens the calendar.</>}>
+<ol>
+    <li><strong>Field</strong>: the date, or the format MM/DD/YYYY as the placeholder.</li>
+    <li><strong>Calendar icon</strong>: a calendar-day icon in the field's trailing slot.</li>
+    <li><strong>Panel</strong>: the calendar, 4 under the field.</li>
+    <li><strong>Header</strong>: Previous month, the month and year, and Next month.</li>
+    <li><strong>Weekdays</strong>: Sun to Sat.</li>
+    <li><strong>Day</strong>: today is outlined and the picked day is filled.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>value</code></td><td>string, array</td><td>an ISO date, YYYY-MM-DD. With <code>range</code>, an array of a start and an end, either of which may be empty.</td><td>none</td><td>filled?: false | true</td></tr>
+        <tr><td><code>range</code></td><td>boolean</td><td>pick a first and a last day</td><td><code>false</code></td><td>range?: false | true</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>called with the ISO date, or with the pair for a range</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>minDate</code>, <code>maxDate</code></td><td>string, date</td><td>the earliest and latest day that can be picked or typed</td><td>none</td><td>days outside the span drawn as disabled</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td>MM/DD/YYYY</td><td>the field text on the instance</td></tr>
+        <tr><td><code>calendarAlign</code></td><td>enum</td><td><code>left</code> | <code>center</code> | <code>right</code></td><td><code>left</code></td><td>drawn under States. No Figma property.</td></tr>
+        <tr><td><code>invalid</code>, <code>valid</code></td><td>boolean</td><td>draw the field invalid or valid</td><td><code>false</code></td><td>state: invalid | valid</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: disabled | read-only</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>id</code>, <code>name</code></td><td>string</td><td>lands on the input, so a label can point at it</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+The field is 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. Figma draws 28, 36 and 44 days at its three sizes. Code draws a 36 day at every size.
+
+Figma lists no props for range, invalid or valid. Code has all three.
+
+Whether the calendar is open is internal. Figma draws it as state=open. Hover exists only in code, from the browser, and clicking the field opens the calendar, so Figma draws focus as open.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The field is the shared field box, and the panel is the shared listbox surface, so Select, Date time picker and Cascader take the same tokens.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the field.</td></tr>
+        <tr><td><code>--ds-background-input</code>, <code>--ds-border-input</code></td><td>theme role</td><td>The fill and border of the field at rest.</td></tr>
+        <tr><td><code>--ds-border-focused</code>, <code>--ds-border-danger</code>, <code>--ds-border-success</code></td><td>theme role</td><td>The field when focused, invalid or valid.</td></tr>
+        <tr><td><code>--ds-icon-subtle</code></td><td>theme role</td><td>The calendar icon.</td></tr>
+        <tr><td><code>--ds-text-subtlest</code></td><td>theme role</td><td>The placeholder.</td></tr>
+        <tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>theme role</td><td>The panel surface and shadow.</td></tr>
+        <tr><td><code>--popover-offset</code></td><td>4</td><td>The gap between the field and the panel.</td></tr>
+        <tr><td><code>--layout-calendar-day-md</code></td><td>36</td><td>The side of a day.</td></tr>
+        <tr><td><code>--layout-calendar-nav</code></td><td>32</td><td>The Previous and Next month buttons.</td></tr>
+        <tr><td><code>--ds-background-selected-bold</code>, <code>--ds-text-inverse</code></td><td>theme role</td><td>The picked day, or the two ends of a range.</td></tr>
+        <tr><td><code>--ds-background-selected</code></td><td>theme role</td><td>The days between the ends of a range.</td></tr>
+        <tr><td><code>--ds-border-brand</code></td><td>theme role</td><td>The outline around today.</td></tr>
+        <tr><td><code>--ds-opacity-disabled</code></td><td>theme role</td><td>A day outside the allowed span.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A medium field with a placeholder. A click, or Down, opens the calendar.</>}>
     <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### A single date
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Single date selection with selected value summary.</>}>
+<DocsCanvasShell description={<>Single date selection with the picked value summarized.</>}>
     <DsCanvasQuiet of={DatePickerStories.PickDate} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Date ranges
+### A range
 
 <DocsCanvasShell description={<>One picker with <code>range</code>: a first day, then a last day.</>}>
     <DsCanvasQuiet of={DatePickerStories.PickRange} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Earliest and latest dates
+### Earliest and latest dates
 
 <DocsCanvasShell description={<>Days outside <code>minDate</code> and <code>maxDate</code> are disabled.</>}>
     <DsCanvasQuiet of={DatePickerStories.Bounds} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
+### Sizes
 
 <DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={DatePickerStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, filled, disabled, and read-only.</>}>
+<DocsCanvasShell description={<>Default, filled, disabled and read-only.</>}>
     <DsCanvasQuiet of={DatePickerStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={DatePickerStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={DatePickerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ width: 300 }}>
+                    <RangeExample />
+                </div>
+            ),
+            doCaption: 'One Date picker with a range.',
+            dontExample: (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', width: 300 }}>
+                    <DatePicker id="datepicker-dont-start" placeholder="Start date" value="2026-10-12" onChange={() => {}} />
+                    <DatePicker id="datepicker-dont-end" placeholder="End date" value="2026-10-25" onChange={() => {}} />
+                </div>
+            ),
+            dontCaption: 'A start picker and an end picker.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **The value is ISO.** <code>value</code> and <code>onChange</code> speak YYYY-MM-DD, and the closed field displays MM/DD/YYYY. The two are not the same string, so do not read what is on screen as the value. A slashed date passed as <code>value</code> parses to empty and the field shows its placeholder.
+- **A range is one picker.** <code>value</code> and <code>onChange</code> speak a start and an end, and either may be empty while picking. The first click sets the first day and the second sets the last. A click before the first day starts again. Typed, a range is two dates joined by a dash.
+- **Typed dates are checked when the person is done.** The field is checked on Enter or when focus leaves it. A real day inside the span is picked and <code>onChange</code> fires. Anything else stays as typed, the field is drawn invalid, and <code>onChange</code> is not called, so the last good value is still yours.
+- **The calendar opens 4 below the field**, with its left edge on the field's and at least as wide. With no room below it opens above, the same gap away. <code>calendarAlign</code> moves it to the center or the right, and near the right edge of the viewport it right-aligns on its own. Every field popup follows this rule, Select included.
+- **Bounds disable days and do not clamp a value.** A <code>value</code> outside <code>minDate</code> and <code>maxDate</code> that you pass in is still displayed. Validate the incoming value yourself.
+- **It gives you a date and not a time.** <code>onChange</code> hands back the ISO day and nothing else. For a moment in time use Date time picker.
 
 </div>
 
@@ -147,76 +240,12 @@ Closed trigger is a **form field** with `MM/DD/YYYY` + **calendar-day** icon (no
 
 ## When to use
 
-Use `DatePicker` for a calendar date — a session date, a deadline, a birthday
-within a bounded range — or, with `range`, a first and a last day. The field
-takes a typed `MM/DD/YYYY` as well as a click in the calendar.
+Use a Date picker when the answer is a calendar day and the weekday matters, such as when a session happens or which day a report covers. Turn on <code>range</code> when the answer has a first and a last day. For a day and a time together, use [Date time picker](?path=/docs/components-forms-and-inputs-date-time-picker--docs). For a choice among a few fixed dates, a [Select](?path=/docs/components-forms-and-inputs-select--docs) is shorter.
 
-`value` and `onChange` speak ISO `YYYY-MM-DD`. The closed field displays
-`MM/DD/YYYY`, and the two formats are not the same string — do not read what is
-on screen as the value. `minDate` and `maxDate` accept either an ISO string or a
-`Date`, and disable everything outside them.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### The value is ISO. Anything else parses to empty.
-
-```jsx
-// Incorrect — parsing splits on "-" and requires three parts, so a slashed
-// date returns null and the field silently shows the placeholder.
-<DatePicker value="08/29/2026" onChange={setDate} />
-
-// Correct.
-<DatePicker value="2026-08-29" onChange={setDate} />
-```
-
-### A range is one picker, not two.
-
-```jsx
-// value and onChange speak [start, end]; either end may be null while picking.
-<DatePicker range value={[start, end]} onChange={([s, e]) => setSpan([s, e])} />
-```
-
-The first click sets the first day and the second the last; a click before the
-first day starts again. Typed, a range is two dates joined by a dash.
-
-### Typed dates are checked when the person is done.
-
-The field is checked on Enter or when focus leaves it. A real day inside
-`minDate`…`maxDate` is picked and `onChange` fires. Anything else stays as typed,
-the field is drawn invalid, and `onChange` is not called, so the last good value
-is still yours.
-
-### The calendar opens 4px below the field.
-
-The popup sits `--size-element-gap-xs` below the field, its left edge on the
-field's, and at least as wide. With no room below it opens above, the same gap
-away. `calendarAlign` moves it to the center or the right; near the right edge
-of the viewport it right-aligns on its own. This is the rule every field popup
-shares with `Select`.
-
-### It gives you a date, not a time.
-
-`onChange` hands back the ISO day and nothing else. For a moment in time, use
-`DateAndTimePicker`, which pairs the two fields and names them as one group.
-
-### Label it the ordinary way.
-
-```jsx
-// The id lands on the input, so a label pointing at it works — unlike the other
-// menu-backed fields in this group.
-<label htmlFor="starts">Session date</label>
-<DatePicker id="starts" value={date} onChange={setDate} />
-```
-
-### Bounds disable days; they do not clamp a value.
-
-A `value` outside `minDate`/`maxDate` that you pass in is still displayed. The
-bounds stop the user picking or typing another one, so validate the incoming
-value yourself.
+- **Pick a span with one range picker.** A range is one field with two dates, so the calendar can show the span and stop an end before the start. Two separate pickers cannot.
+- **Set the earliest and latest dates.** Disable the days nobody may pick, such as past sessions, with <code>minDate</code> and <code>maxDate</code>. Check typed dates against the same span when the field loses focus, and say the allowed span in the message.
+- **Keep the format as the placeholder.** MM/DD/YYYY tells people what to type. Do not replace it with an instruction such as "Pick a date", because the label says what the date is for.
+- **Keep the field typeable.** For a known, distant date such as a birth date, typing beats paging through months.
 
 </div>
 
@@ -224,30 +253,14 @@ value yourself.
 
 ## Accessibility
 
-- **The trigger is wired correctly.** `role="combobox"` with
-  `aria-haspopup="dialog"`, `aria-expanded`, and `aria-controls` pointing at the
-  calendar. Down opens it from the keyboard, Escape closes it, and Enter checks
-  what was typed.
-- **The days are real buttons.** Each is a `button` with a genuine `disabled`
-  attribute outside the bounds, so they are reachable by Tab and announced as
-  unavailable rather than doing nothing.
-- **A day announces its whole date.** Each button is named with the weekday,
-  day, month and year in the reader's locale, carries `aria-pressed` when it is
-  the chosen day, and `aria-current="date"` when it is today. The header's
-  month and year are no longer the only context.
-- **Adjacent-month days are dimmed, not unreadable.** They measure 7.66:1
-  against the calendar surface — still lighter than the current month's 13.98:1,
-  and above the 4.5:1 that 14px text needs.
-- **There is no arrow-key movement inside the calendar.** Tab steps through the
-  days one at a time; up to 31 tab stops to reach the end of a month. Typing the
-  date is the faster path, and the field accepts it.
-- **A rejected date is announced.** The input carries `aria-invalid` when what
-  was typed is not a day it can take.
-- **In a range, the ends and the span are marked.** Both ends carry
-  `aria-pressed`; the days between are drawn as in range.
-- **`readOnly` and `disabled` both stop the calendar opening.** `disabled` takes
-  the input out of the tab order; `readOnly` leaves it focusable and inert,
-  which is the right difference between "not for you" and "not now".
+- **The field says what it opens.** It has the role combobox with a dialog popup, an expanded state, and a link to the calendar. Down opens the calendar from the keyboard, Escape closes it, and Enter checks what was typed.
+- **The days are real buttons.** A day outside the allowed span is genuinely disabled, so it is reachable by Tab and announced as unavailable and not left doing nothing.
+- **A day announces its whole date.** Each button is named with the weekday, day, month and year in the reader's locale. It is marked pressed when it is the chosen day, and current when it is today.
+- **Adjacent-month days are dimmed and still readable.** They measure 7.66:1 against the calendar surface, against 13.98:1 for the current month, and both pass the 4.5:1 that 14px text needs.
+- **There is no arrow-key movement inside the calendar.** Tab steps through the days one at a time, which is up to 31 stops to the end of a month. Typing the date is the faster path, and the field accepts it.
+- **A rejected date is announced.** The input is marked invalid when what was typed is not a day it can take.
+- **In a range, the ends and the span are marked.** Both ends are marked pressed, and the days between are drawn as in range.
+- **Read-only and disabled both stop the calendar opening.** Disabled takes the input out of the tab order. Read-only leaves it focusable and inert, which is the difference between "not for you" and "not now".
 
 </div>
 
@@ -255,8 +268,9 @@ value yourself.
 
 ## Related
 
-- For a date and a time together, use `DateAndTimePicker`.
-- For a range, set `range` on one picker rather than pairing two.
+- [Date time picker](?path=/docs/components-forms-and-inputs-date-time-picker--docs) for a day and a time.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for one of a few fixed dates.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for a number of days.
 
 </div>
 
