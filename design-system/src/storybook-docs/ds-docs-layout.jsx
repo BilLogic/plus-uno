@@ -354,7 +354,7 @@ export function DoDontCard({ tone, children, caption }) {
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                borderRadius: 'var(--card-radius, 12px)',
+                borderRadius: 'var(--card-radius, 16px)',
                 backgroundColor: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
