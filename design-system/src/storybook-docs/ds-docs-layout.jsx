@@ -337,6 +337,88 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
 const CANVAS_OVERLAY_GAP = 'var(--size-element-gap-lg)';
 
 /**
+ * One do or don't card: a live example above a one-line caption.
+ * Compose with `DoDontPair`, or pass several pairs to `DoDontGrid`.
+ *
+ * @param {'do' | 'dont'} tone
+ * @param {React.ReactNode} children - the live example, built from real components
+ * @param {React.ReactNode} caption - the rule, in one sentence
+ */
+export function DoDontCard({ tone, children, caption }) {
+    const isDo = tone === 'do';
+    return (
+        <figure
+            className="sb-ds-dodont-card"
+            style={{
+                margin: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                borderRadius: 'var(--card-radius, 16px)',
+                backgroundColor: 'var(--ds-surface-raised)',
+                boxShadow: 'var(--ds-shadow-raised)',
+            }}
+        >
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '8px 16px',
+                    backgroundColor: isDo ? 'var(--ds-background-success-subtler)' : 'var(--ds-background-danger-subtler)',
+                    color: 'var(--ds-text)',
+                    fontWeight: 700,
+                }}
+            >
+                <i
+                    className={`fa-solid ${isDo ? 'fa-circle-check' : 'fa-circle-xmark'}`}
+                    style={{ color: isDo ? 'var(--ds-icon-success)' : 'var(--ds-icon-danger)' }}
+                    aria-hidden="true"
+                />
+                <span>{isDo ? 'Do' : "Don't"}</span>
+            </div>
+            <div
+                style={{
+                    flex: 1,
+                    padding: '24px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'var(--ds-surface)',
+                }}
+            >
+                <div style={{ width: '100%' }}>{children}</div>
+            </div>
+            <figcaption style={{ padding: '12px 16px', color: 'var(--ds-text)' }}>{caption}</figcaption>
+        </figure>
+    );
+}
+
+/** A matched do and don't, side by side. */
+export function DoDontPair({ doExample, doCaption, dontExample, dontCaption }) {
+    return (
+        <div
+            className="sb-ds-dodont-pair"
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', alignItems: 'stretch' }}
+        >
+            <DoDontCard tone="do" caption={doCaption}>{doExample}</DoDontCard>
+            <DoDontCard tone="dont" caption={dontCaption}>{dontExample}</DoDontCard>
+        </div>
+    );
+}
+
+/** Several pairs, one under another, 24 apart. `pairs` is an array of `DoDontPair` props. */
+export function DoDontGrid({ pairs }) {
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {pairs.map((pair, i) => (
+                <DoDontPair key={i} {...pair} />
+            ))}
+        </div>
+    );
+}
+
+/**
  * Single card: inline Canvas + Controls so the playground reads as one panel.
  */
 export function DocsInteractivePlayground({ description, of: ofStory }) {
