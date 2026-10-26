@@ -125,3 +125,34 @@ test("a file read tells the model to link its url rather than cite a bare path",
   assert.match(result.note ?? "", /`url`/);
   assert.doesNotMatch(result.note ?? "", /cite the path/i);
 });
+
+// uno-bot cannot read Storybook, so a Storybook link it wrote was one it made
+// up (#1563). A read of a design-system component's files hands back the real
+// docs page, from the registry baked at deploy (`integrations/storybook-docs.ts`).
+test("a component file read in the default repo carries the component's Storybook docs link", async () => {
+  const result = (await run({ path: "design-system/src/components/forms-and-inputs/Button/Button.mdx" }, fakes())) as Result & {
+    storybook?: { title: string; url: string };
+  };
+
+  assert.deepEqual(result.storybook, {
+    title: "Storybook: Button",
+    url: "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs",
+  });
+  assert.match(result.note ?? "", /storybook\.url/);
+});
+
+test("a component folder listing carries its Storybook docs link too, and a flat component's file its own", async () => {
+  const deps = { ...fakes(), readPath: async (_t: unknown, path: string) => ({ path, kind: "dir" as const, entries: ["Button.jsx"] }) };
+  const dir = (await run({ path: "design-system/src/components/forms-and-inputs/Button" }, deps)) as Result & { storybook?: { url: string } };
+  assert.match(dir.storybook?.url ?? "", /components-forms-and-inputs-button-button--docs$/);
+
+  const flat = (await run({ path: "design-system/src/components/forms-and-inputs/Checkbox.stories.jsx" }, fakes())) as Result & { storybook?: { url: string } };
+  assert.match(flat.storybook?.url ?? "", /components-forms-and-inputs-checkbox--docs$/);
+});
+
+test("no Storybook link for a path outside a component, or for the same path in another repo", async () => {
+  const other = (await run({ path: "README.md" }, fakes())) as Result & { storybook?: unknown };
+  assert.equal(other.storybook, undefined);
+  const site = (await run({ path: "design-system/src/components/forms-and-inputs/Button/Button.mdx", repo: SITE }, fakes())) as Result & { storybook?: unknown };
+  assert.equal(site.storybook, undefined);
+});

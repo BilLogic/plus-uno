@@ -972,11 +972,11 @@ export const PULL_REQUEST_WORKFLOWS = [
 
 /**
  * The `deploy` script of agents/uno-bot, in order, as data — the seven `deploy`
- * rows plus the two steps that are not checks.
+ * rows plus the three steps that are not checks.
  *
  * WHY ASSERTED AND NOT GENERATED. The rows alone cannot write this chain: they
- * are a set and the chain is a sequence, and its last two segments are not
- * checks at all. Writing it would also mean this generator authoring the line
+ * are a set and the chain is a sequence, and three of its segments are not
+ * checks at all — the write that opens it and the two that close it. Writing it would also mean this generator authoring the line
  * that INVOKES the deployment — `node scripts/deploy.mjs`, the command that
  * reaches a real Cloudflare account — and how the deployment is authorized is
  * not a thing a drift check should hold the pen on. So the order and the tail
@@ -992,6 +992,16 @@ export const PULL_REQUEST_WORKFLOWS = [
  *             is a decision rather than a silence.
  */
 export const DEPLOY_CHAIN = [
+  {
+    step: 'npm run generate:storybook-docs',
+    notAGate:
+      'it WRITES. Each component\'s Storybook docs id is baked from design-system/figma/' +
+      'component-registry.json into src/generated/storybook-docs.ts before anything is ' +
+      'typechecked or bundled, so the link `github_read` hands back is the registry on main ' +
+      'at deploy (#1563). Not a pull-request check on purpose: the registry changes with ' +
+      'every component PR, and a drift gate here would redden those PRs for a file only the ' +
+      'deploy reads.',
+  },
   { step: 'npm run typecheck', runs: 'typecheck' },
   { step: 'npm run check:fetch', runs: 'check:fetch' },
   { step: 'npm run check:contract', runs: 'check:contract' },

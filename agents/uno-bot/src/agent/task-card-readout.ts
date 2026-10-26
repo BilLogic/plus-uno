@@ -201,6 +201,13 @@ function unique(sources: TaskCardSource[]): TaskCardSource[] {
 
 const noSources = (): TaskCardSource[] => [];
 
+/** The Storybook docs page a `github_read` path read handed back, as a page it queried. */
+function storybookLink(result: string): TaskCardSource[] {
+  const doc = succeeded(result)?.storybook as Payload | undefined;
+  const url = doc && typeof doc === "object" ? httpUrl(doc.url) : null;
+  return url ? [{ text: str(doc!.title) ?? url, url, queried: "page" }] : [];
+}
+
 /**
  * The link a `source_read` call reads: the URL it was handed, or the first one
  * in the text it was handed — the tool's own rule for which link it reads.
@@ -305,11 +312,16 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     },
     // A search's hits, or the one file or directory a path read read, each
     // named by its last segment: `Button.jsx`, not the whole path.
+    // Then the component's Storybook docs page, when the read handed one back
+    // (#1563): a link a lookup returned, so an answer may cite it.
     sources: (result) =>
-      unique([...rowLinks("hits", ["path"])(result), ...ownLink(result, "path")]).map((s) => ({
-        ...s,
-        text: s.text.split("/").filter(Boolean).at(-1) ?? s.text,
-      })),
+      unique([
+        ...[...rowLinks("hits", ["path"])(result), ...ownLink(result, "path")].map((s) => ({
+          ...s,
+          text: s.text.split("/").filter(Boolean).at(-1) ?? s.text,
+        })),
+        ...storybookLink(result),
+      ]),
     decision: repoDecision,
   },
   github_intake_search: {

@@ -159,6 +159,23 @@ const ROWS: Row[] = [
     output: "3 entries",
     sources: [{ text: "src", url: "https://github.com/BilLogic/plus-uno/tree/HEAD/src", queried: "page" }],
   },
+  {
+    name: "github_read",
+    args: { path: "design-system/src/components/forms-and-inputs/Button/Button.mdx" },
+    details: "design-system/src/components/forms-and-inputs/Button/Button.mdx",
+    result: ok({
+      path: "design-system/src/components/forms-and-inputs/Button/Button.mdx",
+      url: "https://github.com/BilLogic/plus-uno/blob/HEAD/design-system/src/components/forms-and-inputs/Button/Button.mdx",
+      kind: "file",
+      content: "# Button",
+      storybook: { title: "Storybook: Button", url: "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs" },
+    }),
+    output: "Read design-system/src/components/forms-and-inputs/Button/Button.mdx",
+    sources: [
+      { text: "Button.mdx", url: "https://github.com/BilLogic/plus-uno/blob/HEAD/design-system/src/components/forms-and-inputs/Button/Button.mdx", queried: "page" },
+      { text: "Storybook: Button", url: "https://plus-uno.netlify.app/storybook/?path=/docs/components-forms-and-inputs-button-button--docs", queried: "page" },
+    ],
+  },
   { name: "github_read", args: { path: "README.md" }, details: "README.md", result: failed("GitHub contents 404"), output: null, sources: [] },
   { name: "github_read", args: { search: "nothing" }, details: "nothing", result: ok({ count: 0, hits: [] }), output: "no matches" },
   // github_intake_search
