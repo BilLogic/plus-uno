@@ -13,7 +13,7 @@ const warnToolbar = () => {
     if (toolbarWarned || process.env.NODE_ENV === 'production') return;
     toolbarWarned = true;
     // eslint-disable-next-line no-console
-    console.warn('[PatternTable] `toolbar` is deprecated: the table has no toolbar of its own. Put search, filters and actions in the Section header above the table.');
+    console.warn('[PatternTable] `toolbar` is deprecated: the table has no toolbar of its own. Put search, filters and actions in the Section header above it: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.');
 };
 
 /** Children with fragments opened, so a `thead` passed inside one is found. */

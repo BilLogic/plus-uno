@@ -218,7 +218,6 @@ const TutorHomePageNewLayout = ({
             {/* Page header: Section at page level; the badge is a callout in its body. */}
             <PatternSection
                 level="page"
-                padding="none"
                 title={`Welcome back, ${tutorName}`}
                 description="Here's your tutoring at a glance."
                 data-block="header"
@@ -240,7 +239,6 @@ const TutorHomePageNewLayout = ({
 
             {/* Next session: a flat Section, `_Section header` of the tabs type. */}
             <PatternSection
-                padding="none"
                 title="Next session"
                 data-block="session"
                 tabs={(
@@ -287,7 +285,6 @@ const TutorHomePageNewLayout = ({
 
             {/* Your impact: a flat Section, the pager in its header; the stats strip, then the Skills subsection. */}
             <PatternSection
-                padding="none"
                 title="Your impact"
                 data-block="impact"
                 actions={(
@@ -312,7 +309,6 @@ const TutorHomePageNewLayout = ({
                     </ul>
 
                     <PatternSection
-                        padding="none"
                         title="Skills"
                         data-block="skills"
                         tabs={(
@@ -357,7 +353,6 @@ const TutorHomePageNewLayout = ({
 
             {/* Recommendations: a flat Section, the pager in its header; the lesson cards are the page's only cards. */}
             <PatternSection
-                padding="none"
                 title="Personalized recommendations"
                 data-block="lessons"
                 actions={(
