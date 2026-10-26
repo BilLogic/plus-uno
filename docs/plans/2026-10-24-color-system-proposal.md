@@ -324,7 +324,7 @@ The semantic layer copies Atlassian's token list and its step references, and sw
 | `color.border.focused.inverse` | none | New | A focus ring on bold fills and inverse surfaces. |
 | `color.interaction.hovered` / `.pressed` | black at 16% / 32% | ink at 8% / 12% | PLUS's state-layer ruling (08/12/16). |
 | `color.interaction.dragged` | none | New, 16% | Completes the 08/12/16 ruling. |
-| `color.interaction.inverse.hovered` / `.pressed` | none | New: paper at 8% / 12% in light, ink in dark | Overlays on dark or colored grounds (a close button on a toast); today's surface-state colors. |
+| `color.interaction.inverse.hovered` / `.pressed` | none | New: paper at 8% / 12% in light, ink in dark | Overlays on dark or colored grounds (a close button on a tooltip or a bold-filled banner; the toast is a light overlay surface, so its close button takes the neutral hover); today's surface-state colors. |
 | `color.border.surface` | none | New: transparent, except ink at 49% in light increased contrast | The Surface's edge when increased contrast turns the frame white. |
 | `color.blanket` | Neutral500A, about 46% | ink at 32% | Lighter, in the pastel register; open to tuning on the specimen. |
 | Selection | Blue tint | Neutral ink: 10 / 12 / 14% (increased contrast 12 / 16 / 24%), always with a 2px bar in `border.selected`, which is Lagoon, as are checked controls (decision 17) | Both benchmarks select in neutral, as does Atlassian's FY27 Finesse override (§4.6). Decision 16, applied: pressed stops below Atlassian's 31% so subtle text and links on it keep 4.5:1. Selection never rests on fill alone. |
@@ -333,7 +333,7 @@ The full list, with each token's use and its light and dark values in both plans
 
 **How to read the roles, in short.**
 
-- **Text.** `color.text` (neutral.1000) is body text and buttons; `.subtle` (800) is secondary text, labels and navigation; `.subtlest` (700) is metadata, placeholders and helper text. There is no secondary color, only three emphasis levels of one neutral.
+- **Text.** `color.text` (neutral.1000) is body text and buttons; `.subtle` (800) is secondary text, labels, field helper text and navigation; `.subtlest` (700) is metadata and placeholders. There is no secondary color, only three emphasis levels of one neutral.
 - **Neutral backgrounds.** `color.background.neutral.subtle` is transparent at rest and is what menu items and subtle buttons use. `color.background.neutral` is the default button fill.
 - **Brand and selected.** `color.background.brand.bold` is the primary action. `color.background.selected.bold` is a checked checkbox or a selected radio, and Atlassian says not to use it for primary actions.
 - **Semantic roles.** Danger, warning, success, information and discovery each have four emphasis levels:
@@ -647,7 +647,7 @@ WCAG 2 ratios on opaque values, computed from the generated hex. Alpha tokens ar
 | `color.text.subtle` | `--ds-text-subtle` | secondary text |
 | `color.background.brand.bold.hovered` | `--ds-background-brand-bold-hovered` | primary button, hovered |
 | `color.border.danger` | `--ds-border-danger` | invalid field edge |
-| `color.background.accent.purple.subtler` | `--ds-background-accent-purple-subtler` | mastering-content tag |
+| `color.background.accent.teal.subtler` | `--ds-background-accent-teal-subtler` | mastering-content tag (through `color.background.smart.mastering-content`) |
 | `elevation.surface.raised` | `--ds-surface-raised` | a draggable card |
 
 **Rules that keep the names honest.**
@@ -1186,7 +1186,7 @@ Each cell is `primitive hex` for light / dark. "same as A" means Plan B uses Pla
 | `color.text.discovery.bolder` | Text on top of discovery semantic labels to ensure accessibility and desired visual appearance | purple.900 `#42314d` / purple.200 `#ecdef6` | purple.900 `#392e6b` / purple.200 `#e2e0fe` |
 | `color.text.information` | Informative text or to communicate something is in progress, such as in-progress lozenges | blue.800 `#25619a` / blue.300 `#a3bfdc` | blue.800 `#235ea9` / blue.300 `#91befc` |
 | `color.text.information.bolder` | Text on top of information semantic labels to ensure accessibility and desired visual appearance | blue.900 `#223952` / blue.200 `#d2e5fa` | blue.900 `#103768` / blue.200 `#d3e5fe` |
-| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text *One half-step darker than Atlassian (700) so meta text keeps 4.5:1 on hovered and selected rows and on dark overlays. icon.subtlest stays on 700.* | neutral.750 `#696864` / darkNeutral.750 `#a19e99` | neutral.750 `#646464` / darkNeutral.750 `#9e9e9e` |
+| `color.text.subtlest` | Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text *One half-step darker than Atlassian (700) so meta text keeps 4.5:1 on hovered and selected rows and on dark overlays. icon.subtlest stays on 700. PLUS puts field helper text on `color.text.subtle` instead, so it reads as part of the field (§4.5).* | neutral.750 `#696864` / darkNeutral.750 `#a19e99` | neutral.750 `#646464` / darkNeutral.750 `#9e9e9e` |
 | `color.text.subtle` | Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings | neutral.800 `#5f5e5b` / darkNeutral.800 `#ada9a3` | neutral.800 `#555555` / darkNeutral.800 `#c2c2c2` |
 | `color.text.smart.mastering-content` | Text on the subject fill. Aliases the teal accent. *PLUS product layer: SMART mastering-content is the teal accent.* | teal.850 `#0a5648` / teal.250 `#9ddccb` | teal.850 `#0a5542` / teal.250 `#a4dbc7` |
 | `color.text.smart.relationship` | Text on the subject fill. Aliases the magenta accent. *PLUS product layer: SMART relationship is the magenta accent.* | magenta.850 `#703955` / magenta.250 `#e9c6d5` | magenta.850 `#7e2f4f` / magenta.250 `#fdbed2` |
