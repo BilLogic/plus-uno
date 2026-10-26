@@ -7,7 +7,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, Reso
 <Meta of={PopoverFamilyStories} />
 
 <Title />
-The Popover family is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no scrim. An outside click or Escape closes them, and each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
+The Popover family is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no scrim. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. Each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3043"
@@ -51,7 +51,7 @@ Popover names the pattern and the token collection for four floating layers. A *
 
 ### Properties
 
-The four layers are built from existing components. Their properties are on each component's page.
+The four layers are built from existing components. These are the main properties; each component's page lists the rest.
 
 <DocsTable>
 <thead>
@@ -111,7 +111,7 @@ Figma names the Flag appearances <code>info</code>, <code>success</code>, <code>
     <DsCanvasQuiet of={PopoverFamilyStories.MenuScrolls} />
 </DocsCanvasShell>
 
-A row has three states: rest, hover and selected. Selected uses neutral ink on the selected background. A Menu sits on layer 400.
+A row has three states: rest, hover and selected. Selected uses neutral ink on the selected background. The states are the Dropdown menu's own; see the [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) page. A Menu sits on layer 400.
 
 </div>
 
@@ -123,7 +123,7 @@ A row has three states: rest, hover and selected. Selected uses neutral ink on t
     <DsCanvasQuiet of={PopoverFamilyStories.Popups} />
 </DocsCanvasShell>
 
-A Popup sits on layer 400, and on 510 when it opens from a modal. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+A Popup sits on layer 800 in code, the Tooltip layer. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
 
 </div>
 
@@ -178,7 +178,8 @@ The layer numbers are shared with the [Overlay](?path=/docs/foundations-patterns
 <tr><th>Layer</th><th>Number</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Menu and Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td></tr>
+<tr><td>Menu</td><td>400</td><td><code>--layout-z-index-popup</code></td></tr>
+<tr><td>Popup</td><td>800</td><td><code>--layout-z-index-tooltip</code></td></tr>
 <tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td></tr>
 <tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td></tr>
 </tbody>
@@ -211,7 +212,7 @@ The layer numbers are shared with the [Overlay](?path=/docs/foundations-patterns
 - Stack Flags 16 apart, bottom-left.
 - The Popup body is text or a short list, never a form. Anything with inputs, steps or a long scroll belongs in a modal.
 - Give a Menu row a short label. When a row needs more, add a description line and let the row grow. Never put a sentence in the label.
-- A Popover layer never brings a scrim and never blocks the page. An outside click or Escape closes it.
+- A Popover layer never brings a scrim and never blocks the page. A Menu and a Popup close on an outside click or Escape.
 - Do not put required content in a Popup. Anything the person must read to finish the task belongs on the page.
 
 </div>

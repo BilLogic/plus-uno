@@ -66,7 +66,7 @@ The Drawer pads 16 on every side and stacks its header, body and footer 16 apart
 </tbody>
 </DocsTable>
 
-Figma's Drawer has more options than the code draws today.
+Figma's Drawer has more options than the code draws.
 
 <DocsTable>
 <thead>
@@ -76,7 +76,8 @@ Figma's Drawer has more options than the code draws today.
 <tr><td><code>width</code></td><td>sm, md, lg</td><td>Same: <code>width</code>.</td></tr>
 <tr><td><code>placement</code></td><td>end, start</td><td>Same: <code>placement</code>.</td></tr>
 <tr><td>Header <code>type</code></td><td>default, custom</td><td>Default: <code>title</code> and <code>description</code>. Custom is not in code.</td></tr>
-<tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>.</td></tr>
+<tr><td><code>actions?</code>, <code>close?</code></td><td>on, off</td><td>Not in code. The Close button always shows.</td></tr>
+<tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>. Use it for read-only details.</td></tr>
 <tr><td><code>divider?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>loading?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>column guide?</code></td><td>on, off</td><td>Figma only. It shows the screen-grid columns for checking alignment and never ships.</td></tr>
@@ -205,7 +206,7 @@ A Drawer is placed in the [Overlay](?path=/docs/foundations-patterns-overlay--do
 
 ### Do and don't
 
-None. The Drawer has no do and don't pairs yet.
+None. The Drawer has no do and don't pairs.
 
 </div>
 
@@ -228,6 +229,7 @@ None. The Drawer has no do and don't pairs yet.
 - [Modal](?path=/docs/foundations-patterns-modal--docs) is the centered layer for a task that blocks the page.
 - [Overlay](?path=/docs/foundations-patterns-overlay--docs) places the Drawer at an edge and draws the scrim.
 - [Section](?path=/docs/foundations-patterns-section--docs) and [Card](?path=/docs/foundations-patterns-card--docs) hold content that belongs on the page itself.
+- Page templates show a medium Drawer over the page.
 
 </div>
 

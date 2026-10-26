@@ -57,12 +57,12 @@ An Overlay interrupts the page for one task. It dims everything behind it with o
 <tr><td><code>placement</code></td><td>string</td><td><code>center</code>, <code>start</code>, <code>end</code></td><td><code>center</code></td><td>Centers a modal, or holds a drawer full height at the left (<code>start</code>) or right (<code>end</code>) edge, with no pad.</td></tr>
 <tr><td><code>onScrimClick</code></td><td>function</td><td>none</td><td>none</td><td>Runs for a click on the scrim, not on the layer it holds.</td></tr>
 <tr><td><code>inline</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws the Overlay in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.</td></tr>
-<tr><td><code>screenWidth</code></td><td>number</td><td>768, 1024, 1440</td><td>the page width</td><td>Inline only. The screen width the layer inside takes its width from.</td></tr>
+<tr><td><code>screenWidth</code></td><td>number</td><td>any pixel width; the playground offers 768, 1024 and 1440</td><td>the page width</td><td>Inline only. The screen width the layer inside takes its width from.</td></tr>
 <tr><td><code>screenHeight</code></td><td>number</td><td>any height in px</td><td>hugs the content</td><td>Inline only. The layer inside caps at this height less the top and bottom pad.</td></tr>
 </tbody>
 </DocsTable>
 
-Figma's Overlay has two more properties. **Height** (hug or fill) lives on the Modal inside it, and **stack** (single or nested confirm) is a second Overlay later in the page.
+Figma's Overlay has two more properties. **Height** (hug or fill) lives on the Modal inside it, shown in the Heights example on the [Modal page](?path=/docs/foundations-patterns-modal--docs), and **stack** (single or nested confirm) is a second Overlay later in the page.
 
 </div>
 
@@ -81,7 +81,7 @@ Figma's Overlay has two more properties. **Height** (hug or fill) lives on the M
 <tr><td><code>--layout-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
 <tr><td><code>--layout-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
 <tr><td><code>--layout-max-width-content</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
-<tr><td><code>--layout-max-height-modal</code></td><td>screen less 128</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+<tr><td><code>--layout-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -101,7 +101,7 @@ Figma's Overlay has two more properties. **Height** (hug or fill) lives on the M
 
 ### Screen grid
 
-<DocsCanvasShell description={<>The screen grid has 12 columns with a 16 gutter. It is centered and capped at 1232. A modal spans 6, 8 or 10 of these columns plus 16 on each side. Only the Overlay carries this grid. Page frames carry the content grid.</>}>
+<DocsCanvasShell description={<>The screen grid has 12 columns with a 16 gutter. It is centered and capped at 1232. A modal spans 6, 8 or 10 of these columns plus 16 on each side. Only the Overlay carries this grid. Page frames carry the content grid. In Figma the screen grid is drawn red, the content grid blue and the Modal column guide purple.</>}>
     <DsCanvasQuiet of={OverlayStories.ScreenGrid} />
 </DocsCanvasShell>
 
@@ -139,15 +139,13 @@ Figma has no z-index, so the order is written here and lives in code.
 </thead>
 <tbody>
 <tr><td>Navigation</td><td>200</td><td><code>--layout-z-index-navigation</code></td><td>The floating sidebar. It has a shadow and no scrim, and an outside click closes it.</td></tr>
-<tr><td>Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td><td>Menu and Popup.</td></tr>
+<tr><td>Menu</td><td>400</td><td><code>--layout-z-index-popup</code></td><td>The Menu.</td></tr>
 <tr><td>Scrim</td><td>500</td><td><code>--layout-z-index-scrim</code></td><td>The Overlay and its scrim.</td></tr>
 <tr><td>Modal</td><td>510</td><td><code>--layout-z-index-modal</code></td><td>A Modal or a Drawer.</td></tr>
 <tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td><td>Flags, above a modal.</td></tr>
-<tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td><td>Tooltips, above everything.</td></tr>
+<tr><td>Popup and Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td><td>Popups and Tooltips, above everything. In code the Popup takes the Tooltip layer.</td></tr>
 </tbody>
 </DocsTable>
-
-A popup opened from a modal takes 510 in code, so menus inside dialogs show above them.
 
 </div>
 
@@ -161,7 +159,7 @@ A popup opened from a modal takes 510 in code, so menus inside dialogs show abov
 - Opening a modal closes a floating sidebar, so the two never stack.
 - A floating sidebar gets a shadow and no scrim.
 - Popovers, flags and tooltips never bring a scrim.
-- Both layers cap at the screen height less 128 and scroll their body past it.
+- A modal and a confirm cap at the screen height less 2 × pad-y (see Tokens) and scroll their body past it.
 - Place a modal in the Overlay. Do not detach it to move things around.
 
 </div>

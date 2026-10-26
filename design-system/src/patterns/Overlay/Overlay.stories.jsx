@@ -129,6 +129,7 @@ export const Layers = {
     },
 };
 
+// The stand-in screen sizes and the 48 in the grid width are stage geometry for the docs, not design values; the real values come from the tokens.
 /** The tint a guide paints over the stand-in screen. */
 const guideFill = (token, percent) => `color-mix(in srgb, var(${token}) ${percent}%, transparent)`;
 

@@ -50,7 +50,7 @@ A Modal asks for one decision or one short task before the person goes on. It bl
 
 ### Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>A <code>sm</code>, <code>hug</code> Modal in its Overlay at the 1024 stand-in screen. <strong>1</strong> Header: the title and the Close button. <strong>2</strong> Body: a slot, at least 96 tall, that scrolls past the cap. <strong>3</strong> Footer: a slot for actions, right-aligned, with the primary last. <strong>4</strong> Overlay: the scrim, pads and screen grid around it.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A <code>sm</code>, <code>hug</code> Modal in its Overlay at the 1024 stand-in screen. <strong>1</strong> Header: the title and the Close button. <strong>2</strong> Body: a slot that scrolls past the cap. <strong>3</strong> Footer: a slot for actions, right-aligned, with the primary last. <strong>4</strong> Overlay: the scrim, pads and screen grid around it.</>}>
     <Canvas of={PatternModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -69,7 +69,7 @@ The Modal pads 16 on every side and rounds 12 at every width. The header, body a
 <tbody>
 <tr><td><code>title</code></td><td>node</td><td>text</td><td>none</td><td>The title in the header. It is the dialog's heading and its name.</td></tr>
 <tr><td><code>width</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code></td><td><code>sm</code></td><td>6, 8 or 10 columns of the screen grid plus 16 on each side.</td></tr>
-<tr><td><code>height</code></td><td>string</td><td><code>hug</code>, <code>fill</code></td><td><code>hug</code></td><td>Hug grows with the content to the screen less 128. Fill always sits at that height.</td></tr>
+<tr><td><code>height</code></td><td>string</td><td><code>hug</code>, <code>fill</code></td><td><code>hug</code></td><td>Hug grows with the content to the cap set by the <a href="?path=/docs/foundations-patterns-overlay--docs">Overlay</a>. Fill always sits at that height.</td></tr>
 <tr><td><code>footer</code></td><td>node</td><td>buttons</td><td>none</td><td>The footer slot. Leaving it out removes the footer.</td></tr>
 <tr><td><code>onClose</code></td><td>function</td><td>none</td><td>none</td><td>Draws the Close button and runs when it is pressed.</td></tr>
 <tr><td><code>tabs</code></td><td>list</td><td>each tab has <code>key</code>, <code>label</code>, <code>content</code> and optional <code>disabled</code></td><td>none</td><td>Puts a tab group under the title. The selected tab's content replaces the body.</td></tr>
@@ -80,7 +80,7 @@ The Modal pads 16 on every side and rounds 12 at every width. The header, body a
 </tbody>
 </DocsTable>
 
-Figma's Modal has more options than the code draws today.
+Figma's Modal has more options than the code draws.
 
 <DocsTable>
 <thead>
@@ -90,6 +90,8 @@ Figma's Modal has more options than the code draws today.
 <tr><td><code>width</code></td><td>sm, md, lg</td><td>Same: <code>width</code>.</td></tr>
 <tr><td><code>height</code></td><td>hug, fill</td><td>Same: <code>height</code>.</td></tr>
 <tr><td>Header <code>type</code></td><td>default, custom, tabs</td><td>Default and tabs: <code>title</code> and <code>tabs</code>. Custom is not in code.</td></tr>
+<tr><td><code>description?</code></td><td>on, off</td><td>Not in code. Put a description line in the body or the title.</td></tr>
+<tr><td><code>actions?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>.</td></tr>
 <tr><td><code>divider?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>loading?</code></td><td>on, off</td><td>Not in code.</td></tr>
@@ -111,13 +113,13 @@ Figma's Modal has more options than the code draws today.
 <tr><td><code>--modal-pad</code></td><td>16</td><td>Pad on every side, every size.</td></tr>
 <tr><td><code>--modal-stack-sm</code></td><td>8</td><td>Space between the title row and the tab group.</td></tr>
 <tr><td><code>--modal-stack-md</code></td><td>16</td><td>Space between the header, body and footer, and between fields in a group.</td></tr>
-<tr><td><code>--modal-stack-lg</code></td><td>24</td><td>Space between groups of fields in the body.</td></tr>
-<tr><td><code>--modal-inline-sm</code></td><td>8</td><td>Space between footer buttons.</td></tr>
-<tr><td><code>--modal-inline-md</code></td><td>16</td><td>Wider inline space.</td></tr>
-<tr><td><code>--modal-inline-lg</code></td><td>24</td><td>Widest inline space.</td></tr>
+<tr><td><code>--modal-stack-lg</code></td><td>24</td><td>A token for the space between groups of fields you place in the body slot. The component does not apply it.</td></tr>
+<tr><td><code>--modal-inline-sm</code></td><td>8</td><td>A token for inline space between controls you place in a slot. The footer binds <code>--size-element-gap-sm</code>, 8, for the space between its buttons.</td></tr>
+<tr><td><code>--modal-inline-md</code></td><td>16</td><td>A token for wider inline space in slot content.</td></tr>
+<tr><td><code>--modal-inline-lg</code></td><td>24</td><td>A token for the widest inline space in slot content.</td></tr>
 <tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
 <tr><td><code>--layout-width-modal-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width</td><td>The three width steps, per screen size.</td></tr>
-<tr><td><code>--layout-max-height-modal</code></td><td>screen less 128</td><td>The cap a hug Modal grows to and a fill Modal sits at.</td></tr>
+<tr><td><code>--layout-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at. See Tokens on the <a href="?path=/docs/foundations-patterns-overlay--docs">Overlay</a> page.</td></tr>
 <tr><td><code>--ds-surface-overlay</code></td><td>overlay surface</td><td>The Modal's fill.</td></tr>
 <tr><td><code>--ds-shadow-overlay</code></td><td>overlay shadow</td><td>The Modal's elevation, the overlay pair.</td></tr>
 </tbody>
@@ -150,7 +152,7 @@ Figma's Modal has more options than the code draws today.
 
 ### Height
 
-<DocsCanvasShell description={<><strong>Hug</strong>, the default, grows with its content up to the screen less 128, then the body scrolls. Small content keeps no minimum. <strong>Fill</strong> always sits at that height, so a settings or editor Modal never jumps.</>}>
+<DocsCanvasShell description={<><strong>Hug</strong>, the default, grows with its content up to the cap, then the body scrolls. Small content keeps no minimum. <strong>Fill</strong> always sits at that height, so a settings or editor Modal never jumps.</>}>
     <DsCanvasQuiet of={PatternModalStories.Heights} />
 </DocsCanvasShell>
 
@@ -165,7 +167,7 @@ Figma's Modal has more options than the code draws today.
 </DocsCanvasShell>
 
 - Use tabs for two to five views of one thing that people open in any order.
-- When the views must be done in order, or a later view depends on an earlier answer, split the flow into steps instead. Show one view at a time, put Back and Next in the footer, and write the step in the description, such as "Step 2 of 3".
+- When the views must be done in order, or a later view depends on an earlier answer, split the flow into steps instead. Show one view at a time, put Back and Next in the footer, and write the step in the title or the body, such as "Step 2 of 3".
 - Keep each label to one or two words on one line. At width <code>sm</code> that is about three tabs. Never wrap or scroll the strip, and never nest a second tab group in the body.
 - One footer serves every tab. Save saves them all, and switching tabs keeps what was typed.
 - Prefer height <code>fill</code> when the views differ in length, so switching tabs never resizes the Modal.
@@ -216,7 +218,7 @@ Figma's Modal has more options than the code draws today.
         },
         {
             doExample: <GroupedFields />,
-            doCaption: 'School and teacher sit 16 apart as one group. The next group starts 24 below.',
+            doCaption: 'School and teacher sit 16 apart as one group. The next group starts 24 below. The footer carries the actions.',
             dontExample: <UngroupedFields />,
             dontCaption: 'Four fields at one gap look like one long list, so the person cannot tell which fields belong together.',
         },
@@ -224,7 +226,7 @@ Figma's Modal has more options than the code draws today.
             doExample: <TabsForViews />,
             doCaption: 'Use tabs for views of one session that a tutor opens in any order. One Save in the footer saves every tab.',
             dontExample: <TabsAsSteps />,
-            dontCaption: 'Do not number tabs to fake a sequence. Use steps: one view at a time, Back and Next in the footer, and "Step 1 of 3" in the description.',
+            dontCaption: 'Do not number tabs to fake a sequence. Use steps: one view at a time, Back and Next in the footer, and "Step 1 of 3" in the title or the body.',
         },
         {
             doExample: <FewLabels />,
@@ -247,7 +249,7 @@ When you group fields, work in four steps. Pair a control with the field it cont
 - The Modal has the role dialog. A title-less Modal needs its own accessible name.
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - With tabs, the tab group is a tablist. Left and Right move between tabs, Home and End jump to the ends, and Tab moves from the strip into the panel. The panel is named by its tab.
-- Opening a Modal closes a floating sidebar.
+- Opening a Modal closes a floating sidebar in a Surface container.
 - At most two overlays stack. A confirm of width <code>sm</code> raised from a Modal is the second, and a third is not allowed.
 - The Close button is 32 and its accessible name is "Close".
 
@@ -257,7 +259,7 @@ When you group fields, work in four steps. Pair a control with the field it cont
 
 ### For developers
 
-The pattern draws inline, with no portal, focus trap or Escape handling. For a real dialog with focus management, use the core Modal component, which draws the same layers and tokens. <code>padding</code>, <code>gap</code> and <code>maxHeight</code> still work and warn once in development. Use <code>width</code> and <code>height</code> instead.
+The pattern draws inline, with no portal, focus trap or Escape handling. For a real dialog with focus management, use the core Modal component, which draws the same layers and tokens.
 
 </div>
 

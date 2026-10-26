@@ -43,6 +43,7 @@ export default {
  * after mounting: the placement engine measures the trigger through a ref,
  * which is only attached after the first render.
  */
+// The pixel heights, gaps and padding in these stages are stage geometry: they reserve room for layers that float outside the flow, and are not design values.
 const Stage = ({ height = 160, children, style }) => {
     const [open, setOpen] = React.useState(false);
     React.useEffect(() => { setOpen(true); }, []);
