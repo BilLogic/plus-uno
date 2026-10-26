@@ -558,7 +558,7 @@
             "source": "designer-supplied",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "The base shape Vertical outlined buttons nests, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
+            "notes": "The base shape that Vertical outlined buttons nest, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
@@ -1439,7 +1439,7 @@
           },
           {
             "id": "navbar-components",
-            "name": "Navbar Components",
+            "name": "Navbar components",
             "componentSetNodeId": "72:16339",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16339",
             "source": "designer-supplied",
@@ -1573,16 +1573,6 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
             "source": "node-chart",
             "status": "verified"
-          },
-          {
-            "id": "field",
-            "name": "_Field",
-            "componentSetNodeId": "14841:25919",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The part this component is built on: one box with Leading, Content and Trailing slots, 3 sizes × 7 states. In code it is `_internal/Field.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state rather than a step on the way to `verified`."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"

@@ -21,7 +21,7 @@
     "Foundations/Logos": "Components/Images and icons/Logo",
     "Foundations/Grid": "Foundations/Layout & grid"
   },
-  "count": 169,
+  "count": 168,
   "entries": [
     {
       "type": "docs",
@@ -1212,16 +1212,6 @@
       "newId": "components-loading-loading-skeleton--paragraph",
       "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--paragraph",
       "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--paragraph"
-    },
-    {
-      "type": "story",
-      "oldTitle": "Components/Loading/Skeleton",
-      "newTitle": "Components/Loading/Loading/Skeleton",
-      "name": "Preset Names A Shape",
-      "oldId": "components-loading-skeleton--preset-names-a-shape",
-      "newId": "components-loading-loading-skeleton--preset-names-a-shape",
-      "oldUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-skeleton--preset-names-a-shape",
-      "newUrl": "https://plus-uno.netlify.app/storybook/?path=/story/components-loading-loading-skeleton--preset-names-a-shape"
     },
     {
       "type": "story",
