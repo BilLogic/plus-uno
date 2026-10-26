@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NumberInputStories from './NumberInput.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { NumberInput, Range } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,12 +23,14 @@ export const figmaMeta = {
 
 <Title />
 
+A field for a number, with minus and plus steppers. Reach for it when the exact value matters, such as hours or a session count.
+
 <DocsTabs of={NumberInputStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-63990"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -35,31 +38,79 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
+
+<ol>
+    <li><strong>Label</strong>, shown by <code>showLabel</code>.</li>
+    <li><strong>Field</strong>: the box that holds the value, with the border and focus ring every text field shares.</li>
+    <li><strong>Steppers</strong>: "Decrease" then "Increase", small secondary outlined buttons in the field's trailing slot.</li>
+    <li><strong>Caption or validation message</strong> under the field.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code>, <code>showLabel</code></td><td>node, boolean</td><td>the name of the field</td><td>none, <code>true</code></td><td>label?</td></tr>
+        <tr><td><code>caption</code></td><td>node</td><td>standing help under the field</td><td>none</td><td>caption?, with its text from the validation message</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>any text</td><td><code>"Number"</code></td><td>not drawn</td></tr>
+        <tr><td><code>min</code>, <code>max</code>, <code>step</code></td><td>number</td><td>the bounds and the increment</td><td>no bounds, <code>1</code></td><td>not drawn</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, node</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>validation: none | invalid | success</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: default | focus | disabled | read-only</td></tr>
+        <tr><td><code>subtle</code></td><td>boolean</td><td>borderless until hovered or edited</td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>one size</td></tr>
+    </tbody>
+</DocsTable>
+
+Focus is a browser state, so there is no prop for it. The field is 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+Number input is built on the same field as Text field, so its border, focus ring and validation colors are the ones listed on [Text field](?path=/docs/components-forms-and-inputs-text-field--docs).
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The field's height.</td></tr>
+        <tr><td><code>--item-height-sm</code></td><td>24</td><td>The stepper buttons, set 4 in from the field's edge so the field stays 32.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell attachSourceBelow description={<>Default numeric field with steppers.</>}>
     <Canvas of={NumberInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
 <DocsCanvasShell description={<>Placeholder and editable value.</>}>
     <DsCanvasQuiet of={NumberInputStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Steppers
 
-<div className="sb-ds-doc-section">
-
-## Steppers
-
-<DocsCanvasShell description={<>24 compact secondary outlined buttons in the field's Trailing slot, minus before plus, 4 from the field's edge so it stays 32. They turn off at the bounds.</>}>
+<DocsCanvasShell description={<>Minus before plus. They turn off at the bounds, and read-only hides them.</>}>
     <DsCanvasQuiet of={NumberInputStories.Steppers} />
 </DocsCanvasShell>
 
@@ -67,41 +118,53 @@ export const figmaMeta = {
     <DsCanvasQuiet of={NumberInputStories.EmptyIsNotZero} />
 </DocsCanvasShell>
 
-</div>
+### Validation
 
-<div className="sb-ds-doc-section">
-
-## Validation & feedback
-
-<DocsCanvasShell description={<>Validation styling: invalid and success.</>}>
+<DocsCanvasShell description={<>None, invalid and success. In Figma, invalid and success are drawn on the default state only.</>}>
     <DsCanvasQuiet of={NumberInputStories.Styles} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, focus, disabled, and read-only.</>}>
+<DocsCanvasShell description={<>Default, focus, disabled and read-only. Disabled fades the steppers with the field. Hover comes from the browser.</>}>
     <DsCanvasQuiet of={NumberInputStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={NumberInputStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={NumberInputStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <NumberInput label="Hours tutored this week" defaultValue={6} min={0} max={40} />,
+            doCaption: 'Use Number input when the exact number matters.',
+            dontExample: <Range label="Hours tutored this week" defaultValue={6} min={0} max={40} />,
+            dontCaption: 'Do not use a slider for an exact count. Use Range for a rough position.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Controlled or uncontrolled.** Pass <code>value</code> and <code>onChange</code> to control it, or leave <code>value</code> off and it keeps its own.
+- **Stepper events.** The stepper buttons call <code>onChange</code> with a synthetic event carrying the name, the value and the type "number". <code>onIncrement</code> and <code>onDecrement</code> receive the new number.
+- **Empty reports as an empty string.** Stepping from empty starts at 0 and clamps, so an empty field with a minimum of 5 steps to 5. Give a field with a floor a starting value anyway.
+- **The input is a text input with a decimal input mode**, which is why the wheel does nothing and phones show a number pad.
+- **Extra props reach the input.** Your <code>aria-describedby</code> is composed with the validation message's, not replaced by it.
 
 </div>
 
@@ -117,38 +180,18 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `NumberInput` for a quantity the user adjusts as much as types — a session
-count, a duration, a score out of a known total. The stepper is the point: if
-nobody will ever press it, a plain `Input` is the simpler field.
+Use Number input for a quantity a person adjusts as much as types: a session count, a duration, a score out of a known total. Typing or stepping to a value is precise.
 
-It works controlled or uncontrolled. Pass `value` and `onChange` to control it;
-leave `value` off and it keeps its own. The stepper buttons call `onChange` with
-a synthetic event carrying `{ name, value, type: 'number' }`, and `onIncrement`
-and `onDecrement` with the new number.
+- **Set a minimum and a maximum, and say what they are.** Values clamp to the limits when the field loses focus, so name the limits in the caption, such as "0 to 40 hours".
+- **Keep it for quantities.** Phone numbers, IDs and ZIP codes are not amounts and should not step. Use [Text field](?path=/docs/components-forms-and-inputs-text-field--docs) for them.
+- **For a rough position on a span**, use [Range](?path=/docs/components-forms-and-inputs-range--docs).
+- **For a quick judgment**, use [Rating](?path=/docs/components-forms-and-inputs-rating--docs).
 
-</div>
+Three behaviors to design around:
 
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Typed values clamp when the field loses focus.
-
-`min` and `max` bind the steppers at once and a typed value on blur: "1" on the
-way to "12" is left alone while it is typed, and "12" becomes "10" when the field
-loses focus, with `onChange` called. The steppers turn off at the bounds.
-
-### Empty is not 0.
-
-An empty field stays empty and `onChange` reports `''`; 0 is a value of its own.
-Stepping from empty starts at 0 and clamps, so an empty field with `min={5}`
-steps to `5`. Give a field with a floor a starting value anyway — a field that
-shows nothing and means five is one the user has to press to understand.
-
-### The scroll wheel never changes the value.
-
-The control is a text input with `inputMode="decimal"`, so scrolling the page
-over a focused field does not nudge the number, and phones show a number pad.
+- **Empty is not 0.** An empty field stays empty, and 0 is a value of its own.
+- **Typed values clamp on blur.** "1" on the way to "12" is left alone while it is typed, and "12" becomes "10" when the field loses focus and the maximum is 10.
+- **The scroll wheel does not change the value.**
 
 </div>
 
@@ -156,26 +199,11 @@ over a focused field does not nudge the number, and phones show a number pad.
 
 ## Accessibility
 
-- **`showLabel={false}` hides the label; it does not remove the name.** The
-  label is rendered and clipped to nothing, the same treatment `Input` gives it
-  — see the `showLabel` section in the `Input` docs for why a name cannot be
-  taken away. Prefer a visible label regardless: a field whose name only exists
-  in the accessibility tree is a field sighted users have to guess at.
-- **The steppers are named for the field.** `Decrease {label}` and
-  `Increase {label}`, minus before plus, so a form with three number fields
-  does not read out three identical "Increase" buttons. They take the real `disabled`
-  attribute at the bounds. Read-only hides them.
-- **`required` shows an asterisk and sets `aria-required`.** Explain the
-  asterisk once, in the form's legend.
-- **The validation message is attached to the input.** It carries an id, the
-  field points at it with `aria-describedby`, an invalid field carries
-  `aria-invalid`, and the message renders with `role="alert"` — so the error is
-  heard when it appears and again with the name.
-- **Forwarded props reach the input.** `aria-describedby`, `aria-invalid` and
-  anything else you pass lands on the field itself, and your `aria-describedby`
-  is composed with the message's rather than replaced by it.
-- **The value is text to assistive technology.** There is no spinbutton role,
-  so the label and the unit carry the meaning.
+- **The steppers are named for the field.** They read as "Decrease" and "Increase" followed by the field's label, minus before plus, so a form with three number fields does not read out three identical "Increase" buttons. They turn off at the bounds, and read-only hides them.
+- **Hiding the label keeps the name.** <code>showLabel=false</code> clips the label out of sight and keeps it for assistive technology. Prefer a visible label anyway: a field whose name exists only in the accessibility tree is one sighted people have to guess at.
+- **Required is marked once.** An asterisk shows beside the label and the field is announced as required. Explain the asterisk once, in the form's legend.
+- **Errors are announced.** The validation message is read when it appears and again with the field's name, and an invalid field is announced as invalid.
+- **The value is text to a screen reader.** There is no spinbutton role, so the label and the unit carry the meaning. Put the unit in the label or caption.
 
 </div>
 
@@ -183,10 +211,10 @@ over a focused field does not nudge the number, and phones show a number pad.
 
 ## Related
 
-- For a number nobody steps through, use `Input`.
-- For a value chosen along a scale, use `Range`.
-- For a rating out of five, use `Rating`.
-- For the label and message conventions these fields share, see `Input`.
+- [Range](?path=/docs/components-forms-and-inputs-range--docs) for a rough value on a span.
+- [Text field](?path=/docs/components-forms-and-inputs-text-field--docs) for text, or digits that are not a quantity.
+- [Rating](?path=/docs/components-forms-and-inputs-rating--docs) for a quick judgment.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for the label and message conventions these fields share.
 
 </div>
 

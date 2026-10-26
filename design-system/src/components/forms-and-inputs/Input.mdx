@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputStories from './Input.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Input, Textarea } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -41,14 +42,15 @@ export const figmaMeta = {
 <Meta of={InputStories} />
 
 <Title />
-The labeled text input box allows users to enter textual inputs and receive validation feedback with messages.
+
+A labeled single-line field for short text: a name, an email, a search. It is built on the field box that every text-like input shares, so its border, focus ring and validation colors match Text area, Number input, Input group and Select.
 
 <DocsTabs of={InputStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18357-554"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -56,103 +58,164 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<div className="sb-ds-doc-section">
-
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Default labeled field with placeholder and trailing visual.</>}>
-    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Placeholder vs value, label visibility, required marker, and leading/trailing visuals.</>}>
-    <DsCanvasQuiet of={InputStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Validation & feedback
-
-<DocsCanvasShell description={<>Validation treatments: none, invalid, and success (with optional message).</>}>
-    <DsCanvasQuiet of={InputStories.Styles} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
-    <DsCanvasQuiet of={InputStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, hover, focus, disabled, and read-only.</>}>
-    <DsCanvasQuiet of={InputStories.InteractionStates} />
-</DocsCanvasShell>
-
-</div>
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
 
 <div className="sb-ds-doc-section">
 
 ## Anatomy
 
-<DocsCanvasShell description={<>The label row (label, required asterisk, info tooltip), the <code>_Field</code> box with its Leading, Content and Trailing slots, and the caption: a message on the left and a count on the right.</>}>
-    <DsCanvasQuiet of={InputStories.Anatomy} />
+<ol>
+    <li><strong>Label</strong>, shown by <code>showLabel</code>, with an optional required asterisk and info tooltip.</li>
+    <li><strong>Field</strong>: the box with its border and focus ring.</li>
+    <li><strong>Leading</strong>: an icon or other visual before the value, set by <code>leadingVisual</code>.</li>
+    <li><strong>Value or placeholder</strong>: the text in the content slot.</li>
+    <li><strong>Trailing</strong>: an icon or other visual after the value, set by <code>trailingVisual</code>.</li>
+    <li><strong>Caption or validation message</strong> under the field, with an optional count on its right.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code>, <code>showLabel</code></td><td>node, boolean</td><td>the name of the field</td><td>none, <code>true</code></td><td>label?: true | false</td></tr>
+        <tr><td><code>caption</code></td><td>node</td><td>standing help under the field</td><td>none</td><td>caption?, whose text is the validation message</td></tr>
+        <tr><td><code>placeholder</code>, <code>value</code></td><td>string</td><td>any text</td><td>none</td><td>input: placeholder | value</td></tr>
+        <tr><td><code>type</code></td><td>string</td><td><code>text</code>, <code>email</code>, <code>password</code> and the other input types</td><td><code>text</code></td><td>not drawn</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>maxLength</code></td><td>number</td><td>the longest value. Adds a count on the right of the caption.</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>leadingVisual</code></td><td>icon class or node</td><td>a Font Awesome class or a node</td><td>none</td><td>leading?: true | false, Leading swap</td></tr>
+        <tr><td><code>trailingVisual</code></td><td>icon class or node</td><td>a Font Awesome class or a node</td><td>none</td><td>trailing?, a slot of up to 2</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, node</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>validation: none | invalid | success</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: default | focus | disabled | read-only</td></tr>
+        <tr><td><code>subtle</code></td><td>boolean</td><td>borderless until hovered or edited</td><td><code>false</code></td><td>subtle?: true | false</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large, set on the field</td></tr>
+    </tbody>
+</DocsTable>
+
+The field is 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. Focus is a browser state, and hover comes from the browser.
+
+In Figma a field cannot show focus and invalid together. Code can.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+These tokens belong to the shared field, so Text area, Number input, Select and Tag input take them too.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of a one-line field.</td></tr>
+        <tr><td><code>--field-min-height-sm</code></td><td>80</td><td>The least height of a multi-line field.</td></tr>
+        <tr><td><code>--ds-background-input</code></td><td>theme role</td><td>The field's fill.</td></tr>
+        <tr><td><code>--ds-border-input</code></td><td>theme role</td><td>The field's border at rest.</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>theme role</td><td>The border and ring on focus.</td></tr>
+        <tr><td><code>--ds-border-danger</code></td><td>theme role</td><td>The border of an invalid field.</td></tr>
+        <tr><td><code>--ds-border-success</code></td><td>theme role</td><td>The border of a valid field.</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>theme role</td><td>Standing help in the caption.</td></tr>
+        <tr><td><code>--ds-text-subtlest</code></td><td>theme role</td><td>The placeholder.</td></tr>
+        <tr><td><code>--ds-text-danger</code></td><td>theme role</td><td>An error message.</td></tr>
+        <tr><td><code>--ds-opacity-disabled</code></td><td>theme role</td><td>The fade on a disabled field.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>Default text field with a label and placeholder.</>}>
+    <Canvas of={InputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>An error and a count share the caption; neither replaces the other.</>}>
+<DocsCanvasShell description={<>Placeholder against value, label visibility, the required marker, and leading and trailing visuals.</>}>
+    <DsCanvasQuiet of={InputStories.Content} />
+</DocsCanvasShell>
+
+### Validation
+
+<DocsCanvasShell description={<>None, invalid and success, with an optional message.</>}>
+    <DsCanvasQuiet of={InputStories.Styles} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An error and a count share the caption. Neither replaces the other.</>}>
     <DsCanvasQuiet of={InputStories.CaptionErrorAndCount} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
+<DocsCanvasShell description={<>Default, hover, focus, disabled and read-only.</>}>
+    <DsCanvasQuiet of={InputStories.InteractionStates} />
+</DocsCanvasShell>
 
-## Subtle
+### Anatomy in use
 
-<DocsCanvasShell description={<>Reads as plain text until it is hovered or edited, for record pages where people mostly read. Saves on blur or Enter, Esc cancels, and a failed save stays open in invalid.</>}>
+<DocsCanvasShell description={<>The label row with its asterisk and info tooltip, the field with its leading, content and trailing slots, and the caption with a message on the left and a count on the right.</>}>
+    <DsCanvasQuiet of={InputStories.Anatomy} />
+</DocsCanvasShell>
+
+### Subtle
+
+<DocsCanvasShell description={<>Reads as plain text until it is hovered or edited, for record pages where people mostly read. It saves on blur or Enter, Esc cancels, and a failed save stays open and invalid.</>}>
     <DsCanvasQuiet of={InputStories.Subtle} />
 </DocsCanvasShell>
 
-</div>
+### Search
 
-<div className="sb-ds-doc-section">
-
-## Search
-
-<DocsCanvasShell description={<>An Input with the magnifier in Leading and a visually hidden label. It is an example, not a component.</>}>
+<DocsCanvasShell description={<>A Text field with the magnifier in the leading slot and a visually hidden label. It is an example, not a component.</>}>
     <DsCanvasQuiet of={InputStories.Search} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={InputStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={InputStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Input label="Email" type="email" placeholder="name@school.edu" />,
+            doCaption: 'Use Text field for a name, an email or another short answer.',
+            dontExample: <Textarea label="Email" rows={3} placeholder="name@school.edu" />,
+            dontCaption: 'Do not use a Text area for a one-line answer.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **The message renders only with a validation state.** <code>validationMessage</code> shows when <code>validation</code> is not "none". Set the message alone and nothing shows, which suits a field that should carry its message only once it has failed.
+- **The caption holds a message and a count.** <code>caption</code> is standing help, and a validation message takes its place while <code>validation</code> is set. <code>maxLength</code> adds a count on the right beside either.
+- **Describedby is composed.** Your own <code>aria-describedby</code> is kept and the message id is appended, so standing help and a new error are both read, in that order.
+- **Extra props land on the input**, so <code>autoComplete</code>, <code>pattern</code>, <code>inputMode</code> and any <code>aria-*</code> attribute reach the control rather than its box.
+- **Type changes the keyboard.** <code>type="email"</code> and <code>type="tel"</code> change the mobile keyboard as well as the validation. Set them even where the server validates.
+- **subtle is for editing in place**, on record and profile pages, and not in a form someone fills from top to bottom. Pass <code>onSave</code>. It is called on blur or Enter, Esc cancels, and while it runs the trailing slot shows "saving…". Throw or reject and the field stays open and invalid, keeping what was typed, with your error as the caption.
+- **The id is derived** when you do not pass one. Pass <code>id</code> when something outside the component needs to point at the input. The name is a form key and is never used as an id.
+- **Name the field when the design shows no label:** pass a label and <code>showLabel=false</code>, not only a placeholder.
 
 </div>
 
@@ -168,48 +231,15 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 ## When to use
 
-Use `Input` for single-line text entry — names, emails, search boxes, anything
-where the answer is one short string. It is the field that owns its own label,
-its own validation state and its own message, which makes it the right home for
-an error rather than an `Alert` at the top of the form.
+Use Text field for one line of text: names, emails and short answers. It owns its label, its validation state and its message, which makes it the right home for an error rather than an alert at the top of the form.
 
-`validation` takes `none`, `invalid` or `success`; pair it with
-`validationMessage` and the component renders the message beneath the field with
-a matching icon.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-- **A visual is decoration; it never carries the meaning.** `leadingVisual` and
-  `trailingVisual` accept a Font Awesome class name or a node, and a string is
-  rendered `aria-hidden`. Anything the reader must know — that this is a search
-  field, that the value is a currency — belongs in the `label` or the
-  `validationMessage`, not in the glyph.
-- **`validationMessage` only renders when `validation` is not `none`.** Setting
-  the message alone shows nothing, which is the shape to reach for when a field
-  should carry its message only once it has failed.
-- **The field points AT its message.** When both are set, the message
-  gets an id and the input an `aria-describedby` naming it, alongside
-  `aria-invalid` for `invalid`. A caller's own `aria-describedby` is kept and
-  the generated id appended, so passing one does not silence the error.
-- **The caption holds a message and a count.** `caption` is standing help;
-  a `validationMessage` takes its place while `validation` is not `none`.
-  `maxLength` adds a count on the right ("24 / 30"), beside either.
-- **Set `autoComplete` on every field the browser can fill.** Login email is
-  `email`, the password is `current-password`, and an access code is
-  `one-time-code`. Extra props land on the input, so `autoComplete`,
-  `pattern`, `inputMode` and the rest reach the control rather than its box.
-- **`subtle` is for editing in place**, on record and profile pages, never in a
-  form someone fills from top to bottom. Pass `onSave`; it is called on blur or
-  Enter, Esc cancels, and while it runs Trailing shows "saving…". Throw or
-  reject and the field stays open in `invalid`, keeping what was typed, with
-  your error as the caption.
-- **`type` is passed straight through.** `type="email"` and `type="tel"` change
-  the mobile keyboard as well as the validation, which is worth setting even
-  where the form validates server-side.
+- **Say how to fix it in the message.** An invalid field colors the border, and the message says what to do, such as "Enter an email like name@school.edu".
+- **Show search with the field's magnifier.** Put the magnifier on the leading side and leave the trailing side empty. Keep the placeholder to what is searched, such as "Search tutors".
+- **Use Text field, not the field box.** The field box behind every text-like input is an internal part. Place Text field, Text area, Number input or Select, and reach for the field box only when building a new input.
+- **For an answer that may run past a line**, use [Text area](?path=/docs/components-forms-and-inputs-text-area--docs).
+- **For a number**, use [Number input](?path=/docs/components-forms-and-inputs-number-input--docs).
+- **For an addon that acts on the value**, use [Input group](?path=/docs/components-forms-and-inputs-input-group--docs).
+- **For a choice from a list**, use [Select](?path=/docs/components-forms-and-inputs-select--docs).
 
 </div>
 
@@ -217,111 +247,14 @@ a matching icon.
 
 ## Accessibility
 
-- **The label is associated whether you pass `id` or not.** One id is derived
-  once and used for both the label's `htmlFor` and the input; when no `id` is
-  given, React's `useId` supplies one. Pass `id` when something outside the
-  component needs to point at the input — an `aria-describedby`, a `<label>` you
-  render yourself, a test selector — and you will get exactly the id you passed.
-  `name` is a form key, not an id, and no longer stands in for one.
-- **`showLabel={false}` hides the label, it does not remove it.** The label is
-  rendered either way and always carries `htmlFor`; `showLabel={false}` only
-  clips it out of sight with `.plus-field-label--hidden`. So a field that has a
-  `label` has an accessible name whether or not you show it, and turning the
-  label off costs nothing but the pixels. See *Why `showLabel` cannot take the
-  name away* below.
-- **`required` shows an asterisk and sets `aria-required`.** The asterisk is
-  hidden from assistive technology, which hears "required" from the input. The
-  form explains the asterisk once, in a legend above the fields; there are no
-  "(optional)" marks. The browser's own `required` is not set, so the form
-  decides when to validate.
-- **`info` puts a tooltip button beside the label**, outside the `<label>`, so
-  its name is never part of the field's name.
-- **`validation` is announced, not only drawn.** The message gets an id, the
-  input points at it with `aria-describedby`, and `validation="invalid"` sets
-  `aria-invalid` and renders the message with `role="alert"`, so it is read out
-  when it appears. A `success` message describes without claiming an
-  error. Your own `aria-describedby` is kept and the message id is appended, so
-  standing help and a new error are both read, in that order.
-- **A field with no `label` still has no name.** `showLabel` decides whether the
-  label is *seen*, not whether there is one. If the visible label is rendered by
-  the caller instead — a `<Label>` above the field, a table column header — point
-  it at the input with `htmlFor`; if there is no text anywhere, pass `aria-label`.
-- **Everything else passes through.** `type`, `autoComplete`, `maxLength`,
-  `pattern`, `inputMode` and any `aria-*` attribute all reach the input element,
-  so the native affordances are available even though the wrapper does not use
-  them.
-
-### Name the field, even when the design shows no label.
-
-```jsx
-// Incorrect — a placeholder is not a name, and it disappears as soon as
-// someone types.
-<Input placeholder="Search tutors" />
-
-// Correct — the label names the field; showLabel={false} only hides it.
-<Input label="Search tutors" showLabel={false} placeholder="Search tutors" />
-```
-
-### Explain the asterisk once, not on every field.
-
-```jsx
-// Incorrect — "(required)" in every label, and an asterisk as well.
-<Input label="School (required)" required />
-
-// Correct — the asterisk, with one legend above the form:
-// "Fields marked * are required."
-<Input label="School" required />
-```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Why `showLabel` cannot take the name away
-
-`showLabel={false}` used to skip rendering the label entirely, which raised
-the question of whether that mode should exist at all, since a component that
-makes "no accessible name" easy keeps producing the defect. The 37 call sites answered it,
-and they were not one population:
-
-- **17 pass a real `label` string and then switch it off** — the whole Login
-  family (`LoginPortal`, `InstitutionSelection`, `InstitutionForm`,
-  `AccessCodeForm`) and the prototype-market search field. The name was already
-  written; the design just has no room to show it. These never wanted "no
-  label", only "no visible label".
-- **19 pass no `label` at all**, because the caller renders its own visible
-  label above the field — the Profile sections do this throughout, with the
-  `Label` element from Label and caption. `showLabel={false}` there prevents a
-  *second* label, which is a real and correct use. Removing the prop would put a
-  duplicate label back on every one of those fields.
-- **1 is a search box inside `Select`'s dropdown**, named by the listbox it
-  filters.
-
-So neither answer was right on its own. Forbidding the mode breaks
-the 19; permitting it as-is leaves the 17 one careless call site away from an
-unnamed field forever. The resolution is to make the mode mean something it can
-be trusted with: **`showLabel` is a visual switch, and the accessibility tree
-does not read it.** The 17 gained a name with no visual change and no call-site
-edit; the 19 are untouched, because a `label` you never passed is still not
-rendered. What is left is the one honest way to have no name — pass no text at
-all — which is true of every component in the system and is not something
-`Input` makes especially easy.
-
-The half that `Input` cannot fix is the 19: a label rendered outside the
-component has to be pointed at the input by the caller. Seventeen of them pass
-`htmlFor` — the Profile sections and the tutor profile page — because each names
-one control.
-
-The last two were `DateAndTimePicker`s under a single shared caption, where
-`htmlFor` was never available: one `<label for>` names one control, and that
-field renders two. They were settled from the other end. The visual switch was
-ported — `DateAndTimePicker`'s `showLabel` now clips its label instead of
-deleting it, same clipping, same reasoning — and each picker was given its own
-`label` to clip, so the two controls are named "Start time" and "End time"
-rather than both being called "Time". The visible caption stopped competing for
-that job and names the pair as a `group`. In both components the name now
-belongs to the component; text the caller renders above the field is a caption,
-not a second claim on the name.
+- **The label is associated with the field.** Clicking it focuses the field, and a screen reader announces it with the field.
+- **Hiding the label keeps the name.** <code>showLabel=false</code> clips the label out of sight and keeps it for assistive technology. Use it where the design has no room to show it.
+- **A field with no label has no name.** If the visible label is drawn by something else, such as a column header or a label above the field, point it at the input. If there is no text anywhere, pass an <code>aria-label</code>. A placeholder is not a name, because it disappears as soon as someone types.
+- **Required is marked once.** An asterisk shows beside the label, and the field is announced as required. The form explains the asterisk once, in a legend above the fields. Fields carry no "(required)" or "(optional)" text.
+- **The info tooltip is outside the label**, so its name is never part of the field's name.
+- **Validation is announced.** An invalid field is marked invalid, points at its message, and the message is read out when it appears. A success message describes the field without claiming an error.
+- **A visual is decoration.** Leading and trailing icons are hidden from assistive technology. Anything the reader must know, such as that this is a search field, belongs in the label or the message.
+- **Set autofill on every field the browser can fill.** Login email is "email", the password is "current-password", and an access code is "one-time-code".
 
 </div>
 
@@ -329,11 +262,12 @@ not a second claim on the name.
 
 ## Related
 
-- For multi-line text, use `Textarea`.
-- For numbers with steppers, use `NumberInput`.
-- For a value chosen from a list, use `Select`.
-- For dates, use `DatePicker` or `DateAndTimePicker`.
-- For an input with an attached button or addon, use `InputGroup`.
+- [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for several lines.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for a number.
+- [Input group](?path=/docs/components-forms-and-inputs-input-group--docs) for an addon that acts on the value.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for a choice from a list.
+- [Date picker](?path=/docs/components-forms-and-inputs-date-picker--docs) for a date.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for how labels and captions are written.
 
 </div>
 

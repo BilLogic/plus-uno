@@ -26,7 +26,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 | `value` | number | — | Current slider value |
 | `defaultValue` | number | — | — |
 | `step` | number | `1` | Slider increment |
-| `size` | enum | `'medium'` | Available in 3 sizes: small, medium (default), large. |
+| `size` | enum | `'medium'` | Small or medium (default). Large is deprecated and draws like medium. |
 | `onChange` | func | — | — |
 | `onInput` | func | — | — |
 | `className` | string | `''` | — |
@@ -48,6 +48,4 @@ From `design-system/src/components/forms-and-inputs/Range.scss`. Override these 
 
 Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

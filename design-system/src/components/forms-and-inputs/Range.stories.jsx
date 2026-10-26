@@ -25,7 +25,7 @@ export default {
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
-            description: 'Available in 3 sizes: small, medium (default), large.',
+            description: 'Small or medium (default). Large is deprecated and draws like medium.',
             table: { category: 'Design' },
         },
         value: {
@@ -101,13 +101,9 @@ Overview.parameters = {
 export const Sizes = () => {
     const [value1, setValue1] = useState(50);
     const [value2, setValue2] = useState(50);
-    const [value3, setValue3] = useState(50);
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px' }}>
-            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Small, medium (default), and large track and thumb.
-            </p>
             <Range
                 id="range-small"
                 aria-label="Small range value"
@@ -125,15 +121,6 @@ export const Sizes = () => {
                 value={value2}
                 onChange={(e) => setValue2(parseFloat(e.target.value))}
                 size="medium"
-            />
-            <Range
-                id="range-large"
-                aria-label="Large range value"
-                min={0}
-                max={100}
-                value={value3}
-                onChange={(e) => setValue3(parseFloat(e.target.value))}
-                size="large"
             />
         </div>
     );

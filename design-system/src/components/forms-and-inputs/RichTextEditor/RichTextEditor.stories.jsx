@@ -91,6 +91,22 @@ Overview.parameters = {
     }
 };
 
+/** The compact toolbar and the full toolbar, side by side. */
+export const ToolbarPresets = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%' }}>
+        <RichTextEditor label="Compact toolbar" toolbarPreset="compact" placeholder="Type something..." minHeight={120} />
+        <RichTextEditor label="Full toolbar" toolbarPreset="full" placeholder="Type something..." minHeight={120} />
+    </div>
+);
+
+/** Read-only and disabled both turn editing off. Read-only keeps the text legible. */
+export const States = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, width: '100%' }}>
+        <RichTextEditor label="Read-only" readOnly defaultValue="<p>Reviewed the fractions worksheet together.</p>" minHeight={120} />
+        <RichTextEditor label="Disabled" disabled defaultValue="<p>Reviewed the fractions worksheet together.</p>" minHeight={120} />
+    </div>
+);
+
 export const Interactive = (args) => {
     const [content, setContent] = useState(args.initialContent);
 

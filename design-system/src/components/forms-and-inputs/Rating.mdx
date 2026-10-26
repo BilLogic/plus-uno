@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RatingStories from './Rating.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Rating, NumberInput } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -32,12 +33,14 @@ export const figmaMeta = {
 
 <Title />
 
+A one-to-five rating drawn as five icons, for a quick judgment such as how a session went. Once a value is chosen, a follow-up prompt can appear under it.
+
 <DocsTabs of={RatingStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-59808"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -45,59 +48,116 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
+
+<ol>
+    <li><strong>Icons</strong>: five icons, filled up to the value.</li>
+    <li><strong>Caption</strong>: under the row, or above each icon in the numeric variant.</li>
+    <li><strong>Follow-up prompt</strong>: the comments label, shown once a value is chosen.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>names the question</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>value</code></td><td>number</td><td>0 to 5. 0 is no rating yet.</td><td><code>0</code></td><td>value: 0 | 1 | 2 | 3 | 4 | 5</td></tr>
+        <tr><td><code>variant</code></td><td>enum</td><td><code>comments</code> | <code>numeric</code></td><td><code>comments</code></td><td>show caption? on the icons</td></tr>
+        <tr><td><code>commentsLabel</code>, <code>showCommentsLabel</code></td><td>node, boolean</td><td>the follow-up caption</td><td><code>"Comments"</code>, <code>true</code></td><td>rating label</td></tr>
+        <tr><td><code>icon</code></td><td>enum</td><td><code>star</code> | <code>thumbs-up</code></td><td><code>star</code></td><td>drawn as thumbs-up</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>disabled?: false | true</td></tr>
+    </tbody>
+</DocsTable>
+
+Figma draws one state per value and one caption under each icon. In code, <code>comments</code> puts a single caption under the row, and <code>numeric</code> puts 1 to 5 above the icons.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>Each icon's circular target.</td></tr>
+        <tr><td><code>--icon-md</code></td><td>16</td><td>The icon inside the target.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell attachSourceBelow description={<>Comments-style rating with label and required indicator.</>}>
     <Canvas of={RatingStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
 <DocsCanvasShell description={<>Baseline rating field with supporting copy.</>}>
     <DsCanvasQuiet of={RatingStories.Content} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Behavior
+### Variants
 
 <DocsCanvasShell description={<>Comments and numeric rating patterns.</>}>
     <DsCanvasQuiet of={RatingStories.Variants} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled comments and numeric ratings.</>}>
+<DocsCanvasShell description={<>Disabled comments and numeric ratings. Focus comes from the browser.</>}>
     <DsCanvasQuiet of={RatingStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={RatingStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={RatingStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Rating label="How did the session go?" value={4} onChange={() => {}} />,
+            doCaption: 'Use Rating for a quick judgment such as how a session went.',
+            dontExample: <NumberInput label="How did the session go? (1 to 5)" defaultValue={4} min={1} max={5} />,
+            dontCaption: 'Do not ask for a 1 to 5 score in a number field.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Rating is always controlled.** It holds no state, so pass <code>value</code> and an <code>onChange</code> that receives the number, not an event. Without a handler the icons are clickable and nothing changes.
+- **It is not a form field.** There is no input behind it, so nothing is submitted and <code>name</code> is not used. Carry the value yourself, for example in a hidden input.
+- **The label is a span**, because no form control exists for a label element to point at. The row is named by <code>aria-labelledby</code>, and <code>id</code> lands on the row.
 
 </div>
 
@@ -113,53 +173,13 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Rating` for a single satisfaction score out of five — the end of a session,
-a piece of feedback, a quick judgment the user makes in one gesture. Five items
-is the whole scale; there is no other length.
+Use Rating for a single score out of five: the end of a session, a piece of feedback, a quick judgment made in one gesture. Five icons read at a glance, and five is the whole scale.
 
-`variant` chooses what the row says about itself: `comments` puts one caption
-under the row, `numeric` puts 1–5 above each item. `icon` is `star` or
-`thumbs-up`.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### It is always controlled.
-
-```jsx
-// Incorrect — the component holds no state. Without an onChange the items are
-// clickable and nothing ever changes.
-<Rating label="How was the session?" />
-
-// Correct — onChange receives the number, not an event.
-<Rating label="How was the session?" value={score} onChange={setScore} />
-```
-
-### It is not a form field.
-
-```jsx
-// Incorrect — `name` is accepted and never used. There is no input, so nothing
-// is submitted and nothing is restored on a back navigation.
-<form action="/feedback" method="post">
-    <Rating name="score" value={score} onChange={setScore} />
-</form>
-
-// Correct — carry the value yourself.
-<form onSubmit={submit}>
-    <Rating label="Rating" value={score} onChange={setScore} />
-    <input type="hidden" name="score" value={score} />
-</form>
-```
-
-### Give it a `label`.
-
-The row is a `radiogroup` either way, but the label is what names it. Without
-one it falls back to the generic name "Rating", which says nothing when a page
-carries two of them. `commentsLabel` is a caption under the row, not a
-substitute.
+- **Use it for a quick judgment, not a precise score.** If the exact number matters, ask for it with [Number input](?path=/docs/components-forms-and-inputs-number-input--docs).
+- **Caption the ends when the scale is not obvious.** Name what one and five mean, such as "Poor" and "Great".
+- **Ask the follow-up only after a rating.** The follow-up prompt appears once a value is chosen. Keep it to one short prompt, such as "What could be better?".
+- **For a labeled scale of options**, use [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) laid out inline.
+- **For a position on a span**, use [Range](?path=/docs/components-forms-and-inputs-range--docs).
 
 </div>
 
@@ -167,26 +187,12 @@ substitute.
 
 ## Accessibility
 
-- **It is one value out of five, and says so.** The row is a `radiogroup` and
-  each item is a `radio` carrying `aria-checked` and an `aria-label` of "Rate 1"
-  … "Rate 5". The chosen value is in the accessibility tree, not only in
-  the fill color.
-- **One tab stop, arrow keys within it.** Tab reaches the group once — landing
-  on the checked item, or the first when nothing is checked — and Left/Right,
-  Up/Down, Home and End move the value. Enter and Space still activate an item
-  directly.
-- **Moving the selection is changing it.** There is no "focused but not chosen"
-  state: an arrow key calls `onChange`. That is the usual radio-group behavior
-  and it means a keyboard user cannot browse the scale without setting it.
-- **Disabled stays announced.** The items keep their role, label and
-  `aria-checked` and take `aria-disabled` — an unavailable rating rather than an
-  invisible one — and drop out of the tab order.
-- **The label is a `span`, deliberately.** There is no form control for a
-  `label` element to point at, so the label is a `span` with an id and the row
-  is named by `aria-labelledby`. That is why the `id` lands on the row rather
-  than on a field.
-- **`required` marks the label only.** The asterisk is decorative; nothing
-  carries `aria-required` and nothing blocks a submit.
+- **It is one value out of five, and says so.** The row is a radio group and each icon is a radio named "Rate 1" through "Rate 5". The chosen value is in the accessibility tree, not only in the fill color.
+- **Give it a label.** The label names the row. Without one the row falls back to the generic name "Rating", which says nothing when a page carries two of them. The comments caption is not a substitute.
+- **One tab stop, arrow keys within it.** Tab reaches the group once, landing on the chosen icon or the first when none is chosen. Arrow keys, Home and End move the value.
+- **Moving the selection changes it.** There is no "focused but not chosen" state, so a keyboard user cannot browse the scale without setting it.
+- **Disabled stays announced.** The icons keep their role and value, are announced as unavailable, and drop out of the tab order.
+- **Required marks the label only.** The asterisk is decoration, and nothing blocks a submit.
 
 </div>
 
@@ -194,10 +200,10 @@ substitute.
 
 ## Related
 
-- For a value on a longer scale, use `Range`.
-- For a choice among labeled options rather than a score, use `ChoiceGroup`
-  or `Radio`.
-- For the comment that usually accompanies a rating, use `Textarea`.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for an exact number.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for a labeled scale of options, laid out inline.
+- [Range](?path=/docs/components-forms-and-inputs-range--docs) for a position on a span.
+- [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for the comment that usually accompanies a rating.
 
 </div>
 

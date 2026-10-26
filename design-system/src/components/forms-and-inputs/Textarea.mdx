@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TextareaStories from './Textarea.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Textarea, Input } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -49,14 +50,15 @@ export const figmaMeta = {
 <Meta of={TextareaStories} />
 
 <Title />
-Use a textarea for free text over several lines.
+
+A multi-line text field for answers longer than a line, such as session notes. The field draws the border, focus ring and validation color, and the text area adds the resize grip.
 
 <DocsTabs of={TextareaStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-63273"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -64,79 +66,131 @@ Use a textarea for free text over several lines.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>A labeled textarea with a placeholder, on the same field as Input.</>}>
+<ol>
+    <li><strong>Field</strong>: the box with its border and focus ring, with the value aligned to the top.</li>
+    <li><strong>Value or placeholder</strong>: the text inside the field.</li>
+    <li><strong>Resize grip</strong>: pinned bottom-right.</li>
+</ol>
+
+The label sits above the field, and the caption, with an optional count on its right, sits below.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code>, <code>showLabel</code></td><td>node, boolean</td><td>the name of the field</td><td>none, <code>true</code></td><td>drawn by Label above the field</td></tr>
+        <tr><td><code>caption</code></td><td>node</td><td>standing help under the field</td><td>none</td><td>drawn below the field</td></tr>
+        <tr><td><code>placeholder</code>, <code>value</code></td><td>string</td><td>any text</td><td>none</td><td>input: placeholder | value</td></tr>
+        <tr><td><code>rows</code></td><td>number</td><td>visible lines of text. One row is the short text area.</td><td><code>3</code></td><td>resize the instance. 34 high is one line in Figma.</td></tr>
+        <tr><td><code>maxLength</code></td><td>number</td><td>the longest answer. Adds a count on the right of the caption.</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, node</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>validation: default | invalid | valid</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: default | focus | read-only | disabled</td></tr>
+        <tr><td><code>subtle</code></td><td>boolean</td><td>plain text until hovered or edited</td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>medium drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+Focus is a browser state. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. The <code>state</code> prop is for still pictures: <code>focus</code> draws focus for documentation, and the other values are older names for validation, read-only and disabled.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The field uses the same tokens as [Text field](?path=/docs/components-forms-and-inputs-text-field--docs).
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--field-min-height-sm</code></td><td>80</td><td>The least height of a multi-line field. One row is as tall as a Text field, 32.</td></tr>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of a one-row text area.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>Default text area with a label and placeholder.</>}>
     <Canvas of={TextareaStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Rows
 
-<div className="sb-ds-doc-section">
-
-## Rows
-
-<DocsCanvasShell description={<><code>rows</code> sets the height. One row is the short textarea, as tall as an Input.</>}>
+<DocsCanvasShell description={<>The number of rows sets the height. One row is the short text area, as tall as a Text field.</>}>
     <DsCanvasQuiet of={TextareaStories.Rows} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<><code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
-    <DsCanvasQuiet of={TextareaStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, focus, filled, valid, invalid, disabled and read-only: the same states as Input.</>}>
+<DocsCanvasShell description={<>Default, focus, filled, valid, invalid, disabled and read-only. Read-only stays legible, and disabled fades the field and the grip once. Hover comes from the browser.</>}>
     <DsCanvasQuiet of={TextareaStories.InteractionStates} />
 </DocsCanvasShell>
 
-</div>
+### Count
 
-<div className="sb-ds-doc-section">
-
-## Count
-
-<DocsCanvasShell description={<>With <code>maxLength</code>, a count on the right of the caption, beside any error.</>}>
+<DocsCanvasShell description={<>With a maximum length, a count sits on the right of the caption, beside any error.</>}>
     <DsCanvasQuiet of={TextareaStories.Count} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Subtle
+### Subtle
 
 <DocsCanvasShell description={<>Plain text until hovered or edited. Save and Cancel show while editing, and the field stays open when focus leaves it.</>}>
     <DsCanvasQuiet of={TextareaStories.Subtle} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={TextareaStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={TextareaStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Textarea label="What did you cover in this session?" rows={3} />,
+            doCaption: 'Use Text area when the answer may run past one line.',
+            dontExample: <Input label="What did you cover in this session?" />,
+            dontCaption: 'Do not use a one-line Text field for notes.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Validation works as on Text field.** The message sits in the caption on the left. With <code>maxLength</code>, a count sits on the right, such as "55 / 120", and neither replaces the other.
+- **subtle keeps the editor open.** A click elsewhere mid-paragraph should not publish half a thought, so a subtle text area saves only through its Save button or Ctrl or Cmd with Enter, and stays open when it loses focus. Cancel or Esc puts the saved text back. A failed save, thrown or rejected from <code>onSave</code>, keeps the field open and invalid.
+- **One row, not a short variant.** Pass <code>rows=1</code> for a single-line text area.
+- **The id is derived** when you do not pass one. Pass <code>id</code> only when something outside the component needs to point at the control.
 
 </div>
 
@@ -152,37 +206,13 @@ Use a textarea for free text over several lines.
 
 ## When to use
 
-Use `Textarea` when the answer is prose the user writes in their own words —
-session notes, a reflection, a reason for canceling. The field is 80 high
-at least, and `rows` (default 3) grows it from there. A one-line answer is an
-`Input`, which is 32.
+Use Text area when the answer may run past one line and is prose the person writes in their own words: session notes, a reflection, feedback, a reason for canceling.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-- **`validation` and `validationMessage` work as they do on Input.** The
-  message sits in the caption, on the left; with `maxLength`, a count sits on
-  the right ("55 / 120"), and neither replaces the other.
-- **`subtle` keeps the editor open.** A click elsewhere mid-paragraph should not
-  publish half a thought, so a subtle textarea saves only through its Save
-  button (or Ctrl/⌘+Enter) and stays open when it loses focus. Cancel or Esc
-  puts the saved text back. A failed save keeps the field open in `invalid`.
-- **`state` is for older call sites and still pictures.** `state="focus"` draws
-  focus for documentation; `error`, `success`, `readonly` and `disabled` are
-  older names for `validation`, `readOnly` and `disabled`.
-
-### One row, not a short variant.
-
-```jsx
-// Incorrect — `variant` is gone; there is one textarea.
-<Textarea id="other" label="Other" variant="short" />
-
-// Correct.
-<Textarea id="other" label="Other" rows={1} />
-```
+- **Size it to the usual answer.** Set the number of rows so a typical answer fits without scrolling. The field is 80 high at least and grows from there.
+- **Label it like any field.** Give it a visible label and, where it helps, a caption with the expected length.
+- **For a name, an email or a short phrase**, use [Text field](?path=/docs/components-forms-and-inputs-text-field--docs).
+- **For formatted text**, use [Rich text editor](?path=/docs/components-forms-and-inputs-rich-text-editor--docs).
+- **For a number**, use [Number input](?path=/docs/components-forms-and-inputs-number-input--docs).
 
 </div>
 
@@ -190,16 +220,9 @@ at least, and `rows` (default 3) grows it from there. A one-line answer is an
 
 ## Accessibility
 
-- **The label is associated whether you pass `id` or not.** One id is derived
-  once and used for both the label's `htmlFor` and the control; when no `id` is
-  given, React's `useId` supplies one. Pass `id` only when something outside the
-  component needs to point at the control, and you will get exactly that id back.
-- **`showLabel={false}` hides the label without removing it**, as on Input.
-- **An error is announced.** With `validation="invalid"`, the control carries
-  `aria-invalid`, points at the message with `aria-describedby`, and the message
-  renders with `role="alert"`. The count is described too.
-- **`required` shows an asterisk and sets `aria-required`.** Explain the
-  asterisk once, in the form's legend.
+- **The label is associated with the field.** Give every Text area a label. Hiding it with <code>showLabel=false</code> clips it out of sight and keeps the name for assistive technology.
+- **An error is announced.** An invalid field is marked invalid, points at its message, and the message is read out when it appears. The count is described too.
+- **Required is marked once.** An asterisk shows beside the label and the field is announced as required. Explain the asterisk once, in the form's legend.
 
 </div>
 
@@ -207,8 +230,10 @@ at least, and `rows` (default 3) grows it from there. A one-line answer is an
 
 ## Related
 
-- For a one-line answer that is not prose, use `Input`.
-- For formatted text, use `RichTextEditor`.
+- [Text field](?path=/docs/components-forms-and-inputs-text-field--docs) for one line of text.
+- [Rich text editor](?path=/docs/components-forms-and-inputs-rich-text-editor--docs) for formatted text.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for a number.
+- [Label & caption](?path=/docs/components-forms-and-inputs-label-caption--docs) for how the label and caption are written.
 
 </div>
 

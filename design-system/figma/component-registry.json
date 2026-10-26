@@ -1186,7 +1186,7 @@
             "notes": "The text in Form's Content slot, by kind (2 variants): placeholder or value. No component of its own in code: Input renders it as the native input's placeholder and value, so like Form it is a part to build on, not a component to place."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18357-554"
       }
     },
     "InputGroup": {
@@ -1266,7 +1266,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52724"
       }
     },
     "ListGroup": {
@@ -1620,7 +1620,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-63990"
       }
     },
     "OptionChip": {
@@ -1809,7 +1809,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-57067"
       }
     },
     "Range": {
@@ -1833,7 +1833,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-56465"
       }
     },
     "Rating": {
@@ -1867,7 +1867,7 @@
             "notes": "Was 13536:196, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Rating page 2026-08-29."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-59808"
       }
     },
     "RichTextEditor": {
@@ -1875,7 +1875,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
         "storybookId": "components-forms-and-inputs-rich-text-editor--docs"
       },
@@ -1891,7 +1891,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-53278"
       }
     },
     "ScrollBar": {
@@ -1967,7 +1967,7 @@
             "notes": "28 variants, mode (single · multi · multi (badges)) × state (closed · open · invalid · read-only · disabled) × filled?. Built on Form (`_Field`): Content holds `_Field Text`, or a TagGroup of removable Tags in multi; Trailing holds `_Field Clear` (18756:36409) and the `_Dropdown icon` caret; open variants float a `_Listbox` of Dropdown list Item rows. Searchable and creatable are list content (a `_Listbox Hint` header, a create row footer), not properties. Docs frame: Docs / Select 18729:33744."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342",
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-33744",
         "deliberate": {
           "displayMode": "Code has a third value, `text`, a comma-separated list with no Figma column; `badges` is kept on both sides until the screens that draw Badge chips move to Tags."
         }
@@ -2295,7 +2295,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-54845"
       }
     },
     "Table": {
@@ -2528,7 +2528,7 @@
             "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-35133"
       }
     },
     "Textarea": {
@@ -2580,7 +2580,7 @@
             "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a text area is 80 high at least and grows from there. `rows` is code-only: Figma sets the height by resizing the instance."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-63273"
       }
     },
     "Tile": {
@@ -2787,7 +2787,7 @@
             "notes": "Part: the caret, state collapsed · expanded · leaf (an empty cell of the same size, `Tree/toggle` 16px), with gap? before a checkbox. In code it is `OptionRow.Toggle`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-44556"
       }
     },
     "UserAvatar": {

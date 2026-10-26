@@ -104,10 +104,6 @@ export const Sizes = () => (
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
             <Switch id="switch-medium" name="switch-medium" label="Label" size="medium" defaultChecked />
         </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-            <Switch id="switch-large" name="switch-large" label="Label" size="large" defaultChecked />
-        </div>
     </div>
 );
 

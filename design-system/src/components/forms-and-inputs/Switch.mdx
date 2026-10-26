@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SwitchStories from './Switch.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Switch, Button } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,14 +22,15 @@ export const figmaMeta = {
 <Meta of={SwitchStories} />
 
 <Title />
-Use switch when a user needs to toggle between two states: on and off, true and false, enabled and disabled, etc.
+
+An on/off control that takes effect the moment it flips, such as turning session reminders on. Reach for it when the change applies at once. For an option saved with a form, use Checkbox.
 
 <DocsTabs of={SwitchStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-54845"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -36,63 +38,130 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Default switch with short label.</>}>
-    <Canvas of={SwitchStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ol>
+    <li><strong>Track and thumb</strong>: the thumb sits on the right when the toggle is on.</li>
+    <li><strong>Label</strong>: names the setting.</li>
+    <li><strong>Required mark</strong>: Figma shows it with required?. The code Switch has no required prop.</li>
+</ol>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>names the setting</td><td>none</td><td>Label</td></tr>
+        <tr><td><code>checked</code>, <code>defaultChecked</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>checked: true | false</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: disabled</td></tr>
+        <tr><td><code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: read-only</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td>medium drawn</td></tr>
+        <tr><td><code>name</code>, <code>value</code></td><td>string</td><td>the form key, and what it submits</td><td>none, <code>"on"</code></td><td>not drawn</td></tr>
+        <tr><td>required?</td><td>none</td><td>not a prop</td><td>not available</td><td>required?: true | false</td></tr>
+    </tbody>
+</DocsTable>
+
+Focus is a browser state, and hover comes from the browser. Every size draws a 24-high row with a 14/20 label and one track geometry. <code>large</code> is deprecated: it draws like <code>medium</code> and warns in development. Toggle has one public axis in Figma, checked, and the part Figma calls Form Switch Button carries the drawn on and off positions.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-sm</code></td><td>24</td><td>The row.</td></tr>
+        <tr><td><code>--plus-switch-track-w</code></td><td>25</td><td>The track's width.</td></tr>
+        <tr><td><code>--plus-switch-track-h</code></td><td>12</td><td>The track's height.</td></tr>
+        <tr><td><code>--plus-switch-thumb</code></td><td>8</td><td>The thumb's diameter.</td></tr>
+        <tr><td><code>--plus-switch-pad</code></td><td>2</td><td>The space between the thumb and the track's edge.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A labeled toggle.</>}>
+    <Canvas of={SwitchStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
 <DocsCanvasShell description={<>Short and long label text.</>}>
     <DsCanvasQuiet of={SwitchStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Sizes
 
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
+<DocsCanvasShell description={<>Small and medium draw one track geometry.</>}>
     <DsCanvasQuiet of={SwitchStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Off, on, and disabled.</>}>
+<DocsCanvasShell description={<>Off, on and disabled. Disabled is faded. Hover comes from the browser.</>}>
     <DsCanvasQuiet of={SwitchStories.InteractionStates} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, announced read-only, and the setting does not change.</>}>
+<DocsCanvasShell description={<>Read-only stays focusable at full contrast and is announced as read-only. The setting does not change.</>}>
     <DsCanvasQuiet of={SwitchStories.ReadOnly} />
 </DocsCanvasShell>
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={SwitchStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={SwitchStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <Switch id="reminders-do" label="Session reminders" defaultChecked />,
+            doCaption: 'Use a toggle for a setting that saves as it flips.',
+            dontExample: (
+                <form onSubmit={(event) => event.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
+                    <Switch id="reminders-dont" label="Session reminders" defaultChecked />
+                    <Button type="submit" text="Save" />
+                </form>
+            ),
+            dontCaption: 'Do not put a toggle in a form that saves on Submit. Use Checkbox.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Never leave the control indeterminate**, and never set the checked state by hand with <code>aria-checked</code>. The native checked property carries the state, and the mixed value is not valid for the switch role.
+- **A switch acts now.** Persist on change, for example from <code>onChange</code> with the new checked value, or use a checkbox.
+- **Controlled means controlled.** Pass <code>checked</code> with an <code>onChange</code> that updates it, or the input never moves. Use <code>defaultChecked</code> to leave the state with the browser.
+- **The id is derived** from <code>id</code>, then <code>name</code>, then a generated one.
+- **inputProps** reaches the input for attributes the component does not name, such as <code>aria-describedby</code> and <code>data-*</code>. The <code>type</code> key is removed before they are spread, and a <code>role</code> you pass wins over the default.
 
 </div>
 
@@ -108,70 +177,14 @@ Use switch when a user needs to toggle between two states: on and off, true and 
 
 ## When to use
 
-Use `Switch` for a setting the user turns on or off, where the change lands
-immediately and there is no Save button between the flick and the effect —
-notification preferences, showing archived sessions, a feature toggle in an
-admin panel.
+Use Toggle for a setting that is turned on or off, where the change lands immediately and no Save button sits between the flick and the effect: notification preferences, showing archived sessions, a feature switch in an admin panel. The code component is called Switch.
 
-It always has an id: `id`, else `name`, else a generated one, so its label is
-always associated. `inputProps` is the escape hatch for DOM attributes the
-component does not name.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Read-only shows a setting the person cannot change.
-
-`readOnly` keeps the switch focusable and at full contrast, sets
-`aria-readonly`, and ignores clicks and Space. Use `disabled` for a setting that
-does not apply right now.
-
-### A switch acts now; a checkbox saves later.
-
-```jsx
-// Incorrect — a switch inside a form that is only applied on submit. The
-// affordance promises an immediate effect the form does not deliver.
-<form onSubmit={save}>
-  <Switch id="digest" label="Weekly digest" checked={digest} onChange={onDigest} />
-  <Button type="submit" text="Save" />
-</form>
-
-// Correct — either persist on change, or use a checkbox.
-<Switch id="digest" label="Weekly digest" checked={digest}
-        onChange={(e) => persist(e.target.checked)} />
-```
-
-### `type` cannot be overridden through `inputProps`.
-
-```jsx
-// Incorrect — `type` is stripped out of inputProps before they are spread,
-// so this quietly does nothing.
-<Switch id="a" label="On" inputProps={{ type: 'checkbox' }} />
-
-// Correct — inputProps is for the attributes the component does not name.
-// `role` is already `switch`; pass it only to override.
-<Switch id="a" label="On" inputProps={{ 'aria-describedby': 'a-hint' }} />
-```
-
-### Controlled means controlled.
-
-```jsx
-// Incorrect — `checked` with no `onChange`. The input never moves, because the
-// component is controlled and nothing updates the value.
-<Switch id="archived" label="Show archived" checked={showArchived} />
-
-// Correct.
-<Switch id="archived" label="Show archived" checked={showArchived}
-        onChange={(e) => setShowArchived(e.target.checked)} />
-```
-
-### A switch always needs a label.
-
-Nothing in the control says what it governs. Without a label the accessible
-name is empty, and a screen reader announces only "switch, on".
+- **A switch acts now. If the change waits for a Save or Submit button**, use [Checkbox](?path=/docs/components-forms-and-inputs-checkbox--docs) instead.
+- **Name the thing that is on.** Label it "Session reminders", not "Turn on session reminders". The track already says whether it is on.
+- **Show settings the viewer cannot change as read-only.** Read-only keeps the value legible. Disabled says the control is unavailable right now and fades it.
+- **For one option from a set**, use [Radio](?path=/docs/components-forms-and-inputs-radio--docs), or [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for the group.
+- **For a value along a span**, use [Range](?path=/docs/components-forms-and-inputs-range--docs).
+- **For accepting terms**, use Checkbox. The decision is submitted, not applied on the spot.
 
 </div>
 
@@ -179,61 +192,11 @@ name is empty, and a screen reader announces only "switch, on".
 
 ## Accessibility
 
-- **It is announced as a switch.** The underlying form check turns
-  `type="switch"` into `type="checkbox"` plus a `form-switch` class, which
-  makes the switch purely visual, so the component adds `role="switch"` to the
-  input itself. Screen readers say "on" / "off" rather than "checked" /
-  "not checked". The element underneath is still a real checkbox, so keyboard
-  behavior, the checked state and `name`/`value` in a form are the browser's,
-  unchanged — and assistive technology that does not know the role falls back
-  to the checkbox it really is.
-
-  **The decision, so it does not get re-litigated.** A checkbox-backed
-  toggle is a legitimate pattern and the role was missing for long enough to
-  look deliberate, so this was decided on evidence rather than reflex.
-
-  *Why the role belongs here.* This component's own "when to use" defines it as
-  state that takes effect immediately with no Save button in between, and sends
-  form values to `Checkbox`. That is ARIA's distinction between a switch and a
-  checkbox, near word for word — the semantics were already decided, only the
-  markup had not caught up. Bootstrap's own documented `.form-switch` markup
-  has carried `role="switch"` since 5.1; react-bootstrap's `Form.Check` never
-  emitted it, with no issue and no stated rationale, so the gap is an
-  oversight upstream rather than a position. The W3C APG's switch pattern
-  ships `<input type="checkbox" role="switch">` verbatim as its official
-  example.
-
-  *Why the usual objection no longer holds.* The standing published advice
-  against the role — Adrian Roselli's — rests entirely on screen-reader
-  support, and the two named holdouts have since been addressed: NVDA reported
-  switches as checkboxes until it fixed that in 2023.1, and iOS VoiceOver's
-  long-standing bug was closed against WebKit 17.4. Everywhere the role is not
-  honored it degrades to a correctly announced checkbox with its state — in
-  the published test matrices there is no case of a native-checkbox switch
-  going unannounced or losing its state.
-
-  *The two conditions it comes with.* Never let the input reach an
-  indeterminate state: `aria-checked="mixed"` is not valid under this role,
-  browsers disagree about what to do with it, and neither axe nor the HTML
-  validator flags it — nothing in this repo's gates would catch it. And never
-  set `aria-checked` by hand; the native `checked` property carries the state,
-  which is why the APG example sets no ARIA state at all.
-
-  *If a call site really is collecting a form value*, the fix is `Checkbox`,
-  not a switch with its role turned off — but `inputProps={{ role: 'checkbox' }}`
-  still wins, because the role is set before the spread.
-- **The label is always associated.** `id`, then `name`, then a generated id, so
-  there is no way to end up with an orphaned label — the trap that `Input` and
-  `Textarea` have.
-- **`label` is required in practice.** Nothing else names the control, so
-  omitting it leaves a toggle with no accessible name.
-- **`inputProps` reaches the input.** Everything except `type` is spread onto
-  the underlying form check and lands on the input element, so
-  `aria-describedby`, `aria-labelledby` and `data-*` all work.
-- **The track is small at every size.** The default track is 25×12px, and
-  `size="large"` takes it to 36×20px — both well under the 44×44 minimum in
-  `design-system/guidelines/foundations/accessibility.md`. The associated label
-  is part of the hit area, which is the practical reason never to drop it.
+- **A toggle needs a label.** Nothing else says what it governs. Without a label the control has no name, and a screen reader announces only "switch, on".
+- **It is announced as a switch.** Screen readers say "on" and "off" rather than "checked" and "not checked". Underneath it is a real checkbox, so keyboard behavior, the checked state and the value in a form are the browser's. Assistive technology that does not know the switch role falls back to the checkbox it is.
+- **The label is part of the hit area.** The default track is 25 by 12, and neither size reaches the 44 by 44 target that the [Accessibility](?path=/docs/foundations-accessibility--docs) page asks for. The label's click area is the practical reason never to drop it.
+- **Read-only is announced.** A read-only toggle stays focusable at full contrast, is announced as read-only, and ignores clicks and Space. Use disabled for a setting that does not apply right now.
+- **The label is always associated** with the control, so a label never ends up orphaned.
 
 </div>
 
@@ -241,9 +204,9 @@ name is empty, and a screen reader announces only "switch, on".
 
 ## Related
 
-- For a value saved with the rest of a form, use `Checkbox`.
-- For accepting terms, use `Checkbox` — the decision is submitted, not applied on the spot.
-- For one of two named options, use `ChoiceGroup`.
+- [Checkbox](?path=/docs/components-forms-and-inputs-checkbox--docs) for options saved with a form.
+- [Radio](?path=/docs/components-forms-and-inputs-radio--docs) and [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for one option from a set.
+- [Range](?path=/docs/components-forms-and-inputs-range--docs) for a value along a span.
 
 </div>
 

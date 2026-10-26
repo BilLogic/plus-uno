@@ -46,7 +46,7 @@ export default {
         size: {
             control: 'select',
             options: ['small', 'medium', 'large'],
-            description: 'Size variant',
+            description: 'Small or medium (default). Large is deprecated and draws like medium.',
             table: { category: 'Design' },
         },
         disabled: {
@@ -195,10 +195,6 @@ export const Sizes = () => (
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
             <Radio id="radio-medium" name="radio-size-m" label="Option" size="medium" defaultChecked />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-            <Radio id="radio-large" name="radio-size-l" label="Option" size="large" defaultChecked />
         </div>
     </div>
 );
