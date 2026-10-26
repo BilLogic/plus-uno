@@ -10,6 +10,10 @@ import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
  * Universal card component for creating self-contained containers that display related information.
  * Uses React Bootstrap Card as base.
  *
+ * A card sits on the raised pair, the raised surface with its shadow, and no
+ * border; `showBorder` swaps in a flat 1px outline. A clickable card lifts to
+ * the overlay shadow on hover and settles back while pressed.
+ *
  * The title is a container title in the card title type, the same at every
  * level and shared with PatternCard (`styles/_card-title.scss`), over a
  * Body/default 14 description. Its tag is one heading level below the section
@@ -30,7 +34,8 @@ const Card = ({
     gapSize = 'md',
     radiusSize = 'sm',
     borderSize = 'sm',
-    showBorder = true,
+    showBorder = false,
+    text = 'wrap',
     dragging = false,
     className = '',
     style,
@@ -39,15 +44,16 @@ const Card = ({
     ...props
 }) => {
     // Construct custom classes for PLUS styling system (padding, gaps, borders)
-    // We append these to the RB Card. A card rests flat; a clickable card lifts
-    // on hover, and any card lifts while it is dragged.
+    // We append these to the RB Card. A card rests on the raised pair; a clickable
+    // card lifts on hover, and any card lifts while it is dragged.
     const customClasses = [
         'plus-card',
         paddingSize ? `plus-card-pad-${paddingSize}` : '',
         gapSize ? `plus-card-gap-${gapSize}` : '',
         radiusSize ? `plus-card-radius-${radiusSize}` : '',
+        showBorder ? 'plus-card--bordered' : 'border-0', // RB class to remove border
         showBorder && borderSize ? `plus-card-border-${borderSize}` : '',
-        !showBorder ? 'border-0' : '', // RB class to remove border
+        text === 'truncate' ? 'plus-card--truncate' : '',
         onClick ? 'plus-card--clickable' : '',
         dragging ? 'plus-card--dragging' : '',
         className
@@ -195,8 +201,11 @@ Card.propTypes = {
     gapSize: PropTypes.oneOf(['sm', 'md', 'lg']),
     radiusSize: PropTypes.oneOf(['sm', 'md']),
     borderSize: PropTypes.oneOf(['sm', 'md', 'lg']),
+    /** The bordered option: flat on a 1px outline instead of the raised shadow. */
     showBorder: PropTypes.bool,
-    /** The card is being dragged: it lifts to the raised shadow (Light/2) */
+    /** `truncate` clamps the title to one line and the subtitle and body to three; `wrap` (the default) shows all the text. Mirrors the Figma `text` property. */
+    text: PropTypes.oneOf(['wrap', 'truncate']),
+    /** The card is being dragged: it lifts to the overlay shadow */
     dragging: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,

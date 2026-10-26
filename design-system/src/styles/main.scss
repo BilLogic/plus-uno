@@ -64,19 +64,70 @@
     --plus-card-pad-y: 0px;
     margin: 0;
     overflow: hidden; // clip image to card border-radius
-    // Flat at rest (elevation.md): the page's own fill on a 1px outline-variant
-    // border, and no shadow. The raised shadow is for a clickable card while it
-    // is hovered or dragged.
-    background-color: var(--surface-raised);
-    border-color: var(--color-outline-variant);
-    box-shadow: none;
-    transition: box-shadow 0.15s ease;
+    // The raised pair (elevation.md): the raised surface with its shadow, whose
+    // 1px ring is the card's edge, so there is no border. A clickable card
+    // lifts to the overlay shadow while hovered and settles back while pressed.
+    --plus-card-surface: var(--ds-surface-raised);
+    background-color: var(--plus-card-surface);
+    border-color: transparent;
+    box-shadow: var(--ds-shadow-raised);
+    transition: box-shadow 0.15s ease, background-color 0.15s ease;
 }
 
-// The lift, Light/2 through the raised role's shadow.
-.plus-card--clickable:hover,
-.plus-card--dragging {
+.plus-card--clickable:hover {
+    --plus-card-surface: var(--ds-surface-raised-hovered);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+.plus-card--clickable:active {
+    --plus-card-surface: var(--ds-surface-raised-pressed);
+    box-shadow: var(--ds-shadow-raised);
+}
+
+// A dragged card is over the UI: the overlay shadow.
+.plus-card--dragging,
+.plus-card--dragging:hover,
+.plus-card--dragging:active {
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+// The bordered option (`showBorder`): flat on a 1px outline, no shadow at rest.
+// A clickable card still lifts on hover, and any card lifts while dragged.
+.plus-card--bordered {
+    border-color: var(--color-outline-variant);
+    box-shadow: none;
+}
+
+.plus-card--bordered.plus-card--clickable:hover,
+.plus-card--bordered.plus-card--clickable:active,
+.plus-card--bordered.plus-card--dragging {
+    --plus-card-surface: var(--ds-surface-raised);
+}
+
+.plus-card--bordered.plus-card--clickable:hover,
+.plus-card--bordered.plus-card--dragging {
     box-shadow: var(--surface-raised-shadow);
+}
+
+.plus-card--bordered.plus-card--clickable:active {
+    box-shadow: none;
+}
+
+// `text="truncate"`: the title keeps one line and the subtitle and body keep
+// three, each ending in an ellipsis. Wrap, the default, shows all the text.
+.plus-card--truncate .plus-card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-card--truncate .plus-card-subtitle,
+.plus-card--truncate .plus-card-body {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
 }
 
 .plus-card .plus-card-content {

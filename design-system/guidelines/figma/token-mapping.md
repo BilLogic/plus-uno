@@ -34,7 +34,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
 | Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
 | Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
-| Surface roles/surface-raised | `var(--color-surface-raised)` | A card: flat at rest; a clickable card pairs it with `--surface-raised-shadow` on hover or drag |
+| Surface roles/surface-raised | `var(--color-surface-raised)` | A card, paired with `--ds-shadow-raised`; a clickable card lifts to `--ds-shadow-overlay` on hover or drag |
 | Surface roles/surface-overlay | `var(--color-surface-overlay)` | Legacy floating layers not yet on the new tokens (pair with `--surface-overlay-shadow`). Modals, menus, popovers, tooltips and toasts take `elevation.surface.overlay` + `elevation.shadow.overlay` (`--ds-surface-overlay`, `--ds-shadow-overlay`) |
 
 ### SMART Competency Colors

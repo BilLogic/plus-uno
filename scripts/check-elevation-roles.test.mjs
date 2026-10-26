@@ -155,13 +155,19 @@ const SURFACES = [
 ];
 
 /**
- * A CARD AT REST IS FLAT: a 1px outline-variant border and no shadow. The lift
- * belongs to a clickable card while it is hovered or dragged, so a page of
- * cards reads as one plane until the pointer picks one up.
+ * THE CARD COMPONENT IS ON THE RAISED PAIR TOO: the raised surface under the
+ * raised shadow, no border, lifting to the overlay shadow while a clickable
+ * card is hovered and settling while pressed. `showBorder` is the one flat
+ * option: a 1px outline-variant border and no shadow at rest.
  */
-const FLAT_CARDS = [
-  { file: 'design-system/src/styles/main.scss', selector: '.plus-card', fill: '--surface-raised' },
-];
+const RAISED_CARD = {
+  file: 'design-system/src/styles/main.scss',
+  states: [
+    ['.plus-card', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-card--clickable:hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
+    ['.plus-card--clickable:active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+  ],
+};
 
 /**
  * THE CARD PATTERN IS ON ATLASSIAN'S RAISED PAIR (color proposal, decision
@@ -251,28 +257,27 @@ function compiledDecls(file, selector) {
   return merged;
 }
 
-for (const card of FLAT_CARDS) {
-  test(`${path.basename(card.file)} draws a resting card flat, on its outline`, () => {
-    const rest = compiledDecls(card.file, card.selector);
-    assert.equal(rest['box-shadow'], 'none', `${card.file}: a resting card carries no shadow`);
-    assert.equal(rest['background-color'], `var(${card.fill})`);
-    assert.match(rest['border-color'] ?? rest.border ?? '', /var\(--color-outline-variant\)/, `${card.file}: the resting card's outline role`);
-  });
-
-  test(`${path.basename(card.file)} lifts only a clickable card on hover, or any card while dragged`, () => {
-    for (const lifted of [`${card.selector}--clickable:hover`, `${card.selector}--dragging`]) {
-      assert.equal(compiledDecls(card.file, lifted)['box-shadow'], 'var(--surface-raised-shadow)', `${card.file}: "${lifted}" does not lift`);
+test('main.scss paints a card on the raised pair, lifts it on hover or drag, and keeps a flat bordered option', () => {
+  const { file, states } = RAISED_CARD;
+  assert.equal(compiledDecls(file, '.plus-card')['background-color'], 'var(--plus-card-surface)', `${file}: the card paints its current surface`);
+  for (const [selector, surface, shadow] of states) {
+    const decls = compiledDecls(file, selector);
+    assert.equal(decls['--plus-card-surface'] ?? 'var(--ds-surface-raised)', `var(${surface})`, `${file}: "${selector}" surface`);
+    assert.equal(decls['box-shadow'], `var(${shadow})`, `${file}: "${selector}" shadow`);
+  }
+  assert.equal(compiledDecls(file, '.plus-card--dragging')['box-shadow'], 'var(--ds-shadow-overlay)', `${file}: a dragged card is on the overlay shadow`);
+  const bordered = compiledDecls(file, '.plus-card--bordered');
+  assert.equal(bordered['box-shadow'], 'none', `${file}: the bordered card rests flat`);
+  assert.match(bordered['border-color'] ?? '', /var\(--color-outline-variant\)/, `${file}: the bordered card's outline role`);
+  compiledRules(file).walkRules((rule) => {
+    for (const selector of rule.selectors) {
+      assert.ok(
+        !(selector.trim() === '.plus-card:hover' && rule.nodes.some((n) => n.prop === 'box-shadow')),
+        `${file}: "${selector}" lifts every card on hover, not only a clickable one`,
+      );
     }
-    compiledRules(card.file).walkRules((rule) => {
-      for (const selector of rule.selectors) {
-        assert.ok(
-          !(selector.includes(`${card.selector}:hover`) && rule.nodes.some((n) => n.prop === 'box-shadow' && n.value !== 'none')),
-          `${card.file}: "${selector}" lifts every card on hover, not only a clickable one`,
-        );
-      }
-    });
   });
-}
+});
 
 test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed and dragged', () => {
   const { file, states } = PATTERN_CARD;

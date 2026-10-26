@@ -119,6 +119,15 @@ regions in order: `image`, `header`, then a body of `title` / `subtitle` /
 `body` / `children`, an optional `items` list, and a footer built from `footer`,
 `links` and `actionButton`.
 
+A card rests on the raised pair: the raised surface with the raised shadow, and
+no border. A clickable card lifts to the overlay shadow while hovered or
+dragged, and settles back while pressed. `showBorder` swaps in the bordered
+option, a flat 1px outline with no shadow at rest.
+
+`text="truncate"` clamps the title to one line and the subtitle and body to
+three. The default, `wrap`, shows all the text. It mirrors the Figma `text`
+property.
+
 Padding, gap, radius and border are token-backed size props (`paddingSize`,
 `gapSize`, `radiusSize`, `borderSize`), so a card should never need custom CSS
 for spacing.

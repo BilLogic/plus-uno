@@ -172,7 +172,13 @@ export default {
         },
         showBorder: {
             control: 'boolean',
-            description: 'Show card border',
+            description: 'Bordered option: flat on a 1px outline instead of the raised shadow',
+            table: { category: 'Design' },
+        },
+        text: {
+            control: 'inline-radio',
+            options: ['wrap', 'truncate'],
+            description: 'truncate clamps the title to one line and the subtitle and body to three',
             table: { category: 'Design' },
         },
         id: {
@@ -246,7 +252,8 @@ export const Interactive = {
         gapSize: 'md',
         radiusSize: 'sm',
         borderSize: 'sm',
-        showBorder: true,
+        showBorder: false,
+        text: 'wrap',
     },
     render: (args) => {
         const contentPreset = args.contentPreset || 'basic';
@@ -261,6 +268,7 @@ export const Interactive = {
                 radiusSize={args.radiusSize}
                 borderSize={args.borderSize}
                 showBorder={args.showBorder}
+                text={args.text}
                 image={['media', 'full'].includes(contentPreset) ? imageCap : undefined}
                 header={contentPreset === 'full' ? 'Header' : undefined}
                 footer={contentPreset === 'full' ? 'Footer' : undefined}
@@ -283,8 +291,10 @@ export const Interactive = {
 };
 
 /**
- * A card rests flat on its 1px outline. Only a clickable card lifts, to the
- * raised shadow (Light/2), while it is hovered or dragged.
+ * A card rests on the raised pair, the raised surface with its shadow and no
+ * border. A clickable card lifts to the overlay shadow while hovered, settles
+ * back to the raised shadow while pressed, and a dragged card sits at overlay.
+ * The bordered option stays flat on its outline.
  */
 export const Elevation = {
     parameters: { docs: { disable: true } },
@@ -293,21 +303,54 @@ export const Elevation = {
             <Card title="Static" body="Sits on the page." />
             <Card title="Clickable" body="Opens a session." onClick={() => {}} />
             <Card title="Dragging" body="Being moved." dragging />
+            <Card title="Bordered" body="Flat on its outline." showBorder />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const card = (name) => within(canvasElement).getByText(name).closest('.plus-card');
-        const shadow = (el) => {
+        const still = (el) => {
             el.style.transition = 'none';
-            return getComputedStyle(el).boxShadow;
+            return el;
         };
-        const raised = computedShadow(canvasElement, 'var(--surface-raised-shadow)');
+        const shadow = (el) => getComputedStyle(still(el)).boxShadow;
+        const fill = (el) => getComputedStyle(still(el)).backgroundColor;
+        const raised = computedShadow(canvasElement, 'var(--ds-shadow-raised)');
+        const overlay = computedShadow(canvasElement, 'var(--ds-shadow-overlay)');
 
-        await expect(shadow(card('Static')), 'a static card rests flat').toBe('none');
-        await expect(shadow(card('Clickable')), 'a clickable card rests flat').toBe('none');
-        await expect(withForcedPseudo(card('Static'), ':hover', () => shadow(card('Static'))), 'hovering a static card').toBe('none');
-        await expect(withForcedPseudo(card('Clickable'), ':hover', () => shadow(card('Clickable'))), 'hovering a clickable card').toBe(raised);
-        await expect(shadow(card('Dragging')), 'a dragged card').toBe(raised);
-        await expect(getComputedStyle(card('Static')).borderTopColor, 'the outline role').toBe(tokenColor(canvasElement, '--color-outline-variant'));
+        await expect(shadow(card('Static')), 'a static card rests on the raised shadow').toBe(raised);
+        await expect(fill(card('Static')), 'the raised surface').toBe(tokenColor(canvasElement, '--ds-surface-raised'));
+        await expect(getComputedStyle(card('Static')).borderTopWidth, 'a raised card has no border').toBe('0px');
+        await expect(shadow(card('Clickable')), 'a clickable card rests on the raised shadow').toBe(raised);
+        await expect(withForcedPseudo(card('Static'), ':hover', () => shadow(card('Static'))), 'hovering a static card').toBe(raised);
+        await expect(withForcedPseudo(card('Clickable'), ':hover', () => shadow(card('Clickable'))), 'hovering a clickable card lifts').toBe(overlay);
+        await expect(withForcedPseudo(card('Clickable'), ':active', () => shadow(card('Clickable'))), 'pressing settles back').toBe(raised);
+        await expect(withForcedPseudo(card('Clickable'), ':active', () => fill(card('Clickable'))), 'the pressed surface').toBe(tokenColor(canvasElement, '--ds-surface-raised-pressed'));
+        await expect(shadow(card('Dragging')), 'a dragged card').toBe(overlay);
+        await expect(shadow(card('Bordered')), 'the bordered option is flat').toBe('none');
+        await expect(getComputedStyle(card('Bordered')).borderTopColor, 'the outline role').toBe(tokenColor(canvasElement, '--color-outline-variant'));
+    },
+};
+
+const longTitle = 'A card title that runs on well past the width of the card it sits in';
+const longBody = 'Some quick example text that keeps going so the clamp has something to cut. It carries on across several lines of the card body, past the third, so the wrapped card shows all of it and the truncated card ends in an ellipsis.';
+
+/** `text="truncate"` clamps the title to one line and the body to three; `wrap`, the default, shows everything. */
+export const TextClamp = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+            <div style={{ width: '280px' }}><Card title={longTitle} subtitle={longBody} body={longBody} /></div>
+            <div style={{ width: '280px' }}><Card title={longTitle} subtitle={longBody} body={longBody} text="truncate" /></div>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const [wrapped, clamped] = within(canvasElement).getAllByRole('heading').map((h) => h.closest('.plus-card'));
+        const part = (card, cls) => card.querySelector(cls);
+        await expect(wrapped.classList.contains('plus-card--truncate'), 'wrap is the default').toBe(false);
+        await expect(getComputedStyle(part(wrapped, '.plus-card-title')).whiteSpace, 'wrapped title').not.toBe('nowrap');
+        await expect(getComputedStyle(part(clamped, '.plus-card-title')).whiteSpace, 'clamped title keeps one line').toBe('nowrap');
+        await expect(getComputedStyle(part(clamped, '.plus-card-title')).textOverflow).toBe('ellipsis');
+        await expect(part(clamped, '.plus-card-body').scrollHeight, 'the clamped body is cut').toBeGreaterThan(part(clamped, '.plus-card-body').clientHeight);
+        await expect(part(wrapped, '.plus-card-body').scrollHeight, 'the wrapped body is whole').toBeLessThanOrEqual(part(wrapped, '.plus-card-body').clientHeight);
     },
 };

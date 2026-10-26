@@ -3,13 +3,13 @@
 
 # Card
 
-Universal card component for creating self-contained containers that display related information. Uses React Bootstrap Card as base. The title is a container title in the card title type, the same at every level and shared with PatternCard (`styles/_card-title.scss`), over a Body/default 14 description. Its tag is one heading level below the section the card sits in — an h3 in a section, an h2 straight on a page.
+Universal card component for creating self-contained containers that display related information. Uses React Bootstrap Card as base. A card sits on the raised pair, the raised surface with its shadow, and no border; `showBorder` swaps in a flat 1px outline. A clickable card lifts to the overlay shadow on hover and settles back while pressed. The title is a container title in the card title type, the same at every level and shared with PatternCard (`styles/_card-title.scss`), over a Body/default 14 description. Its tag is one heading level below the section the card sits in — an h3 in a section, an h2 straight on a page.
 
 **Import:** `import { Card } from '@/components';`
 
 **Source:** `design-system/src/components/layout-and-structure/Card/Card.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive, Elevation
+**Stories:** `design-system/src/components/layout-and-structure/Card/Card.stories.jsx` — Content, Actions, Layout, Overview, Interactive, Elevation, TextClamp
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Card/Card.mdx`
 
@@ -31,8 +31,9 @@ Universal card component for creating self-contained containers that display rel
 | `gapSize` | enum | `'md'` | Card gap size |
 | `radiusSize` | enum | `'sm'` | Card border radius size |
 | `borderSize` | enum | `'sm'` | Card border size |
-| `showBorder` | bool | `true` | Show card border |
-| `dragging` | bool | `false` | The card is being dragged: it lifts to the raised shadow (Light/2) |
+| `showBorder` | bool | `false` | Bordered option: flat on a 1px outline instead of the raised shadow |
+| `text` | enum | `'wrap'` | truncate clamps the title to one line and the subtitle and body to three |
+| `dragging` | bool | `false` | The card is being dragged: it lifts to the overlay shadow |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onClick` | func | — | — |
@@ -49,6 +50,8 @@ Universal card component for creating self-contained containers that display rel
 **`radiusSize`** — `sm` · `md`
 
 **`borderSize`** — `sm` · `md` · `lg`
+
+**`text`** — `wrap` · `truncate`
 
 Anything not listed is not a valid value.
 
