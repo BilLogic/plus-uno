@@ -1,0 +1,9 @@
+.tr-sparkline { display: block; overflow: visible; }
+.tr-sparkline__line {
+    fill: none;
+    stroke: var(--ds-chart-brand);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.tr-sparkline__last { fill: var(--ds-chart-brand); }

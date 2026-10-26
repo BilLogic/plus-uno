@@ -1,0 +1,11 @@
+.tr-delta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-025);
+    font: var(--heading-xsmall);
+    font-variant-numeric: tabular-nums;
+}
+.tr-delta > i { font-size: var(--space-075); }
+.tr-delta--up { color: var(--ds-text-success); }
+.tr-delta--down { color: var(--ds-text-warning); }
+.tr-delta--flat { color: var(--ds-text-subtle); }

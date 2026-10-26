@@ -1,0 +1,2 @@
+/* The page grid's rows sit 32 apart, as the boards space their blocks. */
+.tr-shell .plus-frame__content { row-gap: var(--space-200); }

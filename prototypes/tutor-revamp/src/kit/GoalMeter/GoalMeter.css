@@ -1,0 +1,49 @@
+.tr-goal-meter__hint { display: flex; width: 100%; }
+
+.tr-goal-meter {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: var(--space-050);
+    border-radius: var(--radius-025);
+    background: var(--ds-background-neutral);
+}
+
+.tr-goal-meter--sm { height: var(--space-0375); }
+
+.tr-goal-meter:focus-visible {
+    outline: 2px solid var(--ds-border-focused);
+    outline-offset: var(--space-025);
+}
+
+.tr-goal-meter__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: inherit;
+    background: var(--ds-chart-brand);
+}
+
+.tr-goal-meter--success .tr-goal-meter__fill { background: var(--ds-chart-success); }
+.tr-goal-meter--warning .tr-goal-meter__fill { background: var(--ds-chart-warning); }
+
+.tr-goal-meter__target {
+    position: absolute;
+    top: calc(-1 * var(--space-025));
+    bottom: calc(-1 * var(--space-025));
+    width: 2px;
+    margin-left: -1px;
+    border-radius: 1px;
+    background: var(--ds-icon-success);
+}
+
+.tr-goal-meter__range {
+    position: absolute;
+    top: calc(-1 * var(--space-025));
+    bottom: calc(-1 * var(--space-025));
+    left: var(--lo);
+    width: calc(var(--hi) - var(--lo));
+    border-radius: var(--radius-025);
+    box-shadow: inset 0 0 0 1.5px var(--ds-icon-success);
+    z-index: 2;
+    pointer-events: none;
+}

@@ -1,0 +1,3 @@
+/* The app fills the viewport; the Frame scrolls its own surface. */
+html, body, #root { height: 100%; }
+body { margin: 0; background: var(--ds-surface-sunken); }
