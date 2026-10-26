@@ -464,7 +464,7 @@ test('RichTextEditor: toolbar buttons hover 08, press 12, select 16; the block m
 
 /* ─── PatternTable rows ──────────────────────────────────────────────────── */
 
-test('PatternTable: row states are layered over the cell fill — neutral subtle hover and press, the selected ladder with a Lagoon bar', () => {
+test('PatternTable: row states are layered over the cell fill — neutral subtle hover and press, the selected ladder with no leading bar', () => {
   const file = 'patterns/PatternTable/PatternTable.scss';
   const table = '.plus-pattern-table-table';
   const row = `${table} tbody tr`;
@@ -478,10 +478,12 @@ test('PatternTable: row states are layered over the cell fill — neutral subtle
   expectRule(file, `${row}[aria-selected=true]`, { [state]: layer('--ds-background-selected') });
   expectRule(file, `${row}[aria-selected=true]:hover`, { [state]: layer('--ds-background-selected-hovered') });
   expectRule(file, `${row}[aria-selected=true]:active`, { [state]: layer('--ds-background-selected-pressed') });
-  expectRule(file, `${row}[aria-selected=true] > :first-child`, {
-    'background-image': `${over('--ds-border-selected')}, ${over(state)}`,
-    'background-size': 'var(--size-element-stroke-lg) 100%, 100% 100%',
-  });
+  // State is the whole row, never a stripe on one edge: no cell of a selected
+  // row draws a layer of its own over the row's state.
+  const css = sheet(file).toString();
+  assert.ok(!css.includes('--ds-border-selected'), `${file}: a selected row draws a leading bar`);
+  const leading = declarations(sheet(file), `${row}[aria-selected=true] > :first-child`) ?? {};
+  assert.ok(!('background-image' in leading) && !('box-shadow' in leading), `${file}: a selected row's leading cell draws an edge`);
   for (const selector of [`${row}:hover`, `${row}:active`, `${row}[aria-selected=true]`]) {
     assert.ok(!('background-color' in declarations(sheet(file), selector)), `${file}: "${selector}" swaps the fill`);
   }

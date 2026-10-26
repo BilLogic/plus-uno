@@ -85,10 +85,10 @@
     }
 
     /*
-     * A selected row is neutral ink, held under hover and press, with a 2px
-     * Lagoon bar at its leading edge so selection never rests on fill alone.
-     * `aria-selected` belongs to a row of a `role="grid"` table, the kind whose
-     * rows can be selected.
+     * A selected row is neutral ink across the whole row, held under hover and
+     * press, never a stripe on one edge. The checkbox a selectable row carries
+     * is the cue that does not rest on color. `aria-selected` belongs to a row
+     * of a `role="grid"` table, the kind whose rows can be selected.
      */
     tbody tr[aria-selected=true] {
         --plus-pattern-table-row-state: var(--ds-background-selected);
@@ -100,15 +100,6 @@
 
     tbody tr[aria-selected=true]:active {
         --plus-pattern-table-row-state: var(--ds-background-selected-pressed);
-    }
-
-    tbody tr[aria-selected=true] > :first-child {
-        background-image:
-            linear-gradient(var(--ds-border-selected), var(--ds-border-selected)),
-            linear-gradient(var(--plus-pattern-table-row-state), var(--plus-pattern-table-row-state));
-        background-position: left top, left top;
-        background-size: var(--size-element-stroke-lg) 100%, 100% 100%;
-        background-repeat: no-repeat;
     }
 }
 

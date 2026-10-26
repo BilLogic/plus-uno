@@ -6,7 +6,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={PatternTableStories} />
 
 <Title />
-The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background. Grid lines are `--ds-border` and the head rule `--ds-border-bold`; there is no zebra. Row states are layered over each cell's fill, never swapped for it: a hovered row takes `--ds-background-neutral-subtle-hovered` and a pressed one `-pressed`. A selected row is neutral ink, `--ds-background-selected` (held under hover and press by its `-hovered` and `-pressed` steps), with a 2px Lagoon bar in `--ds-border-selected` at its leading edge, so selection never rests on fill alone. Mark it with `aria-selected="true"`, which belongs to a row of a `role="grid"` table. Body cells are Body/default, and head cells are Heading/xxsmall, a group label rather than a heading.
+The table pattern is a shell for data presentation: a toolbar slot, the table content slot (you pass your own `thead`/`tbody`), a pagination slot, and an empty-state slot. The table itself is no-fill — the surrounding card or surface owns the background. Grid lines are `--ds-border` and the head rule `--ds-border-bold`; there is no zebra. Row states are layered over each cell's fill, never swapped for it: a hovered row takes `--ds-background-neutral-subtle-hovered` and a pressed one `-pressed`. A selected row is neutral ink across the whole row, `--ds-background-selected` (held under hover and press by its `-hovered` and `-pressed` steps), with no stripe on its leading edge: state takes the whole shape, never one edge. The checkbox a selectable row carries is the cue that does not rest on color. Mark it with `aria-selected="true"`, which belongs to a row of a `role="grid"` table. Body cells are Body/default, and head cells are Heading/xxsmall, a group label rather than a heading.
 
 `stickyHeader` pins the head row and `stickyColumn` the first column. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Sticky cells paint `--ds-utility-elevation-surface-current`, so they match the page, or the card that sets it to its raised fill, and the row state stays layered on top. A sticky edge takes `--ds-shadow-overflow` only while content is scrolled under it. It mirrors the Table slot component in Figma.
 
@@ -41,7 +41,7 @@ The table pattern is a shell for data presentation: a toolbar slot, the table co
 
 ### Row states
 
-<DocsCanvasShell description={<>Hover a row to see its layer; the second row is selected, with the Lagoon bar at its leading edge.</>}>
+<DocsCanvasShell description={<>Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled.</>}>
     <DsCanvasQuiet of={PatternTableStories.RowStates} />
 </DocsCanvasShell>
 

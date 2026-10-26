@@ -164,7 +164,7 @@ proposal does (`background.selected` is `color.background.selected`, so
 | Card, at rest | `elevation.surface.raised` + `elevation.shadow.raised`, no border |
 | Card, clickable | hovered `elevation.surface.raised.hovered` + `elevation.shadow.overlay`; pressed `elevation.surface.raised.pressed` + `elevation.shadow.raised` |
 | Well inside a card | `elevation.surface.container` |
-| Table and Tree | grid lines `color.border`; head rule `color.border.bold`; row hovered `background.neutral.subtle.hovered`; row selected `background.selected` + 2px bar in `border.selected`; sticky cells `utility.elevation.surface.current`; sticky edge `elevation.shadow.overflow` while scrolled |
+| Table and Tree | grid lines `color.border`; head rule `color.border.bold`; row hovered `background.neutral.subtle.hovered`; row selected `background.selected` across the whole row (no leading bar; the checkbox is the non-color cue); sticky cells `utility.elevation.surface.current`; sticky edge `elevation.shadow.overflow` while scrolled |
 | Tile | rest `background.neutral.subtle`; hovered `background.neutral.subtle.hovered`; selected `background.selected` + `border.selected` |
 | Popover: menu, popup, flag | `elevation.surface.overlay` + `elevation.shadow.overlay` |
 | Tooltip | `background.neutral.bold` + `text.inverse` |

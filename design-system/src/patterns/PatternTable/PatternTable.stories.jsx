@@ -6,6 +6,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternTable from '@/patterns/PatternTable';
 import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
+import { Checkbox } from '@/components';
 
 const sampleRows = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -181,15 +182,17 @@ export const Interactive = {
 
 /**
  * Row states, layered over each cell's fill: hovered and pressed rows take the
- * neutral subtle steps, and a selected row the selected ladder with a 2px
- * Lagoon bar at its leading edge. The head rule is the bold border. Held in
- * all four modes.
+ * neutral subtle steps, and a selected row the selected ladder across the
+ * whole row, with no stripe on its leading edge. The row's checkbox is the cue
+ * that does not rest on color. The head rule is the bold border. Held in all
+ * four modes.
  */
 export const RowStates = {
     render: () => (
         <PatternTable>
             <thead>
                 <tr>
+                    <th><span className="visually-hidden">Select</span></th>
                     <th>Name</th>
                     <th>Role</th>
                     <th>Status</th>
@@ -198,6 +201,7 @@ export const RowStates = {
             <tbody>
                 {sampleRows.map((row, i) => (
                     <tr key={row.name} aria-selected={i === 1}>
+                        <td><Checkbox aria-label={`Select ${row.name}`} checked={i === 1} readOnly /></td>
                         <td>{row.name}</td>
                         <td>{row.role}</td>
                         <td>{row.status}</td>
@@ -216,6 +220,7 @@ export const RowStates = {
             const rest = canvas.getByText('Jordan Blake');
             const selected = canvas.getByText('Casey Rivera');
             const selectedRole = selected.nextElementSibling;
+            const selectedLeading = selected.closest('tr').firstElementChild;
             const row = rest.closest('tr');
 
             await expect(getComputedStyle(head).borderBottomColor, `${mode}: the head rule`).toBe(color('--ds-border-bold'));
@@ -230,8 +235,13 @@ export const RowStates = {
                 .toContain(color('--ds-background-neutral-subtle-pressed'));
 
             await expect(layers(selectedRole), `${mode}: a selected row`).toContain(color('--ds-background-selected'));
-            await expect(layers(selected), `${mode}: the selected bar`).toContain(color('--ds-border-selected'));
-            await expect(getComputedStyle(selected).backgroundSize, `${mode}: the bar is 2px`).toMatch(/^2px 100%/);
+            // State is the whole row, never a stripe on its leading edge: the
+            // first cell draws the same single layer as the rest, and the
+            // checkbox carries the cue that does not rest on color.
+            await expect(layers(selectedLeading), `${mode}: no leading bar`).toBe(layers(selectedRole));
+            await expect(layers(selectedLeading), `${mode}: no leading bar`).not.toContain(color('--ds-border-selected'));
+            await expect(getComputedStyle(selectedLeading).boxShadow, `${mode}: no inset bar`).toBe('none');
+            await expect(canvas.getByLabelText('Select Casey Rivera'), `${mode}: the selected row's checkbox`).toBeChecked();
             await expect(withForcedPseudo(selected.closest('tr'), ':hover', () => layers(selectedRole)), `${mode}: a hovered selected row`)
                 .toContain(color('--ds-background-selected-hovered'));
         });
