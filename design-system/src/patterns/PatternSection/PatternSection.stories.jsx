@@ -216,6 +216,50 @@ export const Footer = () => (
     </PatternSection>
 );
 
+/** Every part of a section: header with actions and a tabs row, content, side and footer. */
+export const Anatomy = () => (
+    <PatternSection
+        title="Upcoming sessions"
+        description={description}
+        actions={<Actions />}
+        tabs={<Tabs />}
+        layout="split"
+        side={slotContent('Side · span 4')}
+        footer={<Button text="View all" style="primary" fill="text" size="medium" onClick={() => {}} />}
+    >
+        {slotContent('Content · span 8')}
+    </PatternSection>
+);
+
+/** Level comes from nesting: a page title, a section inside it, a subsection inside that. */
+export const Levels = () => (
+    <PatternSection level="page" title="Page title" description={description}>
+        <PatternSection title="Section title" description={description}>
+            <PatternSection title="Subsection title" description={description}>
+                {slotContent('Content slot')}
+            </PatternSection>
+        </PatternSection>
+    </PatternSection>
+);
+
+/** The toolbar row in both states: search, filters, count and actions; then the bulk bar. */
+export const Toolbar = () => (
+    <div style={col}>
+        <div>
+            <DemoLabel>state=default</DemoLabel>
+            <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />}>
+                {slotContent('Table')}
+            </PatternSection>
+        </div>
+        <div>
+            <DemoLabel>state=selected</DemoLabel>
+            <PatternSection title="Students" description={description} toolbar={<SelectedToolbar />}>
+                {slotContent('Table')}
+            </PatternSection>
+        </div>
+    </div>
+);
+
 export const Loading = () => (
     <div style={col}>
         <div>

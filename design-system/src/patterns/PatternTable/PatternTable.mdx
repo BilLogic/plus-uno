@@ -1,17 +1,20 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PatternTableStories from './PatternTable.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { StaticSummary, SummaryAsDynamic, DynamicRoster, RosterAsStatic, TreeHierarchy, TreeAsExpandable } from './PatternTableCases.jsx';
 
 <Meta of={PatternTableStories} />
 
 <Title />
-The table pattern is a shell for data presentation: the table content slot (you pass your own `thead`/`tbody`), a pagination slot under the rows, and an empty-state slot. It sits in a Section and spans it. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions, so nothing sits between that header and the head row. The `toolbar` slot is deprecated; it still renders, with a one-time warning in development. The table itself is no-fill — the surrounding card or surface owns the background. Grid lines are `--ds-border` and the head rule `--ds-border-bold`; there is no zebra. Row states are layered over each cell's fill, never swapped for it: a hovered row takes `--ds-background-neutral-subtle-hovered` and a pressed one `-pressed`. A selected row is neutral ink across the whole row, `--ds-background-selected` (held under hover and press by its `-hovered` and `-pressed` steps), with no stripe on its leading edge: state takes the whole shape, never one edge. The checkbox a selectable row carries is the cue that does not rest on color. Mark it with `aria-selected="true"`, which belongs to a row of a `role="grid"` table. Body cells are Body/default, and head cells are Heading/xxsmall, a group label rather than a heading.
+The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot.
 
-`stickyHeader` pins the head row and `stickyColumn` the first column. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Sticky cells paint `--ds-utility-elevation-surface-current`, so they match the page, or the card that sets it to its raised fill, and the row state stays layered on top. A sticky edge takes `--ds-shadow-overflow` only while content is scrolled under it. It mirrors the Table slot component in Figma.
+Static table, Dynamic table and Tree table are planned components, and they have no exports in code yet.
+
+The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19620-139700"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternTable"
 />
 
@@ -21,7 +24,7 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The table in a Section: the Section header carries the title and actions, and the pagination slot sits under the rows.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A table in a Section. The Section header carries the title and the actions, and the pagination slot sits under the rows.</>}>
     <Canvas of={PatternTableStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -29,11 +32,101 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 <div className="sb-ds-doc-section">
 
+### Which table?
+
+Pick the type from what people do with the rows. Ask the questions in order, and stop at the first yes.
+
+1. **Does any row nest under another?** Use a Tree table. Nesting wins over everything else, even when the table is interactive.
+2. **Can people act on the table?** Sorting, filtering, selecting, paging, expanding rows and row actions all count. If they can, use a Dynamic table.
+3. **Otherwise,** use a Static table. People only read it.
+
+One kind of table per block: a Static, Dynamic or Tree table, never mixed in one Section.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A Section header with a title, then the head row, the rows and the pager.</>}>
+    <DsCanvasQuiet of={PatternTableStories.Overview} />
+</DocsCanvasShell>
+
+1. **Section header** holds the title and, in the toolbar type, search, filters, the count and actions.
+2. **Head row** names the columns. Its rule is the bold border.
+3. **Rows** are the data. Each draws a thin rule, and there is no zebra striping.
+4. **Pagination** is a slot under the rows, aligned to the end.
+5. **Message row** replaces the rows when the table is empty. It sits under the head row and spans every column.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Composition
 
-<DocsCanvasShell description={<>The table spans its Section, plain, with no card around it and no toolbar of its own. Paging stays under the rows, inside the same Section.</>}>
-    <DsCanvasQuiet of={PatternTableStories.Composition} />
-</DocsCanvasShell>
+- A table sits in a Section and spans it. The default frame is plain: no outer frame, no card around it, and no padding of its own. Its first and last cells sit flush with the section edge.
+- The Section header carries the toolbar and the tabs. Search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type.
+- The table has no toolbar of its own. Nothing sits between the Section header and the head row.
+- Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable.
+- Paging stays under the rows, inside the same Section.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Values</th>
+            <th>Default</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>children</code></td><td>node</td><td>Your own <code>thead</code>, <code>tbody</code> and <code>tfoot</code></td><td>none</td></tr>
+        <tr><td><code>pagination</code></td><td>node</td><td>The pager under the rows. It hides while the empty state shows.</td><td>none</td></tr>
+        <tr><td><code>empty</code></td><td>boolean</td><td>Swaps the rows for the message row. The head row stays.</td><td><code>false</code></td></tr>
+        <tr><td><code>emptyState</code></td><td>node</td><td>The message row's content. It shows only when <code>empty</code> is also true.</td><td>none</td></tr>
+        <tr><td><code>stickyHeader</code></td><td>boolean</td><td>Pins the head row while the rows scroll under it. It needs <code>maxHeight</code>.</td><td><code>false</code></td></tr>
+        <tr><td><code>stickyColumn</code></td><td>boolean</td><td>Pins the first column while the other columns scroll under it</td><td><code>false</code></td></tr>
+        <tr><td><code>maxHeight</code></td><td>number or CSS length</td><td>Bounds the scroll region's height</td><td>none</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Used for</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--ds-border</code></td><td>color</td><td>The rule under each row</td></tr>
+        <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row</td></tr>
+        <tr><td><code>--ds-text</code></td><td>color</td><td>Body cells, in Body/default 14/20</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>color</td><td>Head cells, in Heading/xxsmall, and the message row</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-hovered</code></td><td>color</td><td>A hovered row</td></tr>
+        <tr><td><code>--ds-background-neutral-subtle-pressed</code></td><td>color</td><td>A pressed row</td></tr>
+        <tr><td><code>--ds-background-selected</code></td><td>color</td><td>A selected row. Hover and press take <code>-hovered</code> and <code>-pressed</code>.</td></tr>
+        <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it</td></tr>
+        <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on</td></tr>
+        <tr><td><code>--ds-border-focused</code></td><td>color</td><td>The focus ring of a scroll region</td></tr>
+        <tr><td><code>--table-pad-x-cell</code></td><td>8</td><td>The side pad of the message row</td></tr>
+        <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row</td></tr>
+        <tr><td><code>--section-stack-md</code></td><td>16</td><td>The space above and below the message</td></tr>
+        <tr><td><code>--element-stack-sm</code></td><td>4</td><td>Space between the lines of the message</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -41,7 +134,9 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 ### Row states
 
-<DocsCanvasShell description={<>Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled.</>}>
+Row states are layered over each cell's fill, never swapped for it. A hovered row takes the neutral subtle hovered step and a pressed row the pressed step. A selected row takes the selected color across the whole row, with no stripe on its leading edge. The checkbox a selectable row carries is the cue that does not rest on color.
+
+<DocsCanvasShell description={<>Hover a row to see its layer. The second row is selected, its checkbox checked and the whole row filled.</>}>
     <DsCanvasQuiet of={PatternTableStories.RowStates} />
 </DocsCanvasShell>
 
@@ -51,7 +146,9 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 ### Sticky header and column
 
-<DocsCanvasShell description={<>Inside a card, sticky cells paint the card's raised fill. Scroll the table: the header and the first column take the overflow shadow once content passes under them.</>}>
+<code>stickyHeader</code> pins the head row and <code>stickyColumn</code> the first column. Only a bounded region scrolls vertically, so pair <code>stickyHeader</code> with <code>maxHeight</code>. A sticky edge takes the overflow shadow only once content is scrolled under it.
+
+<DocsCanvasShell description={<>Scroll the table: the header and the first column take the overflow shadow once content passes under them.</>}>
     <DsCanvasQuiet of={PatternTableStories.Sticky} />
 </DocsCanvasShell>
 
@@ -61,7 +158,9 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 ### Empty state
 
-<DocsCanvasShell description={<>With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the Section header stays usable. A message row takes no hover state, and the pager hides with the rows. Say what will appear and offer the first action.</>}>
+With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the columns still say what will appear and the Section header stays usable. The message row takes no hover state, and the pager hides with the rows. The message shows only when <code>emptyState</code> is also set.
+
+<DocsCanvasShell description={<>An empty table: the head row, then an icon, a title, a line of help and the first action.</>}>
     <DsCanvasQuiet of={PatternTableStories.EmptyState} />
 </DocsCanvasShell>
 
@@ -83,15 +182,89 @@ The table pattern is a shell for data presentation: the table content slot (you 
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+Each pair builds one case from its own type, beside the mistake it replaces.
+
+#### Static table: a weekly session summary
+
+People read the days and compare them. Nothing is sorted, selected or paged, and the total sits in the summary row.
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <StaticSummary />,
+            doCaption: 'Show a read-only summary, in a report or a modal, as a Static table. The total goes in the summary row.',
+            dontExample: <SummaryAsDynamic />,
+            dontCaption: "Don't build the summary as a Dynamic table. Checkboxes, sort arrows and a pager promise actions the summary doesn't have.",
+        },
+    ]}
+/>
+
+#### Dynamic table: a student roster
+
+Tutors sort students, select several and act on them together, and 340 rows need paging.
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <DynamicRoster />,
+            doCaption: 'Build a roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the Section header.',
+            dontExample: <RosterAsStatic />,
+            dontCaption: "Don't show a roster people act on as a Static table. With no sort, selection or paging, 340 students become one long scroll.",
+        },
+    ]}
+/>
+
+#### Tree table: school, class, student
+
+Every row belongs to the row above it, so the level has to show, and every level keeps the same columns.
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <TreeHierarchy />,
+            doCaption: 'Nest classes under their school and students under their class in a Tree table. Each level indents and keeps the columns.',
+            dontExample: <TreeAsExpandable />,
+            dontCaption: "Don't fake a hierarchy with expandable rows. Expanded content is detail about one row, so the classes and students in it lose their columns and can't be sorted or selected.",
+        },
+    ]}
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Accessibility
 
-- For one row's worth of data on its own, use `Card`.
-- For a short list with no columns to compare, use `ListGroup`.
-- For moving between pages of rows, use `Pagination` — the table pattern has a slot for it, under the rows.
-- For the region a table sits in, and the header that carries its title, search, filters and actions, use `PatternSection`.
+- Name every column with a head cell. Head cells are labels for a column, so they use Heading/xxsmall rather than a heading level.
+- Mark the sorted column with <code>aria-sort</code>, and give every icon-only control a name, such as "Actions for Ava Thompson".
+- Mark a selected row with <code>aria-selected="true"</code>. That attribute belongs to a row of a table with <code>role="grid"</code>.
+- Selection is never color alone. The row's checkbox is checked, and the toolbar says "2 selected".
+- A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with <code>maxHeight</code> and one with a sticky column.
+- The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+The <code>toolbar</code> slot is deprecated. It still renders above the table, with a one-time warning in development. Put search, filters and actions in the Section header instead: <code>{'<PatternSection toolbar={<PatternSection.Toolbar />}>'}</code>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- <a target="_top" href="./?path=/docs/foundations-patterns-section--docs">Section</a>: the header types, toolbar and tabs, that sit above every table.
+- <a target="_top" href="./?path=/docs/components-text-and-data-display-table--docs">Table component</a>: the table component, with a set of headers and rows.
+- <a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a>: the pager that fills the pagination slot.
+- <a target="_top" href="./?path=/docs/foundations-patterns-card--docs">Card</a>: a table never sits inside a card.
+- Page templates: the dashboard content shows a Students table in a Section at every breakpoint.
 
 </div>
 
