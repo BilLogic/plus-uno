@@ -535,12 +535,12 @@ function replyOf(
   if (refused) return answerOnlyReply(teammate, refused.verb);
   const answer = delivery.answer();
   if (outcome?.disposition === "answered" && answer !== null) {
-    const { lines, cited } = plainAnswer(answer);
+    const { lines, cited, cut } = plainAnswer(answer);
     const read = delivery.sources();
     const source = sourceOf(cited, read, asked, answer);
     // Links only, never the answer: what the next live miss needs to be told apart.
     if (!source) console.log(`[figma-ask] no source: cited=[${cited.join(" ")}] read=[${read.map((s) => s.url).join(" ")}]`);
-    return { kind: "answer", lines, source };
+    return { kind: "answer", lines, source, cut };
   }
   const note = delivery.notes().at(-1);
   if (outcome?.disposition === "asked" && note) return { kind: "question", lines: plainAnswer(note).lines };

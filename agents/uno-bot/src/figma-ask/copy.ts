@@ -4,6 +4,9 @@
 // would arrive as asterisks and angle brackets. It leads with the label, says
 // the answer in at most three lines, and ends with one source line, its name
 // and link — one the answer itself cites, and that a public thread may carry.
+// A list folds into the line that introduces it, so its items are kept rather
+// than spending one line each; an answer still too long for three lines is
+// cut, and the reply says so above the source (#1565).
 // An answer with no such link is not posted as an answer: the reply says it
 // could not find this, and points at #plus-design, so uno-bot never guesses in
 // a file.
@@ -23,6 +26,9 @@ export const MAX_ANSWER_LINES = 3;
 /** Characters in one line of answer, at most. */
 export const MAX_LINE_CHARS = 300;
 
+/** The line above the source when the answer was cut to fit. */
+export const CUT_LINE = "Cut to fit a comment: the source has the rest.";
+
 /** The reply's last line when there is nothing to link. */
 export const CANT_FIND_LINE = "I couldn't find this in a source I can link, so I won't guess. Ask in #plus-design.";
 
@@ -34,7 +40,7 @@ export interface FigmaSource {
 
 /** What a reply says. */
 export type FigmaReply =
-  | { kind: "answer"; lines: string[]; source: FigmaSource | null }
+  | { kind: "answer"; lines: string[]; source: FigmaSource | null; cut?: boolean }
   | { kind: "question"; lines: string[] }
   /** A teammate's change, not made: `would` is what one approval would do, in
    *  the write's fixed gate words (`agent/tool-table.ts`); null when unknown. */
@@ -89,7 +95,9 @@ export function figmaReplyLines(reply: FigmaReply): string[] {
   return ((): string[] => {
     switch (reply.kind) {
       case "answer":
-        return reply.source && reply.lines.length ? [...reply.lines, sourceLine(reply.source)] : [CANT_FIND_LINE];
+        return reply.source && reply.lines.length
+          ? [...reply.lines, ...(reply.cut ? [CUT_LINE] : []), sourceLine(reply.source)]
+          : [CANT_FIND_LINE];
       case "question":
         return [...reply.lines, "Reply here with @uno and the answer, and I'll pick it up."];
       case "answer-only":
@@ -112,15 +120,19 @@ const SLACK_LINK = /<(https?:\/\/[^|>\s]+)(?:\|[^>]*)?>/g;
 const BARE_LINK = /https?:\/\/[^\s<>()]+[^\s<>().,;:!?'"]/g;
 
 /**
- * The turn's answer as plain lines, and the links it cites, in the order it cites them.
+ * The turn's answer as plain lines, the links it cites in the order it cites
+ * them, and whether anything was cut to fit.
  *
- * Link markup becomes its label, emphasis, headings, bullets and fences go,
- * and a line that is only a "Sources:" heading or list is dropped: the reply
- * carries its own source line.
+ * Link markup becomes its label, emphasis, headings and fences go, and a line
+ * that is only a "Sources:" heading or list is dropped: the reply carries its
+ * own source line. A run of list items folds onto the line that introduces it
+ * — `Styles: primary; secondary.` — or into one line of its own, so a list
+ * never spends the reply's lines one item at a time. Past `MAX_ANSWER_LINES`
+ * lines, or past `MAX_LINE_CHARS` in one, the answer is cut, and `cut` says so.
  *
  * @param text - The answer as the turn wrote it
  */
-export function plainAnswer(text: string): { lines: string[]; cited: string[] } {
+export function plainAnswer(text: string): { lines: string[]; cited: string[]; cut: boolean } {
   const cited: Array<{ at: number; url: string }> = [];
   for (const re of [MD_LINK, SLACK_LINK, BARE_LINK]) {
     for (const m of text.matchAll(re)) cited.push({ at: m.index ?? 0, url: re === MD_LINK ? m[2]! : re === SLACK_LINK ? m[1]! : m[0] });
@@ -133,20 +145,57 @@ export function plainAnswer(text: string): { lines: string[]; cited: string[] } 
   const labels: string[] = [];
   const held = text.replace(MD_LINK, (_m, label: string) => `\u0000${labels.push(label.replace(/\\(.)/g, "$1").replace(/\*\*/g, "")) - 1}\u0000`);
   const plain = toPlainText(held.replace(/\*\*|__/g, "")).replace(/\u0000(\d+)\u0000/g, (_m, i: string) => labels[Number(i)] ?? "");
-  const lines = plain
+  const parts = plain
     .split("\n")
     .filter((l) => !/^\s*(```|~~~)/.test(l))
-    .map((l) =>
-      l
+    .map((l) => {
+      const item = /^\s*(?:[-*•]|\d+[.)])\s+/.test(l);
+      const words = l
         .replace(/^\s*#+\s+/, "")
         .replace(/^\s*(?:[-*•]|\d+[.)])\s+/, "")
         .replace(/\s+/g, " ")
-        .trim(),
-    )
-    .filter((l) => l && !/^sources?\b\s*:?/i.test(l))
-    .slice(0, MAX_ANSWER_LINES)
-    .map(capLine);
-  return { lines, cited: [...new Set(cited.map((c) => c.url))] };
+        .trim();
+      return { item, words };
+    })
+    .filter(({ words }) => words && !/^sources?\b\s*:?/i.test(words));
+
+  const folded = foldLists(parts);
+  const kept = folded.slice(0, MAX_ANSWER_LINES);
+  const lines = kept.map(capLine);
+  const cut = folded.length > kept.length || lines.some((l, i) => l !== kept[i]);
+  return { lines, cited: [...new Set(cited.map((c) => c.url))], cut };
+}
+
+/**
+ * Lines with each run of list items folded in: onto the line before it when
+ * that line introduces it (a line that is not an item), or as one line of its
+ * own. Items join with semicolons and the run ends on a full stop.
+ */
+function foldLists(parts: ReadonlyArray<{ item: boolean; words: string }>): string[] {
+  const out: string[] = [];
+  let run: string[] = [];
+  let lead: string | null = null;
+  const flush = () => {
+    if (run.length) {
+      const items = `${run.map((w) => w.replace(/[.;,]+$/, "")).join("; ")}.`;
+      if (lead === null) out.push(items);
+      else out.push(/[:—-]$/.test(lead) ? `${lead} ${items}` : `${lead} ${items.charAt(0).toUpperCase()}${items.slice(1)}`);
+    } else if (lead !== null) {
+      out.push(lead);
+    }
+    run = [];
+    lead = null;
+  };
+  for (const { item, words } of parts) {
+    if (item) {
+      run.push(words);
+      continue;
+    }
+    flush();
+    lead = words;
+  }
+  flush();
+  return out;
 }
 
 /** A line cut to `MAX_LINE_CHARS`, at a sentence end when one is close enough. */

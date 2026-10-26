@@ -16,7 +16,7 @@ import { readFigmaEvent, jobOf, eventIdOf, type FigmaEventJob } from "../src/fig
 import { answerFigmaAsk, MAX_ASK_TRIES, type AskMark, type FigmaAskDeps } from "../src/figma-ask/job";
 import type { FigmaAskDelivery } from "../src/figma-ask/delivery";
 import { isOwnComment } from "../src/figma-ask/trigger";
-import { CANT_FIND_LINE } from "../src/figma-ask/copy";
+import { CANT_FIND_LINE, CUT_LINE, MAX_LINE_CHARS } from "../src/figma-ask/copy";
 import { candidateThreads } from "../src/figma-comments/threads";
 import { runTurn } from "../src/turn/index";
 import { watchedTurnDeps, type CapacityOutage } from "../src/turn/capacity-outage";
@@ -237,16 +237,51 @@ describe("the reply", () => {
     assert.deepEqual(w.replies(), [
       {
         root: "100",
-        message: ["🐐: Hidden until the first goal is set.", "It shows once a goal exists.", `Source: Goal Setting PRD — ${PRD}`].join("\n"),
+        message: ["🐐: Hidden until the first goal is set. It shows once a goal exists.", `Source: Goal Setting PRD — ${PRD}`].join("\n"),
       },
     ]);
   });
 
-  it("keeps the answer to three lines", async () => {
+  it("keeps the answer to three lines, and says so above the source when it cut the rest", async () => {
     const w = world({ replies: reads(`One.\nTwo.\nThree.\nFour.\nFive. [PRD](${PRD})`) });
     await ask(w, comment("100", "@uno list them"));
     const lines = w.replies()[0]!.message.split("\n");
-    assert.deepEqual(lines, ["🐐: One.", "Two.", "Three.", `Source: Goal Setting PRD — ${PRD}`]);
+    assert.deepEqual(lines, ["🐐: One.", "Two.", "Three.", CUT_LINE, `Source: Goal Setting PRD — ${PRD}`]);
+  });
+
+  // #1565: a bulleted list counted one line per item, so a lead-in and two
+  // bullets filled the reply and the rest vanished without a word.
+  it("folds a list into the line that introduces it, every item kept", async () => {
+    const w = world({
+      replies: reads(
+        `Buttons come in these styles:\n- primary\n- secondary\n- tertiary\n- success\n- danger\n\nSizes are small, medium and large. [PRD](${PRD})`,
+      ),
+    });
+    await ask(w, comment("100", "@uno what button options are there?"));
+    assert.deepEqual(w.replies()[0]!.message.split("\n"), [
+      "🐐: Buttons come in these styles: primary; secondary; tertiary; success; danger.",
+      "Sizes are small, medium and large. PRD",
+      `Source: Goal Setting PRD — ${PRD}`,
+    ]);
+  });
+
+  it("folds a list with no lead-in into one line of its own", async () => {
+    const w = world({ replies: reads(`- Filled\n- Tonal\n- Outline [PRD](${PRD})`) });
+    await ask(w, comment("100", "@uno fills?"));
+    assert.deepEqual(w.replies()[0]!.message.split("\n"), ["🐐: Filled; Tonal; Outline PRD.", `Source: Goal Setting PRD — ${PRD}`]);
+  });
+
+  it("says it cut a line it shortened, and never when the answer fits", async () => {
+    const long = `${"word ".repeat(80).trim()}. [PRD](${PRD})`;
+    const cut = world({ replies: reads(long) });
+    await ask(cut, comment("100", "@uno long?"));
+    const lines = cut.replies()[0]!.message.split("\n");
+    assert.equal(lines.at(-2), CUT_LINE);
+    assert.ok((lines[0] ?? "").length <= MAX_LINE_CHARS + "🐐: ".length);
+
+    const fits = world({ replies: reads(`Hidden until the first goal is set. [PRD](${PRD})`) });
+    await ask(fits, comment("100", "@uno short?"));
+    assert.ok(!fits.replies()[0]!.message.includes(CUT_LINE));
   });
 
   it("says it couldn't find this, pointing at #plus-design, when nothing answers it", async () => {
