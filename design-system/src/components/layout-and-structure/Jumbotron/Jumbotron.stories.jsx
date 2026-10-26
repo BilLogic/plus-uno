@@ -180,7 +180,7 @@ export const Interactive = {
  * The anatomy against its tokens, in all four color modes: the card on the
  * raised pair at Card/pad-lg with no border, the band on the surface container
  * with no radius or shadow, the title an h1 at Heading/large, and the header
- * Section/stack-lg above the actions.
+ * Section/stack-md above the actions.
  */
 export const Anatomy = {
     parameters: { docs: { disable: true } },
@@ -208,7 +208,7 @@ export const Anatomy = {
         await expect(px(getComputedStyle(band).paddingTop), 'the band pads at Surface/stack-lg').toBe(tokenLength(canvasElement, '--surface-stack-lg'));
         await expect(px(getComputedStyle(band).paddingLeft), 'and at Screen/pad-x-screen').toBe(tokenLength(canvasElement, '--layout-pad-x-screen'));
         const content = card.querySelector('.plus-jumbotron-content');
-        await expect(px(getComputedStyle(content).rowGap), 'the header sits Section/stack-lg above the actions').toBe(tokenLength(canvasElement, '--section-stack-lg'));
+        await expect(px(getComputedStyle(content).rowGap), 'the header sits Section/stack-md above the actions').toBe(tokenLength(canvasElement, '--section-stack-md'));
 
         await inEveryColorMode(async (mode) => {
             card.style.transition = 'none';
