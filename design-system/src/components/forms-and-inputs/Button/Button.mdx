@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonStories from './Button.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button } from '@/components';
 import {
     ColorStylesSection,
     FillTreatmentsSection,
@@ -346,14 +347,15 @@ export const figmaMeta = {
 <Meta of={ButtonStories} />
 
 <Title />
-Buttons are interactive elements that are used to perform actions on a page.
+
+A button runs an action on the page or in a form: save, submit, open a dialog. One component draws every fill, so the main action stands out and the actions beside it recede.
 
 <DocsTabs of={ButtonStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-56204"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Button"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -361,13 +363,86 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
+
+<ol>
+    <li><strong>Container</strong>: the fill and border, set by <code>fill</code> and <code>style</code>.</li>
+    <li><strong>Leading visual</strong>: an icon, counter or dropdown part, set by <code>leadingVisual</code>.</li>
+    <li><strong>Label</strong>: the text, set by <code>text</code> or children.</li>
+    <li><strong>Trailing visual</strong>: set by <code>trailingVisual</code>.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>text</code>, children</td><td>string, node</td><td>the label</td><td>none</td><td>text?: true | false</td></tr>
+        <tr><td><code>fill</code></td><td>enum</td><td><code>filled</code> | <code>tonal</code> | <code>outline</code> | <code>ghost</code> | <code>text</code></td><td><code>filled</code></td><td>one set per fill: Filled, Tonal, Outlined and Text buttons. Code's <code>ghost</code> has no set.</td></tr>
+        <tr><td><code>style</code></td><td>enum</td><td><code>primary</code> | <code>secondary</code> | <code>tertiary</code> | <code>success</code> | <code>warning</code> | <code>danger</code> | <code>info</code> | <code>default</code> | <code>social-emotional</code> | <code>mastering-content</code> | <code>advocacy</code> | <code>relationship</code> | <code>technology-tools</code></td><td><code>primary</code></td><td>the first eight. The five pillar styles are not drawn.</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>vertical</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>the Vertical outlined buttons set</td></tr>
+        <tr><td><code>leadingVisual</code>, <code>trailingVisual</code></td><td>icon name or node</td><td>a Font Awesome name or a node</td><td>none</td><td>leadingVisual? and trailingVisual? with an instance swap</td></tr>
+        <tr><td><code>disabled</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state=disabled</td></tr>
+        <tr><td><code>active</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state=pressed</td></tr>
+        <tr><td><code>loading</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>block</code></td><td>boolean</td><td>full width</td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>href</code>, <code>target</code>, <code>as</code></td><td>string, element type</td><td>render a link or another element</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>type</code></td><td>string</td><td>the button's HTML type</td><td><code>button</code></td><td>not drawn</td></tr>
+        <tr><td><code>onClick</code></td><td>function</td><td>called when pressed. Ignored while <code>loading</code>.</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+An icon-only button has no <code>text</code> and no children. It draws a square, 32 at <code>medium</code> and 24 at <code>small</code>.
+
+<code>medium</code> is 32 high and <code>small</code> is 24 high. <code>large</code> is deprecated: it draws like <code>medium</code> and warns in development. Figma still draws a large size.
+
+Hover, focus and pressed come from the browser. In Figma they are variants of <code>state</code>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of a medium button, and the side of a medium icon-only button.</td></tr>
+        <tr><td><code>--item-height-sm</code></td><td>24</td><td>The height of a small button, and the side of a small icon-only button.</td></tr>
+        <tr><td><code>--element-pad-x-md</code>, <code>--element-pad-x-sm</code></td><td>12, 8</td><td>The side padding at each size.</td></tr>
+        <tr><td><code>--element-inline-md</code>, <code>--element-inline-sm</code></td><td>8, 4</td><td>The gap between the visuals and the label.</td></tr>
+        <tr><td><code>--size-element-radius-md</code></td><td>4</td><td>The corner radius.</td></tr>
+        <tr><td><code>--icon-md</code></td><td>16</td><td>The icon size, at every button size.</td></tr>
+        <tr><td><code>--type-weight-medium</code></td><td>500</td><td>The label weight. The label is Body/default.</td></tr>
+        <tr><td><code>--color-primary</code> and its <code>on-</code>, <code>-text</code> and <code>-border</code> pairs</td><td>theme role</td><td>The fill, label and outline of each style. The other styles follow the same naming.</td></tr>
+        <tr><td><code>--color-shadow-state-08</code>, <code>--color-shadow-state-12</code></td><td>theme role</td><td>The hover and pressed layer over a filled or tonal button.</td></tr>
+        <tr><td><code>--color-focus-ring</code></td><td>theme role</td><td>The 2 wide focus ring, drawn 2 off the edge.</td></tr>
+        <tr><td><code>--color-disabled-opacity</code></td><td>0.38</td><td>The fade on a disabled button.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Default primary filled button at medium size—typical call-to-action usage.</>}
+    description={<>Default primary filled button at medium size, the typical call to action.</>}
 >
     <Canvas
         of={ButtonStories.Overview}
@@ -377,68 +452,77 @@ Buttons are interactive elements that are used to perform actions on a page.
     />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
+### Content
 
 <ButtonContentSection />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Appearance
+### Appearance
 
 <div className="space-y-10 md:space-y-12">
     <ColorStylesSection />
     <FillTreatmentsSection />
-
 </div>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
+### Sizes
 
 <DocsCanvasShell description={<SizesDocDescription />}>
     <Canvas of={ButtonStories.SizesFilledRow} story={{ inline: true }} sourceState="none" />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
+### States
 
 <InteractionStatesSection />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
+### Layout and composition
 
 <LayoutSection />
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={ButtonStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={ButtonStories.Interactive}
-    description={
-        <>
-            Use the table in the panel below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
-            the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+                    <Button text="Cancel" fill="outline" />
+                    <Button text="Save changes" fill="filled" />
+                </div>
+            ),
+            doCaption: 'One filled button, with an outlined one beside it.',
+            dontExample: (
+                <div style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+                    <Button text="Save changes" fill="filled" />
+                    <Button text="Publish" fill="filled" />
+                </div>
+            ),
+            dontCaption: 'Two filled buttons competing for the main action.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Navigation takes <code>href</code>.** The component forwards <code>href</code> and <code>target</code> to the rendered element, which becomes an anchor. Middle-click and open in a new tab keep working, which a click handler on a button does not allow.
+- **Loading is not feedback.** <code>loading</code> paints the label transparent and shows a spinner. For a long wait, keep the label with <code>disabled</code> and say what is happening beside it.
+- **<code>style</code> carries two vocabularies.** <code>success</code>, <code>warning</code> and <code>danger</code> say something happened. The five pillar styles are subject colors. A button wearing one is about that subject and not about an outcome.
+- **<code>active</code> is a class.** For a selected button in a row of buttons, also pass <code>aria-pressed</code>.
+- **Extra props land on the element**, so <code>aria-pressed</code>, <code>aria-expanded</code>, <code>aria-controls</code> and <code>aria-describedby</code> need no wrapper.
+- **Other components compose it.** Modal, Card and Jumbotron render a Button from their button props.
 
 </div>
 
@@ -454,53 +538,13 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 ## When to use
 
-Use `Button` for anything the user *does*: submit, confirm, open a dialog, run an
-export, dismiss a step. It is the only component in `actions` that carries a
-click handler of its own, and it is the element the rest of the system composes
-when it needs an action — `Modal`, `Card` and `Jumbotron` all render `Button`
-from their `primaryButton` / `secondaryButton` props.
+Use a Button when a click runs an action on this view: save, submit, open a dialog. Going to another page is a link, and picking between options is a [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs), a [Toggle](?path=/docs/components-forms-and-inputs-toggle--docs) or a [Button group](?path=/docs/components-forms-and-inputs-button-group--docs).
 
-Use it for navigation too, but pass `href`: the component forwards `href` and
-`target` to the underlying element, which renders an anchor. That keeps
-middle-click and "open in new tab" working, which a click handler on a `button`
-does not.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Loading is not a substitute for feedback.
-
-```jsx
-// Incorrect — the label goes transparent, so for a ten-second export the
-// button reads as an empty box for ten seconds.
-<Button text="Export report" loading={isExporting} />
-
-// Correct — keep the label, and say what is happening next to it.
-<Button text="Export report" disabled={isExporting} />
-{isExporting && <Spinner />}
-```
-
-### `style` carries two vocabularies; only one of them means severity.
-
-`success`, `warning` and `danger` say something happened. The five SMART
-domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
-`technology-tools` — are subject colors, and a button wearing one is about
-that domain, not about an outcome. The props table lists all thirteen values
-side by side; the enum does not tell you which half you are in.
-
-```jsx
-// Incorrect — advocacy is the color of a curriculum domain. Nothing about it
-// says "this deletes something".
-<Button text="Delete session" style="advocacy" />
-
-// Correct — severity from the semantic set, domain color where the button is
-// genuinely about that domain.
-<Button text="Delete session" style="danger" />
-<Button text="Open advocacy plan" style="advocacy" />
-```
+- **Give each view one filled button.** The filled button marks the main action. Draw the actions beside it tonal, outlined or as text, so the main one stands out.
+- **Say what the button does.** Label it with a verb and its object, such as Save changes, rather than OK or Submit.
+- **Keep icon-only for in-row actions.** A small icon-only button is a 24 square, for actions inside a row such as the × on a sidebar tab or a disclosure chevron. It has no visible label, so give it an accessible name that says what it does, such as "Close Hogwarts · Tue, Sep 9".
+- **Keep danger for actions that destroy.** The danger style warns that the action deletes or removes something. Using it for ordinary actions spends the warning.
+- **Do not disable a button to explain a rule.** A disabled button does not say why. Where you can, leave it enabled and say what is missing when it is pressed.
 
 </div>
 
@@ -508,50 +552,12 @@ side by side; the enum does not tell you which half you are in.
 
 ## Accessibility
 
-- **Icon-only sizing.** With no `text` and no children the component adds
-  `plus-btn--icon-only`, which sets a square box: 32×32 at `medium` and 24×24
-  at `small`. `large` is deprecated and draws 32×32 like `medium`. No size
-  meets the 44×44 minimum in
-  `design-system/guidelines/foundations/accessibility.md`, so leave room
-  around an icon-only button, and give it a text label where touch matters.
-- **Icon-only naming.** A string `leadingVisual` / `trailingVisual` renders as
-  `<i aria-hidden="true">`, so an icon-only button has no accessible name unless
-  you pass `aria-label` or the `title` prop.
-- **Loading.** `loading` sets `disabled` and `aria-disabled`, drops the click
-  handler, and the stylesheet paints the label transparent while a CSS spinner
-  runs. Nothing is announced. If the wait matters to a screen-reader user, put
-  the status in a live region beside the button.
-- **Disabled.** `disabled` sets both the native attribute and `aria-disabled`.
-  A natively disabled button leaves the tab order, so any explanation of *why*
-  it is disabled must live outside the button, where it can still be reached.
-- **Pass-through.** Unrecognized props are spread onto the rendered element, so
-  `aria-pressed`, `aria-expanded`, `aria-controls` and `aria-describedby` all
-  work without a wrapper.
-
-### An icon-only button needs a name and needs room.
-
-```jsx
-// Incorrect — no text and no children means icon-only, which renders 32×32
-// at the default medium size with no accessible name at all.
-<Button leadingVisual="trash" style="danger" />
-
-// Correct — the name is supplied by hand, and where touch matters the
-// button carries its label too.
-<Button leadingVisual="trash" style="danger" aria-label="Delete session" />
-<Button leadingVisual="trash" style="danger" text="Delete session" />
-```
-
-### A group of buttons is not a selection control.
-
-```jsx
-// Incorrect — `active` is a class. Nothing announces which one is chosen.
-<Button text="Week" active={range === 'week'} onClick={() => setRange('week')} />
-<Button text="Month" active={range === 'month'} onClick={() => setRange('month')} />
-
-// Correct — extra props are spread onto the element, so state can be declared.
-<Button text="Week" active={range === 'week'} aria-pressed={range === 'week'}
-        onClick={() => setRange('week')} />
-```
+- **An icon-only button needs a name.** A string <code>leadingVisual</code> or <code>trailingVisual</code> is hidden from assistive technology, so an icon-only button has no name until you pass <code>aria-label</code> or <code>title</code>. Where touch matters, give it a text label as well.
+- **Icon-only targets are small.** An icon-only button is 32×32 at <code>medium</code> and 24×24 at <code>small</code>. Neither reaches the 44×44 touch target, so leave room around it.
+- **Loading announces nothing.** <code>loading</code> disables the button and drops its click handler, and the spinner is not announced. If the wait matters to a screen reader user, put the status in a live region beside the button.
+- **Disabled leaves the tab order.** A natively disabled button cannot be focused, so any explanation of why it is disabled must sit outside the button, where it can still be reached.
+- **A row of buttons is not a selection control.** Nothing announces which one is chosen unless you add <code>aria-pressed</code>.
+- **Focus is a ring alone**, 2 wide and drawn 2 off the edge, with no fill under it.
 
 </div>
 
@@ -559,10 +565,12 @@ side by side; the enum does not tell you which half you are in.
 
 ## Related
 
-- For a set of choices the user picks between, use `ChoiceGroup`.
-- For a menu of actions behind one trigger, use `Dropdown`.
-- To show that work is under way on the page rather than in the control, use `Progress`.
-- To label a state rather than act on it, use `Badge`.
+- [Button group](?path=/docs/components-forms-and-inputs-button-group--docs) for two to five related actions joined into one control.
+- [Close button](?path=/docs/components-forms-and-inputs-button-close-button--docs) for closing a whole surface.
+- [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) for a menu of actions behind one trigger.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for a set of options the person picks between.
+- [Tabs](?path=/docs/components-navigation-tabs-nav-pills-navbar-tabs--docs) for moving between views within a page.
+- [Progress bar](?path=/docs/components-loading-progress-bar--docs) to show that work is under way on the page rather than in the control.
 
 </div>
 

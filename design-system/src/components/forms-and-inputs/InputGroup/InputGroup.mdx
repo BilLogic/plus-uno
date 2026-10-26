@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InputGroupStories from './InputGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { InputGroup } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,14 +22,15 @@ export const figmaMeta = {
 <Meta of={InputGroupStories} />
 
 <Title />
-Easily extend form controls by adding text, check box, radio, or button on either side of textual inputs.
+
+One field with an addon inside it: a checkbox, radio, icon, text, button or dropdown placed before or after what is typed. Use it when the addon is a real control, or a unit that belongs to the value. For a plain icon, the leading and trailing visuals of a Text field are enough.
 
 <DocsTabs of={InputGroupStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18356-647"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InputGroup"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -36,79 +38,161 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Text prefix and icon suffix around the input.</>}>
+<ol>
+    <li><strong>Label</strong>: names the field, with an optional required asterisk and info tooltip.</li>
+    <li><strong>Leading addon</strong>: in the field's leading slot, set by <code>leadingVisual</code>.</li>
+    <li><strong>Value or placeholder</strong>: the text in the field.</li>
+    <li><strong>Trailing addon</strong>: in the field's trailing slot, set by <code>trailingVisual</code>.</li>
+    <li><strong>Caption or validation message</strong> under the field.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>leadingVisual</code></td><td>addon, array</td><td>one addon, or a list of them</td><td>none</td><td>Leading swap and leading?: by type</td></tr>
+        <tr><td><code>trailingVisual</code></td><td>addon, array</td><td>one addon, or a list of up to two</td><td>none</td><td>Trailing slot and trailingVisual?: by type</td></tr>
+        <tr><td><code>label</code>, <code>showLabel</code></td><td>node, boolean</td><td>the field's name</td><td>none, <code>true</code></td><td>label?: true | false</td></tr>
+        <tr><td><code>info</code></td><td>node</td><td>text for an info tooltip beside the label</td><td>none</td><td>not drawn</td></tr>
+        <tr><td><code>caption</code></td><td>node</td><td>standing help under the field. A validation message takes its place.</td><td>none</td><td>caption?: true | false</td></tr>
+        <tr><td><code>placeholder</code>, <code>value</code>, <code>defaultValue</code></td><td>string</td><td>any text</td><td>none</td><td>input: placeholder | value</td></tr>
+        <tr><td><code>required</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn</td></tr>
+        <tr><td><code>validation</code>, <code>validationMessage</code></td><td>enum, node</td><td><code>none</code> | <code>invalid</code> | <code>success</code></td><td><code>none</code></td><td>validation, as on Text field</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>state: default | focus | disabled | read-only</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>medium</code></td><td><code>medium</code></td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+An addon is an element, a string shorthand, or an object such as <code>type: 'button'</code> with its <code>text</code> and <code>onClick</code>. The shorthands are checkbox, radio, icon, plus, button and dropdown. Any other string is shown as text. The types are checkbox, radio, icon, plus, text, button and dropdown.
+
+Figma sets the addon with a <code>type</code> variant: checkbox, radio, icon, text, button or dropdown. The variant only decides which addon is placed by default. Swap the leading slot, or replace the trailing slot's content, for anything else. Figma also draws a second addon on a side as the Trailing slot's content. Code takes it as the second entry of a list.
+
+The field is 32 high. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. Hover exists only in code, from the browser.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The field is the shared field box, so Text field, Text area, Number input and Select take the same field tokens.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the field.</td></tr>
+        <tr><td><code>--item-height-sm</code></td><td>24</td><td>A button or dropdown addon, centered with 4 around it so the field stays 32.</td></tr>
+        <tr><td><code>--layout-control-checkbox</code></td><td>18</td><td>A checkbox or radio addon.</td></tr>
+        <tr><td><code>--element-pad-x-md</code>, <code>--element-pad-x-xs</code></td><td>12, 4</td><td>The padding around a text addon.</td></tr>
+        <tr><td><code>--ds-background-input</code>, <code>--ds-border-input</code></td><td>theme role</td><td>The fill and border of the field at rest.</td></tr>
+        <tr><td><code>--ds-border-focused</code>, <code>--ds-border-danger</code>, <code>--ds-border-success</code></td><td>theme role</td><td>The field when focused, invalid or valid.</td></tr>
+        <tr><td><code>--ds-text-subtle</code></td><td>theme role</td><td>A text addon, and standing help in the caption.</td></tr>
+        <tr><td><code>--ds-opacity-disabled</code></td><td>theme role</td><td>The fade on a disabled field.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A text prefix and an icon suffix around the input.</>}>
     <Canvas of={InputGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Content
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Baseline input field with addons on both sides.</>}>
+<DocsCanvasShell description={<>A baseline input field with addons on both sides.</>}>
     <DsCanvasQuiet of={InputGroupStories.Content} />
 </DocsCanvasShell>
 
-</div>
+### Slots
 
-<div className="sb-ds-doc-section">
-
-## Slots
-
-<DocsCanvasShell description={<>Addons sit in the field's Leading and Trailing slots and draw no box of their own. Buttons are the 24 compact button with 4 around them, so the field stays 32 high.</>}>
+<DocsCanvasShell description={<>Addons sit in the field's leading and trailing slots and draw no box of their own. Buttons are the 24 compact button with 4 around them, so the field stays 32 high.</>}>
     <DsCanvasQuiet of={InputGroupStories.AddonsInSlots} />
 </DocsCanvasShell>
 
-</div>
+### Addons
 
-<div className="sb-ds-doc-section">
-
-## Addons
-
-<DocsCanvasShell description={<>Selection and action addon patterns.</>}>
+<DocsCanvasShell description={<>Selection and action addons.</>}>
     <DsCanvasQuiet of={InputGroupStories.Variants} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
+### Sizes
 
 <DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={InputGroupStories.Sizes} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Default, disabled, and read-only input groups.</>}>
+<DocsCanvasShell description={<>Default, disabled and read-only. Set the state and the validation on the field, since the group has no states of its own.</>}>
     <DsCanvasQuiet of={InputGroupStories.InteractionStates} />
 </DocsCanvasShell>
 
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={InputGroupStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={InputGroupStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: (
+                <div style={{ width: 300 }}>
+                    <InputGroup
+                        id="inputgroup-do"
+                        label="Promo code"
+                        trailingVisual={{ type: 'button', text: 'Apply', onClick: () => {} }}
+                    />
+                </div>
+            ),
+            doCaption: 'A button that acts on the value.',
+            dontExample: (
+                <div style={{ width: 300 }}>
+                    <InputGroup id="inputgroup-dont" label="Search" leadingVisual="icon" />
+                </div>
+            ),
+            dontCaption: 'Input group for a decorative icon. Use a Text field.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **Label it, and use a Text field when the addon is decoration.** <code>label</code> is associated with the input, and <code>id</code> names the input and not the group. <code>showLabel</code> set to false clips the label without removing the name. For an addon that is only an icon or a unit, a Text field is the smaller component.
+- **An unrecognized string addon becomes text.** A typo such as "buttons" renders as the literal text "buttons" in an addon, with no warning. Use one of the shorthands, or the object form.
+- **The string shorthands come with defaults.** The checkbox and radio shorthands render already checked, with no handler and the generic names "Toggle option" and "Select option". The button shorthand is labeled "Button". Use the object form as soon as the addon does anything.
+- **Subcomponents build the shorthands.** <code>InputGroup.Text</code>, <code>.Icon</code>, <code>.Button</code>, <code>.Dropdown</code>, <code>.Checkbox</code> and <code>.Radio</code> can be passed directly.
+- **Extra props land on the input**, so <code>aria-describedby</code> reaches the element it describes.
 
 </div>
 
@@ -124,56 +208,11 @@ Easily extend form controls by adding text, check box, radio, or button on eithe
 
 ## When to use
 
-Use `InputGroup` for a text field with something inside its box — a unit
-after the value, a currency symbol before it, a button that acts on what was
-typed. The addons sit in the field's Leading and Trailing slots and share its
-one border, so they read as one control.
+Use an Input group when the addon is a real control. A button or a dropdown that acts on what was typed belongs here. When the addon is only an icon, use a [Text field](?path=/docs/components-forms-and-inputs-text-field--docs), which has its own leading and trailing visuals.
 
-`leadingVisual` and `trailingVisual` each take one addon or an array of them
-(Trailing holds two at most): an element, a string shorthand, or an object like
-`{ type: 'button', text: 'Go', onClick }`. Button and dropdown addons are always
-the 24 compact size, centered with 4 around them, so the field stays 32. The subcomponents —
-`InputGroup.Text`, `.Icon`, `.Button`, `.Dropdown`, `.Checkbox`, `.Radio` — are
-what those shorthands build, and can be passed directly.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Label it, and reach for `Input` when the addon is decoration.
-
-```jsx
-// The label is associated with the input, and `id` names the input rather than
-// the group. `showLabel={false}` clips it without removing the name.
-<InputGroup id="amount" label="Amount" leadingVisual="£" />
-
-// For a field whose addon is only an icon or a unit, `Input` is the smaller
-// component and has its own leading and trailing visuals.
-<Input label="Amount" leadingVisual="fa-solid fa-sterling-sign" value={v} onChange={setV} />
-```
-
-Reach for `InputGroup` when the addon is a real control — a button or a dropdown
-that `Input` cannot hold.
-
-### An unrecognized string addon becomes text.
-
-```jsx
-// Incorrect — "buttons" is not one of the shorthands, so it renders as the
-// literal text "buttons" in an addon.
-<InputGroup trailingVisual="buttons" />
-
-// Correct — the shorthands are checkbox, radio, icon, plus, button, dropdown.
-// Anything else is text, which is what makes the typo silent.
-<InputGroup trailingVisual={{ type: 'button', text: 'Search', onClick: run }} />
-```
-
-### The string shorthands come with defaults you probably do not want.
-
-`"checkbox"` and `"radio"` render already checked, with no handler and the
-generic names "Toggle option" and "Select option". `"button"` is labeled
-"Button". Use the object form as soon as the addon does anything.
+- **Put a currency before the value and a unit after it.** A text addon is decoration and does not act on the field: "$" before, "kg" after.
+- **Name every control addon.** A checkbox, radio or button addon needs its own accessible name. The defaults "Toggle option", "Select option" and "Button" say nothing.
+- **Use two addons a side at most.** Each addon is one more thing a screen reader user meets before the field.
 
 </div>
 
@@ -181,21 +220,11 @@ generic names "Toggle option" and "Select option". `"button"` is labeled
 
 ## Accessibility
 
-- **The input takes the name.** `label` associates through `htmlFor`, `id`
-  lands on the input, and extra props are forwarded there too — so
-  `aria-describedby` reaches the element it describes.
-- **Addon controls are named generically.** The checkbox and radio addons
-  default to "Toggle option" and "Select option"; pass `aria-label` in the object
-  form to say what they actually do.
-- **An addon that acts on the field must be a control.** `InputGroup.Button` and
-  `InputGroup.Dropdown` are real ones. `InputGroup.Text` and `InputGroup.Icon`
-  are decoration — the icon is `aria-hidden`, so an icon that means something
-  needs text beside it.
-- **`required` shows an asterisk and sets `aria-required`**, and a
-  `validationMessage` is announced with `role="alert"`, as on `Input`.
-- **Two addons a side is the limit, and it is a limit for a reason.** Four things
-  bolted to a field are four things a screen-reader user meets before the field
-  itself.
+- **The input takes the name.** The label is associated with the input, the id lands on the input, and extra props are forwarded there too.
+- **Addon controls are named generically.** The checkbox and radio addons default to "Toggle option" and "Select option". Pass <code>aria-label</code> in the object form to say what they do.
+- **An addon that acts on the field must be a control.** The button and dropdown addons are real ones. The text and icon addons are decoration, and the icon is hidden from assistive technology, so an icon that means something needs text beside it.
+- **Required shows an asterisk** and marks the input required, and a validation message is announced as an alert, as on Text field.
+- **Two addons a side is the limit.** Four things attached to a field are four things a screen reader user meets before the field itself.
 
 </div>
 
@@ -203,10 +232,10 @@ generic names "Toggle option" and "Select option". `"button"` is labeled
 
 ## Related
 
-- For a labeled text field — the usual case — use `Input`, which has its own
-  leading and trailing visuals.
-- For a number with a stepper, use `NumberInput`.
-- For a button that is not attached to a field, use `Button` beside it.
+- [Text field](?path=/docs/components-forms-and-inputs-text-field--docs) for an icon or unit only.
+- [Number input](?path=/docs/components-forms-and-inputs-number-input--docs) for a number with steppers.
+- [Select](?path=/docs/components-forms-and-inputs-select--docs) for a choice from a list.
+- [Button](?path=/docs/components-forms-and-inputs-button-button--docs) for a button that is not attached to a field.
 
 </div>
 

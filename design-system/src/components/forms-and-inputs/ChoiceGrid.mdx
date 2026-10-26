@@ -2,7 +2,9 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ChoiceGridStories from './ChoiceGrid.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { useState } from 'react';
+import { ChoiceGrid, ChoiceGroup } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -31,14 +33,54 @@ export const figmaMeta = {
 
 <Meta of={ChoiceGridStories} />
 
+export const frequencyColumns = [
+    { id: 'never', label: 'Never' },
+    { id: 'sometimes', label: 'Sometimes' },
+    { id: 'often', label: 'Often' },
+];
+
+export const frequencyRows = [
+    { id: 'notes', label: 'I take notes' },
+    { id: 'review', label: 'I review my work' },
+    { id: 'ask', label: 'I ask questions' },
+];
+
+export const SharedAnswersGrid = () => {
+    const [values, setValues] = useState({ notes: 'often' });
+    return (
+        <ChoiceGrid
+            id="choicegrid-do"
+            rows={frequencyRows}
+            columns={frequencyColumns}
+            values={values}
+            onChange={(rowId, columnId) => setValues({ ...values, [rowId]: columnId })}
+        />
+    );
+};
+
+export const RepeatedGroups = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        {frequencyRows.map((row) => (
+            <ChoiceGroup
+                key={row.id}
+                legend={row.label}
+                options={['Never', 'Sometimes', 'Often']}
+                orientation="inline"
+            />
+        ))}
+    </div>
+);
+
 <Title />
+
+The same choice asked for several questions at once, laid out as a table: one row per question, one column per answer. Use radios for one answer per row and checkboxes for any number.
 
 <DocsTabs of={ChoiceGridStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-60819"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -46,63 +88,133 @@ export const figmaMeta = {
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+<p>Every example on this page follows the toolbar's Color mode and Contrast switches.</p>
+
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Single-row radio grid with one selected column.</>}>
+<ol>
+    <li><strong>Column headers</strong>: one per answer, such as Never, Sometimes and Often.</li>
+    <li><strong>Row</strong>: led by its row label, which is the question.</li>
+    <li><strong>Controls</strong>: a Radio or a Checkbox in each cell, with its label hidden. The column header names each one.</li>
+</ol>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>type</code></td><td>enum</td><td><code>radio</code> | <code>checkbox</code></td><td><code>radio</code></td><td>type: radio | checkbox</td></tr>
+        <tr><td><code>columns</code></td><td>array</td><td>objects with an <code>id</code> and a <code>label</code></td><td>empty</td><td>column 1 to column 4: text</td></tr>
+        <tr><td><code>rows</code></td><td>array</td><td>objects with an <code>id</code> and a <code>label</code></td><td>empty</td><td>Rows: a slot of _Choice Grid Row, with a row label</td></tr>
+        <tr><td><code>values</code></td><td>object</td><td>radio: one column id per row id. Checkbox: a map of column ids to booleans per row id.</td><td>empty</td><td>not drawn</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> | <code>medium</code></td><td><code>medium</code></td><td>size: small | medium | large</td></tr>
+        <tr><td><code>disabled</code>, <code>readOnly</code></td><td>boolean</td><td><code>true</code> | <code>false</code></td><td><code>false</code></td><td>not drawn. Figma draws one state.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>called when a cell changes</td><td>none</td><td>not drawn</td></tr>
+    </tbody>
+</DocsTable>
+
+<code>large</code> is deprecated and draws like <code>medium</code>.
+
+Add or remove questions in Figma by adding row instances to the Rows slot, and set the row type to match the grid.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The cells are Radio and Checkbox, so they take those tokens. The table around them adds a few.
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--color-surface-container-low</code></td><td>theme role</td><td>The table, header and row fill.</td></tr>
+        <tr><td><code>--color-on-surface</code></td><td>theme role</td><td>Column headers and row labels.</td></tr>
+        <tr><td><code>--color-on-surface-variant</code></td><td>theme role</td><td>Headers and labels in a disabled grid.</td></tr>
+        <tr><td><code>--size-element-pad-x-md</code>, <code>--size-element-pad-y-md</code></td><td>see Spacing</td><td>The padding of every cell.</td></tr>
+        <tr><td><code>--size-element-radius-md</code></td><td>4</td><td>The corners of the table.</td></tr>
+        <tr><td><code>--body-default</code></td><td>14/20</td><td>Headers and row labels.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants and states
+
+<DocsCanvasShell attachSourceBelow description={<>A single-row radio grid with one answer chosen.</>}>
     <Canvas of={ChoiceGridStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-</div>
+### Type
 
-<div className="sb-ds-doc-section">
-
-## Selection type
-
-<DocsCanvasShell description={<>Radio (single per row) and checkbox (multiple per row).</>}>
+<DocsCanvasShell description={<>Radio takes one answer per row. Checkbox takes any number.</>}>
     <DsCanvasQuiet of={ChoiceGridStories.Variants} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
+### Rows
 
 <DocsCanvasShell description={<>Several rows against the same column headers.</>}>
     <DsCanvasQuiet of={ChoiceGridStories.Layout} />
 </DocsCanvasShell>
 
-</div>
+### States
 
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled grid.</>}>
+<DocsCanvasShell description={<>Disabled: every control passes the state through.</>}>
     <DsCanvasQuiet of={ChoiceGridStories.InteractionStates} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Read-only grid: the answers show and stay in the tab order, and clicking a cell changes nothing.</>}>
+<DocsCanvasShell description={<>Read-only: the answers show and stay in the tab order, and clicking a cell changes nothing.</>}>
     <DsCanvasQuiet of={ChoiceGridStories.ReadOnly} />
 </DocsCanvasShell>
+
+Hover and focus come from the browser on each control.
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={ChoiceGridStories.Interactive}
+    description={<>Use the table below to change props.</>}
+/>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Do and don't
 
-<DocsInteractivePlayground
-    of={ChoiceGridStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <SharedAnswersGrid />,
+            doCaption: 'One set of answers for several questions.',
+            dontExample: <RepeatedGroups />,
+            dontCaption: 'The same Choice group repeated for each question.',
+        },
+    ]}
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+- **The grid is fully controlled.** It holds no state of its own. In radio mode <code>values</code> maps each row id to a column id. In checkbox mode it maps each row id to an object of column ids and booleans.
+- **<code>onChange</code> has two shapes.** In radio mode it receives the row id and the column id that changed, and you merge them. In checkbox mode it receives the whole new values object, already merged. The copy is fresh, so the object you passed in is left as it was.
+- **A radio row cannot be unanswered again.** Choosing a column always sets it. If "not answered" is meaningful, add a column for it, such as Not applicable, rather than leaving a row the person cannot clear.
+- **Radio rows share a name** built from the grid's id and the row's id, which gives one answer per row and arrow-key movement along it. Without an id the grid generates its own base, so two grids on a page never share ids or groups.
 
 </div>
 
@@ -118,47 +230,11 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `ChoiceGrid` when the same question is asked of several things at once — rate
-each of these six statements, tick which of these tools each tutor uses. It is a
-matrix: one question in the column headers, one subject per row.
+Use a Choice grid when every question has the same answers, such as rating each of six statements, or ticking which tools each tutor uses. A grid saves repeating one Choice group per question. If the answers differ from row to row, ask each question on its own.
 
-It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and
-`{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no
-state of its own.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### `onChange` has two shapes, and only one of them is the new state.
-
-```jsx
-// radio — the two ids that changed. Merge them yourself.
-<ChoiceGrid type="radio" values={v} rows={rows} columns={cols}
-            onChange={(rowId, columnId) => setV({ ...v, [rowId]: columnId })} />
-
-// checkbox — the whole new values object, already merged.
-<ChoiceGrid type="checkbox" values={v} rows={rows} columns={cols}
-            onChange={(next) => setV(next)} />
-```
-
-### In checkbox mode, `onChange` hands you a fresh object.
-
-The merge copies the top level and the row it changes, so the `values` you passed
-in is left as it was and can be compared against the next one.
-
-### A radio row cannot be unanswered again.
-
-Selecting a column always sets it; there is no path back to "not answered". If
-that state is meaningful, add a column for it — "Not applicable" as a real
-option is better than a row the user cannot clear.
-
-### Keep the grid small.
-
-Every cell is a control, so a six-by-five grid is thirty tab stops. Past that,
-ask the questions one at a time with `ChoiceGroup`.
+- **Keep the column headers short.** A header names every control in its column for screen readers. Use one or two words, such as "Never", "Sometimes" and "Often".
+- **Choose the type by the answer, not the look.** Use radios when each row takes exactly one answer, and checkboxes when a row may take several, or none.
+- **Keep the grid small.** Every cell is a control, so a six-by-five grid is thirty tab stops. Past that, ask the questions one at a time in a [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs).
 
 </div>
 
@@ -166,24 +242,11 @@ ask the questions one at a time with `ChoiceGroup`.
 
 ## Accessibility
 
-- **Every cell is named by its row and its column.** Each input carries
-  `aria-labelledby` pointing at both the row label and the column header, so it
-  is announced as "Punctuality, Agree" rather than as an unnamed radio in a
-  table.
-- **Every cell is the real control.** Cells render `Checkbox` and `Radio`, so
-  focus, states and read-only behave as they do anywhere else.
-- **Radio rows are grouped per row.** Each row's inputs share a `name` built from
-  the grid's id and the row's id, which is what makes one answer per row and
-  arrow-key movement along it. With no `id` or `name` the grid generates its own
-  base, so two grids on a page never share ids or radio groups.
-- **The grid itself has no name.** There is no caption and no `aria-label` on the
-  table. Put the question above it as a heading, and describe the scale in the
-  column headers.
-- **The row-header column is empty on purpose.** It carries a visually hidden
-  "Row" so the header row is not a blank cell.
-- **On a narrow screen this is a wide table.** Put it in a horizontal
-  `ScrollBar` rather than letting the columns crush — a header the user cannot
-  read is a question they cannot answer.
+- **Every cell is named by its row and its column.** Each control points at both the row label and the column header, so it is announced as "Punctuality, Agree" and not as an unnamed radio in a table.
+- **Every cell is the real control.** Cells are Checkbox and Radio, so focus, states and read-only behave as they do anywhere else.
+- **The grid itself has no name.** There is no caption and no label on the table. Put the question above it as a heading, and describe the scale in the column headers.
+- **The row-header corner is hidden text.** The corner cell carries a visually hidden "Row", so the header row has no blank cell.
+- **On a narrow screen this is a wide table.** Put it in a horizontal scroll container and not let the columns crush, because a header the person cannot read is a question they cannot answer.
 
 </div>
 
@@ -191,9 +254,9 @@ ask the questions one at a time with `ChoiceGroup`.
 
 ## Related
 
-- For one question with several answers, use `ChoiceGroup`.
-- For a rated answer with end labels, use `ChoiceGroup` with `leadingText` and `trailingText`.
-- For data being displayed rather than answered, use `Table`.
+- [Choice group](?path=/docs/components-forms-and-inputs-choice-group--docs) for one question, and for a labeled scale with inline options.
+- [Rating](?path=/docs/components-forms-and-inputs-rating--docs) for a single judgment.
+- [Table](?path=/docs/components-text-and-data-display-table--docs) for data that is shown and not answered.
 
 </div>
 
