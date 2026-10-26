@@ -171,6 +171,21 @@ test('the screen and container pads alias the space scale per mode', () => {
   }
 });
 
+test('a drawer takes the Modal width steps: each Drawer width aliases its Modal width at every mode', () => {
+  for (const size of ['sm', 'md', 'lg']) {
+    for (const mode of Object.keys(LAYOUT_MODES)) {
+      assert.equal(rawAtMode(`--layout-width-drawer-${size}`, mode), `var(--layout-width-modal-${size})`, `${size} at ${mode}`);
+    }
+  }
+});
+
+test('the Drawer pattern tokens alias the same space steps as Modal, and there is no Drawer radius', () => {
+  for (const leaf of ['pad', 'stack-sm', 'stack-md', 'stack-lg', 'inline-sm', 'inline-md', 'inline-lg']) {
+    assert.equal(corpus.get(`--drawer-${leaf}`)?.raw, corpus.get(`--modal-${leaf}`)?.raw, leaf);
+  }
+  assert.equal(corpus.get('--drawer-radius'), undefined);
+});
+
 test('no modal width is fractional at any mode', () => {
   for (const size of ['sm', 'md', 'lg']) {
     for (const mode of Object.keys(LAYOUT_MODES)) {

@@ -1,0 +1,94 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PatternDrawerStories} />
+
+<Title />
+The drawer pattern is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in an `Overlay` at the `end` edge (the right) or the `start` edge (the left), over the same scrim a modal takes. Its width is a Modal width step, and its title, description and close button follow the Modal rules. It draws the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay`, with Drawer/pad 16 and Drawer/stack-md 16 (the Modal steps, under their own names), and no radius. It is a real dialog: it moves focus inside when it opens, keeps Tab there, closes on Escape, the close button or a click on the scrim, and returns focus to what opened it.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternDrawer"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A <code>width="sm"</code> drawer at the <code>end</code> edge of an inline 1024 screen: the scrim, no pad, the drawer full height.</>}>
+    <Canvas of={PatternDrawerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Width
+
+<DocsCanvasShell description={<><code>sm</code>, <code>md</code> and <code>lg</code> are the Modal width steps: 6, 8 and 10 columns of the screen grid plus 16 on each side, so 384, 507 and 629 at 768, 512, 677 and 843 at 1024, 640, 848 and 1056 at 1440. The width grows with the screen, never shrinks, and the sidebar never changes it.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.Widths} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Placement
+
+<DocsCanvasShell description={<><code>end</code>, the default, holds the drawer at the right edge, for a panel about something on the page. <code>start</code> holds it at the left, for a panel that reads like navigation. A drawer always runs the full height and is never centered: a centered layer is a modal.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.Placements} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Long content
+
+<DocsCanvasShell description={<>The body takes what the header and footer leave and scrolls past it; the footer stays pinned to the bottom. A body that scrolls becomes a tab stop, so a keyboard can reach it.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.LongContent} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Keyboard and focus
+
+<DocsCanvasShell description={<>Open the drawer with the button. Focus moves to its first control, Tab and Shift+Tab cycle inside it, and Escape, the close button or a click on the scrim close it and send focus back to the button. The drawer is a <code>dialog</code> with <code>aria-modal</code>, named by its title.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.KeyboardAndFocus} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PatternDrawerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a task that blocks the page, or needs none of it in view, use `PatternModal`.
+- For content that belongs on the page itself, use `PatternSection` or `PatternCard`.
+- A confirm raised from a drawer is a modal in a second `Overlay` above it.
+
+</div>
+
+</div>

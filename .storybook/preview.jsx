@@ -186,7 +186,8 @@ const preview = {
               "Card",
               "Table",
               "Overlay",
-              "Modal"
+              "Modal",
+              "Drawer"
             ],
             "Imagery",
             "Design tokens",
