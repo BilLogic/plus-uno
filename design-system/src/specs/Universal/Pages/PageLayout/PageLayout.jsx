@@ -90,7 +90,8 @@ const FocusedFrame = ({
                     onClick={onBack}
                 />
             ) : null}
-            <h1 className="plus-page-focused__title">{title}</h1>
+            {/* The focused page names its task here, so it needs a title; the spacer keeps Close at the end without one. */}
+            {title ? <h1 className="plus-page-focused__title">{title}</h1> : <span className="plus-page-focused__title" aria-hidden="true" />}
             {onClose ? (
                 <CloseButton className="plus-page-focused__close" aria-label={closeLabel} onClick={onClose} />
             ) : null}

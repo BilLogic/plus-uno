@@ -433,6 +433,7 @@ export const FocusedBackAsLink = {
 export const FocusedLongBody = {
     args: focusedArgs,
     render: (args) => <FocusedNote {...args} body={3} />,
+    parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => withTestViewport(1024, 600, async () => {
         const { surface, footer, banner, frame } = focusedParts(canvasElement);
         await waitFor(() => expect(surface.scrollHeight, 'the body overflows').toBeGreaterThan(surface.clientHeight));
