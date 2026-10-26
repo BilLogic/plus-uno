@@ -1219,6 +1219,7 @@
       "color/background/smart/mastering-content/default": "var(--ds-background-smart-mastering-content)",
       "color/background/smart/mastering-content/hovered": "var(--ds-background-smart-mastering-content-hovered)",
       "color/background/smart/mastering-content/pressed": "var(--ds-background-smart-mastering-content-pressed)",
+      "color/background/smart/mastering-content/subtle": "var(--ds-background-smart-mastering-content-subtle)",
       "color/background/smart/mastering-content/bold/default": "var(--ds-background-smart-mastering-content-bold)",
       "color/background/smart/mastering-content/bold/hovered": "var(--ds-background-smart-mastering-content-bold-hovered)",
       "color/background/smart/mastering-content/bold/pressed": "var(--ds-background-smart-mastering-content-bold-pressed)",
@@ -1228,6 +1229,7 @@
       "color/background/smart/relationship/default": "var(--ds-background-smart-relationship)",
       "color/background/smart/relationship/hovered": "var(--ds-background-smart-relationship-hovered)",
       "color/background/smart/relationship/pressed": "var(--ds-background-smart-relationship-pressed)",
+      "color/background/smart/relationship/subtle": "var(--ds-background-smart-relationship-subtle)",
       "color/background/smart/relationship/bold/default": "var(--ds-background-smart-relationship-bold)",
       "color/background/smart/relationship/bold/hovered": "var(--ds-background-smart-relationship-bold-hovered)",
       "color/background/smart/relationship/bold/pressed": "var(--ds-background-smart-relationship-bold-pressed)",
@@ -1237,6 +1239,7 @@
       "color/background/smart/social-emotional/default": "var(--ds-background-smart-social-emotional)",
       "color/background/smart/social-emotional/hovered": "var(--ds-background-smart-social-emotional-hovered)",
       "color/background/smart/social-emotional/pressed": "var(--ds-background-smart-social-emotional-pressed)",
+      "color/background/smart/social-emotional/subtle": "var(--ds-background-smart-social-emotional-subtle)",
       "color/background/smart/social-emotional/bold/default": "var(--ds-background-smart-social-emotional-bold)",
       "color/background/smart/social-emotional/bold/hovered": "var(--ds-background-smart-social-emotional-bold-hovered)",
       "color/background/smart/social-emotional/bold/pressed": "var(--ds-background-smart-social-emotional-bold-pressed)",
@@ -1246,6 +1249,7 @@
       "color/background/smart/advocacy/default": "var(--ds-background-smart-advocacy)",
       "color/background/smart/advocacy/hovered": "var(--ds-background-smart-advocacy-hovered)",
       "color/background/smart/advocacy/pressed": "var(--ds-background-smart-advocacy-pressed)",
+      "color/background/smart/advocacy/subtle": "var(--ds-background-smart-advocacy-subtle)",
       "color/background/smart/advocacy/bold/default": "var(--ds-background-smart-advocacy-bold)",
       "color/background/smart/advocacy/bold/hovered": "var(--ds-background-smart-advocacy-bold-hovered)",
       "color/background/smart/advocacy/bold/pressed": "var(--ds-background-smart-advocacy-bold-pressed)",
@@ -1255,6 +1259,7 @@
       "color/background/smart/technology-tools/default": "var(--ds-background-smart-technology-tools)",
       "color/background/smart/technology-tools/hovered": "var(--ds-background-smart-technology-tools-hovered)",
       "color/background/smart/technology-tools/pressed": "var(--ds-background-smart-technology-tools-pressed)",
+      "color/background/smart/technology-tools/subtle": "var(--ds-background-smart-technology-tools-subtle)",
       "color/background/smart/technology-tools/bold/default": "var(--ds-background-smart-technology-tools-bold)",
       "color/background/smart/technology-tools/bold/hovered": "var(--ds-background-smart-technology-tools-bold-hovered)",
       "color/background/smart/technology-tools/bold/pressed": "var(--ds-background-smart-technology-tools-bold-pressed)",
@@ -1264,11 +1269,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1486,
+    "scssTokenCount": 1491,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1110,
-      "resolved": 1081,
+      "total": 1115,
+      "resolved": 1086,
       "percent": 97,
       "unresolved": [
         {

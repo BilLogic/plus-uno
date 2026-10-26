@@ -177,6 +177,7 @@ proposal does (`background.selected` is `color.background.selected`, so
 | Chart | one series `color.chart.brand`; comparison `color.chart.neutral`; series 1–4 `color.chart.categorical.1` to `color.chart.categorical.4` |
 | Skeleton | `color.skeleton` / `color.skeleton.subtle` |
 | SMART subject tag | `background.smart.<subject>` + `text.smart.<subject>` |
+| SMART illustration body | `background.smart.<subject>.subtle`, the mid step at `background.accent.<hue>.subtle` strength; line work `icon.subtle` |
 | Avatar fallback | `background.accent.<hue>.subtler` + `text.accent.<hue>` (for example `background.accent.teal.subtler` + `text.accent.teal`); hovered `color.interaction.hovered` |
 | Divider | `color.border` |
 | Scroll bar thumb | `background.neutral.hovered` / `background.neutral.pressed` |
