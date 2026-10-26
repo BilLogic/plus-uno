@@ -36,12 +36,12 @@ an `icon` you can place left or right. One disclosure is `Collapse`; a set of
 them is `Accordion`, and building the set out of Collapses means writing the
 mutual-exclusion logic yourself.
 
-**`Card` versus `Jumbotron`.** They share the same `paddingSize` / `gapSize` /
-`radiusSize` token props, and both build their own buttons. `Jumbotron` is the
-page-opening block: it has `fluid`, and `primaryButton` plus `secondaryButton`.
-`Card` is the repeatable unit: it has `image`, `header`, `items`, `links` and a
-single `actionButton`. Note `Card`'s `radiusSize` accepts only `sm` and `md`,
-while `Jumbotron`'s accepts `lg` as well.
+**`Card` versus `Jumbotron`.** `Jumbotron` is the page-opening block, one per
+page: the page's `h1` `title`, one `description` line, an `actions` slot and
+optional `media`, in a raised card (built on the Card pattern) or a full-bleed
+band (`container="band"`). `Card` is the repeatable unit: it has `image`,
+`header`, `items`, `links` and a single `actionButton`, and takes the
+`paddingSize` / `gapSize` / `radiusSize` token props.
 
 **`Card` versus `MediaObject`.** A bordered surface with its own regions is a
 card. Media alongside text, aligned six ways via `alignment` and sized by
