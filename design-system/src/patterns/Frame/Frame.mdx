@@ -33,6 +33,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 - **Topbar** — the `Topbar` pattern in the `topbar` slot, `--layout-height-topbar` 32, padded 8 on the left by the topbar itself, so the sidebar toggle sits at (8, 8) at every width and never moves. The frame owns the sidebar state and the topbar draws the one toggle from it: `angles-left` while the sidebar is docked or floating, `bars` while it is closed. Docked, the topbar's start is sidebar-wide, so the breadcrumb lines up with the surface.
 - **Sidebar** — `--layout-width-sidebar` 240, its rows 4 apart. It docks from 1024 (`Layout/sidebar-docked`), padded 8 at the sides, and ends in a 1px `--ds-border` divider flush against the surface (where increased contrast draws the surface edge, the edge lies over the divider, so one line shows); the row then pads 0 on the left (`--layout-pad-left-container`), 8 while it is closed.
 - **Surface** — `--ds-surface`, edged by a `--size-surface-border` ring in `--ds-border-surface` (transparent, except in light increased contrast, where the frame turns white), radius `--surface-radius`, pad `--surface-pad` 16 below 1440 and 24 from 1440.
+- **Footer** — an optional `footer` row under the surface, `--surface-container-stack` 8 below it and padded on the left like the surface row, so it lines up with the surface. `PageLayout` with `frame="focused"` puts its actions there.
 - **Content** — a 12-column grid (`--layout-columns`) with gutter `--layout-gutter` 16, capped at `--layout-max-width-content` 1232 (reading: `--layout-max-width-reading` 864) and centered, never under `--layout-min-width-content` 720. Children span all 12 columns; set `grid-column: span N` to span fewer.
 
 </div>
@@ -80,6 +81,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 ## Related
 
 - For a whole page, use `PageLayout`, which fills this frame with the PLUS TopBar and Sidebar.
+- For a page that holds one task, with no sidebar, use `PageLayout` with `frame="focused"`.
 - For the column math this region is sized by, see **Layout & Grid**.
 - For a region inside the content, use `PatternSection`.
 - For the raw fill-and-elevation primitive, use `Surface`.

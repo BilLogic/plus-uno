@@ -340,6 +340,7 @@ export const FAMILIES = [
   { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
   { family: 'drawer', prefix: '--drawer-', what: 'drawer pad, stack and inline (the Modal steps, no radius)' },
+  { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },

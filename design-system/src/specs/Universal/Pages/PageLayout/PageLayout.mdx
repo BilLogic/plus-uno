@@ -67,4 +67,38 @@ App outer layout — wraps every page with Sidebar, TopBar and the content slot,
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+### Focused frame
+
+`frame="focused"` is the page for one task, with no sidebar. It mirrors the Figma `Pattern/Page template` frame=focused (BS4 Foundation, node 19844:126243) and its parts `_Focused topbar` and `_Focused footer`.
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A session note: Back, the title and Close in the topbar, two sections in the 864 reading column, and Save draft and Submit note in the footer.</>}
+>
+    <Canvas
+        of={PageLayoutStories.Focused}
+        story={{ inline: true }}
+        layout="fullscreen"
+        sourceState="hidden"
+    />
+</DocsCanvasShell>
+
+- **Frame** — the `Frame` with no sidebar: three rows, `--focused-page-stack-sm` 8 apart, inside `--focused-page-pad-y` · `--focused-page-pad-x` 8 on `--ds-surface-sunken`.
+- **Topbar** — a `header`, the page's banner, `--layout-height-topbar` 32: Back (`onBack` or `backHref`), the `title` as the page's one visible `h1` at Heading/xsmall, truncated on one line, and Close (`onClose`), `--focused-page-inline-md` 12 apart. Without a handler, that control is not drawn.
+- **Surface** — the page's `main`, at reading width: content capped at `--layout-max-width-reading` 864, centered, never under 720. A long task scrolls inside it.
+- **Footer** — a `footer` named by `actionsLabel` ("Page actions"): the `actions`, end-aligned, `--focused-page-inline-sm` 8 apart, in a column lined up with the content. It stays put while the surface scrolls; without `actions` there is no footer.
+- **Focus order** — Back, Close, the content, then the actions.
+
+**Default, focused or Modal?**
+
+- **frame="default"** when the person moves among pages: browse, compare, come back. It keeps the sidebar and the breadcrumb.
+- **frame="focused"** for one task that takes more than a screen or a few minutes, which the person finishes or leaves, and where the rest of the app would only distract: writing a session note, setting up a session, reviewing an import.
+- **A Modal** for a short decision or a few fields that keep the page behind them in view. If it scrolls for long or has sections, it is a focused page.
+- **Do** name the task in the title ("Add a session note"), and end the footer with the one primary action.
+- **Don't** add a sidebar, a breadcrumb or the account to a focused page, and don't put several primary actions in the footer.
+
+</div>
+
 </div>
