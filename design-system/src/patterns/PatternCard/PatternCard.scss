@@ -6,6 +6,8 @@
  * token.
  */
 
+@use '../../styles/card-title' as *;
+
 .plus-pattern-card {
     // A surface tells what sits on it which surface it is: a sticky table
     // cell inside the card paints this, so it matches the card, not the page.
@@ -118,9 +120,9 @@
     min-width: 0;
 }
 
+// The card title type, shared with Card (`styles/_card-title.scss`).
 .plus-pattern-card-title {
-    margin: 0;
-    font: var(--heading-xsmall);
+    @include card-title-type;
     color: var(--ds-text);
 }
 
