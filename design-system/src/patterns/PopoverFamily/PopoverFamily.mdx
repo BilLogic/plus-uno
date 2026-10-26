@@ -1,0 +1,266 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PopoverFamilyStories from './PopoverFamily.stories.jsx';
+import { PopupShortList, PopupForm, MenuShortLabels, MenuSentenceLabel } from './PopoverFamily.examples.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={PopoverFamilyStories} />
+
+<Title />
+The Popover family is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no scrim. An outside click or Escape closes them, and each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3043"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PopoverFamily"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Purpose
+
+Popover names the pattern and the token collection for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popover` component and the Flag is the `Toast` component.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### When to use
+
+- Use a Menu to choose one action from a short list.
+- Use a Popup for a small aside anchored to a control, such as a definition, a preview or a short list. A Popup is never a form.
+- Use a Flag to report an outcome that does not need a decision.
+- Use a Tooltip for one line of help on a control.
+- For a decision that must be made before going on, use a [Modal](?path=/docs/foundations-patterns-modal--docs). It takes an [Overlay](?path=/docs/foundations-patterns-overlay--docs) and a scrim, and the Popover family never does.
+- For a task that needs the page in view, use a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A Menu at size md and at size sm. <strong>1</strong> Menu: the floating box, with 4 of pad. <strong>2</strong> Group heading: text in Heading/xxsmall. <strong>3</strong> Menu row: a part, repeated for each item. A row is 32 tall and grows when it carries a description line.</>}>
+    <Canvas of={PopoverFamilyStories.Menu} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+The four layers are built from existing components. Their properties are on each component's page.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Component</th><th>Properties</th></tr>
+</thead>
+<tbody>
+<tr><td>Menu</td><td><code>Dropdown</code></td><td><code>size</code> (<code>default</code> or <code>small</code>), <code>items</code>. An item has <code>text</code>, an optional <code>description</code>, <code>leadingIcon</code>, <code>selected</code> and <code>header</code>.</td></tr>
+<tr><td>Popup</td><td><code>Popover</code></td><td><code>width</code> (<code>sm</code>, <code>md</code> or <code>lg</code>, default <code>sm</code>), <code>title</code>, <code>placement</code>, <code>triggerType</code>, <code>trigger</code>, children as the body.</td></tr>
+<tr><td>Flag</td><td><code>Toast</code></td><td><code>style</code> (<code>info</code>, <code>success</code>, <code>warning</code> or <code>danger</code>), <code>title</code>, children as the description, <code>autohide</code>, <code>delay</code>. <code>ToastContainer</code> places the stack.</td></tr>
+<tr><td>Tooltip</td><td><code>Tooltip</code></td><td><code>text</code>, <code>placement</code> (<code>top</code>, <code>bottom</code>, <code>left</code> or <code>right</code>), <code>trigger</code>, <code>delayShow</code>, <code>delayHide</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+Figma names the Flag appearances <code>info</code>, <code>success</code>, <code>warning</code> and <code>error</code>. In code, <code>error</code> is <code>danger</code>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--popover-pad</code></td><td>16</td><td>Pad of a Popup and a Flag.</td></tr>
+<tr><td><code>--popover-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>320, 400, 480</td><td>The Popup width tiers.</td></tr>
+<tr><td><code>--popover-width-flag</code></td><td>400</td><td>The width of a Flag.</td></tr>
+<tr><td><code>--popover-stack-flag</code></td><td>16</td><td>Space between stacked Flags.</td></tr>
+<tr><td><code>--popover-radius</code></td><td>12</td><td>Corner radius of a Popup and a Flag.</td></tr>
+<tr><td><code>--popover-pad-menu</code></td><td>4</td><td>Inset of the rows inside a Menu.</td></tr>
+<tr><td><code>--popover-min-width-menu</code></td><td>160</td><td>The narrowest a Menu gets.</td></tr>
+<tr><td><code>--popover-max-width-menu</code></td><td>320</td><td>The widest a Menu gets.</td></tr>
+<tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>A Menu scrolls past this height. A row is cut, so the scroll shows.</td></tr>
+<tr><td><code>--popover-radius-menu-md</code></td><td>12</td><td>Menu radius with 32 rows.</td></tr>
+<tr><td><code>--popover-radius-menu-sm</code></td><td>10</td><td>Menu radius with 24 rows.</td></tr>
+<tr><td><code>--popover-pad-y-tooltip</code></td><td>4</td><td>Vertical pad of a Tooltip, so 12/16 text sits in 24. Its horizontal pad is <code>--element-pad-x-sm</code>, 8.</td></tr>
+<tr><td><code>--popover-max-width-tooltip</code></td><td>240</td><td>A longer Tooltip wraps at this width.</td></tr>
+<tr><td><code>--popover-radius-tooltip</code></td><td>6</td><td>Corner radius of a Tooltip.</td></tr>
+<tr><td><code>--popover-gap-screen</code></td><td>8</td><td>The closest any layer gets to the screen edge.</td></tr>
+<tr><td><code>--popover-offset</code></td><td>4</td><td>The gap from a layer to its trigger.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Menu
+
+<DocsCanvasShell description={<>A Menu pads 4 so rows sit inset, each with its own radius: 8 at 32 tall, 6 at 24. The Menu radius follows its rows: 12 with 32 rows and 10 with 24 rows. Width hugs inside 160 to 320. Rows are 32 by default and grow when they carry a description line in Body/small. Group headings are Heading/xxsmall.</>}>
+    <DsCanvasQuiet of={PopoverFamilyStories.Menu} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Height hugs up to 320, then the Menu scrolls. The cut row shows that there is more.</>}>
+    <DsCanvasQuiet of={PopoverFamilyStories.MenuScrolls} />
+</DocsCanvasShell>
+
+A row has three states: rest, hover and selected. Selected uses neutral ink on the selected background. A Menu sits on layer 400.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Popup
+
+<DocsCanvasShell description={<>A Popup pads 16 and rounds 12. Its width is a tier: <code>sm</code> 320, <code>md</code> 400 or <code>lg</code> 480. The title is Heading/xsmall 14/20 and the body is Body/default. Height hugs up to the room left on screen, then scrolls. The body is text or a short list.</>}>
+    <DsCanvasQuiet of={PopoverFamilyStories.Popups} />
+</DocsCanvasShell>
+
+A Popup sits on layer 400, and on 510 when it opens from a modal. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Flag
+
+<DocsCanvasShell description={<>A Flag is 400 wide, pads 16 and rounds 12. It carries a 16 icon in the appearance's icon color, a title in Heading/xsmall, a description in Body/default and a 32 Close button. Flags sit bottom-left and stack 16 apart, with the newest at the bottom.</>}>
+    <DsCanvasQuiet of={PopoverFamilyStories.Flags} />
+</DocsCanvasShell>
+
+Success and info close after 8 seconds. Warning and error stay until dismissed. A Flag sits on layer 600.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tooltip
+
+<DocsCanvasShell description={<>A Tooltip is Body/small 12/16 in the inverse text color on the bold neutral background. It pads 4 above and below and 8 at the sides, so it is 24 tall on one line. It rounds 6 and wraps at 240. A Tooltip sits on layer 800.</>}>
+    <DsCanvasQuiet of={PopoverFamilyStories.Tooltips} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Placement
+
+Every layer stays at least 8 from the screen edge and flips when there is no room. It sits 4 from its trigger. Width hugs content inside its tier, and height hugs up to the room left, then scrolls.
+
+<DocsTable>
+<thead>
+<tr><th>Rule</th><th>Token</th><th>Value</th></tr>
+</thead>
+<tbody>
+<tr><td>Closest to the screen edge</td><td><code>--popover-gap-screen</code></td><td>8</td></tr>
+<tr><td>Gap to the trigger</td><td><code>--popover-offset</code></td><td>4</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layers
+
+The layer numbers are shared with the [Overlay](?path=/docs/foundations-patterns-overlay--docs) page.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Number</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Menu and Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={PopoverFamilyStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Rules
+
+- Menu rows inset 4. Popup and Flag pad 16. Tooltip pads 4 and 8.
+- Width hugs content inside a tier: Menu 160 to 320, Tooltip up to 240, Popup 320, 400 or 480, Flag 400.
+- Stack Flags 16 apart, bottom-left.
+- The Popup body is text or a short list, never a form. Anything with inputs, steps or a long scroll belongs in a modal.
+- Give a Menu row a short label. When a row needs more, add a description line and let the row grow. Never put a sentence in the label.
+- A Popover layer never brings a scrim and never blocks the page. An outside click or Escape closes it.
+- Do not put required content in a Popup. Anything the person must read to finish the task belongs on the page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <PopupShortList />,
+            doCaption: 'Three short rows answer the question without leaving the page.',
+            dontExample: <PopupForm />,
+            dontCaption: 'A form in a popup asks the person to work inside a floating box that closes on a stray click. Use a modal.',
+        },
+        {
+            doExample: <MenuShortLabels />,
+            doCaption: 'Short labels, with a description only on the rows that need one.',
+            dontExample: <MenuSentenceLabel />,
+            dontCaption: 'A whole sentence as the label runs past the menu’s width and crowds the row. Keep the label short and move the detail to the description.',
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- A Popup's trigger is a control that announces the Popup: it carries <code>aria-haspopup</code> and an <code>aria-expanded</code> that tracks the open state.
+- A Popup is not a dialog. Focus does not move into it, and anything focusable inside it is reached by continuing to Tab.
+- An outside click and Escape close a Popup.
+- A hover-only Tooltip leaves out the keyboard. Open it on hover and focus.
+- A Flag is announced without taking focus. Success and info are polite, and warning and error interrupt a screen reader.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- [Popup](?path=/docs/components-overlays-and-layering-popup--docs) is the component page for the Popup, with its triggers and dismissal.
+- [Tooltip](?path=/docs/components-overlays-and-layering-tooltip--docs) is the component page for the Tooltip.
+- [Flag](?path=/docs/components-messaging-flag--docs) is the component page for the Flag.
+- [Overlay](?path=/docs/foundations-patterns-overlay--docs) holds the scrim a Modal needs and a Popover layer never takes.
+- [Modal](?path=/docs/foundations-patterns-modal--docs) is the layer for a decision that blocks the page.
+
+</div>
+
+</div>

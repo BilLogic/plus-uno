@@ -1,0 +1,222 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as OverlayStories from './Overlay.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={OverlayStories} />
+
+<Title />
+The Overlay is the full-screen layer that holds a scrim and the one layer above it, a modal or a drawer, so that layer is placed, not drawn. It fills with the scrim, pads 16 at the sides and 64 above and below, and centers a modal or holds a drawer at the screen edge. The examples on this page follow the toolbar's Color mode switch.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3021"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Overlay"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Purpose
+
+An Overlay interrupts the page for one task. It dims everything behind it with one scrim, so the person sees only the layer on top. It never draws content of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### When to use
+
+- Put a **Modal** in an Overlay when one task blocks the page.
+- Put a **Drawer** in an Overlay, at an edge, when the task needs the page in view.
+- Raise a confirm from a modal in a second Overlay above the first.
+- For a menu, popup, flag or tooltip, use the **Popover family**. These float with no scrim and never take an Overlay.
+- For a floating sidebar, use the **Sidebar**. It takes a shadow and no scrim.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A Modal at the 768 stand-in screen. <strong>1</strong> Overlay: the screen-size frame with the scrim fill, the screen grid and the pads. <strong>2</strong> Modal: the part, centered. <strong>3</strong> Body: a slot in the Modal. <strong>4</strong> Footer: a slot in the Modal.</>}>
+    <Canvas of={OverlayStories.Inline} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+<thead>
+<tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>placement</code></td><td>string</td><td><code>center</code>, <code>start</code>, <code>end</code></td><td><code>center</code></td><td>Centers a modal, or holds a drawer full height at the left (<code>start</code>) or right (<code>end</code>) edge, with no pad.</td></tr>
+<tr><td><code>onScrimClick</code></td><td>function</td><td>none</td><td>none</td><td>Runs for a click on the scrim, not on the layer it holds.</td></tr>
+<tr><td><code>inline</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws the Overlay in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.</td></tr>
+<tr><td><code>screenWidth</code></td><td>number</td><td>768, 1024, 1440</td><td>the page width</td><td>Inline only. The screen width the layer inside takes its width from.</td></tr>
+<tr><td><code>screenHeight</code></td><td>number</td><td>any height in px</td><td>hugs the content</td><td>Inline only. The layer inside caps at this height less the top and bottom pad.</td></tr>
+</tbody>
+</DocsTable>
+
+Figma's Overlay has two more properties. **Height** (hug or fill) lives on the Modal inside it, and **stack** (single or nested confirm) is a second Overlay later in the page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--overlay-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
+<tr><td><code>--overlay-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The scrim, under every modal and drawer.</td></tr>
+<tr><td><code>--layout-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
+<tr><td><code>--layout-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
+<tr><td><code>--layout-max-width-content</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
+<tr><td><code>--layout-max-height-modal</code></td><td>screen less 128</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Pads
+
+<DocsCanvasShell description={<>Pad 16 at the sides and 64 above and below, shaded here. A modal never comes closer to the screen edge. Under 640 tall, the vertical pad drops to 24 in code, since Figma's modes follow width.</>}>
+    <DsCanvasQuiet of={OverlayStories.Pads} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Screen grid
+
+<DocsCanvasShell description={<>The screen grid has 12 columns with a 16 gutter. It is centered and capped at 1232. A modal spans 6, 8 or 10 of these columns plus 16 on each side. Only the Overlay carries this grid. Page frames carry the content grid.</>}>
+    <DsCanvasQuiet of={OverlayStories.ScreenGrid} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Placement
+
+<DocsCanvasShell description={<>A modal is centered. A drawer is held full height at the right edge (<code>end</code>) or the left edge (<code>start</code>), with no pad. A centered layer is always a modal.</>}>
+    <DsCanvasQuiet of={OverlayStories.Placements} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Two overlays
+
+<DocsCanvasShell description={<>A confirm raised from a modal sits in a second Overlay. It reuses the scrim and modal layers later in the page and covers the first. The confirm is always width <code>sm</code>.</>}>
+    <DsCanvasQuiet of={OverlayStories.NestedConfirm} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Layers
+
+Figma has no z-index, so the order is written here and lives in code.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Number</th><th>Token</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td>Navigation</td><td>200</td><td><code>--layout-z-index-navigation</code></td><td>The floating sidebar. It has a shadow and no scrim, and an outside click closes it.</td></tr>
+<tr><td>Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td><td>Menu and Popup.</td></tr>
+<tr><td>Scrim</td><td>500</td><td><code>--layout-z-index-scrim</code></td><td>The Overlay and its scrim.</td></tr>
+<tr><td>Modal</td><td>510</td><td><code>--layout-z-index-modal</code></td><td>A Modal or a Drawer.</td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td><td>Flags, above a modal.</td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td><td>Tooltips, above everything.</td></tr>
+</tbody>
+</DocsTable>
+
+A popup opened from a modal takes 510 in code, so menus inside dialogs show above them.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Rules
+
+- Pad 16 at the sides and 64 above and below. This is the closest a modal gets to the screen edge.
+- Use one scrim, `--ds-blanket`, under every modal and drawer.
+- Stack at most **two overlays**: Overlay 1 for a modal, Overlay 2 for a confirm raised from it.
+- Opening a modal closes a floating sidebar, so the two never stack.
+- A floating sidebar gets a shadow and no scrim.
+- Popovers, flags and tooltips never bring a scrim.
+- Both layers cap at the screen height less 128 and scroll their body past it.
+- Place a modal in the Overlay. Do not detach it to move things around.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+None. The Overlay has no do and don't pairs of its own. The pairs live on the Modal page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- The Overlay is a layout layer with no role. The Modal or Drawer inside it is the dialog.
+- The scrim is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the scrim takes no role and no key handler.
+- The scrim at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
+- A layer wider than a narrow screen keeps its width, and the Overlay scrolls.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+The Overlay draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and scrim tokens. The Drawer pattern brings its own focus handling.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Interactive playground
+
+<DocsInteractivePlayground
+    of={OverlayStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- [Modal](?path=/docs/foundations-patterns-modal--docs) is the layer an Overlay usually holds, centered, for one task that blocks the page.
+- [Drawer](?path=/docs/foundations-patterns-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
+- [Popover family](?path=/docs/foundations-patterns-popover-family--docs) covers the floating layers that never take a scrim.
+
+</div>
+
+</div>

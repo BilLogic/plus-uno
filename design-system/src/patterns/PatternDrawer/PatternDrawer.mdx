@@ -1,15 +1,15 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PatternDrawerStories} />
 
 <Title />
-The drawer pattern is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in an `Overlay` at the `end` edge (the right) or the `start` edge (the left), over the same scrim a modal takes. Its width is a Modal width step, and its title, description and close button follow the Modal rules. It draws the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay`, with Drawer/pad 16 and Drawer/stack-md 16 (the Modal steps, under their own names), and no radius. It is a real dialog: it moves focus inside when it opens, keeps Tab there, closes on Escape, the close button or a click on the scrim, and returns focus to what opened it.
+The Drawer is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters or a short edit. It sits in an Overlay at the right edge or the left edge, over the same scrim a Modal takes. It carries a title, a description, a body and a footer, like a Modal. The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19844-125964"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternDrawer"
 />
 
@@ -17,11 +17,96 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 <div className="sb-ds-doc-section">
 
-### Overview
+### Purpose
 
-<DocsCanvasShell attachSourceBelow description={<>A <code>width="sm"</code> drawer at the <code>end</code> edge of an inline 1024 screen: the scrim, no pad, the drawer full height.</>}>
+A Drawer opens a panel beside the page so a person can work on one thing while the page stays in view. It dims the page with the scrim but does not hide it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### When to use
+
+- Use a Drawer for a task that needs the page in view, such as the details of a row, filters or a short edit.
+- For a task that blocks the page, or needs none of it in view, use a [Modal](?path=/docs/foundations-patterns-modal--docs).
+- For content that belongs on the page itself, use a [Section](?path=/docs/foundations-patterns-section--docs) or a [Card](?path=/docs/foundations-patterns-card--docs).
+- A Drawer is never wider than <code>lg</code>. Past that the page behind it is no longer in view, and the task wants a Modal or a page of its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A <code>sm</code> Drawer at the <code>end</code> edge of an inline 1024 screen. <strong>1</strong> Header: the title, the description and the Close button. <strong>2</strong> Body: a slot that takes the height the header and footer leave, and scrolls past it. <strong>3</strong> Footer: a slot pinned to the bottom edge, with actions right-aligned. <strong>4</strong> Close: the 32 Close button, always shown. Escape and a click on the scrim close the Drawer too.</>}>
     <Canvas of={PatternDrawerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
+
+The Drawer pads 16 on every side and stacks its header, body and footer 16 apart. Header and footer inline space is 8. It draws the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay`. It has no radius, because it meets the screen edge at the top, the bottom and its own side. The title is Heading/medium 20, and the description is Body/default in the subtle text color.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+<thead>
+<tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>open</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td>none</td><td>Whether the Drawer shows. Closing it returns focus to what had it before it opened.</td></tr>
+<tr><td><code>title</code></td><td>node</td><td>text</td><td>none</td><td>The title in the header. It is the dialog's heading and its name.</td></tr>
+<tr><td><code>description</code></td><td>node</td><td>one line</td><td>none</td><td>A line under the title. Add one only when it adds something.</td></tr>
+<tr><td><code>width</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code></td><td><code>sm</code></td><td>The Modal width steps: 6, 8 or 10 columns of the screen grid plus 16 on each side.</td></tr>
+<tr><td><code>placement</code></td><td>string</td><td><code>end</code>, <code>start</code></td><td><code>end</code></td><td>The right edge (<code>end</code>) or the left edge (<code>start</code>).</td></tr>
+<tr><td><code>footer</code></td><td>node</td><td>buttons</td><td>none</td><td>The footer slot, pinned to the bottom edge. The primary action goes last.</td></tr>
+<tr><td><code>onClose</code></td><td>function</td><td>none</td><td>none</td><td>Draws the Close button. Runs for the button, Escape and a click on the scrim.</td></tr>
+<tr><td><code>children</code></td><td>node</td><td>content</td><td>none</td><td>The body slot. It scrolls once it outgrows the screen.</td></tr>
+</tbody>
+</DocsTable>
+
+Figma's Drawer has more options than the code draws today.
+
+<DocsTable>
+<thead>
+<tr><th>Figma property</th><th>Values</th><th>In code</th></tr>
+</thead>
+<tbody>
+<tr><td><code>width</code></td><td>sm, md, lg</td><td>Same: <code>width</code>.</td></tr>
+<tr><td><code>placement</code></td><td>end, start</td><td>Same: <code>placement</code>.</td></tr>
+<tr><td>Header <code>type</code></td><td>default, custom</td><td>Default: <code>title</code> and <code>description</code>. Custom is not in code.</td></tr>
+<tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>.</td></tr>
+<tr><td><code>divider?</code></td><td>on, off</td><td>Not in code.</td></tr>
+<tr><td><code>loading?</code></td><td>on, off</td><td>Not in code.</td></tr>
+<tr><td><code>column guide?</code></td><td>on, off</td><td>Figma only. It shows the screen-grid columns for checking alignment and never ships.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--drawer-pad</code></td><td>16</td><td>Pad on every side, every size.</td></tr>
+<tr><td><code>--drawer-stack-sm</code></td><td>8</td><td>Small space between parts.</td></tr>
+<tr><td><code>--drawer-stack-md</code></td><td>16</td><td>Space between the header, body and footer.</td></tr>
+<tr><td><code>--drawer-stack-lg</code></td><td>24</td><td>Space between groups in the body.</td></tr>
+<tr><td><code>--drawer-inline-sm</code>, <code>-md</code>, <code>-lg</code></td><td>8, 16, 24</td><td>Inline space, such as between footer buttons.</td></tr>
+<tr><td><code>--layout-width-drawer-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width</td><td>The three width steps, the same values as the Modal's.</td></tr>
+<tr><td><code>--ds-surface-overlay</code></td><td>overlay surface</td><td>The Drawer's fill.</td></tr>
+<tr><td><code>--ds-shadow-overlay</code></td><td>overlay shadow</td><td>The Drawer's elevation, the overlay pair.</td></tr>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The scrim the Overlay draws behind it.</td></tr>
+</tbody>
+</DocsTable>
+
+The Drawer tokens alias the same values as the Modal tokens, so the two move together. There is no Drawer radius token.
 
 </div>
 
@@ -29,8 +114,31 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 ### Width
 
-<DocsCanvasShell description={<><code>sm</code>, <code>md</code> and <code>lg</code> are the Modal width steps: 6, 8 and 10 columns of the screen grid plus 16 on each side, so 384, 507 and 629 at 768, 512, 677 and 843 at 1024, 640, 848 and 1056 at 1440. The width grows with the screen, never shrinks, and the sidebar never changes it.</>}>
+<DocsCanvasShell description={<>A Drawer takes the Modal width steps, never the page grid. They are 6, 8 and 10 columns of the screen grid plus 16 on each side. The width grows with the screen, never shrinks, and the sidebar never changes it.</>}>
     <DsCanvasQuiet of={PatternDrawerStories.Widths} />
+</DocsCanvasShell>
+
+<DocsTable>
+<thead>
+<tr><th>Step</th><th>Medium 768</th><th>Large 1024</th><th>X-Large 1440</th><th>Made of</th></tr>
+</thead>
+<tbody>
+<tr><td><code>sm</code></td><td>384</td><td>512</td><td>640</td><td>6 screen-grid columns + 2 × 16</td></tr>
+<tr><td><code>md</code></td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
+<tr><td><code>lg</code></td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Height
+
+A Drawer runs from the top of the screen to the bottom, so it has no hug or fill choice. The body takes what the header and footer leave and scrolls past it. The footer stays pinned to the bottom edge.
+
+<DocsCanvasShell description={<>The body scrolls once its content outgrows the screen. A body that scrolls becomes a tab stop, so a keyboard can reach it.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.LongContent} />
 </DocsCanvasShell>
 
 </div>
@@ -39,7 +147,7 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 ### Placement
 
-<DocsCanvasShell description={<><code>end</code>, the default, holds the drawer at the right edge, for a panel about something on the page. <code>start</code> holds it at the left, for a panel that reads like navigation. A drawer always runs the full height and is never centered: a centered layer is a modal.</>}>
+<DocsCanvasShell description={<><code>end</code>, the default, holds the Drawer at the right edge, for a panel about something on the page. <code>start</code> holds it at the left, for a panel that reads like navigation. A Drawer always runs the full height and is never centered. A centered layer is a Modal.</>}>
     <DsCanvasQuiet of={PatternDrawerStories.Placements} />
 </DocsCanvasShell>
 
@@ -47,11 +155,9 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 <div className="sb-ds-doc-section">
 
-### Long content
+### Relation to Overlay and Modal
 
-<DocsCanvasShell description={<>The body takes what the header and footer leave and scrolls past it; the footer stays pinned to the bottom. A body that scrolls becomes a tab stop, so a keyboard can reach it.</>}>
-    <DsCanvasQuiet of={PatternDrawerStories.LongContent} />
-</DocsCanvasShell>
+A Drawer is placed in the [Overlay](?path=/docs/foundations-patterns-overlay--docs) with an edge placement. The Overlay drops its pad and holds the Drawer at that edge, over the same scrim and the same layers a [Modal](?path=/docs/foundations-patterns-modal--docs) takes. The Drawer follows the Modal's title, width and footer rules. One Drawer shows at a time. A confirm raised from a Drawer is a Modal in a second Overlay above it.
 
 </div>
 
@@ -59,7 +165,7 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 ### Keyboard and focus
 
-<DocsCanvasShell description={<>Open the drawer with the button. Focus moves to its first control, Tab and Shift+Tab cycle inside it, and Escape, the close button or a click on the scrim close it and send focus back to the button. The drawer is a <code>dialog</code> with <code>aria-modal</code>, named by its title.</>}>
+<DocsCanvasShell description={<>Open the Drawer with the button. Focus moves to its first control, Tab and Shift+Tab cycle inside it, and Escape, the Close button or a click on the scrim close it and send focus back to the button.</>}>
     <DsCanvasQuiet of={PatternDrawerStories.KeyboardAndFocus} />
 </DocsCanvasShell>
 
@@ -83,11 +189,45 @@ The drawer pattern is a full-height panel at the edge of the screen, for a task 
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Rules
 
-- For a task that blocks the page, or needs none of it in view, use `PatternModal`.
-- For content that belongs on the page itself, use `PatternSection` or `PatternCard`.
-- A confirm raised from a drawer is a modal in a second `Overlay` above it.
+- Hold the Drawer full height at the screen edge: the right by default, the left for panels that read like navigation.
+- Use a Modal width step, and never go wider than <code>lg</code>.
+- Always place the Drawer over the scrim, in an Overlay. Never put it straight on the page.
+- Show one Drawer at a time.
+- Keep the title short, and add a description only when it adds something.
+- Right-align the footer actions with the primary last. The Close button always shows.
+- Choose a Modal when the task blocks the page or needs none of it in view. Choose a Section when the content belongs on the page itself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+None. The Drawer has no do and don't pairs yet.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- The Drawer is a dialog with <code>aria-modal</code> set to true. The title is its h1 and names it through <code>aria-labelledby</code>.
+- Opening moves focus into the Drawer and traps it there. Tab and Shift+Tab cycle inside.
+- Escape, the Close button and a click on the scrim close it, and focus returns to the control that opened it.
+- A body that scrolls is a tab stop, so a keyboard can reach it.
+- The scrim is a pointer shortcut. A keyboard closes the Drawer from inside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Related
+
+- [Modal](?path=/docs/foundations-patterns-modal--docs) is the centered layer for a task that blocks the page.
+- [Overlay](?path=/docs/foundations-patterns-overlay--docs) places the Drawer at an edge and draws the scrim.
+- [Section](?path=/docs/foundations-patterns-section--docs) and [Card](?path=/docs/foundations-patterns-card--docs) hold content that belongs on the page itself.
 
 </div>
 

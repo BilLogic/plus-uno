@@ -103,9 +103,10 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Popover` for a small panel of secondary content anchored to a control — a
-definition, a preview, a short form with one or two fields. It holds more than a
-`Tooltip` and less than a `Modal`, and unlike a modal it does not take the page.
+Use `Popover` for a small panel of secondary content anchored to a control: a
+definition, a preview or a short list. Its body is text or a short list, never a
+form. For a form, use a `Modal`. It holds more than a `Tooltip` and
+less than a `Modal`, and unlike a modal it does not take the page.
 
 `trigger` is the element it hangs off, `children` the body, `title` the optional
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
@@ -140,15 +141,14 @@ comes nearer than 8 to the screen's edge.
 ```jsx
 // Fine — a string trigger renders a real <button className="plus-popover-trigger">,
 // which carries the role, its own text as the accessible name, and Enter/Space.
-// It used to be a `span` with a tabindex: a focus stop that announced nothing.
 <Popover trigger="What is this?">…</Popover>
 
 // Also fine, and what you want when the trigger needs a Button's own styling.
 <Popover trigger={<Button fill="text" text="What is this?" />}>…</Popover>
 
-// Incorrect — a `div` is not a control. `aria-expanded` is NOT added to it,
-// deliberately: a state on something with no role is invalid ARIA. Pass a
-// control instead of decorating a div.
+// Incorrect — a `div` is not a control. `aria-expanded` is not added to it,
+// because a state on something with no role is invalid ARIA. Pass a control
+// instead of decorating a div.
 <Popover trigger={<div>What is this?</div>}>…</Popover>
 ```
 
@@ -170,7 +170,7 @@ must be read is content that has to stay put while it is read.
   a trigger that can hold them: a `button`, an `a`, a `Button`, anything you
   have already given a `role`, and the button a string trigger becomes. A plain
   `div` gets neither, because a state on something with no role is invalid ARIA.
-- **`aria-controls` is deliberately absent.** It needs the rendered panel's id,
+- **`aria-controls` is not set.** It needs the rendered panel's id,
   `id` is optional here, and an `aria-controls` pointing at an element that does
   not exist yet is worse than none.
 - **Focus does not move into it, and does not have to.** A popover is not a
