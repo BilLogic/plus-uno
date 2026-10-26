@@ -3,7 +3,8 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TAG_SUBJECT_ACCENTS, TagContext } from './Tag';
+import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
+import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
@@ -29,7 +30,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown, the accents SMART subjects alias, became colors Tag draws (outside the palette a picker offers), so `<Tag color="orange">` renders orange where it was yellow with a deprecation warning. A disabled tag is `text.disabled` on `background.disabled`, and a disabled span tag carries `aria-disabled`.' },
+            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown joined the palette, ten colors in all, so `<Tag color="orange">` renders orange where it was yellow with a deprecation warning. A disabled tag is `text.disabled` on `background.disabled`, and a disabled span tag carries `aria-disabled`.' },
             { date: '2026-10-24', kind: 'changed', summary: "A selected tag is the hue's 16 step, held on hover and press. A pressed × is 12, and a focused × shows the ring with no fill." },
             { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
             { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
@@ -59,13 +60,10 @@ const CLEAR = 'rgba(0, 0, 0, 0)';
 
 /* ----------------------------------------------------------------- stories */
 
-/** Every color Tag draws: the palette, then the subject accents. */
-const DRAWN_COLORS = [...TAG_COLORS, ...TAG_SUBJECT_ACCENTS];
-
 /** Every color. The hue is on the border and the swatch; the words stay neutral. */
 export const Colors = () => (
     <div style={row}>
-        {DRAWN_COLORS.map((color) => (
+        {TAG_COLORS.map((color) => (
             <Tag key={color} color={color} data-testid={color}>{color}</Tag>
         ))}
     </div>
@@ -81,7 +79,7 @@ Colors.play = async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const ink = tokenColor(canvasElement, '--ds-text');
 
-        for (const color of DRAWN_COLORS) {
+        for (const color of TAG_COLORS) {
             const tag = canvas.getByTestId(color);
             const swatch = tag.querySelector('[aria-hidden="true"]');
             const s = getComputedStyle(tag);
@@ -104,6 +102,48 @@ Colors.play = async ({ canvasElement }) => {
         const graySwatch = canvas.getByTestId('gray').querySelector('[aria-hidden="true"]');
         const [r, g, b] = getComputedStyle(graySwatch).backgroundColor.match(/\d+/g).map(Number);
         await expect(Math.max(r, g, b) - Math.min(r, g, b)).toBeLessThan(12);
+    });
+};
+
+/** The three colors added to the palette: plain, selected, and as an agent with initials. */
+const NEW_COLORS = ['orange', 'lime', 'brown'];
+
+export const NewColorsContrast = () => (
+    <div style={row}>
+        {NEW_COLORS.map((color) => (
+            <React.Fragment key={color}>
+                <Tag behavior="selectable" color={color} data-testid={`${color}-tag`}>{color}</Tag>
+                <Tag behavior="selectable" color={color} isSelected data-testid={`${color}-selected`}>{`${color} selected`}</Tag>
+                <Tag type="agent" color={color} data-testid={`${color}-agent`}>{`${color} agent`}</Tag>
+            </React.Fragment>
+        ))}
+    </div>
+);
+
+/**
+ * Orange, lime and brown keep each text and background pair at 4.5:1 or above
+ * in all four modes: the neutral words on the hovered, pressed and selected
+ * fills, and the accent's initials on its avatar fill.
+ */
+NewColorsContrast.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await inEveryColorMode(async (mode) => {
+        for (const color of NEW_COLORS) {
+            const tag = canvas.getByTestId(`${color}-tag`);
+            const ink = getComputedStyle(tag).color;
+            for (const pseudo of [':hover', ':active']) {
+                const ground = whileForced(tag, pseudo, 'backgroundColor');
+                await expect(contrastRatio(ink, ground), `${mode}: ${color} words ${pseudo}`)
+                    .toBeGreaterThanOrEqual(4.5);
+            }
+            const selected = getComputedStyle(canvas.getByTestId(`${color}-selected`));
+            await expect(contrastRatio(selected.color, selected.backgroundColor), `${mode}: ${color} selected words`)
+                .toBeGreaterThanOrEqual(4.5);
+            const avatar = avatarOf(canvas.getByTestId(`${color}-agent`));
+            const initials = getComputedStyle(avatar.firstElementChild).color;
+            await expect(contrastRatio(initials, getComputedStyle(avatar).backgroundColor), `${mode}: ${color} initials`)
+                .toBeGreaterThanOrEqual(4.5);
+        }
     });
 };
 

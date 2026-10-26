@@ -21,6 +21,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'The color menu and a new tag\'s random color cover Tag\'s ten colors: orange, lime and brown joined.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The field became 32 with one row of tags, growing as they wrap.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
         ],
@@ -90,7 +91,7 @@ const Owned = ({ onCreateSpy, initialOptions = TOPICS, ...props }) => {
     );
 };
 
-const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
+const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown'];
 
 /**
  * When nothing matches, Create is highlighted and Enter creates the tag. The
@@ -236,7 +237,7 @@ export const PasteSplitsOnCommas = {
     },
 };
 
-/** Each pasted tag gets one of Tag's seven colors, reported with its value. */
+/** Each pasted tag gets one of Tag's ten colors, reported with its value. */
 export const PastedTagsGetTagColors = {
     args: { onCreateSpy: fn() },
     render: (args) => <div style={stack}><Owned {...args} initialOptions={[]} /></div>,
@@ -596,7 +597,7 @@ export const OptionMenuDeletes = {
 };
 
 /**
- * The menu lists Tag's seven colors with the current one checked. A click
+ * The menu lists Tag's ten colors with the current one checked. A click
  * picks one; so do the arrow keys and Enter from the name field.
  */
 export const OptionMenuChangesColor = {
@@ -609,7 +610,7 @@ export const OptionMenuChangesColor = {
         const menu = await body.findByRole('listbox', { name: 'Options for Decision recall' });
         const colors = within(within(menu).getByRole('group', { name: 'Color' })).getAllByRole('option');
         await expect(colors.map((row) => row.textContent)).toEqual(
-            ['Gray', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal']
+            ['Gray', 'Blue', 'Green', 'Purple', 'Magenta', 'Yellow', 'Teal', 'Orange', 'Lime', 'Brown']
         );
         await expect(within(menu).getByRole('option', { name: 'Purple' })).toHaveAttribute('aria-selected', 'true');
 

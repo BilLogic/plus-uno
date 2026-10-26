@@ -26,7 +26,7 @@ const TAG_INPUT_COLOR_ALIASES = {
 /** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
 const ACCEPTED_COLORS = [...TAG_ACCEPTED_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
 
-/** Tag's seven colors as the option menu names them. */
+/** Tag's ten colors as the option menu names them. */
 const COLOR_NAMES = {
     gray: 'Gray',
     blue: 'Blue',
@@ -35,6 +35,9 @@ const COLOR_NAMES = {
     magenta: 'Magenta',
     yellow: 'Yellow',
     teal: 'Teal',
+    orange: 'Orange',
+    lime: 'Lime',
+    brown: 'Brown',
 };
 
 /** The option menu's Delete row; no Tag color has this name. */
@@ -70,7 +73,7 @@ const tagColorOf = (color) => {
     return 'gray';
 };
 
-/** A new tag's color: one of Tag's seven, gray included, picked at random. */
+/** A new tag's color: one of Tag's ten, gray included, picked at random. */
 const randomColor = () => TAG_COLORS[Math.floor(Math.random() * TAG_COLORS.length)];
 
 /** The text a tag or an option shows. */
@@ -101,7 +104,7 @@ let temporaryIds = 0;
  *
  * People can tidy the options where they pick them, as in Notion. With
  * `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a "…"
- * that opens the option's menu: its name, Delete, and Tag's seven colors.
+ * that opens the option's menu: its name, Delete, and Tag's ten colors.
  * With `onReorder`, each row has a handle to drag, or to pick up with Space
  * and move with the arrows. Without these handlers neither appears.
  *
@@ -934,7 +937,7 @@ TagInput.propTypes = {
      */
     onDelete: PropTypes.func,
     /**
-     * `(value, color)`: an option was given another of Tag's seven colors
+     * `(value, color)`: an option was given another of Tag's ten colors
      * from its "…" menu. Store it on the option.
      */
     onColorChange: PropTypes.func,

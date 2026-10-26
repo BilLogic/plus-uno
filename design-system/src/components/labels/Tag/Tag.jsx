@@ -40,17 +40,11 @@ import './Tag.scss';
 /**
  * The color names are categories, never statuses, so there is no `success` or
  * `danger` here, and no red. Each name is the accent family it names, a color
- * with no meaning tied to it; the name-to-token map is in `Tag.scss`. These
- * seven are the palette: what a picker offers and a random color draws from.
+ * with no meaning tied to it; the name-to-token map is in `Tag.scss`. All ten
+ * are the palette: what a picker offers and a random color draws from.
+ * Orange, lime and brown are also the accents three SMART subjects alias.
  */
-export const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal'];
-
-/**
- * The accents the SMART subjects alias that the palette does not offer. Tag
- * draws them, so a SMART subject's accent always has a Tag color, but a
- * picker does not list them.
- */
-export const TAG_SUBJECT_ACCENTS = ['orange', 'lime', 'brown'];
+export const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown'];
 
 /*
  * A literal array, because the docs generator and check:doc-identifiers read
@@ -82,9 +76,8 @@ export const TAG_VARIANTS = ['read-only', 'dismissible', 'selectable', 'operatio
 const DEPRECATED_COLORS = { grey: 'gray' };
 
 /**
- * Every name `color` accepts: the palette, the subject accents, then the
- * deprecated alias. A literal, because the docs generator reads the values
- * from source.
+ * Every name `color` accepts: the ten, then the deprecated alias. A literal,
+ * because the docs generator reads the values from source.
  */
 export const TAG_ACCEPTED_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown', 'grey'];
 
@@ -95,9 +88,7 @@ export const TAG_ACCEPTED_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta'
  */
 export const resolveTagColor = (color) => {
     if (Object.hasOwn(DEPRECATED_COLORS, color)) return { color: DEPRECATED_COLORS[color], deprecated: true };
-    return TAG_COLORS.includes(color) || TAG_SUBJECT_ACCENTS.includes(color)
-        ? { color, deprecated: false }
-        : null;
+    return TAG_COLORS.includes(color) ? { color, deprecated: false } : null;
 };
 
 /**

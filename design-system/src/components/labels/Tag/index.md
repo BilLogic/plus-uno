@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
+**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
 
 **Storybook page:** `design-system/src/components/labels/Tag/Tag.mdx`
 
