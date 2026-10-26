@@ -6,6 +6,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `Suggestion` — a value the system proposes, as a button that sits in a tag
@@ -31,6 +32,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-10-25', kind: 'changed', summary: 'Suggestion moved to discovery: a dashed `border.discovery` edge, `text.discovery` words, an `icon.discovery` glyph, `background.discovery` on hover and its hovered step pressed. Mastering Content now belongs to the SMART subjects alone.' },
             { date: '2026-10-24', kind: 'changed', summary: 'A pressed suggestion is the Mastering Content 12 step, not 16.' },
             { date: '2026-09-29', kind: 'added', summary: 'Suggestion carried a public `Suggestion.isSuggestion` marker that TagGroup used to keep it out of `+n` and at the end of the row, a wrapper had to copy it, and a disabled TagGroup disabled the Suggestions in it.' },
         ],
@@ -95,8 +97,8 @@ export const InATagRow = () => (
 /**
  * The same box as Tag: 22 tall with a 1px border, padding 4, radius 4, gap 4,
  * and the words on the same baseline, so the row reads as one line. The
- * border is dashed in Mastering Content's Border Subtle, and the words and
- * glyph are Mastering Content (Text).
+ * border is dashed in `border.discovery`, the words are `text.discovery` and
+ * the glyph `icon.discovery`.
  */
 InATagRow.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -122,11 +124,11 @@ InATagRow.play = async ({ canvasElement }) => {
     await expect(words.height).toBeCloseTo(tagWords.height, 1);
 
     await expect(s.borderTopStyle, 'dashed').toBe('dashed');
-    await expect(s.borderTopColor)
-        .toBe(tokenColor(canvasElement, '--color-mastering-content-border-subtle'));
-    const ink = tokenColor(canvasElement, '--color-mastering-content-text');
-    await expect(s.color, 'discovery-purple words').toBe(ink);
-    await expect(getComputedStyle(suggestion.querySelector('i')).color, 'and glyph').toBe(ink);
+    await expect(s.borderTopColor, 'a discovery edge')
+        .toBe(tokenColor(canvasElement, '--ds-border-discovery'));
+    await expect(s.color, 'discovery words').toBe(tokenColor(canvasElement, '--ds-text-discovery'));
+    await expect(getComputedStyle(suggestion.querySelector('i')).color, 'and a discovery glyph')
+        .toBe(tokenColor(canvasElement, '--ds-icon-discovery'));
     await expect(px(getComputedStyle(suggestion.querySelector('i')).fontSize), '12px glyph').toBe(12);
 };
 
@@ -183,7 +185,7 @@ Callbacks.play = async ({ canvasElement, args }) => {
     await expect(args.onPrompt).toHaveBeenCalledTimes(1);
 };
 
-/** Rest is outlined only; hover is the 08 state layer, pressed the 12. */
+/** Rest is outlined only; hover is the discovery ground, pressed its hovered step. */
 export const StateLayers = () => (
     <div style={row}>
         <Suggestion label="Relationships" onAccept={() => {}} />
@@ -192,20 +194,22 @@ export const StateLayers = () => (
 );
 
 StateLayers.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const t = (token) => tokenColor(canvasElement, token);
-    const bg = 'backgroundColor';
+    await inEveryColorMode(async () => {
+        const canvas = within(canvasElement);
+        const t = (token) => tokenColor(canvasElement, token);
+        const bg = 'backgroundColor';
 
-    for (const name of ['Add Relationships, suggested', 'Summarize, suggested']) {
-        const el = canvas.getByRole('button', { name });
-        await expect(getComputedStyle(el)[bg], `${name}: rest has no fill`).toBe(CLEAR);
-        await expect(whileForced(el, ':hover', bg), `${name}: hover 08`)
-            .toBe(t('--color-mastering-content-state-08'));
-        await expect(whileForced(el, ':active', bg), `${name}: pressed 12`)
-            .toBe(t('--color-mastering-content-state-12'));
-        // The box never moves between states.
-        await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
-    }
+        for (const name of ['Add Relationships, suggested', 'Summarize, suggested']) {
+            const el = canvas.getByRole('button', { name });
+            await expect(getComputedStyle(el)[bg], `${name}: rest has no fill`).toBe(CLEAR);
+            await expect(whileForced(el, ':hover', bg), `${name}: hover is background.discovery`)
+                .toBe(t('--ds-background-discovery'));
+            await expect(whileForced(el, ':active', bg), `${name}: pressed is background.discovery.hovered`)
+                .toBe(t('--ds-background-discovery-hovered'));
+            // The box never moves between states.
+            await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
+        }
+    });
 };
 
 /**
@@ -222,7 +226,7 @@ export const FocusRing = () => (
 
 FocusRing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ring = tokenColor(canvasElement, '--color-focus-ring');
+    const ring = tokenColor(canvasElement, '--ds-border-focused');
 
     for (const name of ['Add Relationships, suggested', 'Summarize, suggested']) {
         await userEvent.tab();
@@ -272,9 +276,10 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     onStray.mockClear();
     const canvas = within(canvasElement);
     const t = (token) => tokenColor(canvasElement, token);
-    const fill = t('--color-on-surface-state-12');
-    const edge = t('--color-outline-variant');
-    const ink = t('--color-secondary-text');
+    const fill = t('--ds-background-disabled');
+    const edge = t('--ds-border');
+    const ink = t('--ds-text-disabled');
+    const mark = t('--ds-icon-disabled');
     const tag = canvas.getByTestId('tag');
 
     const names = ['Add Relationships, suggested', 'Summarize, suggested'];
@@ -284,15 +289,15 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
         await expect(el, name).toBeDisabled();
 
         const s = getComputedStyle(el);
-        await expect(s.backgroundColor, `${name}: on-surface 12`).toBe(fill);
+        await expect(s.backgroundColor, `${name}: background.disabled`).toBe(fill);
         await expect(s.backgroundColor, `${name}: the disabled Tag's ground`)
             .toBe(getComputedStyle(tag).backgroundColor);
         await expect(s.borderTopStyle, `${name}: still dashed`).toBe('dashed');
-        await expect(s.borderTopColor, `${name}: Outline Variant edge`).toBe(edge);
-        await expect(s.color, `${name}: Secondary (Text) words`).toBe(ink);
+        await expect(s.borderTopColor, `${name}: color.border edge`).toBe(edge);
+        await expect(s.color, `${name}: text.disabled words`).toBe(ink);
         await expect(s.color, `${name}: the disabled Tag's words`)
             .toBe(getComputedStyle(tag).color);
-        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and glyph`).toBe(ink);
+        await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and an icon.disabled glyph`).toBe(mark);
         await expect(px(s.height), `${name}: the box does not move`).toBe(22);
 
         // No hover or press: the ground never changes under a pointer.

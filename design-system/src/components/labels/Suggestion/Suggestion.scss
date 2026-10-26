@@ -5,10 +5,13 @@
  * radius 4, so a suggestion lines up with the tags beside it. The 22 has no
  * semantic token yet, so it is a local custom property, as Tag's is.
  *
- * DISCOVERY PURPLE. The border is dashed in Mastering Content's Border Subtle,
- * and the words and glyph are Mastering Content (Text). Hover is the hue's 08
- * state layer and pressed its 12, the steps color.md names; the Figma set
- * still binds 16 for pressed.
+ * DISCOVERY. A suggestion is something the system proposes, which is
+ * discovery's job: a dashed edge in `border.discovery`, the words in
+ * `text.discovery` and the glyph in `icon.discovery`. Hover is
+ * `background.discovery` and pressed `background.discovery.hovered`, the next
+ * step, since the rest ground is clear: the color proposal's Suggestion chip
+ * row (§4.5, "pressed: background.discovery.hovered"). The Figma set still
+ * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
 .plus-suggestion {
     --plus-suggestion-height: 22px;
@@ -25,12 +28,12 @@
     /* No margin: TagGroup owns the gaps in a tag row. */
     margin: 0;
     padding: 0 var(--size-element-pad-x-xs, 4px);
-    border: var(--size-element-border, 1px) dashed var(--color-mastering-content-border-subtle, rgba(134, 89, 169, 0.45));
+    border: var(--size-element-border, 1px) dashed var(--ds-border-discovery);
     border-radius: var(--size-element-radius-md, 4px);
     background-color: transparent;
     appearance: none;
 
-    color: var(--color-mastering-content-text, #673a8b);
+    color: var(--ds-text-discovery);
     font: inherit;
     text-align: left;
     white-space: nowrap;
@@ -41,7 +44,7 @@
     flex: none;
     font-size: var(--icon-sm);
     line-height: 1;
-    color: inherit;
+    color: var(--ds-icon-discovery);
 }
 
 .plus-suggestion__label {
@@ -54,11 +57,11 @@
 }
 
 .plus-suggestion:hover {
-    background-color: var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08));
+    background-color: var(--ds-background-discovery);
 }
 
 .plus-suggestion:active {
-    background-color: var(--color-mastering-content-state-12, rgba(134, 89, 169, 0.12));
+    background-color: var(--ds-background-discovery-hovered);
 }
 
 /*
@@ -68,7 +71,7 @@
  * The ground stays clear, so focus never reads as pressed.
  */
 .plus-suggestion:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
 
@@ -81,8 +84,12 @@
 .plus-suggestion:disabled,
 .plus-suggestion:disabled:hover,
 .plus-suggestion:disabled:active {
-    border-color: var(--color-outline-variant, #bec8ca);
-    background-color: var(--color-on-surface-state-12, rgba(25, 28, 30, 0.12));
-    color: var(--color-secondary-text, #3b525f);
+    border-color: var(--ds-border);
+    background-color: var(--ds-background-disabled);
+    color: var(--ds-text-disabled);
     cursor: default;
+}
+
+.plus-suggestion:disabled .plus-suggestion__icon {
+    color: var(--ds-icon-disabled);
 }

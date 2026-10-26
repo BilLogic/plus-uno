@@ -1,7 +1,14 @@
 /*
  * NavTabs Component Styles
- * Implements Figma specs for Tabs (underline style indicator)
- * Selected tab shows primary color underline, not folder-style borders
+ * Implements Figma specs for Tabs (underline style indicator), not
+ * folder-style borders.
+ *
+ * Colors, Atlassian's tabs on the --ds- tokens: an unselected tab is
+ * text.subtle on a clear ground; hover and press are the neutral subtle
+ * steps. The selected tab is text.selected over a stroke-md border.selected
+ * indicator (the Lagoon bar), and holds the neutral steps on hover and press,
+ * so selection rests on the bar and the ink, never on a fill. The baseline is
+ * color.border; disabled is text.disabled.
  */
 
 // Base NavTabs container
@@ -15,7 +22,7 @@
     list-style: none;
 
     // Bottom border line across all tabs
-    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--color-outline-variant);
+    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
 
     // Constrain width to content so border doesn't exceed tabs
     width: fit-content;
@@ -29,20 +36,20 @@
         // Pseudo states for Storybook documentation
         &.pseudo-hover>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-hover>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-08);
-            color: var(--color-on-surface) !important;
-            border-bottom-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral-subtle-hovered);
+            color: var(--ds-text-subtle) !important;
+            border-bottom-color: var(--ds-border);
         }
 
         &.pseudo-pressed>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-pressed>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            border-bottom-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral-subtle-pressed);
+            border-bottom-color: var(--ds-border);
         }
 
         &.pseudo-focus>.nav-link:not(.disabled):not(:disabled):not(.active),
         &.pseudo-focus>.plus-nav-link:not(.disabled):not(:disabled):not(.active) {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
@@ -54,8 +61,8 @@
         &.pseudo-hover > .plus-nav-link[aria-current="page"],
         &.pseudo-hover > .nav-link[aria-current="true"],
         &.pseudo-hover > .plus-nav-link[aria-current="true"] {
-            background-color: var(--color-primary-state-08) !important;
-            border-bottom-color: var(--color-primary-border) !important;
+            background-color: var(--ds-background-neutral-subtle-hovered) !important;
+            border-bottom-color: var(--ds-border-selected) !important;
         }
 
         &.pseudo-pressed > .nav-link.active,
@@ -66,8 +73,8 @@
         &.pseudo-pressed > .plus-nav-link[aria-current="page"],
         &.pseudo-pressed > .nav-link[aria-current="true"],
         &.pseudo-pressed > .plus-nav-link[aria-current="true"] {
-            background-color: var(--color-primary-state-12) !important;
-            border-bottom-color: var(--color-primary-border) !important;
+            background-color: var(--ds-background-neutral-subtle-pressed) !important;
+            border-bottom-color: var(--ds-border-selected) !important;
         }
 
         &.pseudo-focus > .nav-link.active,
@@ -78,8 +85,8 @@
         &.pseudo-focus > .plus-nav-link[aria-current="page"],
         &.pseudo-focus > .nav-link[aria-current="true"],
         &.pseudo-focus > .plus-nav-link[aria-current="true"] {
-            border-bottom-color: var(--color-primary-border) !important;
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            border-bottom-color: var(--ds-border-selected) !important;
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
     }
@@ -100,7 +107,7 @@
 
         // Borders
         border: none;
-        border-bottom: var(--size-element-stroke-sm, 1px) solid var(--color-outline-variant);
+        border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
         border-radius: var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0 0;
 
         // Typography: a tab label is Body/default at the medium weight, like a
@@ -111,7 +118,7 @@
 
         // Default state
         background-color: transparent;
-        color: var(--color-on-surface) !important;
+        color: var(--ds-text-subtle) !important;
 
         // Smooth transitions
         transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
@@ -119,48 +126,48 @@
 
         // HOVER state
         &:hover:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-08);
-            color: var(--color-on-surface) !important;
+            background-color: var(--ds-background-neutral-subtle-hovered);
+            color: var(--ds-text-subtle) !important;
             // Explicitly force transparent top/left/right to kill Bootstrap's default hover borders
-            border-color: transparent transparent var(--color-outline-variant) transparent !important;
+            border-color: transparent transparent var(--ds-border) transparent !important;
         }
 
         // PRESSED state
         &:active:not(.disabled):not(:disabled):not(.active) {
-            background-color: var(--color-on-surface-state-12);
-            border-color: transparent transparent var(--color-outline-variant) transparent !important;
+            background-color: var(--ds-background-neutral-subtle-pressed);
+            border-color: transparent transparent var(--ds-border) transparent !important;
         }
 
         // FOCUS state: the focus ring alone, inside the tab, and no fill
         &:focus-visible:not(.disabled):not(:disabled):not(.active) {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: calc(-1 * var(--size-element-stroke-lg));
         }
 
-        // ACTIVE/SELECTED state - SECONDARY UNDERLINE
+        // ACTIVE/SELECTED state - the border.selected underline
         &.active,
         &[aria-selected="true"],
         &[aria-current="page"],
         &[aria-current="true"] {
             // The label stays medium; the underline and the color carry selection.
             background-color: transparent !important;
-            color: var(--color-secondary-text) !important;
-            border-color: transparent transparent var(--color-primary-border) transparent !important;
-            // The active state overrides the 1px outline with a 2px secondary line
+            color: var(--ds-text-selected) !important;
+            border-color: transparent transparent var(--ds-border-selected) transparent !important;
+            // The active state overrides the 1px baseline with the 2px selected bar
             border-bottom-width: var(--size-element-stroke-md, 2px) !important;
             // Negative margin to prevent layout shift from 1px -> 2px border change
             margin-bottom: calc(var(--size-element-stroke-sm, 1px) - var(--size-element-stroke-md, 2px));
 
             &:hover {
-                background-color: var(--color-primary-state-08) !important;
+                background-color: var(--ds-background-neutral-subtle-hovered) !important;
             }
 
             &:active {
-                background-color: var(--color-primary-state-12) !important;
+                background-color: var(--ds-background-neutral-subtle-pressed) !important;
             }
 
             &:focus-visible {
-                outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
+                outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
                 outline-offset: calc(-1 * var(--size-element-stroke-lg));
             }
         }
@@ -169,8 +176,7 @@
         &.disabled,
         &:disabled {
             background-color: transparent;
-            color: var(--color-on-surface) !important;
-            opacity: var(--color-disabled-opacity);
+            color: var(--ds-text-disabled) !important;
             pointer-events: none;
             cursor: not-allowed;
             border-bottom-color: transparent;
@@ -194,25 +200,25 @@
             border-bottom: 2px solid transparent;
             border-radius: 0;
             background-color: transparent;
-            color: var(--color-on-surface) !important;
+            color: var(--ds-text-subtle) !important;
             font: var(--body-default);
             font-weight: var(--type-weight-medium);
 
             &:hover {
-                background-color: var(--color-on-surface-state-08);
-                border-bottom-color: var(--color-outline-variant);
+                background-color: var(--ds-background-neutral-subtle-hovered);
+                border-bottom-color: var(--ds-border);
             }
 
             &:active {
-                background-color: var(--color-on-surface-state-12);
-                border-bottom-color: var(--color-outline-variant);
+                background-color: var(--ds-background-neutral-subtle-pressed);
+                border-bottom-color: var(--ds-border);
             }
 
             &.show,
             &[aria-expanded="true"] {
-                color: var(--color-secondary-text);
-                border-bottom-color: var(--color-secondary-border);
-                background-color: var(--color-secondary-state-08);
+                color: var(--ds-text-selected);
+                border-bottom-color: var(--ds-border-selected);
+                background-color: var(--ds-background-neutral-subtle-hovered);
             }
         }
     }
@@ -236,7 +242,7 @@
     padding-top: var(--size-section-gap-sm, 16px);
 
     &:focus-visible {
-        outline: var(--size-element-stroke-md, 2px) solid var(--color-focus-ring);
+        outline: var(--size-element-stroke-md, 2px) solid var(--ds-border-focused);
         outline-offset: var(--size-element-stroke-sm, 1px);
     }
 }
