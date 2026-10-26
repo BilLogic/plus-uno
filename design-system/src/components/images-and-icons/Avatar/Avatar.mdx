@@ -1,0 +1,264 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AvatarStories from './Avatar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "size": { "type": "enum", "values": ["md", "lg"] },
+    "type": { "type": "enum", "values": ["regular tutor", "lead tutor", "admin"] },
+    "counter": { "type": "boolean" }
+  },
+  "sets": [
+    {
+      "id": "avatar",
+      "name": "Avatar",
+      "componentSetNodeId": "1345:23243",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1345-23243",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "Figma names the set Avatar and code names it UserAvatar. Figma has a focus variant and a name? switch that code does not."
+    }
+  ]
+};
+
+<Meta of={AvatarStories} />
+
+<Title />
+An Avatar shows who is signed in: an initial pill, the person's name and an
+optional count of unread notifications. In code it is `UserAvatar`.
+
+<DocsTabs of={AvatarStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-515"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/UserAvatar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The topbar size, 32 high, with a name and an unread count. Switch the toolbar's Color mode and Contrast to see the pill and the counter in every mode.</>}>
+    <Canvas of={AvatarStories.TopbarSize} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+<DocsCanvasShell description={<>An Avatar with all three parts.</>}>
+    <DsCanvasQuiet of={AvatarStories.Content} />
+</DocsCanvasShell>
+
+1. **Initial pill.** The first letter of the name, centered in a fully rounded pill.
+2. **Name.** The person's full name in Body/default. It truncates at the label maximum width and keeps the full name as a tooltip.
+3. **Counter.** A count of unread notifications. Turn it off with `counter`.
+
+When the person is a lead tutor, a **Lead** status sits between the name and the counter.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Values</th><th>Default</th><th>What it does</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>firstChar</code></td><td>text</td><td><code>J</code></td><td>The initial. Use the first letter of the name beside it.</td><td><code>firstChar</code></td></tr>
+        <tr><td><code>name</code></td><td>text</td><td><code>John Doe</code></td><td>The full name. A long name truncates and keeps its full text as a tooltip.</td><td><code>name</code></td></tr>
+        <tr><td><code>counter</code></td><td>true · false</td><td><code>true</code></td><td>Shows the notification counter.</td><td><code>counter?</code></td></tr>
+        <tr><td><code>counterValue</code></td><td>number</td><td><code>2</code></td><td>The number in the counter.</td><td>The counter's own text</td></tr>
+        <tr><td><code>size</code></td><td><code>md</code> · <code>lg</code></td><td><code>lg</code></td><td><code>md</code> is 32 high, for the topbar. <code>lg</code> is padded, for table rows.</td><td>Not a Figma property</td></tr>
+        <tr><td><code>type</code></td><td><code>regular tutor</code> · <code>lead tutor</code> · <code>admin</code></td><td><code>regular tutor</code></td><td><code>lead tutor</code> adds a Lead status. The other types add none.</td><td>Not a Figma property</td></tr>
+        <tr><td><code>state</code></td><td><code>enabled</code> · <code>hover</code></td><td><code>enabled</code></td><td><code>hover</code> shows the hovered fill.</td><td><code>type</code>: default · focus</td></tr>
+        <tr><td><code>onClick</code></td><td>function</td><td>none</td><td>Makes the Avatar show a pointer cursor and call the function.</td><td>None</td></tr>
+    </tbody>
+</DocsTable>
+
+Figma has two things code does not: a **focus** variant and a `name?` switch that hides the name. Code has two things Figma does not: `size` and `type`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--color-primary-state-08</code></td><td>Primary at 8%</td><td>The initial pill's fill</td></tr>
+        <tr><td><code>--color-primary-text</code></td><td>Primary text</td><td>The initial</td></tr>
+        <tr><td><code>--ds-text</code></td><td>Default text</td><td>The name</td></tr>
+        <tr><td><code>--color-danger-state-08</code></td><td>Danger at 8%</td><td>The counter's fill</td></tr>
+        <tr><td><code>--color-danger-text</code></td><td>Danger text</td><td>The counter's number</td></tr>
+        <tr><td><code>--color-on-surface-state-08</code></td><td>Text color at 8%</td><td>The hovered fill</td></tr>
+        <tr><td><code>--element-radius-full</code></td><td>9999</td><td>The pill and the counter</td></tr>
+        <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the <code>md</code> Avatar</td></tr>
+        <tr><td><code>--image-sm</code> · <code>--image-md</code></td><td>24 · 32</td><td>The pill's size in <code>md</code> and in <code>lg</code></td></tr>
+        <tr><td><code>--label-max-width</code></td><td>160</td><td>Where the <code>md</code> name truncates</td></tr>
+    </tbody>
+</DocsTable>
+
+Figma binds the pill to the accent blue subtler step and the counter to the danger subtle step. Code binds the primary and danger state steps listed above.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsCanvasShell description={<><code>md</code> is 32 high and takes <code>--item-height-md</code>. <code>lg</code> pads the same 32 pill for table rows.</>}>
+    <DsCanvasQuiet of={AvatarStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>The initial always shows. The counter shows by default and turns off with <code>counter</code>.</>}>
+    <DsCanvasQuiet of={AvatarStories.Content} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A lead tutor adds a Lead status. A regular tutor and an admin add none.</>}>
+    <DsCanvasQuiet of={AvatarStories.Roles} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A long name truncates at the label maximum width and keeps the full name as a tooltip.</>}>
+    <DsCanvasQuiet of={AvatarStories.LongName} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>An Avatar has two states: enabled and hover. Hover fills the Avatar with <code>--color-on-surface-state-08</code>. An Avatar with an <code>onClick</code> also shows a pointer cursor.</>}>
+    <DsCanvasQuiet of={AvatarStories.States} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<AvatarStories.DoDont />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- One Avatar per person, at one size within a list.
+- The initial is the first letter of the name beside it.
+- Colors come from tokens. The pill resting on the primary 8% step is a documented exception, not a precedent for other pills.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AvatarStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+Import `UserAvatar` from the `@/components` barrel. The Avatar renders a
+`div`, so make it a control by wrapping it.
+
+```jsx
+import { UserAvatar } from '@/components';
+
+// In the topbar: 32 high, with the unread count.
+<button type="button" aria-label="Account, 2 unread notifications">
+    <UserAvatar size="md" firstChar="J" name="Jane Park" counterValue={2} />
+</button>
+```
+
+The `lg` size is the default and keeps the padded row used in tables. Pass
+`size="md"` wherever the Avatar sits in the 32 topbar.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use an Avatar to show who is signed in, in the topbar, or to name a tutor or
+a student in a row.
+
+- For a school, a tool or a lesson, use **Tile**.
+- For a role or a state beside a name, use **Status**.
+- For a count of unread items on its own, use **Count**.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The pill is decorative.** It is hidden from assistive technology, so the name is the accessible text. Keep the name on wherever the Avatar stands alone.
+- **A truncated name keeps its full text.** It shows as a tooltip, so a long name is never lost.
+- **The counter is a bare number.** Give the control that holds it a name that says what it counts, such as "2 unread notifications".
+- **A clickable Avatar needs a button around it.** The Avatar itself is not focusable and draws no focus ring. Wrap it in a button or a link that carries the accessible name and the focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- A role or a state beside a name: **Status**.
+- A logo or a picture in a square: **Tile**.
+- A count of unread items: **Count**.
+- Avatar colors: **Color**.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

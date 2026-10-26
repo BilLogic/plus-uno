@@ -37,6 +37,9 @@
       "Tree select"
     ],
     "Images and icons": [
+      "Avatar",
+      "Icon",
+      "Image",
       "Logo",
       "Tile",
       "Illustrations"
@@ -164,6 +167,9 @@
       ],
       "Images and icons",
       [
+        "Avatar",
+        "Icon",
+        "Image",
         "Logo",
         "Tile",
         "Illustrations"

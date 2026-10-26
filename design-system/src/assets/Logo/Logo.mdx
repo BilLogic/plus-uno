@@ -1,6 +1,6 @@
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, ArgTypes } from '@storybook/addon-docs/blocks';
 import * as LogoStories from './Logo.stories.jsx';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -27,12 +27,11 @@ export const figmaMeta = {
 <Meta of={LogoStories} />
 
 <Title />
-
-<Description>
-The application Logo. Supports colored, filled, and outlined variations.
-</Description>
+The Logo is the PLUS mark, with or without the wordmark, in colored, filled and
+outlined styles. Use it to mark PLUS itself, never as decoration.
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-605"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/assets/Logo"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -41,9 +40,170 @@ The application Logo. Supports colored, filled, and outlined variations.
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Overview
 
-<LogoStories.Overview />
+## Overview
+
+<DocsCanvasShell description={<>The three styles at size S. The colored logo is brand artwork and looks the same in every color mode. Filled and outlined take the text color, so check them in each mode with the toolbar's Color mode and Contrast switches.</>}>
+    <DsCanvasQuiet of={LogoStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use the Logo to mark PLUS itself: the sidebar and navbar header, sign-in, email
+headers and the loading screen.
+
+- For a partner or tool logo, use **Tile** with <code>content="logo"</code>.
+- For the loading state of a page, use **Spinner**.
+- Never use the Logo as decoration.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **Mark.** The PLUS plus-sign tile, drawn in the chosen style: colored, filled or outlined.
+2. **Wordmark.** The word PLUS, set beside the mark when <code>text</code> is on.
+
+Logo colors are brand artwork, not theme tokens. Pick the style by the ground it sits on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Values</th><th>Default</th><th>What it does</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>style</code></td><td><code>colored</code> · <code>filled</code> · <code>outlined</code></td><td><code>colored</code></td><td>Colored is for light grounds. Filled reads as a block. Outlined suits busy or tinted grounds.</td><td><code>style</code>, the same values</td></tr>
+        <tr><td><code>size</code></td><td><code>XS</code> · <code>S</code> · <code>M</code> · <code>L</code> · <code>XL</code></td><td><code>M</code></td><td>Picks the size step. Never scale an instance by hand.</td><td><code>size</code>, default XS</td></tr>
+        <tr><td><code>text</code></td><td>true · false</td><td><code>false</code></td><td>Adds the PLUS wordmark beside the mark.</td><td><code>text?</code>, the strings true and false</td></tr>
+        <tr><td><code>className</code></td><td>text</td><td>none</td><td>Adds a class to the Logo's outer box.</td><td>None</td></tr>
+    </tbody>
+</DocsTable>
+
+The Figma set defaults to XS and code defaults to M. Filled and outlined are white in Figma. In code they take the current text color.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsCanvasShell description={<>Each step is the mark plus its padding, so the frame is larger than the mark.</>}>
+    <DsCanvasQuiet of={LogoStories.Sizes} />
+</DocsCanvasShell>
+
+<DocsTable>
+    <thead>
+        <tr><th>Size</th><th>Mark</th><th>Padding</th><th>Frame</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>XS</td><td>40</td><td>10</td><td>60</td></tr>
+        <tr><td>S</td><td>64</td><td>16</td><td>96</td></tr>
+        <tr><td>M</td><td>92</td><td>20</td><td>132</td></tr>
+        <tr><td>L</td><td>144</td><td>24</td><td>192</td></tr>
+        <tr><td>XL</td><td>160</td><td>32</td><td>224</td></tr>
+    </tbody>
+</DocsTable>
+
+The wordmark adds width, not height.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Styles and wordmark
+
+<DocsCanvasShell description={<>With <code>text</code> off the Logo is the mark alone. With it on, the wordmark sits beside the mark.</>}>
+    <DsCanvasQuiet of={LogoStories.Wordmark} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Loading mark
+
+<DocsCanvasShell description={<>The PLUS loading animation is the growing Spinner. Use it as it ships, in place of a Logo, on a loading screen.</>}>
+    <DsCanvasQuiet of={LogoStories.LoadingMark} />
+</DocsCanvasShell>
+
+Figma shows the loading mark as a raster image. In code it is the growing variant of the Spinner component, drawn in CSS.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+The Logo is static, so it has no states. A Logo that links home sits inside a
+link, and the link carries the hover and the focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<LogoStories.DoDont />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Use a size step.** Never stretch, crop, recolor or rotate the mark.
+- **Pick the style by the ground.** Use colored on light grounds, filled where the mark must read as a block and outlined on busy or tinted grounds. Filled and outlined need a colored or dark ground.
+- **Leave the brand colors alone.** Do not rebind them to theme tokens.
+- **One brand mark per view.** A second Logo competes with the first and reads as two products.
+- **Partner and tool logos go in a Tile.** Never in the Logo.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Name the Logo where it stands alone.** On the sign-in screen, where nothing else says PLUS, give the wrapper <code>role="img"</code> and <code>aria-label="PLUS"</code>. The Logo draws an SVG that has no name of its own.
+- **Hide it beside a visible title.** Next to the word PLUS the mark is decorative, so hide it from assistive technology and the name is not read twice.
+- **Name a link for where it goes.** A Logo that links home is a link named "PLUS home". It takes keyboard focus and shows the focus ring.
+- **Choose the style by ground.** The mark keeps its contrast only on the ground its style is made for.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- A tool or partner logo in a square: **Tile**. The Logo belongs with the other pages under Images and icons.
+- The loading state of a page: **Spinner**.
+- Logo colors: **Color**.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={LogoStories.Overview}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
 </div>
 
 </div>

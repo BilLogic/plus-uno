@@ -100,6 +100,52 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
+    "Avatar": {
+      "code": {
+        "import": "@/components/images-and-icons",
+        "export": "default",
+        "mdxPath": "design-system/src/components/images-and-icons/Avatar/Avatar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/UserAvatar",
+        "source": "design-system/src/components/images-and-icons/Avatar/Avatar.stories.jsx",
+        "storybookId": "components-images-and-icons-avatar--docs",
+        "props": {
+          "size": {
+            "type": "enum",
+            "values": [
+              "md",
+              "lg"
+            ]
+          },
+          "type": {
+            "type": "enum",
+            "values": [
+              "regular tutor",
+              "lead tutor",
+              "admin"
+            ]
+          },
+          "counter": {
+            "type": "boolean"
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "avatar",
+            "name": "Avatar",
+            "componentSetNodeId": "1345:23243",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1345-23243",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "Figma names the set Avatar and code names it UserAvatar. Figma has a focus variant and a name? switch that code does not."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-515"
+      }
+    },
     "Badge": {
       "code": {
         "import": "@/components/labels",
@@ -1356,7 +1402,8 @@
             "status": "verified",
             "notes": "style and size map one-to-one by name. The Figma variant group is `text?` (with the question mark) and its values are the STRINGS \"true\"/\"false\", while the code prop `text` is a real boolean — convert, do not pass the string through."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-605"
       }
     },
     "MaintenanceAlert": {
@@ -2653,7 +2700,7 @@
             "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"gray (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for gray only, since the picture covers the ground."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-676"
       }
     },
     "Toast": {

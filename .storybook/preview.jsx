@@ -231,6 +231,9 @@ const preview = {
             ],
             "Images and icons",
             [
+              "Avatar",
+              "Icon",
+              "Image",
               "Logo",
               "Tile",
               "Illustrations"

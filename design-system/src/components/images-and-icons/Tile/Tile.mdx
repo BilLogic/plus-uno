@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TileStories from './Tile.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -45,16 +45,17 @@ export const figmaMeta = {
 <Meta of={TileStories} />
 
 <Title />
-A square that frames an icon, a logo or an image: tool logos, school crests,
-lesson thumbnails and the icon beside a list item. Its corners are a quarter of
-its size.
+A Tile is a square that frames an icon, a logo or an image: tool logos, school
+crests, lesson thumbnails and the icon beside a list item. Anything that would
+need an icon larger than 24 belongs in a Tile. Its corners are a quarter of its
+size.
 
 <DocsTabs of={TileStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-676"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Tile"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -62,13 +63,95 @@ its size.
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
+
 <div className="sb-ds-doc-section">
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Six sizes, from 16 to 48, for every kind of content. The icon scales with the tile: 10 in a 16 tile, 24 in a 48.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Six sizes, from 16 to 48, for every kind of content. The icon scales with the tile: 10 in a 16 tile, 24 in a 48. Tile colors follow the toolbar's Color mode and Contrast switches.</>}>
     <Canvas of={TileStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **Ground.** The square, filled from the color. Subtle is the color's container with its on-container icon. Bold is the solid color with its on-color icon. The corners are a quarter of the size.
+2. **Content.** An icon, a logo or an image. Icons and logos are inset. An image fills the square and crops.
+3. **Border.** An optional 1px outline-variant edge inside the tile, for a logo or an image whose own edge fades into the page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Values</th><th>Default</th><th>What it does</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>content</code></td><td><code>icon</code> · <code>logo</code> · <code>image</code></td><td><code>icon</code></td><td>What the tile frames.</td><td><code>content</code></td></tr>
+        <tr><td><code>size</code></td><td>16 · 20 · 24 · 32 · 40 · 48</td><td>32</td><td>One scale for every kind of content.</td><td><code>size</code></td></tr>
+        <tr><td><code>appearance</code></td><td><code>subtle</code> · <code>bold</code></td><td><code>subtle</code></td><td>Icons only. Subtle is the color's container. Bold is the solid color.</td><td><code>appearance</code></td></tr>
+        <tr><td><code>color</code></td><td>gray · blue · green · purple · magenta · yellow · teal · white</td><td>white for a logo, gray otherwise</td><td>A category color from the Tag set. White is for logos.</td><td><code>color</code>, default gray</td></tr>
+        <tr><td><code>hasBorder</code></td><td>true · false</td><td>false</td><td>Adds the 1px edge inside the tile.</td><td><code>border?</code></td></tr>
+        <tr><td><code>icon</code></td><td>A Font Awesome Free name, a class list or a node</td><td>none</td><td>The icon, when <code>content</code> is <code>icon</code>.</td><td>The media slot</td></tr>
+        <tr><td><code>src</code> · <code>children</code></td><td>A URL · a node</td><td>none</td><td>The logo or the image.</td><td>The <code>media</code> slot</td></tr>
+        <tr><td><code>label</code></td><td>text</td><td>none</td><td>Makes the tile an image with this name. Without it the tile is hidden from assistive technology.</td><td>None</td></tr>
+    </tbody>
+</DocsTable>
+
+Image variants exist for gray only in Figma, since the picture covers the
+ground. Code accepts every color on an image and the picture hides it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The corner radius is a quarter of the size at every step. Code computes it, so
+there is no radius token to bind.
+
+<DocsTable>
+    <thead>
+        <tr><th>Size</th><th>Radius</th><th>Icon or logo inset</th><th>Figma radius token</th><th>Figma icon</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>16</td><td>4</td><td>10</td><td><code>Element/radius-md</code></td><td>12</td></tr>
+        <tr><td>20</td><td>5</td><td>12</td><td><code>Tile/radius-sm</code></td><td>12</td></tr>
+        <tr><td>24</td><td>6</td><td>14</td><td><code>Element/radius-item-sm</code></td><td>16</td></tr>
+        <tr><td>32</td><td>8</td><td>16</td><td><code>Element/radius-lg</code></td><td>16</td></tr>
+        <tr><td>40</td><td>10</td><td>20</td><td><code>Tile/radius-lg</code></td><td>24</td></tr>
+        <tr><td>48</td><td>12</td><td>24</td><td><code>Card/radius-sm</code></td><td>24</td></tr>
+    </tbody>
+</DocsTable>
+
+Code insets the icon by the Font Awesome size of the same step. Figma insets it
+to the 12, 16 and 24 icon sizes.
+
+<DocsTable>
+    <thead>
+        <tr><th>Color</th><th>Subtle ground</th><th>Subtle icon</th><th>Bold ground</th><th>Bold icon</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>gray</td><td><code>--color-surface-container-high</code></td><td><code>--color-on-surface-variant</code></td><td><code>--color-inverse-surface</code></td><td><code>--color-inverse-on-surface</code></td></tr>
+        <tr><td>blue</td><td><code>--color-technology-tools-container</code></td><td><code>--color-on-technology-tools-container</code></td><td><code>--color-technology-tools</code></td><td><code>--color-on-technology-tools</code></td></tr>
+        <tr><td>green</td><td><code>--color-advocacy-container</code></td><td><code>--color-on-advocacy-container</code></td><td><code>--color-advocacy</code></td><td><code>--color-on-advocacy</code></td></tr>
+        <tr><td>purple</td><td><code>--color-mastering-content-container</code></td><td><code>--color-on-mastering-content-container</code></td><td><code>--color-mastering-content</code></td><td><code>--color-on-mastering-content</code></td></tr>
+        <tr><td>magenta</td><td><code>--color-relationship-container</code></td><td><code>--color-on-relationship-container</code></td><td><code>--color-relationship</code></td><td><code>--color-on-relationship</code></td></tr>
+        <tr><td>yellow</td><td><code>--color-social-emotional-container</code></td><td><code>--color-on-social-emotional-container</code></td><td><code>--color-social-emotional</code></td><td><code>--color-on-social-emotional</code></td></tr>
+        <tr><td>teal</td><td><code>--color-tertiary-container</code></td><td><code>--color-on-tertiary-container</code></td><td><code>--color-tertiary</code></td><td><code>--color-on-tertiary</code></td></tr>
+    </tbody>
+</DocsTable>
+
+A logo takes the subtle ground of its color and keeps its own colors. Its white
+ground is <code>--color-surface-container-lowest</code>, and gray is
+<code>--color-surface-container</code>. The border is <code>--color-outline-variant</code>.
+Figma names these grounds with the accent background steps and <code>color/icon/inverse</code>.
 
 </div>
 
@@ -118,6 +201,36 @@ its size.
 
 <div className="sb-ds-doc-section">
 
+## States
+
+A Tile is not a control, so it has no hover, focus or disabled state. To make
+one clickable, wrap it in a button or a link. The wrapper carries the name and
+the focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<TileStories.DoDont />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Pick the content, then the color.** Icons take `appearance` and `color`. Logos take a ground color only, since the logo keeps its own. Images cover the tile, so color does not apply.
+- **Colors are categories.** Keep one color per kind of item across the app, or leave tiles gray. A color never stands for a status.
+- **Frame a tool logo or a list-item icon in a Tile.** A loose square leaves size, corner and color to chance. The Tile sets all three.
+- **Never round a tile by hand.** The corners are a quarter of the size.
+- **Icons are Font Awesome Free names.** Use `fa-solid`, `fa-regular` or `fa-brands`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -129,6 +242,30 @@ its size.
         </>
     }
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## For developers
+
+Import `Tile` from the `@/components` barrel. Pick the content first, then the
+props that content takes.
+
+```jsx
+// Incorrect: a bold appearance on a logo does nothing, and a color on an
+// image is hidden under the picture.
+<Tile content="logo" appearance="bold" src={logoUrl} />
+<Tile content="image" color="blue" src={photoUrl} />
+
+// Correct.
+<Tile icon="book-open" appearance="bold" color="blue" />
+<Tile content="logo" src={logoUrl} />
+<Tile content="image" src={photoUrl} />
+```
+
+`color` takes the Tag color set. `orange` and `grey` are deprecated aliases for
+`yellow` and `gray`. They render the same and log a warning in development.
 
 </div>
 
@@ -144,42 +281,14 @@ its size.
 
 ## When to use
 
-Use `Tile` wherever a small square picture stands for a thing: a tool's logo in
+Use a Tile wherever a small square picture stands for a thing: a tool's logo in
 a list of integrations, a school's crest beside its name, a lesson's thumbnail,
 or an icon marking the kind of item in a row. Putting all of them in one frame
 keeps them the same size and shape wherever they appear.
 
-Use an icon on its own when it sits inline with text and needs no frame. Use
-`UserAvatar` for a person: people are round, and a tile is square.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Usage notes
-
-### Pick the content, then the color.
-
-Icons take `appearance` and `color`. Logos take a ground color only, since the
-logo keeps its own. Images cover the whole tile, so color does not apply.
-
-```jsx
-// Incorrect: a bold appearance on a logo does nothing, and a color on an
-// image is hidden under the picture.
-<Tile content="logo" appearance="bold" src={logoUrl} />
-<Tile content="image" color="blue" src={photoUrl} />
-
-// Correct.
-<Tile icon="book-open" appearance="bold" color="blue" />
-<Tile content="logo" src={logoUrl} />
-<Tile content="image" src={photoUrl} />
-```
-
-### Colors are categories.
-
-`color` takes the Tag color set from the label spec, where `yellow` replaces
-`orange` (`orange` still works as a deprecated alias): plain names, never a status. Keep one color per kind of
-item across the app, or leave tiles gray.
+- For a glyph beside text at 12, 16 or 24, use an **Icon** on its own.
+- For a person, use **Avatar**. People are round and named, and a tile is square.
+- For a value someone picked, with a label, use **Tag**.
 
 </div>
 
@@ -187,15 +296,10 @@ item across the app, or leave tiles gray.
 
 ## Accessibility
 
-- **Decorative by default.** A tile usually sits beside a name that already
-  says what it is, so it is hidden from assistive technology
-  (`aria-hidden="true"`) unless it has a `label`.
-- **`label` makes it one image with a name.** The tile becomes `role="img"`
-  with that name, and the picture inside it stays hidden, so the square is
-  announced once. Give a tile a label whenever it stands alone, such as a
-  logo with no name beside it.
-- **Not a control.** A tile has no hover or focus state. To make one clickable,
-  wrap it in a button or link that carries the accessible name.
+- **Decorative by default.** A tile usually sits beside a name that already says what it is, so it is hidden from assistive technology unless it has a `label`.
+- **A label makes it one image with a name.** The tile becomes a `role="img"` with that name, and the picture inside stays hidden, so the square is announced once. Give a tile a label whenever it stands alone, such as a logo with no name beside it.
+- **Not a control.** A tile has no hover or focus state. To make one clickable, wrap it in a button or link that carries the accessible name and the focus ring.
+- **Color is never the only signal.** The name beside the tile says what the category is.
 
 </div>
 
@@ -203,8 +307,11 @@ item across the app, or leave tiles gray.
 
 ## Related
 
-- For a person, use `UserAvatar`.
-- For a value someone picked, with a label, use `Tag`.
+- A glyph beside text at 12, 16 or 24: **Icon**.
+- A person: **Avatar**.
+- A value someone picked, with a label: **Tag**.
+- A picture in long-form content: **Image**.
+- Tile colors follow the Tag set: **Color**.
 
 </div>
 
