@@ -57,6 +57,42 @@ describe('PatternModal sizing', () => {
     });
 });
 
+describe('PatternModal options', () => {
+    it('draws no divider and no skeleton by default', () => {
+        render(<PatternModal title="Move session" footer={<button type="button">Save</button>}>Body</PatternModal>);
+        const el = dialog();
+        expect(el.querySelector('.plus-pattern-modal-divider')).toBeNull();
+        expect(el.querySelector('.plus-pattern-modal-body')).not.toHaveAttribute('aria-busy');
+        expect(screen.getByRole('heading', { level: 1, name: 'Move session' })).toBeInTheDocument();
+    });
+
+    it('takes the place of the title row with a custom header', () => {
+        render(<PatternModal header={<span>Custom row</span>} onClose={() => {}} aria-label="Pick a time">Body</PatternModal>);
+        expect(screen.getByText('Custom row')).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+        expect(dialog()).toHaveAttribute('aria-label', 'Pick a time');
+        expect(dialog()).not.toHaveAttribute('aria-labelledby');
+    });
+
+    it('draws a divider under the header and above the footer', () => {
+        render(<PatternModal title="Move session" divider footer={<button type="button">Save</button>}>Body</PatternModal>);
+        expect(dialog().querySelectorAll('.plus-pattern-modal-divider')).toHaveLength(2);
+    });
+
+    it('draws only the header divider when there is no footer', () => {
+        render(<PatternModal title="Move session" divider>Body</PatternModal>);
+        expect(dialog().querySelectorAll('.plus-pattern-modal-divider')).toHaveLength(1);
+    });
+
+    it('swaps the body for a skeleton while loading', () => {
+        render(<PatternModal title="Move session" loading>Real body</PatternModal>);
+        const body = dialog().querySelector('.plus-pattern-modal-body');
+        expect(body).toHaveAttribute('aria-busy', 'true');
+        expect(screen.queryByText('Real body')).toBeNull();
+        expect(body.querySelector('[aria-hidden="true"]')).not.toBeNull();
+    });
+});
+
 describe('PatternModal deprecation warnings', () => {
     it('warns once per deprecated prop, however many modals pass it', async () => {
         vi.resetModules();
