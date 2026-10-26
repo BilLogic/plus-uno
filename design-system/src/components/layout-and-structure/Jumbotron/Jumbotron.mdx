@@ -28,7 +28,7 @@ export const figmaMeta = {
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Jumbotron"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Jumbotron"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -39,21 +39,38 @@ export const figmaMeta = {
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Title and body copy for a simple hero block.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A page-level title, one supporting line and the actions, on a raised card.</>}>
     <Canvas of={JumbotronStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-<DocsCanvasShell description={<>Subtitle plus primary and secondary actions.</>}>
-    <DsCanvasQuiet of={JumbotronStories.WithActions} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Sizes
+## Container
 
-<DocsCanvasShell description={<>Tighter versus roomier padding tokens.</>}>
-    <DsCanvasQuiet of={JumbotronStories.Sizes} />
+<DocsCanvasShell description={<><code>card</code> sits in the content column on the raised pair; <code>band</code> runs edge to edge on the surface container.</>}>
+    <DsCanvasQuiet of={JumbotronStories.Containers} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alignment
+
+<DocsCanvasShell description={<><code>start</code> or <code>center</code>. Side media keeps the text start-aligned.</>}>
+    <DsCanvasQuiet of={JumbotronStories.Alignment} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Media
+
+<DocsCanvasShell description={<>16:9 on top, or 4:3 at the side. Side media needs 944 of width; below that it moves on top.</>}>
+    <DsCanvasQuiet of={JumbotronStories.Media} />
 </DocsCanvasShell>
 
 </div>
@@ -86,13 +103,25 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Jumbotron` for the one block at the top of a page that states what the page
-is and what to do first — a landing hero, an empty state that has something to
-say, the opening panel of a program. One per page, at most.
+Use `Jumbotron` when a landing or overview page opens with one message and one
+next step, such as a tutor home or a program overview. One per page, at the top.
+For one item among many, use `Card`. For a message the reader has to act on, use
+`Alert`.
 
-`title` renders as the page's `h1` and `subtitle` as a paragraph styled like an
-`h4`. `children` is the body. `primaryButton` and `secondaryButton` are prop
-objects spread into `Button`, so anything `Button` takes goes in them.
+It is a composition, not a new surface: the page-level section header (`title`
+as the page's `h1` at Heading/large, one `description` line at Body/default), an
+`actions` slot and an optional `media` slot, inside a `container`.
+
+```jsx
+<Jumbotron
+  title="Plan your next session"
+  description="See who is on your roster, review their progress and join the call from one place."
+  actions={<>
+    <Button text="Get started" style="primary" fill="filled" />
+    <Button text="Learn more" style="secondary" fill="outline" />
+  </>}
+/>
+```
 
 </div>
 
@@ -100,39 +129,73 @@ objects spread into `Button`, so anything `Button` takes goes in them.
 
 ## Usage notes
 
-### The title is an `h1`, so there can only be one.
+### Lead with one filled button.
+
+The filled button is the next step. The outlined one is an optional alternative,
+such as reading more first.
 
 ```jsx
-// Incorrect — two jumbotrons on a page, or one on a page that already has its
-// own h1, produce two level-one headings and a broken outline.
-<h1>Program</h1>
-<Jumbotron title="Autumn 2026" subtitle="12 weeks, 48 sessions" />
+// Incorrect — two filled buttons compete for the main action.
+<Jumbotron
+  title="Plan your next session"
+  actions={<>
+    <Button text="Get started" style="primary" fill="filled" />
+    <Button text="Learn more" style="primary" fill="filled" />
+  </>}
+/>
 
-// Correct — the jumbotron IS the page heading, or it does not carry a title.
-<Jumbotron title="Autumn 2026" subtitle="12 weeks, 48 sessions" />
+// Correct — one filled primary, then an outlined alternative.
+<Jumbotron
+  title="Plan your next session"
+  actions={<>
+    <Button text="Get started" style="primary" fill="filled" />
+    <Button text="Learn more" style="secondary" fill="outline" />
+  </>}
+/>
 ```
 
-### Always label the buttons.
+### One per page, at the top.
+
+The title is the page's `h1`, so a second Jumbotron, or one under another `h1`,
+breaks the outline.
 
 ```jsx
-// Incorrect — an empty object still renders a button, and its default text is
-// the placeholder "Primary Action".
-<Jumbotron title="Autumn 2026" primaryButton={{ onClick: enroll }} />
+// Incorrect — two level-one headings.
+<h1>Program</h1>
+<Jumbotron title="Autumn 2026" description="12 weeks, 48 sessions" />
+
+// Correct — the Jumbotron is the page heading.
+<Jumbotron title="Autumn 2026" description="12 weeks, 48 sessions" />
+```
+
+### Keep it to a headline and one line.
+
+Longer copy belongs in the page below. The title is the page title at
+Heading/large; do not swap in a Display style to make it louder.
+
+### Pick the container by where it sits.
+
+`container="band"` runs edge to edge at the top of the page. `container="card"`
+sits inside the content column, next to other cards and sections. A band between
+sections reads as a card with no edge.
+
+### Side media needs 944 or wider.
+
+480 for the text, 16 of gutter and 400 for the image make 896 inside the padding;
+with 24 of padding on each side that is 944. Below that the media moves on top on
+its own, inside the padding. Center alignment goes with no media or top media
+only.
+
+```jsx
+// Incorrect — side media keeps the text start-aligned, so `center` is ignored.
+<Jumbotron title="Plan your next session" align="center" media={image} mediaPosition="side" />
 
 // Correct.
-<Jumbotron title="Autumn 2026" primaryButton={{ text: 'Enroll', onClick: enroll }} />
+<Jumbotron title="Plan your next session" align="center" media={image} />
 ```
 
-### The buttons are `medium` unless you say otherwise.
-
-That default is applied before your button object is spread, so `size: 'small'`
-or `size: 'large'` in the object wins. (It was `"default"` until #317 — a value
-`Button` does not accept, which produced a size class no stylesheet defines.)
-
-### `fluid` drops the corner radius.
-
-Radius is applied only when `fluid` is false, so a full-bleed jumbotron is square
-by design. Passing `radiusSize` alongside `fluid` does nothing.
+Images fill the slot at its ratio, 16:9 on top and 4:3 at the side, and are
+cropped rather than stretched.
 
 </div>
 
@@ -140,17 +203,14 @@ by design. Passing `radiusSize` alongside `fluid` does nothing.
 
 ## Accessibility
 
-- **The heading level is fixed.** `title` is always an `h1`. If this block is not
-  the page's main heading, leave `title` out and put your own heading in
-  `children` at the level the outline needs.
-- **The subtitle is a paragraph.** It looks like a heading and is not one, which
-  is right — a subtitle that read as a heading would put a second entry in the
-  outline for the same idea.
-- **Two actions, ranked.** The primary is filled and the secondary is outlined.
-  That ranking is visual; the reading order is the DOM order, so put the action
-  you expect first, first.
-- **The block is a plain `div`.** It is not a landmark and does not need to be —
-  it sits inside whatever `main` or `section` the page already has.
+- **The title is the page's `h1`.** A page with a Jumbotron has no other `h1`,
+  and its sections are `h2`s.
+- **The description is a paragraph,** not a heading, so the outline has one entry
+  for the hero.
+- **Media is content.** Give an image its `alt`, or an empty `alt` when it only
+  decorates.
+- **The block is a plain `div`.** It sits inside whatever `main` the page already
+  has.
 
 </div>
 
@@ -158,10 +218,10 @@ by design. Passing `radiusSize` alongside `fluid` does nothing.
 
 ## Related
 
-- For a bordered container that is not the page's opening statement, use `Card`.
-- For a message about state rather than an invitation to act, use `Alert`.
-- For the actions themselves, see `Button` — every prop it takes can be passed
-  through the button objects.
+- `Card` for one item among many. The Jumbotron card is built on the Card
+  pattern (`PatternCard`), not on this component.
+- `Alert` for a message the reader has to act on.
+- `Carousel` for rotating hero slides.
 
 </div>
 

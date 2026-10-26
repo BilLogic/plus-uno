@@ -3,11 +3,13 @@
 
 # Jumbotron
 
+Mirrors Figma `Jumbotron`: a page-level `_Section header` (the title is the page's h1 at Heading/large 24, one Body/default description line), an actions slot and an optional media slot, in one of two containers. - **container** `card` is a PatternCard on the raised pair at Card/pad-lg; `band` is a full-bleed band on the surface container, padded Surface/stack-lg top and bottom and Screen/pad-x-screen at the sides. - **align** `start` or `center`. Side media keeps the text start-aligned. - **media** with `mediaPosition` `top` (16:9; full bleed in a card) or `side` (4:3 at Size/Width/2500). Side media needs 896 inside the padding — 480 of text, 16 of gutter and 400 of image, so 944 with Card/pad-lg — and below that the media moves on top, inside the padding. - One state: the buttons carry their own. No loading state. `subtitle`, `fluid`, `primaryButton`, `secondaryButton`, `paddingSize`, `gapSize`, `radiusSize` and `children` still work and warn once in development; where a new prop and its old one are both given, the new one wins.
+
 **Import:** `import { Jumbotron } from '@/components';`
 
 **Source:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.stories.jsx` — Basic, WithActions, Sizes, Overview, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.stories.jsx` — Overview, Containers, Alignment, Media, WithoutActions, Interactive, Anatomy, SideMediaNeeds944
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.mdx`
 
@@ -15,20 +17,32 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | node | — | Headline text |
-| `subtitle` | node | — | Supporting subtitle |
-| `children` | node | — | — |
-| `primaryButton` | shape | — | — |
-| `secondaryButton` | shape | — | — |
-| `fluid` | bool | `false` | Fluid width (no border radius) |
-| `paddingSize` | enum | `'md'` | Padding size |
-| `gapSize` | enum | `'md'` | Gap size |
-| `radiusSize` | enum | `'md'` | Border radius size |
+| `title` | node | — | The page title, its h1 (Heading/large) |
+| `description` | node | — | One supporting line (Body/default) |
+| `actions` | node | — | Actions slot: one filled primary Button, then an optional outlined one |
+| `media` | node | — | Media slot: an image that fills the slot at its ratio, 16:9 on top or 4:3 at the side |
+| `mediaPosition` | enum | `'top'` | Where the media sits: `top`, or `side` at Size/Width/2500 (moves on top below 944 wide) |
+| `container` | enum | — | A raised card in the content column, or a full-bleed band |
+| `align` | enum | `'start'` | Text alignment; side media keeps it start |
+| `subtitle` | node | — | Deprecated: use `description` |
+| `children` | node | — | Deprecated: body content; a Jumbotron is a title, a description and actions |
+| `primaryButton` | buttonShape | — | Deprecated: put a filled Button in `actions` |
+| `secondaryButton` | buttonShape | — | Deprecated: put an outlined Button in `actions` |
+| `fluid` | bool | — | Deprecated: use `container="band"` |
+| `paddingSize` | enum | — | Deprecated: still sets the card padding (Card/pad-sm · md · lg) |
+| `gapSize` | enum | — | Deprecated: no effect |
+| `radiusSize` | enum | — | Deprecated: no effect |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 | `style` | object | — | — |
 
 ## Variants
+
+**`mediaPosition`** — `top` · `side`
+
+**`container`** — `card` · `band`
+
+**`align`** — `start` · `center`
 
 **`paddingSize`** — `sm` · `md` · `lg`
 
@@ -40,7 +54,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-large` · `--body-small` · `--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--heading-large` · `--heading-xlarge` · `--heading-xxlarge` · `--size-element-gap-md` · `--size-section-gap-lg` · `--size-section-gap-md` · `--size-section-gap-sm` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-section-radius-lg` · `--size-section-radius-md` · `--size-section-radius-sm`
+`--body-default` · `--ds-surface-container` · `--ds-text` · `--ds-text-subtle` · `--element-inline-md` · `--heading-large` · `--layout-gutter` · `--layout-pad-x-screen` · `--section-min-width-main` · `--section-stack-lg` · `--section-stack-md` · `--size-element-gap-xs` · `--surface-stack-lg` · `--width-2500`
 
 From `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.scss`. Override these through the token layer, never with a literal.
 

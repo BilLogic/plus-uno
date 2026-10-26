@@ -130,7 +130,7 @@ const DonutChart = ({
                     fontWeight: getFontWeight(),
                     fontSize: getFontSize(),
                     lineHeight: getLineHeight(),
-                    color: centerTextSize === 'body3' ? 'var(--color-on-surface-variant, #3f484a)' : 'var(--color-on-surface, #191c1e)'
+                    color: centerTextSize === 'body3' ? 'var(--ds-text-subtle)' : 'var(--ds-text)'
                 }}>
                     {value || ''}
                 </div>
@@ -139,7 +139,7 @@ const DonutChart = ({
                         fontFamily: 'var(--font-family-body, "Merriweather Sans", sans-serif)',
                         fontSize: 'var(--font-size-body3, 12px)',
                         lineHeight: '1.667',
-                        color: 'var(--color-on-surface-variant, #3f484a)',
+                        color: 'var(--ds-text-subtle)',
                         marginTop: '4px'
                     }}>
                         {label}

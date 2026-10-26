@@ -11,7 +11,11 @@
  *   row-state grounds   meta text, links, focus and field edges on hovered, selected and overlay grounds
  *   collapsed states    base, hovered and pressed never share a value; the selection ladder stays ordered
  *   tint vs frame       status tints read as tints against the page and the sunken frame
- *   chart color vision  categorical series 1-4 stay apart under protan and deutan simulation
+ *   chart color vision  neighbors in categorical series 1-6 and the SMART series stay apart, under
+ *                       protan and deutan simulation and for full color vision
+ *   chart contrast      every chart color keeps 3:1 on the surfaces a chart is drawn on
+ *   chart ramps         sequential ramps move away from the surface at every step; a diverging
+ *                       midpoint sits nearer the surface than either arm
  *   teal vs Lagoon      the accent teal never reads as the brand
  *   plan parity         plans differ in primitive values only, never in a semantic mapping
  *   legacy map          every legacy color name used in design-system/ and prototypes/ has a

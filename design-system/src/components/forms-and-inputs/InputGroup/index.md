@@ -30,7 +30,7 @@ slots: text affixes ("$", ".00"), a checkbox or radio, an icon, small buttons an
 | `size` | enum | `'medium'` | Size variant of the input group |
 | `disabled` | bool | `false` | Disable the input group |
 | `readOnly` | bool | — | Make the input read-only |
-| `readonly` | bool | — | @deprecated Prefer `readOnly` |
+| `readonly` | bool | — | @deprecated Prefer readOnly |
 | `validation` | enum | `'none'` | — |
 | `validationMessage` | node | — | — |
 | `leadingVisual` | arrayOf | — | One addon, or an array of them, for the Leading slot. |

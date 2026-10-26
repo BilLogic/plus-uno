@@ -21,8 +21,8 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ### How to Read
 - **First bar** = starting value
-- **Green bars** = positive additions
-- **Red bars** = deductions/losses
+- **Success bars** (`--ds-chart-success`) = positive additions
+- **Danger bars** (`--ds-chart-danger`) = deductions/losses
 - **Final bar** = ending total (sum)
 - Each bar floats from previous endpoint
 
@@ -60,7 +60,7 @@ A waterfall chart shows how a value changes through **sequential additions and s
 ### How to Use
 
 **Best Practices:**
-✅ Use green for additions, red for subtractions
+✅ Keep the signed value label on every bar, so the direction never rests on color alone
 ✅ Include summary bars (totals)
 ✅ Label each step clearly
 ✅ Show intermediate totals if needed

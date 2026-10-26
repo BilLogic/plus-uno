@@ -80,7 +80,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 ## Sizes
 
-<DocsCanvasShell description={<>One height, 32, with the text centered. `small` and `large` are deprecated: they draw like `medium` and warn in development.</>}>
+<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development.</>}>
     <DsCanvasQuiet of={InputStories.Sizes} />
 </DocsCanvasShell>
 
@@ -100,7 +100,7 @@ The labeled text input box allows users to enter textual inputs and receive vali
 
 ## Anatomy
 
-<DocsCanvasShell description={<>The label row (label, required asterisk, info tooltip), the `_Field` box with its Leading, Content and Trailing slots, and the caption: a message on the left and a count on the right.</>}>
+<DocsCanvasShell description={<>The label row (label, required asterisk, info tooltip), the <code>_Field</code> box with its Leading, Content and Trailing slots, and the caption: a message on the left and a count on the right.</>}>
     <DsCanvasQuiet of={InputStories.Anatomy} />
 </DocsCanvasShell>
 
@@ -181,7 +181,7 @@ a matching icon.
 - **`validationMessage` only renders when `validation` is not `none`.** Setting
   the message alone shows nothing, which is the shape to reach for when a field
   should carry its message only once it has failed.
-- **The field points AT its message (#327).** When both are set, the message
+- **The field points AT its message.** When both are set, the message
   gets an id and the input an `aria-describedby` naming it, alongside
   `aria-invalid` for `invalid`. A caller's own `aria-describedby` is kept and
   the generated id appended, so passing one does not silence the error.
@@ -212,13 +212,13 @@ a matching icon.
   given, React's `useId` supplies one. Pass `id` when something outside the
   component needs to point at the input — an `aria-describedby`, a `<label>` you
   render yourself, a test selector — and you will get exactly the id you passed.
-  `name` is a form key, not an id, and no longer stands in for one (#206).
+  `name` is a form key, not an id, and no longer stands in for one.
 - **`showLabel={false}` hides the label, it does not remove it.** The label is
   rendered either way and always carries `htmlFor`; `showLabel={false}` only
   clips it out of sight with `.plus-field-label--hidden`. So a field that has a
   `label` has an accessible name whether or not you show it, and turning the
-  label off costs nothing but the pixels. This was the other way round until
-  #213 — see *Why `showLabel` cannot take the name away* below.
+  label off costs nothing but the pixels. See *Why `showLabel` cannot take the
+  name away* below.
 - **`required` shows an asterisk and sets `aria-required`.** The asterisk is
   hidden from assistive technology, which hears "required" from the input. The
   form explains the asterisk once, in a legend above the fields; there are no
@@ -269,9 +269,9 @@ a matching icon.
 
 ## Why `showLabel` cannot take the name away
 
-`showLabel={false}` used to skip rendering the label entirely. #213 asked
-whether that mode should exist at all, since a component that makes "no
-accessible name" easy keeps producing the defect. The 37 call sites answered it,
+`showLabel={false}` used to skip rendering the label entirely, which raised
+the question of whether that mode should exist at all, since a component that
+makes "no accessible name" easy keeps producing the defect. The 37 call sites answered it,
 and they were not one population:
 
 - **17 pass a real `label` string and then switch it off** — the whole Login
@@ -287,7 +287,7 @@ and they were not one population:
 - **1 is a search box inside `Select`'s dropdown**, named by the listbox it
   filters.
 
-So neither answer in the ticket was right on its own. Forbidding the mode breaks
+So neither answer was right on its own. Forbidding the mode breaks
 the 19; permitting it as-is leaves the 17 one careless call site away from an
 unnamed field forever. The resolution is to make the mode mean something it can
 be trusted with: **`showLabel` is a visual switch, and the accessibility tree
@@ -304,7 +304,7 @@ one control.
 
 The last two were `DateAndTimePicker`s under a single shared caption, where
 `htmlFor` was never available: one `<label for>` names one control, and that
-field renders two. #225 settled them from the other end. The visual switch was
+field renders two. They were settled from the other end. The visual switch was
 ported — `DateAndTimePicker`'s `showLabel` now clips its label instead of
 deleting it, same clipping, same reasoning — and each picker was given its own
 `label` to clip, so the two controls are named "Start time" and "End time"

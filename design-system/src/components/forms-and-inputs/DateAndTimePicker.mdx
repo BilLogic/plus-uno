@@ -82,7 +82,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 ## Sizes
 
-<DocsCanvasShell description={<>One height, 32, with the text centered. `small` and `large` are deprecated: they draw like `medium` and warn in development. The AM/PM menu is 24, like a button in a field.</>}>
+<DocsCanvasShell description={<>One height, 32, with the text centered. <code>small</code> and <code>large</code> are deprecated: they draw like <code>medium</code> and warn in development. The AM/PM menu is 24, like a button in a field.</>}>
     <DsCanvasQuiet of={TimePickerStories.Sizes} />
 </DocsCanvasShell>
 
@@ -179,7 +179,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 - **The calendar opens 4px below the date field.** It is the same calendar as
   `DatePicker`, `--size-element-gap-xs` below, left-aligned, flipping above when
   there is no room. The AM/PM menu opens the same 4px below its button.
-- **Extra props go to the wrapper, not to the two inputs (#230).** The wrapper
+- **Extra props go to the wrapper, not to the two inputs.** The wrapper
   is the element that carries the group's role and name, so a caller's
   `aria-describedby` lands where it can help. They go on last, so a caller's
   `aria-labelledby` overrides the generated one.
@@ -192,23 +192,22 @@ Date and time pickers let people select a date or range of dates and/or a time f
 
 - **`label` names the field, not either input.** The field renders two controls,
   and one `<label for>` names one control, so `label` labels a `role="group"`
-  around both (#206). Each input is then named off that plus its section
+  around both. Each input is then named off that plus its section
   heading — `<field> Date` and `<field> Time` — which is what tells them apart
   once they are read out of context.
 - **`showLabel={false}` hides the label, it does not remove it.** The label is
   rendered either way and always carries `htmlFor`; `showLabel={false}` only
   clips it out of sight with `.plus-datetime-label-hidden`, so the group and
-  both inputs keep their names and the layout does not move. This was the other
-  way round until #225, which brought the component in line with `Input`
-  (#213) — see *Why `showLabel` cannot take the name away* in the Input docs.
+  both inputs keep their names and the layout does not move. This matches
+  `Input` — see *Why `showLabel` cannot take the name away* in the Input docs.
 - **A field with no `label` still has no name.** `showLabel` decides whether the
   label is *seen*; passing no `label` is what leaves the field unnamed. Then
   there is no group either, and the two inputs are called just "Date" and
   "Time" — off their section headings, or off a fallback `aria-label` when
   `showSectionLabels` is off. Both are true of the control and useless as a
   field name: two such pickers on one screen are indistinguishable.
-- **A caption you render above the field cannot be its name.** The pattern that
-  prompted #225 — one visible "Session time" over a start and an end picker —
+- **A caption you render above the field cannot be its name.** The case this guards
+  against — one visible "Session time" over a start and an end picker —
   has no `htmlFor` that works, because one `<label for>` reaches one control and
   there are two fields under it. Give each picker its own `label` with
   `showLabel={false}`, and let the caption name the pair: put it in an element
@@ -218,20 +217,18 @@ Date and time pickers let people select a date or range of dates and/or a time f
 - **Never hand the same `id` to two pickers.** Ids are derived once per instance
   (`useFieldId`), so omitting `id` is safe and unique. Repeating one is not: both
   fields' labels and `aria-labelledby` targets then collide, and every label on
-  the page lands on whichever control the browser reached first (#222).
+  the page lands on whichever control the browser reached first.
 - **`validation` marks both inputs.** Both halves are `_Field`, so
   `validation="invalid"` draws both boxes in the error state and sets
   `aria-invalid` on both inputs, and the message is the shared field caption,
   announced as an alert, which describes the group. `required` renders a `*`
-  span marked `aria-label="required"`. Until #230 a caller had no escape hatch
-  either — this component collected the props it does not name into a rest
-  object and never spread it, so passing `aria-describedby` yourself did
-  nothing, silently. It forwards them now; the rule for where they land is the
-  next bullet.
+  span marked `aria-label="required"`. Props this component does not name, such
+  as your own `aria-describedby`, are forwarded; the rule for where they land is
+  the next bullet.
 - **Forwarded props go to the wrapper, which is the group — not to either
   input.** Anything this component does not name in its own signature is spread
   onto the outer `<div>`, the same element that carries `role="group"` and the
-  field's name (#230). One target, because this field renders two inputs plus an
+  field's name. One target, because this field renders two inputs plus an
   AM/PM control and a prop split across them would land somewhere the caller did
   not choose. The wrapper is the right one of the four: it is what `data-testid`
   means by "this field", and it is what `aria-describedby` is about — a

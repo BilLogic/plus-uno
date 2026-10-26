@@ -66,6 +66,26 @@ export const STATE_GROUNDS = [
 
 const ACCENT_FAMILIES = ['blue', 'teal', 'green', 'lime', 'yellow', 'orange', 'red', 'magenta', 'purple', 'gray', 'brown'];
 
+/**
+ * The chart sequences whose neighbors must stay apart: the categorical series up to Atlassian's limit of six, and
+ * the SMART subjects in S-M-A-R-T order. `design-system/src/dataviz/palette.js` assigns them in the same order.
+ */
+export const CHART_SEQUENCES = {
+  categorical: [1, 2, 3, 4, 5, 6].map((i) => `color.chart.categorical.${i}`),
+  SMART: ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'].map((s) => `color.chart.smart.${s}`),
+};
+
+/** The surfaces a chart is drawn on. */
+const CHART_SURFACES = ['elevation.surface', 'elevation.surface.raised', 'elevation.surface.overlay'];
+
+/** A sequential ramp, low to high: the hue's subtler accent fill, then its three chart emphases. Mirrored by `palette.js`. */
+export const sequentialRamp = (hue) =>
+  [`color.background.accent.${hue}.subtler`, ...['bold', 'bolder', 'boldest'].map((e) => `color.chart.${hue}.${e}`)];
+
+/** One arm of a diverging ramp, from the neutral midpoint out: the gray subtler fill, then the hue's chart emphases. */
+export const divergingArm = (hue) =>
+  ['color.background.accent.gray.subtler', ...['bold', 'bolder', 'boldest'].map((e) => `color.chart.${hue}.${e}`)];
+
 // Color-vision deficiency simulation, Machado 2009, severity 1.
 const PROTAN = [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]];
 const DEUTAN = [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]];
@@ -167,18 +187,41 @@ export function colorChecks({ rows, palette }) {
     }
   }
 
-  // Categorical chart series 1-4 stay apart under protan and deutan simulation (deltaE >= 5).
+  // Neighbors in each chart sequence stay apart: deltaE >= 8 under protan and deutan simulation, and >= 15 for full
+  // color vision. Only neighbors touch in a stack, a bar group or a legend, and the order never skips a slot.
   const chartCvd = [];
-  for (const m of ['light', 'dark']) {
-    const cols = [1, 2, 3, 4].map((i) => S[`color.chart.categorical.${i}`][m].slice(0, 7));
-    for (const [name, M] of [['protan', PROTAN], ['deutan', DEUTAN]]) {
-      const sim = cols.map((c) => simulate(c, M));
-      for (let i = 0; i < 4; i++) {
-        for (let j = i + 1; j < 4; j++) {
-          const d = deltaE(sim[i], sim[j]);
-          if (d < 5) chartCvd.push(`categorical ${i + 1} and ${j + 1} under ${name}, ${m}: deltaE ${d.toFixed(1)} < 5`);
+  for (const [label, seq] of Object.entries(CHART_SEQUENCES)) {
+    for (const m of ['light', 'dark']) {
+      const cols = seq.map((t) => S[t][m].slice(0, 7));
+      for (let i = 0; i + 1 < cols.length; i++) {
+        const pair = `${label} ${seq[i].split('.').at(-1)} and ${seq[i + 1].split('.').at(-1)}`;
+        const normal = deltaE(cols[i], cols[i + 1]);
+        if (normal < 15) chartCvd.push(`${pair}, ${m}: deltaE ${normal.toFixed(1)} < 15`);
+        for (const [name, M] of [['protan', PROTAN], ['deutan', DEUTAN]]) {
+          const d = deltaE(simulate(cols[i], M), simulate(cols[i + 1], M));
+          if (d < 8) chartCvd.push(`${pair} under ${name}, ${m}: deltaE ${d.toFixed(1)} < 8`);
         }
       }
+    }
+  }
+
+  // Every chart color is a mark, so it keeps 3:1 (4.5:1 in increased contrast) on every surface a chart sits on.
+  const chartContrast = Object.keys(S)
+    .filter((n) => n.startsWith('color.chart.'))
+    .flatMap((n) => CHART_SURFACES.flatMap((g) => pairFailures(n, g, 3)));
+
+  // A sequential ramp moves away from the surface at every step, so the strongest tone is the biggest value in
+  // every mode; a diverging midpoint sits nearer the surface than either arm's first step.
+  const chartRamps = [];
+  for (const m of MODES) {
+    const away = (t) => contrast(composite(S[t][m], surface(m)), surface(m));
+    for (const h of ACCENT_FAMILIES) {
+      const ramp = sequentialRamp(h);
+      for (let i = 0; i + 1 < ramp.length; i++) {
+        if (!(away(ramp[i + 1]) > away(ramp[i]))) chartRamps.push(`${ramp[i + 1]} is not past ${ramp[i]}, ${m}`);
+      }
+      const [mid, first] = divergingArm(h);
+      if (!(away(first) > away(mid))) chartRamps.push(`diverging midpoint ${mid} is not nearer the surface than ${first}, ${m}`);
     }
   }
 
@@ -195,6 +238,8 @@ export function colorChecks({ rows, palette }) {
     'collapsed states': collapsedStates,
     'tint vs frame': tintVsFrame,
     'chart color vision': chartCvd,
+    'chart contrast': chartContrast,
+    'chart ramps': chartRamps,
     'teal vs Lagoon': tealVsLagoon,
   };
 }

@@ -9,8 +9,9 @@ import './PatternCard.scss';
  * an optional footer, on Atlassian's raised pair: the raised surface and its
  * shadow, whose 1px ring is the card's edge.
  *
- * - **Header** (`_Card header`): `title` (Heading/xsmall 14, one heading level
- *   below its section) over an optional `description` (Body/default 14), with
+ * - **Header** (`_Card header`): `title` (the card title type, shared with Card
+ *   in `styles/_card-title.scss`, one heading level below its section) over an
+ *   optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
  * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg,
@@ -82,7 +83,7 @@ const PatternCard = ({
 
 PatternCard.propTypes = {
     id: PropTypes.string,
-    /** The card's title: Heading/xsmall 14, tagged one heading level below its section */
+    /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section */
     title: PropTypes.node,
     /** Body/default 14 under the title */
     description: PropTypes.node,

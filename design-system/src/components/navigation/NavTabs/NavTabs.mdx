@@ -36,7 +36,7 @@ export const figmaMeta = {
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/navigation/NavTabs"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavTabs"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -177,7 +177,7 @@ stretches the tabs to fill the bar.
 - **Tab still works in either mode.** In navigation mode every item is focusable
   and activates with Enter, so the bar is operable by keyboard — it is the
   *semantics* that are missing, not the operation.
-- **`mode="tabs"` is the WAI-ARIA tabs pattern (#256).** `role="tablist"` on the
+- **`mode="tabs"` is the WAI-ARIA tabs pattern.** `role="tablist"` on the
   container, `role="tab"` and `aria-selected` on each item, `aria-controls`
   pointing at the panel when one is declared, and roving tabindex: one stop for
   the whole strip, with Left, Right, Home and End moving selection and focus
@@ -229,7 +229,8 @@ stretches the tabs to fill the bar.
 The mode is opt-in rather than the default because three specs under
 `src/specs/Home` render this component as navigation, where anchors are the
 right element and a tablist would be a lie. `NavTabs.test.jsx` asserts the
-navigation markup byte for byte against what shipped before #256.
+navigation markup byte for byte against the markup it rendered before `mode`
+existed.
 
 </div>
 

@@ -38,7 +38,7 @@ A card is a flexible and extensible content container. Cards support a wide vari
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19497"
-    githubLink="https://github.com/BilLogic/plus-vibe-coding-starting-kit/tree/main/design-system/src/components/layout-and-structure/Card"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Card"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -145,8 +145,8 @@ for spacing.
 ### Radius has two values here, not three.
 
 ```jsx
-// Incorrect — `radiusSize` on Card accepts only `sm` and `md`. (Modal and
-// Jumbotron accept `lg`; Card does not.)
+// Incorrect — `radiusSize` on Card accepts only `sm` and `md`. (Modal accepts
+// `lg`; Card does not.)
 <Card radiusSize="lg" title="Weekly summary" />
 
 // Correct.
@@ -167,7 +167,7 @@ instead.
 
 - **The card title is a heading.** `title` renders a real heading tagged one
   level below the section the card sits in: an `h3` in a section, an `h2`
-  straight on a page. Its size stays Heading/xsmall 14 at every level, so a
+  straight on a page. It keeps the one card title type at every level, so a
   screen-reader user can jump between cards by heading without the type
   changing. A card that should not appear in the heading outline leaves
   `title` unset and puts its text in `children`.

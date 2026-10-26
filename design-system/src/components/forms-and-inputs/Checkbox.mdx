@@ -162,12 +162,11 @@ box resolves it like any other, so it cannot be used as a third stored value.
 
 - **The label is wired for you, `id` or no `id`.** The component derives one id
   through `useFieldId` and hands it to the underlying form check, which renders
-  the `label` with a matching `htmlFor`. Until #213 it handed down `id || name`,
-  so a caller who passed neither got an input with no id and a label pointing at
-  nothing — the `label` rendered and named nothing. `Input` and `Textarea` reach
-  the same place by the same route, since #206.
+  the `label` with a matching `htmlFor`, so a caller who passes neither `id` nor
+  `name` still gets a label that names the input. `Input` and `Textarea` reach
+  the same place by the same route.
 - **`name` is not an id.** It is a form key, it is not unique on the page, and no
-  element carries it as one; it no longer stands in for a missing `id` (#213).
+  element carries it as one; it no longer stands in for a missing `id`.
 - **A checkbox with no `label` has no accessible name.** Nothing substitutes for
   it — not a neighboring `<span>`, not the column it sits under. Where the
   design has no room for visible text, pass `aria-label`; it is spread onto the

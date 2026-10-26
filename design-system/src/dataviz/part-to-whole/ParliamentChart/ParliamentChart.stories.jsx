@@ -1,4 +1,5 @@
 import React from 'react';
+import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 import ParliamentChart from './ParliamentChart';
 
 export default {
@@ -65,13 +66,14 @@ Shows **proportions using distinct markers** (dots) in a semi-circle.
 };
 
 const parliamentData = {
-    data: [
-        { name: 'Liberals', value: 24, color: '#FFD700' },
-        { name: 'Conservatives', value: 35, color: '#3366CC' },
-        { name: 'Socialists', value: 18, color: '#DC3912' },
-        { name: 'Greens', value: 12, color: '#109618' },
-        { name: 'Independents', value: 6, color: '#990099' }
-    ]
+    // Most to least, then each group a categorical series in order.
+    data: mostToLeast([
+        { name: 'Liberals', value: 24 },
+        { name: 'Conservatives', value: 35 },
+        { name: 'Socialists', value: 18 },
+        { name: 'Greens', value: 12 },
+        { name: 'Independents', value: 6 }
+    ], (g) => g.value).map((g, i) => ({ ...g, color: CATEGORICAL[i] }))
 };
 
 export const Overview = () => (
@@ -87,9 +89,9 @@ export const Overview = () => (
 export const Interactive = {
     args: {
         data: [
-            { name: 'Group A', value: 10, color: '#AABBCC' },
-            { name: 'Group B', value: 15, color: '#CCDDEE' },
-            { name: 'Group C', value: 5, color: '#EEFF00' }
+            { name: 'Group B', value: 15, color: CATEGORICAL[0] },
+            { name: 'Group A', value: 10, color: CATEGORICAL[1] },
+            { name: 'Group C', value: 5, color: CATEGORICAL[2] }
         ],
         height: 400
     }

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CHROME, STATUS } from '@/dataviz/palette';
 
 /**
  * WaterfallChart Component
@@ -39,8 +40,12 @@ const WaterfallChart = ({
         legend: { enabled: false },
         series: [{
             name: 'Waterfall',
-            upColor: 'var(--color-success)',
-            color: 'var(--color-danger)',
+            // A gain or a loss is a status; the signed value label says which, so color is never alone.
+            upColor: STATUS.success,
+            color: STATUS.danger,
+            borderColor: CHROME.separator,
+            // The connector between bars is chrome, not data.
+            lineColor: CHROME.grid,
             data: data,
             dataLabels: {
                 enabled: true,

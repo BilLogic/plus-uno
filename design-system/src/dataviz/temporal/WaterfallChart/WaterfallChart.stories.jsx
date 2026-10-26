@@ -1,4 +1,5 @@
 import React from 'react';
+import { BRAND } from '@/dataviz/palette';
 import WaterfallChart from './WaterfallChart';
 
 export default {
@@ -19,8 +20,8 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 ### How to Read
 - **First bar** = starting value
-- **Green bars** = positive additions
-- **Red bars** = deductions/losses
+- **Success bars** (\`--ds-chart-success\`) = positive additions
+- **Danger bars** (\`--ds-chart-danger\`) = deductions/losses
 - **Final bar** = ending total (sum)
 - Each bar floats from previous endpoint
 
@@ -52,7 +53,7 @@ A waterfall chart shows how a value changes through **sequential additions and s
 ### How to Use
 
 **Best Practices:**
-✅ Use green for additions, red for subtractions
+✅ Keep the signed value label on every bar, so the direction never rests on color alone
 ✅ Include summary bars (totals)
 ✅ Label each step clearly
 ✅ Show intermediate totals if needed
@@ -76,12 +77,12 @@ A waterfall chart shows how a value changes through **sequential additions and s
 const profitData = {
     categories: ['Start', 'Product', 'Services', 'Costs', 'Marketing', 'Final'],
     data: [
-        { y: 1000, color: 'var(--color-primary)' },
+        { y: 1000, color: BRAND },
         500,
         200,
         -150,
         -100,
-        { isSum: true, color: 'var(--color-primary)' }
+        { isSum: true, color: BRAND }
     ],
     yAxisLabel: 'Revenue ($)'
 };
@@ -93,7 +94,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>Profit & Loss</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Shows how revenue changes through different factors.
             </p>
             <WaterfallChart {...profitData} />

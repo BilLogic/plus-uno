@@ -5,6 +5,7 @@ import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-pr
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternTable from '@/patterns/PatternTable';
 import PatternCard from '@/patterns/PatternCard';
+import PatternSection from '@/patterns/PatternSection';
 import Button from '@/components/forms-and-inputs/Button';
 import { Checkbox } from '@/components';
 
@@ -35,13 +36,9 @@ const tableContent = (
     </>
 );
 
-const toolbarSlot = (
-    <>
-        <span className="h6" style={{ margin: 0 }}>Team members</span>
-        <div style={{ marginLeft: 'auto' }}>
-            <Button text="Add member" style="primary" fill="filled" size="small" onClick={() => {}} />
-        </div>
-    </>
+/** The Section header carries the title and the actions; the table has no toolbar of its own. */
+const sectionActions = (
+    <Button text="Add member" style="primary" fill="filled" size="small" onClick={() => {}} />
 );
 
 const paginationSlot = (
@@ -50,10 +47,13 @@ const paginationSlot = (
     </span>
 );
 
+/** The empty type of the message row: icon, title, description and the first action. */
 const emptyStateSlot = (
     <>
-        <span className="h6" style={{ margin: 0 }}>No members yet</span>
-        <span className="body1-txt">Empty-state slot — invite someone to get started.</span>
+        <i className="fa-regular fa-folder" aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: 'var(--ds-icon-subtle)' }} />
+        <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>No members yet</span>
+        <span style={{ font: 'var(--body-small)' }}>Members you invite show up here.</span>
+        <Button text="Invite a member" style="primary" fill="text" size="small" onClick={() => {}} />
     </>
 );
 
@@ -81,28 +81,16 @@ const wideTable = (
     </>
 );
 
-/** Full shell inside a card — docs section only */
+/** The table in a Section: the header carries the title and actions, paging stays under the rows — docs section only */
 function PatternTableCompositionDemo() {
     return (
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TABLE SHELL INSIDE A CARD</span>
-            <PatternCard>
-                <PatternTable toolbar={toolbarSlot} pagination={paginationSlot}>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TABLE IN A SECTION</span>
+            <PatternSection title="Team members" actions={sectionActions}>
+                <PatternTable pagination={paginationSlot}>
                     {tableContent}
                 </PatternTable>
-            </PatternCard>
-        </div>
-    );
-}
-
-/** Empty state */
-function PatternTableEmptyDemo() {
-    return (
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">EMPTY STATE</span>
-            <PatternCard>
-                <PatternTable toolbar={toolbarSlot} empty emptyState={emptyStateSlot} />
-            </PatternCard>
+            </PatternSection>
         </div>
     );
 }
@@ -119,7 +107,7 @@ export default {
         emptyState: { table: { disable: true } },
         empty: {
             control: 'boolean',
-            description: 'Show the empty-state slot instead of the table',
+            description: 'Swap the body rows for the empty-state message row; the head row stays',
             table: { category: 'State' },
         },
         stickyHeader: {
@@ -149,14 +137,70 @@ export default {
 };
 
 export const Overview = () => (
-    <PatternTable toolbar={toolbarSlot} pagination={paginationSlot}>
-        {tableContent}
-    </PatternTable>
+    <PatternSection title="Team members" actions={sectionActions}>
+        <PatternTable pagination={paginationSlot}>
+            {tableContent}
+        </PatternTable>
+    </PatternSection>
 );
 
 export const Composition = () => <PatternTableCompositionDemo />;
 
-export const EmptyState = () => <PatternTableEmptyDemo />;
+/**
+ * The empty state sits inside the table, under its head row, as a message row
+ * spanning every column; the Section header above stays usable. It is not a
+ * data row, so it takes no hover state, and the pager hides with the rows.
+ * Held in all four modes.
+ */
+export const EmptyState = {
+    render: () => (
+        <PatternSection title="Team members" actions={sectionActions}>
+            <PatternTable empty emptyState={emptyStateSlot} pagination={paginationSlot}>
+                {tableContent}
+            </PatternTable>
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const color = (token) => tokenColor(canvasElement, token);
+        const table = canvas.getByRole('table');
+
+        await inEveryColorMode(async (mode) => {
+            const message = within(table).getByText('No members yet').closest('td');
+            const row = message.closest('tr');
+            await expect(within(table).getByRole('columnheader', { name: 'Role' }), `${mode}: the head row stays`).toBeVisible();
+            await expect(within(table).queryByText('Jordan Blake'), `${mode}: the body rows are replaced`).toBeNull();
+            await expect(message.colSpan, `${mode}: the message spans every column`).toBe(3);
+            await expect(row.closest('tbody'), `${mode}: the message is a row of the table body`).not.toBeNull();
+            await expect(getComputedStyle(message).color, `${mode}: message text`).toBe(color('--ds-text-subtle'));
+            await expect(getComputedStyle(message).borderBottomColor, `${mode}: the message row's rule`).toBe(color('--ds-border'));
+            await expect(withForcedPseudo(row, ':hover', () => getComputedStyle(message).backgroundImage), `${mode}: no hover on a message row`)
+                .not.toContain(color('--ds-background-neutral-subtle-hovered'));
+            await expect(canvas.getByRole('button', { name: 'Add member' }), `${mode}: the Section header stays usable`).toBeEnabled();
+            await expect(canvas.queryByText(/Pagination slot/), `${mode}: no pager without rows`).toBeNull();
+        });
+    },
+};
+
+/**
+ * With a sticky column, the message row spans it rather than pinning to it:
+ * the head cell stays sticky, the message cell does not.
+ */
+export const EmptyWithStickyColumn = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight={240}>
+            {tableContent}
+        </PatternTable>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const message = canvas.getByText('No members yet').closest('td');
+        await expect(getComputedStyle(canvas.getByText('Name')).position, 'the head cell is sticky').toBe('sticky');
+        await expect(getComputedStyle(message).position, 'the message cell is not pinned').not.toBe('sticky');
+        await expect(getComputedStyle(message).boxShadow, 'the message cell draws no overflow shadow').toBe('none');
+    },
+};
 
 export const Interactive = {
     args: {
@@ -167,7 +211,6 @@ export const Interactive = {
     },
     render: (args) => (
         <PatternTable
-            toolbar={toolbarSlot}
             pagination={paginationSlot}
             emptyState={emptyStateSlot}
             empty={args.empty}
@@ -178,6 +221,24 @@ export const Interactive = {
             {tableContent}
         </PatternTable>
     ),
+};
+
+/**
+ * The deprecated `toolbar` slot still renders above the table, so existing
+ * callers keep working while they move their actions to the Section header.
+ */
+export const DeprecatedToolbar = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <PatternTable toolbar={<span>Old toolbar</span>}>
+            {tableContent}
+        </PatternTable>
+    ),
+    play: async ({ canvasElement }) => {
+        const toolbar = canvasElement.querySelector('.plus-pattern-table-toolbar');
+        await expect(toolbar, 'the deprecated toolbar still renders').toHaveTextContent('Old toolbar');
+        await expect(toolbar.nextElementSibling, 'above the table').toHaveClass('plus-pattern-table-scroll');
+    },
 };
 
 /**

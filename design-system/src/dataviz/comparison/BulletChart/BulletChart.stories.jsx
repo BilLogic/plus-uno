@@ -51,7 +51,7 @@ A bullet chart displays **actual vs target** performance with qualitative ranges
 ### How to Use
 
 **Best Practices:**
-✅ Use consistent color bands (red/yellow/green)
+✅ Shade the quality ranges with the danger, warning and success backgrounds, and label them
 ✅ Show clear target marker
 ✅ Compare multiple bullets vertically
 ✅ Include metric labels
@@ -88,8 +88,8 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
             <h3 style={{ marginBottom: '16px' }}>KPI Dashboard</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
-                Shows actual vs target with quality ranges (red/yellow/green zones).
+            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
+                Shows actual vs target with quality ranges in the danger, warning and success backgrounds.
             </p>
             <BulletChart {...kpiData} />
         </section>

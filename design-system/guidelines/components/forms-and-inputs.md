@@ -172,8 +172,9 @@ radio or checkbox.
 
 **`Button`** for a single action. It is the only one of the two that carries a
 click handler, and it is what the rest of the system composes when it
-needs an action: `Modal` and `Jumbotron` build their footers from
-`primaryButton` / `secondaryButton`, `Card` from `actionButton`, `InputGroup`
+needs an action: `Modal` builds its footer from `primaryButton` /
+`secondaryButton`, `Jumbotron` takes Buttons in its `actions` slot, `Card` builds
+from `actionButton`, `InputGroup`
 from `InputGroup.Button`. Pass `href` when the
 action is really navigation — the component forwards it and renders an anchor,
 which keeps middle-click and open-in-new-tab working.
