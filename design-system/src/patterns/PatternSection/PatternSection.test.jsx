@@ -114,6 +114,11 @@ describe('PatternSection', () => {
             expect(screen.getByText('Body')).toBeInTheDocument();
         });
 
+        it('draws the skeleton before a title has arrived', () => {
+            const { container } = render(<PatternSection loading>Body</PatternSection>);
+            expect(container.querySelectorAll('.plus-pattern-section-skeleton .plus-skeleton')).toHaveLength(2);
+        });
+
         it('adds a bar for the bottom row, and on tabs-only draws only that bar', () => {
             const { container, rerender } = render(<PatternSection title="S" tabs={<div />} loading>Body</PatternSection>);
             expect(container.querySelectorAll('.plus-pattern-section-skeleton .plus-skeleton')).toHaveLength(3);

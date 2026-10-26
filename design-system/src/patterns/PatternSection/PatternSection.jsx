@@ -184,6 +184,7 @@ const PatternSection = ({
     header,
     type: typeProp,
     onAddView,
+    addViewLabel = 'Add view',
     loading = false,
     layout = 'single',
     side,
@@ -211,7 +212,7 @@ const PatternSection = ({
     const tabsOnly = type === 'tabs-only';
     const custom = type === 'custom';
     const bottomRow = type === 'toolbar' ? toolbar : (type === 'tabs' || tabsOnly) ? tabs : null;
-    const hasHeader = title || description || actions || bottomRow || (custom && header);
+    const hasHeader = loading || title || description || actions || bottomRow || (custom && header);
 
     const parentLevel = useHeadingLevel();
     const isPage = rankProp === 'page';
@@ -254,7 +255,7 @@ const PatternSection = ({
                     <div className={type === 'toolbar' ? 'plus-pattern-section-toolbar' : 'plus-pattern-section-tabs'}>
                         {bottomRow}
                         {type !== 'toolbar' && onAddView && (
-                            <Button text="Add view" style="primary" fill="text" size="small" leadingVisual="plus" onClick={onAddView} />
+                            <Button text={addViewLabel} style="primary" fill="text" size="small" leadingVisual="plus" onClick={onAddView} />
                         )}
                     </div>
                 )}
@@ -305,6 +306,8 @@ PatternSection.propTypes = {
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
     /** Puts "Add view" at the end of the tabs row, and runs when it is pressed */
     onAddView: PropTypes.func,
+    /** The "Add view" button's label */
+    addViewLabel: PropTypes.string,
     /** Swaps the header for skeleton bars and marks the section busy */
     loading: PropTypes.bool,
     /** Body layout: the content alone, content beside `side`, or stacked subsections */

@@ -179,7 +179,7 @@ export default {
         description: { control: 'text', description: 'Optional description under the title', table: { category: 'Slots' } },
         type: {
             control: 'select',
-            options: ['default', 'tabs', 'toolbar', 'tabs-only'],
+            options: ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'],
             description: 'Header type; read from the slots when left off',
             table: { category: 'Design' },
         },
@@ -248,7 +248,10 @@ export const Interactive = {
         loading: false,
     },
     render: (args) => {
-        const bottom = args.type === 'toolbar' ? { toolbar: <DefaultToolbar /> } : (args.type === 'tabs' || args.type === 'tabs-only') ? { tabs: <Tabs /> } : {};
+        const bottom = args.type === 'toolbar' ? { toolbar: <DefaultToolbar /> }
+            : (args.type === 'tabs' || args.type === 'tabs-only') ? { tabs: <Tabs /> }
+            : args.type === 'custom' ? { header: slotContent('Custom header') }
+            : {};
         return (
             <PatternSection
                 title={args.title || undefined}
