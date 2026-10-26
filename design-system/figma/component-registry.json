@@ -1046,6 +1046,51 @@
         "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940"
       }
     },
+    "Illustration": {
+      "code": {
+        "import": "@/components/images-and-icons",
+        "export": "default",
+        "mdxPath": "design-system/src/components/images-and-icons/Illustration/Illustration.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Illustration",
+        "source": "design-system/src/components/images-and-icons/Illustration/Illustration.jsx",
+        "storybookId": "components-images-and-icons-illustration--docs",
+        "props": {
+          "character": {
+            "type": "enum",
+            "values": [
+              "mastering content",
+              "advocacy",
+              "technology",
+              "relationships",
+              "social emotional",
+              "dot",
+              "approximately equal",
+              "root",
+              "all",
+              "pi",
+              "equal",
+              "divider"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "character",
+            "name": "Character",
+            "componentSetNodeId": "19786:47743",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the Illustrations page. Figma names each character in words (\"mastering content\"); code takes the same name in kebab-case (\"mastering-content\"). Size is not a Figma property: the set is drawn at 1000 and scaled, and the Docs name 48, 96, 160 and 240."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
+      }
+    },
     "Input": {
       "code": {
         "import": "@/components/forms-and-inputs",

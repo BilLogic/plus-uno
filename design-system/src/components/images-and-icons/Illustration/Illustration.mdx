@@ -1,0 +1,259 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as IllustrationStories from './Illustration.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "character": {
+      "type": "enum",
+      "values": ["mastering content", "advocacy", "technology", "relationships", "social emotional", "dot", "approximately equal", "root", "all", "pi", "equal", "divider"]
+    }
+  },
+  "sets": [
+    {
+      "id": "character",
+      "name": "Character",
+      "componentSetNodeId": "19786:47743",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the Illustrations page. Figma names each character in words (\"mastering content\"); code takes the same name in kebab-case (\"mastering-content\"). Size is not a Figma property: the set is drawn at 1000 and scaled, and the Docs name 48, 96, 160 and 240."
+    }
+  ]
+};
+
+<Meta of={IllustrationStories} />
+
+<Title />
+The PLUS illustration characters: five that stand for the SMART areas of
+tutoring and seven math characters. Each is a textured body with a face, arms
+and legs drawn in line work, and takes every color from a token.
+
+<DocsTabs of={IllustrationStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Illustration"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>All twelve characters. Switch the color mode in the toolbar to see them in Dark: the bodies and the line work change with the tokens.</>}>
+    <Canvas of={IllustrationStories.Gallery} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+- **Frame.** A 1000 × 1000 square in Figma, scaled to `size` in code. It is the
+  layout box: what sits next to a character lines up with the frame.
+- **Body.** The textured shape, in the body token. The stipple texture is part
+  of the art, so the body reads as soft at every size.
+- **Face, arms and legs.** Line work in `--ds-icon-subtle`. Most characters
+  reach past the frame with their limbs.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and the SMART mapping
+
+Every body sits at one mid strength, so no character reads louder than the
+others in either mode. The five SMART characters use their area's `subtle`
+step, which exists for illustration bodies. The seven math characters use an
+accent hue at the same strength, and never a SMART hue, so a math character is
+never read as a SMART area. There are only four accent hues left once the SMART
+hues are set aside, so three of them repeat.
+
+<DocsTable>
+    <thead>
+        <tr><th>Character</th><th>Kind</th><th>Body token</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>mastering-content</code></td><td>SMART</td><td><code>--ds-background-smart-mastering-content-subtle</code></td></tr>
+        <tr><td><code>advocacy</code></td><td>SMART</td><td><code>--ds-background-smart-advocacy-subtle</code></td></tr>
+        <tr><td><code>technology</code></td><td>SMART</td><td><code>--ds-background-smart-technology-tools-subtle</code></td></tr>
+        <tr><td><code>relationships</code></td><td>SMART</td><td><code>--ds-background-smart-relationship-subtle</code></td></tr>
+        <tr><td><code>social-emotional</code></td><td>SMART</td><td><code>--ds-background-smart-social-emotional-subtle</code></td></tr>
+        <tr><td><code>dot</code></td><td>Math</td><td><code>--ds-background-accent-red-subtle</code></td></tr>
+        <tr><td><code>approximately-equal</code></td><td>Math</td><td><code>--ds-background-accent-blue-subtle</code></td></tr>
+        <tr><td><code>root</code></td><td>Math</td><td><code>--ds-background-accent-green-subtle</code></td></tr>
+        <tr><td><code>all</code></td><td>Math</td><td><code>--ds-background-accent-purple-subtle</code></td></tr>
+        <tr><td><code>pi</code></td><td>Math</td><td><code>--ds-background-accent-red-subtle</code></td></tr>
+        <tr><td><code>equal</code></td><td>Math</td><td><code>--ds-background-accent-blue-subtle</code></td></tr>
+        <tr><td><code>divider</code></td><td>Math</td><td><code>--ds-background-accent-green-subtle</code></td></tr>
+    </tbody>
+</DocsTable>
+
+Technology's brown is the one body with noticeably less chroma than the rest:
+brown has no more saturated SMART step. The line work is `--ds-icon-subtle` on
+every character.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## SMART characters
+
+<DocsCanvasShell description={<>Mastering content, advocacy, technology, relationships and social emotional. Each body takes its SMART area's <code>subtle</code> step.</>}>
+    <DsCanvasQuiet of={IllustrationStories.SmartCharacters} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Math characters
+
+<DocsCanvasShell description={<>Dot, approximately equal, root, all, pi, equal and divider. Each body takes an accent hue at the same strength as the SMART bodies.</>}>
+    <DsCanvasQuiet of={IllustrationStories.MathCharacters} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsCanvasShell description={<>48, 96, 160 and 240 are the named sizes; any number of pixels also works. The size is the frame's width and height, and the limbs reach past it.</>}>
+    <DsCanvasQuiet of={IllustrationStories.Sizes} />
+</DocsCanvasShell>
+
+- **48, 96, 160, 240.** Below 48 the line work breaks into specks; above 240
+  the stipple starts to read as noise.
+- **The safe area is outside the frame.** The limbs are not clipped. Across
+  the twelve characters they reach up to about 33% of the size to the left,
+  60% to the right, 14% above and 50% below; dot reaches farthest. Leave that
+  much room on the sides a character has limbs on, or the limbs run into what
+  sits next to it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={IllustrationStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Illustration` to give a page or a moment some warmth: the header of Home,
+an empty state, a welcome, or a card that introduces a SMART area. A character
+is decoration beside words that already say what the page is about.
+
+Use an icon, not a character, for anything a person acts on or has to read to
+understand. Use `Tile` for a small square picture of a thing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick a SMART character for a SMART area, and a math character for anything else.
+
+```jsx
+// Incorrect: a math character standing in for a SMART area, and a SMART
+// character used as generic decoration on a page about something else.
+<Illustration character="pi" title="Advocacy" />
+<Illustration character="relationships" />  {/* on a billing page */}
+
+// Correct.
+<Illustration character="advocacy" title="Advocacy" />
+<Illustration character="pi" />
+```
+
+### Keep characters decorative unless they carry meaning.
+
+```jsx
+// Incorrect: a title on a character beside a heading that already says it.
+<h2>Advocacy</h2>
+<Illustration character="advocacy" title="Advocacy" />
+
+// Correct: decorative beside the heading; titled when it stands alone.
+<h2>Advocacy</h2>
+<Illustration character="advocacy" />
+```
+
+### Don't recolor or crop a character.
+
+```jsx
+// Incorrect: the colors come from tokens, so a style override breaks the
+// color modes; and clipping the box cuts the limbs off.
+<Illustration character="dot" style={{ filter: 'hue-rotate(90deg)' }} />
+<div style={{ overflow: 'hidden' }}><Illustration character="dot" /></div>
+
+// Correct: give it room instead.
+<div style={{ padding: 'var(--size-section-gap-lg)' }}><Illustration character="dot" /></div>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Decorative by default.** Without a `title` a character is hidden from
+  assistive technology (`aria-hidden="true"`), since it sits beside words that
+  already say what the page is about.
+- **`title` makes it one image with a name.** The character becomes
+  `role="img"` with that name, and its parts stay hidden, so it is announced
+  once. Give it a title only when it carries meaning on its own.
+- **The line ratio is a property of the source art.** The line work measures
+  about 2.6:1 on the bodies in Light and about 2.7:1 in Dark. That is under 3:1,
+  and it is fine for decoration, which has no contrast requirement. Never put
+  information in a character that a person needs to read.
+- **Every mode.** Bodies and line work take their colors from tokens alone, so
+  a character follows Light, Dark and increased contrast with nothing to set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a small square picture of a thing, use `Tile`.
+- For a person, use `UserAvatar`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

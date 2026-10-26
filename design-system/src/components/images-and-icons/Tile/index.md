@@ -42,4 +42,8 @@ Anything not listed is not a valid value.
 
 From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override these through the token layer, never with a literal.
 
+## Related
+
+Same group: `Illustration`
+
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
