@@ -1,12 +1,35 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TopbarStories from './Topbar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TopbarStories} />
 
-<Title />
-The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the start, the page's **breadcrumb** in the middle, and **Help Center** and the **account** at the end. It mirrors the Figma `_Topbar` and the Specs Top Bar, and it sits in the `topbar` slot of `Frame`.
+export const propRows = [
+    ['sidebar', 'open | closed', 'open', 'Standalone only: whether the sidebar is open. It sets the toggle icon and its expanded state. Inside a surface container the frame decides.', 'sidebar = open | floating | closed'],
+    ['docked', 'boolean', 'true when the sidebar is open', 'Standalone only: whether an open sidebar is docked. Docked, the start area is sidebar-wide.', 'sidebar = open (docked)'],
+    ['onToggle', 'function', 'none', 'Standalone only: called when the toggle is pressed. Without it, and outside a surface container, there is no toggle.', 'none'],
+    ['breadcrumbs', 'list of text, href', 'empty', 'The trail. The last item is the current page.', 'Breadcrumb instance'],
+    ['user', 'name, firstChar, type', 'none', 'The signed-in user. The type lead tutor shows the Lead indicator.', 'User avatar'],
+    ['helpHref', 'string', 'none', 'The Help Center link. It opens in a new tab.', 'Help Center'],
+    ['onHelpClick', 'function', 'none', 'Called when Help Center is pressed.', 'Help Center'],
+    ['loading', 'boolean', 'false', 'Skeletons in place of the breadcrumb and the account. The toggle stays.', 'none'],
+];
+
+export const tokens = [
+    ['--layout-height-topbar', '32', 'The row height. The bar has no padding of its own except the left pad of the start area.'],
+    ['--layout-width-sidebar', '240', 'The start area\'s width while the sidebar is docked, so the breadcrumb lines up with the surface.'],
+    ['--surface-container-pad', '8', 'The left pad of the start area, so the toggle sits at (8, 8).'],
+    ['--element-inline-lg', '12', 'The right pad of the start area, the left pad of the end area, and the gap between Help Center and the avatar.'],
+    ['--item-height-md', '32', 'The toggle, Help Center and the avatar.'],
+    ['--label-max-width', '160', 'The avatar name truncates past it.'],
+    ['--ds-surface-sunken', 'color', 'The frame\'s fill shows through, because the bar has none of its own.'],
+];
+
+<Title>Topbar</Title>
+The Topbar is the top row of the page frame, 32 high. It holds the sidebar toggle at the start, the page's breadcrumb in the middle, and Help Center and the account at the end. It is a part of the surface container and sits in the frame's topbar slot.
+
+The examples on this page follow the **Color mode** switch in the toolbar.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46512"
@@ -20,8 +43,18 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 ### Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Docked: the start area is the sidebar's width, so the breadcrumb starts where the surface does.</>}>
-    <DsCanvasQuiet of={TopbarStories.Overview} />
+    <Canvas of={TopbarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### When to use it
+
+Use the Topbar in the surface container's topbar slot, so every page has the same toggle, trail and account in the same place. The frame owns the sidebar state and hands it to the Topbar, so there is one toggle.
+
+For the trail itself, use **Breadcrumb**. For the account, use **User avatar**. For a heading inside the page, use a **Section header**, not the Topbar.
 
 </div>
 
@@ -29,43 +62,128 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 
 ### Anatomy
 
-- **Row** — `--layout-height-topbar` 32. It has no fill of its own; the frame's `--ds-surface-sunken` shows through.
-- **Start** — padded `--surface-container-pad` 8 on the left, so the toggle sits at the container pad. Docked, it is `--layout-width-sidebar` 240 wide; otherwise it hugs the toggle and pads `--element-inline-lg` 12 before the breadcrumb.
-- **Toggle** — a primary tonal Button at the 32 size, icon only.
-- **Middle** — a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
-- **End** — Help Center (a secondary text Button with `circle-question`) and the UserAvatar at `size="md"`, `--element-inline-lg` 12 apart and 12 after the breadcrumb.
+1. **Start** is the left area, padded 8 on the left so the toggle sits at the container pad. Docked, it is 240 wide. Otherwise it hugs the toggle and pads 12 before the breadcrumb.
+2. **Sidebar toggle** is a primary tonal icon-only Button at 32.
+3. **Middle** is a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
+4. **Help Center** is a secondary text icon Button with the circle-question icon.
+5. **User avatar** is the account: an initial, a name and a role, at size md.
+
+Help Center and the avatar sit 12 apart and 12 after the breadcrumb.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### The toggle
+### Properties
 
-- It shows `angles-left` while the sidebar is open, docked or floating, and `bars` while it is closed.
-- Its name says what a press does: "Close sidebar" while docked, "Open sidebar" otherwise. `aria-expanded` says whether the sidebar is showing.
-- Inside a Frame, the frame owns the sidebar state and hands it to the topbar, so there is one toggle. Standalone, pass `sidebar`, `docked` and `onToggle`; without `onToggle` there is no toggle.
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>What it does</th>
+            <th>Figma</th>
+        </tr>
+    </thead>
+    <tbody>
+        {propRows.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+                <td>{row[3]}</td>
+                <td>{row[4]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
 
-<DocsCanvasShell description={<>Closed: <code>bars</code>, and the breadcrumb follows the toggle.</>}>
+In Figma, set the sidebar property to match the frame: open where the sidebar docks (Large and X-Large), closed at Medium, and floating in the floating variant. The surface container does this for its own variants.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        {tokens.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants and states
+
+#### The toggle
+
+The toggle shows angles-left while the sidebar is open, docked or floating, and bars while it is closed. Its name says what a press does: "Close sidebar" while docked and "Open sidebar" otherwise.
+
+<DocsCanvasShell description={<>Closed: the bars icon, and the breadcrumb follows the toggle.</>}>
     <DsCanvasQuiet of={TopbarStories.Closed} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Floating open: <code>angles-left</code>, and the breadcrumb still follows the toggle.</>}>
+<DocsCanvasShell description={<>Floating: the angles-left icon, and the breadcrumb still follows the toggle.</>}>
     <DsCanvasQuiet of={TopbarStories.Floating} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No toggle: outside a surface container, a Topbar without an onToggle handler has none.</>}>
+    <DsCanvasQuiet of={TopbarStories.NoSidebar} />
+</DocsCanvasShell>
+
+#### Long content
+
+A long trail truncates on one line, and a long name ends in an ellipsis. Help Center and the avatar stay whole.
+
+<DocsCanvasShell description={<>A long trail at 768 truncates; Help Center and the avatar stay whole.</>}>
+    <DsCanvasQuiet of={TopbarStories.LongBreadcrumbAt768} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A long name ends in an ellipsis at the label max width. The role indicator stays.</>}>
+    <DsCanvasQuiet of={TopbarStories.LongName} />
+</DocsCanvasShell>
+
+#### Loading
+
+<DocsCanvasShell description={<>Skeletons hold the place of the breadcrumb and the account. The toggle stays.</>}>
+    <DsCanvasQuiet of={TopbarStories.Loading} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Long content
+### Do and don't
 
-<DocsCanvasShell description={<>A long trail truncates on one line; Help Center and the avatar stay whole.</>}>
-    <DsCanvasQuiet of={TopbarStories.LongBreadcrumbAt768} />
-</DocsCanvasShell>
+None. The Figma docs for the Topbar carry no do and don't pairs. The breadcrumb is always a Breadcrumb instance and never plain text, so the current page truncates and Help Center and the avatar stay whole at 768.
 
-<DocsCanvasShell description={<>A long name ends in an ellipsis at <code>--label-max-width</code>; the role indicator stays.</>}>
-    <DsCanvasQuiet of={TopbarStories.LongName} />
-</DocsCanvasShell>
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- The toggle is a button with a name that changes with the state: "Close sidebar" while docked, "Open sidebar" otherwise. It reports whether the sidebar is showing.
+- Help Center is an icon-only button, so it carries the name "Help Center".
+- The breadcrumb is a navigation landmark, and its last item is the current page.
+- The toggle, Help Center and the avatar are each 32 high.
 
 </div>
 
@@ -87,11 +205,12 @@ The topbar is the app frame's top row, 32 high: the **sidebar toggle** at the st
 
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For the frame it sits in, and the sidebar state it reads, use `Frame`.
-- For a whole page, use `PageLayout`, whose TopBar renders this pattern.
-- For the trail itself, see `Breadcrumb`; for the account, `UserAvatar`.
+- <a href="?path=/docs/foundations-patterns-frame--docs">Surface container</a> for the frame it sits in and the sidebar state it reads.
+- <a href="?path=/docs/foundations-patterns-sidebar--docs">Sidebar</a> for the panel the toggle opens.
+- <a href="?path=/docs/components-navigation-breadcrumbs--docs">Breadcrumbs</a> for the trail itself.
+- <a href="?path=/docs/specs-universal-elements-user-avatar--docs">User avatar</a> for the account.
 
 </div>
 

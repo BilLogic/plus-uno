@@ -1,15 +1,49 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SurfaceStories from './Surface.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SurfaceStories} />
 
-<Title />
-The surface is the base background layer of the application shell. It is a bare tokenized container: pick an elevation level, padding scale, radius scale and border — everything else is a content slot you fill. A level is a fill and its shadow together, so a surface never wears one without the other. It mirrors the Surface slot component in Figma.
+export const propRows = [
+    ['level', 'sunken | default | raised | overlay', 'default', 'The elevation level. It sets the fill and its shadow together.'],
+    ['padding', 'none | sm | md | lg', 'md', 'The padding scale.'],
+    ['radius', 'none | sm | md | lg', 'none', 'The corner radius scale.'],
+    ['border', 'boolean', 'false', 'A bold 2px border in --ds-border-bold. A bordered default surface draws it in place of the edge ring.'],
+    ['title', 'node', 'none', 'The page\'s title, rendered as its one h1 in Heading/large 24 above the content. Leave it unset on a surface that is not a page.'],
+    ['as', 'element type', 'div', 'The element to render, for example main or section.'],
+    ['children', 'node', 'none', 'The content slot.'],
+];
+
+export const levels = [
+    ['sunken', '--ds-surface-sunken', 'none', 'The frame\'s backdrop.'],
+    ['default', '--ds-surface', 'an edge ring in --ds-border-surface', 'The page.'],
+    ['raised', '--ds-surface-raised', '--ds-shadow-raised', 'A card.'],
+    ['overlay', '--ds-surface-overlay', '--ds-shadow-overlay', 'Anything over the UI: a floating sidebar, a modal.'],
+];
+
+export const scales = [
+    ['sm', '16 top and bottom, 16 sides', '8'],
+    ['md', '24 top and bottom, 32 sides', '12'],
+    ['lg', '36 top and bottom, 36 sides', '16'],
+];
+
+export const tokens = [
+    ['--surface-pad', '16 below 1440, 24 from 1440', 'The pad of the Surface inside the surface container. It is also the grid margin.'],
+    ['--surface-radius', '16', 'The radius of the Surface inside the surface container.'],
+    ['--surface-stack-sm', '16', 'The gap between related sections.'],
+    ['--surface-stack-md', '24', 'The gap between sections, and below the title.'],
+    ['--surface-stack-lg', '40', 'The gap before a new topic.'],
+    ['--size-surface-border', '2', 'The width of the edge ring and of the bold border.'],
+];
+
+<Title>Surface</Title>
+A surface is the rounded content box of a page: a tokenized container with a fill, an elevation, a pad and a radius, and a slot for your content. A level is a fill and its shadow together, so a surface never wears one without the other. It is a part of the surface container, and you can use it alone for any block that needs a level.
+
+The examples on this page follow the **Color mode** switch in the toolbar. In dark, a level gets lighter as it rises.
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46582"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Surface"
 />
 
@@ -19,7 +53,7 @@ The surface is the base background layer of the application shell. It is a bare 
 
 ### Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Default surface: <code>--ds-surface</code>, surface padding tokens, no shadow, edged by <code>--ds-border-surface</code>.</>}>
+<DocsCanvasShell attachSourceBelow description={<>The default surface: <code>--ds-surface</code>, the surface pad, no shadow, edged by <code>--ds-border-surface</code>.</>}>
     <Canvas of={SurfaceStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -27,11 +61,156 @@ The surface is the base background layer of the application shell. It is a bare 
 
 <div className="sb-ds-doc-section">
 
-### Elevation levels
+### When to use it
 
-<DocsCanvasShell description={<>The four levels, lowest to highest: <code>sunken</code> (the frame's backdrop), <code>default</code> (the page), <code>raised</code> (a card) and <code>overlay</code> (anything over the UI). Each pairs its fill with its shadow; in dark, a level gets lighter as it rises.</>}>
+Use a surface for the page's content box, or for a block that needs a fill at one of the four levels. Inside the surface container, the Surface is already placed for you.
+
+For one object with a shape agreed, use **Card**, which is raised and ready to fill. For the page frame around the surface, use **Surface container**.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Anatomy
+
+1. **Surface** is the container. It carries the level's fill and shadow, the pad and the radius.
+2. **Title** is optional. A surface that holds a page can carry the page's one h1 above the content.
+3. **Content** is the slot. Sections go here and stack by the Surface stack tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Prop</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>What it does</th>
+        </tr>
+    </thead>
+    <tbody>
+        {propRows.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+                <td>{row[3]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+In Figma the Surface part has one property, width, with the values content and reading. Code sets it on the surface container.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Tokens
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Level</th>
+            <th>Fill</th>
+            <th>Shadow</th>
+            <th>Use</th>
+        </tr>
+    </thead>
+    <tbody>
+        {levels.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td><code>{row[1]}</code></td>
+                <td>{row[2].startsWith('--') ? <code>{row[2]}</code> : row[2]}</td>
+                <td>{row[3]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Step</th>
+            <th>Padding</th>
+            <th>Radius</th>
+        </tr>
+    </thead>
+    <tbody>
+        {scales.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Purpose</th>
+        </tr>
+    </thead>
+    <tbody>
+        {tokens.map((row) => (
+            <tr key={row[0]}>
+                <td><code>{row[0]}</code></td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Variants and states
+
+#### Elevation levels
+
+The four levels run lowest to highest: sunken, default, raised and overlay. Each pairs its fill with its shadow.
+
+<DocsCanvasShell description={<>Each level on the frame's sunken backdrop, labeled with its fill and shadow.</>}>
     <DsCanvasQuiet of={SurfaceStories.Levels} />
 </DocsCanvasShell>
+
+#### Padding and radius
+
+<DocsCanvasShell description={<>The small, medium and large steps of padding and radius on a default surface.</>}>
+    <DsCanvasQuiet of={SurfaceStories.Scales} />
+</DocsCanvasShell>
+
+A surface has no interactive states. Hover, pressed and selected belong to the controls placed on it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Do and don't
+
+None. The Figma docs for the Surface part carry no do and don't pairs.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- A surface has no role of its own. Use <code>as="main"</code> for the page's content box and <code>as="section"</code> for a labeled block.
+- Pass <code>title</code> on the page's surface only. It renders the page's one h1, and Sections inside it open at h2.
+- Text on a surface uses <code>--ds-text</code> at every level, in every color mode.
+- In light increased contrast the default surface draws its edge ring, so it stays distinct from the frame behind it.
 
 </div>
 
@@ -51,15 +230,14 @@ The surface is the base background layer of the application shell. It is a bare 
 
 </div>
 
-
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- For a surface with a shape already agreed — padding, radius, slots — use `Card`.
-- For which shadow goes with which surface, see **Elevation**; each `--ds-surface-*` fill pairs with the `--ds-shadow-*` it must be used with.
-- For which fill to reach for, see **Colors** → surface roles.
-- For the Main region of the app shell, use `Frame`.
+- <a href="?path=/docs/foundations-patterns-card--docs">Card</a> for a surface with a shape already agreed: pad, radius and slots.
+- <a href="?path=/docs/foundations-elevation--docs">Elevation</a> for which shadow goes with which surface level.
+- <a href="?path=/docs/foundations-color--docs">Color</a> for which fill to reach for, under surface roles.
+- <a href="?path=/docs/foundations-patterns-frame--docs">Surface container</a> for the page frame the surface sits in.
 
 </div>
 

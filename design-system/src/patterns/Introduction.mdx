@@ -1,107 +1,164 @@
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { DocsTable, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
 <Meta title="Foundations/Patterns/Introduction" />
 
+export const patterns = [
+    ['Page templates', 'The whole page: the surface container with its content slot, in blank, dashboard and reading variants.', 'Start here for any new page.', 'PageLayout', null],
+    ['Surface container', 'The page frame: a Topbar above a row holding the sidebar and the Surface. Its parts are Topbar, Sidebar and Surface.', 'Every page in the app sits inside one.', 'Frame', 'foundations-patterns-frame'],
+    ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'foundations-patterns-section'],
+    ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'foundations-patterns-card'],
+    ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'foundations-patterns-table'],
+    ['Overlay', 'The full-screen layer that holds the scrim and a modal.', 'Anything that blocks the page behind it.', 'Overlay', 'foundations-patterns-overlay'],
+    ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'foundations-patterns-modal'],
+    ['Popover', 'The floating family: Menu, Popup, Flag and Tooltip, with no scrim.', 'Something anchored to a trigger.', 'Popup (component)', null],
+];
+
 <Title>Patterns</Title>
-Patterns are **componentized shells**. Each one bakes in the non-negotiable frame of a layout layer — background token, radius, elevation, border, and min/max constraints — and leaves everything else as **slots** for consumers to fill. They mirror the slot components in the **"Design System - BS4 Foundation + Component Library"** Figma file one-to-one: what a designer drops content into in Figma is what a developer passes as a slot prop in React.
+A pattern is a page-level shell with its layout rules built in. It sets the fill, radius, padding, elevation and width for one layer of the page, and leaves the content to slots. A page starts from a page template. The surface container holds the Topbar and the sidebar, the Surface pads the content and gives it the 12-column grid, and Sections, Cards and Tables fill it. Modal and Popover sit above the page.
+
+The examples on every pattern page follow the **Color mode** switch in the toolbar, so check each one in light, dark and increased contrast.
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2953"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### The slot philosophy
+### The eight patterns
 
-A pattern never renders your content for you. It answers exactly one question — *what does this layer of the page look like?* — and delegates the rest:
+A slot is a named place in a pattern where you put your own content. Each pattern owns its frame and exposes its slots. Set the layout mode (Medium 768, Large 1024 or X-Large 1440) once on the page template, and everything inside follows it.
 
-- **The shell owns the frame.** Surface color, radius, elevation, border, padding, and gap come from design tokens and cannot drift. You choose from token-backed scales (`sm` / `md` / `lg`), never raw values.
-- **You own the slots.** `header`, `footer`, `actions`, `toolbar`, `pagination`, `emptyState`, and `children` accept any node. Fill them with core components (Button, Badge, Input…) or your own composition.
-- **Patterns nest by layer.** Frame → Section → Card → Table/Modal content. Each layer's tokens are scoped to it (`--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-table-*`, `--size-surface-*`).
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Layer identity
-
-<table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', border: '1px solid var(--color-outline-variant)' }}>
-    <colgroup>
-        <col style={{ width: '18%' }} />
-        <col style={{ width: '20%' }} />
-        <col style={{ width: '44%' }} />
-        <col style={{ width: '18%' }} />
-    </colgroup>
+<DocsTable>
     <thead>
-        <tr style={{ backgroundColor: 'var(--color-surface-container-low)', borderBottom: '2px solid var(--color-outline)' }}>
-            <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600 }}>Pattern</th>
-            <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600 }}>Component</th>
-            <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600 }}>Background token</th>
-            <th className="body2-txt" style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 600 }}>Elevation</th>
+        <tr>
+            <th>Pattern</th>
+            <th>What it is</th>
+            <th>Use it for</th>
+            <th>In code</th>
         </tr>
     </thead>
     <tbody>
-        {[
-            ['Surfaces', 'Surface', '--ds-surface (or the sunken, raised or overlay level)', 'the level\'s own shadow: none, raised or overlay'],
-            ['Frame (app frame)', 'Frame', '--ds-surface-sunken frame; the surface inside is --ds-surface and carries the content grid', '0'],
-            ['Sidebar (side navigation)', 'PatternSidebar', 'none: it sits on the Frame (--ds-surface-sunken), or --ds-surface-overlay when floating', '0'],
-            ['Section', 'PatternSection', 'no fill', '0'],
-            ['Card', 'PatternCard', '--surface-raised on a 1px --color-outline-variant border', '0 at rest; Light/2 while a clickable card is hovered or dragged'],
-            ['Table', 'PatternTable', 'no-fill (container owns the background)', '0'],
-            ['Modal', 'PatternModal', '--surface-overlay (white), over a scrim', 'Light/4'],
-        ].map((row, i) => (
-            <tr key={i} style={{ borderBottom: '1px solid var(--color-outline-variant)' }}>
-                <td className="body2-txt" style={{ padding: '10px 12px' }}>{row[0]}</td>
-                <td style={{ padding: '10px 12px' }}><code style={{ fontSize: '0.85em' }}>{row[1]}</code></td>
-                <td style={{ padding: '10px 12px' }}><code style={{ fontSize: '0.85em', wordBreak: 'break-word' }}>{row[2]}</code></td>
-                <td className="body2-txt" style={{ padding: '10px 12px' }}>{row[3]}</td>
+        {patterns.map((row) => (
+            <tr key={row[0]}>
+                <td>{row[4] ? <a href={'?path=/docs/' + row[4] + '--docs'}>{row[0]}</a> : row[0]}</td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+                <td><code>{row[3]}</code></td>
             </tr>
         ))}
     </tbody>
-</table>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Content on top of surfaces
+### When to use a pattern, and when to use something else
 
-- **Primary text**: `--color-on-surface` — headings, primary data, active body text.
-- **Secondary text**: `--color-on-surface-variant` — subtitles, metadata, timestamps.
-- **Outer borders**: `--color-outline` / **inner dividers**: `--color-outline-variant`.
-- **Interaction states are additive overlays** laid on top of the base fill, never replacing it: hover `--color-on-surface-state-08`, pressed `-12`, selected or dragged `-16`. Focus is the focus ring, never a fill (`foundations/color.md` § State Layers).
+Use a pattern to build a layer of a page: the frame, a region, a container for one object, a table, or a layer above the page. A pattern gives you the layer, never the content inside it.
+
+For a finished piece of UI such as a button, a field or an avatar, use the component. A pattern holds components in its slots, and a component never rebuilds a pattern's frame.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Patterns vs. core components
+### How a page layers
 
-Patterns are *shells*; core components are *finished furniture*. `PatternCard` gives you a tokenized frame with three slots, while the core `Card` component ships title/media/links/actions behavior. Reach for a pattern when you are composing something the core component does not cover — and never rebuild the frame by hand with raw divs and hex codes.
+Each layer has one fill and one elevation. A state such as hover or selected is drawn over the fill, never in place of it.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Layer</th>
+            <th>Fill</th>
+            <th>Elevation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Surface container</td>
+            <td><code>--ds-surface-sunken</code></td>
+            <td>none</td>
+        </tr>
+        <tr>
+            <td>Surface (the page)</td>
+            <td><code>--ds-surface</code></td>
+            <td>none; an edge ring in <code>--ds-border-surface</code></td>
+        </tr>
+        <tr>
+            <td>Section</td>
+            <td>none; the page shows through</td>
+            <td>none</td>
+        </tr>
+        <tr>
+            <td>Card</td>
+            <td><code>--ds-surface-raised</code></td>
+            <td><code>--ds-shadow-raised</code>, no border</td>
+        </tr>
+        <tr>
+            <td>Table</td>
+            <td>none; its container owns the fill</td>
+            <td>none</td>
+        </tr>
+        <tr>
+            <td>Floating sidebar, Modal</td>
+            <td><code>--ds-surface-overlay</code></td>
+            <td><code>--ds-shadow-overlay</code></td>
+        </tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Usage
+
+1. **Start a page from its template.** The template frames the page. Section groups content under one heading, Card groups one object's content, Table holds records and Modal interrupts for a step that must happen first.
+2. **Swap slots, never restyle the pattern.** Content goes in through slots such as content, body, footer, header, actions, tabs, filters, bulk actions, image, cells, items and side. Leave fill, radius, border, padding and elevation as the pattern sets them, because they come from tokens.
+3. **Add content straight into the slot.** Drop content into the slot itself and replace its placeholder. Do not detach the pattern. Inside a surface, Sections group whatever you place, and their spacing comes from the Surface and Section stack tokens, so add padding only where the content itself needs it.
+4. **Draw states as overlays.** Hover, pressed and selected take their own token steps: <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code>, then <code>--ds-background-selected</code> and <code>-hovered</code>. Focus is the focus ring in <code>--ds-border-focused</code>, never a fill.
+5. **Keep filled versions as local components.** A spec that fills a surface container keeps its own component built from the pattern, so usage traces back to the pattern.
+6. **Note every optical nudge.** Spacing tokens set the structure. Where the eye needs a nudge, such as an icon beside text, an all-caps label or a round shape, nudge for optical balance and note it where you make it. Never leave it as an unexplained hard-coded value.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### For developers
+
+Patterns nest by layer, and each layer's tokens belong to it. A Section holds a Card, and the Card holds the object's content. A Table is never wrapped in a Card.
 
 ```jsx
-import { Frame, PatternSection, PatternTable } from '@';
+import { Frame, Topbar, PatternSection, PatternCard } from '@/patterns';
+import { Button, Sidebar } from '@/components';
 
-<Frame topbar={<Breadcrumb items={...} />} sidebar={<Sidebar />}>
+<Frame
+    topbar={<Topbar breadcrumbs={[{ text: 'Home', href: '/' }, { text: 'Team' }]} />}
+    sidebar={<Sidebar user="tutor" activeTabId="home" />}
+>
     <PatternSection title="Team" actions={<Button text="Add" />}>
-        <PatternTable pagination={...}>
-            <thead>…</thead>
-            <tbody>…</tbody>
-        </PatternTable>
+        <PatternCard>Content</PatternCard>
     </PatternSection>
 </Frame>
 ```
 
 </div>
 
-
 <div className="sb-ds-doc-section">
 
-## Related
+### Related
 
-- `Card` — one object, with a shape agreed.
-- `Section` — a region of a page.
-- `Table` — many objects of the same shape.
-- `Modal` — something that must be decided before the page continues.
-- `Surface` — the fill-and-elevation primitive the other four are built on.
+- <a href="?path=/docs/foundations-elevation--docs">Elevation</a> for the shadows of the floating sidebar, floating layers and a lifted clickable card.
+- <a href="?path=/docs/foundations-spacing--docs">Spacing</a> for the layout and pattern variables these patterns bind.
+- <a href="?path=/docs/foundations-layout-grid--docs">Layout & grid</a> for the 12-column grid, the content caps and sidebar docking.
+- <a href="?path=/docs/foundations-typography--docs">Typography</a> for the Heading, Body and Metric text styles the headers use.
 
 </div>
 

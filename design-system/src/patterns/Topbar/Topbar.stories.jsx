@@ -44,7 +44,7 @@ export default {
         sidebar: {
             control: 'inline-radio',
             options: ['open', 'closed'],
-            description: 'Whether the sidebar is open (docked or floating) or closed. Sets the toggle icon and `aria-expanded`.',
+            description: 'Whether the sidebar is open (docked or floating) or closed. Sets the toggle icon and its expanded state.',
             table: { category: 'Design' },
         },
         docked: {
@@ -52,9 +52,9 @@ export default {
             description: 'Docked, the start area is sidebar-wide so the breadcrumb lines up with the surface.',
             table: { category: 'Design' },
         },
-        breadcrumbs: { table: { category: 'Content' } },
-        user: { table: { category: 'Content' } },
-        loading: { control: 'boolean', table: { category: 'Design' } },
+        breadcrumbs: { description: 'The trail. The last item is the current page.', table: { category: 'Content' } },
+        user: { description: 'The signed-in user. A lead tutor shows the Lead indicator.', table: { category: 'Content' } },
+        loading: { control: 'boolean', description: 'Skeletons in place of the breadcrumb and the account. The toggle stays.', table: { category: 'Design' } },
         onToggle: { table: { category: 'Development' } },
         onHelpClick: { table: { category: 'Development' } },
         helpHref: { table: { category: 'Development' } },
