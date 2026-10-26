@@ -21,9 +21,9 @@ import './SidebarTab.scss';
  * States, drawn by the stylesheet:
  * - enabled: transparent, subtle text and icon
  * - hover: the neutral subtle hovered fill (pressed: its pressed step)
- * - selected: the neutral selected fill with selected text and icon, a 2px
- *   leading bar in the selected border color, and `aria-current="page"`, so
- *   selection never rests on fill alone
+ * - selected: the neutral selected fill with selected text and icon, the
+ *   label in the medium weight, and `aria-current="page"`, so selection never
+ *   rests on fill alone
  * - focus: a 2px focused ring, 2px outside the row, and no fill
  * - disabled: the disabled text and icon colors, no tab stop
  *

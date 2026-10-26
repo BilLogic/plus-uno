@@ -157,7 +157,7 @@ export const SelectedItem = {
 /**
  * In every color mode: rows rest in the subtle text color and hover on the
  * neutral subtle step; the selected row is the neutral selected fill with the
- * selected text and a leading bar in the selected border; group labels are
+ * selected text and a medium-weight label, with no leading bar; group labels are
  * the subtlest text.
  */
 export const ColorModes = {
@@ -178,7 +178,9 @@ export const ColorModes = {
             const style = getComputedStyle(selected);
             await expect(style.backgroundColor, `${mode}: the selected fill`).toBe(color('--ds-background-selected'));
             await expect(style.color, `${mode}: the selected text`).toBe(color('--ds-text-selected'));
-            await expect(style.boxShadow, `${mode}: the selected bar`).toContain(color('--ds-border-selected'));
+            await expect(style.boxShadow, `${mode}: no leading bar`).toBe('none');
+            await expect(getComputedStyle(selected.querySelector('.plus-sidebar-tab__label')).fontWeight, `${mode}: the selected label weight`)
+                .toBe(getComputedStyle(canvasElement).getPropertyValue('--type-weight-medium').trim());
             await expect(getComputedStyle(label).color, `${mode}: a group label`).toBe(color('--ds-text-subtlest'));
         });
     },
@@ -584,8 +586,9 @@ export const Thread = {
             if (selected) {
                 await expect(getComputedStyle(selected).backgroundColor, 'selected fills the surface, neutral')
                     .toBe(tokenColor(canvasElement, '--ds-background-selected'));
-                await expect(getComputedStyle(selected).boxShadow, 'and draws the leading bar')
-                    .toContain(tokenColor(canvasElement, '--ds-border-selected'));
+                await expect(getComputedStyle(selected).boxShadow, 'and draws no leading bar').toBe('none');
+                await expect(getComputedStyle(selected.querySelector('.plus-sidebar-tab__label')).fontWeight, 'its label takes the medium weight')
+                    .toBe(getComputedStyle(canvasElement).getPropertyValue('--type-weight-medium').trim());
             }
         };
         await expect(canvas.getByRole('link', { name: 'Session 20' }), 'a selected tab').toHaveAttribute('aria-current', 'page');

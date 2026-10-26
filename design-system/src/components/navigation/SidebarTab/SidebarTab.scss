@@ -100,21 +100,24 @@
 
 /* ------------------------------------------------------------- states */
 
-// Selection is neutral, never color alone: the selected fill, the selected
-// text and icon, and a 2px leading bar in the selected border (Lagoon). The
-// bar is an inset shadow, so it follows the row's radius and takes no room.
-// Hover and press on a selected row move up the selected steps.
+// Selection is neutral and carries a cue beyond color: the selected fill, the
+// selected text and icon, and the label in the medium weight. The label
+// truncates, so the heavier weight never moves the row. Hover and press on a
+// selected row move up the selected steps.
 .plus-sidebar-tab--hover {
     background-color: var(--ds-background-neutral-subtle-hovered);
 }
 
 .plus-sidebar-tab--selected {
     background-color: var(--ds-background-selected);
-    box-shadow: inset var(--size-element-stroke-lg) 0 0 var(--ds-border-selected);
     color: var(--ds-text-selected);
 
     &:hover {
         color: var(--ds-text-selected);
+    }
+
+    .plus-sidebar-tab__label {
+        font-weight: var(--type-weight-medium);
     }
 
     .plus-sidebar-tab__icon {
