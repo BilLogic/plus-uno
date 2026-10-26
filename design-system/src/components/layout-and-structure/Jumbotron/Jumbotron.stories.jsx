@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { computedShadow, tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, probe, tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { Button } from '@/components';
 import Jumbotron from './Jumbotron';
@@ -221,20 +221,10 @@ export const Anatomy = {
             await expect(bandStyle.boxShadow, `${mode}: the band has no shadow`).toBe('none');
             await expect(bandStyle.borderTopLeftRadius, `${mode}: the band is square`).toBe('0px');
             await expect(getComputedStyle(card.querySelector('.plus-jumbotron-description')).color, `${mode}: the description is subtle text`)
-                .toBe(tokenColorAsText(canvasElement, '--ds-text-subtle'));
+                .toBe(probe(canvasElement, 'color', 'var(--ds-text-subtle)'));
         });
     },
 };
-
-/** What a color token computes to as text color, read through a probe. */
-function tokenColorAsText(host, token) {
-    const el = document.createElement('span');
-    el.style.color = `var(${token})`;
-    host.appendChild(el);
-    const value = getComputedStyle(el).color;
-    el.remove();
-    return value;
-}
 
 /**
  * The 944 rule: side media sits beside the text at 960 wide, and moves on top

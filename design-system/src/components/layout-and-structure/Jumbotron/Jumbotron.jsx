@@ -43,9 +43,9 @@ const DEPRECATIONS = {
  *   Surface/stack-lg top and bottom and Screen/pad-x-screen at the sides.
  * - **align** `start` or `center`. Side media keeps the text start-aligned.
  * - **media** with `mediaPosition` `top` (16:9; full bleed in a card) or
- *   `side` (4:3 at Size/Width/2500). Side media needs 944 of width — 480 of
- *   text, 16 of gutter, 400 of image and 48 of padding — and below that the
- *   media moves on top.
+ *   `side` (4:3 at Size/Width/2500). Side media needs 896 inside the padding —
+ *   480 of text, 16 of gutter and 400 of image, so 944 with Card/pad-lg — and
+ *   below that the media moves on top, inside the padding.
  * - One state: the buttons carry their own. No loading state.
  *
  * `subtitle`, `fluid`, `primaryButton`, `secondaryButton`, `paddingSize`,

@@ -119,8 +119,9 @@
 /*
  * Side media needs 944 of width: 480 of text (Section/min-width-main), 16 of
  * gutter (Grid/gutter), 400 of image (Size/Width/2500) and 48 of padding
- * (Card/pad-lg, or Screen/pad-x-screen in a band, on both sides). The frame is
- * the box inside that padding, so the query asks for the other 896. A query
+ * (Card/pad-lg on both sides). The frame is the box inside the padding, so the
+ * query asks for the 896 and holds in a band too, whose Screen/pad-x-screen
+ * grows on wide screens. A query
  * cannot read a token, so the sum is written out; below it the media moves on
  * top, as media=top. Only a side Jumbotron's frame is a size container, so no
  * other Jumbotron changes how it sizes.
