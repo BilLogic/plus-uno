@@ -50,6 +50,13 @@ describe('PatternDrawer', () => {
         expect(drawer.parentElement).toHaveClass('plus-pattern-overlay-placement-start');
     });
 
+    it('draws the footer slot only when a footer is passed', () => {
+        const { rerender } = render(<PatternDrawer inline title="Details" footer={<button type="button">Save</button>}>Body</PatternDrawer>);
+        expect(document.querySelector('.plus-pattern-drawer-footer')).not.toBeNull();
+        rerender(<PatternDrawer inline title="Details">Body</PatternDrawer>);
+        expect(document.querySelector('.plus-pattern-drawer-footer')).toBeNull();
+    });
+
     it('renders nothing while closed', () => {
         render(<PatternDrawer open={false} title="Filters">Body</PatternDrawer>);
         expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

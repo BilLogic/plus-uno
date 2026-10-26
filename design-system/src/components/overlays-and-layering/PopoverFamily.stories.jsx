@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Dropdown, Toast, ToastContainer } from '@/components';
 import Popover from './Popover/Popover';
 import Tooltip from './Tooltip/Tooltip';
@@ -245,6 +245,52 @@ PopupWidths.play = async ({ canvasElement }) => {
     await waitFor(() => expect(
         Math.round(popup.getBoundingClientRect().top - trigger.getBoundingClientRect().bottom),
     ).toBe(4));
+};
+
+export const PopupLayers = () => {
+    const open = useOpenAfterMount();
+    return (
+        <div style={{ minHeight: '200px', padding: '24px' }}>
+            <Popover
+                id="pf-popup-page"
+                triggerType="manual"
+                show={open}
+                placement="bottom-start"
+                title="On the page"
+                trigger={<button type="button">Page popup</button>}
+            >
+                Notes stay with the session.
+            </Popover>
+            <div className="modal" style={{ position: 'relative', display: 'block', zIndex: 'var(--layout-z-index-modal)' }}>
+                <Popover
+                    id="pf-popup-modal"
+                    triggerType="manual"
+                    show={open}
+                    placement="bottom-start"
+                    title="In a modal"
+                    trigger={<button type="button">Modal popup</button>}
+                >
+                    Notes stay with the session.
+                </Popover>
+            </div>
+        </div>
+    );
+};
+
+PopupLayers.play = async ({ canvasElement }) => {
+    const doc = documentOf(canvasElement);
+    const [page, inModal] = await waitFor(() => {
+        const nodes = ['pf-popup-page', 'pf-popup-modal'].map((id) => doc.getElementById(id));
+        if (nodes.some((n) => !n)) throw new Error('not open');
+        return nodes;
+    });
+    const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
+    // On the popup layer (400) from the page, not above toasts.
+    await expect(getComputedStyle(page).zIndex, 'popup layer').toBe(z('--layout-z-index-popup'));
+    // Opened from a modal it mounts in the modal and so rides its layer (510).
+    await expect(inModal.closest('.modal'), 'mounted in the modal').not.toBeNull();
+    await expect(getComputedStyle(inModal.closest('.modal')).zIndex, 'modal layer').toBe(z('--layout-z-index-modal'));
+    await expect(getComputedStyle(inModal).zIndex, 'popup layer inside the modal').toBe(z('--layout-z-index-popup'));
 };
 
 export const PopupKeepsOffTheScreenEdge = () => {

@@ -59,7 +59,7 @@ Surface.propTypes = {
     id: PropTypes.string,
     /** Elevation level: its fill and its shadow, as a pair */
     level: PropTypes.oneOf(SURFACE_LEVELS),
-    /** Padding scale (md maps to the canonical surface padding tokens) */
+    /** Padding scale (md is the frame surface's pad) */
     padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
     /** Radius scale */
     radius: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),

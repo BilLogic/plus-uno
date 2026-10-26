@@ -32,9 +32,10 @@
     box-shadow: var(--ds-shadow-overlay);
 }
 
-/* Padding scale — md is the canonical Surface padding token pair.
-   No sm/lg surface padding tokens exist yet, so those steps borrow the
-   Sections layer padding tokens (same semantic layer family). */
+/* Padding scale — md is the frame surface's pad, so a surface used alone pads
+   as the one inside the frame does. No sm/lg surface padding tokens exist
+   yet, so those steps borrow the Sections layer padding tokens (same
+   semantic layer family). */
 .plus-pattern-surface-pad-none {
     padding: 0;
 }
@@ -44,7 +45,7 @@
 }
 
 .plus-pattern-surface-pad-md {
-    padding: var(--size-surface-pad-y) var(--size-surface-pad-x);
+    padding: var(--surface-pad);
 }
 
 .plus-pattern-surface-pad-lg {

@@ -77,7 +77,7 @@ Figma's Drawer has more options than the code draws.
 <tr><td><code>placement</code></td><td>end, start</td><td>Same: <code>placement</code>.</td></tr>
 <tr><td>Header <code>type</code></td><td>default, custom</td><td>Default: <code>title</code> and <code>description</code>. Custom is not in code.</td></tr>
 <tr><td><code>actions?</code>, <code>close?</code></td><td>on, off</td><td>Not in code. The Close button always shows.</td></tr>
-<tr><td><code>footer?</code></td><td>on, off</td><td>Leave out <code>footer</code>. Use it for read-only details.</td></tr>
+<tr><td><code>footer?</code></td><td>on, off</td><td>Same: <code>footer</code>. Pass the actions to turn it on; leave it out for read-only details.</td></tr>
 <tr><td><code>divider?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>loading?</code></td><td>on, off</td><td>Not in code.</td></tr>
 <tr><td><code>column guide?</code></td><td>on, off</td><td>Figma only. It shows the screen-grid columns for checking alignment and never ships.</td></tr>
@@ -140,6 +140,10 @@ A Drawer runs from the top of the screen to the bottom, so it has no hug or fill
 
 <DocsCanvasShell description={<>The body scrolls once its content outgrows the screen. A body that scrolls becomes a tab stop, so a keyboard can reach it.</>}>
     <DsCanvasQuiet of={PatternDrawerStories.LongContent} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pass <code>footer</code> to pin the actions to the bottom edge. Leave it out for read-only details, and the Drawer ends at the body.</>}>
+    <DsCanvasQuiet of={PatternDrawerStories.Footer} />
 </DocsCanvasShell>
 
 </div>

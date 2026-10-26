@@ -290,6 +290,95 @@ export const Tabs = {
     },
 };
 
+/**
+ * The body never draws shorter than Modal/body-min-height 96, however little
+ * it holds, as Figma holds it.
+ */
+export const BodyMinHeight = {
+    render: () => (
+        <InOverlay>
+            <PatternModal title="Move session" onClose={() => {}} footer={footerActions}>
+                <span>Short.</span>
+            </PatternModal>
+        </InOverlay>
+    ),
+    play: async ({ canvasElement }) => {
+        const [modal] = dialogs(canvasElement);
+        const body = modal.querySelector('.plus-pattern-modal-body');
+        await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('96px');
+        await expect(body.getBoundingClientRect().height).toBeGreaterThanOrEqual(96);
+    },
+};
+
+/** `header` replaces the title row, as `_Modal header` type=custom; the caller names the dialog. */
+export const CustomHeader = {
+    render: () => (
+        <InOverlay>
+            <PatternModal
+                aria-label="Reschedule"
+                header={(
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <strong style={{ font: 'var(--heading-medium)' }}>Reschedule</strong>
+                        <Button text="Help" style="secondary" fill="outline" size="small" onClick={() => {}} />
+                    </div>
+                )}
+                footer={footerActions}
+            >
+                {bodyCopy}
+            </PatternModal>
+        </InOverlay>
+    ),
+    play: async ({ canvasElement }) => {
+        const [modal] = dialogs(canvasElement);
+        const view = within(modal);
+        await expect(view.getByText('Reschedule')).toBeInTheDocument();
+        await expect(view.queryByRole('button', { name: 'Close' }), 'no default close button').toBeNull();
+        await expect(modal).toHaveAttribute('aria-label', 'Reschedule');
+        await expect(modal).not.toHaveAttribute('aria-labelledby');
+    },
+};
+
+/** `divider` draws a rule under the header and above the footer, as Figma's `divider?`. */
+export const Divider = {
+    render: () => (
+        <InOverlay>
+            <PatternModal title="Move session" divider onClose={() => {}} footer={footerActions}>
+                {bodyCopy}
+            </PatternModal>
+        </InOverlay>
+    ),
+    play: async ({ canvasElement }) => {
+        const [modal] = dialogs(canvasElement);
+        const rules = modal.querySelectorAll('.plus-pattern-modal-divider');
+        await expect(rules).toHaveLength(2);
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            for (const rule of rules) {
+                await expect(getComputedStyle(rule).backgroundColor, `rule color (${mode})`).toBe(token('--ds-border'));
+                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--size-element-border')}px`);
+            }
+        });
+    },
+};
+
+/** `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. */
+export const Loading = {
+    render: () => (
+        <InOverlay>
+            <PatternModal title="Move session" loading onClose={() => {}} footer={footerActions}>
+                {bodyCopy}
+            </PatternModal>
+        </InOverlay>
+    ),
+    play: async ({ canvasElement }) => {
+        const [modal] = dialogs(canvasElement);
+        const body = modal.querySelector('.plus-pattern-modal-body');
+        await expect(body).toHaveAttribute('aria-busy', 'true');
+        await expect(within(modal).queryByText(/Move Thursday/), 'the real body is not drawn').toBeNull();
+        await expect(body.querySelector('[aria-hidden="true"]'), 'a skeleton stands in').not.toBeNull();
+        await expect(within(modal).getByRole('button', { name: 'Move session' }), 'the footer stays').toBeInTheDocument();
+    },
+};
+
 export const Interactive = {
     args: {
         title: 'Move session',
