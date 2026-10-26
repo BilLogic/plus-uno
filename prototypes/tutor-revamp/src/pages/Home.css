@@ -5,7 +5,15 @@
 .tr-home__span-8 { grid-column: span 8; }
 .tr-home__span-4 { grid-column: span 4; }
 
-.tr-home__illustration { display: block; }
+.tr-home__illustration {
+    /* The character overflows this box (its limbs reach past the frame),
+       so the header row keeps the greeting's height. */
+    display: flex;
+    align-items: center;
+    height: 64px;
+    margin: 0 58px 0 32px;
+    overflow: visible;
+}
 
 .tr-home__tiles {
     display: grid;

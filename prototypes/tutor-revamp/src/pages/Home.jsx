@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, StaticBadgeSmart, Status } from '@/components';
+import { Button, Illustration, StaticBadgeSmart, Status } from '@/components';
 import { PatternCard } from '@/patterns';
 import {
     Agenda,
@@ -56,8 +56,11 @@ const Home = () => {
                 className="tr-home__hello"
                 eyebrow={<time dateTime={TODAY.iso}>{TODAY.long}</time>}
                 title={`${TODAY.greeting}, ${TUTOR.firstName}`}
-                // Illustration slot: a PLUS character from the illustration set goes here once it lands in the DS.
-                aside={<span className="tr-home__illustration" data-slot="illustration" />}
+                aside={(
+                    <span className="tr-home__illustration">
+                        <Illustration character="social-emotional" size={96} />
+                    </span>
+                )}
             />
 
             <nav className="tr-home__tiles" aria-label="At a glance">
