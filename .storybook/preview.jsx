@@ -185,6 +185,7 @@ const preview = {
               "Section",
               "Card",
               "Table",
+              "Overlay",
               "Modal"
             ],
             "Imagery",

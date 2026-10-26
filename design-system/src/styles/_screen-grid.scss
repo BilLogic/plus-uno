@@ -1,0 +1,53 @@
+/**
+ * The screen grid a layer in the Overlay takes its width from.
+ *
+ * Figma: 12 columns, gutter 16, inside the screen pad, never under 720 and
+ * capped at 1232 like content. A layer spans `--plus-overlay-span` of those
+ * columns plus its own pad on each side, so it grows with the screen, never
+ * shrinks below the 768 screen and ignores the sidebar. Figma's
+ * Modal/width-modal-* per mode are this rule at 768 · 1024 · 1440, and
+ * scripts/frame-layer-tokens.test.mjs holds it to those tokens. The core
+ * Modal (components/messaging/Modal/Modal.scss) works the same rule out with
+ * its own `--plus-modal-*` names, and the same test holds both.
+ *
+ * The screen is `--plus-overlay-screen` when an inline Overlay sets it (a docs
+ * frame drawn at a mode's width), and the viewport otherwise. The screen pad
+ * is Screen/pad-x-screen below 1440, 24; from 1440 the grid is already at its
+ * 1232 cap with either pad, so one value serves.
+ *
+ * Any layer placed in the Overlay pattern (patterns/Overlay) includes this and
+ * sets `--plus-overlay-span` from its width step: 6 · 8 · 10 for sm · md · lg,
+ * with `screen-grid-width-steps`.
+ *
+ * @param $pad the layer's own pad, added on each side of the columns
+ */
+@mixin screen-grid-width($pad: var(--modal-pad)) {
+    --plus-overlay-screen-pad: var(--space-150);
+    --plus-overlay-grid: clamp(
+        var(--layout-min-width-content),
+        var(--plus-overlay-screen, 100vw) - 2 * var(--plus-overlay-screen-pad),
+        var(--layout-max-width-content)
+    );
+    --plus-overlay-column: calc((var(--plus-overlay-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
+
+    width: calc(var(--plus-overlay-span) * var(--plus-overlay-column) + (var(--plus-overlay-span) - 1) * var(--layout-gutter) + 2 * #{$pad});
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+/**
+ * The width steps: `&-width-sm` · `-md` · `-lg` set the span to 6 · 8 · 10.
+ * The numbers match OVERLAY_SPANS in patterns/Overlay/Overlay.jsx.
+ */
+@mixin screen-grid-width-steps {
+    &-width-sm { --plus-overlay-span: 6; }
+    &-width-md { --plus-overlay-span: 8; }
+    &-width-lg { --plus-overlay-span: 10; }
+}
+
+/**
+ * The tallest a layer gets: the screen less Overlay/pad-y above and below.
+ * An inline Overlay sets `--plus-overlay-max-height` from its stand-in screen;
+ * otherwise it is the viewport's (`--layout-max-height-modal`).
+ */
+$overlay-max-height: var(--plus-overlay-max-height, var(--layout-max-height-modal));

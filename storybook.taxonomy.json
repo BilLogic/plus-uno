@@ -117,6 +117,7 @@
         "Section",
         "Card",
         "Table",
+        "Overlay",
         "Modal"
       ],
       "Imagery",
