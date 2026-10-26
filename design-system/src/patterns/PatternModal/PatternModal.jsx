@@ -112,7 +112,9 @@ const PatternModal = ({
         if (bodyRef.current) bodyRef.current.scrollTop = 0;
     }, [tabState?.current]);
 
-    const tabId = (key) => `${reactId}-tab-${key}`;
+    // Ids come from the tab's place in the list, not its key, so a key with a
+    // space in it cannot break the aria-labelledby and aria-controls links.
+    const tabId = (key) => `${reactId}-tab-${tabs.findIndex((tab) => tab.key === key)}`;
     const panelId = `${reactId}-panel`;
 
     const header = (
@@ -184,8 +186,10 @@ const PatternModal = ({
 /**
  * Which tab is selected, controlled by `activeTab` or held here from
  * `defaultActiveTab`. Null without tabs, so the modal draws as it always has.
- * A key that names no enabled tab falls back to the first enabled one, so the
- * body always shows a panel the strip can reach.
+ * A key that names no enabled tab, a controlled one included, shows the first
+ * enabled tab, so the body always holds a panel the strip can reach; the
+ * caller's key is left as it is. Selecting the tab already selected reports
+ * nothing.
  */
 function useTabs(tabs, { activeTab, defaultActiveTab, onTabChange }) {
     const [held, setHeld] = React.useState(defaultActiveTab);
@@ -198,6 +202,7 @@ function useTabs(tabs, { activeTab, defaultActiveTab, onTabChange }) {
         current,
         content: tabs.find((tab) => tab.key === current)?.content,
         select: (key) => {
+            if (key === current) return;
             if (!controlled) setHeld(key);
             onTabChange?.(key);
         },

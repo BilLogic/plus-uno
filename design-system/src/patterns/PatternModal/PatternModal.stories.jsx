@@ -280,10 +280,12 @@ export const Tabs = {
         await expect(fill.getBoundingClientRect().height, 'fill holds its height on a short tab').toBeCloseTo(cap, 0);
 
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            const selected = selectedOf(fill);
-            await expect(getComputedStyle(selected).color, `selected tab ink (${mode})`).toBe(token('--ds-text-selected'));
-            await expect(getComputedStyle(selected).borderBottomColor, `selected tab underline (${mode})`).toBe(token('--ds-border-selected'));
-            await expect(getComputedStyle(fill).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
+            for (const [name, modal] of [['hug', hug], ['fill', fill]]) {
+                const selected = selectedOf(modal);
+                await expect(getComputedStyle(selected).color, `${name}: selected tab ink (${mode})`).toBe(token('--ds-text-selected'));
+                await expect(getComputedStyle(selected).borderBottomColor, `${name}: selected tab underline (${mode})`).toBe(token('--ds-border-selected'));
+                await expect(getComputedStyle(modal).backgroundColor, `${name}: surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
+            }
         });
     },
 };

@@ -148,6 +148,31 @@ describe('PatternModal tabs', () => {
         expect(screen.getByText('Notes panel')).toBeInTheDocument();
     });
 
+    it('links tab and panel even when a key has spaces in it', () => {
+        const spaced = [
+            { key: 'past sessions', label: 'Past sessions', content: <p>Past</p> },
+            { key: 'next week', label: 'Next week', content: <p>Next</p> },
+        ];
+        render(<PatternModal title="Sessions" tabs={spaced} />);
+        const tab = screen.getByRole('tab', { name: 'Past sessions' });
+        expect(tab.id).not.toMatch(/\s/);
+        expect(screen.getByRole('tabpanel', { name: 'Past sessions' })).toBeInTheDocument();
+    });
+
+    it('reports nothing when the selected tab is clicked again', () => {
+        const onTabChange = vi.fn();
+        render(<PatternModal title="Session settings" tabs={tabs} onTabChange={onTabChange} />);
+        fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+        expect(onTabChange).not.toHaveBeenCalled();
+    });
+
+    it('shows the first enabled tab when a controlled key names a disabled one', () => {
+        const withDisabled = [{ ...tabs[0], disabled: true }, tabs[1], tabs[2]];
+        render(<PatternModal title="Session settings" tabs={withDisabled} activeTab="details" />);
+        expect(screen.getByRole('tab', { name: 'Students' })).toHaveAttribute('aria-selected', 'true');
+        expect(screen.getByText('Students panel')).toBeInTheDocument();
+    });
+
     it('skips a disabled tab', () => {
         const withDisabled = [tabs[0], { ...tabs[1], disabled: true }, tabs[2]];
         render(<PatternModal title="Session settings" tabs={withDisabled} />);
