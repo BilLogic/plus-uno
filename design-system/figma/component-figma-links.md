@@ -126,7 +126,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Input | Form | `14841:25919` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919) | unpublished |
 | Components | Input | Input | `39:4802` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802) | verified |
 | Components | InputGroup | Input Group | `13671:3218` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218) | verified |
-| Components | Jumbotron | Jumbotron | `42:5949` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5949) | verified |
+| Components | Jumbotron | Jumbotron | `19627:113213` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-113213) | verified |
 | Components | LabelAndCaption | _Form Caption | `13726:9599` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599) | verified |
 | Components | LabelAndCaption | Label | `14851:17069` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069) | verified |
 | Components | ListGroup | List Group | `69:16193` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16193) | verified |
