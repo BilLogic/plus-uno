@@ -1,0 +1,210 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as ImageStories from './Image.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={ImageStories} />
+
+<Title />
+Image and Figure are the Bootstrap image utilities: a picture in a thumbnail
+frame, and a picture with a caption. They place a picture in content such as a
+lesson, a help article or a training page. They map to no PLUS component, so
+you write them as `img` and `figure` elements with Bootstrap classes.
+
+<DocsTabs of={ImageStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19593-560"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Image"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+
+<div className="sb-ds-doc-section">
+
+## What to write
+
+A thumbnail is an `img` with `img-thumbnail`. A figure is a `figure` that holds
+an `img` with `figure-img` and a `figcaption` with `figure-caption`. The
+thumbnail frame follows the toolbar's Color mode and Contrast switches.
+
+```jsx
+<figure className="figure">
+    <img src={src} className="figure-img img-thumbnail img-fluid" alt="A number line from 0 to 10 with 7 marked" />
+    <figcaption className="figure-caption text-start">A caption for the above image.</figcaption>
+</figure>
+```
+
+<DocsCanvasShell description={<>A thumbnail at its own size, then a fluid thumbnail that scales with its column.</>}>
+    <DsCanvasQuiet of={ImageStories.Thumbnail} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **Thumbnail frame.** The `.img-thumbnail` utility: a 1px outline, 4 of padding and a 4 radius around the picture.
+2. **Picture.** The image itself. Figma draws a teal placeholder that marks where the picture goes and states its size. Replace it with the real picture.
+3. **Caption.** The `figcaption` with `.figure-caption`, aligned left or right.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+Image and Figure have no props. Each choice is a Bootstrap class.
+
+<DocsTable>
+    <thead>
+        <tr><th>Choice</th><th>Values</th><th>Write</th><th>Figma</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Frame</td><td>Thumbnail</td><td><code>img-thumbnail</code> on the <code>img</code></td><td>Image</td></tr>
+        <tr><td>Sizing</td><td>Fixed · fluid</td><td>Fixed keeps the picture's own size. Fluid adds <code>img-fluid</code>, so the picture scales down with its container.</td><td>Image <code>size</code> and Figure <code>style</code></td></tr>
+        <tr><td>Figure</td><td>Picture with caption</td><td><code>figure</code>, <code>figure-img</code> and <code>figure-caption</code></td><td>Figure</td></tr>
+        <tr><td>Caption alignment</td><td>Left · right</td><td><code>text-start</code> · <code>text-end</code></td><td>Figure <code>align</code>, written <code>.text-left</code> and <code>.text-right</code></td></tr>
+    </tbody>
+</DocsTable>
+
+The Bootstrap version in use names the alignment classes <code>text-start</code>
+and <code>text-end</code>. Figma still names them <code>.text-left</code> and
+<code>.text-right</code>. In this version <code>img-thumbnail</code> already limits
+the picture to its container's width, so fixed and fluid look the same in a column wider than the picture.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+The thumbnail frame and the caption take their values from Bootstrap's own
+variables, which the PLUS color tokens feed.
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>Value</th><th>Set by</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Thumbnail outline</td><td>1px, in the border color</td><td><code>--bs-border-width</code> and <code>--bs-border-color</code></td></tr>
+        <tr><td>Thumbnail padding</td><td>4</td><td><code>img-thumbnail</code></td></tr>
+        <tr><td>Thumbnail radius</td><td>Bootstrap border radius</td><td><code>--bs-border-radius</code></td></tr>
+        <tr><td>Caption text</td><td>Small, in the muted text color</td><td><code>figure-caption</code></td></tr>
+    </tbody>
+</DocsTable>
+
+Figma draws the outline in the accent teal border color, the frame with a 4 radius and the placeholder with the accent teal subtlest fill.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Figure
+
+<DocsCanvasShell description={<>A figure ties the caption to the picture. The caption is left or right aligned.</>}>
+    <DsCanvasQuiet of={ImageStories.FigureWithCaption} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A fluid figure scales with its column. A fixed figure keeps the picture's own size.</>}>
+    <DsCanvasQuiet of={ImageStories.FigureSizing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+Image and Figure are static, so they have no states. Wrap a clickable picture
+in a link or a button. That wrapper carries the hover and the focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<ImageStories.DoDont />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Prefer a component when one fits.** Use Tile, or the media slot of a Card or a Jumbotron.
+- **Use fluid in responsive layouts.** A picture then never overflows a narrow column. Use fixed only where the picture has a known size.
+- **Keep the picture's own ratio.** Never stretch it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ImageStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use an Image or a Figure to place a picture in long-form content. Use a Figure
+when the picture needs a caption.
+
+- For a small square picture or a logo beside a name, use **Tile**.
+- For a person, use **Avatar**.
+- For a picture beside a page's main message, use the media slot of **Jumbotron**.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Describe a picture that carries meaning.** Write alt text that says what it shows.
+- **Skip a decorative picture.** Give it an empty alt, `alt=""`, so screen readers pass over it.
+- **A Figure's caption is read with its picture.** Keep the alt text from repeating the caption.
+- **Keep text that matters out of the picture.** Text in an image cannot be read aloud, translated or resized.
+- **A clickable picture takes its name from its wrapper.** The link or button around it also carries the focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- A small square picture or a logo: **Tile**.
+- A person: **Avatar**.
+- A picture beside a page's main message: **Jumbotron**.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

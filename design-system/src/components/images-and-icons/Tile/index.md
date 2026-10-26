@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Tile/Tile.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, OrangeIsYellow, GreyIsGray, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, OrangeIsYellow, GreyIsGray, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, DoDont, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/Tile/Tile.mdx`
 

@@ -1,0 +1,226 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as IconStories from './Icon.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={IconStories} />
+
+<Title />
+An icon is a single Font Awesome Free glyph in a square box exactly its size:
+12, 16 or 24. The box has no padding, so the icon lines up with the text beside
+it and the parent decides the space around it. There is no Icon component in
+code: you write the glyph as an `i` element and size it with a token.
+
+<DocsTabs of={IconStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19596-28"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+
+<div className="sb-ds-doc-section">
+
+## What to write
+
+Write the glyph with a Font Awesome Free class, and set its size and color from
+tokens. Icon colors follow the toolbar's Color mode and Contrast switches, so
+check an icon in each mode.
+
+```jsx
+<i
+    className="fa-solid fa-calendar-days"
+    aria-hidden="true"
+    style={{ fontSize: 'var(--icon-md)', color: 'var(--ds-icon-subtle)' }}
+/>
+```
+
+- **No Icon component.** There is no `Icon` export and no props. The class names, the size token and the color token are the whole API.
+- **Hide it from assistive technology.** Add `aria-hidden="true"` whenever words beside the icon say what it means.
+- **Put a name on an icon used alone.** Give the control that holds it an `aria-label`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **Box.** A square exactly the size: 12, 16 or 24. Nothing inside it pads the glyph.
+2. **Glyph.** The Font Awesome glyph named in the class, centered. Its font size equals the box and its line height is 1, so it never grows taller than the box.
+3. **Color.** `--ds-icon-subtle` by default. Override it on the element with an icon color token.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+An icon has three choices. Each is a class or a token, not a prop.
+
+<DocsTable>
+    <thead>
+        <tr><th>Choice</th><th>Values</th><th>Default</th><th>Write</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Size</td><td>sm 12 · md 16 · lg 24</td><td>md</td><td><code>--icon-sm</code> · <code>--icon-md</code> · <code>--icon-lg</code> as the <code>font-size</code></td></tr>
+        <tr><td>Style</td><td>solid · regular · brands</td><td>solid</td><td><code>fa-solid</code> · <code>fa-regular</code> · <code>fa-brands</code></td></tr>
+        <tr><td>Name</td><td>Any Font Awesome Free glyph name, for example <code>chevron-down</code></td><td>none</td><td><code>fa-</code> followed by the name</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+    <thead>
+        <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>--icon-sm</code></td><td>12</td><td>Chevrons, small text, field validation and small components</td></tr>
+        <tr><td><code>--icon-md</code></td><td>16</td><td>The default, beside 14 and 16 text</td></tr>
+        <tr><td><code>--icon-lg</code></td><td>24</td><td>The largest icon. Anything bigger goes in a Tile.</td></tr>
+        <tr><td><code>--ds-icon-subtle</code></td><td>Neutral 800</td><td>The default icon color</td></tr>
+        <tr><td><code>--ds-icon</code></td><td>Neutral 1000</td><td>An icon that needs the strongest neutral</td></tr>
+        <tr><td><code>--ds-icon-brand</code></td><td>Lagoon 700</td><td>A brand-colored icon</td></tr>
+        <tr><td><code>--ds-icon-success</code></td><td>Green 600</td><td>A success icon</td></tr>
+        <tr><td><code>--ds-icon-danger</code></td><td>Red 700</td><td>A danger icon</td></tr>
+        <tr><td><code>--ds-icon-disabled</code></td><td>Neutral alpha 800</td><td>An icon in a disabled control</td></tr>
+        <tr><td><code>--ds-icon-inverse</code></td><td>Neutral 0</td><td>An icon on a bold ground</td></tr>
+    </tbody>
+</DocsTable>
+
+Figma names the 12, 16 and 24 sizes Size/Icon/sm, md and lg. Figma shows a Primary icon color. Code has no primary icon token, and `--ds-icon-brand` is the nearest.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsCanvasShell description={<>12, 16 and 24. Pick the size from the text beside it.</>}>
+    <DsCanvasQuiet of={IconStories.Sizes} />
+</DocsCanvasShell>
+
+Use **md 16** by default. It sits beside 14 and 16 text. Use **sm 12**
+sparingly, for chevrons, small text, field validation and small components.
+**lg 24** is the largest icon. Anything bigger is decorative and goes in a Tile.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Styles
+
+<DocsCanvasShell description={<>Solid is the default. Regular reads lighter. Brands holds product logos.</>}>
+    <DsCanvasQuiet of={IconStories.Styles} />
+</DocsCanvasShell>
+
+Use **solid** by default. Use **regular** for a quieter version of the same
+glyph. **Brands** holds product logos such as `figma`, `notion` and `slack`, and
+only brand names render in it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color
+
+<DocsCanvasShell description={<>The default color and four others. Each is a token that changes with the color mode.</>}>
+    <DsCanvasQuiet of={IconStories.Colors} />
+</DocsCanvasShell>
+
+An icon has no states of its own. Hover, pressed, focus and disabled belong to
+the control around it, and that control sets the icon color with a token.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Do and don't
+
+<IconStories.DoDont />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rules
+
+- **Font Awesome Free only.** Use `fa-solid`, `fa-regular` or `fa-brands`. Pro families and names (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) are not licensed here and render as a blank box.
+- **One size per row.** Icons in a list share a size so the labels line up.
+- **Colors come from tokens.** Never write a hex value or a `--color-*` name for an icon.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={IconStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use an icon to mark an action or a kind of thing next to words, or alone for a
+well-known action in a tight space.
+
+- For a mark larger than 24, or an icon on a colored square, use **Tile**.
+- For an action people press, use **Button**, and keep icon-only buttons for in-row actions.
+- For a picture or a logo, use **Image** or **Tile**.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A labeled icon is decorative.** Hide it with `aria-hidden="true"`, because the words beside it already carry the meaning.
+- **An icon alone needs a name.** Give the button or link that holds it an `aria-label` that says what the action does.
+- **Color is never the only signal.** A danger icon sits beside words that say what went wrong.
+- **Contrast.** Icon colors are tokens built to meet contrast on the surfaces they are meant for. Check an icon in the toolbar's high-contrast mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- A mark larger than 24, or an icon on a colored square: **Tile**.
+- The icon sizes by type register, and the older Font Awesome sizes: **Iconography**.
+- An icon-only action: **Button**.
+- Icon colors: **Color**.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

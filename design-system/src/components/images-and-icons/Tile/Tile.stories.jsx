@@ -2,6 +2,8 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import Tile, { TILE_SIZES, TILE_COLORS } from './Tile';
+import { UserAvatar } from '@/components';
+import { DoDontGrid } from '@/storybook-docs/ds-docs-layout.jsx';
 
 /**
  * `Tile` — a square that frames an icon, a logo or an image.
@@ -363,6 +365,64 @@ Labeled.play = async ({ canvasElement }) => {
     await expect(canvas.getByRole('img', { name: 'Figma' })).toBeInTheDocument();
     await expect(canvas.getByRole('img', { name: 'Lincoln Elementary' })).toBeInTheDocument();
 };
+
+/* ------------------------------------------------------------- do / don't */
+
+const listStyle = { display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' };
+const item = { display: 'flex', alignItems: 'center', gap: '8px', font: 'var(--body-default)', color: 'var(--ds-text)' };
+
+const Lesson = ({ name, color, size = 24, icon = 'book-open' }) => (
+    <div style={item}><Tile icon={icon} color={color} size={size} />{name}</div>
+);
+
+export const DoDont = () => (
+    <DoDontGrid
+        pairs={[
+            {
+                doExample: (
+                    <div style={listStyle}>
+                        <Lesson name="Algebra I lesson" color="blue" />
+                        <Lesson name="Geometry lesson" color="blue" />
+                        <Lesson name="Biology lesson" color="blue" />
+                    </div>
+                ),
+                doCaption: 'Every lesson in the same color.',
+                dontExample: (
+                    <div style={listStyle}>
+                        <Lesson name="Algebra I lesson" color="blue" />
+                        <Lesson name="Geometry lesson" color="green" />
+                        <Lesson name="Biology lesson" color="magenta" />
+                    </div>
+                ),
+                dontCaption: 'Three lessons in three colors that mean nothing.',
+            },
+            {
+                doExample: <UserAvatar size="md" firstChar="J" name="Jane Park" counter={false} />,
+                doCaption: 'An Avatar for a tutor.',
+                dontExample: <div style={item}><Tile icon="user" size={24} />Jane Park</div>,
+                dontCaption: 'A Tile with a person icon standing in for a tutor.',
+            },
+            {
+                doExample: (
+                    <div style={listStyle}>
+                        <Lesson name="Sessions" icon="calendar" color="gray" />
+                        <Lesson name="Students" icon="user-graduate" color="gray" />
+                        <Lesson name="Lessons" icon="book-open" color="gray" />
+                    </div>
+                ),
+                doCaption: 'Three rows at size 24.',
+                dontExample: (
+                    <div style={listStyle}>
+                        <Lesson name="Sessions" icon="calendar" color="gray" size={16} />
+                        <Lesson name="Students" icon="user-graduate" color="gray" size={32} />
+                        <Lesson name="Lessons" icon="book-open" color="gray" size={24} />
+                    </div>
+                ),
+                dontCaption: 'Sizes 16, 32 and 24 in one list.',
+            },
+        ]}
+    />
+);
 
 /* -------------------------------------------------------------- playground */
 
