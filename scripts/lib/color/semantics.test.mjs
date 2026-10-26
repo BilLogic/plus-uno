@@ -75,9 +75,10 @@ test('SMART subtle: every subject, every mode, its accent subtle; the line work 
         assert.equal(byName[name][`${m}_ref`], accent[`${m}_ref`], `${name} ${m}`);
         assert.equal(byName[name][m], accent[m], `${name} ${m} hex`);
       }
-      // The dark-gray line work (color.icon.subtle) on the body, in Light, sits under 3:1:
-      // about 2.6:1 in Plan A and 3.0:1 in Plan B, the same as on the math characters'
-      // accent subtle. The floor catches a ramp change that would push it lower.
+      // The illustrations' line work (color.icon.subtle, the source art's gray) on the body,
+      // in Light: about 2.6:1 in Plan A and 3.0:1 in Plan B, as on the math characters'
+      // accent subtle. The characters are decorative, so 3:1 does not apply; the ratio is a
+      // known property of the art. The floor catches a ramp change that would push it lower.
       const ratio = contrast(byName['color.icon.subtle'].light, byName[name].light);
       assert.ok(ratio >= 2.5, `${name}: icon.subtle at ${ratio.toFixed(2)}:1 in Plan ${key} Light`);
     }
