@@ -1,4 +1,4 @@
-import React, { Children, Fragment, isValidElement, useCallback, useState } from 'react';
+import React, { Children, Fragment, isValidElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import './PatternTable.scss';
 
@@ -23,14 +23,26 @@ const flatten = (children) => Children.toArray(children).flatMap((child) => (
 
 const isElementOf = (type) => (child) => isValidElement(child) && child.type === type;
 
+/** The rows an empty table drops; the head row, a caption and column groups stay. */
+const isBody = (child) => isElementOf('tbody')(child) || isElementOf('tfoot')(child);
+
 /** How many columns the head row spans, counting each cell's `colSpan`; 1 with no head row. */
-const columnCount = (heads) => {
-    const firstRow = heads.flatMap((head) => flatten(head.props.children)).find(isElementOf('tr'));
+const columnCount = (kept) => {
+    const firstRow = kept.filter(isElementOf('thead'))
+        .flatMap((head) => flatten(head.props.children))
+        .find(isElementOf('tr'));
     if (!firstRow) return 1;
     const count = flatten(firstRow.props.children)
         .filter((cell) => isElementOf('th')(cell) || isElementOf('td')(cell))
         .reduce((sum, cell) => sum + (Number(cell.props.colSpan) || 1), 0);
     return Math.max(count, 1);
+};
+
+/** The rendered head row's span, which also counts cells a wrapper component draws. */
+const renderedColumnCount = (table) => {
+    const row = table?.tHead?.rows[0];
+    if (!row) return null;
+    return Array.from(row.cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0) || null;
 };
 
 /**
@@ -92,11 +104,24 @@ const PatternTable = ({
         className,
     ].filter(Boolean).join(' ');
 
-    if (toolbar) warnToolbar();
+    const hasToolbar = Boolean(toolbar);
+    useEffect(() => {
+        if (hasToolbar) warnToolbar();
+    }, [hasToolbar]);
 
     const showEmptyState = Boolean(empty && emptyState);
     // An empty table keeps its head row and swaps its body for the message row.
-    const heads = showEmptyState ? flatten(children).filter(isElementOf('thead')) : null;
+    const kept = showEmptyState ? flatten(children).filter((child) => !isBody(child)) : null;
+    // The span is read from the children first, then from the rendered head
+    // row, so a head row drawn by a wrapper component is still spanned.
+    const tableRef = useRef(null);
+    const [measuredSpan, setMeasuredSpan] = useState(null);
+    useLayoutEffect(() => {
+        if (!showEmptyState) return;
+        const span = renderedColumnCount(tableRef.current);
+        setMeasuredSpan((prev) => (prev === span ? prev : span));
+    });
+    const messageSpan = showEmptyState ? (measuredSpan ?? columnCount(kept)) : null;
     const tracksScroll = pinsHeader || stickyColumn;
     // A region that scrolls must be reachable by keyboard: a bounded region
     // scrolls vertically, and a sticky column exists for a table that scrolls
@@ -114,13 +139,13 @@ const PatternTable = ({
                 data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
                 data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
             >
-                <table className="plus-pattern-table-table">
+                <table ref={tableRef} className="plus-pattern-table-table">
                     {showEmptyState ? (
                         <>
-                            {heads}
+                            {kept}
                             <tbody>
                                 <tr className="plus-pattern-table-message-row">
-                                    <td className="plus-pattern-table-message" colSpan={columnCount(heads)}>
+                                    <td className="plus-pattern-table-message" colSpan={messageSpan}>
                                         <div className="plus-pattern-table-message-body">{emptyState}</div>
                                     </td>
                                 </tr>

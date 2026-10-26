@@ -57,6 +57,28 @@ describe('PatternTable', () => {
         expect(cell.closest('table')).not.toBeNull();
     });
 
+    it('keeps a caption and a head row drawn by a wrapper component, and spans its columns', () => {
+        const Head = () => (
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+        );
+        render(
+            <PatternTable empty emptyState={<span>No members yet</span>}>
+                <caption>Team members</caption>
+                <Head />
+                {body}
+            </PatternTable>
+        );
+        expect(screen.getByRole('table', { name: 'Team members' })).toBeInTheDocument();
+        expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+        expect(screen.queryByText('Jordan Blake')).toBeNull();
+        expect(screen.getByText('No members yet').closest('td').colSpan).toBe(2);
+    });
+
     it('renders the rows and pagination when not empty', () => {
         render(
             <PatternTable emptyState={<span>No members yet</span>} pagination={<span>1 of 4</span>}>

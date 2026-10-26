@@ -182,6 +182,26 @@ export const EmptyState = {
     },
 };
 
+/**
+ * With a sticky column, the message row spans it rather than pinning to it:
+ * the head cell stays sticky, the message cell does not.
+ */
+export const EmptyWithStickyColumn = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight={240}>
+            {tableContent}
+        </PatternTable>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const message = canvas.getByText('No members yet').closest('td');
+        await expect(getComputedStyle(canvas.getByText('Name')).position, 'the head cell is sticky').toBe('sticky');
+        await expect(getComputedStyle(message).position, 'the message cell is not pinned').not.toBe('sticky');
+        await expect(getComputedStyle(message).boxShadow, 'the message cell draws no overflow shadow').toBe('none');
+    },
+};
+
 export const Interactive = {
     args: {
         empty: false,

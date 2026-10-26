@@ -116,7 +116,7 @@
     background-color: var(--ds-utility-elevation-surface-current);
 }
 
-.plus-pattern-table--sticky-column :is(th, td):first-child {
+.plus-pattern-table--sticky-column :is(th, td):first-child:not(.plus-pattern-table-message) {
     position: sticky;
     left: 0;
     z-index: var(--pattern-table-z-sticky);
@@ -133,7 +133,7 @@
     clip-path: inset(0 0 calc(-1 * var(--pattern-table-overflow-reach)) 0);
 }
 
-.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x] :is(th, td):first-child {
+.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x] :is(th, td):first-child:not(.plus-pattern-table-message) {
     box-shadow: var(--ds-shadow-overflow);
     clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
 }
@@ -145,8 +145,11 @@
 /*
  * The empty state is a message row: one cell spanning every column, under the
  * head row, which stays so the columns still say what will appear. It is not
- * a data row, so it takes no hover or press state. Its rule is the grid line
- * every body cell carries.
+ * a data row, so it takes no hover or press state, and it spans the sticky
+ * column rather than pinning to it. Its rule is the grid line every body cell
+ * carries. The spacing follows the Figma message row's bindings: Section/
+ * stack-md above and below, the cell's side pad, Element/stack-sm between
+ * its lines.
  */
 .plus-pattern-table-table .plus-pattern-table-message-row,
 .plus-pattern-table-table .plus-pattern-table-message-row:hover,
