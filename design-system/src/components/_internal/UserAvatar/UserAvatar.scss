@@ -19,7 +19,7 @@
 
     &:hover,
     &--hover {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-interaction-hovered);
     }
 
     &--clickable {
@@ -48,8 +48,8 @@
     width: var(--image-md);
     height: var(--image-md);
     border-radius: var(--element-radius-full);
-    background-color: var(--color-primary-state-08);
-    color: var(--color-primary-text);
+    background-color: var(--ds-background-accent-blue-subtler);
+    color: var(--ds-text-accent-blue);
     font: var(--body-default);
     line-height: 1;
 }
@@ -77,8 +77,8 @@
     min-width: var(--label-height-md);
     padding: 0 var(--size-element-pad-x-sm);
     border-radius: var(--element-radius-full);
-    background-color: var(--color-danger-state-08);
-    color: var(--color-danger-text);
+    background-color: var(--ds-background-danger-subtler);
+    color: var(--ds-text-danger);
     font: var(--body-small);
 }
 

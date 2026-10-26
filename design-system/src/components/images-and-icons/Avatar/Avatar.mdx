@@ -104,12 +104,12 @@ Figma has two things code does not: a **focus** variant and a `name?` switch tha
         <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--color-primary-state-08</code></td><td>Primary at 8%</td><td>The initial pill's fill</td></tr>
-        <tr><td><code>--color-primary-text</code></td><td>Primary text</td><td>The initial</td></tr>
+        <tr><td><code>--ds-background-accent-blue-subtler</code></td><td>Accent blue, subtler step</td><td>The initial pill's fill</td></tr>
+        <tr><td><code>--ds-text-accent-blue</code></td><td>Accent blue text</td><td>The initial</td></tr>
         <tr><td><code>--ds-text</code></td><td>Default text</td><td>The name</td></tr>
-        <tr><td><code>--color-danger-state-08</code></td><td>Danger at 8%</td><td>The counter's fill</td></tr>
-        <tr><td><code>--color-danger-text</code></td><td>Danger text</td><td>The counter's number</td></tr>
-        <tr><td><code>--color-on-surface-state-08</code></td><td>Text color at 8%</td><td>The hovered fill</td></tr>
+        <tr><td><code>--ds-background-danger-subtler</code></td><td>Danger, subtler step</td><td>The counter's fill</td></tr>
+        <tr><td><code>--ds-text-danger</code></td><td>Danger text</td><td>The counter's number</td></tr>
+        <tr><td><code>--ds-interaction-hovered</code></td><td>Hovered overlay</td><td>The hovered fill</td></tr>
         <tr><td><code>--element-radius-full</code></td><td>9999</td><td>The pill and the counter</td></tr>
         <tr><td><code>--item-height-md</code></td><td>32</td><td>The height of the <code>md</code> Avatar</td></tr>
         <tr><td><code>--image-sm</code> · <code>--image-md</code></td><td>24 · 32</td><td>The pill's size in <code>md</code> and in <code>lg</code></td></tr>
@@ -117,7 +117,7 @@ Figma has two things code does not: a **focus** variant and a `name?` switch tha
     </tbody>
 </DocsTable>
 
-Figma binds the pill to the accent blue subtler step and the counter to the danger subtle step. Code binds the primary and danger state steps listed above.
+Figma binds the counter to the danger subtle step. Code binds the subtler step listed above.
 
 </div>
 
@@ -153,7 +153,7 @@ Figma binds the pill to the accent blue subtler step and the counter to the dang
 
 ## States
 
-<DocsCanvasShell description={<>An Avatar has two states: enabled and hover. Hover fills the Avatar with <code>--color-on-surface-state-08</code>. An Avatar with an <code>onClick</code> also shows a pointer cursor.</>}>
+<DocsCanvasShell description={<>An Avatar has two states: enabled and hover. Hover fills the Avatar with <code>--ds-interaction-hovered</code>. An Avatar with an <code>onClick</code> also shows a pointer cursor.</>}>
     <DsCanvasQuiet of={AvatarStories.States} />
 </DocsCanvasShell>
 
@@ -173,7 +173,7 @@ Figma binds the pill to the accent blue subtler step and the counter to the dang
 
 - One Avatar per person, at one size within a list.
 - The initial is the first letter of the name beside it.
-- Colors come from tokens. The pill resting on the primary 8% step is a documented exception, not a precedent for other pills.
+- Colors come from tokens, so the pill and the counter follow the color mode.
 
 </div>
 

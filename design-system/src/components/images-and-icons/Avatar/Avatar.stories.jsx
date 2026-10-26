@@ -152,8 +152,8 @@ export const DoDont = () => (
                             style={{
                                 padding: '0 var(--element-pad-x-sm)',
                                 borderRadius: 'var(--element-radius-full)',
-                                background: 'var(--color-danger-state-08)',
-                                color: 'var(--color-danger-text)',
+                                background: 'var(--ds-background-danger-subtler)',
+                                color: 'var(--ds-text-danger)',
                                 font: 'var(--body-small)',
                             }}
                         >
