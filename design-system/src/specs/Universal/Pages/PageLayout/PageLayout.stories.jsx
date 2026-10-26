@@ -19,7 +19,7 @@ import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Input, Textarea } from '@/components';
-import { PatternSection } from '@/patterns';
+import { PatternDrawer, PatternSection } from '@/patterns';
 import { SURFACE_EDGE } from '@/patterns/Surface';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -138,6 +138,61 @@ export const Frame = {
             await check(768, false);
             await userEvent.click(canvas.getByRole('button', { name: /sidebar/i }));
             await waitFor(() => expect(sidebar()).toBeInTheDocument());
+        });
+    },
+};
+
+/** A md drawer open over the page: Figma's Pattern/Page template with its drawer? boolean on. */
+const DrawerOverPage = () => {
+    const [open, setOpen] = React.useState(true);
+    return (
+        <>
+            {Overview.render()}
+            <PatternDrawer
+                open={open}
+                width="md"
+                title="Session details"
+                description="Thursday · 4:00–5:00 PM"
+                onClose={() => setOpen(false)}
+                footer={(
+                    <>
+                        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => setOpen(false)} />
+                        <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => setOpen(false)} />
+                    </>
+                )}
+            >
+                <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                    Ana Ruiz · Algebra I · Grade 9. Last session: reviewed factoring and assigned practice set 3.
+                </p>
+            </PatternDrawer>
+        </>
+    );
+};
+
+/**
+ * A drawer open over the page: the scrim covers the whole frame, and the md
+ * drawer runs the full height at the right edge (677 at 1024). Escape closes
+ * it and leaves the page.
+ */
+export const WithDrawer = {
+    render: () => <DrawerOverPage />,
+    parameters: { layout: 'fullscreen' },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await withTestViewport(1024, 900, async () => {
+            const drawer = await canvas.findByRole('dialog', { name: 'Session details' });
+            const overlay = drawer.parentElement;
+            const box = overlay.getBoundingClientRect();
+            const panel = drawer.getBoundingClientRect();
+            await expect(box.width, 'the scrim covers the screen').toBeCloseTo(window.innerWidth, 0);
+            await expect(box.height, 'the scrim covers the screen').toBeCloseTo(window.innerHeight, 0);
+            await expect(panel.right, 'at the right edge').toBeCloseTo(box.right, 0);
+            await expect(panel.height, 'full height').toBeCloseTo(box.height, 0);
+            await expect(panel.width, 'width md at 1024').toBeCloseTo(677, 0);
+            await expect(within(drawer).getByRole('button', { name: 'Close' }), 'focus is in the drawer').toHaveFocus();
+            await userEvent.keyboard('{Escape}');
+            await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
+            await expect(canvas.getByRole('main'), 'the page stays').toBeInTheDocument();
         });
     },
 };

@@ -12,6 +12,12 @@ export const OVERLAY_HEIGHTS = ['hug', 'fill'];
 export const OVERLAY_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
 
 /**
+ * Where the layer sits: `center` for a modal, or `start` · `end` for a drawer
+ * held full height at that edge, with no pad.
+ */
+export const OVERLAY_PLACEMENTS = ['center', 'start', 'end'];
+
+/**
  * Overlay pattern for PLUS design system.
  * The full-screen layer that holds the scrim and a modal, so a modal is
  * placed, not drawn. It fills with the blanket, pads 16 at the sides and 64
@@ -19,11 +25,16 @@ export const OVERLAY_SPANS = Object.freeze({ sm: 6, md: 8, lg: 10 });
  * its child on the modal layer (510).
  * Mirrors "Pattern/Overlay" in the Figma design system file.
  *
+ * With `placement` `start` or `end` it drops the pad and holds its child
+ * full height at that edge of the screen, for a drawer.
+ *
  * It draws the layer only: it does not trap focus, close on Escape or count
  * toward the two-overlay limit. For a real dialog, use the core Modal
- * component, which draws the same layers and scrim tokens.
+ * component, which draws the same layers and scrim tokens; PatternDrawer
+ * brings its own focus handling.
  */
 const Overlay = ({
+    placement = 'center',
     inline = false,
     screenWidth,
     screenHeight,
@@ -35,6 +46,7 @@ const Overlay = ({
 }) => {
     const classes = [
         'plus-pattern-overlay',
+        placement !== 'center' ? `plus-pattern-overlay-placement-${placement}` : '',
         inline ? 'plus-pattern-overlay-inline' : '',
         className,
     ].filter(Boolean).join(' ');
@@ -63,6 +75,8 @@ const Overlay = ({
 };
 
 Overlay.propTypes = {
+    /** `center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad. */
+    placement: PropTypes.oneOf(OVERLAY_PLACEMENTS),
     /** Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. */
     inline: PropTypes.bool,
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */
@@ -76,7 +90,7 @@ Overlay.propTypes = {
     onScrimClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
-    /** The layer it holds: a PatternModal, or a confirm over one. */
+    /** The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge. */
     children: PropTypes.node,
 };
 

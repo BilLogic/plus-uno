@@ -178,15 +178,18 @@ const preview = {
             "Patterns",
             [
               "Introduction",
-              "Frame",
+              "Page templates",
+              "Surface container",
+              "Surface",
               "Topbar",
               "Sidebar",
-              "Surfaces",
               "Section",
               "Card",
               "Table",
               "Overlay",
-              "Modal"
+              "Modal",
+              "Popover family",
+              "Drawer"
             ],
             "Imagery",
             "Design tokens",

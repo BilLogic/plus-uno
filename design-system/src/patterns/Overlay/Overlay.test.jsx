@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import Overlay, { OVERLAY_HEIGHTS, OVERLAY_SPANS, OVERLAY_WIDTHS } from './Overlay';
+import Overlay, { OVERLAY_HEIGHTS, OVERLAY_PLACEMENTS, OVERLAY_SPANS, OVERLAY_WIDTHS } from './Overlay';
 import PatternModal from '../PatternModal';
 
 /**
@@ -14,6 +14,20 @@ describe('Overlay', () => {
         expect(OVERLAY_WIDTHS).toEqual(['sm', 'md', 'lg']);
         expect(OVERLAY_HEIGHTS).toEqual(['hug', 'fill']);
         expect(OVERLAY_SPANS).toEqual({ sm: 6, md: 8, lg: 10 });
+        expect(OVERLAY_PLACEMENTS).toEqual(['center', 'start', 'end']);
+    });
+
+    it('centers by default, with no placement class', () => {
+        render(<Overlay data-testid="overlay">x</Overlay>);
+        expect(screen.getByTestId('overlay').className).toBe('plus-pattern-overlay');
+    });
+
+    it('holds its layer at an edge for placement start or end', () => {
+        const { rerender } = render(<Overlay data-testid="overlay" placement="end">x</Overlay>);
+        expect(screen.getByTestId('overlay')).toHaveClass('plus-pattern-overlay-placement-end');
+        rerender(<Overlay data-testid="overlay" placement="start">x</Overlay>);
+        expect(screen.getByTestId('overlay')).toHaveClass('plus-pattern-overlay-placement-start');
+        expect(screen.getByTestId('overlay')).not.toHaveClass('plus-pattern-overlay-placement-end');
     });
 
     it('is fixed over the page by default, holding its child', () => {

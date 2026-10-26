@@ -180,6 +180,13 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --card-stack-lg
 --card-stack-md
 --card-stack-sm
+--drawer-inline-lg
+--drawer-inline-md
+--drawer-inline-sm
+--drawer-pad
+--drawer-stack-lg
+--drawer-stack-md
+--drawer-stack-sm
 --focused-page-inline-md
 --focused-page-inline-sm
 --focused-page-pad-x
@@ -201,6 +208,9 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --layout-width-column
 --layout-width-column-screen
 --layout-width-content
+--layout-width-drawer-lg
+--layout-width-drawer-md
+--layout-width-drawer-sm
 --layout-width-modal-lg
 --layout-width-modal-md
 --layout-width-modal-sm

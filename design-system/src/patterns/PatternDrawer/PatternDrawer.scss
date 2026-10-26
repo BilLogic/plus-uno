@@ -1,0 +1,97 @@
+/**
+ * Drawer pattern (Patterns/Drawer)
+ * A full-height panel at the edge of the screen, placed in the Overlay
+ * pattern at `start` or `end`, over the same scrim a modal takes. The overlay
+ * pair (elevation.surface.overlay with elevation.shadow.overlay), Drawer/pad
+ * 16, Drawer/stack-md 16 and Drawer/inline-sm 8, which alias the Modal steps;
+ * no radius, since it meets the screen on three sides. Width is a step of the
+ * screen grid, the Modal width steps, worked out by the screen-grid mixin so
+ * it is exact at any screen (Drawer/width-drawer-* hold it at 768 · 1024 · 1440).
+ */
+@use '../../styles/screen-grid' as *;
+
+.plus-pattern-drawer {
+    @include screen-grid-width(var(--drawer-pad));
+    @include screen-grid-width-steps;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--drawer-stack-md);
+    /* Full height: the Overlay stretches it from the top of the screen to the bottom. */
+    max-height: 100%;
+    padding: var(--drawer-pad);
+    background-color: var(--ds-surface-overlay);
+    color: var(--ds-text);
+    box-shadow: var(--ds-shadow-overlay);
+    overflow: hidden;
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+}
+
+/* Header: title and description, then close */
+.plus-pattern-drawer-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--drawer-inline-sm);
+    flex-shrink: 0;
+}
+
+.plus-pattern-drawer-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+    min-width: 0;
+}
+
+.plus-pattern-drawer-title {
+    margin: 0;
+    font: var(--heading-medium);
+    color: var(--ds-text);
+}
+
+.plus-pattern-drawer-description {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+.plus-pattern-drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    border-radius: var(--size-element-radius-md);
+    color: var(--ds-icon-subtle);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+    }
+
+    &:active {
+        background-color: var(--ds-background-neutral-subtle-pressed);
+    }
+}
+
+/* Body: takes what the header and footer leave, and scrolls past it */
+.plus-pattern-drawer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* Footer: pinned to the bottom edge, actions at the end */
+.plus-pattern-drawer-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--drawer-inline-sm);
+    flex-shrink: 0;
+}
