@@ -39,10 +39,11 @@
         background-color: var(--ds-background-neutral-subtle-pressed);
     }
 
-    // The ring sits 2px outside the row, on the frame, never inset on the fill.
+    // The ring sits 2px inside the row's edge, so the sidebar's edge or a
+    // scroller never clips it.
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
         outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-stroke-lg);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
     }
 }
 
@@ -136,7 +137,7 @@
 
 .plus-sidebar-tab--focus {
     outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg);
+    outline-offset: calc(-1 * var(--size-element-stroke-lg));
 }
 
 // The disabled text and icon colors; a disabled row is announced as such

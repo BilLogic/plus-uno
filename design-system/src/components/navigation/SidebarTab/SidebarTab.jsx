@@ -24,7 +24,7 @@ import './SidebarTab.scss';
  * - selected: the neutral selected fill with selected text and icon, the
  *   label in the medium weight, and `aria-current="page"`, so selection never
  *   rests on fill alone
- * - focus: a 2px focused ring, 2px outside the row, and no fill
+ * - focus: a 2px focused ring, 2px inside the row, and no fill
  * - disabled: the disabled text and icon colors, no tab stop
  *
  * `hover` AND `focus` ARE DOCUMENTATION VALUES, NOT BEHAVIOR (#320). They

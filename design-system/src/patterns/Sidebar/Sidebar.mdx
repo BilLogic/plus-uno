@@ -53,7 +53,7 @@ export const tabTokens = [
     ['--ds-background-neutral-subtle-pressed', 'color', 'Pressed.'],
     ['--ds-background-selected', 'color', 'Selected, with --ds-text-selected and a label in --type-weight-medium. There is no leading bar.'],
     ['--ds-background-selected-hovered', 'color', 'Selected and hovered.'],
-    ['--ds-border-focused', 'color', 'The focus ring: 2px, 2px outside the surface.'],
+    ['--ds-border-focused', 'color', 'The focus ring: 2px, drawn 2px inside the surface.'],
     ['--element-stack-sm', '4', 'The gap between tab rows.'],
     ['--ds-text-subtlest', 'color', 'The "Show N more" label.'],
     ['Thread position', 'x 20', 'The thread runs under the parent icon\'s center.'],
@@ -320,7 +320,7 @@ tabs.open('sessions', { id: 's1', title: 'Hogwarts · Tue, Sep 9', href: '/toolk
 - A section label names a <code>role="group"</code>. It is not a heading, so the sidebar adds no headings to the page outline.
 - The selected item carries <code>aria-current="page"</code>. A disabled item is announced and skipped by Tab.
 - An external link opens a new tab and says so to a screen reader.
-- Tab reaches each row in order, and the focus ring is 2px in <code>--ds-border-focused</code>, drawn 2px outside the row.
+- Tab reaches each row in order, and the focus ring is 2px in <code>--ds-border-focused</code>, drawn 2px inside the row.
 - A parent's chevron is a button with an expanded state, and it points at the list it shows. Its name reads "Sessions tabs", for example.
 - Each tab's close button is named "Close" plus the title. Delete or Backspace closes the focused tab.
 - A live tab's dot is named "Live", so the row is announced as live.
