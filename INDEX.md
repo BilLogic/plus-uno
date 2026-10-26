@@ -111,6 +111,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/accessibility.md`](design-system/guidelines/foundations/accessibility.md) | WCAG 2.1 AA is the minimum bar for all PLUS interfaces |
 | [`design-system/guidelines/foundations/border.md`](design-system/guidelines/foundations/border.md) | Border widths and their semantic tokens |
+| [`design-system/guidelines/foundations/color-migration.md`](design-system/guidelines/foundations/color-migration.md) | How to move one component from the legacy color tokens onto the --ds- tokens, end to end |
 | [`design-system/guidelines/foundations/color.md`](design-system/guidelines/foundations/color.md) | The PLUS Design System follows Material Design 3 color guidance |
 | [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
 | [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
@@ -219,6 +220,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-148 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+149 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
