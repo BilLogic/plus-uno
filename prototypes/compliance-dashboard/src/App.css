@@ -1,0 +1,1023 @@
+/**
+ * AI Compliance Monitor Prototype – base styles.
+ * PLUS tokens loaded via main.scss; layout from component library.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
+  font-size: var(--font-size-body2, 14px);
+  color: var(--color-on-surface, #191c1e);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: "Fira Code", "Consolas", monospace;
+  font-size: var(--font-size-code);
+  background: var(--color-surface-container-high, #e8e8e8);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Page content — mirrors TutorPerformancePage.scss */
+.compliance-page__content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.compliance-page__tabs {
+  margin-bottom: var(--size-section-gap-lg);
+  border-bottom: 1px solid var(--color-outline-variant);
+}
+
+.compliance-page__overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-section-gap-lg, 24px);
+  width: 100%;
+  padding-bottom: var(--size-section-pad-y-lg);
+}
+
+.compliance-page__overview-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-section-gap-md);
+}
+
+.compliance-page__overview-header h2 {
+  margin: 0;
+}
+
+/* House surface: white, soft shadow, no hard border (matches TutorDataCard) */
+.compliance-surface {
+  background-color: var(--color-surface-container-lowest, #ffffff);
+  border-radius: var(--card-radius-sm, 12px);
+  padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Four stat cards */
+.compliance-stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--size-section-gap-md);
+}
+
+.compliance-stat-card p {
+  margin: 0;
+}
+
+.compliance-stat-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-element-gap-sm);
+}
+
+.compliance-stat-card__value {
+}
+
+.compliance-stat-card__label {
+  color: var(--color-on-surface);
+}
+
+.compliance-stat-card__caption {
+  color: var(--color-on-surface-variant);
+}
+
+/* Cards that open a page */
+.compliance-stat-card--link {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.compliance-stat-card--link:hover,
+.compliance-stat-card--link:focus-visible {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.compliance-stat-card--link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.compliance-stat-card--link .compliance-stat-card__label {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold-1);
+}
+
+.compliance-stat-card__chevron {
+  color: var(--color-primary);
+  font-size: var(--font-size-fa-body2);
+}
+
+/* Chart card */
+.compliance-chart-card__title {
+  margin: 0;
+  color: var(--color-on-surface);
+}
+
+.compliance-chart-card__caption {
+  margin: 0 0 var(--size-element-gap-md);
+  color: var(--color-on-surface-variant);
+}
+
+/* Option 2 — TutorDataCard grid */
+.compliance-card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-section-gap-md);
+}
+
+.compliance-card-grid .tutor-data-card__content {
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.compliance-trend__summary {
+  margin: 0 0 var(--size-element-gap-sm);
+  color: var(--color-on-surface-variant);
+}
+
+.compliance-trend__now {
+  font-weight: var(--font-weight-semibold-1);
+  color: var(--color-on-surface);
+}
+
+/* Immediate review page */
+.compliance-review__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--size-section-gap-md);
+  margin-bottom: var(--size-section-gap-md);
+}
+
+.compliance-review__header p {
+  margin: 0;
+}
+
+.compliance-review__tutor {
+  font-weight: var(--font-weight-semibold-1);
+}
+
+.compliance-review__muted {
+  color: var(--color-on-surface-variant);
+}
+
+.compliance-review__actions {
+  display: flex;
+  gap: var(--size-element-gap-sm);
+  justify-content: flex-end;
+}
+
+.compliance-review__lede {
+  margin: 0 0 var(--size-section-gap-md);
+  max-width: 78ch;
+  color: var(--color-on-surface-variant);
+}
+
+.compliance-review__tabs {
+  margin-bottom: var(--size-section-gap-md);
+}
+
+.compliance-review__groups {
+  margin-bottom: var(--size-element-gap-md);
+}
+
+/* Severe category marking */
+.compliance-review__tab--severe {
+  color: var(--color-danger);
+  font-weight: var(--font-weight-semibold-1);
+}
+
+.compliance-review__tab-icon {
+  margin-right: 6px;
+  font-size: var(--font-size-fa-body3);
+}
+
+.compliance-review__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Recording review page */
+.recording {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  gap: var(--size-section-gap-md);
+  align-items: start;
+}
+
+.recording__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-section-gap-md);
+  min-width: 0;
+}
+
+.recording__video {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-element-gap-sm);
+  background-color: var(--color-surface-container-highest, #e2e2e5);
+  border-radius: var(--card-radius-sm, 12px);
+}
+
+.recording__video-icon {
+  font-size: var(--font-size-fa-h1);
+  opacity: 0.35;
+}
+
+.recording__muted {
+  margin: 0;
+  color: var(--color-on-surface-variant);
+}
+
+.recording__transport {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  margin-top: var(--size-element-gap-md);
+}
+
+.recording__timeline {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background-color: var(--color-surface-container-highest, #e2e2e5);
+}
+
+.recording__progress {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background-color: var(--color-primary);
+}
+
+.recording__marker {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--color-surface-container-lowest, #fff);
+  border-radius: 50%;
+  background-color: var(--color-danger);
+  cursor: pointer;
+}
+
+.recording__time {
+  margin: 0;
+  min-width: 96px;
+  color: var(--color-on-surface-variant);
+}
+
+.recording__decision {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-section-gap-md);
+}
+
+.recording__claim {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.recording__claim p {
+  margin: 0;
+}
+
+.recording__kicker {
+  color: var(--color-on-surface-variant);
+  letter-spacing: 0.02em;
+}
+
+.recording__claim-text {
+  margin: 2px 0 4px;
+  color: var(--color-on-surface);
+}
+
+.recording__dot {
+  margin: 0 8px;
+  opacity: 0.45;
+}
+
+.recording__decision-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--size-element-gap-md, 12px);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.recording__transcript-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--size-element-gap-md);
+  margin-bottom: var(--size-element-gap-md);
+}
+
+.recording__transcript-head p {
+  margin: 0;
+}
+
+.recording__lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 620px;
+  overflow-y: auto;
+  /* Room for the scrollbar, so it never sits on top of a line's + button. */
+  padding-right: 6px;
+  scrollbar-gutter: stable;
+}
+
+.recording__line {
+  width: 100%;
+  display: flex;
+  gap: var(--size-element-gap-md);
+  padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+  text-align: left;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* The highlight sits on the whole row, so the + at the end is inside it. */
+.recording__line-row {
+  border-left: 3px solid transparent;
+  border-radius: var(--size-element-radius-md, 8px);
+}
+
+.recording__line-row:hover {
+  background-color: var(--color-surface-container, #f4f4f6);
+}
+
+.recording__line-row.is-current {
+  background-color: var(--color-surface-container, #f4f4f6);
+  border-left-color: var(--color-primary);
+}
+
+.recording__line-row.is-flagged {
+  border-left-color: var(--color-danger);
+  background-color: var(--color-danger-container-state-08, rgba(186, 26, 26, 0.06));
+}
+
+/* The line a violation is being added to, while the form is open. */
+.recording__line-row.is-adding {
+  border-left-color: var(--color-primary);
+  background-color: var(--color-primary-state-08);
+}
+
+.recording__stamp {
+  flex-shrink: 0;
+  min-width: 44px;
+  color: var(--color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.recording__text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--size-element-gap-sm);
+  min-width: 0;
+}
+
+.recording__speaker {
+  font-weight: var(--font-weight-semibold-1);
+  color: var(--color-on-surface);
+}
+
+.compliance-trend-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--size-element-gap-md);
+  margin-bottom: var(--size-element-gap-md);
+}
+
+.compliance-trend-head p {
+  margin: 0;
+}
+
+.compliance-page__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+}
+
+.session-search__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  margin-bottom: var(--size-section-gap-md);
+}
+
+.session-search__input {
+  min-width: 260px;
+}
+
+.session-search__count {
+  margin: 0 0 0 auto;
+  color: var(--color-on-surface-variant);
+}
+
+.session-search__state {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+}
+
+/* Repeat patterns list */
+.repeat__patterns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+}
+
+.repeat__pattern {
+  color: var(--color-on-surface-variant);
+}
+
+/* Tutor page */
+.tutor-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-element-gap-md);
+}
+
+.tutor-head p {
+  margin: 0;
+}
+
+.tutor-head__title {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+  margin-bottom: 4px;
+}
+
+.tutor-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-section-gap-md);
+}
+
+.tutor-pattern p {
+  margin: 0;
+}
+
+.tutor-pattern__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--size-element-gap-md);
+  margin-bottom: 6px;
+}
+
+.tutor-pattern__metric {
+  color: var(--color-on-surface);
+}
+
+.tutor-pattern__rate {
+}
+
+.tutor-pattern__bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background-color: var(--color-surface-container-highest, #e2e2e5);
+  margin-bottom: 6px;
+}
+
+.tutor-pattern__fill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--color-danger);
+}
+
+.tutor-pattern__threshold {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  background-color: var(--color-on-surface);
+  opacity: 0.55;
+}
+
+/* ---------- v2 (working copy) ---------- */
+.v2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-element-gap-md);
+}
+
+.v2-muted { color: var(--color-on-surface-variant); }
+.v2-strong { font-weight: var(--font-weight-semibold-1); color: var(--color-on-surface); }
+.v2-note { margin: 0 0 var(--size-element-gap-md); }
+
+/* Labelled assumptions */
+.v2-assumptions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--size-element-gap-md);
+  padding: 10px var(--size-element-pad-x-md, 16px);
+  border: 1px dashed var(--color-outline-variant, #c3c7c9);
+  border-radius: var(--size-element-radius-md, 8px);
+  background-color: var(--color-surface, #f9f9fc);
+}
+
+.v2-assumptions__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--size-section-gap-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--color-on-surface-variant);
+}
+
+.v2-tabs { margin-bottom: 0; }
+
+/* Compact tiles */
+.v2-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--size-element-gap-md);
+}
+
+.v2-tile {
+  padding: 10px 14px;
+  border-radius: var(--card-radius-sm, 12px);
+  background-color: var(--color-surface-container-lowest, #fff);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.v2-tile p { margin: 0; }
+
+.v2-tile__value {
+  color: var(--color-on-surface);
+}
+
+.v2-tile--alert .v2-tile__value { color: var(--color-danger); }
+
+.v2-tile__label { color: var(--color-on-surface-variant); }
+
+/* Side-by-side charts */
+.v2-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+  gap: var(--size-element-gap-md);
+}
+
+.v2-chart__title {
+  margin: 0 0 4px;
+  color: var(--color-on-surface);
+}
+
+/* Filter bar */
+.v2-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  margin-bottom: var(--size-element-gap-md);
+}
+
+.v2-filters__search { min-width: 240px; }
+
+.v2-filters__count {
+  margin: 0 0 0 auto;
+  color: var(--color-on-surface-variant);
+}
+
+/* Table cells */
+.v2-metric-cell,
+.v2-pattern-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+}
+
+.v2-pattern-cell {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.v2-severe-icon {
+  color: var(--color-danger);
+  font-size: var(--font-size-fa-body3);
+}
+
+.v2-decision-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+/* v2 lanes, matrix, reasons */
+.v2-lane-label {
+  margin: var(--size-element-gap-md) 0 0;
+  font-weight: var(--font-weight-semibold-1);
+  color: var(--color-on-surface-variant);
+}
+
+.v2-mono { font-variant-numeric: tabular-nums; }
+
+.v2-matrix {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 6px;
+  margin-top: var(--size-element-gap-md);
+}
+
+.v2-matrix th {
+  font-weight: var(--font-weight-semibold-1);
+  color: var(--color-on-surface-variant);
+  text-align: left;
+}
+
+.v2-matrix__cell {
+  padding: 10px 12px;
+  border-radius: var(--size-element-radius-md, 8px);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.v2-matrix__cell span { display: block; }
+
+.v2-matrix__n {
+}
+
+.v2-matrix__cell--good { background-color: var(--color-success-state-12); color: var(--color-success); }
+.v2-matrix__cell--bad { background-color: var(--color-danger-state-12); color: var(--color-danger); }
+.v2-matrix__cell--unknown { background-color: var(--color-surface-container, #f4f4f6); color: var(--color-on-surface-variant); }
+
+.v2-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-element-gap-sm);
+  margin-top: var(--size-element-gap-sm);
+}
+
+.v2-reason {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background-color: var(--color-surface-container, #f4f4f6);
+  color: var(--color-on-surface-variant);
+}
+
+/* Recording: flag stepper + annotation */
+.recording__stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+  margin-top: 6px;
+}
+
+.recording__counter {
+  color: var(--color-on-surface-variant);
+  font-variant-numeric: tabular-nums;
+}
+
+.recording__annotate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: var(--size-element-gap-md);
+  border-top: 1px solid var(--color-outline-variant, #e2e2e5);
+}
+
+.recording__annotate p { margin: 0; }
+
+.recording__annotate-label {
+  color: var(--color-on-surface);
+}
+
+.recording__required { color: var(--color-danger); }
+
+.recording__annotate-row {
+  margin: var(--size-element-gap-sm) 0;
+}
+
+/* Decision box: four stacked rows — claim, flag stepper, decision, annotation */
+.recording__decision {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--size-element-gap-md);
+}
+
+.recording__decision .recording__decision-actions {
+  justify-content: flex-start;
+  margin-left: 0;
+}
+
+.recording__annotate-submit {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  margin-top: 4px;
+}
+
+.v2-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--size-element-gap-sm);
+  margin-bottom: 4px;
+}
+
+.compliance-page__header-actions .export-search-filter-bar {
+  align-items: center;
+}
+
+/* Week windows on the All Compliance Flags chart */
+.v2-window-tabs { margin: 2px 0 4px; }
+
+/* Filter bar: filters left, count + sort right, clear link only when filtered */
+.v2-filters__right {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+  margin-left: auto;
+}
+
+.v2-filters__right .v2-filters__count { margin: 0; }
+
+.v2-filters__clear {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Sortable column headers, same arrow language as PLUS's Status and Warnings table */
+.v2-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font-weight: inherit;
+  cursor: pointer;
+}
+
+.v2-sort__icon {
+  font-size: var(--font-size-fa-body3);
+  opacity: 0.25;
+}
+
+.v2-sort.is-active .v2-sort__icon {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.v2-nowrap { white-space: nowrap; margin: 0; }
+
+/* Status group rows on the Tutors tab */
+.v2-group-row {
+  background-color: var(--color-surface, #f9f9fc);
+}
+
+.v2-group {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+}
+
+/* Tutors tab: one section per status, coloured on the left edge */
+
+.v2-tutor-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--size-element-gap-sm);
+}
+
+
+/* Grouped reason picker: group names as non-selectable headers */
+.dropdown-item.dropdown-section-header,
+.dropdown-item.dropdown-section-header:disabled {
+  opacity: 1;
+  cursor: default;
+  font-weight: var(--font-weight-semibold-1);
+  font-size: var(--font-size-body3);
+  letter-spacing: 0.02em;
+  color: var(--color-on-surface-variant);
+  background: transparent;
+}
+
+.dropdown-item.dropdown-section-header .selected-icon { display: none; }
+
+.v2-matrix__note { margin: 6px 0 0; }
+.v2-diagnosis-tabs .nav { flex-wrap: wrap; gap: 4px; }
+
+/* Section heading: the DS .h4 class sets size and weight; only spacing here. */
+.v2-section-title {
+  margin: var(--size-element-gap-md) 0 0;
+  color: var(--color-on-surface);
+}
+
+/*
+ * A dropdown at the right edge of a chart card opens right-aligned, so its menu
+ * grows left into the card. The DS Dropdown already right-aligns near the
+ * window edge; it can't see the card's edge, which is what was clipping it.
+ */
+.v2-chart-head .dropdown-menu {
+  left: auto !important;
+  right: 0 !important;
+}
+
+/* Chart cards don't clip: a menu taller or wider than the card stays whole. */
+.compliance-surface.v2-chart {
+  overflow: visible;
+}
+
+/* Let chart cards shrink with their grid column instead of holding it open. */
+.v2-charts > * { min-width: 0; }
+
+/* Next flag to review, below a saved verdict */
+.recording__next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--size-element-gap-md);
+  padding-top: var(--size-element-gap-md);
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+/* Transcript: a line, then its + at the far right */
+.recording__lines { position: relative; }
+
+.recording__line-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.recording__line-row .recording__line {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Hidden until its line is pointed at, so scrolling stays calm. Keyboard
+   focus shows it too, so it can still be reached without a mouse. */
+.recording__add-line {
+  flex-shrink: 0;
+  margin: 4px 4px 0 0;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.recording__line-row:hover .recording__add-line,
+.recording__line-row.is-adding .recording__add-line,
+.recording__add-line:hover,
+.recording__add-line:focus-visible {
+  opacity: 1;
+}
+
+/* A violation the supervisor added, under its line or at its moment */
+.recording__added {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-sm);
+  padding: 2px var(--size-element-pad-x-md, 12px) var(--size-element-pad-y-md, 8px) calc(44px + var(--size-element-gap-md) + var(--size-element-pad-x-md, 12px) + 3px);
+}
+
+.recording__moment {
+  display: flex;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--size-element-radius-md, 8px);
+  background-color: var(--color-primary-state-08);
+}
+
+.recording__moment .recording__added { padding: 0; }
+
+.recording__remove {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-primary-text);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.recording__add-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--size-element-gap-sm);
+  margin: 4px 0 var(--size-element-gap-sm);
+  padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--size-element-radius-md, 8px);
+  background-color: var(--color-surface-container-lowest);
+}
+
+.recording__add-form p { margin: 0; }
+.recording__add-form .form-group, .recording__add-form textarea { width: 100%; }
+
+.recording__marker--added { background-color: var(--color-primary); }
+
+.recording__transcript-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--size-element-gap-sm);
+}
+
+.recording__field-label {
+  margin: 0 0 4px;
+  color: var(--color-on-surface-variant);
+}
+
+.recording__changed { margin: 4px 0 0; }
+
+/* DS Cards clip their content (overflow: hidden), which cut off dropdown menus
+   opening near a card's bottom edge — the Tutors filters, Session history. */
+.plus-card.compliance-surface { overflow: visible; }
+
+/* While the add form is open the list gives up the form's height, so the card
+   keeps its size and the line being flagged stays on screen. */
+.recording__transcript.is-adding .recording__lines { max-height: 420px; }
+
+.v2-status-note { margin: 4px 0 0; }
+
+/* Flagged by the AI, still waiting on a verdict — could still push the rate past the threshold. */
+.tutor-pattern__pending {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 999px;
+  background-color: var(--color-danger-container);
+}
+
+/* AI diagnosis: the Reason dropdown, with the tab's "where to fix it" beside it */
+.v2-reason-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--size-element-gap-md);
+  margin: var(--size-element-gap-sm) 0 var(--size-element-gap-md);
+}
+
+.v2-reason-bar p { margin: 0; }

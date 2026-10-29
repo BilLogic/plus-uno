@@ -49,6 +49,17 @@
   to = "/prototypes/post-session-reflection/index.html"
   status = 200
 
+# Branch experiment: AI compliance dashboard prototype (feat/compliance-dashboard-prototype)
+[[redirects]]
+  from = "/prototypes/compliance-dashboard"
+  to = "/prototypes/compliance-dashboard/"
+  status = 302
+
+[[redirects]]
+  from = "/prototypes/compliance-dashboard/*"
+  to = "/prototypes/compliance-dashboard/index.html"
+  status = 200
+
 # SPA catch-all for live-app routes (must come AFTER Storybook + demo redirects).
 [[redirects]]
   from = "/*"
