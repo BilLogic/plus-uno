@@ -151,7 +151,7 @@
     "sass": "^1.105.1",
     "storybook": "^10.5.0",
     "tailwindcss": "^4.2.2",
-    "uno-blueprint": "github:BilLogic/uno-blueprint#v2.8.6",
+    "uno-blueprint": "github:BilLogic/uno-blueprint#v2.8.8",
     "vite": "^8.3.4",
     "vitest": "^5.0.4"
   },
