@@ -13,7 +13,6 @@ import { countedFetch } from "../../net";
 import {
   CELL_FALLBACK_SELECT,
   EDGE_SELECT_COLUMNS,
-  FINDINGS_TABLE,
   TOUCHPOINTS_TABLE,
   TOUCHPOINT_SELECT,
 } from "../../integrations/blueprint";
@@ -55,15 +54,24 @@ export const blueprintHealthProbe: ProbeRun = async (env) => {
   // The exact selects the bot issues, not just table reachability — a
   // renamed column 400s here while bare selects stay green.
   //
-  // IMPORTED, not restated. These three probes were written as copies of the
+  // IMPORTED, not restated. These probes were written as copies of the
   // selects and then stayed still while 20260820130000, 20260830190000 and
   // 20260830280000 renamed the columns underneath them, so the probe agreed
   // with a read that had stopped working. A copy of a select is a second
   // thing to keep correct; an import is the same thing.
   await probe("select_cells_spec", `/rest/v1/cells?select=${encodeURIComponent(CELL_FALLBACK_SELECT)}&limit=1`);
   await probe("select_edges_kind", `/rest/v1/cell_dependencies?select=${encodeURIComponent(EDGE_SELECT_COLUMNS)}&limit=1`);
-  await probe("select_findings_open", `/rest/v1/${FINDINGS_TABLE}?select=id&status=eq.open&limit=1`);
-  // The touchpoint registry's select (#414), imported like the three above.
+  // Findings arrive through the search, not a table read: `audit_findings`
+  // refuses the anon key since 20261101130000, and `search_blueprint` (security
+  // definer) returns them on its `include` findings branch. So this asks the
+  // RPC for that branch, the one route the bot has to them.
+  const params = BLUEPRINT_CONTRACT.searchBlueprintParams;
+  await probe("include_findings", `/rest/v1/rpc/${BLUEPRINT_CONTRACT.rpcs.searchBlueprint}`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ [params.q]: "tutor", [params.include]: ["findings"] }),
+  });
+  // The touchpoint registry's select (#414), imported like the two selects above.
   // `table_touchpoints` comes from the botReadTables loop now that the
   // contract lists it; this is the fuller check — the columns the read names.
   await probe("select_touchpoints", `/rest/v1/${TOUCHPOINTS_TABLE}?select=${encodeURIComponent(TOUCHPOINT_SELECT)}&limit=1`);

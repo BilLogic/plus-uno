@@ -1,4 +1,4 @@
-// `include` rows → the shapes fetchEdges/fetchFindings used to return.
+// `include` rows → the shapes fetchEdges and the direct findings read used to return.
 //
 // These two mappers are the seam where an optimization could quietly become a
 // behavior change. The bot stopped making two subrequests and started reading
@@ -136,14 +136,14 @@ test("a finding keeps every field the model reads as its own key", () => {
     source: "audit",
     cell_ids: [HIT, OTHER],
     // the note travels as `snippet` on the wire and must land as `note`, which
-    // is the key fetchFindings' raw rows used
+    // is the key the direct findings read's raw rows used
     note: "Front Stage Actions lane is completely unpopulated",
     updated_at: "2026-08-02T00:00:00Z",
   });
 });
 
 test("findings total equals the row count — there is no capped page to under-count", () => {
-  // fetchFindings needed count=exact because its page stopped at 20. The RPC's
+  // The direct findings read needed count=exact because its page stopped at 20. The RPC's
   // findings branch has no LIMIT, so the returned set IS the matched set.
   const rows = Array.from({ length: 25 }, (_, i) => ({
     kind: "finding",

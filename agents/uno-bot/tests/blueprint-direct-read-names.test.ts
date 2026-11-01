@@ -60,7 +60,6 @@ import { BLUEPRINT_CONTRACT } from "../src/generated/blueprint-contract";
 import {
   PROSE_COLUMN,
   POSITION_COLUMN,
-  FINDINGS_TABLE,
   EDGE_SELECT_COLUMNS,
   CELL_FALLBACK_SELECT,
 } from "../src/integrations/blueprint-schema";
@@ -312,10 +311,6 @@ test("no direct read names a relation or column the contract does not carry", ()
 test("the bot's own schema constants are names the contract carries", () => {
   // The half a literal sweep cannot reach: these reach the wire through
   // `${…}`, so the file that names them is the only place they can be checked.
-  assert.ok(
-    (BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(FINDINGS_TABLE),
-    `${FINDINGS_TABLE} is not a table the contract says the bot reads`,
-  );
   for (const [what, column] of [
     ["prose", PROSE_COLUMN],
     ["position", POSITION_COLUMN],

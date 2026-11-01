@@ -140,18 +140,6 @@ export const PROSE_COLUMN = columnFromAll(
  *  `scenarios` — for the same reason PROSE_COLUMN is. */
 export const POSITION_COLUMN = columnFromAll(["phases", "scenarios"], ROLES.phases.position);
 
-/**
- * The findings table. `findings` until 20260830190000.
- *
- * The contract names it, so the next rename arrives with the vendored bytes
- * instead of as a 404 that every call site reports as "nothing is flagged
- * here". `findingsTableIsInContract` still holds it to `botReadTables` — the
- * two fields are declared apart in the contract and a table named by one and
- * dropped from the other would stop being probed by /health/blueprint while
- * this read went on issuing it.
- */
-export const FINDINGS_TABLE = BLUEPRINT_CONTRACT.botFindingsTable;
-
 /** Edge select columns. `label` became `name` and `note` was dropped by
  *  20260830190000. The FK embed hints are appended at the call site from
  *  `BLUEPRINT_CONTRACT.fkConstraints` — those were already pinned; these were
@@ -273,7 +261,6 @@ export function touchpointFilter(words: readonly string[]): string {
 export const DIRECT_READ_STRINGS: readonly string[] = [
   CELL_FALLBACK_SELECT,
   EDGE_SELECT_COLUMNS,
-  FINDINGS_TABLE,
   `id,name,${PROSE_COLUMN}`,
   `order=${POSITION_COLUMN}`,
   TOUCHPOINTS_TABLE,
@@ -343,11 +330,6 @@ export const RETIRED_CONVENTIONS: ReadonlyArray<{ phrase: string; instead: strin
  *  `filter_path_type`, so the boundary is explicit. */
 export function namesRetiredColumn(s: string): string | undefined {
   return RETIRED_NAMES.find((n) => new RegExp(`(^|[^a-z_])${n}([^a-z_]|$)`, "i").test(s));
-}
-
-/** The findings table the bot reads must be one the contract says it reads. */
-export function findingsTableIsInContract(): boolean {
-  return (BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(FINDINGS_TABLE);
 }
 
 /** The touchpoint registry must be one the contract says is anon-readable.

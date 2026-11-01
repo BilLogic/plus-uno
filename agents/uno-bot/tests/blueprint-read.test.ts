@@ -126,7 +126,7 @@ test("the six reads' REAL failure answers are `failed`, not served", () => {
   assert.equal(dispositionOf(null), "failed");
   // fetchEdges. `[]` carries no evidence either way, so it is not served.
   assert.equal(dispositionOf([]), "failed");
-  // fetchRows, and so fetchFindings / fetchSlices / fetchTouchpoints.
+  // fetchRows, and so fetchSlices / fetchTouchpoints.
   assert.equal(dispositionOf({ rows: [], total: undefined }), "failed");
   assert.equal(dispositionOf({ rows: [] }), "failed");
 });

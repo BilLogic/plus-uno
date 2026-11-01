@@ -83,10 +83,11 @@ export function mapIncludeEdges(
 }
 
 /**
- * `include:findings` rows → the field-per-key shape fetchFindings returns.
+ * `include:findings` rows → the field-per-key shape the direct findings read
+ * returned before `audit_findings` closed to the anon key.
  *
  * `total` equals `rows.length` by construction: the RPC applies no cap to its
- * findings branch, so this IS the whole matched set. fetchFindings needed
+ * findings branch, so this IS the whole matched set. The direct read needed
  * count=exact because its page stopped at 20; here there is no page to
  * under-count, and inventing a separate count would re-introduce the
  * counted-the-capped-page bug from the other direction.
@@ -111,7 +112,7 @@ export function mapIncludeFindings(data: Array<Record<string, unknown>>): {
         source: l.source,
         cell_ids: l.cell_ids,
         // travels as `snippet` on the wire; lands as `note`, the key
-        // fetchFindings' raw rows used
+        // the direct findings read's raw rows used
         note: r.snippet,
         updated_at: r.updated_at,
       };

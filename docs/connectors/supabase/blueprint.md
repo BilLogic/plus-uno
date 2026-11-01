@@ -2,7 +2,7 @@
 embodiment: all
 summary: What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: 24e0ed7f1ddf
+vendored_revision: db64d530db07
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md. -->
@@ -92,10 +92,11 @@ about the roadmap, answer from `proposed`, `planned` and `built`.
 
 A path's `kind` is `happy`, `variant` or `exception`. The happy path IS the
 scenario's main route. A variant is equally normal, chosen by a condition. An
-exception is a rule or a failure diverting the route. Nothing connects across
-paths: each path owns its lanes and cells, and shares the scenario's steps
-through `path_steps` in its own order. A scenario's `layout` is `stacked` or
-`merged` — how the board is drawn, a display setting and not a kind.
+exception is a rule or a failure diverting the route. Each path owns its
+lanes and cells, and shares the scenario's steps through `path_steps` in its
+own order; a link may still join cells on any path or scenario of the same
+service. A scenario's `layout` is `stacked` or `merged` — how the board is
+drawn, a display setting and not a kind.
 Dependencies between cells are `leads_to` (this cell makes the other happen,
 drawn as an arrow) or `enables` (the other must already be in place).
 

@@ -35,7 +35,6 @@ import assert from "node:assert/strict";
 import {
   PROSE_COLUMN,
   POSITION_COLUMN,
-  FINDINGS_TABLE,
   TOUCHPOINT_READ_KEYS,
   EDGE_SELECT_COLUMNS,
   CELL_FALLBACK_SELECT,
@@ -78,7 +77,6 @@ test("every derived read string is the contract's own label", () => {
   // and a piece of it retyped by hand in `blueprint-schema.ts` is a red test.
   assert.equal(PROSE_COLUMN, ROLES.cells.prose);
   assert.equal(POSITION_COLUMN, ROLES.phases.position);
-  assert.equal(FINDINGS_TABLE, BLUEPRINT_CONTRACT.botFindingsTable);
   assert.deepEqual([...TOUCHPOINT_READ_KEYS], [...BLUEPRINT_CONTRACT.botTouchpointReadKeys]);
 });
 
@@ -97,10 +95,6 @@ test("every role names a column its own table declares", () => {
       );
     }
   }
-  // `audit_findings` declares no role at all — a verdict keyed to cells has no
-  // label, no prose and no order of its own. The empty entry is a decision
-  // recorded, so the sweep above must have something to iterate for it.
-  assert.ok("audit_findings" in ROLES, "every direct-read table carries a role entry, empty or not");
   assert.deepEqual(Object.keys(ROLES).sort(), Object.keys(COLUMNS).sort());
 });
 
@@ -111,10 +105,6 @@ test("the touchpoint read keys are a subset of that table's columns", () => {
   for (const key of BLUEPRINT_CONTRACT.botTouchpointReadKeys) {
     assert.ok(declared.includes(key), `botTouchpointReadKeys names \`${key}\`, not in botDirectReadColumns.touchpoints`);
   }
-  assert.ok(
-    (BLUEPRINT_CONTRACT.botReadTables as readonly string[]).includes(BLUEPRINT_CONTRACT.botFindingsTable),
-    "botFindingsTable is not a table botReadTables says the bot reads",
-  );
 });
 
 test("the prose and position columns are declared on every table they are read from", () => {

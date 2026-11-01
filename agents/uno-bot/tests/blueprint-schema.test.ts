@@ -4,13 +4,11 @@ import {
   PROSE_COLUMN,
   POSITION_COLUMN,
   TOUCHPOINT_READ_KEYS,
-  FINDINGS_TABLE,
   EDGE_SELECT_COLUMNS,
   CELL_FALLBACK_SELECT,
   DIRECT_READ_STRINGS,
   RETIRED_NAMES,
   namesRetiredColumn,
-  findingsTableIsInContract,
 } from "../src/integrations/blueprint-schema";
 import { BLUEPRINT_CONTRACT } from "../src/generated/blueprint-contract";
 
@@ -36,14 +34,20 @@ test("the retired list matches on whole words only", () => {
   assert.equal(namesRetiredColumn("order=order_position"), "order_position");
 });
 
-test("the findings table is one the contract says the bot reads", () => {
-  // This is the pin. The table's name now comes from the contract's
-  // `botFindingsTable`, so a rename is followed by the next sync; what is left
-  // to catch is the contract naming a table its own `botReadTables` has
-  // dropped, which would leave /health/blueprint no longer probing a table
-  // this read still issues.
-  assert.ok(findingsTableIsInContract(), `${FINDINGS_TABLE} not in botReadTables`);
-  assert.ok(!BLUEPRINT_CONTRACT.botReadTables.includes("findings" as never));
+test("the bot reads no signed-in-only relation directly", () => {
+  // It holds the anon key, which 20261101130000 refuses on every relation the
+  // contract lists as signed-in-only. A direct read of one would 401 and reach
+  // Slack as a failure to look; findings come through the search instead.
+  const closed = new Set<string>(BLUEPRINT_CONTRACT.signedInReadTables);
+  for (const table of BLUEPRINT_CONTRACT.botReadTables) assert.ok(!closed.has(table), `${table} is signed-in-only`);
+  for (const table of Object.keys(BLUEPRINT_CONTRACT.botDirectReadColumns)) {
+    assert.ok(!closed.has(table), `${table} is signed-in-only`);
+  }
+  for (const s of DIRECT_READ_STRINGS) {
+    for (const table of closed) {
+      assert.ok(!new RegExp(`(^|[^a-z_])${table}([^a-z_]|$)`).test(s), `direct read names ${table}: ${s}`);
+    }
+  }
 });
 
 test("the cells fallback still reads the resources embed", () => {
