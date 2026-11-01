@@ -41,9 +41,21 @@ test("the health probe reads findings through the search's include branch, and n
   }
 
   const rpc = `/rest/v1/rpc/${BLUEPRINT_CONTRACT.rpcs.searchBlueprint}`;
+  const include = BLUEPRINT_CONTRACT.searchBlueprintParams.include;
   const findingsAsk = sent.find(
-    (r) => new URL(r.url).pathname === rpc && r.body && JSON.parse(r.body).include !== undefined,
+    (r) => new URL(r.url).pathname === rpc && r.body && JSON.parse(r.body)[include] !== undefined,
   );
   assert.ok(findingsAsk, "no search call asked for an include");
-  assert.deepEqual(JSON.parse(findingsAsk.body!)[BLUEPRINT_CONTRACT.searchBlueprintParams.include], ["findings"]);
+  assert.deepEqual(JSON.parse(findingsAsk.body!)[include], ["findings"]);
+});
+
+test("findings outside the search are a failure to look, and cost no request", async () => {
+  const { findingsWithoutSearch } = await import("../src/integrations/blueprint.js");
+  const before = sent.length;
+  const answer = await findingsWithoutSearch(ENV, ["cell-aaa"]);
+  assert.equal(answer.disposition, "failed", "a read that cannot be made is never an empty table");
+  assert.deepEqual(answer.rows, []);
+  assert.equal(answer.total, undefined, "no count may be claimed for findings nobody looked at");
+  assert.equal(sent.length, before, "the anon key is refused on audit_findings; asking anyway is a wasted subrequest");
+  assert.deepEqual(await findingsWithoutSearch(ENV, []), { rows: [], total: 0, disposition: "served" });
 });

@@ -76,7 +76,7 @@ test("the read entry puts the search FIRST, so an unconfigured deployment still 
   // or let an enrichment run first, and an unconfigured deployment becomes a
   // served empty result again — which the tests above would not catch, because
   // they pin what the tool RETURNS and not the order it reads in.
-  const { searchBlueprint, fetchBlueprintIndex, fetchEdges, fetchFindings, fetchSlices, fetchTouchpoints } =
+  const { searchBlueprint, fetchBlueprintIndex, fetchEdges, findingsWithoutSearch, fetchSlices, fetchTouchpoints } =
     await import("../src/integrations/blueprint.js");
   const { readBlueprint, BlueprintUnavailableError } = await import(
     "../src/integrations/blueprint-read.js"
@@ -89,7 +89,7 @@ test("the read entry puts the search FIRST, so an unconfigured deployment still 
           search: (query, options) => searchBlueprint(UNCONFIGURED, query, options),
           index: (options) => fetchBlueprintIndex(UNCONFIGURED, options),
           edges: (cellIds) => fetchEdges(UNCONFIGURED, cellIds),
-          findings: (cellIds) => fetchFindings(UNCONFIGURED, cellIds),
+          findings: (cellIds) => findingsWithoutSearch(UNCONFIGURED, cellIds),
           slices: (query) => fetchSlices(UNCONFIGURED, query),
           touchpoints: (query) => fetchTouchpoints(UNCONFIGURED, query),
         },
@@ -104,11 +104,11 @@ test("and if the order ever moved, each enrichment read still says `unavailable`
   // answers an unconfigured deployment with an empty page rather than a throw
   // — which is indistinguishable from "the blueprint has nothing on this"
   // unless the read says how it went. Now each one does.
-  const { fetchBlueprintIndex, fetchEdges, fetchFindings, fetchSlices, fetchTouchpoints } =
+  const { fetchBlueprintIndex, fetchEdges, findingsWithoutSearch, fetchSlices, fetchTouchpoints } =
     await import("../src/integrations/blueprint.js");
   assert.equal((await fetchBlueprintIndex(UNCONFIGURED)).disposition, "unavailable");
   assert.equal((await fetchEdges(UNCONFIGURED, ["cell-aaa"])).disposition, "unavailable");
-  assert.equal((await fetchFindings(UNCONFIGURED, ["cell-aaa"])).disposition, "unavailable");
+  assert.equal((await findingsWithoutSearch(UNCONFIGURED, ["cell-aaa"])).disposition, "unavailable");
   assert.equal((await fetchSlices(UNCONFIGURED, "goal setting")).disposition, "unavailable");
   assert.equal((await fetchTouchpoints(UNCONFIGURED, "zoom")).disposition, "unavailable");
   // Zero subrequests: the tripwire at the top of this file is what asserts it.

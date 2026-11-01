@@ -34,7 +34,7 @@ import {
   BlueprintUnavailableError,
   fetchBlueprintIndex,
   fetchEdges,
-  fetchFindings,
+  findingsWithoutSearch,
   fetchSlices,
   fetchTouchpoints,
   type BlueprintRetrieval,
@@ -399,13 +399,15 @@ export async function executeBlueprintSearch(
         ...(autoIndex ? { autoIndex: true } : {}),
       },
       {
-        // The six reads, bound to this deployment. They are the same
+        // The six reads, bound to this deployment. Five are the same
         // countedFetch-backed functions everything else calls — injection sits
-        // ABOVE the metered call, never around it (ADR-022).
+        // ABOVE the metered call, never around it (ADR-022). The sixth,
+        // findings outside the search, makes no call: the anon key is refused
+        // on `audit_findings`, so it reports a failure to look instead.
         search: (q, o) => searchBlueprint(env, q, o),
         index: (o) => fetchBlueprintIndex(env, o),
         edges: (ids) => fetchEdges(env, ids),
-        findings: (ids) => fetchFindings(env, ids),
+        findings: (ids) => findingsWithoutSearch(env, ids),
         slices: (q) => fetchSlices(env, q),
         touchpoints: (q) => fetchTouchpoints(env, q),
       },

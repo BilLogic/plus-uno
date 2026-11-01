@@ -1262,7 +1262,7 @@ async function fetchRows(
  *  up, and `failed` says exactly that: a failure to look, never "no
  *  findings". An unconfigured deployment stays `unavailable`, and no matched
  *  cell is still an answered zero. */
-export async function fetchFindings(
+export async function findingsWithoutSearch(
   env: Env,
   cellIds: string[],
 ): Promise<{
