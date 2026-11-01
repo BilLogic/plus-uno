@@ -3,7 +3,7 @@ embodiment: all
 disclosure: reference
 summary: Every blueprint table and column as the database catalog describes it, and the tables only a service key reads — the schema section of blueprint.md, disclosed
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: 24e0ed7f1ddf
+vendored_revision: db64d530db07
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
@@ -214,7 +214,7 @@ Steps included on a path and their column order
 | `updated_at` | — |
 
 ### `paths`
-One route through a scenario: happy, variant or exception (kind), and how far along it is (status). Nothing connects across paths; a path is a detour, not a stage.
+One route through a scenario: happy, variant or exception (kind), and how far along it is (status). A link may join cells on any path or scenario of the same service; a path is a detour, not a stage.
 
 5 of 10 columns described.
 
@@ -427,5 +427,7 @@ The deletions in public.authoring_changes, in the shape the retired deleted_stru
 These exist and a service key reads them. What each is for:
 
 - `business_models` — How the service is funded, priced and delivered. One row per service. Renamed from `propositions` on 2026-08-21 — that word already meant a cell's value proposition, which is a different thing at a different level.
+- `cell_storyboard_receipts` — —
+- `structure_membership_receipts` — —
 
 <!-- /generated:schema -->

@@ -36,7 +36,6 @@ import { type BlueprintScope, hasFilter, hasScope, scopeBody, scopeKey } from ".
 import {
   PROSE_COLUMN,
   POSITION_COLUMN,
-  FINDINGS_TABLE,
   EDGE_SELECT_COLUMNS,
   CELL_FALLBACK_SELECT,
   TOUCHPOINTS_TABLE,
@@ -44,7 +43,7 @@ import {
   touchpointFilter,
 } from "./blueprint-schema";
 
-export { FINDINGS_TABLE, EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT, TOUCHPOINTS_TABLE, TOUCHPOINT_SELECT };
+export { EDGE_SELECT_COLUMNS, CELL_FALLBACK_SELECT, TOUCHPOINTS_TABLE, TOUCHPOINT_SELECT };
 
 /** One page of the touchpoint registry, as the bot's own tool reads it. */
 export const TOUCHPOINT_PAGE = 15;
@@ -1249,14 +1248,20 @@ async function fetchRows(
   return { rows: data as Array<Record<string, unknown>>, total, disposition: "served" };
 }
 
-/** Audit findings already recorded against these cells. A READ — triage is a
- *  write, so it stays in the app where a service-tier session can do it.
+/** Audit findings recorded against these cells, when the search did NOT
+ *  carry them — the fallback half of the fused-or-fallback switch
+ *  (blueprint-read.ts). It makes no request, because there is none this
+ *  Worker may make.
  *
- *  `findings.cell_ids` is a uuid ARRAY (one finding can span cells), not a
- *  scalar `cell_id`. The old `cell_id=in.(…)` filter asked for a column that
- *  does not exist: PostgREST 400s, fetchRows logs a warning and returns [], and
- *  the tool reported "no findings" for cells that had them. Array overlap
- *  (`ov`) is the correct operator, and it needs `{}`, not `()`. */
+ *  `audit_findings` is signed-in-only since 20261101130000: the anon key the
+ *  bot holds is refused on it (the contract's `signedInReadTables`). Findings
+ *  reach the bot one way, inside `search_blueprint`'s `include: ['findings']`
+ *  branch — a security-definer function, so it reads them for the anon key
+ *  without the table being published to it. When the search answers on a
+ *  path that does not carry that branch, the findings could not be looked
+ *  up, and `failed` says exactly that: a failure to look, never "no
+ *  findings". An unconfigured deployment stays `unavailable`, and no matched
+ *  cell is still an answered zero. */
 export async function fetchFindings(
   env: Env,
   cellIds: string[],
@@ -1265,24 +1270,10 @@ export async function fetchFindings(
   total: number | undefined;
   disposition: BlueprintDisposition;
 }> {
-  const ids = cellIds.filter(Boolean).slice(0, 10);
-  // No cells matched, so there is nothing a finding could be against: an
-  // answered zero, not an unmade read.
-  if (ids.length === 0) return { rows: [], total: 0, disposition: "served" };
-  // Open findings only: the app's triage invariant is "dismissed stays
-  // dismissed" — re-surfacing closed findings in Slack re-litigates a call
-  // the team already made in-app, and closed rows eat the 20-row cap.
-  //
-  // The total rides along: `fetchRows` already counted the full matched set
-  // under count=exact, and dropping it re-creates the counted-the-capped-page
-  // bug that 258cfd02 fixed for slices ("5 of 14").
-  const { rows, total, disposition } = await fetchRows(
-    env,
-    FINDINGS_TABLE,
-    `cell_ids=ov.{${ids.join(",")}}&status=eq.open`,
-    20,
-  );
-  return { rows, total, disposition };
+  if (!isBlueprintConfigured(env)) return { rows: [], total: undefined, disposition: "unavailable" };
+  // No cells matched, so there is nothing a finding could be against.
+  if (cellIds.filter(Boolean).length === 0) return { rows: [], total: 0, disposition: "served" };
+  return { rows: [], total: undefined, disposition: "failed" };
 }
 
 /** Named slices someone already cut. Points at an existing view instead of
