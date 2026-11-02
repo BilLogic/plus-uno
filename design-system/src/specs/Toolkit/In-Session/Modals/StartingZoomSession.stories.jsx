@@ -34,7 +34,7 @@ export const StartingZoomSession = () => (
             >
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <span className="h5" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+                    <span className="h5" style={{ margin: 0, color: 'var(--color-on-surface)', whiteSpace: 'nowrap' }}>
                         Ready to Start Zoom Session?
                     </span>
                     <i

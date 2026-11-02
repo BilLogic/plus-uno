@@ -489,8 +489,11 @@
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:105",
         "lineHeight": "VariableID:19364:111",
-        "fontWeight": "VariableID:19364:115",
-        "letterSpacing": "VariableID:20219:35"
+        "fontWeight": "VariableID:19364:115"
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": -2
       }
     },
     {
@@ -501,8 +504,11 @@
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:104",
         "lineHeight": "VariableID:19364:110",
-        "fontWeight": "VariableID:19364:115",
-        "letterSpacing": "VariableID:20219:34"
+        "fontWeight": "VariableID:19364:115"
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": -1
       }
     },
     {
@@ -513,8 +519,11 @@
         "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:103",
         "lineHeight": "VariableID:19364:109",
-        "fontWeight": "VariableID:19364:115",
-        "letterSpacing": "VariableID:20219:34"
+        "fontWeight": "VariableID:19364:115"
+      },
+      "letterSpacing": {
+        "unit": "PERCENT",
+        "value": -1
       }
     },
     {

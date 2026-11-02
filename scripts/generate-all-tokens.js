@@ -1059,6 +1059,14 @@ function generateTypeSCSS() {
         if (!json.variables.some((v) => v.name === name)) stale('FAMILY_FALLBACKS', `Figma has no ${name}.`);
     }
 
+    const percentSpacing = (style) => {
+        const ls = style.letterSpacing;
+        if (!ls || ls.unit !== 'PERCENT' || ls.value === 0) return undefined;
+        const match = json.variables.find((v) => v.name.startsWith('Letter spacing/') && v.valuesByMode?.[mode] === ls.value);
+        if (!match) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} has letter spacing ${ls.value}% and no Letter spacing variable holds it.`);
+        return match.id;
+    };
+
     const styles = [];
     for (const style of json.textStyles) {
         const group = TYPE_STYLE_GROUPS.indexOf(style.name.split('/')[0]);
@@ -1068,7 +1076,10 @@ function generateTypeSCSS() {
             if (!v) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} ${field} is not bound to a type variable.`);
             return `var(${typeToken(v).token})`;
         };
-        const spacing = style.boundVariables?.letterSpacing;
+        // A variable bound to letter spacing renders in pixels in Figma, so the
+        // library holds the percent on the style and the variable of the same
+        // value names it here.
+        const spacing = style.boundVariables?.letterSpacing ?? percentSpacing(style);
         if (spacing) {
             styles.push({
                 group,

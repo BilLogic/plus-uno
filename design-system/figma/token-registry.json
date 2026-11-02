@@ -57,9 +57,11 @@
         "var(--font-weight-headline)",
         "var(--font-family-headline)"
       ],
-      "Title": [
+      "Title (H4–H5)": [
         "var(--font-weight-title)",
-        "var(--font-weight-semibold-2)"
+        "var(--font-family-title)",
+        "var(--type-family-heading)",
+        "var(--type-weight-semibold)"
       ],
       "H1–H6": [
         "var(--font-size-h1)",
