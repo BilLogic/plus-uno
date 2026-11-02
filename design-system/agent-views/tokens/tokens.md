@@ -294,7 +294,6 @@ The Atlassian scale, generated from Figma: `font: var(--heading-large)`. A butto
 --heading-xxlarge-tracking
 --heading-xxsmall
 --line-height-100
---line-height-1125
 --line-height-125
 --line-height-150
 --line-height-175

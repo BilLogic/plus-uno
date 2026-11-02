@@ -171,6 +171,10 @@
 .plus-home-new__stat-value {
     font: var(--metric-large);
     font-variant-numeric: tabular-nums;
+    // Noto Sans's glyph box is taller than this line: padding and an equal
+    // negative margin hold the box where it was and keep the digits inside it.
+    padding-block: 0.125em;
+    margin-block: -0.125em;
     color: var(--ds-text);
 }
 

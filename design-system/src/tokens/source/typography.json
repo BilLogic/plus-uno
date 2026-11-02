@@ -423,25 +423,6 @@
       "hiddenFromPublishing": false
     },
     {
-      "id": "VariableID:20219:32",
-      "name": "Line height/1125",
-      "variableCollectionId": "VariableCollectionId:19364:98",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "LINE_HEIGHT"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--line-height-1125)"
-      },
-      "valuesByMode": {
-        "19364:0": 18
-      },
-      "resolvedValuesByMode": {
-        "19364:0": 18
-      },
-      "hiddenFromPublishing": true
-    },
-    {
       "id": "VariableID:20219:33",
       "name": "Letter spacing/none",
       "variableCollectionId": "VariableCollectionId:19364:98",
@@ -609,7 +590,7 @@
       "boundVariables": {
         "fontFamily": "VariableID:19364:113",
         "fontSize": "VariableID:19364:99",
-        "lineHeight": "VariableID:20219:32",
+        "lineHeight": "VariableID:19364:106",
         "fontWeight": "VariableID:19364:114"
       }
     },

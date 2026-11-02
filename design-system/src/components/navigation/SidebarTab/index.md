@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--element-inline-md` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--line-height-100` · `--size-element-stroke-lg` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--element-inline-md` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/SidebarTab/SidebarTab.scss`. Override these through the token layer, never with a literal.
 

@@ -557,7 +557,6 @@
       "Letter spacing/tight": "var(--type-tracking-tight)",
       "Letter spacing/tighter": "var(--type-tracking-tighter)",
       "Line height/100": "var(--line-height-100)",
-      "Line height/1125": "var(--line-height-1125)",
       "Line height/125": "var(--line-height-125)",
       "Line height/150": "var(--line-height-150)",
       "Line height/175": "var(--line-height-175)",
@@ -1309,11 +1308,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1530,
+    "scssTokenCount": 1529,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1134,
-      "resolved": 1105,
+      "total": 1133,
+      "resolved": 1104,
       "percent": 97,
       "unresolved": [
         {

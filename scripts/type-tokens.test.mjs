@@ -45,7 +45,7 @@ const STYLES = [
   ['Heading/xxsmall', 'heading', 12, 16, 600],
   ['Body/large', 'body', 16, 24, 400],
   ['Body/default', 'body', 14, 20, 400],
-  ['Body/small', 'body', 12, 18, 400],
+  ['Body/small', 'body', 12, 16, 400],
   ['Metric/large', 'heading', 28, 32, 600],
   ['Metric/medium', 'heading', 24, 28, 600],
   ['Metric/small', 'heading', 16, 20, 600],

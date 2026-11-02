@@ -23,7 +23,7 @@ const SCALE = [
     ['Heading', 'xxsmall', '12/16', 'Tutors plan the week from here'],
     ['Body', 'large', '16/24', 'Tutors plan the week from here'],
     ['Body', 'default', '14/20', 'Tutors plan the week from here'],
-    ['Body', 'small', '12/18', 'Tutors plan the week from here'],
+    ['Body', 'small', '12/16', 'Tutors plan the week from here'],
     ['Metric', 'large', '28/32', '1,284 sessions'],
     ['Metric', 'medium', '24/28', '1,284 sessions'],
     ['Metric', 'small', '16/20', '1,284 sessions'],

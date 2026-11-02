@@ -16,7 +16,6 @@
 
     /* Line height primitives (hidden in Figma; named by rem × 100) */
     --line-height-100: 1rem;
-    --line-height-1125: 1.125rem;
     --line-height-125: 1.25rem;
     --line-height-150: 1.5rem;
     --line-height-175: 1.75rem;
@@ -54,7 +53,7 @@
     --heading-xxsmall: var(--type-weight-semibold) var(--font-size-075) / var(--line-height-100) var(--type-family-heading);
     --body-large: var(--type-weight-regular) var(--font-size-100) / var(--line-height-150) var(--type-family-body);
     --body-default: var(--type-weight-regular) var(--font-size-0875) / var(--line-height-125) var(--type-family-body);
-    --body-small: var(--type-weight-regular) var(--font-size-075) / var(--line-height-1125) var(--type-family-body);
+    --body-small: var(--type-weight-regular) var(--font-size-075) / var(--line-height-100) var(--type-family-body);
     --metric-large: var(--type-weight-semibold) var(--font-size-175) / var(--line-height-200) var(--type-family-heading);
     --metric-medium: var(--type-weight-semibold) var(--font-size-150) / var(--line-height-175) var(--type-family-heading);
     --metric-small: var(--type-weight-semibold) var(--font-size-100) / var(--line-height-125) var(--type-family-heading);

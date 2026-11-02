@@ -88,6 +88,10 @@
 .plus-pattern-section-title--page {
     font: var(--heading-large);
     letter-spacing: var(--heading-large-tracking);
+    // Noto Serif's glyph box is taller than this line: padding and an equal
+    // negative margin hold the box where it was and keep the glyphs inside it.
+    padding-block: 0.125em;
+    margin-block: -0.125em;
 }
 
 /* A section on a page: Heading/medium 20/24. */
