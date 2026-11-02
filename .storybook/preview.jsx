@@ -215,6 +215,7 @@ const preview = {
               "Date time picker",
               "Dropdown menu",
               "File upload",
+              "Inline edit",
               "Input group",
               "Label & caption",
               "Number input",
