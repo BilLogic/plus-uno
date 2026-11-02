@@ -1,0 +1,187 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as VisuallyHiddenStories from './VisuallyHidden.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={VisuallyHiddenStories} />
+
+<Title />
+Text that screen readers announce and nobody sees. It is a one-pixel clipped
+span, so it takes no space, paints nothing and needs no tokens.
+
+<DocsTabs of={VisuallyHiddenStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/VisuallyHidden"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The sentence reads "Order total: $42.00" on screen. A screen reader also says "including shipping", which is the hidden span.</>}>
+    <Canvas of={VisuallyHiddenStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Naming an icon-only control
+
+<DocsCanvasShell description={<>The trash icon is decorative and the hidden text is the button's name, so it is announced as "Delete session, button".</>}>
+    <DsCanvasQuiet of={VisuallyHiddenStories.NamesAControl} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Hidden column headers
+
+<DocsCanvasShell description={<>Selection and actions columns have no visible title, but each still has a column header a screen reader announces with its cells.</>}>
+    <DsCanvasQuiet of={VisuallyHiddenStories.HiddenColumnHeaders} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Role and id
+
+<DocsCanvasShell description={<><code>role</code> makes the span a live region; <code>id</code> lets a control point at it with <code>aria-describedby</code>.</>}>
+    <DsCanvasQuiet of={VisuallyHiddenStories.RoleAndId} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={VisuallyHiddenStories.Interactive}
+    description={
+        <>
+            Change the hidden text or role in the table below. Nothing changes on screen, which is the point; the
+            text is in the page for assistive technology.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `VisuallyHidden` when the words a screen reader needs are not words a
+sighted person needs: the name of an icon-only button, the title of a table
+column that holds only checkboxes, the count in a status message, a table
+caption the layout already explains.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>children</code></td><td>node</td><td>The text screen readers announce.</td></tr>
+        <tr><td><code>id</code></td><td>string</td><td>An id for <code>aria-labelledby</code> or <code>aria-describedby</code> to point at.</td></tr>
+        <tr><td><code>role</code></td><td>string</td><td>An ARIA role for the span, such as <code>status</code>.</td></tr>
+    </tbody>
+</DocsTable>
+
+It renders Bootstrap's `.visually-hidden` on a `span`, which is one pixel
+square, clipped, out of the flow and kept in the accessibility tree. Existing
+markup that writes `className="visually-hidden"` is the same thing and can move
+to the component as it is touched.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Hide with this, not with `display: none`.
+
+```jsx
+// Incorrect: display none and the hidden attribute remove the text from the
+// accessibility tree too, so nothing is announced.
+<span style={{ display: 'none' }}>Delete session</span>
+
+// Correct: drawn nowhere, still read.
+<VisuallyHidden>Delete session</VisuallyHidden>
+```
+
+### Do not hide what a sighted person also needs.
+
+```jsx
+// Incorrect: the instruction is invisible to people who can see, and they
+// cannot find it.
+<VisuallyHidden>Passwords must be at least 12 characters.</VisuallyHidden>
+
+// Correct: say it to everyone, and let the field point at it.
+<p id="pw-help">Passwords must be at least 12 characters.</p>
+<input aria-describedby="pw-help" />
+```
+
+### Keep it out of the focus order.
+
+```jsx
+// Incorrect: a hidden link or button can still be focused, and a keyboard
+// user lands on something they cannot see.
+<VisuallyHidden><a href="/skip">Skip</a></VisuallyHidden>
+
+// Correct: hide text, not controls. A skip link needs to appear on focus.
+<VisuallyHidden>Skip</VisuallyHidden>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Announced, not drawn.** The text stays in the accessibility tree, so it is
+  part of the name, description or content of whatever contains it. This is the
+  difference from `display: none`, `visibility: hidden` and `aria-hidden`, which
+  remove it.
+- **Pair with `aria-hidden` on the visual.** An icon beside hidden text should be
+  `aria-hidden="true"`, so the control is announced once, by its text.
+- **Live regions.** `role="status"` makes a polite announcement when its text
+  changes. Render the region before the text changes, since a region that
+  appears already filled is often not announced.
+- **No contrast or size to meet.** Nothing is painted, so there is no color
+  requirement. The text should still be written for the ear: complete words, in
+  the page's language.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For an icon-only button, pair it with `Tooltip` so sighted people get the name too.
+- For a visible label on a field, use `Label & caption`.
+- For a loading indicator that announces itself, `Spinner` already includes a visually hidden label.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

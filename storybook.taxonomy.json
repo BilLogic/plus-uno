@@ -54,7 +54,8 @@
       "Jumbotron",
       "List group",
       "Media object",
-      "Scrollbar"
+      "Scrollbar",
+      "Visually hidden"
     ],
     "Loading": [
       "Progress bar",
@@ -194,7 +195,8 @@
         "Jumbotron",
         "List group",
         "Media object",
-        "Scrollbar"
+        "Scrollbar",
+        "Visually hidden"
       ],
       "Loading",
       [

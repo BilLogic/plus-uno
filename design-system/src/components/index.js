@@ -54,5 +54,6 @@ export { default as Toast } from '@/components/messaging/Toast';
 export { ToastContainer } from '@/components/messaging/Toast';
 export { default as Tooltip } from '@/components/overlays-and-layering/Tooltip';
 export { default as UserAvatar } from '@/components/_internal/UserAvatar';
+export { default as VisuallyHidden } from '@/components/layout-and-structure/VisuallyHidden';
 export * from '@/dataviz';
 // Note: constants.js is internal and NOT exported publicly
