@@ -3,13 +3,13 @@
 
 # Table
 
-Standard table component for displaying tabular data.
+Standard table component for displaying tabular data, built from the shared `_Table` parts (`TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow`, `TableFooter`). The feel: hairline horizontal dividers, no outer frame, a quiet header over a stronger rule, single-line cells that end in an ellipsis with a tooltip, no zebra. Rows are 32, 40 or 48 tall (`size`); `density` is the older name for the same prop. `StaticTable` is this table for a fixed grid people read.
 
 **Import:** `import { Table } from '@/components';`
 
 **Source:** `design-system/src/components/_internal/Table/Table.jsx`
 
-**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty
+**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty, Sizes, FramedAndLines, Cells, RowStates, Summary, Footer, Static
 
 **Storybook page:** `design-system/src/components/_internal/Table/Table.mdx`
 
@@ -18,24 +18,41 @@ Standard table component for displaying tabular data.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `headers` | arrayOf or string or shape or node or object | `[]` | Column headers — a string, or { text, width, align, className } for control over layout |
-| `rows` | arrayOf or node or shape or string or number or object | `[]` | Row data — each row is an array of cells; a cell is a node or { content, align, colSpan, className } |
+| `headers` | arrayOf or string or shape or node or object | `[]` | Column headers — a string, or { text, width, align } for control over layout; align is text, number or icon |
+| `rows` | enum | `[]` | Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className } |
 | `striped` | bool | `false` | Alternate row background |
 | `hover` | bool | `true` | Highlight the row under the cursor |
-| `bordered` | bool | `false` | Draw cell borders |
-| `density` | enum | `'md'` | Vertical cell padding, bound to the --size-table-cell-y token family |
+| `bordered` | bool | `false` | Frame the table and draw vertical lines |
+| `verticalLines` | bool | `false` | Vertical hairlines between columns |
+| `frame` | enum | `'plain'` | Plain spans its section with no outer frame; framed draws its own edge |
+| `size` | enum | — | Row height: sm 32, md 40, lg 48, from the Row size tokens |
+| `density` | enum | — | The older name for size |
+| `titleColumn` | number | — | Index of the one column that names the record, set in semibold |
+| `rowStates` | enum | — | One state per row: rest, highlighted, selected or disabled |
+| `summary` | arrayOf | — | One calculation per column, in a muted row that closes the table |
+| `emptyState` | node | — | Shown as a message row spanning every column when there are no rows |
+| `footer` | node | — | A TableFooter under the rows |
+| `onRowClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
 ## Variants
 
+**`rows`** — `default` · `title`
+
+**`frame`** — `plain` · `framed`
+
+**`size`** — `sm` · `md` · `lg`
+
 **`density`** — `sm` · `md` · `lg`
+
+**`rowStates`** — `rest` · `highlighted` · `selected` · `disabled`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-on-surface` · `--color-outline-variant` · `--heading-xxsmall` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-100` · `--size-table-cell-x` · `--size-table-cell-y`
+`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--font-weight-semibold-2` · `--heading-xxsmall` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--size-element-border` · `--size-element-gap-md` · `--size-indicator-sm` · `--size-row-comfortable` · `--size-row-compact` · `--size-row-default` · `--size-spacing-large-space-800` · `--size-table-cell-gap` · `--size-table-cell-inline` · `--size-table-cell-pad-x` · `--size-table-cell-pad-y` · `--size-table-radius-md` · `--size-table-radius-sm`
 
 From `design-system/src/components/_internal/Table/Table.scss`. Override these through the token layer, never with a literal.
 
