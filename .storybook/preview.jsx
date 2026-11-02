@@ -261,7 +261,8 @@ const preview = {
               "Jumbotron",
               "List group",
               "Media object",
-              "Scrollbar"
+              "Scrollbar",
+              "Visually hidden"
             ],
             "Loading",
             [
