@@ -306,10 +306,6 @@ const preview = {
           ],
           "AI",
           [
-            "Overview",
-            "Principles",
-            "Voice and tone",
-            "Color and elevation",
             "Components",
             [
               "Generative border",
