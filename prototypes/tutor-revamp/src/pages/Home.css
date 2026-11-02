@@ -45,7 +45,7 @@
 .tr-home__next-head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-100); }
 .tr-home__next-title { display: flex; flex-direction: column; gap: var(--space-0375); min-width: 0; }
 .tr-home__next-h { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-075); }
-.tr-home__next-h h2 { margin: 0; font: var(--heading-large); color: var(--ds-text); }
+.tr-home__next-h h2 { margin: 0; font: var(--heading-large); letter-spacing: var(--heading-large-tracking); color: var(--ds-text); }
 .tr-home__next-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-075); color: var(--ds-text-subtle); }
 
 .tr-home__prep-head {

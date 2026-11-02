@@ -43,10 +43,16 @@
     margin-top: var(--space-100);
     font: var(--metric-large);
     font-variant-numeric: tabular-nums;
+    /* Noto Sans's glyph box is taller than this line: padding and an equal
+       negative margin hold the box where it was and keep the digits inside it. */
+    padding-block: 0.125em;
+    margin-block: -0.125em;
+    font-variant-numeric: tabular-nums;
 }
 .tr-stat-tile__value small {
     margin-left: var(--space-025);
     font: var(--metric-small);
+    font-variant-numeric: tabular-nums;
     color: var(--ds-text-subtle);
 }
 .tr-stat-tile__meter { display: block; margin: var(--space-0375) 0 var(--space-0125); }

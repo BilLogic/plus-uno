@@ -55,7 +55,7 @@
     }
 
     &__legend-label {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-style: normal;
         font-weight: 300;
         font-size: 12px;
@@ -83,7 +83,7 @@
             text-align: center;
 
             h1 {
-                font-family: 'Lato', sans-serif;
+                font-family: var(--font-family-header);
                 font-weight: 700;
                 font-size: 40px;
                 line-height: 1.6;
@@ -91,7 +91,7 @@
             }
 
             p {
-                font-family: 'Merriweather Sans', sans-serif;
+                font-family: var(--font-family-body);
                 font-weight: 300;
                 font-size: 16px;
                 line-height: 1.5;
@@ -124,7 +124,7 @@
                 position: absolute;
                 right: 8px; // Right align text to grid
                 transform: translateY(-50%); // Center exactly on line
-                font-family: 'Merriweather Sans', sans-serif;
+                font-family: var(--font-family-body);
                 font-weight: 300;
                 font-size: 12px;
                 color: var(--color-on-surface-variant, #3f484a);
@@ -196,7 +196,7 @@
         .x-label {
             position: absolute;
             bottom: -24px;
-            font-family: 'Merriweather Sans', sans-serif;
+            font-family: var(--font-family-body);
             font-weight: 300;
             font-size: 12px;
             color: var(--color-on-surface, #191c1e);
@@ -226,7 +226,7 @@
             padding-bottom: 20px;
 
             span {
-                font-family: 'Merriweather Sans', sans-serif;
+                font-family: var(--font-family-body);
                 font-weight: 300;
                 font-size: 12px;
                 line-height: 1.667;
@@ -269,7 +269,7 @@
         }
 
         .tutor-charts-element__x-label {
-            font-family: 'Merriweather Sans', sans-serif;
+            font-family: var(--font-family-body);
             font-weight: 300;
             font-size: 12px;
             color: var(--color-on-surface, #191c1e);

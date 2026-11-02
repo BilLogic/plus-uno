@@ -39,7 +39,7 @@
     }
 
     &__title {
-        font-family: 'Lato', sans-serif;
+        font-family: var(--font-family-header);
         font-weight: 600;
         font-size: 16px;
         line-height: 1.5;
@@ -84,7 +84,7 @@
     }
 
     &__subtitle {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-weight: 700;
         font-size: 14px;
         line-height: 1.571;
@@ -93,7 +93,7 @@
     }
 
     &__description {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-weight: 300;
         font-size: 12px;
         line-height: 1.667;
@@ -154,7 +154,7 @@
     }
 
     &__smart-bar-label {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-weight: 300;
         font-size: 12px;
         line-height: 1.667;

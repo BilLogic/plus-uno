@@ -108,7 +108,7 @@
     }
 
     &__percentage {
-        font-family: 'Lato', sans-serif;
+        font-family: var(--font-family-header);
         font-size: 28px;
         font-weight: 600;
         color: var(--color-on-surface, #191c1e);

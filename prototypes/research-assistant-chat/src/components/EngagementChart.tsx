@@ -76,7 +76,7 @@ export function EngagementChart({
       width: CHART_WIDTH,
       spacingBottom: 20,
       style: {
-        fontFamily: 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)',
+        fontFamily: 'var(--font-family-body)',
         color: colors.text,
       },
     },

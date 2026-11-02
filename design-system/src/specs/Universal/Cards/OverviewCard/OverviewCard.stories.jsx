@@ -358,7 +358,7 @@ export const Interactive = {
  */
 export const Overview = () => (
     <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
-        <h3 style={{ marginBottom: '16px', fontFamily: 'Lato, sans-serif' }}>SMART Cards (Student Needs)</h3>
+        <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)' }}>SMART Cards (Student Needs)</h3>
         <div style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -373,7 +373,7 @@ export const Overview = () => (
             <OverviewCard type="undefined" smartData={smartDataSets.undefined} titleAs="h4" />
         </div>
 
-        <h3 style={{ marginBottom: '16px', fontFamily: 'Lato, sans-serif' }}>Metric Cards</h3>
+        <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)' }}>Metric Cards</h3>
         <div style={{
             display: 'flex',
             flexWrap: 'wrap',

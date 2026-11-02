@@ -9,7 +9,7 @@
     gap: var(--element-gap-lg, 12px);
 
     &__title {
-        font-family: 'Lato', sans-serif;
+        font-family: var(--font-family-header);
         font-size: 20px;
         font-weight: 600;
         line-height: 1.4;

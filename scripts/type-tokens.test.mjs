@@ -36,10 +36,10 @@ const rem = (px) => `${px / 16}rem`;
 
 /** Name, family, size px, line height px, weight: the Atlassian scale in the lab. */
 const STYLES = [
-  ['Heading/xxlarge', 'heading', 32, 36, 600],
-  ['Heading/xlarge', 'heading', 28, 32, 600],
-  ['Heading/large', 'heading', 24, 28, 600],
-  ['Heading/medium', 'heading', 20, 24, 600],
+  ['Heading/xxlarge', 'heading-serif', 32, 36, 500],
+  ['Heading/xlarge', 'heading-serif', 28, 32, 500],
+  ['Heading/large', 'heading-serif', 24, 28, 500],
+  ['Heading/medium', 'heading-serif', 20, 24, 500],
   ['Heading/small', 'heading', 16, 20, 600],
   ['Heading/xsmall', 'heading', 14, 20, 600],
   ['Heading/xxsmall', 'heading', 12, 16, 600],
@@ -51,8 +51,10 @@ const STYLES = [
   ['Metric/small', 'heading', 16, 20, 600],
 ];
 const STACKS = {
-  heading: '"Lato", sans-serif',
-  body: '"Merriweather Sans", "Open Sans", sans-serif',
+  heading: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+  'heading-serif': '"Noto Serif", "Noto Serif Fallback", serif',
+  body: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+  code: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
 };
 const cssName = (style) => `--${style.toLowerCase().replace('/', '-')}`;
 
@@ -65,9 +67,13 @@ test('the font primitives are named by rem × 100 and resolve to their rem value
   }
 });
 
-test('the family and weight variables resolve to Lato, Merriweather Sans and 400 · 500 · 600', () => {
+test('the family and weight variables resolve to Noto Sans, Noto Serif, Noto Sans Mono and 400 · 500 · 600', () => {
   assert.equal(corpus.get('--type-family-heading')?.value, STACKS.heading);
   assert.equal(corpus.get('--type-family-body')?.value, STACKS.body);
+  assert.equal(corpus.get('--type-family-heading-serif')?.value, STACKS['heading-serif']);
+  assert.equal(corpus.get('--type-family-code')?.value, STACKS.code);
+  assert.equal(corpus.get('--type-family-brand-heading')?.value, STACKS['heading-serif']);
+  assert.equal(corpus.get('--type-family-brand-body')?.value, STACKS.body);
   assert.equal(corpus.get('--type-weight-regular')?.value, '400');
   assert.equal(corpus.get('--type-weight-medium')?.value, '500');
   assert.equal(corpus.get('--type-weight-semibold')?.value, '600');
@@ -89,7 +95,7 @@ test('every text style resolves to its size, line height, weight and family', ()
 });
 
 test('code is 0.875em of the text around it, in the code stack', () => {
-  assert.equal(resolved('--code'), '400 0.875em / 1 "Source Code Pro", monospace');
+  assert.equal(resolved('--code'), `400 0.875em / 1 ${STACKS.code}`);
 });
 
 test('every library text style binds all four properties to a type variable', () => {
@@ -107,7 +113,7 @@ test('every library text style binds all four properties to a type variable', ()
 });
 
 test('the font primitives are hidden in the library and every type variable is scoped', () => {
-  const scope = { 'Font size/': 'FONT_SIZE', 'Line height/': 'LINE_HEIGHT', 'Family/': 'FONT_FAMILY', 'Weight/': 'FONT_WEIGHT' };
+  const scope = { 'Font size/': 'FONT_SIZE', 'Line height/': 'LINE_HEIGHT', 'Family/': 'FONT_FAMILY', 'Weight/': 'FONT_WEIGHT', 'Letter spacing/': 'LETTER_SPACING' };
   for (const v of EXPORT.variables) {
     const [start, expected] = Object.entries(scope).find(([s]) => v.name.startsWith(s)) ?? [];
     assert.ok(start, `${v.name} is none of ${Object.keys(scope).join(', ')}`);
@@ -132,12 +138,13 @@ test('a family is set in one place: the family token, never in a style', () => {
   const declarations = tokenSources({ root: REPO_ROOT }).flatMap(({ text }) =>
     [...text.matchAll(/^\s*(--[\w-]+)\s*:\s*([^;]+);/gm)].map(([, name, value]) => ({ name, value })),
   );
-  for (const [token, face] of [
-    ['--type-family-heading', 'Lato'],
-    ['--type-family-body', 'Merriweather Sans'],
+  for (const [face, tokens] of [
+    ['Noto Sans', ['--type-family-heading', '--type-family-body', '--type-family-brand-body']],
+    ['Noto Serif', ['--type-family-heading-serif', '--type-family-brand-heading']],
+    ['Noto Sans Mono', ['--type-family-code']],
   ]) {
-    const setters = declarations.filter((d) => d.value.includes(`"${face}"`)).map((d) => d.name);
-    assert.deepEqual(setters, [token], `"${face}" is written outside ${token}`);
+    const setters = declarations.filter((d) => d.value.startsWith(`"${face}",`)).map((d) => d.name);
+    assert.deepEqual(setters, tokens, `"${face}" is written outside ${tokens.join(', ')}`);
   }
   for (const [style, family] of STYLES) {
     assert.match(corpus.get(cssName(style)).raw, new RegExp(`var\\(--type-family-${family}\\)$`), style);

@@ -124,6 +124,18 @@
       "Family/body": [
         "var(--type-family-body)"
       ],
+      "Family/heading-serif": [
+        "var(--type-family-heading-serif)"
+      ],
+      "Family/code": [
+        "var(--type-family-code)"
+      ],
+      "Family/brand-heading": [
+        "var(--type-family-brand-heading)"
+      ],
+      "Family/brand-body": [
+        "var(--type-family-brand-body)"
+      ],
       "Weight/regular": [
         "var(--type-weight-regular)"
       ],
@@ -132,6 +144,15 @@
       ],
       "Weight/semibold": [
         "var(--type-weight-semibold)"
+      ],
+      "Letter spacing/none": [
+        "var(--type-tracking-none)"
+      ],
+      "Letter spacing/tight": [
+        "var(--type-tracking-tight)"
+      ],
+      "Letter spacing/tighter": [
+        "var(--type-tracking-tighter)"
       ]
     },
     "spacing": {
@@ -520,7 +541,11 @@
     },
     "typography": {
       "Family/body": "var(--type-family-body)",
+      "Family/brand-body": "var(--type-family-brand-body)",
+      "Family/brand-heading": "var(--type-family-brand-heading)",
+      "Family/code": "var(--type-family-code)",
       "Family/heading": "var(--type-family-heading)",
+      "Family/heading-serif": "var(--type-family-heading-serif)",
       "Font size/075": "var(--font-size-075)",
       "Font size/0875": "var(--font-size-0875)",
       "Font size/100": "var(--font-size-100)",
@@ -528,6 +553,9 @@
       "Font size/150": "var(--font-size-150)",
       "Font size/175": "var(--font-size-175)",
       "Font size/200": "var(--font-size-200)",
+      "Letter spacing/none": "var(--type-tracking-none)",
+      "Letter spacing/tight": "var(--type-tracking-tight)",
+      "Letter spacing/tighter": "var(--type-tracking-tighter)",
       "Line height/100": "var(--line-height-100)",
       "Line height/125": "var(--line-height-125)",
       "Line height/150": "var(--line-height-150)",
@@ -1280,11 +1308,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1519,
+    "scssTokenCount": 1529,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1126,
-      "resolved": 1097,
+      "total": 1133,
+      "resolved": 1104,
       "percent": 97,
       "unresolved": [
         {
