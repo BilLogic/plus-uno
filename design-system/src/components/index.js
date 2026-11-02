@@ -2,6 +2,7 @@ import '../styles/main.scss';
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Alert } from '@/components/messaging/Alert';
+export { default as EmptyState } from '@/components/messaging/EmptyState';
 export { default as Badge } from '@/components/labels/Badge';
 // Deprecated, beside Badge: a thin wrapper that renders Status, Count and Tag
 // while its calls move. See BadgeVariants.jsx.
