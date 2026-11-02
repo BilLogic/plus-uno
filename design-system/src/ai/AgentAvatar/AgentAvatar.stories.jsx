@@ -44,7 +44,7 @@ const box = (el) => {
     return { width: Math.round(r.width), height: Math.round(r.height) };
 };
 
-/** A landscape picture, 3:2, so a stretched image would show as a wrong aspect. */
+/** Test fixture, not styling: a landscape picture, 3:2, so a stretched image would show as a wrong aspect. Its fills are image data, not tokens. */
 const PHOTO = 'data:image/svg+xml;utf8,'
     + encodeURIComponent(
         '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200">'

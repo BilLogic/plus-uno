@@ -37,4 +37,9 @@ describe('AgentAvatar', () => {
         rerender(<AgentAvatar label="A" size={20} />);
         expect(container.firstChild).toHaveClass('plus-agent-avatar--32');
     });
+
+    it('keeps its own role and name when a caller passes others', () => {
+        render(<AgentAvatar label="PLUS AI" role="presentation" aria-label="Other" />);
+        expect(screen.getByRole('img', { name: 'PLUS AI' })).toBeInTheDocument();
+    });
 });

@@ -35,7 +35,13 @@ const AgentAvatar = ({
     const classes = ['plus-agent-avatar', `plus-agent-avatar--${resolvedSize}`, className].filter(Boolean).join(' ');
 
     return (
-        <span className={classes} role="img" aria-label={label} {...rest}>
+        <span
+            {...rest}
+            className={classes}
+            // After the spread, so a caller cannot rename the avatar or hide it.
+            role="img"
+            aria-label={label}
+        >
             {showImage ? (
                 <img className="plus-agent-avatar__image" src={src} alt="" onError={() => setFailed(true)} />
             ) : (
