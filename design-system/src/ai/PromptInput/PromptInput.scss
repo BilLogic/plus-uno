@@ -1,0 +1,50 @@
+/*
+ * PromptInput: the Text area's box, with the text growing inside it and the one
+ * AI action at its lower edge. Every length is a size token; the send button
+ * takes the AI bold ground, hovered and pressed, in place of the primary blue.
+ */
+.plus-prompt-input {
+    --prompt-input-max-height: calc(var(--item-height-md) * 5);
+}
+
+// A prompt box is a row of controls and text, not a form field: it starts at one
+// line, rounds like a surface, and keeps its controls at the foot as it grows.
+.plus-prompt-input .plus-prompt-input__field.plus-field {
+    align-items: flex-end;
+    min-height: var(--item-height-md);
+    border-radius: var(--size-element-radius-lg);
+}
+
+.plus-prompt-input .plus-field__content {
+    align-self: stretch;
+    align-items: flex-start;
+}
+
+.plus-prompt-input .plus-field__leading,
+.plus-prompt-input .plus-field__trailing {
+    align-self: flex-end;
+}
+
+.plus-prompt-input textarea.plus-prompt-input__control {
+    resize: none;
+    overflow-y: auto;
+    max-height: var(--prompt-input-max-height);
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+// The one AI action in the region. A disabled send keeps the Button's own
+// disabled look, so these hold for an enabled button only.
+.plus-prompt-input .plus-prompt-input__action.plus-btn.plus-btn--filled:not(:disabled) {
+    --plus-btn-state-layer: transparent;
+    background-color: var(--ds-ai-background-bold);
+    color: var(--ds-text-inverse);
+
+    &:hover {
+        background-color: var(--ds-ai-background-bold-hovered);
+    }
+
+    &:active {
+        background-color: var(--ds-ai-background-bold-pressed);
+    }
+}

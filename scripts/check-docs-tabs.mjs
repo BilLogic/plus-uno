@@ -320,9 +320,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // is the shape `componentIdentity` already recognizes and the shape #276
   // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
   // both are visible in one group while the deprecation runs.
-  if (tabbed.length !== 67) {
+  if (tabbed.length !== 69) {
     all.push(
-      `expected 67 tabbed docs pages (66 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 69 tabbed docs pages (68 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

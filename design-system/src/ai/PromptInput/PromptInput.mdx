@@ -1,0 +1,199 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PromptInputStories from './PromptInput.stories.jsx';
+import PromptInput from './PromptInput';
+import { Button } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+
+<Meta of={PromptInputStories} />
+
+<Title />
+Where a person writes to the agent: a text area that grows to a most, an optional
+control before it, and one send action in the AI bold ground. Atlassian does not specify a prompt input, so these are PLUS's own rules, built
+from its Text area box, its Button and the AI tokens.
+
+<DocsTabs of={PromptInputStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/ai/PromptInput"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Empty, focused, filled, generating and disabled. The send button is the one AI action: filled with the AI bold ground.</>}>
+    <Canvas of={PromptInputStories.States} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<DocsCanvasShell description={<>Enter sends and empties the field. Shift+Enter starts a new line. Nothing is sent while the field is empty.</>}>
+    <DsCanvasQuiet of={PromptInputStories.EnterSubmits} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The Enter that confirms an input method&rsquo;s candidate, as when typing Japanese, is not a send.</>}>
+    <DsCanvasQuiet of={PromptInputStories.IgnoresComposition} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The box grows with its text to a most of five lines, then scrolls.</>}>
+    <DsCanvasQuiet of={PromptInputStories.GrowsToAMaximum} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Generating
+
+<DocsCanvasShell description={<>While a reply is generated the send button becomes Stop, the field is ringed by a GenerativeBorder, and Enter sends nothing.</>}>
+    <DsCanvasQuiet of={PromptInputStories.StopWhileGenerating} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<><code>startSlot</code> holds one quiet control before the text, such as attach.</>}>
+    <DsCanvasQuiet of={PromptInputStories.WithAStartSlot} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Starters fill the field for a person to read and send. They never send.</>}>
+    <DsCanvasQuiet of={PromptInputStories.WithStarters} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PromptInputStories.Interactive}
+    description={<>Change the label, placeholder and state in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `PromptInput` where a person asks the agent for something, at the foot of a
+chat or in a panel that talks to it. Use `Textarea` for text that is a field in a
+form.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>string</td><td>The accessible name of the field. Required.</td></tr>
+        <tr><td><code>value</code> / <code>defaultValue</code></td><td>string</td><td>Control or seed the text. Uncontrolled, the field clears after a send.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>Called with the change event.</td></tr>
+        <tr><td><code>onSubmit</code></td><td>function(value)</td><td>Called with the text on Enter or the send button.</td></tr>
+        <tr><td><code>isGenerating</code></td><td>boolean</td><td>The send button becomes Stop and the field gets a GenerativeBorder.</td></tr>
+        <tr><td><code>onStop</code></td><td>function</td><td>What Stop does.</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>Hint text while the field is empty.</td></tr>
+        <tr><td><code>isDisabled</code></td><td>boolean</td><td>Turns off the field and the action.</td></tr>
+        <tr><td><code>startSlot</code></td><td>node</td><td>One quiet control before the text.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### One AI action per region.
+
+The send button is the one AI action here, filled with <code>--ds-ai-background-bold</code>.
+Every other control in the region is quiet, so the eye finds one place to act.
+
+<DoDont>
+    <Do caption="One filled AI action. The attach control beside it is a ghost button.">
+        <div style={{ width: '100%' }}>
+            <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI" startSlot={<Button leadingVisual="paperclip" aria-label="Attach a file" style="secondary" fill="ghost" size="small" />} />
+        </div>
+    </Do>
+    <Dont caption="Do not fill a second control with the AI ground, or any other filled button beside the send.">
+        <div style={{ display: 'flex', gap: 'var(--element-inline-md)', alignItems: 'center', width: '100%' }}>
+            <div style={{ flex: 1 }}><PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI" /></div>
+            <Button text="Send to all" style="primary" fill="filled" size="small" />
+        </div>
+    </Dont>
+</DoDont>
+
+### Starters suggest; they never send.
+
+`PromptStarters` puts words in the field for a person to read, change and send.
+Do not send a starter on press.
+
+```jsx
+// Incorrect: pressing a starter sends it before the person has read it.
+<PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => send(s.text)} />
+
+// Correct: the starter fills the field and the person sends.
+<PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => setText(s.text)} />
+```
+
+### Show generation once.
+
+While `isGenerating`, the field wears a GenerativeBorder and the action is Stop.
+Do not add a spinner beside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named field.** `label` is the textarea's accessible name. A placeholder is
+  not a name.
+- **Named actions.** The send and Stop buttons carry their names, &ldquo;Send&rdquo; and
+  &ldquo;Stop generating&rdquo;, and are real buttons.
+- **Keys.** Enter sends, Shift+Enter starts a line, and Enter during input method
+  composition does nothing.
+- **Busy.** While generating, the wrapper is `aria-busy` and the ring is hidden
+  from assistive technology; under reduced motion the ring does not turn.
+- **Focus.** The box draws the Text area's focus ring.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Prompt starters`, for suggested prompts that fill the field.
+- `Generative border`, the ring shown while generating.
+- `Textarea`, for text that is a field in a form.
+- `Agent avatar`, to show who is replying.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
