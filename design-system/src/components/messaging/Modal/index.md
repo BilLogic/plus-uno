@@ -77,6 +77,6 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 
 ## Related
 
-Same group: `Alert` · `Toast`
+Same group: `Alert` · `EmptyState` · `Toast`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
