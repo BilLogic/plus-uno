@@ -7,7 +7,7 @@
     "neutral": "Fitted role by role to Notion's own grays (read live 2026-10-25) and placed on Atlassian's steps by the role each step serves: 100 sunken, 200 neutral fill, 300 border, 500 input border (>= 3:1), 600 bold border, 700 subtlest text (>= 4.5:1), 800 subtle text, 1000 text. Dark: 0 sunken, 100 surface, 200 raised and input, 250 overlay, 600 input border, 700 subtlest, 800 subtle, 1000 text. Where Notion falls below AA, the step takes the nearest value that passes.",
     "alpha": "Percent of ink (light) or paper (dark) behind each alpha slot. Slot 300 is the line (color.border): Notion draws dividers and table grids at about 7% warm ink.",
     "shadow": "Light geometry per layer: [x, y, blur, spread, ink %]. Raised is Notion's card (a 5% ring and a very wide 2% blur); overlay is Notion's popover.",
-    "accents": "Notion's chroma ladder (app stylesheet, 2026-10-25) is the same for every hue; each family scales it by [tints <= 300, mid 400-700, dark 800+]. Lagoon (205) is the brand; teal is a mint (176) kept apart from Lagoon and green; yellow's warning.bold reads amber, not khaki. Lagoon's dark-mode states (250-400) come from the brand ramp, so dark hover brightens instead of draining."
+    "accents": "Notion's chroma ladder (app stylesheet, 2026-10-25) is the same for every hue; each family scales it by [tints <= 300, mid 400-700, dark 800+]. Lagoon (202) is the brand; teal is a mint (176) kept apart from Lagoon and green; yellow's warning.bold reads amber, not khaki. Lagoon's dark-mode states (250-400) come from the brand ramp, so dark hover brightens instead of draining. Lagoon follows Notion's teal: lower chroma, a near-white tint, and a soft pastel at 250-400 (lowered contrast targets on those three steps only)."
   },
   "neutral": {
     "light": {
@@ -39,7 +39,7 @@
     },
     "tintFloor": 0.02,
     "families": {
-      "lagoon": { "H": 205, "scale": [1, 1, 1], "override": { "900": 0.07, "1000": 0.055, "1100": 0.045 } },
+      "lagoon": { "H": 202, "scale": [1, 1, 1], "override": { "100": 0.013, "200": 0.036, "500": 0.1, "600": 0.095, "700": 0.088, "800": 0.075, "850": 0.062, "900": 0.045, "1000": 0.04, "1100": 0.034 } },
       "blue": { "H": 250, "scale": [1, 1.04, 1] },
       "teal": { "H": 176, "scale": [1.6, 1, 1.1] },
       "green": { "H": 158, "scale": [0.57, 0.74, 0.76] },
@@ -51,6 +51,6 @@
       "purple": { "H": 310, "scale": [1, 0.97, 1] },
       "brown": { "H": 55, "scale": [0.5, 0.48, 0.44] }
     },
-    "borrow": { "family": "lagoon", "steps": [250, 300, 400], "from": { "H": 205, "vivid": 0.95, "cmax": 0.15 } }
+    "borrow": { "family": "lagoon", "steps": [250, 300, 400], "from": { "H": 202, "vivid": 0.95, "cmax": 0.098, "targets": { "250": 1.43, "300": 1.6, "400": 1.8 } } }
   }
 }

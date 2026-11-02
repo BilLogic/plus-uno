@@ -61,7 +61,7 @@ test('alphas are rgb() with a slash, never 8-digit hex', () => {
 test('the Bootstrap bridge points --bs-* at --ds-* and writes comma triplets Bootstrap can compose', () => {
   const bridge = files['_bootstrap-bridge.scss'];
   assert.match(bridge, /--bs-primary: var\(--ds-background-brand-bold\);/);
-  assert.match(bridge, /--bs-primary-rgb: 20, 123, 132;/);
+  assert.match(bridge, /--bs-primary-rgb: 20, 124, 130;/);
   for (const v of ['body-bg', 'body-color', 'border-color', 'link-color', 'link-hover-color', 'focus-ring-color']) assert.match(bridge, new RegExp(`--bs-${v}: var\\(--ds-`), v);
   for (const v of Object.keys(BRIDGE_TRIPLETS)) assert.match(bridge, new RegExp(`${v}: \\d+, \\d+, \\d+;`), v);
   for (const v of ['secondary-bg', 'tertiary-bg', 'emphasis-color']) assert.ok(`--bs-${v}-rgb` in BRIDGE_TRIPLETS, v);
