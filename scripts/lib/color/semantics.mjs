@@ -416,7 +416,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       byName[n] = r;
     }
   }
-  // ---- AI: a product layer for the agent's register. Atlassian's Rovo tokens (color.rovo.*) are one
+  // ---- AI: a product layer for the agent's register. Atlassian's AI color tokens are one
   // achromatic bold ground plus accents that only ever mark an edge or a glyph. PLUS takes the same shape
   // from tokens it already has: the bold ground is the neutral bold, the edge and glyph are discovery
   // purple (the AI-suggestion role). No text or background token exists in the accent, by design.
@@ -430,7 +430,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   for (const [tn, src, use] of AI_MAP) {
     const r0 = byName[src];
     const r = { ...r0, name: tn, atl_light: '—', atl_dark: '—', use,
-      deviation: `PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing ${src}.` };
+      deviation: `PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing ${src}.` };
     rows.push(r);
     byName[tn] = r;
   }
