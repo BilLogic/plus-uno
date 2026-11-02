@@ -358,7 +358,10 @@ export const SortableHeadCells = {
             const style = getComputedStyle(button);
             await expect(style.outlineStyle, `${mode}: focus is a ring`).toBe('solid');
             await expect(style.outlineColor, `${mode}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
-            await expect(style.backgroundColor, `${mode}: focus is not a fill`).toBe('rgba(0, 0, 0, 0)');
+            // The real pointer may still rest on the button after the clicks above; its
+            // hover fill is the only fill the cell may carry. Focus adds none.
+            const fill = button.matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)';
+            await expect(style.backgroundColor, `${mode}: focus is not a fill`).toBe(fill);
             button.blur();
         });
     }
