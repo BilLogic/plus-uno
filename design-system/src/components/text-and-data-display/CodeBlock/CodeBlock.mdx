@@ -1,0 +1,201 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as CodeBlockStories from './CodeBlock.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={CodeBlockStories} />
+
+<Title />
+Several lines of code on the code surface, with line numbers, highlighted lines,
+and long lines that scroll or wrap. The text is one ink: it does not color syntax.
+
+<DocsTabs of={CodeBlockStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/CodeBlock"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Line numbers are on by default. The numbers sit in a gutter a screen reader skips.</>}>
+    <Canvas of={CodeBlockStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Without line numbers
+
+<DocsCanvasShell description={<>Turn the gutter off with <code>showLineNumbers={'{false}'}</code> for short snippets that are not discussed line by line.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.WithoutLineNumbers} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Highlighted lines
+
+<DocsCanvasShell description={<><code>highlight="2-4"</code> marks lines 2 to 4. A screen reader hears "Highlight start" and "Highlight end" around the run.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.HighlightedLines} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An array marks separate runs: <code>[1, 3, 4]</code> is line 1, then lines 3 and 4.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.SeparateHighlights} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Long lines
+
+<DocsCanvasShell description={<>By default long lines scroll sideways in a region a keyboard can focus. <code>label</code> names it for screen readers.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.ScrollsLongLines} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>With <code>wrap</code>, lines fold inside the box and nothing scrolls.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.WrapsLongLines} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Blank lines
+
+<DocsCanvasShell description={<>A blank line keeps its height and its number.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.BlankLines} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CodeBlockStories.Interactive}
+    description={<>Change the text, highlight, wrap and label in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `CodeBlock` for code a reader may copy or follow line by line: an example,
+a command sequence, a config file. For a name or short phrase inside a
+sentence, use `Code`.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>Default</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>text</code></td><td>string</td><td>empty</td><td>The code, lines separated by newlines.</td></tr>
+        <tr><td><code>language</code></td><td>string</td><td>none</td><td>Recorded as a <code>language-*</code> class. It does not color the text.</td></tr>
+        <tr><td><code>showLineNumbers</code></td><td>bool</td><td><code>true</code></td><td>Numbers each line in a gutter screen readers skip.</td></tr>
+        <tr><td><code>highlight</code></td><td>string, number or array</td><td>none</td><td>Lines to mark, such as "2,4-6" or [1, 3].</td></tr>
+        <tr><td><code>wrap</code></td><td>bool</td><td><code>false</code></td><td>Folds long lines instead of scrolling sideways.</td></tr>
+        <tr><td><code>label</code></td><td>string</td><td><code>Code snippet</code></td><td>Names the scrolling region. Unused when <code>wrap</code> is on.</td></tr>
+        <tr><td><code>className</code></td><td>string</td><td>none</td><td>Extra classes for placement.</td></tr>
+    </tbody>
+</DocsTable>
+
+The typeface is the `--code` text style at 0.875rem on a 1.25rem line. The
+surface is `--ds-background-code-default`, the ink `--ds-text-code-default`, the
+gutter `--ds-background-code-gutter` with `--ds-text-code-gutter`, and a
+highlighted line `--ds-background-code-highlight`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Choose scroll or wrap by what the code means.
+
+```jsx
+// Correct: scroll keeps line structure, which matters for shell commands and
+// config where a fold could read as a new line.
+<CodeBlock text={command} />
+
+// Correct: wrap suits prose-like output inside a narrow column.
+<CodeBlock text={log} wrap />
+```
+
+### Name each block when there are several on a page.
+
+```jsx
+// Incorrect: two regions both named "Code snippet".
+<CodeBlock text={install} />
+<CodeBlock text={config} />
+
+// Correct: each region says what it holds.
+<CodeBlock text={install} label="Install command" />
+<CodeBlock text={config} label="Config file" />
+```
+
+### Do not rely on a highlight alone.
+
+```jsx
+// Incorrect: the fill is the only cue, and the surrounding text never says
+// which line to look at.
+<CodeBlock text={snippet} highlight="3" />
+
+// Correct: the highlight supports the sentence that points at it.
+<p>Line 3 sets the timeout.</p>
+<CodeBlock text={snippet} highlight="3" />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Keyboard scroll.** A scrolling block is a focusable region with a name, so a
+  keyboard user can scroll it with the arrow keys. A wrapping block has nothing
+  to scroll and is not a tab stop.
+- **Highlights are spoken.** Each highlighted run is bracketed by "Highlight
+  start" and "Highlight end" for screen readers, because fill alone says nothing
+  to them. Those words are not selectable, so they stay out of a copy.
+- **Line numbers are skipped.** The gutter is hidden from assistive technology and
+  cannot be selected, so a copy is the code alone.
+- **Contrast.** Ink, gutter and highlight come from the code color roles and keep
+  their contrast in every color and contrast mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For code inside a sentence, `Code`.
+- Syntax coloring is not part of this component.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

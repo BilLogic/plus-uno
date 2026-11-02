@@ -1,0 +1,146 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as CodeStories from './Code.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={CodeStories} />
+
+<Title />
+A short piece of code inside a sentence, set in the code typeface on a neutral
+chip. For several lines, use `CodeBlock`.
+
+<DocsTabs of={CodeStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Code"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The chip is a <code>code</code> element. Its size is 0.875 of the sentence it sits in.</>}>
+    <Canvas of={CodeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## In a heading
+
+<DocsCanvasShell description={<>Because the size is relative, the chip stays 0.875 of a heading as well as of body text.</>}>
+    <DsCanvasQuiet of={CodeStories.InHeading} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Long values
+
+<DocsCanvasShell description={<>A token with no spaces breaks inside the chip instead of overflowing the line.</>}>
+    <DsCanvasQuiet of={CodeStories.WrapsAtTheEdge} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CodeStories.Interactive}
+    description={<>Change the text in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Code` for a name, command, value or snippet that sits inside a sentence:
+a function, a file path, a flag, a token.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>children</code></td><td>node</td><td>The code, as text.</td></tr>
+        <tr><td><code>className</code></td><td>string</td><td>Extra classes for placement.</td></tr>
+    </tbody>
+</DocsTable>
+
+The typeface and size are the `--code` text style (0.875em, so the chip scales
+with the text around it). The fill is `--ds-background-neutral` and the ink is
+`--ds-text-code-default`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Use a block for more than a phrase.
+
+```jsx
+// Incorrect: a long chip wraps awkwardly and loses its structure.
+<p>Run <Code>{multiLineScript}</Code></p>
+
+// Correct: a block keeps lines, numbers and scroll.
+<CodeBlock text={multiLineScript} />
+```
+
+### Do not use it for emphasis.
+
+```jsx
+// Incorrect: the chip tells readers "this is literal text to type".
+<p>Press <Code>important</Code> to continue.</p>
+
+// Correct: bold or a button label for emphasis.
+<p>Press <strong>Continue</strong> to proceed.</p>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Announced as text.** The chip is a `code` element; screen readers read it as
+  ordinary text, so write the code so it makes sense spoken.
+- **Contrast.** The ink on the chip fill passes in every color mode, because both
+  come from the code color roles.
+- **It wraps.** Long values break inside the chip, so reflow at narrow widths and
+  200% zoom does not scroll the page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For several lines, `CodeBlock`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

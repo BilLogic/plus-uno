@@ -13,6 +13,8 @@ export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGrou
 export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
 export { default as CloseButton } from '@/components/forms-and-inputs/CloseButton';
+export { default as Code } from '@/components/text-and-data-display/Code';
+export { default as CodeBlock } from '@/components/text-and-data-display/CodeBlock';
 export { default as Collapse } from '@/components/layout-and-structure/Collapse';
 export { default as Count } from '@/components/labels/Count';
 export { default as Divider } from '@/components/layout-and-structure/Divider';

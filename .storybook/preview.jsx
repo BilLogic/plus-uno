@@ -299,6 +299,8 @@ const preview = {
             ],
             "Text and data display",
             [
+              "Code",
+              "Code block",
               "Table"
             ]
           ],
