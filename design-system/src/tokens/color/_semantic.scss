@@ -524,6 +524,11 @@
   --ds-text-smart-technology-tools: var(--palette-brown-850);
   --ds-icon-smart-technology-tools: var(--palette-brown-600);
   --ds-border-smart-technology-tools: var(--palette-brown-600);
+  --ds-ai-background-bold: var(--palette-neutral-1000);
+  --ds-ai-background-bold-hovered: var(--palette-neutral-900);
+  --ds-ai-background-bold-pressed: var(--palette-neutral-800);
+  --ds-ai-border: var(--palette-purple-600);
+  --ds-ai-icon: var(--palette-purple-600);
   --ds-chart-smart-social-emotional: var(--palette-orange-600);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-700);
   --ds-chart-smart-mastering-content: var(--palette-teal-800);
@@ -1061,6 +1066,11 @@
   --ds-text-smart-technology-tools: var(--palette-brown-250);
   --ds-icon-smart-technology-tools: var(--palette-brown-500);
   --ds-border-smart-technology-tools: var(--palette-brown-500);
+  --ds-ai-background-bold: var(--palette-dark-neutral-1000);
+  --ds-ai-background-bold-hovered: var(--palette-dark-neutral-900);
+  --ds-ai-background-bold-pressed: var(--palette-dark-neutral-800);
+  --ds-ai-border: var(--palette-purple-500);
+  --ds-ai-icon: var(--palette-purple-500);
   --ds-chart-smart-social-emotional: var(--palette-orange-500);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-400);
   --ds-chart-smart-mastering-content: var(--palette-teal-300);
@@ -1599,6 +1609,11 @@
     --ds-text-smart-technology-tools: var(--palette-brown-250);
     --ds-icon-smart-technology-tools: var(--palette-brown-500);
     --ds-border-smart-technology-tools: var(--palette-brown-500);
+    --ds-ai-background-bold: var(--palette-dark-neutral-1000);
+    --ds-ai-background-bold-hovered: var(--palette-dark-neutral-900);
+    --ds-ai-background-bold-pressed: var(--palette-dark-neutral-800);
+    --ds-ai-border: var(--palette-purple-500);
+    --ds-ai-icon: var(--palette-purple-500);
     --ds-chart-smart-social-emotional: var(--palette-orange-500);
     --ds-chart-smart-social-emotional-hovered: var(--palette-orange-400);
     --ds-chart-smart-mastering-content: var(--palette-teal-300);
@@ -1929,6 +1944,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-1000);
   --ds-icon-smart-technology-tools: var(--palette-brown-800);
   --ds-border-smart-technology-tools: var(--palette-brown-800);
+  --ds-ai-border: var(--palette-purple-700);
+  --ds-ai-icon: var(--palette-purple-700);
   --ds-chart-smart-social-emotional: var(--palette-orange-800);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-900);
   --ds-chart-smart-mastering-content: var(--palette-teal-1000);
@@ -2258,6 +2275,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-1000);
   --ds-icon-smart-technology-tools: var(--palette-brown-800);
   --ds-border-smart-technology-tools: var(--palette-brown-800);
+  --ds-ai-border: var(--palette-purple-700);
+  --ds-ai-icon: var(--palette-purple-700);
   --ds-chart-smart-social-emotional: var(--palette-orange-800);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-900);
   --ds-chart-smart-mastering-content: var(--palette-teal-1000);
@@ -2588,6 +2607,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-1000);
   --ds-icon-smart-technology-tools: var(--palette-brown-800);
   --ds-border-smart-technology-tools: var(--palette-brown-800);
+  --ds-ai-border: var(--palette-purple-700);
+  --ds-ai-icon: var(--palette-purple-700);
   --ds-chart-smart-social-emotional: var(--palette-orange-800);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-900);
   --ds-chart-smart-mastering-content: var(--palette-teal-1000);
@@ -2918,6 +2939,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-1000);
   --ds-icon-smart-technology-tools: var(--palette-brown-800);
   --ds-border-smart-technology-tools: var(--palette-brown-800);
+  --ds-ai-border: var(--palette-purple-700);
+  --ds-ai-icon: var(--palette-purple-700);
   --ds-chart-smart-social-emotional: var(--palette-orange-800);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-900);
   --ds-chart-smart-mastering-content: var(--palette-teal-1000);
@@ -3221,6 +3244,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-100);
   --ds-icon-smart-technology-tools: var(--palette-brown-300);
   --ds-border-smart-technology-tools: var(--palette-brown-300);
+  --ds-ai-border: var(--palette-purple-400);
+  --ds-ai-icon: var(--palette-purple-400);
   --ds-chart-smart-social-emotional: var(--palette-orange-300);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-200);
   --ds-chart-smart-mastering-content: var(--palette-teal-100);
@@ -3521,6 +3546,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-100);
   --ds-icon-smart-technology-tools: var(--palette-brown-300);
   --ds-border-smart-technology-tools: var(--palette-brown-300);
+  --ds-ai-border: var(--palette-purple-400);
+  --ds-ai-icon: var(--palette-purple-400);
   --ds-chart-smart-social-emotional: var(--palette-orange-300);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-200);
   --ds-chart-smart-mastering-content: var(--palette-teal-100);
@@ -3822,6 +3849,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-100);
   --ds-icon-smart-technology-tools: var(--palette-brown-300);
   --ds-border-smart-technology-tools: var(--palette-brown-300);
+  --ds-ai-border: var(--palette-purple-400);
+  --ds-ai-icon: var(--palette-purple-400);
   --ds-chart-smart-social-emotional: var(--palette-orange-300);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-200);
   --ds-chart-smart-mastering-content: var(--palette-teal-100);
@@ -4123,6 +4152,8 @@
   --ds-text-smart-technology-tools: var(--palette-brown-100);
   --ds-icon-smart-technology-tools: var(--palette-brown-300);
   --ds-border-smart-technology-tools: var(--palette-brown-300);
+  --ds-ai-border: var(--palette-purple-400);
+  --ds-ai-icon: var(--palette-purple-400);
   --ds-chart-smart-social-emotional: var(--palette-orange-300);
   --ds-chart-smart-social-emotional-hovered: var(--palette-orange-200);
   --ds-chart-smart-mastering-content: var(--palette-teal-100);
