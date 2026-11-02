@@ -50,7 +50,7 @@ const DonutChartSVG = ({
     const getTextStyle = () => {
         if (centerTextSize === 'body3') {
             return {
-                fontFamily: 'var(--font-family-body, "Merriweather Sans", sans-serif)',
+                fontFamily: 'var(--font-family-body)',
                 fontWeight: 'var(--font-weight-normal, 300)',
                 fontSize: '12px',
                 lineHeight: '1.4',
@@ -60,7 +60,7 @@ const DonutChartSVG = ({
         }
         // Default to header styles for other sizes
         return {
-            fontFamily: 'var(--font-family-header, "Lato", sans-serif)',
+            fontFamily: 'var(--font-family-header)',
             fontWeight: 'bold',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',

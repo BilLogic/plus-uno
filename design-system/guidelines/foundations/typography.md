@@ -26,16 +26,23 @@ Still on the older layer: the deprecated Badge's `body*-txt` sizes, the `h5` bra
 
 | Usage | Token | Font |
 |-------|-------|------|
-| Headlines (H1-H6) | `--font-family-header` | Lato |
-| Body Text (B1-B3) | `--font-family-body` | Merriweather Sans |
-| Code | `--font-family-code` | Source Code Pro |
+| Headings 32 to 20 (Heading xxlarge to medium) | `--type-family-heading-serif` | Noto Serif, weight 500 |
+| Headings 16 to 12, metrics (tabular numbers) | `--type-family-heading` (older name `--font-family-header`) | Noto Sans, weight 600 |
+| Body text | `--type-family-body` (older name `--font-family-body`) | Noto Sans, weight 400 and 500 |
+| Code | `--type-family-code` (older name `--font-family-code`) | Noto Sans Mono |
+| Brand headings and body | `--type-family-brand-heading`, `--type-family-brand-body` | Noto Serif, Noto Sans |
+
+Letter spacing is `-0.02em` at 32 and `-0.01em` at 28 and 24, set beside the
+`font` shorthand from `--heading-xxlarge-tracking` and its siblings; everything
+20 and under is 0. A quote takes the body family. Fraunces is not part of the
+system. Tuning notes: Foundations/Typography in Storybook.
 
 ## Font Weights
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--font-weight-normal` | 300 | Regular body text |
-| `--font-weight-semibold-1` | 400 | Semibold text, badges |
+| `--font-weight-normal` | 400 | Regular body text |
+| `--font-weight-semibold-1` | 500 | Medium text, badges |
 | `--font-weight-semibold-2` | 600 | Title text (H4-H6) |
 | `--font-weight-bold` | 700 | Headlines (H1-H3) |
 
@@ -56,9 +63,9 @@ Apply these classes to elements for consistent typography:
 ### Body Text
 | Class | Size | Weight | Usage |
 |-------|------|--------|-------|
-| `.body1-txt` | 16px | 300 | Standard body text |
-| `.body2-txt` | 14px | 300 | Secondary text |
-| `.body3-txt` | 12px | 300 | Captions, small text |
+| `.body1-txt` | 16px | 400 | Standard body text |
+| `.body2-txt` | 14px | 400 | Secondary text |
+| `.body3-txt` | 12px | 400 | Captions, small text |
 
 ### Weight Modifiers
 | Class | Effect |
@@ -71,10 +78,10 @@ Apply these classes to elements for consistent typography:
 Components automatically apply appropriate typography based on size prop:
 
 ```jsx
-// Headlines use Lato Bold
+// Headlines use Noto Sans
 <Badge size="h1">Large Badge</Badge>
 
-// Body sizes use Merriweather Sans Semibold
+// Body sizes use Noto Sans medium
 <Badge size="b2">Default Badge</Badge>
 ```
 
@@ -94,5 +101,5 @@ Components automatically apply appropriate typography based on size prop:
 
 1. **Do not hardcode font values** - Always use typography tokens or classes
 2. **Match size to hierarchy** - Use h1-h6 for structural headings, b1-b3 for content
-3. **Body text is light (300)** - Regular body uses light weight for readability
+3. **Body text is regular (400)** - labels and emphasis use medium (500)
 4. **Headlines are bold (700)** - H1-H3 use bold weight for emphasis

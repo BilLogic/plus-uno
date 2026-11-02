@@ -181,7 +181,7 @@ const RadarChart = ({
                     style: {
                         fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
                         fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
-                        fontFamily: 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)',
+                        fontFamily: 'var(--font-family-body)',
                         color: 'var(--ds-text)',
                         textOutline: 'none'
                     },
@@ -196,7 +196,7 @@ const RadarChart = ({
                     style: {
                         fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
                         fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
-                        fontFamily: 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)',
+                        fontFamily: 'var(--font-family-body)',
                         color: 'var(--ds-text)',
                         textOutline: 'none'
                     },

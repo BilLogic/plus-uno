@@ -25,7 +25,7 @@ const Row = ({ children }) => (
 const Stat = ({ title, body }) => (
     <PatternCard padding="sm" style={{ flex: '1 1 var(--card-min-width-sm)' }}>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>{title}</p>
-        <p style={{ margin: 0, font: 'var(--metric-small)' }}>{body}</p>
+        <p style={{ margin: 0, font: 'var(--metric-small)', fontVariantNumeric: 'tabular-nums' }}>{body}</p>
     </PatternCard>
 );
 
@@ -46,7 +46,7 @@ export const SectionRepeatingCardTitle = () => (
     <InDocs>
         <PatternSection title="Sessions" description="Your sessions">
             <PatternCard title="Sessions" description="Your sessions">
-                <p style={{ margin: 0, font: 'var(--metric-small)' }}>24 this week</p>
+                <p style={{ margin: 0, font: 'var(--metric-small)', fontVariantNumeric: 'tabular-nums' }}>24 this week</p>
             </PatternCard>
         </PatternSection>
     </InDocs>
@@ -100,7 +100,7 @@ const StudentTabs = () => {
 const activeCount = (
     <PatternCard padding="sm" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>Active students</p>
-        <p style={{ margin: 0, font: 'var(--metric-small)' }}>12</p>
+        <p style={{ margin: 0, font: 'var(--metric-small)', fontVariantNumeric: 'tabular-nums' }}>12</p>
     </PatternCard>
 );
 

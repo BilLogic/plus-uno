@@ -23,7 +23,7 @@ const SCALE = [
     ['Heading', 'xxsmall', '12/16', 'Tutors plan the week from here'],
     ['Body', 'large', '16/24', 'Tutors plan the week from here'],
     ['Body', 'default', '14/20', 'Tutors plan the week from here'],
-    ['Body', 'small', '12/16', 'Tutors plan the week from here'],
+    ['Body', 'small', '12/18', 'Tutors plan the week from here'],
     ['Metric', 'large', '28/32', '1,284 sessions'],
     ['Metric', 'medium', '24/28', '1,284 sessions'],
     ['Metric', 'small', '16/20', '1,284 sessions'],
@@ -43,7 +43,7 @@ export const TypeScale = () => (
                         <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{family}/{size} · {metrics}</span>
                         <span style={code}>var({token})</span>
                     </div>
-                    <span style={{ font: `var(${token})`, color: 'var(--ds-text)' }}>{sample}</span>
+                    <span style={{ font: `var(${token})`, letterSpacing: `var(${token}-tracking, normal)`, fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>{sample}</span>
                 </div>
             );
         })}
@@ -74,7 +74,7 @@ export const HeadingLevels = () => (
 /** Code/default sets code, token names and values. */
 export const CodeStyle = () => (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-        Pad a card with <C>--card-pad-md</C>: the code span takes 0.875em of the text around it, in Source Code Pro.
+        Pad a card with <C>--card-pad-md</C>: the code span takes 0.875em of the text around it, in Noto Sans Mono.
     </p>
 );
 

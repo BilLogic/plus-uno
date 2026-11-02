@@ -6,6 +6,30 @@
    the prototypes `@use` this file directly. */
 @use "type";
 
+/* Fallback faces. Each stack in `_type.scss` ends in one of these before its
+   CSS generic, so the page reflows by a few pixels, not a line, when the Noto
+   files arrive. They are local system faces resized to Noto's metrics
+   (measured in Chrome with Noto loaded: the width of a Latin and Vietnamese
+   pangram against Arial and Times New Roman, and Noto's ascent and descent;
+   the overrides are divided by size-adjust). No file is downloaded. */
+@font-face {
+    font-family: "Noto Sans Fallback";
+    src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+    size-adjust: 104.3%;
+    ascent-override: 102.6%;
+    descent-override: 27.8%;
+    line-gap-override: 0%;
+}
+
+@font-face {
+    font-family: "Noto Serif Fallback";
+    src: local("Times New Roman"), local("Times");
+    size-adjust: 113.8%;
+    ascent-override: 94%;
+    descent-override: 25.5%;
+    line-gap-override: 0%;
+}
+
 :root {
 
     /* common font sizes: `--font-size-125` (1.25rem) is a font primitive in
@@ -25,8 +49,8 @@
     --font-family-body: var(--type-family-body);
 
     /*font weights*/
-    --font-weight-normal: 300;
-    --font-weight-semibold-1: 400;
+    --font-weight-normal: 400;
+    --font-weight-semibold-1: 500;
     --font-weight-semibold-2: 600;
     --font-weight-bold: 700;
 
@@ -57,7 +81,7 @@
     --font-letter-spacing-display3: 0;
 
     /*Display 4 - Figma: 56px, Open Sans, 400, lineHeight 150%, letterSpacing 1px */
-    --font-family-display4: "Open Sans", sans-serif;
+    --font-family-display4: var(--font-family-body);
     --font-size-display4: 3.5rem;
     /* 56px */
     --font-line-height-display4: var(--font-line-height-150);
@@ -168,7 +192,7 @@
        to load. Measured: this stack resolved 171.13px where `monospace` is
        480.08px, so the fallback was not merely a different mono face — it was
        not monospaced at all. */
-    --font-family-code: "Source Code Pro", monospace;
+    --font-family-code: var(--type-family-code);
 
     /*Fontawesome (icons)*/
     /* Font Awesome Solid */

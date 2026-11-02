@@ -170,6 +170,7 @@
 
 .plus-home-new__stat-value {
     font: var(--metric-large);
+    font-variant-numeric: tabular-nums;
     color: var(--ds-text);
 }
 

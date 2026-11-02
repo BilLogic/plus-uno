@@ -19,7 +19,7 @@
             vertical-align: middle;
             white-space: nowrap;
             padding: 12px 0px 12px 12px; // Adjusted padding
-            font-family: 'Merriweather Sans', sans-serif;
+            font-family: var(--font-family-body);
             font-size: 12px;
             font-weight: 500; // Match Figma header weight (Medium/Regular)
 
@@ -57,7 +57,7 @@
 
                 &__name {
                     font-size: 12px !important; // Match Figma Body B3 (12px)
-                    font-family: 'Merriweather Sans', sans-serif;
+                    font-family: var(--font-family-body);
                     color: var(--color-on-surface, #191c1e);
                 }
             }

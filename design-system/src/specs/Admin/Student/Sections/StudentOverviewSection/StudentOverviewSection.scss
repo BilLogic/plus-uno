@@ -76,7 +76,7 @@ $color-other: #807878;
     }
 
     &__title {
-        font-family: 'Lato', sans-serif;
+        font-family: var(--font-family-header);
         font-size: 24px;
         font-weight: 600;
         line-height: 1.333;
@@ -128,7 +128,7 @@ $color-other: #807878;
         flex-shrink: 0;
 
         span {
-            font-family: 'Merriweather Sans', sans-serif;
+            font-family: var(--font-family-body);
             font-size: 12px;
             font-weight: 300;
             line-height: 1;
@@ -238,7 +238,7 @@ $color-other: #807878;
     }
 
     &__bar-value {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-size: 14px;
         font-weight: 300;
         line-height: 1.571;
@@ -247,7 +247,7 @@ $color-other: #807878;
 
     // Date label
     &__date {
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-size: 12px;
         font-weight: 300;
         line-height: 1.667;
@@ -274,7 +274,7 @@ $color-other: #807878;
         gap: var(--size-spacing-small-space-050);
 
         span:last-child {
-            font-family: 'Merriweather Sans', sans-serif;
+            font-family: var(--font-family-body);
             font-size: 12px;
             font-weight: 300;
             line-height: 1.667;

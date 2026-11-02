@@ -945,7 +945,8 @@ ${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    
 const rem = (n) => `${+(Number(n) / 16).toFixed(4)}rem`;
 
 /** How each kind of typography value is written in CSS; families take their fallbacks below. */
-const TYPE_VALUE = { size: rem, weight: String, family: null };
+const em = (n) => `${+(Number(n) / 100).toFixed(4)}em`;
+const TYPE_VALUE = { size: rem, weight: String, tracking: em, family: null };
 
 /**
  * A type variable's CSS name and folder, from `scripts/lib/typography-collection.mjs`.
@@ -970,8 +971,12 @@ function typeToken(v) {
  * `--font-family-body` already had.
  */
 const FAMILY_FALLBACKS = {
-    'Family/heading': ['sans-serif'],
-    'Family/body': ['"Open Sans"', 'sans-serif'],
+    'Family/heading': ['"Noto Sans Fallback"', 'sans-serif'],
+    'Family/heading-serif': ['"Noto Serif Fallback"', 'serif'],
+    'Family/body': ['"Noto Sans Fallback"', 'sans-serif'],
+    'Family/code': ['ui-monospace', '"SF Mono"', 'Menlo', 'Consolas', 'monospace'],
+    'Family/brand-heading': ['"Noto Serif Fallback"', 'serif'],
+    'Family/brand-body': ['"Noto Sans Fallback"', 'sans-serif'],
 };
 
 /**
@@ -980,7 +985,7 @@ const FAMILY_FALLBACKS = {
  * Figma text style cannot express, so it is code only.
  */
 const CODE_ONLY_TYPE_STYLES = {
-    'Code': 'var(--type-weight-regular) 0.875em / 1 var(--font-family-code)',
+    'Code': 'var(--type-weight-regular) 0.875em / 1 var(--type-family-code)',
 };
 
 /** The style groups in the order they are written. */
@@ -1027,6 +1032,14 @@ function generateTypeSCSS() {
             if (!v) throw new Error(`${TYPOGRAPHY_FILE}: ${style.name} ${field} is not bound to a type variable.`);
             return `var(${typeToken(v).token})`;
         };
+        const spacing = style.boundVariables?.letterSpacing;
+        if (spacing) {
+            styles.push({
+                group,
+                token: `--${slug(style.name)}-tracking`,
+                value: `var(${typeToken(byId.get(spacing)).token})`,
+            });
+        }
         styles.push({
             group,
             token: `--${slug(style.name)}`,
@@ -1040,7 +1053,7 @@ function generateTypeSCSS() {
     }
 
     const block = (items) => items.map(({ token, value }) => `    ${token}: ${value};\n`).join('');
-    const [sizes, lineHeights, families, weights] = TYPOGRAPHY_FOLDERS.map((f) => declarations.get(f));
+    const [sizes, lineHeights, families, weights, tracking] = TYPOGRAPHY_FOLDERS.map((f) => declarations.get(f));
     const bySize = (items) => [...items].sort((a, b) => a.px - b.px);
 
     return `/**
@@ -1058,6 +1071,8 @@ ${block(bySize(lineHeights))}
 ${block(families)}
     /* Weights */
 ${block(bySize(weights))}
+    /* Letter spacing (a \`font\` shorthand cannot carry it; a text style that has one gets a \`-tracking\` companion) */
+${block(bySize(tracking))}
     /* Text styles */
 ${block([...styles].sort((a, b) => a.group - b.group))}
     /* Code only (CODE_ONLY_TYPE_STYLES) */

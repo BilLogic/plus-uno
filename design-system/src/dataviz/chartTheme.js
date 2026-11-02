@@ -13,7 +13,7 @@
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
-const BODY = 'var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif)';
+const BODY = 'var(--font-family-body)';
 
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,
@@ -88,7 +88,7 @@ const chartTheme = {
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: 'var(--font-family-header, "Lato", sans-serif)',
+            fontFamily: 'var(--font-family-header)',
             fontWeight: 'var(--font-weight-headline, 700)',
             fontSize: 'var(--font-size-h4, 24px)'
         }

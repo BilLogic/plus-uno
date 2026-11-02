@@ -155,7 +155,7 @@
         background: none;
         border: none;
         color: var(--color-primary, #0472a8);
-        font-family: 'Merriweather Sans', sans-serif;
+        font-family: var(--font-family-body);
         font-size: 12px;
         font-weight: 600;
         cursor: pointer;
