@@ -44,7 +44,7 @@
  * checked, and telling them apart is the caller's words, not a color.
  */
 .plus-ai-label--reviewed {
-    border-color: var(--color-success);
+    border-color: var(--ds-border-success);
 
     .plus-ai-label__mark {
         color: var(--color-success);
