@@ -1,0 +1,13 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AgentAvatarStories from './AgentAvatar.stories.jsx';
+
+<Meta of={AgentAvatarStories} />
+
+<Title />
+An agent as a hexagon, since circles are for people, after Atlassian's <a href="https://atlassian.design/amp">Atlassian Mark Pattern</a>.
+
+<Canvas of={AgentAvatarStories.Sizes} />
+<Canvas of={AgentAvatarStories.Picture} />
+<Canvas of={AgentAvatarStories.WithAPerson} />
+<Canvas of={AgentAvatarStories.Interactive} />

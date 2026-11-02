@@ -1,0 +1,51 @@
+/*
+ * AgentAvatar: a hexagon in the AI bold ground. The box is a square on the
+ * Media size, as Avatar's is, so it lines up beside one; a regular hexagon is
+ * clipped inside it with a point top and bottom. The glyph sizes are Avatar's.
+ */
+$agent-avatar-sizes: (
+    16: (var(--size-media-xxs), var(--font-size-fa-body3)),
+    24: (var(--size-media-sm), var(--font-size-fa-body1)),
+    32: (var(--size-media-md), var(--font-size-fa-h5)),
+    40: (var(--size-media-lg), var(--font-size-fa-h4)),
+    48: (var(--size-media-xl), var(--font-size-fa-h3)),
+);
+
+.plus-agent-avatar {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    inline-size: var(--agent-avatar-size, var(--size-media-md));
+    block-size: var(--agent-avatar-size, var(--size-media-md));
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    background-color: var(--ds-ai-background-bold);
+    color: var(--ds-text-inverse);
+    line-height: 1;
+    // A regular hexagon: its width is 86.6 percent of its height.
+    clip-path: polygon(50% 0, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%);
+    user-select: none;
+
+    &__glyph {
+        font-size: var(--agent-avatar-glyph, var(--font-size-fa-h5));
+        line-height: 1;
+        color: inherit;
+    }
+
+    &__image {
+        display: block;
+        inline-size: 100%;
+        block-size: 100%;
+        object-fit: cover;
+    }
+}
+
+@each $size, $values in $agent-avatar-sizes {
+    .plus-agent-avatar--#{$size} {
+        --agent-avatar-size: #{nth($values, 1)};
+        --agent-avatar-glyph: #{nth($values, 2)};
+    }
+}
