@@ -17996,7 +17996,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold ground for the primary AI action, the AI cursor and the agent avatar. Achromatic: AI is a register, not another status. PLUS: PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing color.background.neutral.bold.",
+     "description": "Bold ground for the primary AI action, the AI cursor and the agent avatar. Achromatic: AI is a register, not another status. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18026,7 +18026,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing color.background.neutral.bold.hovered.",
+     "description": "Hovered bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.hovered.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18056,7 +18056,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing color.background.neutral.bold.pressed.",
+     "description": "Pressed bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.pressed.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18086,7 +18086,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The edge that marks generated or generating content. Never a fill. PLUS: PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing color.border.discovery.",
+     "description": "The edge that marks generated or generating content. Never a fill. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.border.discovery.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18116,7 +18116,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "The AI glyph (sparkle, wand). Pair it with a label. PLUS: PLUS product layer: the AI register, shaped like Atlassian's color.rovo tokens, aliasing color.icon.discovery.",
+     "description": "The AI glyph (sparkle, wand). Pair it with a label. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.icon.discovery.",
      "values": {
       "Light": {
        "alias": "color / primitives",
