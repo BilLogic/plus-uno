@@ -21,10 +21,11 @@ export const alignName = (align) => {
 const classes = (...names) => names.filter(Boolean).join(' ');
 
 /**
- * Single-line text that ends in an ellipsis. The full text rides in a tooltip,
- * and only while it is clipped, so a name that fits never shows one.
+ * Whether a single line of text is cut off. Re-measures when the element is
+ * resized and when the pointer arrives, so a tooltip is offered only while
+ * there is something to read.
  */
-const ClippedText = ({ children, className }) => {
+export const useClipped = (deps) => {
     const ref = useRef(null);
     const [clipped, setClipped] = useState(false);
     const measure = useCallback(() => {
@@ -39,8 +40,18 @@ const ClippedText = ({ children, className }) => {
         const observer = new ResizeObserver(measure);
         observer.observe(el);
         return () => observer.disconnect();
-    }, [measure, children]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [measure, deps]);
 
+    return { ref, clipped, measure };
+};
+
+/**
+ * Single-line text that ends in an ellipsis. The full text rides in a tooltip,
+ * and only while it is clipped, so a name that fits never shows one.
+ */
+const ClippedText = ({ children, className }) => {
+    const { ref, clipped, measure } = useClipped(children);
     const text = (
         <span ref={ref} className={className} onMouseEnter={measure}>
             {children}
