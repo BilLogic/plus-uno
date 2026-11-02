@@ -57,3 +57,11 @@ test('a ramp step keeps its contrast promise against white', () => {
   assert.deepEqual(lagoon[700], { L: 0.533, C: 0.087, H: 205, hex: '#147b84', cr_white: 5 });
   assert.deepEqual(lagoon[1100], { L: 0.233, C: 0.038, H: 205, hex: '#022326', cr_white: 16.52 });
 });
+
+test('a ramp takes per-step contrast targets and leaves the other steps alone', () => {
+  const base = ramp(202, 0.95, 0.098);
+  const soft = ramp(202, 0.95, 0.098, null, undefined, { 400: 1.8 });
+  assert.equal(soft[400].cr_white, 1.8);
+  assert.ok(soft[400].L > base[400].L);
+  assert.deepEqual(soft[700], base[700]);
+});
