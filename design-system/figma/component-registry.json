@@ -1190,6 +1190,21 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
       }
     },
+    "InlineEdit": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InlineEdit",
+        "source": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx",
+        "storybookId": "components-forms-and-inputs-inline-edit--docs",
+        "props": {}
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": []
+      }
+    },
     "Input": {
       "code": {
         "import": "@/components/forms-and-inputs",

@@ -8,6 +8,8 @@ export { default as Radio } from './Radio';
 export { default as Switch } from './Switch';
 export { default as DatePicker } from './DatePicker';
 export { default as DateAndTimePicker } from './DateAndTimePicker';
+export { default as InlineEdit } from './InlineEdit';
+export { default as InlineEditableTextfield } from './InlineEditableTextfield';
 export { default as InputGroup } from './InputGroup';
 export { default as NumberInput } from './NumberInput';
 export { default as Cascader } from './Cascader';
