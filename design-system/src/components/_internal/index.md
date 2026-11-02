@@ -15,7 +15,7 @@ authored half (#166), counted rather than assumed.
 | [SessionManagementSnackbar](SessionManagementSnackbar/index.md) | 4 | ✕ | ✕ | ✕ |
 | [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |
 | [StaticBadgeSmart](StaticBadgeSmart/index.md) | 4 | ✕ | ✕ | ✕ |
-| [Table](Table/index.md) | 9 | ✕ | ✕ | ✕ |
+| [Table](Table/index.md) | 18 | ✕ | ✕ | ✕ |
 | [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 
 **Authored coverage:** When to use 0/10 (0%) · Correct/incorrect 0/10 (0%) · Accessibility 0/10 (0%)

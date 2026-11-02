@@ -51,6 +51,7 @@ export { default as Tag } from '@/components/labels/Tag';
 export { TagContext, useTagContext } from '@/components/labels/Tag';
 export { default as TagGroup } from '@/components/labels/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
+export { StaticTable, TableCell, TableRow, TableMessageRow, TableSummaryRow, TableFooter } from '@/components/_internal/Table';
 export { default as Tile } from '@/components/images-and-icons/Tile';
 export { default as Toast } from '@/components/messaging/Toast';
 export { ToastContainer } from '@/components/messaging/Toast';

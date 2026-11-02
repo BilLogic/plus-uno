@@ -75,7 +75,7 @@ When a view has no data, show three things — never a blank panel and never a b
 2. A short descriptive message, e.g. "No students enrolled yet".
 3. A single primary action, e.g. "Add Student".
 
-`Table` renders its own empty state when `rows.length === 0`.
+`Table` draws no empty state on its own. Pass `emptyState` and, when `rows` is empty, the header stays and the message takes the body as one row spanning every column; without it the table renders only its header.
 
 ## Loading
 

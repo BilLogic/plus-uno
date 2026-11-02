@@ -11,12 +11,15 @@ import {
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
+    "size": { "type": "enum", "values": ["sm", "md", "lg"] },
     "density": { "type": "enum", "values": ["sm", "md", "lg"] },
+    "frame": { "type": "enum", "values": ["plain", "framed"] },
+    "verticalLines": { "type": "boolean" },
     "striped": { "type": "boolean" },
     "hover": { "type": "boolean" },
     "bordered": { "type": "boolean" }
   },
-  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. Neither the Dynamic nor the Tree table has a component of its own in code (PatternTable carries part of Dynamic table's behavior: the sticky header and column, paging and the empty state), so the three pages are listed here as docs pages, not as sets to write back to. `density`, `striped`, `hover` and `bordered` are code-only until a set maps them.",
+  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. Neither the Dynamic nor the Tree table has a component of its own in code (PatternTable carries part of Dynamic table's behavior: the sticky header and column, paging and the empty state), so the three pages are listed here as docs pages, not as sets to write back to. `size`, `density`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
   "sets": [
     {
       "id": "static-table-page",
@@ -98,6 +101,85 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <Canvas of={TableStories.Bordered} />
 
+<Canvas of={TableStories.FramedAndLines} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Row size
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Rows are 32, 40 or 48 tall at minimum: pick by how much each row holds, not by screen width.</>}
+>
+
+<Canvas of={TableStories.Sizes} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Cells
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Text, a muted second line, wrapping, the title emphasis, text, number and icon alignment, a leading slot, an error and a loading cell.</>}
+>
+
+<Canvas of={TableStories.Cells} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Row states
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A row rests, is highlighted, selected or disabled.</>}
+>
+
+<Canvas of={TableStories.RowStates} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Summary and footer
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>The summary row closes the table with one calculation per column. The footer states the range.</>}
+>
+
+<Canvas of={TableStories.Summary} />
+
+<Canvas of={TableStories.Footer} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Static table
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A fixed grid people read: rows rest or are highlighted, and nothing hovers.</>}
+>
+
+<Canvas of={TableStories.Static} />
+
 </DocsCanvasShell>
 
 </div>
@@ -108,7 +190,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>With no rows the header still renders — pair it with an empty-state message.</>}
+    description={<>With no rows the header stays and `emptyState` takes the body as one message row.</>}
 >
 
 <Canvas of={TableStories.Empty} />
@@ -138,8 +220,11 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 ## Usage notes
 
 - **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
-- **Per-cell control** — pass `{ content, align, colSpan, className }` instead of a bare value when a cell needs alignment or spanning.
-- **Density** maps to the `--size-table-cell-*` token family.
+- **Per-cell control** — pass `{ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }` instead of a bare value. `align` is `text`, `number` or `icon`.
+- **Row size** — `size` (`density` is the older name) is `sm`, `md` or `lg`, at 32, 40 and 48 from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
+- **Long text** truncates to one line with an ellipsis and shows the full text in a tooltip; pass `overflow: 'wrap'` for a cell that should wrap.
+- **One title column** — `titleColumn` is the index of the column that names the record.
+- **Static or Dynamic** — use `StaticTable` for a grid people only read. A table people sort, filter, select or page is a Dynamic table.
 
 </div>
 
