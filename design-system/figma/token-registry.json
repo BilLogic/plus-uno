@@ -1298,11 +1298,6 @@
       "color/text/smart/technology-tools": "var(--ds-text-smart-technology-tools)",
       "color/icon/smart/technology-tools": "var(--ds-icon-smart-technology-tools)",
       "color/border/smart/technology-tools": "var(--ds-border-smart-technology-tools)",
-      "color/ai/background/bold/default": "var(--ds-ai-background-bold)",
-      "color/ai/background/bold/hovered": "var(--ds-ai-background-bold-hovered)",
-      "color/ai/background/bold/pressed": "var(--ds-ai-background-bold-pressed)",
-      "color/ai/border": "var(--ds-ai-border)",
-      "color/ai/icon": "var(--ds-ai-icon)",
       "color/chart/smart/social-emotional/default": "var(--ds-chart-smart-social-emotional)",
       "color/chart/smart/social-emotional/hovered": "var(--ds-chart-smart-social-emotional-hovered)",
       "color/chart/smart/mastering-content/default": "var(--ds-chart-smart-mastering-content)",
@@ -1316,11 +1311,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1554,
+    "scssTokenCount": 1549,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1138,
-      "resolved": 1109,
+      "total": 1133,
+      "resolved": 1104,
       "percent": 97,
       "unresolved": [
         {

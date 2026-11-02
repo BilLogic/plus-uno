@@ -8,8 +8,7 @@
 // Six departures from the reference are deliberate, and the comparison is
 // shaped around them:
 // - PLUS adds tokens the reference never had: `color.background.smart.<subject>.subtle`,
-//   the mid-strength SMART fill for illustration bodies, and the `color.ai.*`
-//   AI layer (bold ground, edge, glyph). They are dropped from
+//   the mid-strength SMART fill for illustration bodies. They are dropped from
 //   our side before comparing, so every reference token still matches.
 // - Descriptions (`use`, `deviation`, Figma `description`) say the rule rather
 //   than the proposal's decision numbers, so names, references and hex are
@@ -48,8 +47,8 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v)));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(background-smart-[a-z-]+-subtle|ai-[a-z-]+): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-background-smart-[a-z-]+-subtle: [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
