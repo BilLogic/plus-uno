@@ -45,6 +45,6 @@ From `design-system/src/components/messaging/Toast/Toast.scss`. Override these t
 
 ## Related
 
-Same group: `Alert` · `Modal`
+Same group: `Alert` · `EmptyState` · `Modal`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
