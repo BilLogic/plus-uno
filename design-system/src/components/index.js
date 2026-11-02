@@ -21,7 +21,6 @@ export { default as Count } from '@/components/labels/Count';
 export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
-export { default as GenerativeBorder } from '@/ai/GenerativeBorder';
 export * from '@/components/forms-and-inputs';
 export { default as Avatar } from '@/components/images-and-icons/Avatar';
 export { default as AvatarGroup } from '@/components/images-and-icons/AvatarGroup';
