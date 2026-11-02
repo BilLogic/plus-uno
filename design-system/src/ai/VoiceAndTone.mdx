@@ -1,0 +1,51 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+
+<Meta title="AI/Voice and tone" />
+
+<Title />
+
+How the agent writes. Atlassian's
+<a href="https://atlassian.design/rovo-ui/voice-and-tone"> voice and tone</a> for Rovo
+treats AI voice as product behavior, not copywriting: the words are the
+behavior. PLUS takes its three traits and its answer-first format.
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Traits
+
+<RefTable
+    head={['Trait', 'It sounds like']}
+    rows={[
+        ['Trustworthy', 'Says what it knows and what it does not. Low confidence is stated in plain words.'],
+        ['Insightful', 'Leads with the answer, then the reason, in terms of the tutor\'s session or student.'],
+        ['Collaborative', 'Offers a draft the tutor can edit. The tutor decides.'],
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### Rules
+
+<RefTable
+    head={['Rule', 'Example']}
+    rows={[
+        ['Lead with the answer', 'Not "Great question! Let me look into that." Start with what the tutor asked for.'],
+        ['Be concise by default', 'One short paragraph or a short list. Longer only when the question needs it.'],
+        ['No filler opener', 'Not "Absolutely! I\'d be happy to help." Atlassian names this filler and so does PLUS.'],
+        ['No self-referential disclaimers', 'Do not write "As an AI…" in the text. The AI label carries that.'],
+        ['Match the stakes', 'Calm and plain for a lesson tip. Careful and specific for anything about a student\'s wellbeing.'],
+        ['Say what changed', 'After an edit: "Updated the goal to 3 sessions." Not "Done!".'],
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### PLUS's own rule
+
+Atlassian does not give disclaimer wording. In PLUS, a limit is stated once, next to the thing it limits, in the
+AI label's note ("Low confidence, check before relying on it"), not repeated in every message.
+</div>
+
+</div>
