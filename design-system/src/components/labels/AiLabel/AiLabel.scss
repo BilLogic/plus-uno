@@ -1,22 +1,13 @@
 /*
- * AiLabel — the agent's mark (#269).
+ * AiLabel: the agent's mark.
  *
- * ACHROMATIC BY DESIGN, AND THAT IS THE DECISION RATHER THAN A PLACEHOLDER.
- * Atlassian's `color.rovo.background.brand.bold` is #000000: AI is a different
- * REGISTER, not another semantic color competing with success and danger. So
- * the ground here is the neutral surface ramp this system already has, and the
- * only accent is the glyph and the edge.
- *
- * #269 says the brand hue is Bill's call. When it is made, it lands on ONE
- * declaration — `--plus-ai-accent` below — and nothing else in this file moves.
- * That is why it is a local custom property with a token fallback rather than a
- * new design token: a token nothing has decided is a token nobody can read, and
- * this repo has spent two passes deleting exactly that.
+ * ACHROMATIC GROUND, PURPLE EDGE AND GLYPH. AI is a different register, not
+ * another semantic color competing with success and danger, so the ground is
+ * the neutral surface ramp and the only accent is a uniform outline in
+ * `--ds-ai-border` and a glyph in `--ds-ai-icon`. The accent marks an edge and
+ * an icon; it never floods a surface and is never a bar on one side.
  */
 .plus-ai-label {
-    /* The one line the brand decision changes. */
-    --plus-ai-accent: var(--color-on-surface-variant);
-
     display: inline-flex;
     align-items: baseline;
     gap: var(--size-element-gap-sm);
@@ -25,14 +16,9 @@
     margin: 0;
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
 
-    /*
-     * The edge, not a fill. Decision 2: the identity marks an edge and a glyph
-     * and never floods a surface, which is also what keeps the mark legible on
-     * whatever it is attached to.
-     */
+    /* The edge, not a fill, and the same on all four sides. */
     background-color: var(--color-surface-container-lowest);
-    border: var(--size-element-border) solid var(--color-outline-variant);
-    border-inline-start: var(--size-element-stroke-lg) solid var(--plus-ai-accent);
+    border: var(--size-element-border) solid var(--ds-ai-border);
     border-radius: var(--size-element-radius-md);
 
     color: var(--color-on-surface);
@@ -40,7 +26,7 @@
 
 .plus-ai-label__mark {
     flex: none;
-    color: var(--plus-ai-accent);
+    color: var(--ds-ai-icon);
     /* Sized from the type register beside it, so the glyph and the words scale
        together rather than drifting apart at a different step. */
     font-size: var(--font-size-fa-body3-solid);
@@ -53,12 +39,16 @@
 
 /*
  * `reviewed` is the one origin a person has signed off, so it is the one that
- * loses the caution edge and takes the system's own success color. `generated`
- * and `assisted` keep the neutral edge: neither has been checked, and telling
- * them apart is the caller's words, not a color.
+ * leaves the AI edge for the system's own success color, on the whole outline
+ * and the glyph. `generated` and `assisted` keep the AI edge: neither has been
+ * checked, and telling them apart is the caller's words, not a color.
  */
 .plus-ai-label--reviewed {
-    --plus-ai-accent: var(--color-success);
+    border-color: var(--color-success);
+
+    .plus-ai-label__mark {
+        color: var(--color-success);
+    }
 }
 
 /*
@@ -70,10 +60,13 @@
  * on the one pair in the system that is known to fail.
  */
 .plus-ai-label--low {
-    --plus-ai-accent: var(--color-warning-text);
     background-color: var(--color-warning-container);
     color: var(--color-on-warning-container);
     border-color: var(--color-warning-text);
+
+    .plus-ai-label__mark {
+        color: var(--color-warning-text);
+    }
 }
 
 .plus-ai-label__note {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import AiLabel, { AI_ORIGINS } from './AiLabel';
 
 /**
@@ -152,36 +153,46 @@ TheGlyphIsDecoration.play = async ({ canvasElement }) => {
 };
 
 /**
- * No brand hue is picked here.
+ * The edge is one outline, and the glyph is the AI icon.
  *
- * Atlassian's `color.rovo.background.brand.bold` is #000000: AI is a different
- * REGISTER, not another semantic color competing with success and danger. The
- * accent is one local custom property with a neutral token behind it, so the
- * branding decision #269 leaves open lands on one declaration and nothing else
- * moves.
- *
- * This asserts the absence, because the absence is the design: nothing in the
- * component may resolve to `--color-primary`, which is what the surface it
- * replaces hard-codes as `fill="#0472A8"`.
+ * AI is a different REGISTER, not another semantic color, so the ground stays
+ * neutral and the only accent is an outline in `--ds-ai-border` with a glyph in
+ * `--ds-ai-icon`. The outline is the same width and color on all four sides,
+ * never a bar on one. `reviewed`, the one origin a person has checked, leaves
+ * the AI edge for success on the whole outline and the glyph.
  */
-export const NoBrandHueIsAssumed = () => (
+export const EdgeAndGlyphUseAiTokens = () => (
     <div style={row}>
-        <AiLabel origin="generated" />
+        <AiLabel origin="generated" data-testid="generated" />
+        <AiLabel origin="reviewed" data-testid="reviewed" />
     </div>
 );
 
-NoBrandHueIsAssumed.play = async ({ canvasElement }) => {
-    const mark = canvasElement.querySelector('.plus-ai-label');
-    const styles = getComputedStyle(mark);
-    const primary = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-primary')
-        .trim();
-    const accent = styles.getPropertyValue('--plus-ai-accent').trim();
-    await expect(accent, 'the accent must be a real value').not.toBe('');
-    await expect(
-        accent.toLowerCase(),
-        'the AI mark must not borrow the primary action color',
-    ).not.toBe(primary.toLowerCase());
+EdgeAndGlyphUseAiTokens.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sides = ['Top', 'Right', 'Bottom', 'Left'];
+    const outline = (el) => {
+        const s = getComputedStyle(el);
+        return {
+            widths: sides.map((side) => s[`border${side}Width`]),
+            colors: sides.map((side) => s[`border${side}Color`]),
+        };
+    };
+    const generated = canvas.getByTestId('generated');
+    const reviewed = canvas.getByTestId('reviewed');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const edge = outline(generated);
+        await expect(new Set(edge.widths).size, `one width on every side, ${mode}`).toBe(1);
+        await expect(edge.colors, `AI edge on every side, ${mode}`).toEqual(Array(4).fill(token('--ds-ai-border')));
+        await expect(
+            getComputedStyle(generated.querySelector('.plus-ai-label__mark')).color,
+            `AI glyph, ${mode}`,
+        ).toBe(token('--ds-ai-icon'));
+
+        const checked = outline(reviewed);
+        await expect(new Set(checked.widths).size, `one width on every side, reviewed, ${mode}`).toBe(1);
+        await expect(checked.colors, `success edge on every side, ${mode}`).toEqual(Array(4).fill(token('--color-success')));
+    });
 };
 
 /* -------------------------------------------------------------- playground */
