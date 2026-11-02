@@ -8,10 +8,9 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (71)
+## UI components (70)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
-- AgentAvatar — exported here, implemented outside `src/components/`; read the source
 - [Alert](../../src/components/messaging/Alert/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)
 - [AvatarGroup](../../src/components/images-and-icons/AvatarGroup/index.md)
@@ -38,7 +37,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
 - [Footer](../../src/components/_internal/Footer/index.md)
-- GenerativeBorder — exported here, implemented outside `src/components/`; read the source
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)

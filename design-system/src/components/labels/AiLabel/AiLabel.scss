@@ -1,13 +1,22 @@
 /*
- * AiLabel: the agent's mark.
+ * AiLabel — the agent's mark (#269).
  *
- * ACHROMATIC GROUND, PURPLE EDGE AND GLYPH. AI is a different register, not
- * another semantic color competing with success and danger, so the ground is
- * the neutral ground and the only accent is a uniform border in
- * `--ds-ai-border` and a glyph in `--ds-ai-icon`. The accent marks an edge and
- * an icon; it never floods the ground and is never a bar on one side.
+ * ACHROMATIC BY DESIGN, AND THAT IS THE DECISION RATHER THAN A PLACEHOLDER.
+ * Atlassian's `color.rovo.background.brand.bold` is #000000: AI is a different
+ * REGISTER, not another semantic color competing with success and danger. So
+ * the ground here is the neutral surface ramp this system already has, and the
+ * only accent is the glyph and the edge.
+ *
+ * #269 says the brand hue is Bill's call. When it is made, it lands on ONE
+ * declaration — `--plus-ai-accent` below — and nothing else in this file moves.
+ * That is why it is a local custom property with a token fallback rather than a
+ * new design token: a token nothing has decided is a token nobody can read, and
+ * this repo has spent two passes deleting exactly that.
  */
 .plus-ai-label {
+    /* The one line the brand decision changes. */
+    --plus-ai-accent: var(--color-on-surface-variant);
+
     display: inline-flex;
     align-items: baseline;
     gap: var(--size-element-gap-sm);
@@ -16,17 +25,22 @@
     margin: 0;
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
 
-    /* The edge, not a fill, and the same on all four sides. */
-    background-color: var(--ds-surface);
-    border: var(--size-element-border) solid var(--ds-ai-border);
+    /*
+     * The edge, not a fill. Decision 2: the identity marks an edge and a glyph
+     * and never floods a surface, which is also what keeps the mark legible on
+     * whatever it is attached to.
+     */
+    background-color: var(--color-surface-container-lowest);
+    border: var(--size-element-border) solid var(--color-outline-variant);
+    border-inline-start: var(--size-element-stroke-lg) solid var(--plus-ai-accent);
     border-radius: var(--size-element-radius-md);
 
-    color: var(--ds-text);
+    color: var(--color-on-surface);
 }
 
 .plus-ai-label__mark {
     flex: none;
-    color: var(--ds-ai-icon);
+    color: var(--plus-ai-accent);
     /* Sized from the type register beside it, so the glyph and the words scale
        together rather than drifting apart at a different step. */
     font-size: var(--font-size-fa-body3-solid);
@@ -39,31 +53,27 @@
 
 /*
  * `reviewed` is the one origin a person has signed off, so it is the one that
- * leaves the AI edge for the system's own success color, on the whole border
- * and the glyph. `generated` and `assisted` keep the AI edge: neither has been
- * checked, and telling them apart is the caller's words, not a color.
+ * loses the caution edge and takes the system's own success color. `generated`
+ * and `assisted` keep the neutral edge: neither has been checked, and telling
+ * them apart is the caller's words, not a color.
  */
 .plus-ai-label--reviewed {
-    border-color: var(--ds-border-success);
-
-    .plus-ai-label__mark {
-        color: var(--ds-icon-success);
-    }
+    --plus-ai-accent: var(--color-success);
 }
 
 /*
- * Low confidence is an inline warning: `--ds-background-warning` with the
- * body text on it, the border and glyph in the warning role. The pair holds its
- * contrast in every color and contrast mode.
+ * Low confidence uses the WARNING container pair, not the warning ground.
+ *
+ * Deliberate, and measured: `--color-warning` with a white label is 3.70:1 and
+ * fails AA (#312), while `--color-warning-container` with
+ * `--color-on-warning-container` is 13.27:1. A new component must not be built
+ * on the one pair in the system that is known to fail.
  */
 .plus-ai-label--low {
-    background-color: var(--ds-background-warning);
-    color: var(--ds-text);
-    border-color: var(--ds-border-warning);
-
-    .plus-ai-label__mark {
-        color: var(--ds-icon-warning);
-    }
+    --plus-ai-accent: var(--color-warning-text);
+    background-color: var(--color-warning-container);
+    color: var(--color-on-warning-container);
+    border-color: var(--color-warning-text);
 }
 
 .plus-ai-label__note {
@@ -98,6 +108,6 @@
 }
 
 .plus-ai-label__explain:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline: var(--size-element-stroke-lg) solid var(--color-primary);
     outline-offset: var(--size-element-gap-xs);
 }
