@@ -78,6 +78,8 @@
       "Tooltip"
     ],
     "Text and data display": [
+      "Code",
+      "Code block",
       "Table"
     ]
   },
@@ -233,6 +235,8 @@
       ],
       "Text and data display",
       [
+        "Code",
+        "Code block",
         "Table"
       ]
     ],
