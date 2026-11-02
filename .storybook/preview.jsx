@@ -305,6 +305,16 @@ const preview = {
               "Table"
             ]
           ],
+          "AI",
+          [
+            "Components",
+            [
+              "Generative border",
+              "Agent avatar",
+              "Prompt input",
+              "Prompt starters"
+            ]
+          ],
           "Data visualizations",
           [
             "Comparison",

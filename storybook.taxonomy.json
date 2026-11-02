@@ -6,6 +6,7 @@
     "Getting started/",
     "Foundations/",
     "Components/",
+    "AI/",
     "Data visualizations/",
     "Specs/",
     "Deprecated/"
@@ -22,6 +23,7 @@
       "Date time picker",
       "Dropdown menu",
       "File upload",
+      "Inline edit",
       "Input group",
       "Label & caption",
       "Number input",
@@ -151,6 +153,7 @@
         "Date time picker",
         "Dropdown menu",
         "File upload",
+        "Inline edit",
         "Input group",
         "Label & caption",
         "Number input",
@@ -238,6 +241,16 @@
         "Code",
         "Code block",
         "Table"
+      ]
+    ],
+    "AI",
+    [
+      "Components",
+      [
+        "Generative border",
+        "Agent avatar",
+        "Prompt input",
+        "Prompt starters"
       ]
     ],
     "Data visualizations",
