@@ -61,6 +61,8 @@
     }
 
     &:focus-visible {
+        // @grounds: --ds-background-input
+        // The ring sits 2 outside the button, on the field's ground, not on the AI bold.
         outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
         outline-offset: var(--size-element-stroke-lg);
     }
