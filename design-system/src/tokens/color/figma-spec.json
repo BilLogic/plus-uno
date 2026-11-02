@@ -17987,6 +17987,156 @@
      }
     },
     {
+     "name": "color/ai/background/bold/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Bold ground for the primary AI action, the AI cursor and the agent avatar. Achromatic: AI is a register, not another status. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/ai/background/bold/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Hovered bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.hovered.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/900"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/900"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/900"
+      }
+     }
+    },
+    {
+     "name": "color/ai/background/bold/pressed",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold-pressed)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Pressed bold AI ground. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.background.neutral.bold.pressed.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/800"
+      }
+     }
+    },
+    {
+     "name": "color/ai/border",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-border)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "The edge that marks generated or generating content. Never a fill. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.border.discovery.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "purple/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "purple/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "purple/700"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "purple/400"
+      }
+     }
+    },
+    {
+     "name": "color/ai/icon",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-icon)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "The AI glyph (sparkle, wand). Pair it with a label. PLUS: PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing color.icon.discovery.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "purple/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "purple/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "purple/700"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "purple/400"
+      }
+     }
+    },
+    {
      "name": "color/chart/smart/social-emotional/default",
      "codeSyntax": {
       "WEB": "var(--ds-chart-smart-social-emotional)"

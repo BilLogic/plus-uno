@@ -416,6 +416,25 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       byName[n] = r;
     }
   }
+  // ---- AI: a product layer for the agent's register. Atlassian's AI color tokens are one
+  // achromatic bold ground plus accents that only ever mark an edge or a glyph. PLUS takes the same shape
+  // from tokens it already has: the bold ground is the neutral bold, the edge and glyph are discovery
+  // purple (the AI-suggestion role). No text or background token exists in the accent, by design.
+  const AI_MAP = [
+    ['color.ai.background.bold', 'color.background.neutral.bold', 'Bold ground for the primary AI action, the AI cursor and the agent avatar. Achromatic: AI is a register, not another status.'],
+    ['color.ai.background.bold.hovered', 'color.background.neutral.bold.hovered', 'Hovered bold AI ground.'],
+    ['color.ai.background.bold.pressed', 'color.background.neutral.bold.pressed', 'Pressed bold AI ground.'],
+    ['color.ai.border', 'color.border.discovery', 'The edge that marks generated or generating content. Never a fill.'],
+    ['color.ai.icon', 'color.icon.discovery', 'The AI glyph (sparkle, wand). Pair it with a label.'],
+  ];
+  for (const [tn, src, use] of AI_MAP) {
+    const r0 = byName[src];
+    const r = { ...r0, name: tn, atl_light: '—', atl_dark: '—', use,
+      deviation: `PLUS product layer: the AI register, shaped like Atlassian's AI color tokens, aliasing ${src}.` };
+    rows.push(r);
+    byName[tn] = r;
+  }
+
   // A subject's chart series is its accent hue at the emphasis that keeps S-M-A-R-T neighbors apart
   // (deltaE >= 8 under protan and deutan, >= 15 for full color vision), in that order.
   const SMART_CHART = { 'social-emotional': 'bold', 'mastering-content': 'boldest', advocacy: 'bold', relationship: 'boldest', 'technology-tools': 'bold' };
