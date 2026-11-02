@@ -1,0 +1,51 @@
+/*
+ * GenerativeBorder: a flat two-tone ring drawn over the edge of the wrapped
+ * content, so it never moves the layout. Two tones in hard-stop 30 degree
+ * sectors of a repeating conic gradient turn by animating a registered angle; a mask keeps only the
+ * ring. No blur, no gradient blend, no tint.
+ */
+@property --generative-border-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 0deg;
+}
+
+.plus-generative-border {
+    --generative-border-width: var(--size-element-stroke-lg);
+
+    position: relative;
+    min-width: 0;
+
+    &__ring {
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        padding: var(--generative-border-width);
+        border-radius: var(--generative-border-radius);
+        pointer-events: none;
+        background: repeating-conic-gradient(
+            from var(--generative-border-angle),
+            var(--ds-ai-border) 0 30deg,
+            var(--ds-ai-background-bold) 30deg 60deg
+        );
+        // Keep the padding box's complement: the ring, not the middle.
+        -webkit-mask: linear-gradient(currentColor 0 0) content-box, linear-gradient(currentColor 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(currentColor 0 0) content-box, linear-gradient(currentColor 0 0);
+        mask-composite: exclude;
+        animation: plus-generative-border-turn 4s linear infinite;
+    }
+}
+
+@keyframes plus-generative-border-turn {
+    to {
+        --generative-border-angle: 360deg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-generative-border__ring {
+        animation: none;
+        background: var(--ds-ai-border);
+    }
+}
