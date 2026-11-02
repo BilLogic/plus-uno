@@ -128,18 +128,29 @@ export const Axes = () => (
         </p>
         {REGISTERS.map(({ name }) => {
             const isBody = name.startsWith('body');
-            // h1-h3 are headlines (700), h4-h6 are titles (600). Reading that off
-            // the name is exactly the step this page argues should not be needed.
+            // h1-h3 are headlines and h4-h5 titles, all Noto Serif at 500; h6 is
+            // Noto Sans at 600. Reading that off the name is exactly the step this
+            // page argues should not be needed.
+            const level = Number(name[1]);
             const weight = isBody
                 ? '--font-weight-normal'
-                : Number(name[1]) <= 3
+                : level <= 3
                     ? '--font-weight-headline'
-                    : '--font-weight-title';
+                    : level <= 5
+                        ? '--font-weight-title'
+                        : '--type-weight-semibold';
+            const family = isBody
+                ? '--font-family-body'
+                : level <= 3
+                    ? '--font-family-headline'
+                    : level <= 5
+                        ? '--font-family-title'
+                        : '--type-family-heading';
             return (
                 <Row
                     key={name}
                     label={`--font-size-${name}`}
-                    note={`+ --font-line-height-${name}, ${weight}, --font-family-${isBody ? 'body' : 'header'}`}
+                    note={`+ --font-line-height-${name}, ${weight}, ${family}`}
                 >
                     <span
                         data-axes={name}
@@ -147,7 +158,7 @@ export const Axes = () => (
                             fontSize: `var(--font-size-${name})`,
                             lineHeight: `var(--font-line-height-${name})`,
                             fontWeight: `var(${weight})`,
-                            fontFamily: isBody ? 'var(--font-family-body)' : 'var(--font-family-header)',
+                            fontFamily: `var(${family})`,
                         }}
                     >
                         The quick brown fox jumps
@@ -241,7 +252,7 @@ AgainstTheRules.play = async () => {
             await expect(comp, `${composite} probe missing`).not.toBe(null);
 
             // Weight first, because that is the axis that was wrong: h4-h6 are
-            // titles at 600 and the composites claimed 700.
+            // titles at 600 and the composites claimed 700 (today h1-h5 are serif at 500 and h6 sans at 600).
             await expect(comp.weight, `${composite} weight vs ${name}`).toBe(rule.weight);
             await expect(comp.size, `${composite} size vs ${name}`).toBe(rule.size);
             await expect(comp.lineHeight, `${composite} line-height vs ${name}`).toBe(rule.lineHeight);
