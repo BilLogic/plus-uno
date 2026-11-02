@@ -1,0 +1,114 @@
+/**
+ * InlineEdit — a read view that is the same size as the field it opens into.
+ *
+ * The read view is drawn on the field's own box: 32 high (`--item-height-md`),
+ * the same 1px border (transparent at rest) and the same side padding, so
+ * opening the editor changes the fill and the border and nothing else. The
+ * compact variant is 24 (`--item-height-sm`) in both views.
+ *
+ * Confirm and cancel sit under the edit view, over whatever follows it, so
+ * showing them does not push the page down.
+ */
+
+.plus-inline-edit {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--size-element-gap-xs);
+    width: 100%;
+}
+
+// The edit view fills the width; the read view hugs its text unless asked.
+.plus-inline-edit > .plus-field-stack,
+.plus-inline-edit > .plus-field {
+    align-self: stretch;
+}
+
+.plus-inline-edit__read {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    height: var(--item-height-md);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
+    border: var(--size-element-border) solid transparent;
+    border-radius: var(--size-element-radius-sm);
+    background-color: transparent;
+    color: var(--ds-text);
+    font: var(--body-default);
+    text-align: start;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+    }
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-lg);
+    }
+
+    &--fill {
+        display: flex;
+        width: 100%;
+    }
+}
+
+.plus-inline-edit__text {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-inline-edit__placeholder {
+    color: var(--ds-text-subtlest);
+}
+
+// Read by a screen reader after the read view; never drawn.
+.plus-inline-edit__hint {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// A zero-height row right after the edit view, so the buttons hang from where
+// it ends (under the caption, when there is one) without taking any room.
+.plus-inline-edit__anchor {
+    position: relative;
+    align-self: stretch;
+    height: 0;
+    // Takes back the column's gap above it, so the row adds nothing.
+    margin-block-start: calc(-1 * var(--size-element-gap-xs));
+}
+
+.plus-inline-edit__actions {
+    position: absolute;
+    inset-block-start: var(--size-element-gap-xs);
+    inset-inline-end: 0;
+    z-index: 1;
+    display: flex;
+    gap: var(--size-element-gap-xs);
+    padding: var(--size-element-gap-xs);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+// ── Compact ─────────────────────────────────────────────────────────────────
+
+.plus-inline-edit--compact {
+    .plus-inline-edit__read,
+    .plus-field {
+        height: var(--item-height-sm);
+    }
+}

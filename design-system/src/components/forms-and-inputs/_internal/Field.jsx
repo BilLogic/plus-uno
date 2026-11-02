@@ -156,6 +156,7 @@ export function fieldDescription({ fieldId, message, counted = false, describedB
  * the `<label>` so its name never becomes part of the field's name.
  */
 export const FieldLabel = ({
+    id,
     htmlFor,
     children,
     required = false,
@@ -166,7 +167,7 @@ export const FieldLabel = ({
 }) => {
     if (!children) return null;
     const label = (
-        <label htmlFor={htmlFor} className={`plus-field-label${hidden ? ' plus-field-label--hidden' : ''} ${className}`.trim()}>
+        <label id={id} htmlFor={htmlFor} className={`plus-field-label${hidden ? ' plus-field-label--hidden' : ''} ${className}`.trim()}>
             {children}
             {required && <span className="plus-field-required" aria-hidden="true">*</span>}
         </label>
@@ -189,6 +190,8 @@ export const FieldLabel = ({
 };
 
 FieldLabel.propTypes = {
+    /** The label's own id, for a control that is named by it with `aria-labelledby`. */
+    id: PropTypes.string,
     htmlFor: PropTypes.string,
     children: PropTypes.node,
     required: PropTypes.bool,
