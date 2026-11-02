@@ -4,7 +4,6 @@ import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import { Button } from '@/components';
 import GenerativeBorder, { GENERATIVE_BORDER_RADII } from './GenerativeBorder';
 
 /**
@@ -38,7 +37,7 @@ export default {
     },
 };
 
-const surface = {
+const box = {
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
@@ -53,8 +52,18 @@ const surface = {
 /** A wrapper is as wide as its parent, so a story sets the width of the thing it surrounds. */
 const wrap = { maxWidth: 'var(--section-min-width-main)' };
 
+const toggle = {
+    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+    border: 'var(--border-default) solid var(--ds-border-input)',
+    borderRadius: 'var(--size-element-radius-md)',
+    background: 'var(--ds-background-input)',
+    color: 'var(--ds-text)',
+    font: 'var(--body-default)',
+    cursor: 'pointer',
+};
+
 const Draft = ({ text = 'Here is a first draft of the session summary.' }) => (
-    <div style={surface}>
+    <div style={box}>
         <strong style={{ font: 'var(--heading-small)' }}>Session summary</strong>
         <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{text}</span>
     </div>
@@ -85,7 +94,7 @@ export const Generating = () => (
 );
 
 /**
- * The ring lies over the edge of the surface at the border-width token, hidden
+ * The ring lies over the edge of the box at the border-width token, hidden
  * from assistive technology, while the wrapper says it is busy. Its two tones
  * are the AI edge and the AI bold ground in every color mode, and it turns.
  */
@@ -116,7 +125,7 @@ export const ReducedMotion = () => (
 /*
  * Only this story touches the motion preference. The test runner emulates it
  * through Playwright; in plain Storybook there is no runner, so the play
- * function stops there: switch the OS setting to see the still ring.
+ * function stops there: change the OS setting to see the still ring.
  */
 ReducedMotion.beforeEach = async () => async () => {
     await emulateReducedMotion(null);
@@ -138,7 +147,7 @@ export const Radii = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--layout-gutter)' }}>
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} active radius={radius}>
-                <div style={{ ...surface, borderRadius: 'var(--generative-border-radius)', minWidth: 'var(--card-min-width-sm)' }}>
+                <div style={{ ...box, borderRadius: 'var(--generative-border-radius)', minWidth: 'var(--card-min-width-sm)' }}>
                     <span style={{ font: 'var(--body-small)' }}>{radius}</span>
                 </div>
             </GenerativeBorder>
@@ -146,7 +155,7 @@ export const Radii = () => (
     </div>
 );
 
-/** Each radius name follows its token, so the ring meets the corners of the surface it wraps. */
+/** Each radius name follows its token, so the ring meets the corners of the content it wraps. */
 Radii.play = async ({ canvasElement }) => {
     const rings = [...canvasElement.querySelectorAll('.plus-generative-border__ring')];
     const radii = rings.map((ring) => getComputedStyle(ring).borderTopLeftRadius);
@@ -163,7 +172,9 @@ export const Interactive = (args) => {
             <GenerativeBorder {...args} active={active} data-testid="wrapper" style={wrap}>
                 <Draft />
             </GenerativeBorder>
-            <Button text={active ? 'Finish generating' : 'Start generating'} style="secondary" fill="outline" onClick={() => setActive((v) => !v)} />
+            <button type="button" style={toggle} onClick={() => setActive((v) => !v)}>
+                {active ? 'Finish generating' : 'Start generating'}
+            </button>
         </div>
     );
 };

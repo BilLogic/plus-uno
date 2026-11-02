@@ -1,6 +1,6 @@
 /*
  * GenerativeBorder: a flat two-tone ring drawn over the edge of the wrapped
- * surface, so it never moves the layout. Two tones in hard-stop 30 degree
+ * content, so it never moves the layout. Two tones in hard-stop 30 degree
  * sectors of a repeating conic gradient turn by animating a registered angle; a mask keeps only the
  * ring. No blur, no gradient blend, no tint.
  */
