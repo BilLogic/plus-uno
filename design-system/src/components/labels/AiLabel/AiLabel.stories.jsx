@@ -67,7 +67,7 @@ TheMarkIsNotAControl.play = async ({ canvasElement }) => {
 /**
  * Low confidence says what to do about it.
  *
- * #269 quotes Rovo's voice guidance: the system must "define… what happens when
+ * #269 quotes Atlassian's AI voice guidance: the system must "define… what happens when
  * confidence is low". A caution treatment with no instruction is a warning with
  * no instruction, so the note is part of the component and not left to each
  * caller's prose — it has a default, and the default is an instruction.
@@ -153,13 +153,13 @@ TheGlyphIsDecoration.play = async ({ canvasElement }) => {
 };
 
 /**
- * The edge is one outline, and the glyph is the AI icon.
+ * The edge is one border, and the glyph is the AI icon.
  *
  * AI is a different REGISTER, not another semantic color, so the ground stays
- * neutral and the only accent is an outline in `--ds-ai-border` with a glyph in
- * `--ds-ai-icon`. The outline is the same width and color on all four sides,
+ * neutral and the only accent is a border in `--ds-ai-border` with a glyph in
+ * `--ds-ai-icon`. The border is the same width and color on all four sides,
  * never a bar on one. `reviewed`, the one origin a person has checked, leaves
- * the AI edge for success on the whole outline and the glyph.
+ * the AI edge for success on the whole border and the glyph.
  */
 export const EdgeAndGlyphUseAiTokens = () => (
     <div style={row}>
@@ -171,7 +171,7 @@ export const EdgeAndGlyphUseAiTokens = () => (
 EdgeAndGlyphUseAiTokens.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sides = ['Top', 'Right', 'Bottom', 'Left'];
-    const outline = (el) => {
+    const edgeOf = (el) => {
         const s = getComputedStyle(el);
         return {
             widths: sides.map((side) => s[`border${side}Width`]),
@@ -181,7 +181,7 @@ EdgeAndGlyphUseAiTokens.play = async ({ canvasElement }) => {
     const generated = canvas.getByTestId('generated');
     const reviewed = canvas.getByTestId('reviewed');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
-        const edge = outline(generated);
+        const edge = edgeOf(generated);
         await expect(new Set(edge.widths).size, `one width on every side, ${mode}`).toBe(1);
         await expect(edge.colors, `AI edge on every side, ${mode}`).toEqual(Array(4).fill(token('--ds-ai-border')));
         await expect(
@@ -189,9 +189,9 @@ EdgeAndGlyphUseAiTokens.play = async ({ canvasElement }) => {
             `AI glyph, ${mode}`,
         ).toBe(token('--ds-ai-icon'));
 
-        const checked = outline(reviewed);
+        const checked = edgeOf(reviewed);
         await expect(new Set(checked.widths).size, `one width on every side, reviewed, ${mode}`).toBe(1);
-        await expect(checked.colors, `success edge on every side, ${mode}`).toEqual(Array(4).fill(token('--color-success')));
+        await expect(checked.colors, `success edge on every side, ${mode}`).toEqual(Array(4).fill(token('--ds-border-success')));
     });
 };
 

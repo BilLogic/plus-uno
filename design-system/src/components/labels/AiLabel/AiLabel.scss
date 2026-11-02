@@ -3,9 +3,9 @@
  *
  * ACHROMATIC GROUND, PURPLE EDGE AND GLYPH. AI is a different register, not
  * another semantic color competing with success and danger, so the ground is
- * the neutral surface ramp and the only accent is a uniform outline in
+ * the neutral ground and the only accent is a uniform border in
  * `--ds-ai-border` and a glyph in `--ds-ai-icon`. The accent marks an edge and
- * an icon; it never floods a surface and is never a bar on one side.
+ * an icon; it never floods the ground and is never a bar on one side.
  */
 .plus-ai-label {
     display: inline-flex;
@@ -17,11 +17,11 @@
     padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
 
     /* The edge, not a fill, and the same on all four sides. */
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--ds-surface);
     border: var(--size-element-border) solid var(--ds-ai-border);
     border-radius: var(--size-element-radius-md);
 
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-ai-label__mark {
@@ -47,25 +47,22 @@
     border-color: var(--ds-border-success);
 
     .plus-ai-label__mark {
-        color: var(--color-success);
+        color: var(--ds-icon-success);
     }
 }
 
 /*
- * Low confidence uses the WARNING container pair, not the warning ground.
- *
- * Deliberate, and measured: `--color-warning` with a white label is 3.70:1 and
- * fails AA (#312), while `--color-warning-container` with
- * `--color-on-warning-container` is 13.27:1. A new component must not be built
- * on the one pair in the system that is known to fail.
+ * Low confidence is an inline warning: `--ds-background-warning` with the
+ * body text on it, the border and glyph in the warning role. The pair holds its
+ * contrast in every color and contrast mode.
  */
 .plus-ai-label--low {
-    background-color: var(--color-warning-container);
-    color: var(--color-on-warning-container);
-    border-color: var(--color-warning-text);
+    background-color: var(--ds-background-warning);
+    color: var(--ds-text);
+    border-color: var(--ds-border-warning);
 
     .plus-ai-label__mark {
-        color: var(--color-warning-text);
+        color: var(--ds-icon-warning);
     }
 }
 
@@ -101,6 +98,6 @@
 }
 
 .plus-ai-label__explain:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--color-primary);
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
     outline-offset: var(--size-element-gap-xs);
 }
