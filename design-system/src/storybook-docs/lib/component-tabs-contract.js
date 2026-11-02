@@ -21,9 +21,6 @@
 
 const COMPONENTS_ROOT = 'design-system/src/components';
 
-/** The AI section's components, one capitalized folder each (`ai/GenerativeBorder/`). Its overview pages sit loose in `ai/` and have no tabs. */
-const AI_ROOT = 'design-system/src/ai';
-
 /** Vite reports import paths as `./a/b.jsx`; the repo talks in `a/b.jsx`. */
 const repoPath = (p) => String(p).replace(/\\/g, '/').replace(/^\.\//, '');
 
@@ -56,8 +53,8 @@ export const TABS = [
 ];
 
 /**
- * The docs pages that get a tab strip: every component and every AI
- * component, plus one named exception.
+ * The docs pages that get a tab strip: every component, plus one named
+ * exception.
  *
  * Atlassian files its Design tokens page under `/components/` and gives it the
  * strip, while Color, Spacing, Typography and Accessibility sit under
@@ -81,7 +78,6 @@ export const TABBED_EXCEPTIONS = ['design-system/src/styles/DesignTokens.mdx'];
 export function isTabbedDocsPage(file) {
   const path = repoPath(file);
   if (TABBED_EXCEPTIONS.includes(path)) return true;
-  if (path.startsWith(`${AI_ROOT}/`)) return /^[A-Z][^/]*\/[^/]+\.mdx$/.test(path.slice(AI_ROOT.length + 1));
   return path.startsWith(`${COMPONENTS_ROOT}/`) && path.endsWith('.mdx');
 }
 
