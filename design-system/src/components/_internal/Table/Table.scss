@@ -302,3 +302,88 @@
     align-items: center;
     gap: var(--size-element-gap-md);
 }
+
+// ---------------------------------------------------------------- head cell
+
+// A column header. The unsorted arrow appears on hover and focus; a sorted
+// column keeps its arrow. The sort button fills the whole cell, so the state
+// fill covers the cell, and focus is a ring inset in the cell, never a fill.
+.plus-table-head-cell-inner,
+.plus-table-head-cell-button {
+    display: flex;
+    align-items: center;
+    gap: var(--size-table-cell-inline);
+    min-width: 0;
+    width: 100%;
+}
+
+.plus-table-head-cell-type,
+.plus-table-head-cell-sort {
+    flex: none;
+    width: var(--size-icon-sm);
+    font-size: var(--size-icon-sm);
+    line-height: 1;
+    text-align: center;
+}
+
+.plus-table-head-cell-label {
+    min-width: 0;
+}
+
+.plus-table-head-cell-label--truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-table-head-cell--truncate {
+    overflow: hidden;
+}
+
+.plus-table-head-cell.plus-table-cell--align-number {
+    .plus-table-head-cell-inner,
+    .plus-table-head-cell-button { justify-content: flex-end; }
+}
+
+.plus-table-head-cell.plus-table-cell--align-icon {
+    .plus-table-head-cell-inner,
+    .plus-table-head-cell-button { justify-content: center; }
+}
+
+// The cell hands its padding to the button, so the button is the whole cell.
+.plus-table .plus-table-head-cell--sortable,
+.plus-table-head-cell--sortable {
+    padding: 0;
+}
+
+.plus-table-head-cell-button {
+    appearance: none;
+    height: var(--plus-table-row-height, var(--size-row-default));
+    margin: 0;
+    padding: 0 var(--size-table-cell-pad-x);
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    cursor: pointer;
+
+    .plus-table-head-cell-sort { opacity: 0; }
+
+    &:hover,
+    &:focus-visible,
+    &.plus-table-head-cell-button--sorted {
+        .plus-table-head-cell-sort { opacity: 1; }
+    }
+
+    &.plus-table-head-cell-button--sorted { color: var(--ds-text); }
+
+    &:hover { background-color: var(--ds-background-neutral-subtle-hovered); }
+
+    &:active { background-color: var(--ds-background-neutral-subtle-pressed); }
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+}

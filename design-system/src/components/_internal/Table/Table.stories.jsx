@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import Table, { StaticTable, TableFooter } from '@/components/_internal/Table';
+import Table, { StaticTable, TableFooter, HeadCell } from '@/components/_internal/Table';
 
 export default {
     title: 'Components/Text and data display/Table',
@@ -270,5 +270,99 @@ export const Static = {
         const row = rowOf(canvasElement, 'Priya Nair');
         await userEvent.hover(row);
         await expect(getComputedStyle(row).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    }
+};
+
+const HeadRow = ({ children }) => (
+    <table className="plus-table plus-table-md" style={{ tableLayout: 'fixed' }}>
+        <thead><tr>{children}</tr></thead>
+    </table>
+);
+
+export const HeadCells = {
+    parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 12 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
+    render: () => (
+        <HeadRow>
+            <HeadCell label="Student" icon="fa-regular fa-user" width="160px" />
+            <HeadCell label="A column name far too long for the width it was given" width="120px" />
+            <HeadCell label="Sessions" align="number" icon="fa-solid fa-hashtag" width="120px" />
+            <HeadCell label="Flagged" align="icon" icon="fa-solid fa-flag" isIconOnlyHeader width="64px" />
+        </HeadRow>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const long = canvas.getByText(/far too long/);
+        await waitFor(() => expect(long.scrollWidth).toBeGreaterThan(long.clientWidth));
+        await expect(getComputedStyle(long).textOverflow).toBe('ellipsis');
+        await userEvent.hover(long);
+        await waitFor(() => expect(within(canvasElement.ownerDocument.body).getByRole('tooltip')).toHaveTextContent(/far too long/));
+        await userEvent.unhover(long);
+        await expect(canvas.getByRole('columnheader', { name: 'Flagged' })).toBeVisible();
+        await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
+        await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');
+        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
+    }
+};
+
+const SortableHeads = () => {
+    const [sorted, setSorted] = React.useState({ key: null, sort: 'none' });
+    const head = (key, label, extra = {}) => (
+        <HeadCell
+            key={key}
+            label={label}
+            isSortable
+            sort={sorted.key === key ? sorted.sort : 'none'}
+            onSort={(sort) => setSorted({ key, sort })}
+            {...extra}
+        />
+    );
+    return (
+        <HeadRow>
+            {head('student', 'Student', { width: '200px' })}
+            {head('sessions', 'Sessions', { width: '140px', align: 'number' })}
+        </HeadRow>
+    );
+};
+
+export const SortableHeadCells = {
+    render: () => <SortableHeads />,
+    parameters: { docs: { description: { story: 'A sortable column puts `aria-sort` on the header and a real button inside it. A press asks for ascending, then descending, then no sort; the page owns the sort. The unsorted arrow shows on hover and focus and a sorted column keeps its arrow, always 12 tall. Focus is a ring inset in the cell, never a fill.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const th = canvas.getByRole('columnheader', { name: /Student/ });
+        const button = within(th).getByRole('button');
+        const arrow = th.querySelector('.plus-table-head-cell-sort');
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+        await expect(getComputedStyle(arrow).opacity, 'unsorted arrow is hidden at rest').toBe('0');
+        await userEvent.tab();
+        await expect(button, 'the button takes focus from the keyboard').toHaveFocus();
+        await expect(getComputedStyle(arrow).opacity, 'and the arrow shows on focus').toBe('1');
+        await expect(px(getComputedStyle(arrow).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
+        button.blur();
+
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'ascending');
+        await expect(arrow).toHaveClass('fa-sort-up');
+        await userEvent.unhover(button);
+        await expect(getComputedStyle(arrow).opacity, 'a sorted arrow stays').toBe('1');
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'descending');
+        await expect(arrow).toHaveClass('fa-sort-down');
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+
+        await inEveryColorMode(async (mode) => {
+            button.blur();
+            await userEvent.tab();
+            await expect(button, `${mode}: keyboard focus`).toHaveFocus();
+            const style = getComputedStyle(button);
+            await expect(style.outlineStyle, `${mode}: focus is a ring`).toBe('solid');
+            await expect(style.outlineColor, `${mode}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+            // The real pointer may still rest on the button after the clicks above; its
+            // hover fill is the only fill the cell may carry. Focus adds none.
+            const fill = button.matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)';
+            await expect(style.backgroundColor, `${mode}: focus is not a fill`).toBe(fill);
+            button.blur();
+        });
     }
 };

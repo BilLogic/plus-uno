@@ -9,7 +9,7 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 
 **Source:** `design-system/src/components/_internal/Table/Table.jsx`
 
-**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty, Sizes, FramedAndLines, Cells, RowStates, Summary, Footer, Static
+**Stories:** `design-system/src/components/_internal/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty, Sizes, FramedAndLines, Cells, RowStates, Summary, Footer, Static, HeadCells, SortableHeadCells
 
 **Storybook page:** `design-system/src/components/_internal/Table/Table.mdx`
 
@@ -52,7 +52,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--font-weight-semibold-2` · `--heading-xxsmall` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--size-element-border` · `--size-element-gap-md` · `--size-indicator-sm` · `--size-row-comfortable` · `--size-row-compact` · `--size-row-default` · `--size-spacing-large-space-800` · `--size-table-cell-gap` · `--size-table-cell-inline` · `--size-table-cell-pad-x` · `--size-table-cell-pad-y` · `--size-table-radius-md` · `--size-table-radius-sm`
+`--body-default` · `--body-small` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--font-weight-semibold-2` · `--heading-xxsmall` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--size-element-border` · `--size-element-gap-md` · `--size-element-stroke-lg` · `--size-icon-sm` · `--size-indicator-sm` · `--size-row-comfortable` · `--size-row-compact` · `--size-row-default` · `--size-spacing-large-space-800` · `--size-table-cell-gap` · `--size-table-cell-inline` · `--size-table-cell-pad-x` · `--size-table-cell-pad-y` · `--size-table-radius-md` · `--size-table-radius-sm`
 
 From `design-system/src/components/_internal/Table/Table.scss`. Override these through the token layer, never with a literal.
 
