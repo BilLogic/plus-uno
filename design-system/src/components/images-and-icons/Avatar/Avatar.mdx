@@ -1,0 +1,210 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AvatarStories from './Avatar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "size": {
+      "type": "enum",
+      "values": ["16", "20", "24", "32", "40", "48", "96", "128"]
+    },
+    "shape": {
+      "type": "enum",
+      "values": ["circle", "square"]
+    },
+    "status": {
+      "type": "enum",
+      "values": ["online", "away", "busy", "offline"]
+    }
+  },
+  "sets": []
+};
+
+<Meta of={AvatarStories} />
+
+<Title />
+A person or an agent as a picture, their initials or an icon. Circles are
+people; squares are teams and agents. `AvatarGroup` overlaps a row of them and
+folds the rest into a `+n`.
+
+<DocsTabs of={AvatarStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Avatar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Eight sizes. 16 to 48 are the Media sizes; 96 and 128 are for profiles.</>}>
+    <Canvas of={AvatarStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Initials, icons and pictures
+
+<DocsCanvasShell description={<>Initials are the first letters of the first and last words of the name. A 16 or 20 keeps one.</>}>
+    <DsCanvasQuiet of={AvatarStories.Initials} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The picture wins when it loads. When it fails the initials show, then the icon, then a plain person glyph.</>}>
+    <DsCanvasQuiet of={AvatarStories.Fallbacks} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Shape and color
+
+<DocsCanvasShell description={<>A square takes a quarter of its size as its radius.</>}>
+    <DsCanvasQuiet of={AvatarStories.Shapes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Colors are categories from the Tag set, never a status.</>}>
+    <DsCanvasQuiet of={AvatarStories.Colors} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Presence
+
+<DocsCanvasShell description={<>A dot a quarter of the avatar's size, at the bottom right. The status is also said in the avatar's accessible name.</>}>
+    <DsCanvasQuiet of={AvatarStories.Status} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Group
+
+<DocsCanvasShell description={<><code>max</code> counts the <code>+n</code> in, so seven people with a max of five show four avatars and <code>+3</code>. The <code>+3</code> opens the rest by name.</>}>
+    <DsCanvasQuiet of={AvatarStories.Group} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AvatarStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Avatar` wherever a person or an agent is named in a row, a thread or a
+list of attendees. Use `AvatarGroup` for a short set of people that would crowd
+a line: the attendees of a session, the members of a team.
+
+Use `Tile` for a school, a tool or a lesson: a square picture of a thing, not
+a face. Use `UserAvatar` for the signed-in user in the topbar, with the name,
+role and notification counter beside the initial.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Circle for people, square for teams and agents.
+
+Keep one shape per kind within a list, so the shape tells a person from an
+agent at a glance.
+
+```jsx
+// Incorrect: a person in a square, an agent in a circle.
+<Avatar shape="square" name="Jane Park" />
+<Avatar icon="robot" label="Study bot" />
+
+// Correct.
+<Avatar name="Jane Park" />
+<Avatar shape="square" icon="robot" label="Study bot" />
+```
+
+### Keep the name beside bare initials.
+
+Two people can share initials. The name is what tells them apart, so drop it
+only where the person is named nearby.
+
+### Let the group set the size.
+
+`AvatarGroup` passes its `size` and `shape` to every avatar, so the row stays
+even.
+
+```jsx
+<AvatarGroup label="Session attendees" max={5}>
+    {people.map((p) => <Avatar key={p.id} name={p.name} src={p.photo} />)}
+</AvatarGroup>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Decorative by default.** An avatar with no `name` or `label` is hidden from
+  assistive technology (`aria-hidden="true"`), for use beside a name that
+  already says who it is.
+- **A name makes it one image.** With a `name` or `label` it becomes
+  `role="img"` with that name. A `status` is added to the name ("Jane Park,
+  online"), since the dot's color alone says nothing to a screen reader.
+- **The group is a named group.** Give `AvatarGroup` a `label`. The `+n` is a
+  button named by its count ("+3, 3 more people"); it opens a menu of the
+  hidden people by name, reached with Tab and closed with Escape.
+- **Not a control.** An avatar has no hover or focus state of its own. To make
+  one clickable, wrap it in a button or link that carries the name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+- For a school, a tool or a lesson in a square, use `Tile`.
+- For a role or state beside a name, use `Status`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

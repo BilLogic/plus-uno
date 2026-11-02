@@ -21,6 +21,7 @@ export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
 export * from '@/components/forms-and-inputs';
+export { default as Avatar, AvatarGroup } from '@/components/images-and-icons/Avatar';
 export { default as Illustration } from '@/components/images-and-icons/Illustration';
 export { default as Jumbotron } from '@/components/layout-and-structure/Jumbotron';
 export { default as ListGroup } from '@/components/layout-and-structure/ListGroup';

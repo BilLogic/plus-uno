@@ -1,0 +1,156 @@
+/*
+ * Avatar and AvatarGroup: a person or an agent as a picture, initials or icon.
+ *
+ * 16 to 48 are the Media sizes (--size-media-*). 96 and 128 are profile sizes
+ * no role names yet, so they sit here, built from the spacing primitives. A
+ * circle rounds fully; a square takes a quarter of its size, like Tile.
+ */
+$avatar-sizes: (
+    16: (var(--size-media-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
+    20: (var(--size-media-xs), var(--font-size-body3), var(--font-size-fa-body2)),
+    24: (var(--size-media-sm), var(--font-size-body3), var(--font-size-fa-body1)),
+    32: (var(--size-media-md), var(--font-size-body2), var(--font-size-fa-h5)),
+    40: (var(--size-media-lg), var(--font-size-body1), var(--font-size-fa-h4)),
+    48: (var(--size-media-xl), var(--font-size-h5), var(--font-size-fa-h3)),
+    96: (var(--size-spacing-large-space-1200), var(--font-size-h2), var(--font-size-fa-h1)),
+    128: (calc(var(--size-spacing-large-space-900) * 2), var(--font-size-h1), var(--font-size-fa-h1)),
+);
+
+// The initials and icon grounds, per Tag color: ground, ink.
+$avatar-colors: (
+    'blue': (var(--ds-background-accent-blue-subtler), var(--ds-text-accent-blue)),
+    'gray': (var(--ds-background-accent-gray-subtler), var(--ds-text-accent-gray)),
+    'green': (var(--ds-background-accent-green-subtler), var(--ds-text-accent-green)),
+    'purple': (var(--ds-background-accent-purple-subtler), var(--ds-text-accent-purple)),
+    'magenta': (var(--ds-background-accent-magenta-subtler), var(--ds-text-accent-magenta)),
+    'yellow': (var(--ds-background-accent-yellow-subtler), var(--ds-text-accent-yellow)),
+    'teal': (var(--ds-background-accent-teal-subtler), var(--ds-text-accent-teal)),
+);
+
+.plus-avatar {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    inline-size: var(--avatar-size, var(--size-media-md));
+    block-size: var(--avatar-size, var(--size-media-md));
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: middle;
+    background-color: var(--ds-background-accent-blue-subtler);
+    color: var(--ds-text-accent-blue);
+    font-family: inherit;
+    font-size: var(--avatar-font, var(--font-size-body2));
+    font-weight: var(--font-weight-semibold-2);
+    line-height: 1;
+    border-radius: var(--size-element-radius-full);
+    --avatar-glyph: var(--font-size-fa-h5);
+}
+
+.plus-avatar--square {
+    border-radius: calc(var(--avatar-size, var(--size-media-md)) / 4);
+}
+
+@each $size, $values in $avatar-sizes {
+    .plus-avatar--#{$size},
+    .plus-avatar-group--#{$size} {
+        --avatar-size: #{nth($values, 1)};
+        --avatar-font: #{nth($values, 2)};
+        --avatar-glyph: #{nth($values, 3)};
+    }
+}
+
+@each $name, $tokens in $avatar-colors {
+    .plus-avatar--#{$name} {
+        background-color: nth($tokens, 1);
+        color: nth($tokens, 2);
+    }
+}
+
+.plus-avatar__initials,
+.plus-avatar__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-inline-size: 100%;
+    overflow: hidden;
+    user-select: none;
+}
+
+.plus-avatar .plus-avatar__icon > * {
+    font-size: var(--avatar-glyph);
+    line-height: 1;
+    color: inherit;
+}
+
+.plus-avatar__image {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+}
+
+/* ---------------------------------------------------------------- status */
+
+.plus-avatar__status {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-end: 0;
+    inline-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
+    block-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
+    min-inline-size: calc(var(--size-element-border) * 6);
+    min-block-size: calc(var(--size-element-border) * 6);
+    box-sizing: border-box;
+    border-radius: var(--size-element-radius-full);
+    // The ring cuts the dot out of the picture beneath it.
+    box-shadow: 0 0 0 calc(var(--size-element-border) * 2) var(--ds-surface);
+}
+
+// A circle's edge curves in, so its dot sits on the curve, not the corner.
+.plus-avatar--circle > .plus-avatar__status {
+    inset-inline-end: calc(var(--avatar-size, var(--size-media-md)) / 20);
+    inset-block-end: calc(var(--avatar-size, var(--size-media-md)) / 20);
+}
+
+.plus-avatar__status--online { background-color: var(--ds-background-success-bold); }
+.plus-avatar__status--away { background-color: var(--ds-background-warning-bold); }
+.plus-avatar__status--busy { background-color: var(--ds-background-danger-bold); }
+.plus-avatar__status--offline { background-color: var(--ds-background-neutral-bold); }
+
+/* --------------------------------------------------------------- overflow */
+
+button.plus-avatar--overflow {
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--ds-background-accent-gray-subtle);
+    }
+
+    &:focus-visible {
+        outline: calc(var(--size-element-border) * 2) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-border);
+    }
+}
+
+/* ------------------------------------------------------------------ group */
+
+.plus-avatar-group {
+    display: inline-flex;
+    align-items: center;
+    // The first item's negative margin is given back, so the row starts at its edge.
+    padding-inline-start: calc(var(--avatar-size, var(--size-media-md)) / 4);
+}
+
+.plus-avatar-group__item {
+    display: inline-flex;
+    margin-inline-start: calc(var(--avatar-size, var(--size-media-md)) / -4);
+}
+
+// A ring separates neighbors, in the surface color the group sits on.
+.plus-avatar-group .plus-avatar {
+    box-shadow: 0 0 0 calc(var(--size-element-border) * 2) var(--ds-surface);
+}

@@ -100,6 +100,51 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
+    "Avatar": {
+      "code": {
+        "import": "@/components/images-and-icons",
+        "export": "default",
+        "mdxPath": "design-system/src/components/images-and-icons/Avatar/Avatar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Avatar",
+        "source": "design-system/src/components/images-and-icons/Avatar/Avatar.jsx",
+        "storybookId": "components-images-and-icons-avatar--docs",
+        "props": {
+          "size": {
+            "type": "enum",
+            "values": [
+              "16",
+              "20",
+              "24",
+              "32",
+              "40",
+              "48",
+              "96",
+              "128"
+            ]
+          },
+          "shape": {
+            "type": "enum",
+            "values": [
+              "circle",
+              "square"
+            ]
+          },
+          "status": {
+            "type": "enum",
+            "values": [
+              "online",
+              "away",
+              "busy",
+              "offline"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": []
+      }
+    },
     "Badge": {
       "code": {
         "import": "@/components/labels",
