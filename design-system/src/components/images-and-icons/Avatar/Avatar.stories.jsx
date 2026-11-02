@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Avatar, { AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from './Avatar';
-import AvatarGroup from './AvatarGroup';
+import AvatarGroup from '../AvatarGroup';
 
 /**
  * `Avatar` and `AvatarGroup`: a person or an agent as a picture, initials or icon.

@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { AVATAR_SIZES, AVATAR_SHAPES } from './Avatar';
+import { AVATAR_SIZES, AVATAR_SHAPES } from '../Avatar';
 import Dropdown from '../../forms-and-inputs/Dropdown';
-import './Avatar.scss';
+import '../Avatar/Avatar.scss';
 
 /**
  * A row of avatars that overlap, with the rest behind a `+n`.
