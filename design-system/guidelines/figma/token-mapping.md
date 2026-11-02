@@ -115,7 +115,8 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Modal padding | `var(--size-modal-pad-{x\|y}-{sm\|md\|lg})` |
 | Section padding | `var(--size-section-pad-{x\|y}-{sm\|md\|lg})` |
 | Surface padding | `var(--size-surface-pad-{x\|y})` |
-| Table cell | `var(--size-table-cell-{x\|y\|gap})` |
+| Table cell | `var(--size-table-cell-pad-{x\|y})` 12 · 8 and `var(--size-table-cell-inline)` 12; the older `--size-table-cell-{x\|y\|gap}` resolve to the same |
+| Size roles | `var(--size-icon-md)`, `var(--size-row-default)`: Icon sm · md · lg 12 · 16 · 24, Indicator sm · md 16 · 20, Control sm · md · lg 24 · 32 · 40, Row compact · default · comfortable 32 · 40 · 48, Media xxs … xl 16 · 20 · 24 · 32 · 40 · 48. Code only until Figma has the variables |
 
 ### Scale Tokens
 

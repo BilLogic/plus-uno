@@ -165,7 +165,8 @@
       "Modal padding": "var(--size-modal-pad-{x|y}-{sm|md|lg})",
       "Section padding": "var(--size-section-pad-{x|y}-{sm|md|lg})",
       "Surface padding": "var(--size-surface-pad-{x|y})",
-      "Table cell": "var(--size-table-cell-{x|y|gap})"
+      "Table cell": "var(--size-table-cell-pad-{x|y})",
+      "Size roles": "var(--size-icon-md)"
     },
     "elevation": {
       "Elevation Light/1 (subtle)": "var(--elevation-light-1)",
@@ -1308,7 +1309,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1529,
+    "scssTokenCount": 1549,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1133,
