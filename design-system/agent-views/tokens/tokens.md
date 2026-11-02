@@ -25,6 +25,9 @@ Use for padding, margin, and gaps.
 --size-card-radius-full
 --size-card-radius-md
 --size-card-radius-sm
+--size-control-lg
+--size-control-md
+--size-control-sm
 --size-element-border
 --size-element-gap-lg
 --size-element-gap-md
@@ -45,6 +48,17 @@ Use for padding, margin, and gaps.
 --size-element-stroke-md
 --size-element-stroke-sm
 --size-element-stroke-xl
+--size-icon-lg
+--size-icon-md
+--size-icon-sm
+--size-indicator-md
+--size-indicator-sm
+--size-media-lg
+--size-media-md
+--size-media-sm
+--size-media-xl
+--size-media-xs
+--size-media-xxs
 --size-modal-border-lg
 --size-modal-border-md
 --size-modal-border-sm
@@ -61,6 +75,9 @@ Use for padding, margin, and gaps.
 --size-modal-radius-lg
 --size-modal-radius-md
 --size-modal-radius-sm
+--size-row-comfortable
+--size-row-compact
+--size-row-default
 --size-section-border
 --size-section-gap-lg
 --size-section-gap-md
@@ -86,6 +103,9 @@ Use for padding, margin, and gaps.
 --size-surface-pad-y
 --size-surface-radius
 --size-table-cell-gap
+--size-table-cell-inline
+--size-table-cell-pad-x
+--size-table-cell-pad-y
 --size-table-cell-x
 --size-table-cell-y
 --size-table-radius-md
