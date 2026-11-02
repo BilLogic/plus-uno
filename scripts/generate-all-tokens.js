@@ -361,7 +361,32 @@ ${lines(groups.stroke)}}
 const SEMANTIC_OVERRIDES = {
     'element-radius-sm': 'border-radius-radius-100',
     'surface-container-gap-md': 'spacing-medium-space-300',
+    // A table cell pads 12 on the inline axis and keeps 8 on the block axis.
+    // Figma's Table/cell-x and Table/cell-gap still say 10.
+    'table-cell-x': 'spacing-medium-space-200',
+    'table-cell-gap': 'spacing-medium-space-200',
 };
+
+/**
+ * One primitive size scale used through five roles. A role names what the
+ * size is for, and each step points at the spacing primitive of that size, so
+ * a 24 Icon and a 24 Control stay one number. Steps are listed in the order
+ * they are written.
+ */
+const SIZE_ROLES = [
+    { prefix: 'icon', heading: 'Icon Sizes', steps: { sm: 'spacing-medium-space-200', md: 'spacing-medium-space-300', lg: 'spacing-medium-space-500' } },
+    { prefix: 'indicator', heading: 'Indicator Sizes', steps: { sm: 'spacing-medium-space-300', md: 'spacing-medium-space-400' } },
+    { prefix: 'control', heading: 'Control Sizes', steps: { sm: 'spacing-medium-space-500', md: 'spacing-large-space-600', lg: 'spacing-large-space-700' } },
+    { prefix: 'row', heading: 'Row Sizes', steps: { compact: 'spacing-large-space-600', default: 'spacing-large-space-700', comfortable: 'spacing-large-space-800' } },
+    {
+        prefix: 'media',
+        heading: 'Media Sizes',
+        steps: {
+            xxs: 'spacing-medium-space-300', xs: 'spacing-medium-space-400', sm: 'spacing-medium-space-500',
+            md: 'spacing-large-space-600', lg: 'spacing-large-space-700', xl: 'spacing-large-space-800',
+        },
+    },
+];
 
 /** Semantic tokens the stylesheet declares that Figma does not have. */
 const CODE_ONLY_SEMANTICS = {
@@ -369,6 +394,12 @@ const CODE_ONLY_SEMANTICS = {
     'surface-container-pad-y': 'spacing-medium-space-200',
     'table-radius-md': 'border-radius-radius-200',
     'table-radius-sm': 'border-radius-radius-150',
+    'table-cell-pad-x': 'spacing-medium-space-200',
+    'table-cell-pad-y': 'spacing-small-space-100',
+    'table-cell-inline': 'spacing-medium-space-200',
+    ...Object.fromEntries(
+        SIZE_ROLES.flatMap(({ prefix, steps }) => Object.entries(steps).map(([step, primitive]) => [`${prefix}-${step}`, primitive])),
+    ),
 };
 
 /**
@@ -393,13 +424,14 @@ const SEMANTIC_LAYERS = [
     { prefix: 'surface', heading: 'Surfaces Layer' },
     { prefix: 'surface-container', heading: 'Surface Containers Layer' },
     { prefix: 'table', heading: 'Table Tokens' },
+    ...SIZE_ROLES.map(({ prefix, heading, steps }) => ({ prefix, heading, steps: Object.keys(steps) })),
 ];
 
 /**
  * Within a layer, tokens are written by kind in this order, then by size with
  * `-full` last. A token of a kind not listed here is a refusal.
  */
-const SEMANTIC_KINDS = ['cell-x', 'cell-y', 'cell-gap', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
+const SEMANTIC_KINDS = ['cell-pad-x', 'cell-pad-y', 'cell-inline', 'cell-x', 'cell-y', 'cell-gap', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
 
 /**
  * Generate semantic tokens SCSS
@@ -456,6 +488,9 @@ function generateSemanticsSCSS() {
     }
     const kind = (token, prefix) => {
         const rest = token.slice(prefix.length + 1);
+        // A size role is ordered by its steps, not by SEMANTIC_KINDS.
+        const steps = SEMANTIC_LAYERS.find((l) => l.prefix === prefix).steps;
+        if (steps) return steps.indexOf(rest);
         const index = SEMANTIC_KINDS.findIndex((k) => rest === k || rest.startsWith(`${k}-`));
         if (index < 0) throw new Error(`size _ semantics.json: --size-${token} is none of SEMANTIC_KINDS.`);
         return index;
@@ -465,7 +500,8 @@ function generateSemanticsSCSS() {
     let scss = `/**
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
- * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers
+ * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers,
+ * Table, then the size roles: Icon, Indicator, Control, Row, Media
  */
 
 :root {
