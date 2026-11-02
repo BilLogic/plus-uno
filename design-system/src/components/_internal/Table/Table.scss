@@ -175,10 +175,6 @@
 
 // Row fills are drawn on the row, so a hovered or highlighted row reads as one
 // band across its cells.
-.plus-table tbody tr {
-    transition: background-color 0.15s ease;
-}
-
 .plus-table-hover tbody tr:hover,
 .plus-table tbody tr.plus-table-row--clickable:hover {
     background-color: var(--ds-background-neutral-subtle-hovered);
