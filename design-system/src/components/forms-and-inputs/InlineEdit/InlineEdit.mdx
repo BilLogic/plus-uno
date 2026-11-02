@@ -1,0 +1,210 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as InlineEditStories from './InlineEdit.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {},
+  "sets": []
+};
+
+<Meta of={InlineEditStories} />
+
+<Title />
+Text that reads as text and becomes a field when it is pressed. `InlineEdit` holds
+any edit view; `InlineEditableTextfield` is the one built on `Input`.
+
+<DocsTabs of={InlineEditStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InlineEdit"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Press the name to edit it. Enter or the check confirms; Escape or the cross cancels.</>}>
+    <Canvas of={InlineEditStories.Textfield} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Same size, both views
+
+<DocsCanvasShell description={<>The read view is drawn on the field's own box, 32 high, with the same side padding, so the text does not move when the editor opens. Compact is 24 in both.</>}>
+    <DsCanvasQuiet of={InlineEditStories.SameHeight} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The buttons hang under the field over whatever follows it, so showing them does not push the page down.</>}>
+    <DsCanvasQuiet of={InlineEditStories.ButtonsDoNotMoveThePage} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Confirming
+
+<DocsCanvasShell description={<>Leaving the field confirms, as Enter does. Focus goes where the person sent it.</>}>
+    <DsCanvasQuiet of={InlineEditStories.LeavingConfirms} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>keepEditViewOpenOnBlur</code> makes leaving do nothing, so a click elsewhere cannot publish half a thought. Only Enter and the check confirm.</>}>
+    <DsCanvasQuiet of={InlineEditStories.KeepOpenOnBlur} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>hideActionButtons</code> leaves the buttons off. Enter, Escape and leaving still work.</>}>
+    <DsCanvasQuiet of={InlineEditStories.WithoutButtons} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>startWithEditViewOpen</code> opens in the field with the caret in it.</>}>
+    <DsCanvasQuiet of={InlineEditStories.StartsOpen} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Validation
+
+<DocsCanvasShell description={<><code>validate</code> returns a message to refuse a value. The field stays open, marked invalid, with the message in its caption, and typing clears it.</>}>
+    <DsCanvasQuiet of={InlineEditStories.Validation} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A <code>onConfirm</code> that throws or rejects shows its message the same way and keeps what was typed.</>}>
+    <DsCanvasQuiet of={InlineEditStories.FailedConfirm} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Other edit views and an empty value
+
+<DocsCanvasShell description={<><code>InlineEdit</code> takes any edit view as a function. It is given the value, an <code>onChange</code> that takes a value or an event, and the validation to show.</>}>
+    <DsCanvasQuiet of={InlineEditStories.WithAnotherEditView} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>With no text the read view shows the placeholder in the subtle color, so there is still something to press.</>}>
+    <DsCanvasQuiet of={InlineEditStories.Placeholder} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={InlineEditStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `InlineEdit` for a value that is read far more often than it is changed and
+that can be saved on its own: a title, a name or a short note on a record or a
+profile page.
+
+Use `Input` inside a form, where a Save button submits every field together. An
+inline edit saves when it is confirmed and has no say in the form's submit, so
+placing one in a form leaves two ways to save. Use a subtle `Input` where
+leaving the field should save with no buttons at all.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Keep the read view to plain text.
+
+The whole read view is one button. A link or a button inside it cannot be
+reached or pressed, so put those beside it.
+
+```jsx
+// Incorrect: a link inside the read view.
+<InlineEdit readView={() => <a href="/profile">{name}</a>} ... />
+
+// Correct.
+<InlineEditableTextfield label="Name" value={name} onConfirm={setName} />
+```
+
+### Let the parent hold the value.
+
+`defaultValue` is what the edit view starts with each time it opens. Update it
+in `onConfirm`, or the next edit starts from the old value.
+
+### Say why a value was refused.
+
+Return the reason from `validate`, in the words a tutor would use. A refused
+value leaves the editor open, so the person can fix it without retyping.
+
+### Leave the editor open for long text.
+
+Set `keepEditViewOpenOnBlur` where a stray click would publish an unfinished
+thought, and keep the buttons so there is a clear way out.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The read view is a button.** It is named by the label and the text ("Display
+  name Ada Lovelace") and described as "Edit" (`editLabel`).
+- **Focus follows the editor.** Opening it puts the caret in the field. Enter,
+  the check or Escape returns focus to the read view. Leaving the field
+  confirms and leaves focus where the person sent it.
+- **Enter confirms and Escape cancels.** In a multi-line edit view, Enter adds a
+  line and Cmd or Ctrl and Enter confirms.
+- **Refusals are announced.** The message is in the field's caption with
+  `role="alert"`, and the field is `aria-invalid`.
+- **The buttons are named.** The check and the cross are icon-only, named by
+  `confirmLabel` and `cancelLabel`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a field in a form, use `Input`.
+- For editing in place with no buttons, use `Input` with `subtle`.
+- For several lines edited in place, use `Textarea` with `subtle`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

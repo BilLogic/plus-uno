@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-23 components. Each row links to the generated facts; the three columns after it are the
+25 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -18,6 +18,8 @@ authored half (#166), counted rather than assumed.
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
+| [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
+| [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [Input](Input.md) | 30 | ✅ | ✅ | ✅ |
 | [InputGroup](InputGroup/index.md) | 24 | ✅ | ✅ | ✅ |
 | [NumberInput](NumberInput.md) | 27 | ✅ | ✕ | ✅ |
@@ -31,7 +33,7 @@ authored half (#166), counted rather than assumed.
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 23/23 (100%) · Correct/incorrect 15/23 (65%) · Accessibility 23/23 (100%)
+**Authored coverage:** When to use 24/25 (96%) · Correct/incorrect 16/25 (64%) · Accessibility 24/25 (96%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
