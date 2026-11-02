@@ -34,7 +34,7 @@ describe('GenerativeBorder', () => {
     });
 
     it('follows the named radius token and falls back to the card radius', () => {
-        const { container, rerender } = render(<GenerativeBorder radius="element">x</GenerativeBorder>);
+        const { container, rerender } = render(<GenerativeBorder radius="control">x</GenerativeBorder>);
         expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--size-element-radius-md)');
         rerender(<GenerativeBorder radius="huge">x</GenerativeBorder>);
         expect(container.firstChild.style.getPropertyValue('--generative-border-radius')).toBe('var(--card-radius)');
