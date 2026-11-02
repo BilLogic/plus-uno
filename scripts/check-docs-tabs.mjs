@@ -312,7 +312,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // Skeleton and Suggestion added one each, and CloseButton added one when
   // Alert's dismiss control became a shared component, and TagInput added one
   // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
-  // Scale, two pages for one, Illustration added one, and VisuallyHidden added one — the deliberate
+  // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two — the deliberate
   // edit this number is here to force.
   //
   // BadgeVariants is the one component here documented from a FLAT source
@@ -320,9 +320,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // is the shape `componentIdentity` already recognizes and the shape #276
   // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
   // both are visible in one group while the deprecation runs.
-  if (tabbed.length !== 61) {
+  if (tabbed.length !== 63) {
     all.push(
-      `expected 61 tabbed docs pages (60 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 63 tabbed docs pages (62 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

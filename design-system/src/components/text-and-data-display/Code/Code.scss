@@ -1,0 +1,14 @@
+/*
+ * Code: the inline chip. The typeface and size come from the --code text style
+ * (0.875em of the surrounding text); fill and ink from the code color roles.
+ */
+
+.plus-code {
+    font: var(--code);
+    padding: 0 var(--size-spacing-small-space-050);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-background-neutral);
+    color: var(--ds-text-code-default);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}

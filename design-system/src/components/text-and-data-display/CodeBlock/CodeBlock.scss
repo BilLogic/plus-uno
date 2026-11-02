@@ -1,0 +1,87 @@
+/*
+ * CodeBlock: the block. Typeface from the --code text style, with the block
+ * line height; surface, ink, gutter and highlight from the code color roles.
+ * The default width is the container's; lines scroll or wrap inside it.
+ */
+
+.plus-code-block {
+    // Gutter width: the digits of the last line number, plus padding each side.
+    --plus-code-block-gutter: calc(var(--plus-code-block-digits, 1) * 1ch + 2 * var(--size-spacing-medium-space-200));
+
+    display: block;
+    margin: 0;
+    padding: var(--size-spacing-small-space-100) 0;
+    overflow-x: auto;
+    font: var(--code);
+    font-size: var(--font-size-0875);
+    line-height: var(--line-height-125);
+    background-color: var(--ds-background-code-default);
+    color: var(--ds-text-code-default);
+    border: var(--size-element-border) solid var(--ds-border);
+    border-radius: var(--size-element-radius-md);
+    tab-size: 4;
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    }
+
+    code {
+        display: block;
+        min-width: 100%;
+        width: max-content;
+        font: inherit;
+    }
+
+    &__line {
+        display: flex;
+        white-space: pre;
+        background-color: transparent;
+
+        &[data-highlighted] {
+            background-color: var(--ds-background-code-highlight);
+        }
+    }
+
+    &__number {
+        position: sticky;
+        left: 0;
+        flex: 0 0 auto;
+        box-sizing: border-box;
+        width: var(--plus-code-block-gutter);
+        padding: 0 var(--size-spacing-medium-space-200);
+        text-align: right;
+        user-select: none;
+        background-color: var(--ds-background-code-gutter);
+        color: var(--ds-text-code-gutter);
+    }
+
+    &__text {
+        flex: 1 1 auto;
+        min-width: 0;
+        padding: 0 var(--size-spacing-medium-space-300);
+
+        // A blank line keeps one line of height; the content is not selectable text.
+        &[data-empty]::before {
+            content: '\200b';
+        }
+    }
+
+    // The words a screen reader gets at the edges of a highlight are not code.
+    &__marker {
+        user-select: none;
+    }
+
+    &--wrap {
+        overflow-x: visible;
+
+        code {
+            width: auto;
+        }
+
+        .plus-code-block__line {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+    }
+}
