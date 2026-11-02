@@ -43,8 +43,9 @@ system. Tuning notes: Foundations/Typography in Storybook.
 |-------|-------|-------|
 | `--font-weight-normal` | 400 | Regular body text |
 | `--font-weight-semibold-1` | 500 | Medium text, badges |
-| `--font-weight-semibold-2` | 600 | Title text (H4-H6) |
-| `--font-weight-bold` | 700 | Headlines (H1-H3) |
+| `--font-weight-semibold-2` | 600 | Small titles (H6) and Noto Sans headings 16 and under |
+| `--font-weight-bold` | 700 | Emphasis inside body text (`.font-weight-bold`) |
+| `--font-weight-headline`, `--font-weight-title` | 500 | Noto Serif headings (H1-H5) |
 
 ## Typography Classes
 
@@ -53,12 +54,12 @@ Apply these classes to elements for consistent typography:
 ### Headlines
 | Class | Size | Weight | Usage |
 |-------|------|--------|-------|
-| `.h1` | 40px | 700 | Major headings |
-| `.h2` | 32px | 700 | Section headings |
-| `.h3` | 28px | 700 | Subsection headings |
-| `.h4` | 24px | 600 | Legacy titles; a card title is Heading/xsmall 14 |
-| `.h5` | 20px | 600 | List titles |
-| `.h6` | 16px | 600 | Small titles |
+| `.h1` | 40px | 500, Noto Serif | Major headings |
+| `.h2` | 32px | 500, Noto Serif | Section headings |
+| `.h3` | 28px | 500, Noto Serif | Subsection headings |
+| `.h4` | 24px | 500, Noto Serif | Legacy titles; a card title is Heading/xsmall 14 |
+| `.h5` | 20px | 500, Noto Serif | List titles |
+| `.h6` | 16px | 600, Noto Sans | Small titles |
 
 ### Body Text
 | Class | Size | Weight | Usage |
@@ -102,4 +103,4 @@ Components automatically apply appropriate typography based on size prop:
 1. **Do not hardcode font values** - Always use typography tokens or classes
 2. **Match size to hierarchy** - Use h1-h6 for structural headings, b1-b3 for content
 3. **Body text is regular (400)** - labels and emphasis use medium (500)
-4. **Headlines are bold (700)** - H1-H3 use bold weight for emphasis
+4. **Headings 20 and up are Noto Serif at 500** - `.h1`-`.h5`, `--font-family-headline` and `--font-family-title`; `.h6` and below are Noto Sans at 600

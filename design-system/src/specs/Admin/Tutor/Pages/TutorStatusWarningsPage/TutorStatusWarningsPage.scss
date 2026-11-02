@@ -66,9 +66,9 @@
         gap: var(--spacing-small-space-100, 8px);
 
         .title-h4 {
-            font-family: var(--font-family-header);
+            font-family: var(--font-family-title);
             font-size: var(--font-size-h4, 24px);
-            font-weight: 700; // Bold to match screenshot
+            font-weight: var(--font-weight-title); // Bold to match screenshot
             line-height: var(--line-height-h4, 1.33);
             color: var(--color-on-surface, #191c1e);
             margin: 0;

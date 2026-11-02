@@ -42,9 +42,9 @@
     }
 
     &__title {
-        font-family: var(--font-family-header);
+        font-family: var(--font-family-title);
         font-size: var(--font-size-h4, 24px);
-        font-weight: var(--font-weight-semibold-2, 600);
+        font-weight: var(--font-weight-title);
         line-height: 1.333;
         color: var(--color-on-surface);
         width: 100%;
