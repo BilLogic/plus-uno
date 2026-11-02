@@ -24,6 +24,19 @@ and regenerate rather than touching the literal.
 - **Specs grammar:** `Specs/<Area>/(<Phase>/)<Type>/<Component>`, with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages. Title Case phases and types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
 - **Naming:** sentence-case display names in titles ("Button group"), using Atlassian's name where Atlassian has the component ("Text field" for `Input`, "Popup" for `Popover`); the label family keeps its own names (Status, Count, Tag, Tag group, Suggestion). PascalCase code exports never change with the display name. A spec composes core components; a local organism reached from 2+ areas gets promoted into `components/` instead of being re-implemented.
 
+## The benchmark: Atlassian
+
+atlassian.design is the benchmark for every Figma and Storybook docs page. Take
+Atlassian's structure, guidance, do and don'ts and wording, then adapt them to
+PLUS: the tutoring context, PLUS component names, our tokens. The page cites the
+atlassian.design page it adapts.
+
+- **Order:** the Figma page in the BS4 library first. Bill reviews it. The
+  Storybook MDX is written from the reviewed Figma page, never ahead of it.
+- **One standard:** the same sections, in the same order and voice, on every
+  page. Figma's section list is `figma/page-documentation.md` § The Docs frame;
+  the MDX carries the same sections in that order.
+
 ## The MDX page shell
 
 Every docs page uses the same skeleton:
