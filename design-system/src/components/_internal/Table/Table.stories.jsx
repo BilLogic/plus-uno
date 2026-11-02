@@ -333,7 +333,9 @@ export const SortableHeadCells = {
         const button = within(th).getByRole('button');
         const arrow = th.querySelector('.plus-table-head-cell-sort');
         await expect(th).toHaveAttribute('aria-sort', 'none');
-        await expect(getComputedStyle(arrow).opacity, 'unsorted arrow is hidden at rest').toBe('0');
+        // The suite's real pointer persists between stories and may rest on the button
+        // when this one starts; hover is the other thing that shows the arrow.
+        await expect(getComputedStyle(arrow).opacity, 'unsorted arrow is hidden at rest').toBe(button.matches(':hover') ? '1' : '0');
         await userEvent.tab();
         await expect(button, 'the button takes focus from the keyboard').toHaveFocus();
         await expect(getComputedStyle(arrow).opacity, 'and the arrow shows on focus').toBe('1');
