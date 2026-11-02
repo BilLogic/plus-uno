@@ -42,6 +42,6 @@ From `design-system/src/components/layout-and-structure/Collapse/Collapse.scss`.
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
+Same group: `Accordion` · `Card` · `Carousel` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
