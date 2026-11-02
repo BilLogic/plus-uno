@@ -39,6 +39,8 @@
         .tooltip-inner {
             box-sizing: border-box;
             font: var(--body-small);
+            // A tooltip is 24 high on one line: the 12/16 line, not Body/small's 18.
+            line-height: var(--line-height-100);
             text-align: left;
             box-shadow: var(--ds-shadow-overlay);
         }

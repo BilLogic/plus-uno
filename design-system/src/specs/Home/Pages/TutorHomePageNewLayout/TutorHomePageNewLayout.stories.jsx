@@ -134,6 +134,9 @@ const expectNoClippedText = async (list) => {
         for (const el of holders) {
             const label = `${name}: "${el.textContent.trim().slice(0, 40)}"`;
             await expect(el.scrollWidth, `${label} fits its width`).toBeLessThanOrEqual(el.clientWidth + 1);
+            // Noto Serif's glyph box is taller than a 28 line, so it overflows a
+            // visible heading by 2px; only a box that clips can cut text.
+            if (getComputedStyle(el).overflowY === 'visible') continue;
             await expect(el.scrollHeight, `${label} fits its height`).toBeLessThanOrEqual(el.clientHeight + 1);
         }
     }

@@ -81,6 +81,8 @@
 
 .plus-sidebar-tab__description {
     font: var(--body-small);
+    // The row is 2 + 20 + 16 + 2 = 40; keep the 16 line, not Body/small's 18.
+    line-height: var(--line-height-100);
     color: var(--ds-text-subtle);
 }
 

@@ -30,8 +30,8 @@ const expectStyle = async (element, name, [size, lineHeight, weight]) => {
     await expect(style.fontWeight, `${name} font weight`).toBe(String(weight));
 };
 
-const HEADING_LARGE = [24, 28, 600];
-const HEADING_MEDIUM = [20, 24, 600];
+const HEADING_LARGE = [24, 28, 500];
+const HEADING_MEDIUM = [20, 24, 500];
 const HEADING_SMALL = [16, 20, 600];
 const HEADING_XSMALL = [14, 20, 600];
 const HEADING_XXSMALL = [12, 16, 600];

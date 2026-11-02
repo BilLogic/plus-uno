@@ -308,6 +308,8 @@ $dropdown-themes: (
     // to hold it.
     .pdropdown-item-description {
         font: var(--body-small);
+        // Keeps the row at 48; the 16 line, not Body/small's 18.
+        line-height: var(--line-height-100);
         color: var(--ds-text-subtle);
     }
 
