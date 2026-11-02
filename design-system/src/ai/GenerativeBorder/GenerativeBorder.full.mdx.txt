@@ -1,0 +1,178 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as GenerativeBorderStories from './GenerativeBorder.stories.jsx';
+import GenerativeBorder from './GenerativeBorder';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+
+<Meta of={GenerativeBorderStories} />
+
+<Title />
+A ring that shows content is being generated. It turns on when generation starts
+and off when it ends. Modeled on Atlassian's
+<a href="https://atlassian.design/rovo-ui/generative-border"> generative border</a>.
+
+<DocsTabs of={GenerativeBorderStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/ai/GenerativeBorder"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Generating: a flat ring of the AI edge and AI bold ground turns slowly around the surface. The wrapper is <code>aria-busy</code>.</>}>
+    <Canvas of={GenerativeBorderStories.Generating} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+### Idle
+
+<DocsCanvasShell description={<>Not generating. The children render with no ring, and the wrapper is not busy.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Idle} />
+</DocsCanvasShell>
+
+### Generating
+
+<DocsCanvasShell description={<>The ring lies over the edge of the surface, so nothing shifts when it appears.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Generating} />
+</DocsCanvasShell>
+
+### Reduced motion
+
+<DocsCanvasShell description={<>With <code>prefers-reduced-motion: reduce</code> the ring stops turning and is one solid AI edge line.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.ReducedMotion} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Radius
+
+<DocsCanvasShell description={<><code>radius</code> names the corner token the ring follows. Match the surface it wraps.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Radii} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={GenerativeBorderStories.Interactive}
+    description={<>Start and finish generating, and change the radius, in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `GenerativeBorder` around the surface the agent is writing into, for exactly
+as long as it is writing: a draft, a summary, a reply. Turn `active` on when
+generation starts and off when it ends.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>active</code></td><td>boolean</td><td>Shows the ring and sets <code>aria-busy</code> on the wrapper. Off, there is no ring.</td></tr>
+        <tr><td><code>radius</code></td><td>card | card-sm | element | element-lg | full</td><td>The corner token the ring follows. Defaults to <code>card</code>.</td></tr>
+        <tr><td><code>children</code></td><td>node</td><td>The surface being generated into.</td></tr>
+        <tr><td><code>className</code></td><td>string</td><td>Added to the wrapper.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+<DoDont>
+    <Do caption="Show it while content is generating, then remove it.">
+        <GenerativeBorder active>
+            <div style={{ padding: 'var(--card-pad-md)', font: 'var(--body-default)' }}>Drafting the summary…</div>
+        </GenerativeBorder>
+    </Do>
+    <Dont caption="Do not use it as decoration or to make a card stand out. It means something is being generated.">
+        <GenerativeBorder active>
+            <div style={{ padding: 'var(--card-pad-md)', font: 'var(--body-default)' }}>Weekly highlights</div>
+        </GenerativeBorder>
+    </Dont>
+</DoDont>
+
+### One generation indicator at a time.
+
+Do not pair the ring with another eye-catching indicator, such as a spinner or a
+shimmering skeleton, on the same surface. The ring is the signal.
+
+### One ring per surface.
+
+Do not nest two. A ring inside a ring reads as two generations and competes for
+the same edge. Wrap the outer surface, or the one that is actually changing.
+
+```jsx
+// Incorrect: two rings on nested surfaces.
+<GenerativeBorder active>
+    <GenerativeBorder active>{draft}</GenerativeBorder>
+</GenerativeBorder>
+
+// Correct: the surface that is being written into.
+<GenerativeBorder active={isGenerating}>{draft}</GenerativeBorder>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The ring is decorative.** It is hidden from assistive technology.
+- **`aria-busy` says what changed.** The wrapper is `aria-busy="true"` while
+  `active`, which tells assistive technology the content is still changing.
+- **Reduced motion.** Under `prefers-reduced-motion: reduce` the ring does not
+  turn. It is one solid `--ds-ai-border` line.
+- **Contrast.** Both tones are AI color tokens that carry a value for every
+  color and contrast mode. The ring never carries meaning alone.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `AI/Color and elevation`, for the `--ds-ai-border` and `--ds-ai-background-bold` tokens.
+- `Prompt input`, which wraps itself in the ring while the agent replies.
+- `Spinner` and `Skeleton`, for loading that is not generation.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

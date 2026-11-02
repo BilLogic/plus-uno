@@ -45,4 +45,11 @@ describe('GenerativeBorder', () => {
         expect(container.firstChild).toHaveClass('plus-generative-border', 'mine');
         expect(screen.getByTestId('gb')).toBe(container.firstChild);
     });
+
+    it('keeps its own aria-busy when a caller passes one', () => {
+        const { container, rerender } = render(<GenerativeBorder aria-busy="true">x</GenerativeBorder>);
+        expect(container.firstChild).toHaveAttribute('aria-busy', 'false');
+        rerender(<GenerativeBorder active aria-busy="false">x</GenerativeBorder>);
+        expect(container.firstChild).toHaveAttribute('aria-busy', 'true');
+    });
 });
