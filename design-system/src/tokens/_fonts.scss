@@ -58,23 +58,24 @@
     /*Shared*/
     --font-weight-display: var(--font-weight-semibold-1);
 
-    /*Display 1 - Figma: 80px, Lato, 400, lineHeight 140% */
-    --font-family-display1: var(--font-family-header);
+    /*Display 1 - Figma: 80px, lineHeight 140%. Display 1 to 3 sit above the
+       32px heading step, so they take the serif heading voice. */
+    --font-family-display1: var(--font-family-headline);
     --font-size-display1: 5rem;
     /* 80px */
     --font-line-height-display1: 140%;
     /* 140% = 112px / 80px */
     --font-letter-spacing-display1: 0;
 
-    /*Display 2 - Figma: 72px, Lato, 400, lineHeight 138.9% */
-    --font-family-display2: var(--font-family-header);
+    /*Display 2 - Figma: 72px, lineHeight 138.9% */
+    --font-family-display2: var(--font-family-headline);
     --font-size-display2: 4.5rem;
     /* 72px */
     --font-line-height-display2: 138.9%;
     --font-letter-spacing-display2: 0;
 
-    /*Display 3 - Figma: 64px, Lato, 400, lineHeight 150% */
-    --font-family-display3: var(--font-family-header);
+    /*Display 3 - Figma: 64px, lineHeight 150% */
+    --font-family-display3: var(--font-family-headline);
     --font-size-display3: 4rem;
     /* 64px */
     --font-line-height-display3: var(--font-line-height-150);
@@ -90,24 +91,25 @@
 
     /*Headline*/
     /*Shared*/
-    /* Note: Figma uses SF Pro Display for h1/h2, but codebase uses Lato for consistency */
-    --font-family-headline: var(--font-family-header);
-    /* Note: Figma specifies Semibold (600) for h1/h2, but codebase uses Bold (700) for headlines */
-    --font-weight-headline: var(--font-weight-bold);
+    /* Headings from 32px up to 20px are Noto Serif at 500, the same voice as
+       the `--heading-xxlarge` to `--heading-medium` text styles. Headings from
+       16px down are Noto Sans at 600 (`.h6`, `--heading-small` and below). */
+    --font-family-headline: var(--type-family-heading-serif);
+    --font-weight-headline: var(--type-weight-medium);
 
-    /*h1 - Figma: Headline/H1 - 40px, Lato Bold (700), lineHeight 160% */
+    /*h1 - Figma: Headline/H1 - 40px, Noto Serif (500), lineHeight 160% */
     --font-size-h1: 2.5rem;
     /* 40px */
     --font-line-height-h1: 160%;
     /* 160% = 64px / 40px */
 
-    /*h2 - Figma: Headline/H2 - 32px, Lato Bold (700), lineHeight 150% */
+    /*h2 - Figma: Headline/H2 - 32px, Noto Serif (500), lineHeight 150% */
     --font-size-h2: 2rem;
     /* 32px */
     --font-line-height-h2: 1.5;
     /* 150% = 48px / 32px */
 
-    /*h3 - Figma: Headline/H3 - 28px, Lato Bold (700), lineHeight 142.9% */
+    /*h3 - Figma: Headline/H3 - 28px, Noto Serif (500), lineHeight 142.9% */
     --font-size-h3: 1.75rem;
     /* 28px */
     --font-line-height-h3: 142.9%;
@@ -115,22 +117,24 @@
 
     /*Title*/
     /*Shared*/
-    --font-family-title: var(--font-family-header);
-    --font-weight-title: var(--font-weight-semibold-2);
+    /* h4 and h5 (24px and 20px) are still serif headings. h6 is the first sans
+       step and sets its own family and weight where it is declared. */
+    --font-family-title: var(--type-family-heading-serif);
+    --font-weight-title: var(--type-weight-medium);
 
-    /*h4 - Figma: Title/H4 - 24px, Lato, lineHeight 133.3% */
+    /*h4 - Figma: Title/H4 - 24px, Noto Serif (500), lineHeight 133.3% */
     --font-size-h4: 1.5rem;
     /* 24px */
     --font-line-height-h4: 133.3%;
     /* 133.3% = 32px / 24px */
 
-    /*h5 - Figma: Title/H5 - 20px, Lato, lineHeight 140% */
+    /*h5 - Figma: Title/H5 - 20px, Noto Serif (500), lineHeight 140% */
     --font-size-h5: var(--font-size-125);
     /* 1.25rem = 20px */
     --font-line-height-h5: var(--font-line-height-140);
     /* 140% = 28px / 20px */
 
-    /*h6 - Figma: Title/H6 - 16px, Lato, lineHeight 150% */
+    /*h6 - Figma: Title/H6 - 16px, Noto Sans (600), lineHeight 150% */
     --font-size-h6: 1rem;
     /* 16px */
     --font-line-height-h6: var(--font-line-height-150);
@@ -345,13 +349,9 @@ body,
     font-weight: var(--font-weight-display);
 }
 
-%font-family-header {
-    font-family: var(--font-family-header);
-}
-
 .display1-txt {
     @extend %font-display;
-    @extend %font-family-header;
+    font-family: var(--font-family-display1);
     font-size: var(--font-size-display1);
     line-height: var(--font-line-height-display1);
     letter-spacing: var(--font-letter-spacing-display1);
@@ -359,7 +359,7 @@ body,
 
 .display2-txt {
     @extend %font-display;
-    @extend %font-family-header;
+    font-family: var(--font-family-display2);
     font-size: var(--font-size-display2);
     line-height: var(--font-line-height-display2);
     letter-spacing: var(--font-letter-spacing-display2);
@@ -367,7 +367,7 @@ body,
 
 .display3-txt {
     @extend %font-display;
-    @extend %font-family-header;
+    font-family: var(--font-family-display3);
     font-size: var(--font-size-display3);
     line-height: var(--font-line-height-display3);
     letter-spacing: var(--font-letter-spacing-display3);
@@ -384,7 +384,7 @@ body,
 /* rules for headlines (h1,h2,h3) */
 %font-headline {
     @extend %default-font-color;
-    @extend %font-family-header;
+    font-family: var(--font-family-headline);
     font-weight: var(--font-weight-headline);
     margin: 0;
 }
@@ -422,7 +422,7 @@ h3,
 /* rules for titles (h4,h5,h6) */
 %font-title {
     @extend %default-font-color;
-    @extend %font-family-header;
+    font-family: var(--font-family-title);
     font-weight: var(--font-weight-title);
     margin: 0;
 }
@@ -450,6 +450,8 @@ h5,
 h6,
 .h6 {
     @extend %font-title;
+    font-family: var(--type-family-heading);
+    font-weight: var(--type-weight-semibold);
     font-size: var(--font-size-h6);
     line-height: var(--font-line-height-h6);
 
@@ -551,10 +553,9 @@ h6,
  */
 :root {
     /*
-     * h1–h3 are HEADLINES and h4–h6 are TITLES, and the two carry different
-     * weights: `%font-headline` sets `--font-weight-headline` (700), `%font-title`
-     * sets `--font-weight-title` (600). Figma agrees — Headline/H1–H3 are Lato
-     * Bold, Title/H4–H6 are Lato SemiBold.
+     * h1–h5 are Noto Serif at 500 (`--font-family-headline` and `-title`, one
+     * weight), and h6 is Noto Sans at 600, the same split the `--heading-*`
+     * text styles draw at 20px and 16px.
      *
      * These six shipped with a literal `700` on all six, so `--type-h4` rendered
      * an h4 one weight heavier than `h4` itself did. The layer that exists to
@@ -562,12 +563,12 @@ h6,
      * weight token rather than restating its value is the actual fix: a literal
      * is a second place for the number to live, which is the whole failure mode.
      */
-    --type-h1: var(--font-weight-headline) var(--font-size-h1) / var(--font-line-height-h1) var(--font-family-header);
-    --type-h2: var(--font-weight-headline) var(--font-size-h2) / var(--font-line-height-h2) var(--font-family-header);
-    --type-h3: var(--font-weight-headline) var(--font-size-h3) / var(--font-line-height-h3) var(--font-family-header);
-    --type-h4: var(--font-weight-title) var(--font-size-h4) / var(--font-line-height-h4) var(--font-family-header);
-    --type-h5: var(--font-weight-title) var(--font-size-h5) / var(--font-line-height-h5) var(--font-family-header);
-    --type-h6: var(--font-weight-title) var(--font-size-h6) / var(--font-line-height-h6) var(--font-family-header);
+    --type-h1: var(--font-weight-headline) var(--font-size-h1) / var(--font-line-height-h1) var(--font-family-headline);
+    --type-h2: var(--font-weight-headline) var(--font-size-h2) / var(--font-line-height-h2) var(--font-family-headline);
+    --type-h3: var(--font-weight-headline) var(--font-size-h3) / var(--font-line-height-h3) var(--font-family-headline);
+    --type-h4: var(--font-weight-title) var(--font-size-h4) / var(--font-line-height-h4) var(--font-family-title);
+    --type-h5: var(--font-weight-title) var(--font-size-h5) / var(--font-line-height-h5) var(--font-family-title);
+    --type-h6: var(--type-weight-semibold) var(--font-size-h6) / var(--font-line-height-h6) var(--type-family-heading);
 
     /*
      * Body — `%font-body` sets `--font-weight-normal` (300), so that is the token

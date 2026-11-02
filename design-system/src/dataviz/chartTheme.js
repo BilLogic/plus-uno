@@ -88,8 +88,8 @@ const chartTheme = {
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: 'var(--font-family-header)',
-            fontWeight: 'var(--font-weight-headline, 700)',
+            fontFamily: 'var(--font-family-headline)',
+            fontWeight: 'var(--font-weight-headline)',
             fontSize: 'var(--font-size-h4, 24px)'
         }
     },

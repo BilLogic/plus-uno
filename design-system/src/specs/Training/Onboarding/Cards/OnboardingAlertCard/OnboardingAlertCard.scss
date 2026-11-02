@@ -6,7 +6,9 @@
 .onboarding-alert-card {
     display: flex;
     align-items: flex-start;
-    width: 400px;
+    /* 27rem, not the 400px of the frame: the title is a 20px Noto Serif line of
+       about 353px, which the 331px of text room in 400px wraps to two lines. */
+    width: 27rem;
     max-width: 100%;
 
     &__alert {
@@ -33,9 +35,9 @@
     }
 
     &__title {
-        font-family: var(--font-family-header);
+        font-family: var(--font-family-title);
         font-size: var(--font-size-h5, 20px);
-        font-weight: var(--font-weight-semibold-2, 600);
+        font-weight: var(--font-weight-title);
         line-height: 1.4;
         width: 100%;
         margin: 0;

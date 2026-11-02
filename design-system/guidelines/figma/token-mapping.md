@@ -60,8 +60,8 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Display 2 | `var(--font-size-display2)` |
 | Display 3 | `var(--font-size-display3)` |
 | Display 4 | `var(--font-size-display4)` |
-| Headline (H1–H3) | `var(--font-size-h1)`, `var(--font-weight-headline)`, `var(--font-family-headline)` — Headline has no single size token; use the H-scale |
-| Title | `var(--font-weight-title)`, `var(--font-weight-semibold-2)` — Title has no dedicated size token; pair with an H-scale size |
+| Headline (H1–H3) | `var(--font-size-h1)`, `var(--font-weight-headline)`, `var(--font-family-headline)` (Noto Serif, 500) — Headline has no single size token; use the H-scale |
+| Title (H4–H5) | `var(--font-weight-title)`, `var(--font-family-title)` (Noto Serif, 500); H6 is `var(--type-family-heading)` at `var(--type-weight-semibold)` — Title has no dedicated size token; pair with an H-scale size |
 | H1–H6 | `var(--font-size-h1)` through `var(--font-size-h6)` |
 | Body 1 | `var(--font-size-body1)`, `var(--font-weight-body1-regular)` |
 | Body 2 | `var(--font-size-body2)` |
@@ -92,6 +92,8 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Letter spacing/none | `var(--type-tracking-none)` |
 | Letter spacing/tight | `var(--type-tracking-tight)` |
 | Letter spacing/tighter | `var(--type-tracking-tighter)` |
+
+A variable bound to letter spacing renders in pixels in Figma, so `Heading/xxlarge`, `xlarge` and `large` hold their tracking as an explicit percent (-2%, -1%, -1%) on the style, and the `Letter spacing/*` variables (-1, -2) read as percent of font size. The token generator matches a style's percent to the variable of the same value.
 
 The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
 
