@@ -138,7 +138,7 @@ export const Radii = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--layout-gutter)' }}>
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} active radius={radius}>
-                <div style={{ ...surface, borderRadius: 'inherit', minWidth: 'var(--card-min-width-sm)' }}>
+                <div style={{ ...surface, borderRadius: 'var(--generative-border-radius)', minWidth: 'var(--card-min-width-sm)' }}>
                     <span style={{ font: 'var(--body-small)' }}>{radius}</span>
                 </div>
             </GenerativeBorder>

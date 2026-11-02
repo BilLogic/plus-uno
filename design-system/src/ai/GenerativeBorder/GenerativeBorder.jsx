@@ -42,10 +42,11 @@ const GenerativeBorder = ({
 
     return (
         <div
+            {...props}
             className={classes}
+            // After the spread, so a caller's `aria-busy` cannot disagree with `active`.
             aria-busy={active}
             style={{ '--generative-border-radius': `var(${token})`, ...style }}
-            {...props}
         >
             {children}
             {active && <span className="plus-generative-border__ring" aria-hidden="true" />}
