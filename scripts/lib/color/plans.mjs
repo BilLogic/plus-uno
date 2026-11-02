@@ -71,7 +71,7 @@ function accents({ recipe, vivid, families, ...rest }) {
     }
     if (rest.borrow) {
       const { family, steps, from } = rest.borrow;
-      const source = ramp(from.H, from.vivid, from.cmax);
+      const source = ramp(from.H, from.vivid, from.cmax, null, undefined, from.targets);
       for (const step of steps) out[family][step] = source[step];
     }
     return out;

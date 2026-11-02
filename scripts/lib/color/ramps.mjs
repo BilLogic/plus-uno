@@ -36,9 +36,11 @@ const WHITE = '#ffffff';
  * @param {number} cmax      chroma cap, multiplied by `shape[step]`
  * @param {number|null} [hueLight]  hue the five lightest steps drift toward
  * @param {Record<number, number>} [shape]
+ * @param {Record<number, number>} [targets]  contrast overrides for single steps; the rest keep `TARGET`
  * @returns {Record<number, {L: number, C: number, H: number, hex: string, cr_white: number}>}
  */
-export function ramp(H, vivid, cmax, hueLight = null, shape = SHAPE) {
+export function ramp(H, vivid, cmax, hueLight = null, shape = SHAPE, targets = {}) {
+  const target = { ...TARGET, ...targets };
   const out = {};
   STEPS.forEach((step, index) => {
     let C = cmax;
@@ -47,7 +49,7 @@ export function ramp(H, vivid, cmax, hueLight = null, shape = SHAPE) {
     // L depends on chroma slightly and chroma on L, so iterate.
     for (let i = 0; i < 4; i++) {
       Hs = hueLight === null ? H : H + (hueLight - H) * Math.max(0, ((index <= 4 ? 1 : 0) * (5 - index)) / 5);
-      L = lForContrast(TARGET[step], WHITE, Hs, C, true);
+      L = lForContrast(target[step], WHITE, Hs, C, true);
       C = Math.min(cmax * shape[step], vivid * maxChroma(L, Hs));
     }
     const hex = oklchToHex(L, C, Hs);
