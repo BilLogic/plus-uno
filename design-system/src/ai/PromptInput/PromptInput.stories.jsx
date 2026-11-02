@@ -87,7 +87,7 @@ export const States = () => (
 );
 
 /**
- * Empty, the send button is disabled. With text, it is the AI bold ground with an
+ * Empty, the send button is disabled. Typed, it is the AI bold ground with an
  * inverse glyph in every color mode. Generating, it is Stop and the field is
  * ringed. Disabled, the field and the button are both off.
  */
@@ -95,11 +95,11 @@ States.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const boxes = [...canvasElement.querySelectorAll('.plus-prompt-input')];
     await expect(boxes, 'five states').toHaveLength(5);
-    const [empty, focused, withText, generating, disabled] = boxes;
+    const [empty, focused, typed, generating, disabled] = boxes;
 
     await expect(within(empty).getByRole('button', { name: 'Send' })).toBeDisabled();
     await expect(within(focused).getByRole('textbox')).toBeInTheDocument();
-    await expect(within(withText).getByRole('button', { name: 'Send' })).toBeEnabled();
+    await expect(within(typed).getByRole('button', { name: 'Send' })).toBeEnabled();
     await expect(within(generating).getByRole('button', { name: 'Stop generating' })).toBeEnabled();
     await expect(generating.getAttribute('aria-busy'), 'generating is busy').toBe('true');
     await expect(generating.querySelector('.plus-generative-border__ring'), 'ringed').not.toBeNull();
@@ -107,7 +107,7 @@ States.play = async ({ canvasElement }) => {
     await expect(within(disabled).getByRole('textbox')).toBeDisabled();
     await expect(within(disabled).getByRole('button', { name: 'Send' })).toBeDisabled();
 
-    const send = within(withText).getByRole('button', { name: 'Send' });
+    const send = within(typed).getByRole('button', { name: 'Send' });
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(send).backgroundColor, `send ground, ${mode}`).toBe(token('--ds-ai-background-bold'));
         await expect(getComputedStyle(send).color, `send glyph, ${mode}`).toBe(token('--ds-text-inverse'));
