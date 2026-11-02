@@ -2307,6 +2307,14 @@
         "source": "design-system/src/components/_internal/Table/Table.jsx",
         "storybookId": "components-text-and-data-display-table--docs",
         "props": {
+          "size": {
+            "type": "enum",
+            "values": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
           "density": {
             "type": "enum",
             "values": [
@@ -2314,6 +2322,16 @@
               "md",
               "lg"
             ]
+          },
+          "frame": {
+            "type": "enum",
+            "values": [
+              "plain",
+              "framed"
+            ]
+          },
+          "verticalLines": {
+            "type": "boolean"
           },
           "striped": {
             "type": "boolean"

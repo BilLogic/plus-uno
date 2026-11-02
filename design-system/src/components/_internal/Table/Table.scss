@@ -1,91 +1,304 @@
 /**
- * PLUS Table base styles.
- * Used by the Table component (components/Table/Table.jsx).
+ * PLUS Table: Table, StaticTable and the shared `_Table` parts.
+ *
+ * The feel: hairline horizontal dividers, no outer frame, a quiet header over
+ * a stronger rule, single-line cells with an ellipsis, hover and highlight as
+ * a transparency of an ink token so dark mode flips with the tokens. Rows take
+ * their height from the Row size tokens (32 / 40 / 48); a single-line cell
+ * fills that height, and a cell with a second line or wrapped text grows it
+ * by the cell's vertical pad.
  */
 
 .plus-table-wrapper {
     width: 100%;
+}
+
+// The table scrolls sideways inside itself, never the page around it.
+.plus-table-scroll {
+    width: 100%;
     overflow-x: auto;
 }
 
+.plus-table-framed {
+    border: var(--size-element-border) solid var(--ds-border);
+    border-radius: var(--size-table-radius-md);
+    overflow: hidden;
+}
+
 .plus-table {
+    --plus-table-row-height: var(--size-row-default);
+    // A truncating cell stops growing here, so one long name cannot push the
+    // other columns out of the table.
+    --plus-table-cell-max-width: var(--size-spacing-large-space-800);
+
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     background-color: transparent;
+    color: var(--ds-text);
 
-    thead {
-        tr {
-            background-color: transparent;
-        }
-
-        th {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
-            border: none;
-            border-bottom: 1px solid var(--color-outline-variant);
-            background-color: transparent;
-            // A column's label is a group label, not a heading: Heading/xxsmall 12/16.
-            font: var(--heading-xxsmall);
-            color: var(--color-on-surface);
-            text-align: left;
-            vertical-align: middle;
-        }
-    }
-
-    tbody {
-        tr {
-            background-color: transparent;
-            transition: background-color 0.15s ease;
-
-            &:hover {
-                background-color: rgba(25, 28, 30, 0.04);
-            }
-        }
-
-        td {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
-            border: none;
-            border-bottom: 1px solid var(--color-outline-variant);
-            vertical-align: middle;
-            font: var(--body-default);
-            color: var(--color-on-surface);
-            background-color: transparent;
-        }
-    }
-}
-
-.plus-table-striped tbody tr:nth-of-type(even) {
-    background-color: rgba(0, 0, 0, 0.02);
-
-    &:hover {
-        background-color: rgba(25, 28, 30, 0.06);
-    }
-}
-
-.plus-table-hover tbody tr:hover {
-    background-color: rgba(25, 28, 30, 0.06);
-}
-
-.plus-table-bordered {
-    border: 1px solid var(--color-outline-variant);
+    &.plus-table-sm { --plus-table-row-height: var(--size-row-compact); }
+    &.plus-table-md { --plus-table-row-height: var(--size-row-default); }
+    &.plus-table-lg { --plus-table-row-height: var(--size-row-comfortable); }
 
     th,
     td {
-        border: 1px solid var(--color-outline-variant);
+        padding: 0 var(--size-table-cell-pad-x);
+        border: none;
+        border-bottom: var(--size-element-border) solid var(--ds-border);
+        vertical-align: middle;
+        background-color: transparent;
+    }
+
+    // The head row is quiet: a group label (Heading/xxsmall 12/16, muted) over
+    // a stronger rule.
+    thead th {
+        height: var(--plus-table-row-height);
+        font: var(--heading-xxsmall);
+        color: var(--ds-text-subtle);
+        text-align: left;
+        border-bottom-color: var(--ds-border-bold);
+    }
+
+    tbody td {
+        height: var(--plus-table-row-height);
+        font: var(--body-default);
+        color: var(--ds-text);
     }
 }
 
-.plus-table-density-sm th,
-.plus-table-density-sm td {
-    padding: var(--size-spacing-small-space-050) var(--size-spacing-small-space-100);
+// ---------------------------------------------------------------- alignment
+
+.plus-table .plus-table-cell--align-text { text-align: left; }
+
+.plus-table .plus-table-cell--align-number {
+    text-align: right;
+
+    .plus-table-cell-inner { justify-content: flex-end; }
 }
 
-.plus-table-density-md th,
-.plus-table-density-md td {
-    padding: var(--size-table-cell-y) var(--size-table-cell-x);
+.plus-table .plus-table-cell--align-icon {
+    text-align: center;
+    width: var(--plus-table-row-height);
+
+    .plus-table-cell-inner { justify-content: center; }
 }
 
-.plus-table-density-lg th,
-.plus-table-density-lg td {
-    padding: var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-300);
+// -------------------------------------------------------------------- cells
+
+.plus-table-cell-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--size-table-cell-inline);
+    min-width: 0;
+}
+
+.plus-table-cell-leading {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+}
+
+.plus-table-cell-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.plus-table-cell-secondary {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+// Single line, ellipsis. The tooltip carries the full text while it is clipped.
+.plus-table tbody .plus-table-cell--truncate {
+    max-width: var(--plus-table-cell-max-width);
+
+    .plus-table-cell-text {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+// Wrapping is opt-in, and the row grows by the cell's vertical pad.
+.plus-table tbody .plus-table-cell--wrap {
+    padding-block: var(--size-table-cell-pad-y);
+
+    .plus-table-cell-text {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+}
+
+.plus-table tbody .plus-table-cell--lines-2 {
+    padding-block: var(--size-table-cell-pad-y);
+}
+
+// The one column that names the record.
+.plus-table tbody .plus-table-cell--title .plus-table-cell-text {
+    font-weight: var(--font-weight-semibold-2);
+}
+
+.plus-table tbody .plus-table-cell--error {
+    color: var(--ds-text-danger);
+}
+
+.plus-table tbody .plus-table-cell--loading {
+    .plus-table-cell-body {
+        visibility: hidden;
+    }
+
+    .plus-table-cell-inner {
+        position: relative;
+    }
+
+    // A bar in the cell's own space, a transparency of the ink token.
+    .plus-table-cell-inner::after {
+        content: '';
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: 0;
+        margin-block: auto;
+        width: 60%;
+        height: var(--size-indicator-sm);
+        border-radius: var(--size-table-radius-sm);
+        background-color: color-mix(in srgb, var(--ds-text) 8%, transparent);
+    }
+}
+
+// --------------------------------------------------------------------- rows
+
+// Row fills are drawn on the row, so a hovered or highlighted row reads as one
+// band across its cells.
+.plus-table-hover tbody tr:hover,
+.plus-table tbody tr.plus-table-row--clickable:hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
+.plus-table-hover tbody tr:active,
+.plus-table tbody tr.plus-table-row--clickable:active {
+    background-color: var(--ds-background-neutral-subtle-pressed);
+}
+
+.plus-table tbody tr.plus-table-row--clickable {
+    cursor: pointer;
+}
+
+// Zebra is opt-in.
+.plus-table-striped tbody tr:nth-of-type(even) {
+    background-color: color-mix(in srgb, var(--ds-text) 4%, transparent);
+}
+
+.plus-table tbody tr.plus-table-row--highlighted {
+    background-color: color-mix(in srgb, var(--ds-background-warning-bold) 8%, transparent);
+
+    &:hover {
+        background-color: color-mix(in srgb, var(--ds-background-warning-bold) 12%, transparent);
+    }
+}
+
+.plus-table tbody tr.plus-table-row--selected {
+    background-color: var(--ds-background-selected);
+
+    &:hover {
+        background-color: var(--ds-background-selected-hovered);
+    }
+
+    &:active {
+        background-color: var(--ds-background-selected-pressed);
+    }
+}
+
+.plus-table tbody tr.plus-table-row--disabled {
+    color: var(--ds-text-disabled);
+    pointer-events: none;
+
+    td {
+        color: var(--ds-text-disabled);
+    }
+}
+
+.plus-table tbody tr.plus-table-row--no-divider td {
+    border-bottom-color: transparent;
+}
+
+// The last row's hairline would double the frame's edge.
+.plus-table-framed .plus-table tbody tr:last-child td {
+    border-bottom-color: transparent;
+}
+
+// Verticals are optional.
+.plus-table-vertical-lines {
+    th:not(:last-child),
+    td:not(:last-child) {
+        border-inline-end: var(--size-element-border) solid var(--ds-border);
+    }
+}
+
+// ------------------------------------------------------------ message rows
+
+.plus-table .plus-table-message-row {
+    background-color: transparent;
+
+    &:hover,
+    &:active {
+        background-color: transparent;
+    }
+
+    .plus-table-message {
+        height: var(--size-row-comfortable);
+        padding: var(--size-table-cell-pad-y) var(--size-table-cell-pad-x);
+        color: var(--ds-text-subtle);
+        text-align: center;
+    }
+
+    &.plus-table-message-row--error .plus-table-message {
+        color: var(--ds-text-danger);
+    }
+}
+
+.plus-table-message-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-md);
+}
+
+// ------------------------------------------------------------- summary row
+
+// Muted, one calculation per column, no rule under it.
+.plus-table tfoot .plus-table-summary-row td {
+    height: var(--plus-table-row-height);
+    border-bottom: none;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+// ------------------------------------------------------------------ footer
+
+.plus-table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--size-table-cell-gap);
+    min-height: var(--size-row-default);
+    padding-inline: var(--size-table-cell-pad-x);
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+
+    &.plus-table-footer--compact {
+        min-height: var(--size-row-compact);
+    }
+}
+
+.plus-table-footer-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-md);
 }
