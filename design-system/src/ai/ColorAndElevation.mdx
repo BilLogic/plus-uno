@@ -1,0 +1,64 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TokenTable, RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import * as AiColorStories from './ColorAndElevation.stories.jsx';
+
+<Meta of={AiColorStories} />
+
+<Title />
+
+The AI register has three kinds of token: a bold ground, an edge and a glyph. It
+is shaped like Atlassian's
+<a href="https://atlassian.design/rovo-ui/color"> Rovo color</a> tokens, which are one
+bold ground plus accents that only ever mark an edge or an icon, and it is built
+from tokens PLUS already has, so there is no new palette.
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens/color"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### Tokens
+
+<Canvas of={AiColorStories.Swatches} sourceState="none" />
+
+<TokenTable
+    swatch
+    rows={[
+        { token: '--ds-ai-background-bold', use: <>The primary AI action, the agent avatar and the AI cursor. Aliases <C>--ds-background-neutral-bold</C>. Achromatic on purpose: AI is a register, not another status.</> },
+        { token: '--ds-ai-background-bold-hovered', use: 'Hovered bold ground.' },
+        { token: '--ds-ai-background-bold-pressed', use: 'Pressed bold ground.' },
+        { token: '--ds-ai-border', use: <>The edge that marks generated or generating content. Aliases <C>--ds-border-discovery</C>.</> },
+        { token: '--ds-ai-icon', use: <>The AI glyph. Aliases <C>--ds-icon-discovery</C>. Always paired with a label unless the meaning is obvious.</> },
+    ]}
+/>
+</div>
+
+<div className="sb-ds-doc-section">
+### Where the accent may appear
+
+<RefTable
+    head={['Allowed', 'Not allowed']}
+    rows={[
+        ['An edge: the generative border, an AI label\'s outline', 'A filled panel, card or banner in the accent'],
+        ['A glyph: the sparkle or wand, beside a label', 'Accent text, or a gradient, tint or fade of it'],
+        ['The bold ground on one primary AI action per region', 'The bold ground on a non-AI action, or on two buttons in one region'],
+    ]}
+/>
+
+There are no AI text or AI background accent tokens, by design. Atlassian's
+Rovo set has none either.
+</div>
+
+<div className="sb-ds-doc-section">
+### Elevation
+
+An AI panel uses the core elevation pairs. Atlassian adds one overlay token for
+Rovo opening over another app (<C>elevation.rovo.surface.overlay</C>) and says menus and
+dropdowns use the core levels. PLUS has no such overlay yet, so
+<C>--ds-surface-overlay</C> applies; a separate AI overlay is a follow-up if a case needs it.
+</div>
+
+</div>

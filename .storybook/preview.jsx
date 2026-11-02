@@ -215,7 +215,6 @@ const preview = {
               "Date time picker",
               "Dropdown menu",
               "File upload",
-              "Inline edit",
               "Input group",
               "Label & caption",
               "Number input",
@@ -303,6 +302,20 @@ const preview = {
               "Code",
               "Code block",
               "Table"
+            ]
+          ],
+          "AI",
+          [
+            "Overview",
+            "Principles",
+            "Voice and tone",
+            "Color and elevation",
+            "Components",
+            [
+              "Generative border",
+              "Agent avatar",
+              "Prompt input",
+              "Prompt starters"
             ]
           ],
           "Data visualizations",

@@ -6,6 +6,7 @@
     "Getting started/",
     "Foundations/",
     "Components/",
+    "AI/",
     "Data visualizations/",
     "Specs/",
     "Deprecated/"
@@ -238,6 +239,20 @@
         "Code",
         "Code block",
         "Table"
+      ]
+    ],
+    "AI",
+    [
+      "Overview",
+      "Principles",
+      "Voice and tone",
+      "Color and elevation",
+      "Components",
+      [
+        "Generative border",
+        "Agent avatar",
+        "Prompt input",
+        "Prompt starters"
       ]
     ],
     "Data visualizations",

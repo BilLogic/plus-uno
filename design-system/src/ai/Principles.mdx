@@ -1,0 +1,34 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+
+<Meta title="AI/Principles" />
+
+<Title />
+
+Eight rules for AI in PLUS. They come from Atlassian's
+<a href="https://atlassian.design/rovo-ui/ai-interaction-guidelines"> AI interaction guidelines</a>
+and its <a href="https://atlassian.design/rovo-ui/about-rovo-ui">Rovo UI principles</a>,
+read in a tutoring product, where the people using it are tutors and the data
+is about students.
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+### The rules
+
+<RefTable
+    head={['Rule', 'In PLUS']}
+    rows={[
+        ['Always say it is AI', 'Anything the agent wrote or changed carries an AI label. People should always know when they are working with AI and when they are not.'],
+        ['Integrated, not segregated', 'The agent lives where the work happens: a prompt input in the lesson or the reflection, not a separate app.'],
+        ['Keep the flow state', 'Controls sit in the working surface. Do not send a tutor to another screen to use AI.'],
+        ['Pop the hood', 'Show how an outcome was produced: what the agent read and why it answered this way. Where sources exist, show them.'],
+        ['Color is a signal', 'The AI accent marks an edge or a glyph that something is generated or generating. It never fills a surface and never decorates.'],
+        ['Motion with intent', 'Motion means work is happening. It stops when the work stops, and it is off under reduced motion.'],
+        ['Accelerate responsibly', 'Say what the agent will do before it does it, and give a way to undo or edit. State low confidence in words.'],
+        ['Privacy by default', 'Do not show one person\'s data to another through the agent. Say what it can see.'],
+    ]}
+/>
+</div>
+
+</div>
