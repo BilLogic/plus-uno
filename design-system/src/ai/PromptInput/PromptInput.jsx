@@ -1,6 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from '@/components';
 // Field and useFieldId are parts, not exported from the barrel.
 import Field from '@/components/forms-and-inputs/_internal/Field';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
@@ -22,7 +21,7 @@ import './PromptInput.scss';
  *   button.
  * - **label** names the field for assistive technology.
  *
- * The send button is the one AI action in the region: it is filled with the AI
+ * The send button is the one AI action in the region: it takes the AI
  * bold ground, and nothing else beside it should be.
  */
 const PromptInput = ({
@@ -79,37 +78,37 @@ const PromptInput = ({
         }
     };
 
+    // A plain button, because Button has no AI appearance yet: the AI ground is the
+    // one thing this action is for, and its styles live in PromptInput.scss.
     const action = isGenerating ? (
-        <Button
+        <button
+            type="button"
             className="plus-prompt-input__action"
-            style="primary"
-            fill="filled"
-            size="small"
-            leadingVisual="stop"
             aria-label="Stop generating"
             title="Stop generating"
             // Stop is never held back by `isDisabled`: a generation must stay cancelable.
             disabled={!onStop}
             onClick={() => onStop?.()}
-        />
+        >
+            <i className="fa-solid fa-stop" aria-hidden="true" />
+        </button>
     ) : (
-        <Button
+        <button
+            type="button"
             className="plus-prompt-input__action"
-            style="primary"
-            fill="filled"
-            size="small"
-            leadingVisual="paper-plane"
             aria-label="Send"
             title="Send"
             disabled={!canSend}
             onClick={submit}
-        />
+        >
+            <i className="fa-solid fa-paper-plane" aria-hidden="true" />
+        </button>
     );
 
     return (
         <GenerativeBorder
             active={isGenerating}
-            radius="element-lg"
+            radius="rounded"
             className={['plus-prompt-input', className].filter(Boolean).join(' ')}
         >
             <Field

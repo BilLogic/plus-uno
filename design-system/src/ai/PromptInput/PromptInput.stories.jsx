@@ -3,7 +3,6 @@ import { expect, fireEvent, fn, userEvent, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
-import { Button } from '@/components';
 import PromptStarters from '../PromptStarters';
 import PromptInput from './PromptInput';
 
@@ -50,7 +49,28 @@ export default {
 const wrap = { maxWidth: 'var(--section-min-width-main)' };
 const column = { ...wrap, display: 'flex', flexDirection: 'column', gap: 'var(--layout-gutter)' };
 
-const attach = <Button leadingVisual="paperclip" aria-label="Attach a file" title="Attach a file" style="secondary" fill="ghost" size="small" />;
+const attach = (
+    <button
+        type="button"
+        aria-label="Attach a file"
+        title="Attach a file"
+        style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            inlineSize: 'var(--item-height-sm)',
+            blockSize: 'var(--item-height-sm)',
+            padding: 0,
+            border: 0,
+            borderRadius: 'var(--size-element-radius-md)',
+            background: 'transparent',
+            color: 'var(--ds-icon-subtle)',
+            cursor: 'pointer',
+        }}
+    >
+        <i className="fa-solid fa-paperclip" aria-hidden="true" />
+    </button>
+);
 
 const textbox = (el) => within(el).getByRole('textbox', { name: 'Message to PLUS AI' });
 
@@ -67,7 +87,7 @@ export const States = () => (
 );
 
 /**
- * Empty, the send button is disabled. Filled, it is the AI bold ground with an
+ * Empty, the send button is disabled. With text, it is the AI bold ground with an
  * inverse glyph in every color mode. Generating, it is Stop and the field is
  * ringed. Disabled, the field and the button are both off.
  */
@@ -75,11 +95,11 @@ States.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const boxes = [...canvasElement.querySelectorAll('.plus-prompt-input')];
     await expect(boxes, 'five states').toHaveLength(5);
-    const [empty, focused, filled, generating, disabled] = boxes;
+    const [empty, focused, withText, generating, disabled] = boxes;
 
     await expect(within(empty).getByRole('button', { name: 'Send' })).toBeDisabled();
     await expect(within(focused).getByRole('textbox')).toBeInTheDocument();
-    await expect(within(filled).getByRole('button', { name: 'Send' })).toBeEnabled();
+    await expect(within(withText).getByRole('button', { name: 'Send' })).toBeEnabled();
     await expect(within(generating).getByRole('button', { name: 'Stop generating' })).toBeEnabled();
     await expect(generating.getAttribute('aria-busy'), 'generating is busy').toBe('true');
     await expect(generating.querySelector('.plus-generative-border__ring'), 'ringed').not.toBeNull();
@@ -87,7 +107,7 @@ States.play = async ({ canvasElement }) => {
     await expect(within(disabled).getByRole('textbox')).toBeDisabled();
     await expect(within(disabled).getByRole('button', { name: 'Send' })).toBeDisabled();
 
-    const send = within(filled).getByRole('button', { name: 'Send' });
+    const send = within(withText).getByRole('button', { name: 'Send' });
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(send).backgroundColor, `send ground, ${mode}`).toBe(token('--ds-ai-background-bold'));
         await expect(getComputedStyle(send).color, `send glyph, ${mode}`).toBe(token('--ds-text-inverse'));
@@ -173,16 +193,16 @@ StopWhileGenerating.play = async ({ canvasElement }) => {
 
 export const WithAStartSlot = () => <div style={wrap}><PromptInput label="Message to PLUS AI" startSlot={attach} placeholder="Ask PLUS AI" /></div>;
 
-/** One quiet control sits before the text, and the AI send stays the only filled action. */
+/** One quiet control sits before the text, and the AI send stays the only action on the AI ground. */
 WithAStartSlot.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const attachButton = canvas.getByRole('button', { name: 'Attach a file' });
     const input = textbox(canvasElement);
     await expect(attachButton.compareDocumentPosition(input) & Node.DOCUMENT_POSITION_FOLLOWING, 'before the text').toBeTruthy();
-    await expect(getComputedStyle(attachButton).backgroundColor, 'the slot control is not filled').toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(attachButton).backgroundColor, 'the slot control has no ground').toBe('rgba(0, 0, 0, 0)');
 };
 
-/* ------------------------------------------------------------- in a surface */
+/* ------------------------------------------------------------- in a layout */
 
 export const WithStarters = () => {
     const [text, setText] = useState('');
