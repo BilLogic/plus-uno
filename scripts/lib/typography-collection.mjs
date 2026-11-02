@@ -1,15 +1,17 @@
 /**
  * The `typography` collection, and the code name of each of its variables.
  *
- * One collection in four folders: `Font size/*` and `Line height/*` (hidden
- * from publishing, named by rem × 100), `Family/*` and `Weight/*`. It is
+ * One collection in five folders: `Font size/*` and `Line height/*` (hidden
+ * from publishing, named by rem × 100), `Family/*`, `Weight/*` and
+ * `Letter spacing/*` (percent of the font size, written in em). It is
  * exported to `design-system/src/tokens/source/typography.json`, beside the
  * text styles that bind every property to one of these variables.
  *
  * A variable's code name is its folder's prefix plus its leaf:
  * `Font size/075` is `--font-size-075`, `Line height/125` is
  * `--line-height-125`, `Family/heading` is `--type-family-heading` and
- * `Weight/medium` is `--type-weight-medium`. Each variable's WEB code syntax
+ * `Weight/medium` is `--type-weight-medium` and `Letter spacing/tight` is
+ * `--type-tracking-tight`. Each variable's WEB code syntax
  * in Figma names the same token.
  *
  * The generator and the token registry both read this table, so the two
@@ -26,6 +28,7 @@ export const TYPOGRAPHY_FOLDERS = [
   { figma: 'Line height/', css: '--line-height-', kind: 'size' },
   { figma: 'Family/', css: '--type-family-', kind: 'family' },
   { figma: 'Weight/', css: '--type-weight-', kind: 'weight' },
+  { figma: 'Letter spacing/', css: '--type-tracking-', kind: 'tracking' },
 ];
 
 /** The folder a variable path is in, or `null`. */

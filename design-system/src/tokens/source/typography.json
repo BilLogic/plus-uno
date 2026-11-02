@@ -264,10 +264,10 @@
         "WEB": "var(--type-family-heading)"
       },
       "valuesByMode": {
-        "19364:0": "Lato"
+        "19364:0": "Noto Sans"
       },
       "resolvedValuesByMode": {
-        "19364:0": "Lato"
+        "19364:0": "Noto Sans"
       }
     },
     {
@@ -283,10 +283,10 @@
         "WEB": "var(--type-family-body)"
       },
       "valuesByMode": {
-        "19364:0": "Merriweather Sans"
+        "19364:0": "Noto Sans"
       },
       "resolvedValuesByMode": {
-        "19364:0": "Merriweather Sans"
+        "19364:0": "Noto Sans"
       }
     },
     {
@@ -345,6 +345,139 @@
       "resolvedValuesByMode": {
         "19364:0": 600
       }
+    },
+    {
+      "id": "VariableID:20219:28",
+      "name": "Family/heading-serif",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-family-heading-serif)"
+      },
+      "valuesByMode": {
+        "19364:0": "Noto Serif"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Noto Serif"
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:29",
+      "name": "Family/code",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-family-code)"
+      },
+      "valuesByMode": {
+        "19364:0": "Noto Sans Mono"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Noto Sans Mono"
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:30",
+      "name": "Family/brand-heading",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-family-brand-heading)"
+      },
+      "valuesByMode": {
+        "19364:0": "Noto Serif"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Noto Serif"
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:31",
+      "name": "Family/brand-body",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "STRING",
+      "scopes": [
+        "FONT_FAMILY"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-family-brand-body)"
+      },
+      "valuesByMode": {
+        "19364:0": "Noto Sans"
+      },
+      "resolvedValuesByMode": {
+        "19364:0": "Noto Sans"
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:33",
+      "name": "Letter spacing/none",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-tracking-none)"
+      },
+      "valuesByMode": {
+        "19364:0": 0
+      },
+      "resolvedValuesByMode": {
+        "19364:0": 0
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:34",
+      "name": "Letter spacing/tight",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-tracking-tight)"
+      },
+      "valuesByMode": {
+        "19364:0": -1
+      },
+      "resolvedValuesByMode": {
+        "19364:0": -1
+      },
+      "hiddenFromPublishing": false
+    },
+    {
+      "id": "VariableID:20219:35",
+      "name": "Letter spacing/tighter",
+      "variableCollectionId": "VariableCollectionId:19364:98",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "LETTER_SPACING"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--type-tracking-tighter)"
+      },
+      "valuesByMode": {
+        "19364:0": -2
+      },
+      "resolvedValuesByMode": {
+        "19364:0": -2
+      },
+      "hiddenFromPublishing": false
     }
   ],
   "textStyles": [
@@ -353,10 +486,11 @@
       "name": "Heading/xxlarge",
       "description": "CSS: var(--heading-xxlarge)",
       "boundVariables": {
-        "fontFamily": "VariableID:19364:112",
+        "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:105",
         "lineHeight": "VariableID:19364:111",
-        "fontWeight": "VariableID:19364:116"
+        "fontWeight": "VariableID:19364:115",
+        "letterSpacing": "VariableID:20219:35"
       }
     },
     {
@@ -364,10 +498,11 @@
       "name": "Heading/xlarge",
       "description": "CSS: var(--heading-xlarge)",
       "boundVariables": {
-        "fontFamily": "VariableID:19364:112",
+        "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:104",
         "lineHeight": "VariableID:19364:110",
-        "fontWeight": "VariableID:19364:116"
+        "fontWeight": "VariableID:19364:115",
+        "letterSpacing": "VariableID:20219:34"
       }
     },
     {
@@ -375,10 +510,11 @@
       "name": "Heading/large",
       "description": "CSS: var(--heading-large)",
       "boundVariables": {
-        "fontFamily": "VariableID:19364:112",
+        "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:103",
         "lineHeight": "VariableID:19364:109",
-        "fontWeight": "VariableID:19364:116"
+        "fontWeight": "VariableID:19364:115",
+        "letterSpacing": "VariableID:20219:34"
       }
     },
     {
@@ -386,10 +522,10 @@
       "name": "Heading/medium",
       "description": "CSS: var(--heading-medium)",
       "boundVariables": {
-        "fontFamily": "VariableID:19364:112",
+        "fontFamily": "VariableID:20219:28",
         "fontSize": "VariableID:19364:102",
         "lineHeight": "VariableID:19364:108",
-        "fontWeight": "VariableID:19364:116"
+        "fontWeight": "VariableID:19364:115"
       }
     },
     {

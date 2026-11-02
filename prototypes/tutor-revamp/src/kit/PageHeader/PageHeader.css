@@ -18,10 +18,11 @@
 .tr-page-header__title {
     margin: 0;
     font: var(--heading-xxlarge);
+    letter-spacing: var(--heading-xxlarge-tracking);
     letter-spacing: -0.01em;
     color: var(--ds-text);
 }
-.tr-page-header--detail .tr-page-header__title { font: var(--heading-xlarge); }
+.tr-page-header--detail .tr-page-header__title { font: var(--heading-xlarge); letter-spacing: var(--heading-xlarge-tracking); }
 .tr-page-header__meta {
     display: flex;
     flex-wrap: wrap;

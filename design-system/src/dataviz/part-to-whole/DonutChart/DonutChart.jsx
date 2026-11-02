@@ -126,7 +126,7 @@ const DonutChart = ({
                 width: '100%'
             }}>
                 <div style={{
-                    fontFamily: centerTextSize === 'body3' ? 'var(--font-family-body, "Merriweather Sans", sans-serif)' : 'var(--font-family-header, "Lato", sans-serif)',
+                    fontFamily: centerTextSize === 'body3' ? 'var(--font-family-body)' : 'var(--font-family-header)',
                     fontWeight: getFontWeight(),
                     fontSize: getFontSize(),
                     lineHeight: getLineHeight(),
@@ -136,7 +136,7 @@ const DonutChart = ({
                 </div>
                 {label && (
                     <div style={{
-                        fontFamily: 'var(--font-family-body, "Merriweather Sans", sans-serif)',
+                        fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3, 12px)',
                         lineHeight: '1.667',
                         color: 'var(--ds-text-subtle)',

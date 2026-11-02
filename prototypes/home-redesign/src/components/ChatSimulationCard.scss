@@ -10,7 +10,7 @@
     border-radius: 12px;
     overflow: hidden;
     /* Simulate a mobile/panel view */
-    font-family: 'Lato', sans-serif;
+    font-family: var(--font-family-header);
 }
 
 /* Skeleton Loading */

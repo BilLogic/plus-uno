@@ -23,7 +23,7 @@ const EPSILON = 1;
  * asserting the rendered result, and reading the token to compare against the
  * token would assert nothing.
  */
-const PROSE_FAMILY = 'Merriweather Sans';
+const PROSE_FAMILY = 'Noto Sans';
 const PROSE_SIZE = '16px';
 const PROSE_COLOR = 'rgb(25, 28, 30)';
 /**

@@ -39,7 +39,7 @@ const CallOffFormOrganism = ({
     const isChecked = isInteractive ? checked : initialChecked;
 
     return (
-        <div style={{ maxWidth: '531px', fontFamily: '"Merriweather Sans", sans-serif' }}>
+        <div style={{ maxWidth: '531px', fontFamily: 'var(--font-family-body)' }}>
             <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>
                 <div className="d-flex flex-column" style={{ gap: '2px', flex: 1, minWidth: 0 }}>
                     <strong className="d-block body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Call off entire recurring session</strong>
@@ -106,7 +106,7 @@ const CallOffFormOrganism = ({
                             <Form.Label style={{
                                 fontSize: '12px',
                                 fontWeight: 400, // Regular
-                                fontFamily: '"Merriweather Sans", sans-serif',
+                                fontFamily: 'var(--font-family-body)',
                                 marginBottom: 0
                             }}>
                                 Which supervisor did you speak with? <span className="text-danger">*</span>

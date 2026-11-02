@@ -27,7 +27,7 @@ const Label = ({ text = 'Label', required = true, htmlFor }) => (
             className="body3-txt"
             style={{
                 color: 'var(--ds-text)',
-                fontFamily: 'Merriweather Sans',
+                fontFamily: 'var(--font-family-body)',
                 fontWeight: 400,
                 lineHeight: 1.667,
             }}
@@ -39,7 +39,7 @@ const Label = ({ text = 'Label', required = true, htmlFor }) => (
                 className="body3-txt"
                 style={{
                     color: 'var(--ds-text-danger)',
-                    fontFamily: 'Merriweather Sans',
+                    fontFamily: 'var(--font-family-body)',
                     fontWeight: 300,
                     lineHeight: 1.667,
                 }}
@@ -115,7 +115,7 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
                 className="body3-txt"
                 style={{
                     color: getTextColor(),
-                    fontFamily: 'Merriweather Sans',
+                    fontFamily: 'var(--font-family-body)',
                     fontWeight: 300,
                     lineHeight: 1.667,
                 }}

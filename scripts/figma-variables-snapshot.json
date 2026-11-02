@@ -3,12 +3,12 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-10-25",
-  "totalVariables": 593,
+  "totalVariables": 600,
   "byType": {
     "COLOR": 232,
-    "FLOAT": 347,
+    "FLOAT": 350,
     "BOOLEAN": 9,
-    "STRING": 5
+    "STRING": 9
   },
   "collections": {
     "colors / accent": {
@@ -432,7 +432,11 @@
       ],
       "variables": [
         "Family/body",
+        "Family/brand-body",
+        "Family/brand-heading",
+        "Family/code",
         "Family/heading",
+        "Family/heading-serif",
         "Family/icon",
         "Family/icon-brands",
         "Font size/075",
@@ -442,6 +446,9 @@
         "Font size/150",
         "Font size/175",
         "Font size/200",
+        "Letter spacing/none",
+        "Letter spacing/tight",
+        "Letter spacing/tighter",
         "Line height/100",
         "Line height/125",
         "Line height/150",

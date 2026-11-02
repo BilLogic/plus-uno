@@ -9,7 +9,7 @@ body,
 .docs-story,
 .sbdocs,
 .sbdocs-wrapper {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif) !important;
+    font-family: var(--font-family-body) !important;
     color: var(--color-on-surface, #191c1e) !important;
 }
 
@@ -43,14 +43,14 @@ body,
  */
 .sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
-    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-family: var(--font-family-header) !important;
     font-size: var(--font-size-display4, 56px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
 }
 
 .sbdocs h2:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-family: var(--font-family-header) !important;
     font-size: var(--font-size-h2, 32px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
@@ -61,7 +61,7 @@ body,
 .sbdocs h4:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs h5:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs h6:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-header, 'Lato', sans-serif) !important;
+    font-family: var(--font-family-header) !important;
     font-size: var(--font-size-h3, 28px) !important;
     font-weight: var(--font-weight-headline, 700) !important;
     color: var(--color-on-surface, #191c1e) !important;
@@ -105,7 +105,7 @@ body,
  */
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-body, 'Merriweather Sans', 'Open Sans', sans-serif);
+    font-family: var(--font-family-body);
     font-size: var(--font-size-body1, 16px);
     line-height: var(--font-line-height-body1, 150%);
     font-weight: var(--font-weight-normal, 300);
@@ -153,7 +153,7 @@ body,
  */
 .sbdocs code,
 .sbdocs pre {
-    font-family: var(--font-family-code, 'Source Code Pro', monospace) !important;
+    font-family: var(--font-family-code) !important;
 }
 
 .sbdocs code {
@@ -388,7 +388,7 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
-  font-family: var(--font-family-header, 'Lato', sans-serif);
+  font-family: var(--font-family-header);
   font-size: var(--font-size-display4, 56px);
   font-weight: var(--font-weight-headline, 700);
   line-height: 1.1;
@@ -713,7 +713,7 @@ a.sbdocs-a {
 .docs-story section > h6,
 .docs-story section > .h5,
 .docs-story section > .h6 {
-    font-family: var(--font-family-body, 'Merriweather Sans', sans-serif) !important;
+    font-family: var(--font-family-body) !important;
     font-size: var(--font-size-body2, 14px) !important;
     font-weight: 600 !important;
     color: var(--color-neutral-text, var(--color-on-surface-variant, #5c5c5c)) !important;
@@ -1087,7 +1087,7 @@ a.sbdocs-a {
     border-bottom: 2px solid transparent;
     padding: var(--size-surface-container-pad-y) 0;
     color: var(--color-on-surface-variant, #43474e);
-    font-family: var(--font-family-header, 'Lato', sans-serif);
+    font-family: var(--font-family-header);
     font-size: var(--font-size-body1, 16px);
     font-weight: var(--font-weight-medium, 500);
     line-height: 1.5;

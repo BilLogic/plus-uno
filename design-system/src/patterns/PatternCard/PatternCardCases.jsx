@@ -10,7 +10,7 @@ import PatternCard from '@/patterns/PatternCard';
 const metric = (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>Sessions this week</p>
-        <p style={{ margin: 0, font: 'var(--metric-medium)' }}>24</p>
+        <p style={{ margin: 0, font: 'var(--metric-medium)', fontVariantNumeric: 'tabular-nums' }}>24</p>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>+3 from last week</p>
     </div>
 );

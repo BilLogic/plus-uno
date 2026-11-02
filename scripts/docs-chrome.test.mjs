@@ -122,7 +122,7 @@ test('a table that fits does not need a scrolling wrapper', () => {
 
 const prose = (over = {}) => ({
   label: 'p 0: Buttons are interactive',
-  fontFamily: '"Merriweather Sans", "Open Sans", sans-serif',
+  fontFamily: '"Noto Sans", "Noto Sans Fallback", sans-serif',
   fontSize: '16px',
   color: 'rgb(25, 28, 30)',
   measure: 74,

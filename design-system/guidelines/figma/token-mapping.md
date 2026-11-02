@@ -82,9 +82,16 @@ Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity 
 | Metric/small | `var(--metric-small)` |
 | Family/heading | `var(--type-family-heading)` |
 | Family/body | `var(--type-family-body)` |
+| Family/heading-serif | `var(--type-family-heading-serif)` |
+| Family/code | `var(--type-family-code)` |
+| Family/brand-heading | `var(--type-family-brand-heading)` |
+| Family/brand-body | `var(--type-family-brand-body)` |
 | Weight/regular | `var(--type-weight-regular)` |
 | Weight/medium | `var(--type-weight-medium)` |
 | Weight/semibold | `var(--type-weight-semibold)` |
+| Letter spacing/none | `var(--type-tracking-none)` |
+| Letter spacing/tight | `var(--type-tracking-tight)` |
+| Letter spacing/tighter | `var(--type-tracking-tighter)` |
 
 The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
 
@@ -93,7 +100,7 @@ The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds i
 Two kinds of text node carry no text style, and each binds its type variables directly so a token change still reaches it:
 
 - **A weighted label or run** (a button or Tab group label at `Weight/medium`, a semibold run inside body text): a weight change drops a node's text style, so the node binds `Font size/0875`, `Line height/125`, `Family/body` and the `Weight/*` it needs. Create no medium or semibold style for it.
-- **A code sample in docs**: `Code` has no Figma style, so the sample is Source Code Pro bound to `Font size/0875` and `Line height/125`.
+- **A code sample in docs**: `Code` has no Figma style, so the sample is Noto Sans Mono (`Family/code`) bound to `Font size/0875` and `Line height/125`.
 
 ## Spacing Tokens
 
