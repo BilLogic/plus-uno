@@ -19,7 +19,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
+      "notes": "Created 2026-08-29 on the labels page, BESIDE the four AI marks the product invented locally rather than instead of them. The Figma set still draws the earlier side stripe; the code now uses the decided --ds-ai-* treatment: an achromatic ground with a uniform --ds-ai-border border and a --ds-ai-icon glyph. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
     }
   ]
 };
@@ -82,8 +82,8 @@ involved somewhere.
 
 ## Colors
 
-<DocsCanvasShell description={<>No brand hue is picked. The accent is one local custom property behind a neutral token, so the branding decision lands on a single declaration.</>}>
-    <DsCanvasQuiet of={AiLabelStories.NoBrandHueIsAssumed} />
+<DocsCanvasShell description={<>The edge is one border in <code>--ds-ai-border</code> on all four sides, and the glyph is <code>--ds-ai-icon</code>. <code>reviewed</code> takes success on both.</>}>
+    <DsCanvasQuiet of={AiLabelStories.EdgeAndGlyphUseAiTokens} />
 </DocsCanvasShell>
 
 </div>
@@ -121,10 +121,9 @@ a suggested question, a drafted summary, a recommended lesson. It answers two
 questions at once — where did this come from, and how much should I trust it —
 and both belong on the content rather than in a paragraph elsewhere on the page.
 
-It is a **first stab, not a settled component.** The color is
-deliberately unresolved: `--plus-ai-accent` is one local custom property behind a
-neutral token, so when the brand decision is made it lands on a single
-declaration.
+The mark is a neutral ground with a purple border and glyph, from the
+`--ds-ai-border` and `--ds-ai-icon` tokens. The border is the same on all four
+sides; the mark never carries a colored bar down one side.
 
 </div>
 

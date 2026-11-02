@@ -70,7 +70,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
+            "notes": "Created 2026-08-29 on the labels page, BESIDE the four AI marks the product invented locally rather than instead of them. The Figma set still draws the earlier side stripe; the code now uses the decided --ds-ai-* treatment: an achromatic ground with a uniform --ds-ai-border border and a --ds-ai-icon glyph. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"

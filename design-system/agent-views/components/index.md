@@ -11,6 +11,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 ## UI components (71)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
+- AgentAvatar — exported here, implemented outside `src/components/`; read the source
 - [Alert](../../src/components/messaging/Alert/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)
 - [AvatarGroup](../../src/components/images-and-icons/AvatarGroup/index.md)

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './AiLabel.scss';
 
 /**
- * `AiLabel` — this came from the agent, and here is how much to trust it (#269).
+ * `AiLabel` — this came from the agent, and here is how much to trust it.
  *
  * WHY IT EXISTS, MEASURED. The product already has AI surfaces. It has four,
  * each invented locally, and they do not agree about anything:
@@ -20,23 +20,23 @@ import './AiLabel.scss';
  *                                       story.
  *   AlertForSupervisors (Training)      prose, no mark at all.
  *
- * Three marks, three colors, none of them shared. That is #269's argument with
- * the evidence attached, and it is why this is a component rather than a fifth
- * local one.
+ * Three marks, three colors, none of them shared. That is why this is a
+ * component rather than a fifth local one.
  *
- * NO BRAND HUE IS PICKED HERE, ON PURPOSE. #269 says the color is Bill's call
- * and this file does not make it. What it does take from Atlassian's Rovo — read
- * from `@atlaskit/tokens` and recorded on #269 — are the three decisions that
- * are NOT about which hue:
+ * THE COLOR DECISION IS MADE. What it takes from Atlassian's AI guidance, read from
+ * `@atlaskit/tokens`, is three decisions, now carried by the `--ds-ai-*`
+ * tokens:
  *
- *   1. THE BOLD GROUND IS ACHROMATIC. `color.rovo.background.brand.bold` is
+ *   1. THE BOLD GROUND IS ACHROMATIC. Atlassian's AI bold ground is
  *      #000000. AI is a different REGISTER, not another semantic color
- *      competing with success and danger — so this uses the neutral surface
- *      ramp the system already has, and adding a hue later changes one token.
- *   2. THE ACCENT IS ONLY EVER A BORDER AND AN ICON. Rovo has no `rovo.text`
- *      and no `rovo.background` in its accent hues: the identity marks an edge
- *      and a glyph, it never floods a surface. So does this.
- *   3. LOW CONFIDENCE IS A STATE, NOT A FOOTNOTE. Rovo's voice guidance is
+ *      competing with success and danger, so this uses the neutral ground
+ *      the system already has.
+ *   2. THE ACCENT IS ONLY EVER AN EDGE AND AN ICON. Atlassian's AI tokens have no text
+ *      and no background in their accent hues: the identity marks an edge
+ *      and a glyph, it never floods a ground. So here the edge is a uniform
+ *      border in `--ds-ai-border`, never a bar on one side, and the glyph is
+ *      `--ds-ai-icon`.
+ *   3. LOW CONFIDENCE IS A STATE, NOT A FOOTNOTE. Atlassian's AI voice guidance is
  *      explicit that the system must "define… what happens when confidence is
  *      low", so `confidence="low"` is part of the API and carries a required
  *      note rather than being left to each caller's prose.
@@ -124,7 +124,7 @@ export const AiLabel = ({
                       * The note is REQUIRED by propTypes when confidence is low,
                       * and defaulted here as well: a low-confidence mark with no
                       * advice is a warning with no instruction, which is the
-                      * thing #269 quotes Rovo's guidance against.
+                      * thing Atlassian's AI voice guidance warns against.
                       */}
                     {note ?? 'Check this before relying on it'}
                 </span>
