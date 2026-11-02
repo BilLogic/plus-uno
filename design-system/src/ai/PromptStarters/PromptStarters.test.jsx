@@ -28,4 +28,9 @@ describe('PromptStarters', () => {
         const { container } = render(<PromptStarters label="Suggested prompts" starters={[]} />);
         expect(container).toBeEmptyDOMElement();
     });
+
+    it('keeps its own role and name when a caller passes others', () => {
+        render(<PromptStarters label="Suggested prompts" starters={starters} role="list" aria-label="Other" />);
+        expect(screen.getByRole('group', { name: 'Suggested prompts' })).toBeInTheDocument();
+    });
 });

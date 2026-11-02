@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Suggestion from '@/components/labels/Suggestion';
+import { Suggestion } from '@/components';
 import './PromptStarters.scss';
 
 /**
@@ -24,10 +24,11 @@ const PromptStarters = ({
     if (starters.length === 0) return null;
     return (
         <div
+            {...props}
+            // After the spread, so a caller cannot rename or re-role the group.
             role="group"
             aria-label={label}
             className={['plus-prompt-starters', className].filter(Boolean).join(' ')}
-            {...props}
         >
             {starters.map((starter) => (
                 <Suggestion

@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button } from '@/components';
+// Field and useFieldId are parts, not exported from the barrel.
 import Field from '@/components/forms-and-inputs/_internal/Field';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import GenerativeBorder from '../GenerativeBorder';
@@ -87,7 +88,8 @@ const PromptInput = ({
             leadingVisual="stop"
             aria-label="Stop generating"
             title="Stop generating"
-            disabled={isDisabled || !onStop}
+            // Stop is never held back by `isDisabled`: a generation must stay cancelable.
+            disabled={!onStop}
             onClick={() => onStop?.()}
         />
     ) : (

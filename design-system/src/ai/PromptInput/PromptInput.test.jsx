@@ -112,4 +112,13 @@ describe('PromptInput', () => {
         await userEvent.type(field(), 'a');
         expect(onChange).toHaveBeenCalledOnce();
     });
+
+    it('keeps Stop enabled when the input is disabled, so a generation can be cancelled', async () => {
+        const onStop = vi.fn();
+        render(<PromptInput label="Message to PLUS AI" isDisabled isGenerating onStop={onStop} />);
+        const stop = screen.getByRole('button', { name: 'Stop generating' });
+        expect(stop).toBeEnabled();
+        await userEvent.click(stop);
+        expect(onStop).toHaveBeenCalledOnce();
+    });
 });
