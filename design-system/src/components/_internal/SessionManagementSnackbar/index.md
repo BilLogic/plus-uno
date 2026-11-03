@@ -30,7 +30,7 @@ From `design-system/src/components/_internal/SessionManagementSnackbar/SessionMa
 
 ## Related
 
-Same group: `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `Sidebar` · `Table` · `UserAvatar`
+Same group: `LoadingGif` · `SessionAvailabilitySnackbar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

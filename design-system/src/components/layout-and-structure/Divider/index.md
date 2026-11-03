@@ -39,6 +39,6 @@ From `design-system/src/components/layout-and-structure/Divider/Divider.scss`. O
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

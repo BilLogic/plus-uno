@@ -2,7 +2,7 @@
 
 # Images and icons
 
-5 components. Each row links to the generated facts; the three columns after it are the
+6 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -12,8 +12,9 @@ authored half (#166), counted rather than assumed.
 | [AvatarGroup](AvatarGroup/index.md) | 7 | ✕ | ✕ | ✕ |
 | [Illustration](Illustration/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
+| [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 3/5 (60%) · Correct/incorrect 3/5 (60%) · Accessibility 3/5 (60%)
+**Authored coverage:** When to use 3/6 (50%) · Correct/incorrect 3/6 (50%) · Accessibility 3/6 (50%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -46,6 +46,6 @@ From `design-system/src/components/navigation/SidebarTab/SidebarTab.scss`. Overr
 
 ## Related
 
-Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Pagination` · `Scrollspy`
+Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Scrollspy` · `Sidebar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

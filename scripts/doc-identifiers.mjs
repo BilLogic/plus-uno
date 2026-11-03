@@ -532,8 +532,15 @@ export function parsePropTypes(source, symbol) {
     if (!cleaned) return;
     const m = cleaned.match(/^([A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/);
     if (!m) return;
-    const oneOf = m[2].match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
-    const oneOfNamed = oneOf ? null : m[2].match(/PropTypes\.oneOf\(\s*([A-Za-z_$][\w$]*)\s*\)/);
+    // Anchored to the TOP of the type expression: an unanchored search matched
+    // a nested field's own `oneOf` — `rows: arrayOf(arrayOf(oneOfType([shape({
+    // state: oneOf(['rest', 'error']) })])))` read `rows` as an enum of
+    // `'rest' | 'error'`, and the contract test then handed Table's `rows` a
+    // bare string, which threw at `rows.map` the first time a component this
+    // nested ever left `_internal` and reached this check (#1702).
+    const typeExpr = m[2].trim();
+    const oneOf = typeExpr.match(/^PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
+    const oneOfNamed = oneOf ? null : typeExpr.match(/^PropTypes\.oneOf\(\s*([A-Za-z_$][\w$]*)\s*\)/);
     props.push({
       name: m[1],
       type: m[2].replace(/\s+/g, ' ').trim(),

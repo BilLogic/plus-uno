@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import Table, { StaticTable, TableFooter, HeadCell } from '@/components/_internal/Table';
+import Table, { StaticTable, TableFooter, HeadCell } from '@/components/text-and-data-display/Table';
 
 export default {
     title: 'Components/Text and data display/Table',

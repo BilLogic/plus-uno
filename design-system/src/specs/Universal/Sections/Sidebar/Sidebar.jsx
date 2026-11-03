@@ -1,4 +1,4 @@
-import Sidebar from '@/components/_internal/Sidebar/Sidebar';
+import Sidebar from '@/components/navigation/Sidebar/Sidebar';
 
 export default Sidebar;
 
