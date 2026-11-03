@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as SmartTagStories from './SmartTag.stories.jsx';
+
+<Meta of={SmartTagStories} />
+
+<Title />
+A SMART competency area, as a Tag whose color and icon the subject fixes.
+
+<DocsTabs of={SmartTagStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={SmartTagStories.Overview} />
+
+<ArgTypes of={SmartTagStories} />
+
+</DocsTab>
+
+</DocsTabs>

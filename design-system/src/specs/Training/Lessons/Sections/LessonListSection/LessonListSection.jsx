@@ -9,7 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
-import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
+import SmartTag from '@/components/labels/SmartTag';
 import './LessonListSection.scss';
 
 const LessonListSection = ({
@@ -25,7 +25,7 @@ const LessonListSection = ({
         { id: 1, name: 'Hermione Granger', status: 'Needs Motivation', focusArea: null },
         { id: 2, name: 'Ron Weasley', status: 'Needs Motivation', focusArea: null },
         { id: 3, name: 'Harry Potter', status: 'Needs Motivation', focusArea: null },
-        { id: 4, name: 'Luna Lovegood', status: 'Needs Motivation', focusArea: 'relationships' },
+        { id: 4, name: 'Luna Lovegood', status: 'Needs Motivation', focusArea: 'relationship' },
         { id: 5, name: 'Draco Malfoy', status: 'Needs Motivation', focusArea: 'advocacy' }
     ];
 
@@ -90,7 +90,7 @@ const LessonListSection = ({
                                     </td>
                                     <td className="lesson-list-section__td lesson-list-section__td--focus">
                                         {student.focusArea ? (
-                                            <StaticBadgeSmart type={student.focusArea} />
+                                            <SmartTag subject={student.focusArea} />
                                         ) : (
                                             <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                                                 —

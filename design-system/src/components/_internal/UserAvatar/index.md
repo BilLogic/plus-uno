@@ -42,7 +42,7 @@ From `design-system/src/components/_internal/UserAvatar/UserAvatar.scss`. Overri
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table`
+Same group: `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

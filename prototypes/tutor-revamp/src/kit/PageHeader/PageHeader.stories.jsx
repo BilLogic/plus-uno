@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
-import { Button, StatusTag } from '@/components';
+import { Button, DateTag } from '@/components';
 import PageHeader from './PageHeader';
 import { DARK, LIGHT, onSurface } from '../storyModes';
 
@@ -29,7 +29,7 @@ export const Detail = {
         detail: true,
         eyebrow: 'Mon, Jan 22, 2024',
         title: 'Math 7',
-        status: <StatusTag type="date" appearance="warning">Starts in 25 min</StatusTag>,
+        status: <DateTag appearance="warning">Starts in 25 min</DateTag>,
         meta: 'Today, 1:00–2:00 pm at Lincoln Middle School with Ms. Rivera',
         actions: <Button text="Join session" appearance="primary" isDisabled />,
     },

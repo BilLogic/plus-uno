@@ -31,7 +31,7 @@ From `design-system/src/components/_internal/SessionAvailabilitySnackbar/Session
 
 ## Related
 
-Same group: `CompetencyBadge` · `Footer` · `LoadingGif` · `Navbar` · `SessionManagementSnackbar` · `Sidebar` · `StaticBadgeSmart` · `Table` · `UserAvatar`
+Same group: `Footer` · `LoadingGif` · `Navbar` · `SessionManagementSnackbar` · `Sidebar` · `Table` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

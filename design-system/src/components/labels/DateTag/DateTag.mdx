@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as DateTagStories from './DateTag.stories.jsx';
+
+<Meta of={DateTagStories} />
+
+<Title />
+A due or event date, outlined with a fixed icon the app picks from the date and the due-soon window.
+
+<DocsTabs of={DateTagStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={DateTagStories.Overview} />
+
+<ArgTypes of={DateTagStories} />
+
+</DocsTab>
+
+</DocsTabs>

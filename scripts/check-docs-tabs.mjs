@@ -317,12 +317,13 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
   // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two,
   // Banner and InlineMessage added one each (69), and Progress indicator and
-  // Progress tracker added one each — the deliberate
+  // Progress tracker added one each (71), and Date tag and Smart tag added one
+  // each when they split out of Status tag — the deliberate
   // edit this number is here to force.
   //
-  if (tabbed.length !== 71) {
+  if (tabbed.length !== 73) {
     all.push(
-      `expected 71 tabbed docs pages (71 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 73 tabbed docs pages (73 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

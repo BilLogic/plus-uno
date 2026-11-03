@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
-import StatusTag, {
-    STATUS_TAG_APPEARANCES, STATUS_TAG_DATE_APPEARANCES, STATUS_TAG_SMART_APPEARANCES, STATUS_TAG_SPACINGS,
-    STATUS_TAG_STATUS_APPEARANCES, STATUS_TAG_TYPES,
-} from './StatusTag';
+import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './StatusTag';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -49,7 +46,7 @@ const PAD = { default: 4, spacious: 12 };
 /** The nested count's height, and its inset from the top and right edges. */
 const COUNT = { default: { height: 16, inset: 2 }, spacious: { height: 20, inset: 6 } };
 
-/** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
+/** [fill, text, inner border] per appearance, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
     neutral: ['--ds-background-neutral', '--ds-text', '--ds-background-neutral-pressed'],
     success: ['--ds-background-success', '--ds-text-success', '--ds-background-success-pressed'],
@@ -57,17 +54,6 @@ const STATE_COLORS = {
     danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
     info: ['--ds-background-information', '--ds-text-information', '--ds-background-information-pressed'],
     discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content', '--ds-background-smart-mastering-content-pressed'],
-    ...Object.fromEntries(STATUS_TAG_SMART_APPEARANCES.map((subject) => [
-        subject,
-        [`--ds-background-smart-${subject}`, `--ds-text-smart-${subject}`, `--ds-background-smart-${subject}-pressed`],
-    ])),
-};
-
-/** [border, text, icon] per date style. A date is outlined: it has no fill. */
-const DATE_LOOK = {
-    neutral: ['--ds-border', '--ds-text-subtle', 'fa-calendar'],
-    warning: ['--ds-border-warning-subtle', '--ds-text-warning', 'fa-clock'],
-    danger: ['--ds-border-danger-subtle', '--ds-text-danger', 'fa-triangle-exclamation'],
 };
 
 /** The 1px inside border is an inset box-shadow, so the height stays exact. */
@@ -152,53 +138,6 @@ Styles.play = async ({ canvasElement }) => {
     }
 };
 
-/** A date is outlined, with a fixed icon per style: calendar, clock, alert. */
-export const Dates = () => (
-    <div style={grid}>
-        {STATUS_TAG_SPACINGS.map((size) => (
-            <div key={size} style={row}>
-                <StatusTag type="date" spacing={size} data-testid={`neutral-${size}`}>Due Oct 14</StatusTag>
-                <StatusTag type="date" appearance="warning" spacing={size} data-testid={`warning-${size}`}>Due tomorrow</StatusTag>
-                <StatusTag type="date" appearance="danger" spacing={size} data-testid={`danger-${size}`}>2 days overdue</StatusTag>
-            </div>
-        ))}
-    </div>
-);
-Dates.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const token = (name) => tokenColor(canvasElement, name);
-
-    await inEveryColorModeOf(canvasElement, async (mode, themed) => {
-        for (const size of STATUS_TAG_SPACINGS) {
-            for (const [style, [edge, ink]] of Object.entries(DATE_LOOK)) {
-                const el = canvas.getByTestId(`${style}-${size}`);
-                const name = `${mode}: ${style}-${size}`;
-                await expect(innerBorder(el), `${name} border`).toBe(themed(edge));
-                await expect(getComputedStyle(el).color, `${name} text`).toBe(themed(ink));
-            }
-        }
-    });
-
-    for (const size of STATUS_TAG_SPACINGS) {
-        for (const [style, [edge, ink, icon]] of Object.entries(DATE_LOOK)) {
-            const name = `${style}-${size}`;
-            const el = canvas.getByTestId(name);
-            const s = getComputedStyle(el);
-            await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(alpha(s.backgroundColor), `${name} has no fill`).toBe(0);
-            await expect(innerBorder(el), `${name} border`).toBe(token(edge));
-            await expect(s.color, `${name} text`).toBe(token(ink));
-
-            const glyph = iconIn(el);
-            await expect(glyph, `${name} has an icon`).not.toBeNull();
-            await expect(getComputedStyle(glyph, '::before').content, `${name} icon is ${icon}`).toBe(glyphOf(canvasElement, icon));
-            await expect(glyph).toHaveAttribute('aria-hidden', 'true');
-            await expect(getComputedStyle(glyph).color, `${name} icon color`).toBe(token(ink));
-            await expect(px(getComputedStyle(glyph).fontSize), `${name} icon size`).toBe(size === 'spacious' ? 16 : 12);
-        }
-    }
-};
-
 /**
  * `trailingMetric` nests a Count tag of the same appearance: compact (16) in default,
  * default (20) in spacious, inset equally from the top and the right.
@@ -207,7 +146,7 @@ export const WithCount = () => (
     <div style={grid}>
         {STATUS_TAG_SPACINGS.map((size) => (
             <div key={size} style={row}>
-                {STATUS_TAG_STATUS_APPEARANCES.map((appearance) => (
+                {STATUS_TAG_APPEARANCES.map((appearance) => (
                     <StatusTag key={appearance} appearance={appearance} spacing={size} trailingMetric={38} data-testid={`${appearance}-${size}`}>
                         {appearance}
                     </StatusTag>
@@ -224,7 +163,7 @@ WithCount.play = async ({ canvasElement }) => {
     const token = (name) => tokenColor(canvasElement, name);
 
     for (const size of STATUS_TAG_SPACINGS) {
-        for (const [style, [, ink]] of Object.entries(STATE_COLORS).filter(([name]) => STATUS_TAG_STATUS_APPEARANCES.includes(name))) {
+        for (const [style, [, ink]] of Object.entries(STATE_COLORS)) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
             await expect(el.getBoundingClientRect().height, `${name} keeps its height`).toBe(SIZE[size]);
@@ -252,25 +191,14 @@ WithCount.play = async ({ canvasElement }) => {
 
 /**
  * `trailingMetricAppearance` sets the nested Count tag's own appearance, which
- * otherwise follows the Status tag's. A date and the SMART subjects take no
- * metric: they have their own looks, so it is dropped with a development warning.
+ * otherwise follows the Status tag's.
  */
-export const TrailingMetricAppearance = () => {
-    const [unsupported, setUnsupported] = useState(false);
-    return (
-        <div style={row}>
-            <StatusTag appearance="success" trailingMetric={4} data-testid="follows">Completed</StatusTag>
-            <StatusTag appearance="success" trailingMetric={4} trailingMetricAppearance="danger" data-testid="own">Completed</StatusTag>
-            <button type="button" onClick={() => setUnsupported(true)}>Mount a date and a SMART subject with a metric</button>
-            {unsupported && (
-                <>
-                    <StatusTag appearance="advocacy" trailingMetric={7} data-testid="smart">Advocacy</StatusTag>
-                    <StatusTag type="date" appearance="warning" trailingMetric={7} data-testid="date">Due tomorrow</StatusTag>
-                </>
-            )}
-        </div>
-    );
-};
+export const TrailingMetricAppearance = () => (
+    <div style={row}>
+        <StatusTag appearance="success" trailingMetric={4} data-testid="follows">Completed</StatusTag>
+        <StatusTag appearance="success" trailingMetric={4} trailingMetricAppearance="danger" data-testid="own">Completed</StatusTag>
+    </div>
+);
 TrailingMetricAppearance.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const pillIn = (id) => within(canvas.getByTestId(id)).getByText('4').parentElement;
@@ -290,17 +218,6 @@ TrailingMetricAppearance.play = async ({ canvasElement }) => {
     const pill = pillIn('follows').getBoundingClientRect();
     await expect(pill.height).toBe(COUNT.default.height);
     await expect(box.right - pill.right).toBe(COUNT.default.inset);
-
-    // A date and a SMART subject take none, and say so in development.
-    const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-        await userEvent.click(canvas.getByRole('button', { name: /Mount a date/ }));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`trailingMetric` is for the status appearances'));
-        await expect(within(canvas.getByTestId('smart')).queryByText('7')).toBeNull();
-        await expect(within(canvas.getByTestId('date')).queryByText('7')).toBeNull();
-    } finally {
-        warn.mockRestore();
-    }
 };
 
 /** `leadingVisual` adds one icon before the label, in the text color. */
@@ -459,37 +376,6 @@ NeverAButton.play = async ({ canvasElement }) => {
 };
 
 /**
- * A date takes only neutral, warning and danger. Any other style falls back to
- * neutral with a development warning. The Status mounts on a button press after
- * the console is watched.
- */
-export const DateStyleFallback = () => {
-    const [mounted, setMounted] = useState(false);
-    return (
-        <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount a success date</button>
-            <StatusTag type="date" data-testid="neutral">Due Oct 14</StatusTag>
-            {mounted && <StatusTag type="date" appearance="success" data-testid="fallback">Due Oct 14</StatusTag>}
-        </div>
-    );
-};
-DateStyleFallback.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-        await userEvent.click(canvas.getByRole('button', { name: 'Mount a success date' }));
-        const fallback = canvas.getByTestId('fallback');
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('type="date"'));
-        const neutral = canvas.getByTestId('neutral');
-        await expect(innerBorder(fallback)).toBe(innerBorder(neutral));
-        await expect(getComputedStyle(fallback).color).toBe(getComputedStyle(neutral).color);
-        await expect(getComputedStyle(iconIn(fallback), '::before').content).toBe(glyphOf(canvasElement, 'fa-calendar'));
-    } finally {
-        warn.mockRestore();
-    }
-};
-
-/**
  * The weight is pinned at every spacing: regular, from body.small in default and
  * body.default in spacious. A Status tag inside a table header or a heading does not
  * inherit bold.
@@ -524,22 +410,17 @@ PinnedWeight.play = async ({ canvasElement }) => {
 };
 
 /**
- * An unknown style falls back to neutral, and an unknown type to state, each
- * with a development warning, rather than rendering an unstyled label. The
- * Statuses mount on a button press after the console is watched.
+ * An unknown appearance falls back to neutral, with a development warning,
+ * rather than rendering an unstyled label. The Status mounts on a button
+ * press after the console is watched.
  */
 export const UnknownValuesFallBack = () => {
     const [mounted, setMounted] = useState(false);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount unknown values</button>
+            <button type="button" onClick={() => setMounted(true)}>Mount an unknown appearance</button>
             <StatusTag data-testid="neutral">Not started</StatusTag>
-            {mounted && (
-                <>
-                    <StatusTag appearance="purple" data-testid="unknown-style">Not started</StatusTag>
-                    <StatusTag type="deadline" appearance="success" data-testid="unknown-type">Not started</StatusTag>
-                </>
-            )}
+            {mounted && <StatusTag appearance="purple" data-testid="unknown-style">Not started</StatusTag>}
         </div>
     );
 };
@@ -548,9 +429,8 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
     const token = (name) => tokenColor(canvasElement, name);
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     try {
-        await userEvent.click(canvas.getByRole('button', { name: 'Mount unknown values' }));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('appearance="purple" falls back to neutral'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('type="deadline"'));
+        await userEvent.click(canvas.getByRole('button', { name: 'Mount an unknown appearance' }));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('appearance="purple" is not one of'));
 
         // The unknown style renders exactly as neutral.
         const neutral = canvas.getByTestId('neutral');
@@ -558,12 +438,6 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(unknownStyle).backgroundColor).toBe(token('--ds-background-neutral'));
         await expect(getComputedStyle(unknownStyle).color).toBe(getComputedStyle(neutral).color);
         await expect(innerBorder(unknownStyle)).toBe(innerBorder(neutral));
-
-        // The unknown type is a filled state, keeping its valid style.
-        const unknownType = canvas.getByTestId('unknown-type');
-        await expect(getComputedStyle(unknownType).backgroundColor).toBe(token('--ds-background-success'));
-        await expect(innerBorder(unknownType)).toBe(token('--ds-background-success-pressed'));
-        await expect(iconIn(unknownType), 'a state has no date icon').toBeNull();
     } finally {
         warn.mockRestore();
     }
@@ -575,7 +449,6 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
 export const Interactive = {
     args: {
         children: 'Needs review',
-        type: 'state',
         appearance: 'warning',
         spacing: 'default',
         leadingVisual: '',
@@ -583,16 +456,8 @@ export const Interactive = {
         maxWidth: 200,
     },
     argTypes: {
-        type: { control: 'inline-radio', options: STATUS_TAG_TYPES },
         appearance: { control: 'select', options: STATUS_TAG_APPEARANCES },
         spacing: { control: 'inline-radio', options: STATUS_TAG_SPACINGS },
-    },
-    parameters: {
-        docs: {
-            description: {
-                story: `A date takes only ${STATUS_TAG_DATE_APPEARANCES.join(', ')}.`,
-            },
-        },
     },
     render: ({ leadingVisual, ...args }) => <StatusTag {...args} leadingVisual={leadingVisual || undefined} />,
 };

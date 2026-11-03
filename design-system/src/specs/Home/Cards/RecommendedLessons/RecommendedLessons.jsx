@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
 import Button from '@/components/forms-and-inputs/Button';
 import Divider from '@/components/layout-and-structure/Divider';
-import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
+import SmartTag from '@/components/labels/SmartTag';
 import './RecommendedLessons.scss';
 
 /**
@@ -87,7 +87,7 @@ const RecommendedLessons = ({
                 <div className="plus-recommended-lessons-top">
                     <div className="plus-recommended-lessons-tags">
                         {badgeType && (
-                            <StaticBadgeSmart type={badgeType} />
+                            <SmartTag subject={badgeType} />
                         )}
                         {duration && (
                             <>
@@ -132,7 +132,7 @@ RecommendedLessons.propTypes = {
     id: PropTypes.string,
     breakpoint: PropTypes.oneOf(['< XXL', 'XXL & above']),
     image: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    badgeType: PropTypes.oneOf(['socio-emotional', 'mastering-content', 'advocacy', 'relationships', 'technology-tools']),
+    badgeType: PropTypes.oneOf(['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools']),
     title: PropTypes.string.isRequired,
     duration: PropTypes.string,
     status: PropTypes.oneOf(['in-progress', 'completed', 'not-started']),
