@@ -33,7 +33,6 @@ export const Overview = () => (
         <Tooltip
             text="Get notifications sent to an alternate email address"
             placement="right"
-            size="small"
             id="tooltip-additional-email-overview"
         >
             <TriggerIcon />
@@ -56,7 +55,6 @@ export const Variants = () => (
                 key={placement}
                 text="Get notifications sent to an alternate email address"
                 placement={placement}
-                size="small"
                 id={`tooltip-additional-email-var-${placement}`}
                 show={true}
             >
@@ -88,7 +86,6 @@ export const Interactive = {
             <Tooltip
                 text="Get notifications sent to an alternate email address"
                 placement={args.placement}
-                size="small"
                 id="tooltip-additional-email-interactive"
                 show={args.showTooltip ? true : undefined}
             >

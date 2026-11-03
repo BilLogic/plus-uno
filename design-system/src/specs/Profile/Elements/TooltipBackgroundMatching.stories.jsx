@@ -40,7 +40,7 @@ const TriggerIcon = () => (
 
 export const Overview = () => (
     <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
-        <Tooltip text={<TooltipContent />} placement="right" size="small" id="tooltip-bg-matching-overview">
+        <Tooltip text={<TooltipContent />} placement="right" id="tooltip-bg-matching-overview">
             <TriggerIcon />
         </Tooltip>
     </div>
@@ -61,7 +61,6 @@ export const Variants = () => (
                 key={placement}
                 text={<TooltipContent />}
                 placement={placement}
-                size="small"
                 id={`tooltip-bg-matching-var-${placement}`}
                 show={true}
             >
@@ -93,7 +92,6 @@ export const Interactive = {
             <Tooltip
                 text={<TooltipContent />}
                 placement={args.placement}
-                size="small"
                 id="tooltip-bg-matching-interactive"
                 show={args.showTooltip ? true : undefined}
             >

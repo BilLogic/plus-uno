@@ -162,50 +162,6 @@ IconBold.play = async ({ canvasElement }) => {
     }
 };
 
-/**
- * `orange` is the old name for `yellow`, kept as a deprecated alias: it paints
- * exactly what `yellow` paints, in both appearances.
- */
-export const OrangeIsYellow = () => (
-    <div style={row}>
-        <Tile color="yellow" icon="book-open" data-testid="yellow" />
-        <Tile color="orange" icon="book-open" data-testid="orange" />
-        <Tile color="yellow" appearance="bold" icon="book-open" data-testid="yellow-bold" />
-        <Tile color="orange" appearance="bold" icon="book-open" data-testid="orange-bold" />
-    </div>
-);
-
-OrangeIsYellow.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const [a, b] of [['yellow', 'orange'], ['yellow-bold', 'orange-bold']]) {
-        const want = canvas.getByTestId(a);
-        const got = canvas.getByTestId(b);
-        await expect(getComputedStyle(got).backgroundColor).toBe(getComputedStyle(want).backgroundColor);
-        await expect(getComputedStyle(got.querySelector('i')).color).toBe(getComputedStyle(want.querySelector('i')).color);
-    }
-    await expect(getComputedStyle(canvas.getByTestId('orange')).backgroundColor)
-        .toBe(tokenColor(canvasElement, '--color-social-emotional-container'));
-};
-
-/**
- * `grey` is the old spelling of `gray`, kept as a deprecated alias: it paints
- * exactly what `gray` paints, and says so in development.
- */
-export const GreyIsGray = () => (
-    <div style={row}>
-        <Tile color="gray" icon="book-open" data-testid="gray" />
-        <Tile color="grey" icon="book-open" data-testid="grey" />
-    </div>
-);
-
-GreyIsGray.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const want = canvas.getByTestId('gray');
-    const got = canvas.getByTestId('grey');
-    await expect(got).toHaveClass('plus-tile--gray');
-    await expect(getComputedStyle(got).backgroundColor).toBe(getComputedStyle(want).backgroundColor);
-};
-
 /* ------------------------------------------------------------------ logos */
 
 const Logo = () => (

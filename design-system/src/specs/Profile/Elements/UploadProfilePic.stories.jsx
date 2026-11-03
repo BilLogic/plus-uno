@@ -35,7 +35,7 @@ export const UploadProfilePic = ({ state = 'unfilled', avatarSrc }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-pad-x-sm, 8px)',
+                gap: 'var(--element-pad-compact, 8px)',
                 alignItems: 'center',
             }}
         >

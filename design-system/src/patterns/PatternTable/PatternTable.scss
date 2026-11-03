@@ -25,12 +25,6 @@
     color: var(--ds-text);
 }
 
-.plus-pattern-table-toolbar {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-md);
-}
-
 .plus-pattern-table-scroll {
     overflow: auto;
     border-radius: var(--size-table-radius-sm);

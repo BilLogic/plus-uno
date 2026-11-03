@@ -259,11 +259,11 @@ const preview = {
               "Date tag",
               "Status tag",
               "Tag",
-              "Tag group",
               [
-                "Tag group",
+                "Tag",
                 "Smart tag"
               ],
+              "Tag group",
               "AI label",
               [
                 "AI label",

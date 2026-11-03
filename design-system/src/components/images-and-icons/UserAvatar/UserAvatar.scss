@@ -11,7 +11,7 @@
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    padding: var(--size-element-pad-y-md) var(--element-pad-default);
     border-radius: var(--size-element-radius-md);
     background-color: var(--color-surface-container-lowest);
     color: var(--color-on-surface);
@@ -75,7 +75,7 @@
     justify-content: center;
     flex-shrink: 0;
     min-width: var(--label-height-md);
-    padding: 0 var(--size-element-pad-x-sm);
+    padding: 0 var(--element-pad-compact);
     border-radius: var(--element-radius-full);
     background-color: var(--ds-background-danger-subtler);
     color: var(--color-danger-text);

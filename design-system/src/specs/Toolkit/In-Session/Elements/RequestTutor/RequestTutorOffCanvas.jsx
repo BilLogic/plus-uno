@@ -71,7 +71,7 @@ const Chip = ({ selected, children, onClick }) => (
         onClick={onClick}
         className="body2-txt"
         style={{
-            padding: 'var(--size-element-pad-y-sm) var(--size-element-pad-x-md)',
+            padding: 'var(--size-element-pad-y-sm) var(--element-pad-default)',
             borderRadius: 'var(--size-element-radius-full, 999px)',
             border: `var(--size-element-stroke-sm) solid ${selected ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`,
             background: selected ? 'var(--color-primary)' : 'var(--ds-background-neutral)',

@@ -65,7 +65,7 @@ const MATHiaGoalStatusBanner = ({
     return (
         <Alert
             style="primary"
-            dismissable={isDismissable}
+            dismissible={isDismissable}
             onDismiss={onDismiss}
             className={className}
         >

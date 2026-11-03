@@ -57,15 +57,15 @@
 
 /* Padding scale: the inner box, so the image stays full bleed */
 .plus-pattern-card-pad-sm .plus-pattern-card-inner {
-    padding: var(--card-pad-sm);
+    padding: var(--card-pad-compact);
 }
 
 .plus-pattern-card-pad-md .plus-pattern-card-inner {
-    padding: var(--card-pad-md);
+    padding: var(--card-pad-default);
 }
 
 .plus-pattern-card-pad-lg .plus-pattern-card-inner {
-    padding: var(--card-pad-lg);
+    padding: var(--card-pad-spacious);
 }
 
 .plus-pattern-card-inner {

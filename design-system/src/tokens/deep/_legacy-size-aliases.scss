@@ -11,10 +11,4 @@
  */
 
 :root {
-    --size-element-pad-x-md: var(--element-pad-default); /* ADR-038, one cycle */
-    --size-element-pad-x-sm: var(--element-pad-compact); /* ADR-038, one cycle */
-    --card-pad-md: var(--card-pad-default); /* ADR-038, one cycle */
-    --card-pad-sm: var(--card-pad-compact); /* ADR-038, one cycle */
-    --card-pad-lg: var(--card-pad-spacious); /* ADR-038, one cycle */
-    --modal-pad: var(--modal-pad-x-default); /* ADR-038, one cycle */
 }

@@ -16,7 +16,7 @@ import * as ElevationStories from './Elevation.stories.jsx';
 <Meta of={ElevationStories} />
 
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-lg)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }}>
         {[
             ['sunken', '--ds-surface-sunken', null, 'The frame. No shadow.'],
             ['default', '--ds-surface', null, 'The page and flat content. No shadow.'],
@@ -24,7 +24,7 @@ export const LevelTiles = () => (
             ['overlay', '--ds-surface-overlay', '--ds-shadow-overlay', 'Menus, popups, flags, modals and dragged cards.'],
             ['overflow', null, '--ds-shadow-overflow', 'Content scrolling under a sticky part. A shadow only.'],
         ].map(([name, surface, shadow, note]) => (
-            <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: surface ? `var(${surface})` : 'var(--ds-surface)', boxShadow: shadow ? `var(${shadow})` : undefined, color: 'var(--ds-text)', font: 'var(--body-small)' }}>
+            <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: surface ? `var(${surface})` : 'var(--ds-surface)', boxShadow: shadow ? `var(${shadow})` : undefined, color: 'var(--ds-text)', font: 'var(--body-small)' }}>
                 <strong style={{ font: 'var(--heading-xsmall)' }}>{name}</strong>
                 <code style={{ font: 'var(--code)', wordBreak: 'break-word' }}>{[surface, shadow].filter(Boolean).join(' + ')}</code>
                 <span style={{ color: 'var(--ds-text-subtle)' }}>{note}</span>
@@ -34,7 +34,7 @@ export const LevelTiles = () => (
 );
 
 export const Kard = ({ children = 'Sessions this week', value = '24', style }) => (
-    <div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', ...style }}>
+    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', ...style }}>
         <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{children}</span>
         <span style={{ font: 'var(--metric-medium)', color: 'var(--ds-text)' }}>{value}</span>
     </div>
@@ -239,8 +239,8 @@ At the top the header has no shadow. Once content scrolls under it, the overflow
 
 <FoundationExample caption="At the top: no shadow. Scrolled: the overflow shadow.">
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
-    <div style={{ padding: 'var(--card-pad-sm)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)' }}>Sessions</div>
-    <div style={{ padding: 'var(--card-pad-sm)', background: 'var(--ds-surface)', boxShadow: 'var(--ds-shadow-overflow)', font: 'var(--heading-xsmall)' }}>Sessions</div>
+    <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)' }}>Sessions</div>
+    <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', boxShadow: 'var(--ds-shadow-overflow)', font: 'var(--heading-xsmall)' }}>Sessions</div>
 </div>
 </FoundationExample>
 
@@ -290,8 +290,8 @@ How to lift a surface, and what not to do.
 <Do caption="One raised card marks the next session.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
     <Kard value="Next session" />
-    <div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
-    <div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
+    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
+    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
 </div>
 </Do>
 <Dont caption="Every card raised: visual noise, and nothing stands out.">

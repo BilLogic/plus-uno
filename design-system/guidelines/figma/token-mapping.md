@@ -108,7 +108,7 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Card padding | `var(--size-card-pad-{x\|y}-{sm\|md\|lg})` |
 | Card gap | `var(--size-card-gap-{sm\|md\|lg})` |
 | Card radius | `var(--size-card-radius-{sm\|md\|full})` |
-| Element padding | `var(--size-element-pad-{x\|y}-{sm\|md\|lg})`, plus `var(--size-element-pad-x-xs)` (4) |
+| Element padding | `var(--size-element-pad-y-{sm\|md\|lg})`, plus `var(--size-element-pad-x-{xs\|lg})` (4 · 16); x-sm and x-md moved to `--element-pad-compact` and `--element-pad-default` (ADR-038) |
 | Element gap | `var(--size-element-gap-{xs\|sm\|md\|lg})` |
 | Element radius | `var(--size-element-radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--size-modal-pad-{x\|y}-{sm\|md\|lg})` |

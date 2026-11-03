@@ -74,17 +74,9 @@ export default {
         actions: { table: { disable: true } },
         media: { table: { disable: true } },
         mediaPosition: { table: { disable: true } },
-        children: { table: { disable: true } },
         style: { table: { disable: true } },
         id: { table: { disable: true } },
         className: { table: { disable: true } },
-        subtitle: { table: { disable: true } },
-        fluid: { table: { disable: true } },
-        primaryButton: { table: { disable: true } },
-        secondaryButton: { table: { disable: true } },
-        paddingSize: { table: { disable: true } },
-        gapSize: { table: { disable: true } },
-        radiusSize: { table: { disable: true } },
     },
 };
 
@@ -204,7 +196,7 @@ export const Anatomy = {
         probeFont.remove();
 
         const inner = card.querySelector('.plus-pattern-card-inner');
-        await expect(px(getComputedStyle(inner).paddingTop), 'the card pads at Card/pad-lg').toBe(tokenLength(canvasElement, '--card-pad-lg'));
+        await expect(px(getComputedStyle(inner).paddingTop), 'the card pads at Card/pad-lg').toBe(tokenLength(canvasElement, '--card-pad-spacious'));
         await expect(px(getComputedStyle(band).paddingTop), 'the band pads at Surface/stack-lg').toBe(tokenLength(canvasElement, '--surface-stack-lg'));
         await expect(px(getComputedStyle(band).paddingLeft), 'and at Screen/pad-x-screen').toBe(tokenLength(canvasElement, '--layout-pad-x-screen'));
         const content = card.querySelector('.plus-jumbotron-content');

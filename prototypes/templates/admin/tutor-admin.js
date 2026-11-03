@@ -168,7 +168,7 @@ function buildSidebarNavigation() {
             navItem.style.display = 'flex';
             navItem.style.alignItems = 'center';
             navItem.style.gap = `var(--size-element-gap-sm)`;
-            navItem.style.padding = `var(--size-element-pad-y-sm) var(--size-element-pad-x-sm)`;
+            navItem.style.padding = `var(--size-element-pad-y-sm) var(--element-pad-compact)`;
             navItem.style.borderRadius = `var(--size-element-radius-sm)`;
             navItem.style.textDecoration = 'none';
             navItem.style.color = item.selected 
@@ -721,7 +721,7 @@ function showBulkAssignModal() {
     groupSelect.className = 'plus-select body2-txt';
     groupSelect.style.marginBottom = 'var(--size-modal-gap-md)';
     groupSelect.style.width = '100%';
-    groupSelect.style.padding = `var(--size-element-pad-y-md) var(--size-element-pad-x-md)`;
+    groupSelect.style.padding = `var(--size-element-pad-y-md) var(--element-pad-default)`;
     
     const defaultOption = document.createElement('option');
     defaultOption.value = '';

@@ -34,7 +34,7 @@
     --plus-modal-column: calc((var(--plus-modal-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
     --plus-modal-span: 6;
 
-    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--layout-gutter) + 2 * var(--modal-pad));
+    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--layout-gutter) + 2 * var(--modal-pad-x-default));
     flex-shrink: 0;
     box-sizing: border-box;
     /* The overlay pair, as every floating layer: the blanket under the modal sets it apart from a menu. */
@@ -45,7 +45,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
-    padding: var(--modal-pad);
+    padding: var(--modal-pad-x-default);
     overflow: hidden;
     /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
     max-height: var(--layout-max-height-modal);

@@ -105,7 +105,7 @@ const DonutChartSVG = ({
                         transform: 'translate(-50%, -100%)',
                         backgroundColor: 'var(--ds-text)',
                         color: 'var(--ds-text-inverse)',
-                        padding: 'var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 8px)',
+                        padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-default, 8px)',
                         borderRadius: 'var(--size-element-radius-sm, 4px)',
                         fontSize: 'var(--font-size-body3, 12px)',
                         fontFamily: 'var(--font-family-body)',

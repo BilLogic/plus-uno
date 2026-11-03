@@ -207,24 +207,6 @@ export const Interactive = {
 };
 
 /**
- * The deprecated `toolbar` slot still renders above the table, so existing
- * callers keep working while they move their actions to the Section header.
- */
-export const DeprecatedToolbar = {
-    parameters: { docs: { disable: true } },
-    render: () => (
-        <PatternTable toolbar={<span>Old toolbar</span>}>
-            {tableContent}
-        </PatternTable>
-    ),
-    play: async ({ canvasElement }) => {
-        const toolbar = canvasElement.querySelector('.plus-pattern-table-toolbar');
-        await expect(toolbar, 'the deprecated toolbar still renders').toHaveTextContent('Old toolbar');
-        await expect(toolbar.nextElementSibling, 'above the table').toHaveClass('plus-pattern-table-scroll');
-    },
-};
-
-/**
  * Row states, layered over each cell's fill: hovered and pressed rows take the
  * neutral subtle steps, and a selected row the selected ladder across the
  * whole row, with no stripe on its leading edge. The row's checkbox is the cue

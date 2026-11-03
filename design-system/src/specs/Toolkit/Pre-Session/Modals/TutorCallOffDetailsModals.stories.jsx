@@ -81,7 +81,7 @@ export const PreReview_TutorRequest = () => (
                                         backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
                                         borderRadius: 'var(--size-element-radius-full)',
-                                        padding: '0 var(--size-element-pad-x-sm)',
+                                        padding: '0 var(--element-pad-compact)',
                                         marginRight: 'var(--size-element-gap-sm)'
                                     }}
                                 >
@@ -297,7 +297,7 @@ export const PostReview_SupervisorReview = () => (
                                     backgroundColor: 'var(--ds-background-success)',
                                     color: 'var(--color-success-text)',
                                     borderRadius: 'var(--size-element-radius-full)',
-                                    padding: '0 var(--size-element-pad-x-sm)'
+                                    padding: '0 var(--element-pad-compact)'
                                 }}
                             >
                                 Approved
@@ -379,7 +379,7 @@ export const PostReview_TutorRequest = () => (
                                         backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
                                         borderRadius: 'var(--size-element-radius-full)',
-                                        padding: '0 var(--size-element-pad-x-sm)',
+                                        padding: '0 var(--element-pad-compact)',
                                         marginRight: 'var(--size-element-gap-sm)'
                                     }}
                                 >
@@ -414,7 +414,7 @@ const StateLabel = ({ stage, tab }) => (
     <div style={{
         textAlign: 'center',
         marginBottom: 'var(--size-modal-gap-md)',
-        padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+        padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
         backgroundColor: 'var(--ds-background-brand-subtlest)',
         borderRadius: 'var(--size-element-radius-md)'
     }}>

@@ -71,12 +71,6 @@
     color: var(--ds-text-subtle);
 }
 
-.plus-jumbotron-body {
-    font: var(--body-default);
-    color: var(--ds-text-subtle);
-    min-width: 0;
-}
-
 /* Actions: one filled button, then an optional outlined one */
 .plus-jumbotron-actions {
     display: flex;

@@ -29,8 +29,7 @@ const FileUpload = ({
     const fileInputRef = useRef(null);
     /** One id for the label and the file input — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
-    /** `success` is the old name for `valid`, the field vocabulary Figma uses. */
-    const state = validation === 'success' ? 'valid' : validation;
+    const state = validation;
 
     /*
      * #327 — see `Input.jsx`. This component has TWO things worth pointing at:
@@ -196,8 +195,7 @@ FileUpload.propTypes = {
     disabled: PropTypes.bool,
     /** Shows the field and its files without a way to choose a file. */
     readOnly: PropTypes.bool,
-    /** `success` is deprecated: use `valid`. */
-    validation: PropTypes.oneOf(['none', 'invalid', 'valid', 'success']),
+    validation: PropTypes.oneOf(['none', 'invalid', 'valid']),
     validationMessage: PropTypes.string,
     buttonText: PropTypes.string,
     className: PropTypes.string,

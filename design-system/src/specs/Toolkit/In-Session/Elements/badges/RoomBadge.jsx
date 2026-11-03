@@ -39,7 +39,7 @@ export const RoomBadge = ({ number, outOfRange = false }) => {
                 gap: 'var(--size-element-gap-sm, 4px)',
                 flexShrink: 0,
                 height: '20px',
-                padding: '0 var(--size-element-pad-x-sm)',
+                padding: '0 var(--element-pad-compact)',
                 borderRadius: 'var(--size-element-radius-md)',
                 backgroundColor: tone.bg,
                 color: tone.fg,

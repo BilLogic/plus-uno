@@ -207,7 +207,6 @@ test('every scale variable has explicit scopes for its property', () => {
 test('the old tokens still resolve at their old values', () => {
   const old = {
     '--size-element-pad-x-xs': '4px',
-    '--size-element-pad-x-sm': '8px',
     '--size-element-pad-y-sm': '4px',
     '--size-element-pad-y-md': '6px',
     '--size-element-radius-sm': '4px',

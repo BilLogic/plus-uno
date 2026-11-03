@@ -9,9 +9,6 @@ export default {
     },
 };
 
-/** @deprecated Prefer default import of SessionRating.jsx */
-export const SessionRatingField = SessionRating;
-
 /**
  * Session Rating
  * Uses the Session Rating Element (Foundations Rating + session comment copy).

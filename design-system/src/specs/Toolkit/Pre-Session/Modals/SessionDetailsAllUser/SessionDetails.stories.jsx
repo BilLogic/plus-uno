@@ -418,7 +418,7 @@ export const OneTimeSession_PreFillIn = () => (
  * Fill-In Review Choices Modal
  * Shows a confirmation modal for reviewing fill-in session selections
  * Uses:
- * - Alert component (warning style, non-dismissable)
+ * - Alert component (warning style, non-dismissible)
  * - Fill-In Schedule table structure (simplified, no checkboxes)
  * - Badge component for "No lead" indicators
  */
@@ -586,7 +586,7 @@ export const FillIn_ReviewChoices = () => {
 
                     {/* Warning Alert + Fill-In Schedule Table */}
                     <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                        <Alert style="warning" dismissable={false}>
+                        <Alert style="warning" dismissible={false}>
                             You are filling in for <strong>{fillInSessions.length} sessions</strong>. The following sessions will be added to your schedule.
                         </Alert>
 

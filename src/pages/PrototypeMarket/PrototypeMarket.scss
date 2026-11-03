@@ -395,7 +395,7 @@ html.market-active #root {
 
   &__modal-comment {
     border-left: var(--size-element-stroke-lg, 2px) solid var(--color-outline-variant, #cfd8dc);
-    padding-left: var(--size-element-pad-x-md, 10px);
+    padding-left: var(--element-pad-default, 10px);
     margin-bottom: 0;
 
     &-head {

@@ -5,34 +5,6 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
 import { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '../Overlay';
 import './PatternModal.scss';
 
-const REPLACEMENTS = {
-    padding: 'the modal pads Modal/pad 16 on every side.',
-    gap: 'the modal stacks Modal/stack-md 16.',
-    maxHeight: 'use height="hug" (grows to the screen less 128) or height="fill".',
-};
-
-/** The deprecated props that have warned in this session, so each warns once. */
-const warned = new Set();
-
-/**
- * Says once per session, in development, that an old sizing prop is kept only
- * so no caller breaks.
- *
- * @param {Record<string, unknown>} passed - The deprecated props, by name, as the caller passed them.
- */
-function useDeprecatedSizing(passed) {
-    const names = Object.keys(passed).filter((name) => passed[name] != null).join(',');
-    React.useEffect(() => {
-        if (!names || process.env.NODE_ENV === 'production') return;
-        for (const name of names.split(',')) {
-            if (warned.has(name)) continue;
-            warned.add(name);
-            // eslint-disable-next-line no-console
-            console.warn(`[PatternModal] ${name} is deprecated and kept only so no caller breaks; ${REPLACEMENTS[name]}`);
-        }
-    }, [names]);
-}
-
 /**
  * Modal pattern for PLUS design system.
  * Modal shell rendered inline (no portal, focus trap or Escape): header with
@@ -71,9 +43,6 @@ const PatternModal = ({
     loading = false,
     width = 'sm',
     height = 'hug',
-    maxHeight,
-    padding,
-    gap,
     tabs,
     activeTab,
     defaultActiveTab,
@@ -84,22 +53,14 @@ const PatternModal = ({
     ...props
 }) => {
     const reactId = React.useId();
-    useDeprecatedSizing({ padding, gap, maxHeight });
     const tabState = useTabs(tabs, { activeTab, defaultActiveTab, onTabChange });
 
     const classes = [
         'plus-pattern-modal',
         `plus-pattern-modal-width-${width}`,
         `plus-pattern-modal-height-${height}`,
-        padding ? `plus-pattern-modal-pad-${padding}` : '',
-        gap ? `plus-pattern-modal-gap-${gap}` : '',
         className,
     ].filter(Boolean).join(' ');
-
-    const modalStyle = {
-        ...style,
-        maxHeight: maxHeight ?? style?.maxHeight,
-    };
 
     // A `role="dialog"` needs an accessible name. The header title is the name
     // whenever there is one, so point `aria-labelledby` at it; a caller that
@@ -110,11 +71,11 @@ const PatternModal = ({
 
     // The body scrolls once the modal reaches its cap, and a scrollable region
     // that holds no focusable content is unreachable by keyboard. A fill modal
-    // is always at its cap, a hug one when its content outgrows the screen, an
-    // old `maxHeight` one past that height: give the body a tab stop then.
+    // is always at its cap, a hug one when its content outgrows the screen:
+    // give the body a tab stop then.
     const bodyRef = React.useRef(null);
     const overflows = useOverflows(bodyRef);
-    const bodyScrolls = height === 'fill' || (maxHeight ?? style?.maxHeight) != null || overflows;
+    const bodyScrolls = height === 'fill' || overflows;
 
     // A new tab is a new page of the body: start it at the top, not wherever
     // the last tab was scrolled to.
@@ -157,7 +118,7 @@ const PatternModal = ({
         <div
             id={id}
             className={classes}
-            style={modalStyle}
+            style={style}
             role="dialog"
             aria-modal="false"
             aria-labelledby={labelledBy}
@@ -272,12 +233,6 @@ PatternModal.propTypes = {
     width: PropTypes.oneOf(OVERLAY_WIDTHS),
     /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
     height: PropTypes.oneOf(OVERLAY_HEIGHTS),
-    /** Deprecated: a fixed cap. Use `height`. */
-    maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Deprecated: the old Modal/pad-* tokens. The modal pads Modal/pad 16. */
-    padding: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: the old Modal/gap-* tokens. The modal stacks Modal/stack-md 16. */
-    gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /**
      * A tab group under the title: `{ key, label, content, disabled? }` per tab.
      * The tabs stay put in the header and the body, now the tab panel, shows the

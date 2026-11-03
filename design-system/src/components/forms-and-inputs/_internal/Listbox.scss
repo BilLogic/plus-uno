@@ -117,7 +117,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--size-element-pad-x-sm);
+    padding: 0 var(--element-pad-compact);
     pointer-events: none;
 
     > * {
@@ -141,7 +141,7 @@
     display: flex;
     align-items: center;
     gap: var(--size-element-gap-sm);
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    padding: var(--size-element-pad-y-md) var(--element-pad-default);
     color: var(--ds-text-subtle);
     font: var(--body-default);
 

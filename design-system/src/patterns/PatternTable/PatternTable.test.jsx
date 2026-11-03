@@ -91,23 +91,4 @@ describe('PatternTable', () => {
         expect(screen.getByText('1 of 4')).toBeInTheDocument();
     });
 
-    it('still renders a deprecated toolbar, and warns once in development', async () => {
-        // A fresh module, so the once-per-session warning has not fired yet.
-        vi.resetModules();
-        const { default: FreshTable } = await import('./PatternTable');
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        const { rerender } = render(<FreshTable toolbar={<span>Old toolbar</span>}>{head}</FreshTable>);
-        rerender(<FreshTable toolbar={<span>Old toolbar</span>}>{head}</FreshTable>);
-        render(<FreshTable toolbar={<span>Another</span>}>{head}</FreshTable>);
-        expect(screen.getByText('Old toolbar')).toBeInTheDocument();
-        expect(warn).toHaveBeenCalledTimes(1);
-        expect(warn.mock.calls[0][0]).toMatch(/`toolbar` is deprecated/);
-        expect(warn.mock.calls[0][0]).toMatch(/Section header/);
-    });
-
-    it('does not warn without a toolbar', () => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        render(<PatternTable>{head}{body}</PatternTable>);
-        expect(warn).not.toHaveBeenCalled();
-    });
 });

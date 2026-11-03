@@ -14,7 +14,7 @@ import SmartTag, { SMART_TAG_SUBJECTS } from './SmartTag';
  */
 
 export default {
-    title: 'Components/Labels/Tag group/Smart tag',
+    title: 'Components/Labels/Tag/Smart tag',
     component: SmartTag,
     tags: ['!dev', '!autodocs'],
     parameters: {

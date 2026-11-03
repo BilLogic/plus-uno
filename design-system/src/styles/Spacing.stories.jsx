@@ -14,7 +14,7 @@ export default {
 };
 
 const box = {
-    padding: 'var(--modal-pad)',
+    padding: 'var(--modal-pad-x-default)',
     borderRadius: 'var(--modal-radius)',
     background: 'var(--ds-surface-overlay)',
     boxShadow: 'var(--ds-shadow-overlay)',

@@ -31,7 +31,7 @@ export default {
 /**
  * Fill In (Empty State)
  * Empty state when there are no fill-in sessions available.
- * Reuses: Alert (warning, dismissable), Button (primary outline + leading refresh icon),
+ * Reuses: Alert (warning, dismissible), Button (primary outline + leading refresh icon),
  * info icon, close icon, hourglass icon, body typography tokens.
  */
 export const FillIn_EmptyState = () => (
@@ -75,7 +75,7 @@ export const FillIn_EmptyState = () => (
                     </div>
                 </div>
                 {/* One-time Fill-ins banner (design system Alert, Figma copy) */}
-                <Alert style="warning" dismissable>
+                <Alert style="warning" dismissible>
                     <strong>One-time Fill-ins:</strong> Help cover specific sessions that need additional tutors.
                     These are individual sessions, not recurring commitments.
                 </Alert>
@@ -168,7 +168,7 @@ export const FillIn = () => (
                     </div>
                 </div>
                 {/* One-time Fill-ins banner (design system Alert, Figma copy) */}
-                <Alert style="warning" dismissable>
+                <Alert style="warning" dismissible>
                     <strong>One-time Fill-ins:</strong> Help cover specific sessions that need additional tutors.
                     These are individual sessions, not recurring commitments.
                 </Alert>
@@ -493,7 +493,7 @@ export const Confirmation = () => {
                     </div>
                     <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
                         {/* Warning alert (design system Alert) */}
-                        <Alert style="warning" dismissable={false}>
+                        <Alert style="warning" dismissible={false}>
                             You're filling in for the following session(s). Please confirm before continuing.
                         </Alert>
                         {/* Session table: pre-session/tables/Fill Ins */}
@@ -568,7 +568,7 @@ export const Success = () => (
                 </div>
                 <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     {/* Success alert (design system Alert) */}
-                    <Alert style="success" dismissable={false}>
+                    <Alert style="success" dismissible={false}>
                         The following session(s) have been added to your schedule.
                     </Alert>
                     {/* Table: Table / my sessions — Date & time (ET) | School & teacher | Status | Actions (Figma 2279-148185, 2279-148186) */}

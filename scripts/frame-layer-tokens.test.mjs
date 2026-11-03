@@ -93,9 +93,6 @@ const FIXED = {
   '--section-stack-lg': '24px',
   '--section-min-width-main': '480px',
   '--section-min-width-side': '224px',
-  '--card-pad-sm': '16px',
-  '--card-pad-md': '20px',
-  '--card-pad-lg': '24px',
   '--card-stack-sm': '4px',
   '--card-stack-md': '8px',
   '--card-stack-lg': '12px',
@@ -117,7 +114,6 @@ const FIXED = {
   '--table-stack': '8px',
   '--overlay-pad-x': '16px',
   '--overlay-pad-y': '64px',
-  '--modal-pad': '16px',
   '--modal-stack-sm': '8px',
   '--modal-stack-md': '16px',
   '--modal-stack-lg': '24px',
@@ -187,9 +183,12 @@ test('a drawer takes the Modal width steps: each Drawer width aliases its Modal 
 });
 
 test('the Drawer pattern tokens alias the same space steps as Modal, and there is no Drawer radius', () => {
-  for (const leaf of ['pad', 'stack-sm', 'stack-md', 'stack-lg', 'inline-sm', 'inline-md', 'inline-lg']) {
+  for (const leaf of ['stack-sm', 'stack-md', 'stack-lg', 'inline-sm', 'inline-md', 'inline-lg']) {
     assert.equal(corpus.get(`--drawer-${leaf}`)?.raw, corpus.get(`--modal-${leaf}`)?.raw, leaf);
   }
+  // Modal's own pad moved to the role token `--modal-pad-x-default` (ADR-038,
+  // declared in tokens/deep, outside this file's corpus); Drawer still aliases the same step.
+  assert.equal(corpus.get('--drawer-pad')?.raw, 'var(--space-100)', 'pad');
   assert.equal(corpus.get('--drawer-radius'), undefined);
 });
 
@@ -292,7 +291,6 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--layout-gutter': 'var(--space-100)',
     '--layout-max-width-content': 'var(--size-7700)',
     '--surface-pad': 'var(--space-100)',
-    '--card-pad-md': 'var(--space-125)',
     '--card-min-width-md': 'var(--width-1900)',
     '--card-max-height-sm': 'var(--size-1900)',
     '--card-max-height-md': 'var(--size-2500)',
@@ -341,12 +339,18 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
  */
 const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
 
+// `--modal-pad-x-default` (ADR-038, tokens/deep, outside this file's corpus) is
+// non-responsive, same 16px the old `--modal-pad` held at every mode.
+const MODAL_PAD_PX = 16;
+
 /** The width Modal.scss computes for a span on a screen `width` wide, its tokens read at `mode`. */
 function modalWidth(span, width, mode) {
   const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
   assert.ok(block, 'Modal.scss has no .plus-modal block');
   const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-modal-'))].map(([, n, v]) => [n, v.trim()]));
   local['--plus-modal-span'] = String(span);
+  // ADR-038, tokens/deep, outside this file's corpus: inject it like a local.
+  local['--modal-pad-x-default'] = String(MODAL_PAD_PX);
   const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1];
   assert.ok(formula, '.plus-modal declares no width');
   const resolve = (expr, depth = 0) => {
@@ -371,7 +375,7 @@ test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, t
     for (const span of [6, 8, 10]) {
       const expected = span * num('--layout-width-column-screen', mode)
         + (span - 1) * num('--layout-gutter', mode)
-        + 2 * num('--modal-pad', mode);
+        + 2 * MODAL_PAD_PX;
       // The token holds the column to two decimals, so ten columns drift by under a tenth of a pixel.
       const actual = modalWidth(span, width, mode);
       assert.ok(Math.abs(actual - expected) < 0.1, `${span} columns at ${mode}: Modal.scss ${actual}, Figma ${expected}`);
@@ -392,7 +396,7 @@ function screenGridWidth(span, width, mode) {
   assert.ok(block, '_screen-grid.scss has no screen-grid-width mixin');
   const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-overlay-'))].map(([, n, v]) => [n, v.trim()]));
   local['--plus-overlay-span'] = String(span);
-  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1]?.replace('#{$pad}', 'var(--modal-pad)');
+  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1]?.replace('#{$pad}', String(MODAL_PAD_PX));
   assert.ok(formula, 'the screen-grid-width mixin declares no width');
   const resolve = (expr, depth = 0) => {
     assert.ok(depth < 10, `${expr} does not resolve`);

@@ -46,7 +46,7 @@ const box = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--element-inline-md)',
-    padding: 'var(--card-pad-md)',
+    padding: 'var(--card-pad-default)',
     border: 'var(--border-default) solid var(--ds-border)',
     borderRadius: 'var(--generative-border-radius, var(--card-radius))',
     background: 'var(--ds-surface-raised)',
@@ -57,7 +57,7 @@ const box = {
 const wrap = { maxWidth: 'var(--section-min-width-main)' };
 
 const toggle = {
-    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
     border: 'var(--border-default) solid var(--ds-border-input)',
     borderRadius: 'var(--element-radius-md)',
     background: 'var(--ds-background-input)',
