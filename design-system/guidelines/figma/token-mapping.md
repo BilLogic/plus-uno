@@ -17,7 +17,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Figma Variable / Style | PLUS CSS Token | Notes |
 |------------------------|----------------|-------|
 | Primary / Primary 500 | `var(--color-primary)` | Main brand color |
-| Primary Container | `var(--color-primary-container)` | Prefer over `-state-08` for elevated surfaces |
+| Primary Container | `var(--color-primary-container)` | Elevated or filled surfaces |
 | On Primary | `var(--color-on-primary)` | Text/icons on primary backgrounds |
 | Secondary | `var(--color-secondary)` | |
 | Danger / Error | `var(--color-danger)` | |
@@ -45,9 +45,6 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | Social Emotional | `var(--color-social-emotional)` |
 | Advocacy | `var(--color-advocacy)` |
 | Technology Tools | `var(--color-technology-tools)` |
-
-### State Opacity Convention
-Tokens ending in `-state-08`, `-state-12`, `-state-16` are 8%, 12%, 16% opacity variants. Use `-container` tokens instead for elevated or filled surfaces.
 
 ### Label Border Convention
 `<Hue>/<Hue> Border Subtle` is the hue at 45%, the border of an outlined label (Tag, date Status), and maps to `var(--color-<hue>-border-subtle)`. It is not `<Hue> Border`, the 3:1 role that maps to `var(--color-<hue>-border)`. Success, Warning, Danger, Tertiary and the five SMART hues have one.
@@ -168,7 +165,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 When encoding rules via `create_design_system_rules`, include these conventions:
 
 1. **Never hardcode** — all visual values must map to the tokens above
-2. **Container over state** — use `-container` tokens for filled surfaces, not `-state-08`
+2. **Container for filled surfaces** — use `-container` tokens for filled surfaces
 3. **Semantic context** — choose token by context (card → `--size-card-*`, element → `--size-element-*`)
 4. **Font Awesome Free only** — `fa-solid`, `fa-regular`, `fa-brands`. No Pro icons
 5. **React-Bootstrap base** — components extend Bootstrap 5.3, not alternative frameworks

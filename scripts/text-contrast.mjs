@@ -161,8 +161,8 @@ export function textSibling(token, values) {
 /**
  * The ground as it actually paints.
  *
- * STATE LAYERS ARE NOT GROUNDS. `--color-primary-state-08` is
- * `rgba(4, 114, 168, 0.08)` — an 8% wash over whatever is beneath. Reading it
+ * TRANSLUCENT TINTS ARE NOT GROUNDS. An 8% tint of primary is
+ * `rgba(4, 114, 168, 0.08)` — a wash over whatever is beneath. Reading it
  * as if it were solid gives `--color-primary-text` at 1.27:1 and a page of
  * failures that are not there. That is the same arithmetic mistake #268's audit
  * made and had to correct, and the first draft of this check made it again: 34

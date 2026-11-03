@@ -195,19 +195,6 @@ export function deriveCandidates(collection, name, { codeSyntax } = {}) {
   if (collection === TYPOGRAPHY_COLLECTION) return [typographyToken(name)].filter(Boolean);
 
   if (collection.startsWith('colors')) {
-    // State layers land as `--color-<base>-state-<NN>` in code. Figma spells the
-    // same thing two ways: accent puts the tint in the leaf ("Advocacy 08"),
-    // neutral puts it in the parent ("…/on surface/opacity-0_08").
-    const accentTint = leaf.match(/\s(\d{2})$/);
-    const neutralTint = leaf.match(/opacity-0[_.]?(\d{2})$/);
-    if (accentTint) {
-      const base = slug(leaf.replace(/\s*\d{2}$/, ''));
-      out.push(`--color-${base}-state-${accentTint[1]}`);
-    }
-    if (neutralTint) {
-      const base = slug(parts[parts.length - 2] || head);
-      out.push(`--color-${base}-state-${neutralTint[1]}`);
-    }
     if (/\(text\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(text\)/i, ''))}-text`);
     out.push(`--color-${slug(leaf)}`);
     out.push(`--color-${slug(head)}-${slug(leaf)}`);

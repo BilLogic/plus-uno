@@ -14,16 +14,16 @@
  * `--size-card-border-lg`) and seven colors. Three of those colors cannot be
  * seen against the page:
  *
- *   --color-primary-state-08    1.13:1     an 8% tint of primary
+ *   an 8% tint of primary       1.13:1
  *   --color-inverse-primary     1.62:1     a light tint meant for DARK grounds
- *   --color-on-surface-state-12 1.28:1
+ *   a 12% tint of on-surface    1.28:1
  *
  * against `--color-primary` at 5.02:1, which is what the majority of the
  * declarations already use.
  *
  * A GLOW IS NOT AUTOMATICALLY A DEFECT, and this is the correction that shaped
  * the check. Eleven of the fourteen `box-shadow: 0 0 0 0.2rem
- * var(--color-primary-state-08)` declarations sit beside `border-color:
+ * an 8% primary tint` declarations sit beside `border-color:
  * var(--color-primary-border)` in the same rule. There the BORDER is the
  * indicator at 5.02:1 and the glow is decoration around it, exactly as
  * Bootstrap intends. Reporting those as failures would be measuring one
@@ -173,7 +173,7 @@ export function selectorChain(source, offset) {
  *
  * The ground needs compositing too, and the first draft forgot it. Four
  * findings came back at 1.22:1 for `outline: 2px solid var(--color-primary)` on
- * `background-color: var(--color-primary-state-12)`: a 12% tint of primary is a
+ * a 12% primary tint as `background-color`: a 12% tint of primary is a
  * near-white ground where the ring measures 5.02:1, but read as a raw rgba its
  * channels are primary's own, so the check was comparing primary against
  * primary. A translucent ground is composited over the page before anything is

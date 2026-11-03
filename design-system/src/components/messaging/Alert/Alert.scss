@@ -138,10 +138,19 @@
 
 $alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 
+// Each style's ground is the named background token of its role.
+$alert-grounds: (
+    'primary': '--ds-background-brand-subtlest',
+    'secondary': '--ds-background-neutral',
+    'success': '--ds-background-success',
+    'danger': '--ds-background-danger',
+    'warning': '--ds-background-warning',
+    'info': '--ds-background-information',
+);
+
 @each $theme in $alert-themes {
     .plus-alert.#{$theme} {
-        // Figma's `<Style> Container 08` state layer.
-        background-color: var(--color-#{$theme}-container-state-08);
+        background-color: var(#{map-get($alert-grounds, $theme)});
         border-color: var(--color-#{$theme}-border);
 
         .plus-alert-leading {

@@ -7,7 +7,7 @@ summary: Tokens — Overview & Decision Tree
 
 ## Non-Negotiable Rules
 
-- Color, spacing, typography, radius and elevation come from compile-ready tokens (e.g. `var(--color-on-surface-state-08)`) — not raw values, and not Figma literal names.
+- Color, spacing, typography, radius and elevation come from compile-ready tokens (e.g. `var(--color-on-surface)`) — not raw values, and not Figma literal names.
 - Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
 - Choose semantic layer first (element/card/section/modal/table), then pick token.
 - Use primitives only for token-definition work, not feature implementation.
@@ -31,7 +31,7 @@ The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/p
 
 ## Token References
 
-- [Color](color.md) — Color roles, SMART framework, surfaces, state layers
+- [Color](color.md) — Color roles, SMART framework, surfaces, interaction states
 - [Spacing](spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
 - [Typography](typography.md) — Font families, weights, classes, sizing
 - [Elevation](elevation.md) — Shadow depth tokens

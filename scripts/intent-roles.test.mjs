@@ -196,7 +196,7 @@ test('a hover color mixed by hand is a use: color-mix with black or white, or a 
     'design-system/src/a.scss': [
       '.a:hover { background-color: color-mix(in srgb, var(--color-primary), black 8%); }',
       '.b:hover { filter: brightness(0.92); }',
-      '.c:active { background-color: color-mix(in srgb, var(--color-primary-state-08), white 12%); }',
+      '.c:active { background-color: color-mix(in srgb, var(--color-primary), white 12%); }',
     ].join('\n'),
   });
   const uses = mixedUses(stylesheets(root), root);
@@ -210,17 +210,17 @@ test('a mix with transparent is an alpha, not a state color, and a comment is no
       '.a { color: color-mix(in srgb, var(--color-secondary) 38%, transparent); }',
       '// the old filter: brightness(0.92) dimmed the label',
       '/* color-mix(in srgb, var(--color-primary), black 8%) */',
-      '.b:hover { background-image: linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08)); }',
+      '.b:hover { background-image: linear-gradient(var(--ds-interaction-hovered), var(--ds-interaction-hovered)); }',
     ].join('\n'),
   });
   assert.equal(mixedUses(stylesheets(root), root).length, 0);
 });
 
-test('a new hand-mixed file names its lines and the state layer to use', () => {
+test('a new hand-mixed file names its lines and the named tokens to use', () => {
   const uses = [{ file: 'x.scss', line: 4, kind: 'mix' }];
   const [message] = mixFailures(uses, { failures: [{ kind: 'new', key: 'x.scss' }] });
   assert.match(message, /x\.scss mixes a state color by hand.*line 4/);
-  assert.match(message, /--color-shadow-state-08\/12\/16/);
+  assert.match(message, /--ds-interaction-hovered/);
 });
 
 test('a hand-mixed hover in a fixture tree is a finding', () => {

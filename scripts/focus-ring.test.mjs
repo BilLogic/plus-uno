@@ -9,7 +9,11 @@ import { AFFORDANCE, NEGATED, colors, failures, focusRules, indicators, invisibl
 import { declarationErrors } from './lib/declared-grounds.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
-const VALUES = colors();
+const VALUES = new Map([
+  ...colors(),
+  ['--tint-primary-08', 'rgba(4, 114, 168, 0.08)'],
+  ['--tint-primary-12', 'rgba(4, 114, 168, 0.12)'],
+]);
 
 function corpus(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'focus-ring-'));
@@ -24,7 +28,7 @@ test('the ring is measured against a translucent ground composited over the page
   // A 12% tint of primary is a near-white ground, so a primary ring on it is
   // legible. Read as raw rgba its channels are primary's own and the check
   // compares primary against primary — four false findings in the first run.
-  const onTint = ratio('--color-primary', '--color-primary-state-12', VALUES);
+  const onTint = ratio('--color-primary', '--tint-primary-12', VALUES);
   assert.ok(onTint > 4, `primary on a 12% primary tint measured ${onTint}`);
   const onPage = ratio('--color-primary', '--color-surface', VALUES);
   assert.ok(Math.abs(onTint - onPage) < 1, 'a 12% tint is not far from the page');
@@ -32,7 +36,7 @@ test('the ring is measured against a translucent ground composited over the page
 
 test('the tokens the sweep found are still the values it found them at', () => {
   assert.ok(ratio('--color-inverse-primary', '--color-surface', VALUES) < 2);
-  assert.ok(ratio('--color-primary-state-08', '--color-surface', VALUES) < 1.3);
+  assert.ok(ratio('--tint-primary-08', '--color-surface', VALUES) < 1.3);
   assert.ok(ratio('--color-focus-ring', '--color-surface', VALUES) >= 4.5);
 });
 
@@ -44,7 +48,7 @@ test('a rule is scored on its strongest affordance, not its weakest', () => {
       '.a:focus {',
       '  outline: none;',
       '  border-color: var(--color-primary);',
-      '  box-shadow: 0 0 0 0.2rem var(--color-primary-state-08);',
+      '  box-shadow: 0 0 0 0.2rem var(--tint-primary-08);',
       '}',
     ].join('\n'),
   });
