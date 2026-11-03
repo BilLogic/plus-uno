@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { Button, Checkbox, Pagination } from '@/components';
+import { Checkbox, Pagination, Button, IconButton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -33,7 +33,7 @@ const SortHead = ({ children, sort, align }) => (
 );
 
 const RowActions = ({ label }) => (
-    <Button iconBefore="ellipsis" appearance="subtle" spacing="compact" aria-label={label} onClick={() => {}} />
+    <IconButton icon="ellipsis" appearance="subtle" spacing="compact" label={label} onClick={() => {}} />
 );
 
 const Pager = ({ range, pages }) => (

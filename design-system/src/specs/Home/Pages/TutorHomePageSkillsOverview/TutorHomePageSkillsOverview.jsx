@@ -4,7 +4,7 @@ import { PageLayout } from '@/specs/Universal/Pages';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { MetricsCard, RecommendedLessons, BadgeCard } from '@/specs/Home/Cards';
-import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components';
 import './TutorHomePageSkillsOverview.scss';
 
 /**
@@ -43,17 +43,14 @@ const TutorHomePageSkillsOverview = ({
 
     const scrollCarousel = (direction) => {
         if (!carouselRef.current) return;
-        
         const scrollAmount = 500;
         const currentScroll = carouselRef.current.scrollLeft;
         const maxScroll = carouselRef.current.scrollWidth - carouselRef.current.clientWidth;
-        
         if (direction === 'left') {
             carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         } else {
             carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
-        
         // Update scroll state after a brief delay
         setTimeout(() => {
             if (carouselRef.current) {
@@ -136,21 +133,19 @@ const TutorHomePageSkillsOverview = ({
                         <div className="plus-tutor-home-impact-header">
                             <h4 className="h4">Your Impact</h4>
                             <div className="plus-tutor-home-impact-controls">
-                                <Button
+                                <IconButton
                                     spacing="compact"
-                                    iconBefore="arrow-left"
+                                    icon="arrow-left"
                                     onClick={() => setActiveImpactPage(Math.max(1, activeImpactPage - 1))}
                                     isDisabled={activeImpactPage === 1}
-                                    title="Previous page"
-                                    aria-label="Previous page"
+                                    label="Previous page"
                                 />
-                                <Button
+                                <IconButton
                                     spacing="compact"
-                                    iconBefore="arrow-right"
+                                    icon="arrow-right"
                                     onClick={() => setActiveImpactPage(Math.min(3, activeImpactPage + 1))}
                                     isDisabled={activeImpactPage === 3}
-                                    title="Next page"
-                                    aria-label="Next page"
+                                    label="Next page"
                                 />
                             </div>
                         </div>
@@ -166,21 +161,19 @@ const TutorHomePageSkillsOverview = ({
                     <div className="plus-tutor-home-recommendations-header">
                         <h4 className="h4">Personalized Recommendations</h4>
                         <div className="plus-tutor-home-recommendations-controls">
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-left"
+                                icon="arrow-left"
                                 onClick={() => scrollCarousel('left')}
                                 isDisabled={!canScrollLeft}
-                                title="Scroll left"
-                                aria-label="Scroll recommendations left"
+                                label="Scroll recommendations left"
                             />
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-right"
+                                icon="arrow-right"
                                 onClick={() => scrollCarousel('right')}
                                 isDisabled={!canScrollRight}
-                                title="Scroll right"
-                                aria-label="Scroll recommendations right"
+                                label="Scroll recommendations right"
                             />
                         </div>
                     </div>

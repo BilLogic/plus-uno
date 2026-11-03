@@ -4,7 +4,7 @@ import { PageLayout } from '@/specs/Universal/Pages';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationTrainingProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationTrainingProgress';
 import { MetricsCard, RecommendedLessons } from '@/specs/Home/Cards';
-import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components';
 import './TutorHomePageSkillsOverviewDifferentLayout.scss';
 
 /**
@@ -43,17 +43,14 @@ const TutorHomePageSkillsOverviewDifferentLayout = ({
 
     const scrollCarousel = (direction) => {
         if (!carouselRef.current) return;
-        
         const scrollAmount = 500;
         const currentScroll = carouselRef.current.scrollLeft;
         const maxScroll = carouselRef.current.scrollWidth - carouselRef.current.clientWidth;
-        
         if (direction === 'left') {
             carouselRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         } else {
             carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
-        
         // Update scroll state after a brief delay
         setTimeout(() => {
             if (carouselRef.current) {
@@ -133,21 +130,19 @@ const TutorHomePageSkillsOverviewDifferentLayout = ({
                     <div className="plus-tutor-home-onboarding-header">
                         <h4 className="h4">Complete Your Onboarding</h4>
                         <div className="plus-tutor-home-onboarding-controls">
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-left"
+                                icon="arrow-left"
                                 onClick={() => scrollCarousel('left')}
                                 isDisabled={!canScrollLeft}
-                                title="Scroll left"
-                                aria-label="Scroll onboarding left"
+                                label="Scroll onboarding left"
                             />
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-right"
+                                icon="arrow-right"
                                 onClick={() => scrollCarousel('right')}
                                 isDisabled={!canScrollRight}
-                                title="Scroll right"
-                                aria-label="Scroll onboarding right"
+                                label="Scroll onboarding right"
                             />
                         </div>
                     </div>

@@ -4,7 +4,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import PatternCard from '@/patterns/PatternCard';
-import { Button, Skeleton } from '@/components';
+import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 
 const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
@@ -403,7 +403,7 @@ export const Anatomy = () => (
             image={imagePlaceholder('16:9')}
             title="Ana Ruiz"
             description="Algebra I · Thu 4:00 PM"
-            actions={<Button iconBefore="ellipsis-vertical" appearance="subtle" spacing="compact" aria-label="More actions" onClick={() => {}} />}
+            actions={<IconButton icon="ellipsis-vertical" appearance="subtle" spacing="compact" label="More actions" onClick={() => {}} />}
             footer={viewSession}
         >
             {sessionBody}

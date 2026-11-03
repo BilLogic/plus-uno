@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, Button, CountTag, NavTabs, Select, StaticBadgeSmart, StatusTag, Tag } from '@/components';
+import { Alert, CountTag, NavTabs, Select, StaticBadgeSmart, StatusTag, Tag, Button, IconButton } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -100,19 +100,19 @@ const SESSION_COPY = {
 /** Previous and next, for a paged block. */
 const PagerControls = ({ label, onPrevious, onNext, previousDisabled, nextDisabled }) => (
     <>
-        <Button
+        <IconButton
             spacing="compact"
-            iconBefore="arrow-left"
+            icon="arrow-left"
             onClick={onPrevious}
             isDisabled={previousDisabled}
-            aria-label={`Previous ${label}`}
+            label={`Previous ${label}`}
         />
-        <Button
+        <IconButton
             spacing="compact"
-            iconBefore="arrow-right"
+            icon="arrow-right"
             onClick={onNext}
             isDisabled={nextDisabled}
-            aria-label={`Next ${label}`}
+            label={`Next ${label}`}
         />
     </>
 );

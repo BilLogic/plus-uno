@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components';
 
 /**
  * Uploaded file row (Figma Elements · File List Item `10750:475180`).
@@ -42,13 +42,12 @@ const FileListItem = ({ name, size = '', onRemove }) => (
             </span>
         )}
         <div style={{ marginLeft: 'auto' }}>
-            <Button
+            <IconButton
                 type="button"
                 appearance="subtle"
                 spacing="compact"
-                title={`Remove ${name}`}
-                aria-label={`Remove ${name}`}
-                iconBefore="close"
+                label={`Remove ${name}`}
+                icon="close"
                 onClick={onRemove}
             />
         </div>

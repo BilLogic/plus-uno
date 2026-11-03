@@ -1,5 +1,5 @@
 import React from 'react';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { IconButton } from '@/components';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -20,16 +20,16 @@ export const SupervisorSignUpMgmtButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Management Actions</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Add: Plus icon, Outline */}
-                <Button iconBefore="plus" aria-label="Add to fill-in list" />
+                <IconButton icon="plus" label="Add to fill-in list" />
 
                 {/* Remove: Minus icon, Outline */}
-                <Button iconBefore="minus" aria-label="Remove from fill-in list" />
+                <IconButton icon="minus" label="Remove from fill-in list" />
 
                 {/* Copy: Copy icon, Outline */}
-                <Button iconBefore="copy" aria-label="Copy recruitment message" />
+                <IconButton icon="copy" label="Copy recruitment message" />
 
                 {/* Success: Check icon, Filled Success */}
-                <Button iconBefore="check" appearance="primary" aria-label="Success" />
+                <IconButton icon="check" appearance="primary" label="Success" />
             </div>
         </section>
     </div>

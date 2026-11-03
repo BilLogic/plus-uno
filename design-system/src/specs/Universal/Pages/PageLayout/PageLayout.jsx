@@ -11,7 +11,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, CloseButton } from '@/components';
+import { CloseButton, LinkButton } from '@/components';
 import { Frame, PatternDrawer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
@@ -79,7 +79,7 @@ const FocusedFrame = ({
     const topbar = (
         <header className="plus-page-focused__topbar">
             {hasBack ? (
-                <Button
+                <LinkButton
                     className="plus-page-focused__back"
                     appearance="subtle"
                     iconBefore="arrow-left"

@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button, IconButton } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
 import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import './SessionControlsConsolidated.scss';
@@ -90,10 +90,10 @@ const SessionControlsConsolidated = ({
                     fill="outline"
                     size="small"
                     toggle={
-                        <Button
+                        <IconButton
                             spacing="compact"
-                            iconBefore="ellipsis"
-                            aria-label="More session actions"
+                            icon="ellipsis"
+                            label="More session actions"
                         />
                     }
                 />

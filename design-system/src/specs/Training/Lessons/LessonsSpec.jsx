@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Button, StatusTag, Select } from '@/components';
+import { Card, Table, StatusTag, Select, Button, IconButton } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 
 export const LessonsSpec = () => {
@@ -56,7 +56,7 @@ export const LessonsSpec = () => {
             )
         },
         { key: 'duration', label: 'Duration' },
-        { key: 'actions', label: '', render: () => <Button appearance="subtle" iconBefore="chevron-right" aria-label="Open lesson" /> }
+        { key: 'actions', label: '', render: () => <IconButton appearance="subtle" icon="chevron-right" label="Open lesson" /> }
     ];
 
     return (
@@ -81,19 +81,19 @@ export const LessonsSpec = () => {
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                         <Button spacing="compact" text="Expand All" />
                         <div className="d-flex gap-1 bg-white border rounded p-1">
-                            <Button
+                            <IconButton
                                 appearance="subtle" isSelected={view === 'list'}
-                                iconBefore="list-ul"
+                                icon="list-ul"
                                 spacing="compact"
-                                aria-label="List view"
+                                label="List view"
                                 aria-pressed={view === 'list'}
                                 onClick={() => setView('list')}
                             />
-                            <Button
+                            <IconButton
                                 appearance="subtle" isSelected={view === 'grid'}
-                                iconBefore="table-cells-large"
+                                icon="table-cells-large"
                                 spacing="compact"
-                                aria-label="Grid view"
+                                label="Grid view"
                                 aria-pressed={view === 'grid'}
                                 onClick={() => setView('grid')}
                             />

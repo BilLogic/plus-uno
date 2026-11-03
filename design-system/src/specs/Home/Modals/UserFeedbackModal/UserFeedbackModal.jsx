@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '@/components/messaging/Modal';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button, IconButton } from '@/components';
 import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import Divider from '@/components/layout-and-structure/Divider';
 import { ProductAreaDropdown } from '@/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown';
@@ -238,15 +238,15 @@ const UserFeedbackModal = ({
                                             aria-label={config.severityLabel}
                                         >
                                             {Array.from({ length: severityCount }, (_, index) => (
-                                                <Button
+                                                <IconButton
                                                     key={`severity-${index}`}
-                                                    iconBefore={severityLeadingVisual(severityIcon)}
+                                                    icon={severityLeadingVisual(severityIcon)}
                                                     isSelected={severity === index}
                                                     onClick={() => handleSeverityChange(index)}
                                                     spacing="compact"
                                                     isSelected={severity === index}
                                                     className="plus-user-feedback-modal-severity-btn"
-                                                    aria-label={`Level ${index + 1} of ${severityCount}`}
+                                                    label={`Level ${index + 1} of ${severityCount}`}
                                                     aria-pressed={severity === index}
                                                 />
                                             ))}

@@ -60,7 +60,6 @@ const ButtonGroup = ({
                 onClick={buttonConfig.onClick}
                 isDisabled={buttonConfig.isDisabled}
                 isSelected={buttonConfig.isSelected}
-                href={buttonConfig.href}
                 {...buttonConfig.props}
             />
         ));

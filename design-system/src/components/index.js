@@ -6,6 +6,9 @@ export { default as EmptyState } from '@/components/messaging/EmptyState';
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 
 export { default as Button } from '@/components/forms-and-inputs/Button';
+export { default as IconButton } from '@/components/forms-and-inputs/IconButton';
+export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
+export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
 export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGroup';
 export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';

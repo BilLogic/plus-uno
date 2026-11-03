@@ -4,7 +4,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { Button, CountTag, StatusTag } from '@/components';
+import { CountTag, StatusTag, IconButton } from '@/components';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
@@ -312,7 +312,7 @@ export const WithActionsOnHover = {
                 icon="calendar-alt"
                 onClick={onRowClick}
                 elemAfter={<CountTag value={3} label="3 upcoming" />}
-                actionsOnHover={<Button appearance="subtle" spacing="compact" iconBefore="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
+                actionsOnHover={<IconButton appearance="subtle" spacing="compact" icon="ellipsis" label="More actions for Sessions" onClick={onMore} />}
             />
         </div>
     ),

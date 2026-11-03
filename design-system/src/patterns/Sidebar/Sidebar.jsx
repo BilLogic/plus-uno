@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, CountTag, Divider, SidebarTab } from '@/components';
+import { CountTag, Divider, SidebarTab, Button, IconButton } from '@/components';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 
@@ -125,11 +125,11 @@ const PatternSidebar = ({
                     state={activeId === tab.id ? 'selected' : 'enabled'}
                     elemAfter={tab.status === 'live' ? <CountTag isDot appearance="success" label="Live" /> : undefined}
                     actionsOnHover={(
-                        <Button
+                        <IconButton
                             appearance="subtle"
                             spacing="compact"
-                            iconBefore="xmark"
-                            aria-label={`Close ${tab.title}`}
+                            icon="xmark"
+                            label={`Close ${tab.title}`}
                             onClick={close}
                         />
                     )}
@@ -191,11 +191,11 @@ const PatternSidebar = ({
                         ),
                     })}
                     <span className="plus-pattern-sidebar__chevron">
-                        <Button
+                        <IconButton
                             appearance="subtle"
                             spacing="compact"
-                            iconBefore={expanded ? 'chevron-down' : 'chevron-right'}
-                            aria-label={`${item.text} tabs`}
+                            icon={expanded ? 'chevron-down' : 'chevron-right'}
+                            label={`${item.text} tabs`}
                             aria-expanded={expanded}
                             aria-controls={listId}
                             onClick={() => toggleIn(setCollapsed, item.id)}

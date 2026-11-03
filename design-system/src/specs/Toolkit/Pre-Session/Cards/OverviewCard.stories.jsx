@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconButton } from '@/components';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -7,35 +8,6 @@ export default {
         layout: 'padded',
     },
 };
-
-/**
- * Icon Button Component
- * Small circular button with icon, matching Figma design
- */
-export const IconButton = ({ icon = 'fa-table-cells-large', ariaLabel = 'View options' }) => (
-    <button
-        type="button"
-        aria-label={ariaLabel}
-        className="d-flex align-items-center justify-content-center"
-        style={{
-            backgroundColor: 'var(--ds-background-brand-subtlest)',
-            borderRadius: 'var(--size-element-radius-full)',
-            padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-            border: 'none',
-            cursor: 'pointer'
-        }}
-    >
-        <i
-            className={`fa-solid ${icon}`}
-            aria-hidden="true"
-            style={{
-                fontSize: 'var(--font-size-fa-h6-solid)',
-                color: 'var(--color-secondary-text)',
-                lineHeight: 1
-            }}
-        />
-    </button>
-);
 
 /**
  * Stat Card Component
@@ -61,7 +33,7 @@ export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLa
             >
                 {title}
             </span>
-            <IconButton icon={icon} ariaLabel={iconAriaLabel} />
+            <IconButton icon={(icon || 'fa-table-cells-large').replace(/^(fa-solid\s+)?fa-/, '')} label={iconAriaLabel} shape="circle" appearance="subtle" spacing="compact" />
         </div>
 
         {/* Large stat value */}

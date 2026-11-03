@@ -153,12 +153,12 @@ tooltip; the prop is kept so no call site breaks.
 // Incorrect — the icon-only button has no accessible name of its own, so it is
 // announced as "button" with a description hanging off it.
 <Tooltip text="Archive session">
-  <Button appearance="primary" iconBefore="box-archive" />
+  <IconButton appearance="primary" icon="box-archive" />
 </Tooltip>
 
 // Correct — name the control, then describe it.
 <Tooltip text="Moves this session out of the active list">
-  <Button appearance="primary" iconBefore="box-archive" aria-label="Archive session" />
+  <IconButton appearance="primary" icon="box-archive" label="Archive session" />
 </Tooltip>
 ```
 
@@ -168,11 +168,11 @@ tooltip; the prop is kept so no call site breaks.
 // Incorrect — the link cannot be clicked. Moving the pointer toward it leaves
 // the trigger, and the tooltip hides.
 <Tooltip text={<a href="/help">Read the guide</a>}>
-  <Button appearance="primary" iconBefore="circle-question" aria-label="Help" />
+  <IconButton appearance="primary" icon="circle-question" label="Help" />
 </Tooltip>
 
 // Correct — a Popover is the overlay that holds content you can interact with.
-<Popover title="Scheduling" trigger={<Button appearance="primary" iconBefore="circle-question" aria-label="Help" />}>
+<Popover title="Scheduling" trigger={<IconButton appearance="primary" icon="circle-question" label="Help" />}>
   <a href="/help">Read the guide</a>
 </Popover>
 ```

@@ -7,7 +7,7 @@ import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import Card from '@/components/layout-and-structure/Card';
 import NavTabs from '@/components/navigation/NavTabs';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { IconButton } from '@/components';
 import chartTheme from '@/dataviz/chartTheme';
 import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
@@ -107,21 +107,19 @@ const DataVisualizationSkillsProgress = ({
                 <div className="plus-data-viz-header-with-title">
                     {title && <h4 className="h4 plus-data-viz-header-title">{title}</h4>}
                     <div className="plus-data-viz-nav-buttons">
-                        <Button
+                        <IconButton
                             spacing="compact"
-                            iconBefore="chart-pie"
+                            icon="chart-pie"
                             onClick={() => setActiveTab('skills-overview')}
                             isSelected={activeTab === 'skills-overview'}
-                            title="Skills Overview"
-                            aria-label="Skills Overview"
+                            label="Skills Overview"
                         />
-                        <Button
+                        <IconButton
                             spacing="compact"
-                            iconBefore="chart-line"
+                            icon="chart-line"
                             onClick={() => setActiveTab('skills-progress')}
                             isSelected={activeTab === 'skills-progress'}
-                            title="Skills Progress"
-                            aria-label="Skills Progress"
+                            label="Skills Progress"
                         />
                     </div>
                 </div>
@@ -191,7 +189,6 @@ const DataVisualizationSkillsProgress = ({
                             ];
                             const yourPerformance = skillsOverviewData?.yourPerformance || [60, 55, 80, 90, 70, 85, 75];
                             const averagePerformance = skillsOverviewData?.averagePerformance || [70, 70, 65, 75, 60, 70, 60];
-                            
                             const radarSeries = [
                                 { 
                                     name: 'Your performance', 
@@ -206,7 +203,6 @@ const DataVisualizationSkillsProgress = ({
                                     dashStyle: 'Dash'
                                 }
                             ];
-                            
                             return (
                                 <>
                                     <div className="plus-data-viz-radar-container">
