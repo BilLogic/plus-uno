@@ -53,22 +53,17 @@ export const TABS = [
 ];
 
 /**
- * The docs pages that get a tab strip: every component, plus one named
- * exception.
- *
- * Atlassian files its Design tokens page under `/components/` and gives it the
- * strip, while Color, Spacing, Typography and Accessibility sit under
- * `/foundations` with no tabs at all (measured on atlassian.design, 2026-08-26).
- * `DesignTokens.mdx` is this repo's equivalent of that page, so it is listed
- * here BY NAME rather than matched by a rule — adding the next one has to be a
- * deliberate edit, not a heuristic that quietly widens.
+ * The docs pages that get a tab strip: every component, and any page named
+ * here BY NAME. Foundations pages sit on the Foundation template with no tabs
+ * (Atlassian's own foundation pages have none), so the list is empty; adding a
+ * page has to be a deliberate edit, not a heuristic that quietly widens.
  *
  * A rule is what the alternative would have to be, and there is none available:
- * all 387 MDX pages in `design-system/src/` share the same
- * `sb-ds-component-docs` and `sb-ds-doc-section` wrappers and the same heading
- * names, so markup cannot tell a component page from a foundation page.
+ * all MDX pages in `design-system/src/` share the same `sb-ds-component-docs`
+ * and `sb-ds-doc-section` wrappers and the same heading names, so markup cannot
+ * tell a component page from a foundation page.
  */
-export const TABBED_EXCEPTIONS = ['design-system/src/styles/DesignTokens.mdx'];
+export const TABBED_EXCEPTIONS = [];
 
 /**
  * Whether a repo-relative MDX path is a docs page that gets a tab strip.

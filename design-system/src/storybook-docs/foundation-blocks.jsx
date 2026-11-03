@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { StatusTag } from '@/components';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 /**
@@ -151,21 +152,10 @@ const Verdict = ({ tone, caption, children }) => {
                     color: 'var(--ds-text)',
                 }}
             >
-                <span
-                    style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 'var(--element-inline-md)',
-                        font: 'var(--heading-xsmall)',
-                        color: isDo ? 'var(--ds-text-success)' : 'var(--ds-text-danger)',
-                    }}
-                >
-                    <i
-                        className={`fa-solid ${isDo ? 'fa-circle-check' : 'fa-circle-xmark'}`}
-                        aria-hidden="true"
-                        style={{ fontSize: 'var(--icon-md)', color: isDo ? 'var(--ds-icon-success)' : 'var(--ds-icon-danger)' }}
-                    />
-                    {isDo ? 'Do' : 'Don’t'}
+                <span>
+                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} leadingVisual={isDo ? 'circle-check' : 'circle-xmark'}>
+                        {isDo ? 'Do' : 'Don’t'}
+                    </StatusTag>
                 </span>
                 <span>{caption}</span>
             </figcaption>

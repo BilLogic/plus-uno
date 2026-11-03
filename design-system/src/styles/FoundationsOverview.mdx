@@ -1,0 +1,88 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+} from '@/storybook-docs/foundation-page.jsx';
+
+export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+
+<Meta title="Foundations/Foundations overview" tags={['!dev']} />
+
+<FoundationHero
+    title="Foundations overview"
+    summary="Foundations create consistent experiences across the tutor and student apps."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Overview">
+
+Foundations are the tokens, guidelines and visual styles that every pattern and component builds on: color, spacing, typography and more. This page lists all fourteen, grouped as tokens, guidelines, then styles.
+
+- Repo: `design-system/guidelines/foundations/` holds the written guidance for each foundation.
+- Figma: one page per foundation under Foundations, in this order.
+- Storybook: one page per foundation under Foundations, in the same order.
+
+</FoundationSection>
+
+<FoundationSection title="The fourteen foundations">
+
+Each foundation has a one-line definition.
+
+<RefTable
+    head={['Group', 'Foundation', 'What it is']}
+    rows={[
+        ['Design tokens', <Page id="tokens">Tokens</Page>, 'Named values that store a design decision once, for every theme.'],
+        ['Guidelines', <Page id="accessibility">Accessibility</Page>, 'What makes the apps usable by everyone, and how each foundation supports it.'],
+        ['Guidelines', 'Content', 'How the words inside the apps are written. The guidance lives in the repo.'],
+        ['Guidelines', <Page id="spacing">Spacing</Page>, 'The space inside and between boxes, named by the job it does.'],
+        ['Guidelines', <Page id="layout-grid">Layout & grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.'],
+        ['Styles', <Page id="color">Color</Page>, 'Every color as a token named for its job.'],
+        ['Styles', <Page id="typography">Typography</Page>, 'Heading, Body, Metric and Code text styles.'],
+        ['Styles', <Page id="motion">Motion</Page>, 'Duration, easing and what is allowed to move.'],
+        ['Styles', <Page id="iconography">Iconography</Page>, 'Font Awesome Free icons at three sizes.'],
+        ['Styles', <Page id="illustrations">Illustrations</Page>, 'The hand-drawn characters for moments with room to breathe.'],
+        ['Styles', <Page id="logos">Logos</Page>, 'The PLUS mark, with or without the wordmark.'],
+        ['Styles', <Page id="elevation">Elevation</Page>, 'Surface and shadow pairs that lift a layer.'],
+        ['Styles', <Page id="border">Border</Page>, 'A width token paired with a color token.'],
+        ['Styles', <Page id="radius">Radius</Page>, 'Corner roundness: height ÷ 4, with buttons at 6 and 4.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Page anatomy">
+
+Every foundation page follows the same shape, so you can find the same thing in the same place.
+
+- A hero names the foundation, says what it is in one line.
+- Contents lists every section, Overview and Related included.
+- The foundation's own sections come next, then Accessibility, then Related last.
+- Examples are drawn from live tokens, so they follow the toolbar's Color mode and Contrast switches.
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Every foundation page ends its guidance with the accessibility rules that foundation owns: contrast in Color, heading order in Typography, the focus ring in Border and Radius, reduced motion in Motion.
+- The Accessibility page holds the rules that cut across them.
+- Test a screen in every color mode before shipping, not only Light.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Tokens', description: 'The names every other foundation points back to.', href: '?path=/docs/foundations-tokens--docs' },
+        { title: 'Patterns', description: 'Where foundations are composed into layouts.', href: '?path=/docs/foundations-patterns-introduction--docs' },
+    ]}
+/>
+
+</FoundationSection>

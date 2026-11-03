@@ -104,3 +104,14 @@ Components automatically apply appropriate typography based on size prop:
 2. **Match size to hierarchy** - Use h1-h6 for structural headings, b1-b3 for content
 3. **Body text is regular (400)** - labels and emphasis use medium (500)
 4. **Headings 20 and up are Noto Serif at 500** - `.h1`-`.h5`, `--font-family-headline` and `--font-family-title`; `.h6` and below are Noto Sans at 600
+
+
+## Figma text styles
+
+- Heading, Body, Metric and Code are the text styles for all work; pick by where the text sits on the page, not by how big it should look.
+- Heading/large 24 is the page's one h1, Heading/medium 20 a section's h2, Heading/small 16 an h3; a modal title is Heading/medium, a card, popup or flag title Heading/xsmall. Never skip a level.
+- Labels (button, tab, menu) use Body/default/medium; there is no separate button style.
+- Numbers that are the point use Metric, never a heading style.
+- Names and titles truncate to one line; text that is the content wraps. Never shrink type to fit.
+- Sizes are in rem, so text follows the reader's browser setting.
+
