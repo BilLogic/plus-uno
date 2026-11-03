@@ -11,7 +11,7 @@ import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import Progress from '@/components/loading/Progress';
-import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
+import SmartTag from '@/components/labels/SmartTag';
 import AiIndicator from '@/specs/Training/Lessons/Elements/AiIndicator/AiIndicator';
 import StatusIndicators from '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators';
 import './LessonsTable.scss';
@@ -155,7 +155,7 @@ const LessonsTable = ({
                                 {/* Competency Column */}
                                 <td className="lessons-table__cell">
                                     {lesson.competencyArea ? (
-                                        <StaticBadgeSmart type={lesson.competencyArea} />
+                                        <SmartTag subject={lesson.competencyArea} />
                                     ) : (
                                         <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
                                             {lesson.competency || 'N/A'}

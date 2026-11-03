@@ -1,0 +1,10 @@
+/*
+ * Smart tag — a thin wrapper on Tag, so it is 22 tall like any other Tag.
+ * `elemBefore` carries no size of its own (Tag leaves that to the caller), and
+ * a SMART subject's icon reads at the same size as the label it sits beside:
+ * `--icon-sm`, Tag's own 12 text.
+ */
+.plus-smart-tag__icon {
+    font-size: var(--icon-sm);
+    line-height: 1;
+}

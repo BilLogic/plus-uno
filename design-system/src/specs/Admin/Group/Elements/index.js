@@ -8,6 +8,6 @@
 // No custom elements - uses shared components:
 // - Button (from components/Button)
 // - Badge (from components/Badge)
-// - StaticBadgeSmart (from components/StaticBadgeSmart)
+// - SmartTag (from components/SmartTag)
 // - NavTabs (from components/NavTabs)
 // - Pagination (from components/Pagination)

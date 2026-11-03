@@ -98,13 +98,13 @@
 }
 
 /*
- * The color map: [fill, text, inside border] per style for `state`.
+ * The color map: [fill, text, inside border] per appearance.
  *
- * fill    the style's tinted background token.
- * text    the style's (Text) color.
- * border  the style's pressed background token.
+ * fill    the appearance's tinted background token.
+ * text    the appearance's (Text) color.
+ * border  the appearance's pressed background token.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
- * mapping Count tag and Tag use. The five SMART subjects read their own tokens.
+ * mapping Count tag and Tag use.
  */
 $status-state: (
     'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed)),
@@ -113,39 +113,14 @@ $status-state: (
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
     'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed)),
     'discovery': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content), var(--ds-background-smart-mastering-content-pressed)),
-    'social-emotional': (var(--ds-background-smart-social-emotional), var(--ds-text-smart-social-emotional), var(--ds-background-smart-social-emotional-pressed)),
-    'mastering-content': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content), var(--ds-background-smart-mastering-content-pressed)),
-    'advocacy': (var(--ds-background-smart-advocacy), var(--ds-text-smart-advocacy), var(--ds-background-smart-advocacy-pressed)),
-    'relationship': (var(--ds-background-smart-relationship), var(--ds-text-smart-relationship), var(--ds-background-smart-relationship-pressed)),
-    'technology-tools': (var(--ds-background-smart-technology-tools), var(--ds-text-smart-technology-tools), var(--ds-background-smart-technology-tools-pressed)),
-);
-
-/*
- * `date` is outlined: no fill, [text, border] per style. The border is
- * the neutral border for neutral and the style's subtle border for warning
- * and danger, the border every outlined label uses.
- */
-$status-date: (
-    'neutral': (var(--ds-text-subtle), var(--ds-border)),
-    'warning': (var(--ds-text-warning), var(--ds-border-warning-subtle)),
-    'danger': (var(--ds-text-danger), var(--ds-border-danger-subtle)),
 );
 
 @each $name, $look in $status-state {
-    .plus-status--state.plus-status--#{$name} {
+    .plus-status--#{$name} {
         --plus-status-edge: #{nth($look, 3)};
 
         background-color: nth($look, 1);
         color: nth($look, 2);
-    }
-}
-
-@each $name, $look in $status-date {
-    .plus-status--date.plus-status--#{$name} {
-        --plus-status-edge: #{nth($look, 2)};
-
-        background-color: transparent;
-        color: nth($look, 1);
     }
 }
 

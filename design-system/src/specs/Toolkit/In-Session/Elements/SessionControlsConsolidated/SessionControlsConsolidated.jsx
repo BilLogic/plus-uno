@@ -25,7 +25,7 @@ import './SessionControlsConsolidated.scss';
 const SessionInfoBadges = ({ studentCount, tutorCount, roomCount, showRoom }) => (
     <div className="plus-session-controls__badges">
         <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-graduate" aria-hidden="true"></i>} className="fw-normal" title="Students marked present / listed on roster for this session">{studentCount}</StatusTag>
-        <StatusTag appearance="mastering-content" leadingVisual={<i className="fa-solid fa-chalkboard-user" aria-hidden="true"></i>} className="fw-normal" title="Tutors marked present / listed on roster for this session">{tutorCount}</StatusTag>
+        <StatusTag appearance="discovery" leadingVisual={<i className="fa-solid fa-chalkboard-user" aria-hidden="true"></i>} className="fw-normal" title="Tutors marked present / listed on roster for this session">{tutorCount}</StatusTag>
         {showRoom && (
             <StatusTag appearance="neutral" leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={roomCount === '—'
                     ? 'Assign students to tutors to size breakout rooms'

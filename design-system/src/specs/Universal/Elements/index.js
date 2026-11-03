@@ -4,4 +4,4 @@
  */
 
 export { default as UserAvatar } from './UserAvatar/UserAvatar';
-export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart/StaticBadgeSmart';
+export { default as SmartTag } from '@/components/labels/SmartTag';

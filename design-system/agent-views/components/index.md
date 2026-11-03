@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (78)
+## UI components (79)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -31,6 +31,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Collapse](../../src/components/layout-and-structure/Collapse/index.md)
 - [CountTag](../../src/components/labels/CountTag/index.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
+- [DateTag](../../src/components/labels/DateTag/index.md)
 - [DateTimePicker](../../src/components/forms-and-inputs/DateTimePicker/index.md)
 - [Divider](../../src/components/layout-and-structure/Divider/index.md)
 - [Dropdown](../../src/components/forms-and-inputs/Dropdown/index.md)
@@ -69,9 +70,9 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Sidebar](../../src/components/_internal/Sidebar/index.md)
 - [SidebarTab](../../src/components/navigation/SidebarTab/index.md)
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
+- [SmartTag](../../src/components/labels/SmartTag/index.md)
 - [Spinner](../../src/components/loading/Spinner/index.md)
 - [SplitButton](../../src/components/forms-and-inputs/SplitButton/index.md)
-- [StaticBadgeSmart](../../src/components/_internal/StaticBadgeSmart/index.md)
 - [StatusTag](../../src/components/labels/StatusTag/index.md)
 - [Suggestion](../../src/components/labels/Suggestion/index.md)
 - [Table](../../src/components/_internal/Table/index.md)

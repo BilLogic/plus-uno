@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Illustration, StaticBadgeSmart, StatusTag } from '@/components';
+import { Button, DateTag, Illustration, SmartTag, StatusTag } from '@/components';
 import { PatternCard } from '@/patterns';
 import {
     Agenda,
@@ -95,7 +95,7 @@ const Home = () => {
                     <div className="tr-home__next-title">
                         <div className="tr-home__next-h">
                             <h2 id="home-next">{MATH_7.title}</h2>
-                            <StatusTag type="date" appearance="warning">{MATH_7.startsIn}</StatusTag>
+                            <DateTag appearance="warning">{MATH_7.startsIn}</DateTag>
                         </div>
                         <div className="tr-home__next-meta">
                             <span>{`${MATH_7.school}, ${MATH_7.teacher}’s class`}</span>
@@ -168,7 +168,7 @@ const Home = () => {
                     <img src={PICKED_LESSON.image} alt="" />
                     <span className="tr-home__pick-title">{PICKED_LESSON.title}</span>
                     <span className="tr-home__pick-meta">
-                        <StaticBadgeSmart type={PICKED_LESSON.area} />
+                        <SmartTag subject={PICKED_LESSON.area} />
                         <span>{PICKED_LESSON.duration}</span>
                     </span>
                     <ProgressSteps total={PICKED_LESSON.steps} done={PICKED_LESSON.stepsDone} />

@@ -4,45 +4,20 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 import * as StatusTagStories from './StatusTag.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
-export const figmaMeta = {
-  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-  "props": {
-    "type": { "type": "enum", "values": ["state", "date"] },
-    "appearance": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery", "social-emotional", "mastering-content", "advocacy", "relationship", "technology-tools"] },
-    "spacing": { "type": "enum", "values": ["default", "spacious"] },
-    "leadingVisual": { "type": "boolean" },
-    "trailingMetric": { "type": "boolean" }
-  },
-  "sets": [
-    {
-      "id": "status-tag",
-      "name": "Status tag",
-      "componentSetNodeId": "17876:1653",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653",
-      "source": "manual",
-      "status": "verified",
-      "isComponentSet": true,
-      "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on state, neutral and default. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
-    }
-  ]
-};
-
 <Meta of={StatusTagStories} />
 
 <Title />
-Is it a number? Count tag. Is it the condition something is in, and can that
-condition change? Status tag. Otherwise, Tag. A Status tag is the condition
-something is in, whether the system calculated it or a person set it.
+Is it a number? Count tag. Is it a due or event date? Date tag. Is it the
+condition something is in, and can that condition change? Status tag. Otherwise,
+Tag. A Status tag is the condition something is in, whether the system
+calculated it or a person set it.
 
 <DocsTabs of={StatusTagStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/StatusTag"
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -51,18 +26,8 @@ something is in, whether the system calculated it or a person set it.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Six appearances, each with a meaning, and the five SMART subjects. The fill is the appearance's tinted background, the text its (Text) color, and a 1px inside border its pressed step.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Six appearances, each with a meaning. The fill is the appearance's tinted background, the text its (Text) color, and a 1px inside border its pressed step.</>}>
     <Canvas of={StatusTagStories.Styles} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Variants
-
-<DocsCanvasShell description={<><code>type="date"</code> is outlined, with a fixed icon per appearance: calendar when the date is not close, clock when it is due soon, alert when it is overdue.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Dates} />
 </DocsCanvasShell>
 
 </div>
@@ -79,10 +44,6 @@ something is in, whether the system calculated it or a person set it.
     <DsCanvasQuiet of={StatusTagStories.NarrowContainer} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A date takes only neutral, warning and danger. Any other appearance falls back to neutral with a development warning.</>}>
-    <DsCanvasQuiet of={StatusTagStories.DateStyleFallback} />
-</DocsCanvasShell>
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -97,7 +58,7 @@ something is in, whether the system calculated it or a person set it.
     <DsCanvasQuiet of={StatusTagStories.WithCount} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>trailingMetricAppearance</code> sets the count's own appearance, which otherwise follows the Status tag. A date and the SMART subjects take no metric.</>}>
+<DocsCanvasShell description={<><code>trailingMetricAppearance</code> sets the count's own appearance, which otherwise follows the Status tag.</>}>
     <DsCanvasQuiet of={StatusTagStories.TrailingMetricAppearance} />
 </DocsCanvasShell>
 
@@ -123,29 +84,6 @@ something is in, whether the system calculated it or a person set it.
 
 </div>
 
-
-<div className="sb-ds-doc-section">
-
-## ADS documentation
-
-Benchmarked against the [ADS documentation](https://atlassian.design/components/lozenge) for this component. The parity table lists each ADS prop and what the Status tag does with it.
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS: Lozenge</th><th>Status tag</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>children</code></td><td><code>children</code></td><td>The status text, as people say it.</td></tr>
-        <tr><td><code>appearance</code> (default, inprogress, moved, new, removed, success)</td><td><code>appearance</code> (neutral, success, warning, danger, info, discovery, and the five SMART subjects)</td><td>PLUS names the meaning. SMART subjects keep their own colors.</td></tr>
-        <tr><td><code>isBold</code></td><td>None</td><td>Status tags are filled with a tinted background; a bold fill is not part of the PLUS set.</td></tr>
-        <tr><td><code>maxWidth</code></td><td><code>maxWidth</code></td><td>Same; the full text is a tooltip, reachable by keyboard.</td></tr>
-        <tr><td>None</td><td><code>spacing</code> (default 20, spacious 32)</td><td>Spacious sits beside a heading.</td></tr>
-        <tr><td>None</td><td><code>type</code> (state, date), <code>leadingVisual</code>, <code>trailingMetric</code>, <code>trailingMetricAppearance</code></td><td>A date is outlined with a fixed icon; a count nests a Count tag.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>
@@ -159,10 +97,11 @@ Benchmarked against the [ADS documentation](https://atlassian.design/components/
 ## When to use
 
 Use `StatusTag` for the condition something is in when that condition can change:
-completed, needs review, missed, in progress, due tomorrow, overdue. It is the
-same component whether the system calculated the state or a person set it.
+completed, needs review, missed, in progress. It is the same component whether
+the system calculated the state or a person set it.
 
 - **Is it a number?** Count tag.
+- **Is it a due or event date?** Date tag.
 - **Is it the condition something is in, and can that condition change?** Status tag.
 - **Otherwise** (a subject, a person, a category): Tag.
 
@@ -179,8 +118,7 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 Each appearance means one thing: neutral (not started), success (done), warning
 (needs attention), danger (failed or missed), info (in progress) and discovery
-(new). A SMART subject keeps its own colors, because it names a subject, not a
-condition. There is no color prop; a category with a color is a Tag.
+(new). There is no color prop; a category with a color is a Tag.
 
 ```jsx
 // Incorrect — a category borrowing a status color.
@@ -188,17 +126,6 @@ condition. There is no color prop; a category with a color is a Tag.
 
 // Correct — a condition that can change.
 <StatusTag appearance="info">In progress</StatusTag>
-```
-
-### Let the app pick a date's appearance.
-
-A date is neutral when it is not close, warning when it is due soon and danger
-when it is overdue. Derive the appearance from the date and the due-soon window,
-and write the label as people say it.
-
-```jsx
-<StatusTag type="date" appearance="warning">Due tomorrow</StatusTag>
-<StatusTag type="date" appearance="danger">2 days overdue</StatusTag>
 ```
 
 ### Nest a count instead of placing one beside it.
@@ -221,8 +148,6 @@ success status with a danger count of failures.
 <StatusTag appearance="success" trailingMetric={38} trailingMetricAppearance="danger">Completed</StatusTag>
 ```
 
-A date and the SMART subjects have their own looks and take no metric.
-
 ### Edit in the field, not on the label.
 
 A Status tag never opens a menu. Where a status can be changed, the field around
@@ -243,9 +168,8 @@ success · warning · danger).
   takes focus so a keyboard user can reach the tooltip holding the full text;
   pointer users get the same tooltip on hover. The full text is always in the
   DOM, so a screen reader hears all of it.
-- **Not color alone.** Dates differ in icon as well as color (calendar, clock,
-  alert), and a state can add a `leadingVisual` where color alone is not enough.
-  Icons are decorative and hidden from assistive technology.
+- **Not color alone.** A state can add a `leadingVisual` where color alone is
+  not enough. Icons are decorative and hidden from assistive technology.
 - **An edge on any surface.** The 1px inside border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.
 
@@ -256,7 +180,8 @@ success · warning · danger).
 ## Related
 
 - For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
-- For a category, a subject or a person, use `Tag`.
+- For a due or event date, use `DateTag`.
+- For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
 
 </div>
 

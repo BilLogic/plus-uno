@@ -1,32 +1,32 @@
 /**
  * SmartBadges (SMART Competency Badges)
- * 
+ *
  * SMART competency area badges representing:
- * - **S** - Socio-Emotional Learning
+ * - **S** - Social-Emotional Learning
  * - **M** - Mastering Content
  * - **A** - Advocacy
- * - **R** - Relationships
+ * - **R** - Relationship
  * - **T** - Technology & Tools
  */
 
 import React from 'react';
-import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart/StaticBadgeSmart';
+import SmartTag, { SMART_TAG_SUBJECTS } from '@/components/labels/SmartTag';
 
 export default {
     title: 'Specs/Universal/Elements/Smart Badges',
-    component: StaticBadgeSmart,
+    component: SmartTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
-                component: `SMART competency areas, each a read-only Tag in its curriculum color.
+                component: `SMART competency areas, each a Tag in its curriculum color.
 
 | Type | Area |
 |------|------|
-| S | Socio-Emotional Learning |
+| S | Social-Emotional Learning |
 | M | Mastering Content |
 | A | Advocacy |
-| R | Relationships |
+| R | Relationship |
 | T | Technology & Tools |`
             }
         }
@@ -35,7 +35,7 @@ export default {
 
 /**
  * Overview
- * Every SMART area: a read-only Tag in the area's curriculum color. A Tag has
+ * Every SMART area: a Tag in the area's curriculum color. A Tag has
  * one size, so there are no size variants.
  */
 export const Overview = {
@@ -44,22 +44,18 @@ export const Overview = {
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>All Types</h6>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <StaticBadgeSmart type="socio-emotional" />
-                    <StaticBadgeSmart type="mastering-content" />
-                    <StaticBadgeSmart type="advocacy" />
-                    <StaticBadgeSmart type="relationships" />
-                    <StaticBadgeSmart type="technology-tools" />
+                    {SMART_TAG_SUBJECTS.map((subject) => (
+                        <SmartTag key={subject} subject={subject} />
+                    ))}
                 </div>
             </section>
 
             <section>
                 <h6 className="h6" style={{ marginBottom: '16px' }}>In a row</h6>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    <StaticBadgeSmart type="socio-emotional" />
-                    <StaticBadgeSmart type="mastering-content" />
-                    <StaticBadgeSmart type="advocacy" />
-                    <StaticBadgeSmart type="relationships" />
-                    <StaticBadgeSmart type="technology-tools" />
+                    {SMART_TAG_SUBJECTS.map((subject) => (
+                        <SmartTag key={subject} subject={subject} />
+                    ))}
                 </div>
             </section>
         </div>
@@ -68,19 +64,18 @@ export const Overview = {
 
 /**
  * Interactive
- * Playground with a control for the area
+ * Playground with a control for the subject
  */
 export const Interactive = {
-    render: (args) => <StaticBadgeSmart {...args} />,
+    render: (args) => <SmartTag {...args} />,
     args: {
-        type: 'socio-emotional'
+        subject: 'social-emotional'
     },
     argTypes: {
-        type: {
+        subject: {
             control: { type: 'select' },
-            options: ['socio-emotional', 'mastering-content', 'advocacy', 'relationships', 'technology-tools'],
+            options: SMART_TAG_SUBJECTS,
             table: { category: 'Design' }
-        },
-        size: { table: { disable: true } }
+        }
     }
 };

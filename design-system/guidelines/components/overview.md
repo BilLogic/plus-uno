@@ -130,7 +130,6 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 | **Checkbox** | Elements | `design-system/src/components/Checkbox` |
 | **Chip** | Elements | `design-system/src/components/Chip` |
 | **Collapse** | Sections | `design-system/src/components/Collapse` |
-| **CompetencyBadge** | Elements | `design-system/src/components/CompetencyBadge` |
 | **DatePicker** | Modals | `design-system/src/components/DatePicker` |
 | **Divider** | Elements | `design-system/src/components/Divider` |
 | **Dropdown** | Elements | `design-system/src/components/Dropdown` |
@@ -153,7 +152,6 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 | **Section** | Sections | `design-system/src/components/Section` |
 | **SidebarTab** | Surfaces | `design-system/src/components/SidebarTab` |
 | **Spinner** | Modals | `design-system/src/components/Spinner` |
-| **StaticBadgeSmart** | Elements | `design-system/src/components/StaticBadgeSmart` |
 | **SuperCompPill** | Elements | `design-system/src/components/SuperCompPill` |
 | **Switch** | Elements | `design-system/src/components/Switch` |
 | **Table** | Tables | `design-system/src/components/Table` |

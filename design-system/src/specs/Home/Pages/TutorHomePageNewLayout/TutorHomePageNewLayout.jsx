@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, CountTag, NavTabs, Select, StaticBadgeSmart, StatusTag, Tag, Button, IconButton } from '@/components';
+import { Alert, CountTag, NavTabs, Select, SmartTag, StatusTag, Tag, Button, IconButton } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -73,9 +73,9 @@ const IMPACT_PAGES = [
  */
 const CATEGORY_AREA = {
     'Mastering Content': 'mastering-content',
-    'Socio-Emotional': 'socio-emotional',
+    'Socio-Emotional': 'social-emotional',
     Advocacy: 'advocacy',
-    Relationships: 'relationships',
+    Relationships: 'relationship',
     'Technology Tools': 'technology-tools',
 };
 
@@ -377,7 +377,7 @@ const TutorHomePageNewLayout = ({
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
                                     {CATEGORY_AREA[lesson.category]
-                                        ? <StaticBadgeSmart type={CATEGORY_AREA[lesson.category]} />
+                                        ? <SmartTag subject={CATEGORY_AREA[lesson.category]} />
                                         : lesson.category && <Tag color="gray">{lesson.category}</Tag>}
                                     {lesson.duration && <span className="plus-home-new__caption">{lesson.duration}</span>}
                                     {lesson.inProgress && <StatusTag appearance="warning" leadingVisual="spinner">In progress</StatusTag>}

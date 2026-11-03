@@ -9,46 +9,25 @@ import './StatusTag.scss';
 /**
  * `StatusTag` — the condition something is in.
  *
- * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count tag. Is it the
- * condition something is in, and can that condition change? Status tag, whether
- * the system calculated it or a person set it. Otherwise, Tag. A Status tag is
+ * WHICH LABEL, IN FOUR QUESTIONS. Is it a number? Count tag. Is it a due or
+ * event date? Date tag. Is it the condition something is in, and can that
+ * condition change? Status tag, whether the system calculated it or a person
+ * set it. Otherwise, Tag (or SmartTag for a SMART subject). A Status tag is
  * filled (a meaning); Tag is outlined (a category).
  *
- * THE NAMES FOLLOW THE LIBRARY. `type`, `appearance`, `spacing`,
- * `leadingVisual` and `trailingMetric` take the same words Button and Count tag use, and
- * the same values as the Status tag set in Figma, so handoff needs no
- * translation.
+ * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `leadingVisual` and
+ * `trailingMetric` take the same words Button and Count tag use, and the same
+ * values as the Status tag set in Figma, so handoff needs no translation.
  *
  * A STATUS TAG IS NEVER A BUTTON. It is a `span` with no role and no click
  * handler. Where a status can be edited, the field around it becomes an inline
  * Dropdown; the label itself never becomes a control. The one time it takes
  * focus is when its text is truncated, so a keyboard user can reach the tooltip
  * that holds the full text.
- *
- * A DATE IS OUTLINED, AND THE APP PICKS ITS APPEARANCE. `type="date"` takes
- * neutral (not close), warning (due soon) and danger (overdue), each with a
- * fixed icon. The appearance comes from the date and the due-soon window, never
- * from taste; any other appearance falls back to neutral with a development
- * warning, as an unknown appearance does on a state and an unknown type falls
- * back to state.
- *
- * A SMART SUBJECT KEEPS ITS COLORS. The five SMART subjects are appearances of a
- * state, drawn from the subject's own `smart` tokens.
  */
 
-export const STATUS_TAG_TYPES = ['state', 'date'];
-export const STATUS_TAG_STATUS_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
-export const STATUS_TAG_SMART_APPEARANCES = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
-export const STATUS_TAG_APPEARANCES = [...STATUS_TAG_STATUS_APPEARANCES, ...STATUS_TAG_SMART_APPEARANCES];
-export const STATUS_TAG_DATE_APPEARANCES = ['neutral', 'warning', 'danger'];
+export const STATUS_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
 export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
-
-/** The fixed icon of each date appearance: calendar, clock, alert. */
-export const STATUS_TAG_DATE_ICONS = {
-    neutral: 'calendar',
-    warning: 'clock',
-    danger: 'triangle-exclamation',
-};
 
 const warn = (message) => {
     if (process.env.NODE_ENV !== 'production') {
@@ -64,7 +43,6 @@ const renderVisual = (visual) => (typeof visual === 'string'
 
 export const StatusTag = ({
     children,
-    type = 'state',
     appearance = 'neutral',
     spacing = 'default',
     leadingVisual,
@@ -89,16 +67,9 @@ export const StatusTag = ({
         }
     }
 
-    let effectiveType = type;
-    if (!STATUS_TAG_TYPES.includes(type)) {
-        warn(`type="${type}" is not one of ${STATUS_TAG_TYPES.join(', ')}; it falls back to state.`);
-        effectiveType = 'state';
-    }
-    const isDate = effectiveType === 'date';
-    const allowed = isDate ? STATUS_TAG_DATE_APPEARANCES : STATUS_TAG_APPEARANCES;
     let effectiveAppearance = appearance;
-    if (!allowed.includes(effectiveAppearance)) {
-        warn(`type="${effectiveType}" takes ${allowed.join(', ')}; appearance="${appearance}" falls back to neutral.`);
+    if (!STATUS_TAG_APPEARANCES.includes(effectiveAppearance)) {
+        warn(`appearance="${appearance}" is not one of ${STATUS_TAG_APPEARANCES.join(', ')}; it falls back to neutral.`);
         effectiveAppearance = 'neutral';
     }
 
@@ -108,14 +79,8 @@ export const StatusTag = ({
         effectiveSpacing = 'default';
     }
 
-    const visual = isDate ? STATUS_TAG_DATE_ICONS[effectiveAppearance] : leadingVisual;
-    /* A date and the SMART subjects have their own looks, and a metric belongs to the status looks only. */
-    const canNestMetric = !isDate && STATUS_TAG_STATUS_APPEARANCES.includes(effectiveAppearance);
+    const visual = leadingVisual;
     const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
-    if (wantsMetric && !canNestMetric) {
-        warn('`trailingMetric` is for the status appearances; a date and the SMART subjects do not take one.');
-    }
-    const hasCount = wantsMetric && canNestMetric;
     let metricAppearance = effectiveAppearance;
     if (trailingMetricAppearance !== undefined) {
         if (COUNT_TAG_APPEARANCES.includes(trailingMetricAppearance)) metricAppearance = trailingMetricAppearance;
@@ -129,14 +94,13 @@ export const StatusTag = ({
      */
     const visualKey = typeof visual === 'string' ? visual : Boolean(visual);
     const labelRef = useRef(null);
-    const truncated = useIsTruncated(labelRef, [children, effectiveSpacing, maxWidth, visualKey, hasCount]);
+    const truncated = useIsTruncated(labelRef, [children, effectiveSpacing, maxWidth, visualKey, wantsMetric]);
 
     const classes = [
         'plus-status',
-        `plus-status--${effectiveType}`,
         `plus-status--${effectiveAppearance}`,
         `plus-status--${effectiveSpacing}`,
-        hasCount ? 'plus-status--with-count' : '',
+        wantsMetric ? 'plus-status--with-count' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -169,7 +133,7 @@ export const StatusTag = ({
                         {children}
                     </span>
                 </span>
-                {hasCount && (
+                {wantsMetric && (
                     <CountTag
                         value={trailingMetric}
                         appearance={metricAppearance}
@@ -184,15 +148,13 @@ export const StatusTag = ({
 StatusTag.propTypes = {
     /** The status text, as people say it: "Needs review", "Due tomorrow". */
     children: PropTypes.node.isRequired,
-    /** `state` for a condition; `date` for a due or event date, outlined with a fixed icon. */
-    type: PropTypes.oneOf(STATUS_TAG_TYPES),
-    /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. The five SMART subjects draw their own `smart` tokens. */
+    /** The meaning. Info is Tertiary; discovery is the curriculum purple. */
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
-    /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. */
+    /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. */
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. Status appearances only: a date and the SMART subjects take none. */
+    /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */
     trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),
