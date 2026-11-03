@@ -180,6 +180,38 @@ Figma's Modal has more options than the code draws.
 
 <div className="sb-ds-doc-section">
 
+### Inline confirmation
+
+A Modal never opens another Modal. When something inside it needs a follow-up decision — confirming a delete, for example — the inline confirmation replaces the Modal's content in place, in the same dialog:
+
+- **Title** becomes the question, such as "Delete this session?"
+- **Body** gives one line stating the consequence.
+- **Footer** holds Back (secondary) and an action named after the question, such as "Delete session". The action takes the danger appearance when it destroys something.
+- **Back** returns to the previous view without losing anything typed there.
+
+Inline confirmations of a destructive action do not dismiss on a Blanket click — only Close, Escape or Back close them.
+
+```jsx
+// Don't — a second Modal opens on top of the first.
+<Modal title="Session settings" show={open}>
+  {form}
+  <Modal title="Discard changes?" show={confirming}>…</Modal>
+</Modal>
+
+// Do — the same dialog swaps title, body and footer for the confirmation.
+<Modal
+  title={confirming ? 'Discard changes?' : 'Session settings'}
+  show={open}
+  footer={confirming ? discardFooter : formFooter}
+>
+  {confirming ? 'Your edits to this session are not saved.' : form}
+</Modal>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ### Custom header, divider and loading
 
 <DocsCanvasShell description={<><code>header</code> takes the place of the title row, so the caller owns the title and the Close button and names the dialog with <code>aria-label</code>.</>}>
@@ -276,7 +308,9 @@ When you group fields, work in four steps. Pair a control with the field it cont
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - With tabs, the tab group is a tablist. Left and Right move between tabs, Home and End jump to the ends, and Tab moves from the strip into the panel. The panel is named by its tab.
 - Opening a Modal closes a floating sidebar in a Surface container.
-- At most two overlays stack. A confirm of width <code>sm</code> raised from a Modal is the second, and a third is not allowed.
+- A Modal never opens another Modal. A Popup, Menu, Tooltip or a field's dropdown can still float above it, by elevation, and a Flag always renders on top.
+- Dismiss is Close, Escape, a click on the Blanket, or an optional Cancel. An inline confirmation of a destructive action turns off the Blanket click.
+- Focus order is Close, then the body, then the secondary action, then the primary action. Focus returns to the trigger on close.
 - The Close button is 32 and its accessible name is "Close".
 
 </div>
