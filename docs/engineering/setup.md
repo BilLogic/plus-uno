@@ -240,12 +240,14 @@ its `actions` scope) and of the harness name sweep (the Worker's
 no `embodiment:` and sit outside the bundle (#425).
 
 When it reports a generated artifact as stale, the fix is always to regenerate
-and commit:
+and commit. `npm run regenerate` (`scripts/regenerate.mjs`) runs every
+generator and every ratchet's `--update` in the order each step's inputs
+demand — generators first, `agents/uno-bot`'s harness bundle once its own
+deps are installed, then the ratchets, which record what the generators just
+produced:
 
 ```bash
-npm run generate:agent
-npm run generate:index
-npm --prefix agents/uno-bot run bundle:harness
+npm run regenerate
 ```
 
 ### Harness seams

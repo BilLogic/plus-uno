@@ -23,6 +23,7 @@ import { fileURLToPath } from 'node:url';
 
 import { failures, mappings } from './figma-node-types.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -30,27 +31,32 @@ const REGISTRY = 'design-system/figma/component-registry.json';
 const RECORDING = 'design-system/figma/node-types.json';
 
 /**
- * The floor. A comparison over an empty recording agrees with everything, so
- * the size is asserted rather than assumed. Lower it only when a mapping is
- * genuinely deleted, and say which one in the commit. 85: Button group
- * (34:5212) and Close button's two sets (17827:827, 17827:846) left the
- * registry when their MDX dropped Figma references, taking their three nodes
- * out of the recording. Before that, 88: Date tag and Smart
- * tag split out of Status tag with no Figma mapping of their own, taking
- * Status's node 17876:1653 out of the registry. Before that, 89: Select,
+ * The floor, as a recorded baseline rather than a literal in this file. A
+ * comparison over an empty recording agrees with everything, so the size is
+ * asserted rather than assumed. The floor has moved down five times before,
+ * each time a genuine deletion rather than a regression: 85, when Button
+ * group (34:5212) and Close button's two sets (17827:827, 17827:846) left
+ * the registry when their MDX dropped Figma references, taking their three
+ * nodes out of the recording; 88, when Date tag and Smart tag split out of
+ * Status tag with no Figma mapping of their own, taking Status's node
+ * 17876:1653 out of the registry; 89, after Select,
  * Cascader and Tree select dropped their Figma mappings when the family moved
- * to ADS props; Phase D backfills Figma from the rebuilt code and the mappings
- * return. 94: OptionChip left with the answer Tags, taking its node
- * 10661:10292 out of the registry. Before that, 95: Input, Textarea,
- * Number input and Input group left with Text field and Text area, taking their
- * six Figma nodes (`_Field` among them) out of the registry.
+ * to ADS props (Phase D backfills Figma from the rebuilt code and the
+ * mappings return); 94, when OptionChip left with the answer Tags, taking its
+ * node 10661:10292 out of the registry; 95, when Input, Textarea, Number
+ * input and Input group left with Text field and Text area, taking their six
+ * Figma nodes (`_Field` among them) out of the registry. `--update` refuses
+ * that move automatically — raising the floor is the only thing it writes — so
+ * a genuine deletion is recorded by hand-editing
+ * `scripts/baselines/figma-node-types.json` in the same commit that explains it.
  */
-export const MIN_RECORDED = 85;
+export const BASELINE = 'scripts/baselines/figma-node-types.json';
 
 export const REMEDY =
   `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +
   `     Figma, and record what came back in ${RECORDING} with the date.\n` +
-  `     A node id only means anything inside its own file.`;
+  `     A node id only means anything inside its own file. If the count rose, run\n` +
+  `     \`npm run check:figma-node-types -- --update\` to raise the floor.`;
 
 // The registry and the recording are the two files both questions compare, so
 // they are read once per root.
@@ -59,18 +65,27 @@ const inputs = byRoot((repoRoot) => {
   return { registry: read(REGISTRY), recording: read(RECORDING) };
 });
 
+/** Opened fresh on every call: `--update` writes the record and the gate then reads it back. */
+const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
+
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { registry, recording } = inputs(repoRoot);
 
   const found = failures(registry, recording).map((message) => ({ message }));
   const recorded = Object.keys(recording.nodes ?? {}).length;
+  const ratchet = ratchetFor(repoRoot);
 
-  if (recorded < MIN_RECORDED) {
+  for (const failure of ratchet.failures({ minRecorded: recorded })) {
+    if (failure.kind === 'absent') {
+      found.push({ message: failure.message });
+      continue;
+    }
     found.push({
       message:
-        `${recorded} recorded node type(s), fewer than the ${MIN_RECORDED} this was measured over. ` +
-        `A comparison against an empty recording agrees with everything.`,
+        `${recorded} recorded node type(s), fewer than the ${failure.recorded} the baseline holds. ` +
+        `A comparison against an emptier recording agrees with more. If a mapping was genuinely ` +
+        `deleted, record it by hand in ${BASELINE} and say which one in the commit.`,
     });
   }
 
@@ -98,4 +113,42 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   );
 }
 
-main(import.meta.url, 'check:figma-node-types', { run, summary, remedy: REMEDY });
+/**
+ * `--update` raises the floor to what was just measured. It refuses a fall —
+ * which is the whole difference between regenerating the baseline and editing
+ * it: a genuine deletion is recorded by hand in `scripts/baselines/figma-node-types.json`,
+ * never by this flag.
+ */
+function record(repoRoot = REPO_ROOT) {
+  const { recording } = inputs(repoRoot);
+  const recorded = Object.keys(recording.nodes ?? {}).length;
+  const ratchet = ratchetFor(repoRoot);
+  const refused = !ratchet.absent && ratchet.failures({ minRecorded: recorded }).length > 0;
+  if (refused) {
+    console.error(
+      `[check-figma-node-types] not recorded: ${recorded} is fewer than the current floor. ` +
+        `If mappings were genuinely removed, edit ${BASELINE} by hand and say which one in the commit.`,
+    );
+    return;
+  }
+  ratchet.update(
+    { minRecorded: recorded },
+    {
+      seed: {
+        why:
+          'The floor under design-system/figma/node-types.json\'s recorded node count. It may rise ' +
+          'as `npm run audit:figma-registry` records more mappings, and never falls except by a ' +
+          'hand edit that explains the deletion. Re-measure and raise it with ' +
+          '`npm run check:figma-node-types -- --update`.',
+      },
+    },
+  );
+  console.log(`[check-figma-node-types] floor recorded: ${recorded}`);
+}
+
+main(import.meta.url, 'check:figma-node-types', {
+  run,
+  summary,
+  remedy: REMEDY,
+  fallThrough: { '--update': record },
+});

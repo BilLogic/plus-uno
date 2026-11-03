@@ -166,9 +166,9 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-figma-node-types.mjs',
-    floors: { MIN_RECORDED: 85 },
+    baseline: 'scripts/baselines/figma-node-types.json',
     guards:
-      "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing.",
+      "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing. The recorded-node floor is a ratchet (`scripts/lib/ratchet.mjs`): it may rise with `npm run check:figma-node-types -- --update` and never falls except by a hand edit that names the deletion.",
   },
   {
     name: 'check:figma-snapshots',
@@ -535,17 +535,20 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-docs-tabs.mjs',
+    baseline: 'scripts/baselines/docs-tabs.json',
     guards:
       'that the component docs pages keep the tab split ADR-025 gave them. Examples · Code · '
       + 'Usage · Changelog stopped being Storybook `types.TAB` addons and became part of the '
-      + 'page, so tab membership now lives in 49 MDX files as `<DocsTab tab="…">` wrappers — '
-      + 'this is what stops those 49 drifting. It asserts the population is still 49 (48 '
-      + 'components plus one named exception), that every `sb-ds-doc-section` sits in a tab '
-      + 'rather than outside all of them, that a section is in the tab its heading assigns it '
-      + 'in BOTH directions, that no page outside the set sprouts a strip — the bug the old '
-      + 'mechanism actually had, since Storybook never filtered the tab list and a Colors '
-      + 'foundation page therefore offered a Usage tab — and that section divs and headings are '
-      + 'still one-to-one. It cannot see whether a tab RENDERS: only a browser knows that, and '
+      + 'page, so tab membership now lives in each component\'s MDX as `<DocsTab tab="…">` '
+      + 'wrappers — this is what stops them drifting. It asserts the tabbed population against a '
+      + 'recorded floor (a ratchet, `scripts/lib/ratchet.mjs`: it may rise as a component gains a '
+      + 'docs page, via `npm run check:docs-tabs -- --update`, and never falls except by a hand '
+      + 'edit that names the removal), that every `sb-ds-doc-section` sits in a tab rather than '
+      + 'outside all of them, that a section is in the tab its heading assigns it in BOTH '
+      + 'directions, that no page outside the set sprouts a strip — the bug the old mechanism '
+      + 'actually had, since Storybook never filtered the tab list and a Colors foundation page '
+      + 'therefore offered a Usage tab — and that section divs and headings are still '
+      + 'one-to-one. It cannot see whether a tab RENDERS: only a browser knows that, and '
       + '`check:storybook` runs story tests, not docs pages.',
   },
   {

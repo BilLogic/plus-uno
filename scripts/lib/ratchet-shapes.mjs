@@ -179,6 +179,25 @@ export const SHAPES = [
     ],
   },
   {
+    file: 'scripts/baselines/figma-node-types.json',
+    check: 'check:figma-node-types',
+    command: 'node scripts/check-figma-node-types.mjs --update',
+    prose: 'why',
+    // The registry's measured coverage is a FLOOR, not a ceiling: it may rise
+    // as `audit:figma-registry` records more mappings, and must never
+    // silently drop a count a prior measurement established.
+    sets: [{ name: 'minRecorded', at: '', form: 'scalar', fields: ['minRecorded'], direction: 'grow-only' }],
+  },
+  {
+    file: 'scripts/baselines/docs-tabs.json',
+    check: 'check:docs-tabs',
+    command: 'node scripts/check-docs-tabs.mjs --update',
+    prose: 'why',
+    // The tabbed-docs population is a FLOOR: it may rise as a component gains
+    // a docs page, and must never silently drop one a prior measurement held.
+    sets: [{ name: 'tabbedPages', at: '', form: 'scalar', fields: ['tabbedPages'], direction: 'grow-only' }],
+  },
+  {
     file: 'scripts/baselines/focus-ring.json',
     check: 'check:focus-ring',
     command: null,
