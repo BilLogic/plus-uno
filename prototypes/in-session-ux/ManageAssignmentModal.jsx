@@ -108,7 +108,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                     border: '1px solid var(--color-outline-variant)',
                     borderRadius: '8px',
                     fontSize: '14px',
-                    color: 'var(--color-on-surface)'
+                    color: 'var(--ds-text)'
                 }}>
                     Editing Mode: Drag students between tutors to reassign them.
                 </div>
