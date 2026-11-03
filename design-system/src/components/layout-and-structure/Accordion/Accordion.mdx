@@ -21,7 +21,7 @@ export const figmaMeta = {
 <Meta of={AccordionStories} />
 
 <Title />
-Accordion component for organizing content into collapsible sections. Built on React Bootstrap with custom styling per the design system.
+Accordion component for organizing content into collapsible sections.
 
 <DocsTabs of={AccordionStories}>
 
@@ -171,20 +171,19 @@ it leaves the accordion with no edge to hold it.
 
 ## Accessibility
 
-- **Each header is a real button.** React Bootstrap renders the header as a
-  `button` carrying `aria-expanded`, wrapped in an `h2`. Tab reaches every
-  header; Enter and Space toggle; the heading list shows the whole index.
-- **The body is not associated with its header.** There is no `aria-controls` on
-  the button and no `role="region"` or `aria-labelledby` on the body — it is a
-  plain `div` that follows. In practice a screen reader lands on the body
-  immediately after the header it just expanded, so the order carries the
-  meaning. It does not survive being jumped to out of order.
-- **Write `header` as a heading.** It becomes the text of an `h2`, so it is
+- **Each header is a real button.** It carries `aria-expanded` and
+  `aria-controls`, wrapped in a heading. Tab reaches every header; Enter and
+  Space toggle; the heading list shows the whole index.
+- **The body is associated with its header.** The panel's `role="region"` is
+  labelled by the header that opened it, so a screen reader can jump straight
+  to it, not just land there in document order.
+- **Write `header` as a heading.** It becomes the text of a heading, so it is
   read both in place and in the heading list. A short noun phrase, not a
   sentence.
-- **`disabled` stops the keyboard too.** The prop reaches the header button as
-  a real `disabled` attribute, so the section is out of the tab order and
-  announced as unavailable rather than merely grayed. It still is not a way to
+- **`disabled` stops a press, not discovery.** The header stays focusable and
+  announced as unavailable (`aria-disabled`) rather than removed from the tab
+  order — so a keyboard or screen-reader user can tell the section exists.
+  Pressing it, by mouse or keyboard, never opens it. It is still not a way to
   withhold content: the body stays in the DOM, so leave the item out if what is
   inside it is not for this reader.
 - **Focus stays on the header after a toggle.** Opening an item does not move

@@ -9,7 +9,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Accordion component for organizing content into collapsible sections. Built on React Bootstrap with custom styling per the design system.'
+                component: 'Accordion component for organizing content into collapsible sections.'
             }
         }
     },
@@ -80,6 +80,12 @@ const sampleItems = [
     }
 ];
 
+// A second header set for any demo that sits open on the same page as
+// another open accordion — a panel's accessible name is its own header, so
+// two open panels literally titled "Accordion Item #1" collide under the
+// a11y "landmark-unique" rule even though they belong to different accordions.
+const flushSampleItems = sampleItems.map((item) => ({ ...item, header: `Flush ${item.header}` }));
+
 const accordionPage = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
 
 function AccordionVariantsDemos() {
@@ -98,7 +104,7 @@ function AccordionVariantsDemos() {
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
                 <div style={{ border: '1px dashed var(--color-outline-variant)', padding: '0' }}>
-                    <Accordion items={sampleItems} defaultActiveKey="0" flush />
+                    <Accordion items={flushSampleItems} defaultActiveKey="0" flush />
                 </div>
             </section>
         </>

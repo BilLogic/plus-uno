@@ -678,7 +678,6 @@ a.sbdocs-a {
  * Tailwind's `collapse` utility sets `visibility: collapse`, which hides 
  * Bootstrap components like Accordion when they expand but keep the `.collapse` class.
  */
-.accordion-collapse.collapse.show,
 .collapse.show {
     visibility: visible !important;
 }
