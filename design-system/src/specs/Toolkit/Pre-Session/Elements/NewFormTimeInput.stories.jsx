@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import DateAndTimePicker from '@/components/forms-and-inputs/DateAndTimePicker';
+import DateTimePicker from '@/components/forms-and-inputs/DateTimePicker';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/New Form Time Input',
@@ -15,7 +15,7 @@ export default {
 /**
  * SessionTimeInput Component
  * A time range input with two time pickers separated by a dash.
- * Reuses the DateAndTimePicker component (time-only mode via showDate={false}).
+ * Reuses the DateTimePicker component (time-only mode via showDate={false}).
  * Matches the Figma "Create New Session / Form Time Input" spec.
  *
  * Spacing:
@@ -32,7 +32,7 @@ export default {
  * Naming (#225). "Session time" sits above two separate pickers, and a single
  * `<label for>` names one control, so it cannot be the name of either. Each
  * picker owns its own name instead — `label="Start time"` / `label="End time"`
- * with `showLabel={false}`, which the component now clips rather than deletes —
+ * with `isLabelHidden`, which the component clips rather than deletes —
  * and the visible caption names the pair as a `group`. So the caption stays a
  * caption, and the two controls are told apart by assistive tech.
  *
@@ -79,15 +79,15 @@ const SessionTimeInput = ({
             >
                 {/* Start Time */}
                 <div style={{ flex: '1 0 0', minWidth: 0, minHeight: 1 }}>
-                    <DateAndTimePicker
+                    <DateTimePicker
                         label="Start time"
-                        showLabel={false}
+                        isLabelHidden
                         showSectionLabels={false}
                         showDate={false}
                         timePlaceholder="___ : ___ ET"
                         timeValue={(isFilled || isMissingEnd) ? '11:00' : undefined}
-                        validation={isMissingStart ? 'invalid' : 'none'}
-                        validationMessage={isMissingStart ? 'Start Time is required' : ''}
+                        isInvalid={isMissingStart}
+                        errorMessage={isMissingStart ? 'Start Time is required' : ''}
                     />
                 </div>
 
@@ -111,15 +111,15 @@ const SessionTimeInput = ({
 
                 {/* End Time */}
                 <div style={{ flex: '1 0 0', minWidth: 0, minHeight: 1 }}>
-                    <DateAndTimePicker
+                    <DateTimePicker
                         label="End time"
-                        showLabel={false}
+                        isLabelHidden
                         showSectionLabels={false}
                         showDate={false}
                         timePlaceholder="___ : ___ ET"
                         timeValue={(isFilled || isMissingStart) ? '11:00' : undefined}
-                        validation={isMissingEnd ? 'invalid' : 'none'}
-                        validationMessage={isMissingEnd ? 'End Time is required' : ''}
+                        isInvalid={isMissingEnd}
+                        errorMessage={isMissingEnd ? 'End Time is required' : ''}
                     />
                 </div>
             </div>

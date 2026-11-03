@@ -1,5 +1,5 @@
 /**
- * Time zones for DateAndTimePicker. Times are stored in UTC and shown in the
+ * Time zones for DateTimePicker. Times are stored in UTC and shown in the
  * viewer's zone, which the caption under the time names; when the other
  * person in a session is in another zone, the caption adds their time.
  */

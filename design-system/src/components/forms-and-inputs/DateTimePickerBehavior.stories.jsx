@@ -1,10 +1,10 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import DateAndTimePicker from './DateAndTimePicker';
+import DateTimePicker from './DateTimePicker/DateTimePicker';
 
 /**
- * What DateAndTimePicker does, held to a play test each: its calendar is the
+ * What DateTimePicker does, held to a play test each: its calendar is the
  * shared one and opens 4px from the date field, the AM/PM menu keeps the same
  * gap, and the time zone caption names the viewer's zone and, when it
  * differs, the other person's time.
@@ -32,8 +32,8 @@ const page = within(document.body);
  */
 export const BothHalvesAreTheSharedField = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '296px' }}>
-        <DateAndTimePicker data-testid="dt-plain" label="Session time" dateValue="2026-10-21" timeValue="09:15 AM" timeZone="America/New_York" />
-        <DateAndTimePicker data-testid="dt-invalid" label="Session end" validation="invalid" validationMessage="Pick an end time" timeZone="America/New_York" />
+        <DateTimePicker data-testid="dt-plain" label="Session time" dateValue="2026-10-21" timeValue="09:15 AM" timeZone="America/New_York" />
+        <DateTimePicker data-testid="dt-invalid" label="Session end" isInvalid errorMessage="Pick an end time" timeZone="America/New_York" />
     </div>
 );
 
@@ -58,7 +58,7 @@ BothHalvesAreTheSharedField.play = async ({ canvasElement }) => {
 /** The date half opens the shared calendar, 4px under the date field. */
 export const CalendarOpensFourPixelsBelow = () => (
     <div style={{ maxWidth: '296px', marginLeft: '16px' }}>
-        <DateAndTimePicker label="Session time" dateValue="2026-10-21" timeZone="America/New_York" />
+        <DateTimePicker label="Session time" dateValue="2026-10-21" timeZone="America/New_York" />
     </div>
 );
 
@@ -82,7 +82,7 @@ CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
 /** The AM/PM menu opens 4px under its toggle. */
 export const PeriodMenuOpensFourPixelsBelow = () => (
     <div style={{ maxWidth: '296px' }}>
-        <DateAndTimePicker label="Session time" timeValue="09:15 AM" timeZone="America/New_York" />
+        <DateTimePicker label="Session time" timeValue="09:15 AM" timeZone="America/New_York" />
     </div>
 );
 
@@ -102,8 +102,8 @@ PeriodMenuOpensFourPixelsBelow.play = async ({ canvasElement }) => {
 /** The caption names the viewer's zone, and adds the other person's time when theirs differs. */
 export const TimeZoneCaption = (args) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '296px' }}>
-        <DateAndTimePicker data-testid="tz-same" label="Session time" dateValue="2026-10-21" timeValue="04:00 PM" timeZone="America/New_York" />
-        <DateAndTimePicker
+        <DateTimePicker data-testid="tz-same" label="Session time" dateValue="2026-10-21" timeValue="04:00 PM" timeZone="America/New_York" />
+        <DateTimePicker
             data-testid="tz-other"
             label="Session time"
             dateValue="2026-10-21"
@@ -144,7 +144,7 @@ TimeZoneCaption.play = async ({ args, canvasElement }) => {
  */
 export const UnknownTimeZone = (args) => (
     <div style={{ maxWidth: '296px' }}>
-        <DateAndTimePicker
+        <DateTimePicker
             data-testid="tz-unknown"
             label="Session time"
             dateValue="2026-10-21"

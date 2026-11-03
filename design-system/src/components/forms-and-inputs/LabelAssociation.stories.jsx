@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import DateAndTimePicker from './DateAndTimePicker';
+import DateTimePicker from './DateTimePicker/DateTimePicker';
 import FileUpload from './FileUpload';
 import ChoiceGroup from './ChoiceGroup';
 import TextField from './TextField/TextField';
@@ -18,7 +18,7 @@ import TextArea from './TextArea/TextArea';
  * while handing only `id` to the control. A caller who passed `name` and no
  * `id` got a label pointing at an id no element carried — a `for` that looks
  * right in the markup and resolves to nothing. Three of them
- * (`DateAndTimePicker`, `Rating`, `TagInput`) never put an id on anything the
+ * (`DateTimePicker`, `Rating`, `TagInput`) never put an id on anything the
  * label could reach, so their labels dangled even when `id` *was* passed.
  *
  * axe's `label` rule only sees half of that: it fires when an `input` ends up
@@ -28,7 +28,7 @@ import TextArea from './TextArea/TextArea';
  * has to resolve, and every field has to be reachable by its visible label.
  *
  * #225 added the hidden-label case, which is the same defect one step earlier:
- * `DateAndTimePicker`'s hidden label used to skip rendering the label at
+ * `DateTimePicker`'s hidden label used to skip rendering the label at
  * all, so there was no `for` to dangle and no name to check — the field simply
  * had none. Its story asserts names rather than `for` targets, which is the only
  * form of the question that survives a label that is not there.
@@ -93,7 +93,7 @@ export const NameWithoutId = () => (
         <TextArea name="message" label="Message" placeholder="Say something" />
         <TextField type="number" name="quantity" label="Quantity" />
         <FileUpload name="transcript" label="Transcript" />
-        <DateAndTimePicker name="starts" label="Session start" />
+        <DateTimePicker name="starts" label="Session start" />
         <ChoiceGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating name="overall" label="Overall rating" value={3} />
         <TagInput name="topics" label="Topics" options={['Algebra', 'Geometry']} tags={['Algebra', 'Geometry']} />
@@ -166,7 +166,7 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
 
 /**
  * `isLabelHidden` on the components that offer it. The label is clipped,
- * not dropped: #213 settled that for the Text field, #225 for `DateAndTimePicker`,
+ * not dropped: #213 settled that for the Text field, #225 for `DateTimePicker`,
  * whose label option used to feed `hasLabel` and so took the name away along with
  * the pixels — leaving two inputs called "Date" and "Time", which does not say
  * which field.
@@ -179,12 +179,12 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
 export const HiddenLabels = () => (
     <div style={stack}>
         <TextField id="hl-email" name="email" label="Email address" isLabelHidden />
-        <DateAndTimePicker id="hl-starts" name="starts" label="Session start" showLabel={false} />
-        <DateAndTimePicker
+        <DateTimePicker id="hl-starts" name="starts" label="Session start" isLabelHidden />
+        <DateTimePicker
             id="hl-ends"
             name="ends"
             label="Session end"
-            showLabel={false}
+            isLabelHidden
             showDate={false}
             showSectionLabels={false}
         />
@@ -225,7 +225,7 @@ HiddenLabels.play = async ({ canvasElement }) => {
  * The other half of naming a field: pointing it at text the component did not
  * render (#230).
  *
- * `DateAndTimePicker` destructured `...props` and never spread it, so a caller
+ * `DateTimePicker` destructured `...props` and never spread it, so a caller
  * wiring up validation wrote `aria-describedby={errorId}` and got nothing — no
  * React warning, no `propTypes` warning, no attribute. It now forwards to the
  * wrapper, which is the same element that carries `role="group"` and the field's
@@ -241,10 +241,10 @@ HiddenLabels.play = async ({ canvasElement }) => {
  */
 export const ForwardedProps = () => (
     <div style={stack}>
-        <DateAndTimePicker
+        <DateTimePicker
             name="starts"
             label="Session start"
-            validation="invalid"
+            isInvalid
             aria-describedby="fp-starts-error"
             data-testid="session-start-field"
         />
@@ -304,7 +304,7 @@ export const ExplicitIds = () => (
         <TextArea id="la-message" name="message" label="Message" />
         <TextField type="number" id="la-quantity" name="quantity" label="Quantity" />
         <FileUpload id="la-transcript" name="transcript" label="Transcript" />
-        <DateAndTimePicker id="la-starts" name="starts" label="Session start" />
+        <DateTimePicker id="la-starts" name="starts" label="Session start" />
         <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
         <TagInput id="la-topics" name="topics" label="Topics" options={['Algebra']} tags={['Algebra']} />

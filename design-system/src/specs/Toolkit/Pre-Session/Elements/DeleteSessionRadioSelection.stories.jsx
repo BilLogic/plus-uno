@@ -53,7 +53,7 @@ export const dateRangeOption = ({
             }}
         >
             <DatePicker
-                size="small"
+                spacing="compact"
                 placeholder={startPlaceholder}
                 value={startDate}
                 onChange={() => {}}
@@ -68,7 +68,7 @@ export const dateRangeOption = ({
                 to
             </span>
             <DatePicker
-                size="small"
+                spacing="compact"
                 placeholder={endPlaceholder}
                 value={endDate}
                 onChange={() => {}}

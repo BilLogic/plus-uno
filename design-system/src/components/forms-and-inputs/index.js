@@ -7,7 +7,7 @@ export { default as Checkbox } from './Checkbox';
 export { default as Radio } from './Radio';
 export { default as Toggle } from './Toggle';
 export { default as DatePicker } from './DatePicker';
-export { default as DateAndTimePicker } from './DateAndTimePicker';
+export { default as DateTimePicker } from './DateTimePicker';
 export { default as InlineEdit } from './InlineEdit';
 export { default as InlineEditableTextfield } from './InlineEditableTextfield';
 export { default as Cascader } from './Cascader';

@@ -549,48 +549,12 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
       }
     },
-    "DateAndTimePicker": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/DateAndTimePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/DateAndTimePicker.jsx",
-        "storybookId": "components-forms-and-inputs-date-time-picker--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "date-and-time-picker",
-            "name": "DateAndTimePicker",
-            "componentSetNodeId": "18804:38420",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × validation none · invalid · success × filled? × size. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          },
-          {
-            "id": "time-field",
-            "name": "_Time Field",
-            "componentSetNodeId": "16560:4508",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The time half, state × filled? × size: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateAndTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
-      }
-    },
     "DatePicker": {
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker",
+        "githubLink": null,
         "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
         "storybookId": "components-forms-and-inputs-date-picker--docs"
       },
@@ -605,7 +569,7 @@
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × size. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`gap-xs`) below the field, left-aligned, flipping above when there is no room. `range` and `size` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
+            "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × spacing. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`gap-xs`) below the field, left-aligned, flipping above when there is no room. `range` and `spacing` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
           },
           {
             "id": "calendar",
@@ -627,8 +591,42 @@
             "isComponentSet": true,
             "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480"
+        ]
+      }
+    },
+    "DateTimePicker": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx",
+        "storybookId": "components-forms-and-inputs-date-time-picker--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "date-and-time-picker",
+            "name": "DateTimePicker",
+            "componentSetNodeId": "18804:38420",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
+          },
+          {
+            "id": "time-field",
+            "name": "_Time Field",
+            "componentSetNodeId": "16560:4508",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "The time half, state × filled? × spacing: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
+          }
+        ]
       }
     },
     "Divider": {

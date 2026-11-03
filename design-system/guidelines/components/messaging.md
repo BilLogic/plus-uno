@@ -25,7 +25,7 @@ user can keep working.
 | is about one form field | none of these | the field's own error state |
 
 That last row is the one that matters most. `TextField`, `TextArea`, `FileUpload`
-and `DateAndTimePicker` all take `isInvalid` plus `errorMessage`,
+and `DateTimePicker` all take `isInvalid` plus `errorMessage`,
 which renders the message directly beneath the control with a matching icon. An
 `Alert` at the top of a form makes the user hunt for which field is wrong.
 
