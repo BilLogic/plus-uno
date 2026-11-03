@@ -19,7 +19,7 @@ import TagGroup from './TagGroup';
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Tag group',
+    title: 'Components/Labels/Tag group',
     component: TagGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {

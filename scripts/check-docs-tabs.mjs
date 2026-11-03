@@ -86,7 +86,6 @@ const USAGE_HEADINGS = new Set([
   'Usage',
   'Content guidelines',
   'Accessibility',
-  'ADS parity',
   'Usage notes',
   'Related',
   'Why `showLabel` cannot take the name away',
@@ -109,6 +108,8 @@ const USAGE_HEADINGS = new Set([
 const RETIRED_HEADINGS = new Map([
   ['Correct and incorrect', 'dissolve it: move each pair under the rule it illustrates (#254)'],
   ['When not to use', 'move each case to a `Related` bullet or a don\'t card (#254)'],
+  ['ADS parity', 'drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it'],
+  ['ADS documentation', 'drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it'],
 ]);
 
 const SECTION_OPEN = '<div className="sb-ds-doc-section">';
