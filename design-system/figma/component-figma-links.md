@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-55 docs-page links + 77 style/variant entries across 65 components.
+54 docs-page links + 76 style/variant entries across 64 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -49,7 +49,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | SidebarTab | `17118:120` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120) |
 | Components | Skeleton | `17885:47731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731) |
 | Components | Spinner | `3497:19485` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485) |
-| Components | StatusTag | `17882:1647` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647) |
 | Components | Suggestion | `17885:57` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57) |
 | Components | Table | `17156:122` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122) |
 | Components | Tag | `17884:2099` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099) |
@@ -133,7 +132,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Spinner | Spinner Growing | `9296:3061` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061) | verified |
 | Components | Spinner | Spinner Rotating | `9297:3104` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104) | verified |
 | Components | Spinner | Spinner Stacking | `9297:3156` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156) | verified |
-| Components | StatusTag | Status tag | `17876:1653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653) | verified |
 | Components | Suggestion | Suggestion | `17878:1769` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769) | verified |
 | Components | Tag | Tag | `17877:47506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506) | verified |
 | Components | TagGroup | TagGroup | `17878:1713` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713) | verified |
