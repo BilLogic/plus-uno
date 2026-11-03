@@ -590,7 +590,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 38: Tag and Suggestion moved onto the --ds- tokens, and their 40 state
     // and border washes went with the legacy names.
     // 34: Range's thumb took the brand bold steps, and its four state washes went.
-);
+    expect(withAlpha).toBe(34);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
