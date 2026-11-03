@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as SelectStories from './Select.stories.jsx';
+
+<Meta of={SelectStories} />
+
+<Title />
+A select picks one value, or several, from a list.
+
+<DocsTabs of={SelectStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={SelectStories.Overview} />
+
+<ArgTypes of={SelectStories} />
+
+</DocsTab>
+
+</DocsTabs>

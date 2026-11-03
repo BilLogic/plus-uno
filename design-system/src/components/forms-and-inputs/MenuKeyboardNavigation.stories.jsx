@@ -15,7 +15,7 @@ import TreeSelect from './TreeSelect';
  * the panel was a `tree`; every node was a `treeitem` with `aria-selected` and
  * `aria-expanded`. Not one of them was a tab stop, and there was no key handler
  * anywhere in the file — so a screen-reader user was told there was a tree,
- * told which node was selected, and had no way to reach any of it. In `multiple`
+ * told which node was selected, and had no way to reach any of it. In `isMulti`
  * mode the per-node checkboxes are real inputs, which made the component look
  * partly operable; in single mode there was no keyboard path to a selection at
  * all.
@@ -166,14 +166,14 @@ CollapsesAndEscapes.play = async ({ canvasElement }) => {
 };
 
 /**
- * `multiple` toggles rather than choosing, and stays open while it does.
+ * `isMulti` toggles rather than choosing, and stays open while it does.
  */
 export const MultipleTogglesWithoutClosing = () => {
     const [subjects, setSubjects] = useState([]);
     return (
         <div style={stack}>
             <label htmlFor="mkn-multi">Subjects</label>
-            <TreeSelect id="mkn-multi" multiple options={SUBJECTS} value={subjects} onChange={setSubjects} />
+            <TreeSelect id="mkn-multi" isMulti options={SUBJECTS} value={subjects} onChange={setSubjects} />
             <p data-testid="mkn-multi-value">{subjects.join(',') || 'none'}</p>
         </div>
     );

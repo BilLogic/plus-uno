@@ -229,12 +229,11 @@ const PrototypeMarket = () => {
           <Select
             id="market-stage-filter"
             aria-label="Stage"
-            mode="multi"
+            isMulti
             options={stageOptions}
             value={selectedStages}
             onChange={setSelectedStages}
             placeholder="All stages"
-            size="medium"
           />
         </div>
 
@@ -243,12 +242,11 @@ const PrototypeMarket = () => {
           <Select
             id="market-pillar-filter"
             aria-label="Pillar"
-            mode="multi"
+            isMulti
             options={pillarOptions}
             value={selectedPillars}
             onChange={setSelectedPillars}
             placeholder="All pillars"
-            size="medium"
           />
         </div>
 
@@ -257,12 +255,11 @@ const PrototypeMarket = () => {
           <Select
             id="market-creator-filter"
             aria-label="Creator"
-            mode="multi"
+            isMulti
             options={creatorOptions}
             value={selectedCreators}
             onChange={setSelectedCreators}
             placeholder="All creators"
-            size="medium"
           />
         </div>
 

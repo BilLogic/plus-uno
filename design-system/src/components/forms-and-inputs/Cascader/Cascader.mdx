@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as CascaderStories from './Cascader.stories.jsx';
+
+<Meta of={CascaderStories} />
+
+<Title />
+A cascader picks a path through a hierarchy, one column per level.
+
+<DocsTabs of={CascaderStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={CascaderStories.Overview} />
+
+<ArgTypes of={CascaderStories} />
+
+</DocsTab>
+
+</DocsTabs>

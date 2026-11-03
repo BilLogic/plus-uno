@@ -65,7 +65,7 @@ export const SelectRequired = () => (
             id="dapi-school"
             options={schoolOptions}
             placeholder="Select a school"
-            required
+            isRequired
         />
         <Select
             id="dapi-optional"

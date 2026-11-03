@@ -134,7 +134,7 @@ export const CallerPropsNameTheControl = () => (
         <Select
             id="nf-term"
             aria-labelledby="nf-term-label"
-            required
+            isRequired
             options={[{ value: 'fall', label: 'Fall' }]}
         />
         <DatePicker id="nf-session-date" aria-label="Session date" />

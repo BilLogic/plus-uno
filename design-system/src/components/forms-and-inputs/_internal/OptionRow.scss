@@ -64,6 +64,11 @@
     }
 }
 
+/* Matches a compact field (32): Menu row Item 24 rather than Item 32. */
+.plus-option-row--compact {
+    min-height: var(--item-height-sm);
+}
+
 /*
  * Reordering (Figma state=dragging and `drop indicator?`): the lifted row on
  * the overlay surface and its shadow with a `color.border` edge, and a Lagoon

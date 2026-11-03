@@ -318,32 +318,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
       }
     },
-    "Cascader": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Cascader.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Cascader.jsx",
-        "storybookId": "components-forms-and-inputs-cascader--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "cascader",
-            "name": "Cascader",
-            "componentSetNodeId": "18550:28181",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a Columns frame of equal `_Listbox Column`s of `Dropdown list Item` rows; a row with children shows caret-right in Trailing. state default · filled · open · disabled. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` with `OptionRow.Chevron` in Trailing. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-28181"
-      }
-    },
     "Checkbox": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -1674,35 +1648,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
       }
     },
-    "Select": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Select.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Select.jsx",
-        "storybookId": "components-forms-and-inputs-select--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "select",
-            "name": "Select",
-            "componentSetNodeId": "8583:12093",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=8583-12093",
-            "source": "node-chart",
-            "status": "verified",
-            "verifiedAt": "2026-10-15",
-            "notes": "28 variants, mode (single · multi · multi (badges)) × state (closed · open · invalid · read-only · disabled) × filled?. Built on Form (`_Field`): Content holds `_Field Text`, or a TagGroup of removable Tags in multi; Trailing holds `_Field Clear` (18756:36409) and the `_Dropdown icon` caret; open variants float a `_Listbox` of Dropdown list Item rows. Searchable and creatable are list content (a `_Listbox Hint` header, a create row footer), not properties. Docs frame: Docs / Select 18729:33744."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342",
-        "deliberate": {
-          "displayMode": "Code has a second value, `text`, a comma-separated list with no Figma column."
-        }
-      }
-    },
     "Sidebar": {
       "code": {
         "import": "@/specs/Universal/Sections/Sidebar/Sidebar",
@@ -2467,52 +2412,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227860"
-      }
-    },
-    "TreeSelect": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/TreeSelect.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/TreeSelect.jsx",
-        "storybookId": "components-forms-and-inputs-tree-select--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "tree-select",
-            "name": "Tree Select",
-            "componentSetNodeId": "18550:42560",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18550-42560",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "A `_Field` trigger over `_Listbox`, whose Body holds a flat run of `Dropdown list Item` rows: state default · filled · open · disabled × multiple? false · true. In code the field is `_internal/Field.jsx` and each row is `_internal/OptionRow.jsx` in the `treeitem` role. Built in the library and signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          },
-          {
-            "id": "tree-indent",
-            "name": "_Tree Indent",
-            "componentSetNodeId": "13520:72548",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13520-72548",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "Part: the row's depth, level 1 · 2 · 3, in steps bound to `Tree/indent` (20px, aliasing space-400). In code it is `OptionRow.Indent`, depth × 20px. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
-          },
-          {
-            "id": "tree-toggle",
-            "name": "_Tree Toggle",
-            "componentSetNodeId": "18607:41718",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18607-41718",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "Part: the caret, state collapsed · expanded · leaf (an empty cell of the same size, `Tree/toggle` 16px), with gap? before a checkbox. In code it is `OptionRow.Toggle`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state. Every row is `Dropdown list Item` (37:6472), the row OptionRow draws; its Leading slot holds this part."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-"
       }
     },
     "UserAvatar": {

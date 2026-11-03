@@ -46,13 +46,11 @@ export const GradYearDropdown = ({ id = 'grad-year', value, onChange, defaultVal
             <Label text="Graduation Year" required={required} />
             <Select
                 id={id}
-                mode="single"
                 options={gradYearOptions}
                 value={value}
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select Graduation Year"
-                size="medium"
                 style={{ width: '100%' }}
                 {...props}
             />
