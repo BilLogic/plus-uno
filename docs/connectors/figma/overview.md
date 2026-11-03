@@ -1,6 +1,6 @@
 ---
 embodiment: all
-summary: Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the six annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md
+summary: Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the five annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md
 ---
 
 # Figma Workspace Conventions
@@ -29,7 +29,7 @@ Each limit in a reply carries its cause and the next route: what could not be do
 
 ## Canvas vs comments
 
-- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it. Writing or classifying an annotation: the six category labels are [`annotations.md`](annotations.md).
+- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it. Writing or classifying an annotation: the five category labels are [`annotations.md`](annotations.md).
 - **Comment pins = human dialogue.** uno-bot reads them with a pasted frame (#899) and for decisions (#900), and replies in one only when a comment asks it with @uno (#903).
 
 ## Teams and stage folders
