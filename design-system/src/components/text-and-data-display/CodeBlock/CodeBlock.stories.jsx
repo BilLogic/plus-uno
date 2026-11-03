@@ -17,7 +17,7 @@ import CodeBlock from './CodeBlock';
  */
 
 export default {
-    title: 'Components/Text and data display/Code block',
+    title: 'Components/Text and data display/Code/Code block',
     component: CodeBlock,
     tags: ['!dev', '!autodocs'],
     parameters: {

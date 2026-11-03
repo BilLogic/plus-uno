@@ -20,7 +20,7 @@ import DateTag, { DATE_TAG_APPEARANCES, DATE_TAG_SPACINGS } from './DateTag';
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Date tag',
+    title: 'Components/Labels/Date tag',
     component: DateTag,
     tags: ['!dev', '!autodocs'],
     parameters: {

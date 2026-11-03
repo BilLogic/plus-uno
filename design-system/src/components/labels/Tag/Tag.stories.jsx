@@ -25,7 +25,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Tag',
+    title: 'Components/Labels/Tag',
     component: Tag,
     tags: ['!dev', '!autodocs'],
     parameters: {

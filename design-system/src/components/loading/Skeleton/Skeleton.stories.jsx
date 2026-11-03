@@ -31,7 +31,7 @@ import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './S
 // the ReducedMotion story fails loudly rather than skipping.
 
 export default {
-    title: 'Components/Loading/Loading/Skeleton',
+    title: 'Components/Loading/Skeleton',
     component: Skeleton,
     tags: ['!dev', '!autodocs'],
     parameters: {

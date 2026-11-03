@@ -21,7 +21,7 @@ import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './Status
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Status tag',
+    title: 'Components/Labels/Status tag',
     component: StatusTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
