@@ -1,0 +1,52 @@
+/*
+ * Heading: text style comes from `data-size`, ink from `data-color`. The HTML
+ * tag is a separate decision (made in JSX from the ambient heading level), so
+ * the same size can land on any of h1–h6, div or span.
+ */
+
+.plus-heading {
+    margin: 0;
+
+    &[data-size='xxlarge'] {
+        font: var(--heading-xxlarge);
+        letter-spacing: var(--heading-xxlarge-tracking);
+    }
+
+    &[data-size='xlarge'] {
+        font: var(--heading-xlarge);
+        letter-spacing: var(--heading-xlarge-tracking);
+    }
+
+    &[data-size='large'] {
+        font: var(--heading-large);
+        letter-spacing: var(--heading-large-tracking);
+    }
+
+    &[data-size='medium'] {
+        font: var(--heading-medium);
+    }
+
+    &[data-size='small'] {
+        font: var(--heading-small);
+    }
+
+    &[data-size='xsmall'] {
+        font: var(--heading-xsmall);
+    }
+
+    &[data-size='xxsmall'] {
+        font: var(--heading-xxsmall);
+    }
+
+    &[data-color='color.text'] {
+        color: var(--ds-text);
+    }
+
+    &[data-color='color.text.inverse'] {
+        color: var(--ds-text-inverse);
+    }
+
+    &[data-color='color.text.warning.inverse'] {
+        color: var(--ds-text-warning-inverse);
+    }
+}

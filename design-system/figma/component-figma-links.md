@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 77 style/variant entries across 69 components.
+56 docs-page links + 77 style/variant entries across 68 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -81,7 +81,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | AiLabel | AI label | `17560:1166` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166) | verified |
 | Components | Alert | alert | `11:324` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324) | verified |
 | Components | Breadcrumb | Breadcrumb | `27:618` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618) | verified |
-| Components | Calendar | _Calendar | `18819:40157` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157) | unpublished |
 | Components | Card | Card | `4241:27817` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817) | verified |
 | Components | Card | Overview Card | `12785:189314` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=12785-189314) | verified |
 | Components | Carousel | Carousel | `34:7879` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-7879) | verified |
@@ -93,6 +92,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | DatePicker | _Calendar | `18819:40157` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157) | unpublished |
 | Components | DatePicker | _Calendar Day | `9413:1755` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1755) | unpublished |
 | Components | DatePicker | DatePicker | `13574:1150` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150) | unpublished |
+| Components | DateTimePicker | _Time Field | `16560:4508` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508) | unpublished |
 | Components | DateTimePicker | DateTimePicker | `18804:38420` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420) | unpublished |
 | Components | Divider | Divider | `10:174` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=10-174) | verified |
 | Components | Dropdown | Dropdown | `4457:25458` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4457-25458) | verified |
@@ -100,6 +100,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Dropdown | Dropdown List | `9109:14766` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766) | verified |
 | Components | FileUpload | File Upload | `13696:8299` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299) | verified |
 | Components | Flag | Flag | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
+| Components | Heading | Heading | `20626:95` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95) | verified |
 | Components | Illustration | Character | `19786:47743` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743) | verified |
 | Components | Jumbotron | Jumbotron | `19627:113213` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-113213) | verified |
 | Components | LabelAndCaption | _Form Caption | `13726:9599` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599) | verified |
@@ -141,7 +142,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | TagInput | _Option menu | `19150:44293` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293) | unpublished |
 | Components | TagInput | TagInput | `18233:48345` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345) | unpublished |
 | Components | Tile | Tile | `17878:1928` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928) | verified |
-| Components | TimePicker | Time picker | `16560:4508` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508) | unpublished |
 | Components | Toggle | Form Switch Button | `82:16570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570) | verified |
 | Components | Tooltip | Tooltip | `42:6020` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020) | verified |
 | Other | Footer | Footnote | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) | verified |

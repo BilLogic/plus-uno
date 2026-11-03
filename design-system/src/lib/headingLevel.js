@@ -1,4 +1,5 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * The heading level of the nearest page, section or dialog.
@@ -18,3 +19,24 @@ export const useHeadingLevel = () => useContext(HeadingLevelContext);
 
 /** The tag for a heading level, held to h1 … h6. */
 export const headingTag = (level) => `h${Math.min(Math.max(Math.round(level), 1), 6)}`;
+
+/**
+ * Sets the heading level for a subtree. With no `value`, nests one level below
+ * its own ambient level, so a section inside a section keeps counting down;
+ * `value` resets the level outright, for content outside the normal flow (a
+ * dialog, a portal) that does not inherit its surrounding page's level.
+ */
+export const HeadingContextProvider = ({ value, children }) => {
+    const ambient = useHeadingLevel();
+    return (
+        <HeadingLevelContext.Provider value={value ?? ambient + 1}>
+            {children}
+        </HeadingLevelContext.Provider>
+    );
+};
+
+HeadingContextProvider.propTypes = {
+    /** Resets the level outright. Omit to nest one level below the ambient level. */
+    value: PropTypes.oneOf([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]),
+    children: PropTypes.node,
+};

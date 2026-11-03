@@ -28,6 +28,6 @@ From `design-system/src/components/text-and-data-display/Code/Code.scss`. Overri
 
 ## Related
 
-Same group: `CodeBlock` · `Table`
+Same group: `CodeBlock` · `Heading` · `Table`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

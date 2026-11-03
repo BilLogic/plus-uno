@@ -1,0 +1,39 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as HeadingStories from './Heading.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "heading",
+      "name": "Heading",
+      "componentSetNodeId": "20626:95",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "variantProps": {
+        "size": "Size"
+      }
+    }
+  ]
+};
+
+<Meta of={HeadingStories} />
+
+<Title />
+A text style with its own HTML tag, kept separate so the same size can land on any level of the page.
+
+<DocsTabs of={HeadingStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={HeadingStories.Overview} />
+
+<ArgTypes of={HeadingStories} />
+
+</DocsTab>
+
+</DocsTabs>
