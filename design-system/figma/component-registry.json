@@ -1946,14 +1946,13 @@
             "type": "enum",
             "values": [
               "default",
-              "compact",
               "spacious"
             ]
           },
           "leadingVisual": {
             "type": "boolean"
           },
-          "count": {
+          "trailingMetric": {
             "type": "boolean"
           }
         }

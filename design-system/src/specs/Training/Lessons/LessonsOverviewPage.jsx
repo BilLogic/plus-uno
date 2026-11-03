@@ -78,7 +78,7 @@ const LessonsOverviewPage = () => {
                                     <td className="py-3 px-4">
                                         <div className="d-flex align-items-center gap-2">
                                             {lesson.title}
-                                            {lesson.ai && <StatusTag appearance="discovery" spacing="compact">AI</StatusTag>}
+                                            {lesson.ai && <StatusTag appearance="discovery">AI</StatusTag>}
                                         </div>
                                     </td>
                                     <td className="py-3 px-4"><StatusTag>{lesson.area}</StatusTag></td>

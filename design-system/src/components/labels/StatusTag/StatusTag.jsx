@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 
-import CountTag, { formatCount } from '../CountTag/CountTag';
+import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './StatusTag.scss';
@@ -15,7 +15,7 @@ import './StatusTag.scss';
  * filled (a meaning); Tag is outlined (a category).
  *
  * THE NAMES FOLLOW THE LIBRARY. `type`, `appearance`, `spacing`,
- * `leadingVisual` and `count` take the same words Button and Count tag use, and
+ * `leadingVisual` and `trailingMetric` take the same words Button and Count tag use, and
  * the same values as the Status tag set in Figma, so handoff needs no
  * translation.
  *
@@ -41,7 +41,7 @@ export const STATUS_TAG_STATUS_APPEARANCES = ['neutral', 'success', 'warning', '
 export const STATUS_TAG_SMART_APPEARANCES = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
 export const STATUS_TAG_APPEARANCES = [...STATUS_TAG_STATUS_APPEARANCES, ...STATUS_TAG_SMART_APPEARANCES];
 export const STATUS_TAG_DATE_APPEARANCES = ['neutral', 'warning', 'danger'];
-export const STATUS_TAG_SPACINGS = ['default', 'compact', 'spacious'];
+export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
 /** The fixed icon of each date appearance: calendar, clock, alert. */
 export const STATUS_TAG_DATE_ICONS = {
@@ -68,7 +68,8 @@ export const StatusTag = ({
     appearance = 'neutral',
     spacing = 'default',
     leadingVisual,
-    count,
+    trailingMetric,
+    trailingMetricAppearance,
     maxWidth = 200,
     className = '',
     id,
@@ -108,9 +109,18 @@ export const StatusTag = ({
     }
 
     const visual = isDate ? STATUS_TAG_DATE_ICONS[effectiveAppearance] : leadingVisual;
-    /* A compact tag is 16 tall, the height of a compact count: there is no room to nest one. */
-    const hasCount = count !== undefined && count !== null && formatCount(count) !== null
-        && effectiveSpacing !== 'compact';
+    /* A date and the SMART subjects have their own looks, and a metric belongs to the status looks only. */
+    const canNestMetric = !isDate && STATUS_TAG_STATUS_APPEARANCES.includes(effectiveAppearance);
+    const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
+    if (wantsMetric && !canNestMetric) {
+        warn('`trailingMetric` is for the status appearances; a date and the SMART subjects do not take one.');
+    }
+    const hasCount = wantsMetric && canNestMetric;
+    let metricAppearance = effectiveAppearance;
+    if (trailingMetricAppearance !== undefined) {
+        if (COUNT_TAG_APPEARANCES.includes(trailingMetricAppearance)) metricAppearance = trailingMetricAppearance;
+        else warn(`trailingMetricAppearance="${trailingMetricAppearance}" is not one of ${COUNT_TAG_APPEARANCES.join(', ')}; it follows appearance.`);
+    }
 
     /*
      * A node visual is a new object every render; keying the measurement on it
@@ -161,8 +171,8 @@ export const StatusTag = ({
                 </span>
                 {hasCount && (
                     <CountTag
-                        value={count}
-                        appearance={STATUS_TAG_STATUS_APPEARANCES.includes(effectiveAppearance) ? effectiveAppearance : 'neutral'}
+                        value={trailingMetric}
+                        appearance={metricAppearance}
                         spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
                     />
                 )}
@@ -178,12 +188,14 @@ StatusTag.propTypes = {
     type: PropTypes.oneOf(STATUS_TAG_TYPES),
     /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. The five SMART subjects draw their own `smart` tokens. */
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
-    /** `default` (20) in rows, lists and sentences; `compact` (16) in dense tables; `spacious` (32) beside a heading. */
+    /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
     /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. */
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** A number nested inside the label as a Count tag of the same appearance: compact (16) in default, default (20) in spacious. Hidden at 0, and not shown at `compact`. */
-    count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. Status appearances only: a date and the SMART subjects take none. */
+    trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** The Count tag's appearance. Defaults to the Status tag's own. */
+    trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),
     /** The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     className: PropTypes.string,

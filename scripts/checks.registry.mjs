@@ -269,6 +269,16 @@ export const CHECKS = [
       'the old component language not coming back while the library moves to the ADS names: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, counted per rule and per file in design-system/src, prototypes and src. A count may fall and never rise; a migration PR lowers the record with `npm run check:ads-language -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
+    name: 'check:legacy-colors',
+    script: 'node scripts/check-legacy-colors.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-legacy-colors.mjs',
+    baseline: 'scripts/baselines/legacy-colors.json',
+    guards:
+      'components staying on the themed `--ds-*` color tokens: the legacy `--color-*` tokens and hex fallbacks inside `var()` are light-only and stay light in dark mode, so their uses are counted per rule and per file in design-system/src/components, design-system/src/ai and prototypes. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:legacy-colors -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
     name: 'check:retired-spelling',
     script: 'node scripts/check-retired-spelling.mjs',
     pkg: 'root',

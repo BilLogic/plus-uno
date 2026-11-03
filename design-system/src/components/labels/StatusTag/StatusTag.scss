@@ -1,9 +1,8 @@
 /*
  * Status tag — the condition something is in.
  *
- * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); compact is 16 (same
- * type, tighter); spacious is 32 (B2 14, icon 16, radius 6). The two heights have no semantic token yet
- * (label heights 16/20/22/32 are a token follow-up), so they are local custom
+ * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); spacious is 32 (B2 14, icon 16, radius 6). The two heights have no semantic token yet
+ * (label heights 20/22/32 are a token follow-up), so they are local custom
  * properties set from `_label-heights.scss`, which Skeleton reads too.
  *
  * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
@@ -47,15 +46,6 @@
     min-width: 0;
     padding-right: var(--size-spacing-small-space-025, 2px);
     gap: var(--size-element-gap-xs, 4px);
-}
-
-.plus-status--compact {
-    --plus-status-height: #{label.$status-height-compact};
-    --plus-status-icon-box: 16px;
-
-    .plus-status__label {
-        line-height: var(--plus-status-height);
-    }
 }
 
 .plus-status--spacious {
@@ -110,14 +100,14 @@
 /*
  * The color map: [fill, text, inside border] per style for `state`.
  *
- * fill    the style's tinted background token; neutral is surface-container.
- * text    the style's (Text) color; neutral is on-surface-variant.
+ * fill    the style's tinted background token.
+ * text    the style's (Text) color.
  * border  the style's pressed background token.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
  * mapping Count tag and Tag use. The five SMART subjects read their own tokens.
  */
 $status-state: (
-    'neutral': (var(--color-surface-container, #edeef0), var(--color-on-surface-variant, #3f484a), var(--ds-background-neutral-pressed)),
+    'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed)),
     'success': (var(--ds-background-success), var(--ds-text-success), var(--ds-background-success-pressed)),
     'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed)),
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
@@ -132,13 +122,13 @@ $status-state: (
 
 /*
  * `date` is outlined: no fill, [text, border] per style. The border is
- * outline-variant for neutral and the style's Border Subtle (the hue at 45%)
- * for warning and danger, the border every outlined label uses.
+ * the neutral border for neutral and the style's subtle border for warning
+ * and danger, the border every outlined label uses.
  */
 $status-date: (
-    'neutral': (var(--color-on-surface-variant, #3f484a), var(--color-outline-variant, #bec8ca)),
-    'warning': (var(--color-warning-text, #5b4a00), var(--color-warning-border-subtle, rgba(159, 130, 5, 0.45))),
-    'danger': (var(--color-danger-text, #9b0606), var(--color-danger-border-subtle, rgba(186, 26, 26, 0.45))),
+    'neutral': (var(--ds-text-subtle), var(--ds-border)),
+    'warning': (var(--ds-text-warning), var(--ds-border-warning-subtle)),
+    'danger': (var(--ds-text-danger), var(--ds-border-danger-subtle)),
 );
 
 @each $name, $look in $status-state {
@@ -161,7 +151,7 @@ $status-date: (
 
 /* Focusable only while truncated, as the tooltip's trigger. */
 .plus-status:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--color-focus-ring, #0472a8);
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
     outline-offset: var(--size-element-stroke-lg, 2px);
 }
 

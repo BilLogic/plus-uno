@@ -41,9 +41,9 @@
  *
  * subtle   the style's tinted background token, so a count inside a tinted
  *          label reads as a shade of it; ink is the style's (Text).
- * bold     the solid base with its on-color. Warning is the exception: its
- *          base with white ink fails AA, so bold warning uses Warning Container.
- * dot      the solid base, which is the whole mark.
+ * bold     the style's bold background token with inverse text. Warning is the
+ *          exception: its bold ground is light, so it takes the warning inverse text.
+ * dot      the style's icon role token, which is the whole mark.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
  * mapping Status tag and Tag use.
  */
@@ -57,21 +57,21 @@ $count-subtle: (
 );
 
 $count-bold: (
-    'neutral': (var(--color-inverse-surface, #2e3133), var(--color-inverse-on-surface, #f0f1f3)),
-    'success': (var(--color-success, #3e691a), var(--color-on-success, #ffffff)),
-    'warning': (var(--color-warning-container, #ffe17a), var(--color-on-warning-container, #231b00)),
-    'danger': (var(--color-danger, #ba1a1a), var(--color-on-danger, #ffffff)),
-    'info': (var(--color-info), var(--color-on-info)),
-    'discovery': (var(--color-mastering-content, #8659a9), var(--color-on-mastering-content, #ffffff)),
+    'neutral': (var(--ds-background-neutral-bold), var(--ds-text-inverse)),
+    'success': (var(--ds-background-success-bold), var(--ds-text-inverse)),
+    'warning': (var(--ds-background-warning-bold), var(--ds-text-warning-inverse)),
+    'danger': (var(--ds-background-danger-bold), var(--ds-text-inverse)),
+    'info': (var(--ds-background-information-bold), var(--ds-text-inverse)),
+    'discovery': (var(--ds-background-smart-mastering-content-bold), var(--ds-text-inverse)),
 );
 
 $count-dot: (
-    'neutral': var(--color-on-surface-variant, #3f484a),
-    'success': var(--color-success, #3e691a),
-    'warning': var(--color-warning, #9f8205),
-    'danger': var(--color-danger, #ba1a1a),
-    'info': var(--color-info),
-    'discovery': var(--color-mastering-content, #8659a9),
+    'neutral': var(--ds-icon-subtle),
+    'success': var(--ds-icon-success),
+    'warning': var(--ds-icon-warning),
+    'danger': var(--ds-icon-danger),
+    'info': var(--ds-icon-information),
+    'discovery': var(--ds-icon-smart-mastering-content),
 );
 
 @each $name, $pair in $count-subtle {
@@ -89,14 +89,14 @@ $count-dot: (
 }
 
 /*
- * Inverse is for counts on filled buttons and dark surfaces. It replaces the
- * three filled counter styles with one: a solid white pill with dark text, so
- * it passes contrast on any fill rather than depending on the ground beneath
- * it. It is neutral whatever `style` says.
+ * Inverse is for counts on filled buttons and bold or brand fills. It is the
+ * page surface with subtle text, so it reads as a pill cut out of the fill in
+ * light and in dark, rather than depending on the ground beneath it. It is
+ * neutral whatever `style` says.
  */
 .plus-count--inverse {
-    background-color: var(--color-surface-container-lowest, #ffffff);
-    color: var(--color-on-surface-variant, #3f484a);
+    background-color: var(--ds-surface);
+    color: var(--ds-text-subtle);
 }
 
 /* The dot: 8, solid, no number. Its name comes from `label`. */
@@ -119,7 +119,7 @@ $count-dot: (
  * box-shadow outside the box, as in Figma, so the pill keeps its exact height.
  */
 .plus-count--ring {
-    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--color-surface, #f9f9fc);
+    box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface);
 }
 
 /*

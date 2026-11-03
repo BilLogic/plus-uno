@@ -418,9 +418,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 3 `var(--color-*, rgba(…))` sites, every one
+   * Measured over the live tree: 1 `var(--color-*, rgba(…))` sites, every one
    * captured, and every one names a defined token and is compared with
-   * alpha on both sides. All 3 agree (16 until the Admin, Training, Home, Login and Universal state washes moved onto --ds- tokens; 18 until 2026-11-03, when the prototypes moved onto the --ds- tokens; 34 until 2026-11-03, when the Labels state steps moved onto --ds- tokens; 38 until the Range thumb sweep; 81 until 2026-10-24, when a Dropdown
+   * alpha on both sides. All 1 agree (3 until the Status tag's date borders moved onto --ds- tokens; 16 until the Admin, Training, Home, Login and Universal state washes moved onto --ds- tokens; 18 until 2026-11-03, when the prototypes moved onto the --ds- tokens; 34 until 2026-11-03, when the Labels state steps moved onto --ds- tokens; 38 until the Range thumb sweep; 81 until 2026-10-24, when a Dropdown
    * fallback that duplicated its token was dropped and Tag's × lost its focus
    * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
    * tokens, which carry no fallbacks), because the disagreeing washes were
@@ -444,7 +444,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(3);
+    expect(washes).toBe(1);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -495,7 +495,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // option) took --ds- tokens, and their rgba fallbacks went.
     // 3: the Admin, Training, Home, Login and Universal state washes moved onto
     // the --ds- tokens.
-    expect(withAlpha).toBe(3);
+    // 1: Status tag's date borders moved onto the --ds- tokens, and two washes went.
+    expect(withAlpha).toBe(1);
+    // 404: the Labels moved onto the --ds- tokens, and their color fallbacks went.
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
@@ -527,7 +529,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // the --ds- tokens, and their 13 color fallbacks went with the legacy names.
     // 431: the reflection prototype's base styles took --ds- tokens, and their four
     // color fallbacks went.
-    expect(comparable).toBe(431);
+    // 404: the Labels moved onto the --ds- tokens, and their 27 color fallbacks went.
+    expect(comparable).toBe(404);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
