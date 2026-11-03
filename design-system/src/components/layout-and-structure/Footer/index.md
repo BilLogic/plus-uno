@@ -22,7 +22,7 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
