@@ -18,8 +18,8 @@
 | `children` | node | — | The tags, and any Suggestions offered beside them. Suggestions always sit at the end, after `+n`, and are never counted or hidden; they must be direct children, or components that carry Suggestion's `isSuggestion` marker. `null` and `false` are skipped rather than counted. |
 | `label` | string | — | The group's accessible name — what this set of tags is. |
 | `overflow` | enum | `'wrap'` | `wrap` flows onto more lines; `collapse` keeps one line, shows as many tags as fit, and puts the rest behind `+n`. |
-| `alignment` | enum | `'left'` | `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. |
-| `disabled` | bool | `false` | Disables every Tag and Suggestion in the group, as a disabled field does. |
+| `alignment` | enum | `'start'` | `end` lines the tags and the `+n` up on the end edge, for a right-aligned table column. |
+| `isDisabled` | bool | — | Disables every Tag and Suggestion in the group, as a disabled field does. |
 | `maxVisible` | number | — | `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. |
 | `overflowLabel` | func | — | Formats the overflow tag's visible label. Defaults to `+n`; its accessible name starts with that label: "+3 more tags" ("+1 more tag"), or "<label>, 3 more tags" for a custom one. |
 | `onOverflowClick` | func | — | Replaces the `+n` menu — for opening a picker or a panel instead. |
@@ -30,7 +30,7 @@
 
 **`overflow`** — `wrap` · `collapse`
 
-**`alignment`** — `left` · `right`
+**`alignment`** — `start` · `end`
 
 Anything not listed is not a valid value.
 

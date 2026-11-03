@@ -123,11 +123,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-select--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Switch.",
-    "Switch",
-    "components-forms-and-inputs-toggle--docs"
-  ],
-  [
     "design-system/src/components/forms-and-inputs/TagInput.",
     "TagInput",
     "components-forms-and-inputs-tag-input--docs"
@@ -136,6 +131,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/forms-and-inputs/Textarea.",
     "Textarea",
     "components-forms-and-inputs-text-area--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/Toggle.",
+    "Toggle",
+    "components-forms-and-inputs-toggle--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/TreeSelect.",

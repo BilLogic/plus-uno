@@ -1961,7 +1961,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
@@ -2059,15 +2059,6 @@
         "source": "design-system/src/components/labels/Tag/Tag.jsx",
         "storybookId": "components-labels-status-count-tag-tag--docs",
         "props": {
-          "behavior": {
-            "type": "enum",
-            "values": [
-              "read-only",
-              "removable",
-              "selectable",
-              "link"
-            ]
-          },
           "color": {
             "type": "enum",
             "values": [
@@ -2090,6 +2081,9 @@
             ]
           },
           "isSelected": {
+            "type": "boolean"
+          },
+          "isRemovable": {
             "type": "boolean"
           },
           "isLoading": {
@@ -2116,7 +2110,7 @@
               "isLoading": "state=saving",
               "isElevated": "elevated"
             },
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled is isDisabled, or TagContext for a whole field; remove? on a link is href plus isRemovable; count? is trailingMetric. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled and focus × on a link's separate ×; code ignores it on a removable or selectable tag with a warning."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
@@ -2141,11 +2135,11 @@
           "alignment": {
             "type": "enum",
             "values": [
-              "left",
-              "right"
+              "start",
+              "end"
             ]
           },
-          "disabled": {
+          "isDisabled": {
             "type": "boolean"
           }
         }
@@ -2161,7 +2155,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
+            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false; left and right are start and end in code, and disabled is isDisabled. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
           }
         ]
       }

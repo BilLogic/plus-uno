@@ -32,9 +32,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-25', kind: 'changed', summary: 'Suggestion moved to discovery: a dashed `border.discovery` edge, `text.discovery` words, an `icon.discovery` glyph, `background.discovery` on hover and its hovered step pressed. Mastering Content now belongs to the SMART subjects alone.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'A pressed suggestion is the Mastering Content 12 step, not 16.' },
-            { date: '2026-09-29', kind: 'added', summary: 'Suggestion carried a public `Suggestion.isSuggestion` marker that TagGroup used to keep it out of `+n` and at the end of the row, a wrapper had to copy it, and a disabled TagGroup disabled the Suggestions in it.' },
+            { date: '2026-11-03', kind: 'changed', summary: '`isDisabled` disables one suggestion; a disabled field or TagGroup still disables all of them through `TagContext`.' },
         ],
         docs: {
             description: {
@@ -248,10 +246,9 @@ FocusRing.play = async ({ canvasElement }) => {
 };
 
 /**
- * Disabled, beside disabled Tags, from the field's `TagContext` only. Its
+ * Disabled, beside disabled Tags, from the field's `TagContext`, or alone with `isDisabled`. Its
  * ground and words are asserted equal to the disabled Tag's, because the two
- * stylesheets each name the pair. There is no `disabled` prop, so a stray one
- * outside a disabled field changes nothing.
+ * stylesheets each name the pair. `isDisabled` disables one on its own.
  */
 const onStray = fn();
 
@@ -262,12 +259,12 @@ export const DisabledBesideTags = {
             <button type="button">Before</button>
             <TagContext.Provider value={{ isDisabled: true }}>
                 <Tag color="blue" data-testid="tag">Algebra</Tag>
-                <Tag behavior="removable" color="blue" onRemove={() => {}}>Advocacy</Tag>
+                <Tag isRemovable color="blue" onAfterRemoveAction={() => {}}>Advocacy</Tag>
                 <Suggestion label="Relationships" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
             </TagContext.Provider>
             <button type="button">After</button>
-            <Suggestion label="Fractions" disabled onAccept={onStray} />
+            <Suggestion label="Fractions" isDisabled onAccept={onStray} />
         </div>
     ),
 };
@@ -317,15 +314,11 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
     }
     await expect(args.onAccept).not.toHaveBeenCalled();
 
-    // A stray `disabled` outside a disabled field is not a prop: the
-    // suggestion stays live, takes focus and is accepted.
-    const stray = canvas.getByRole('button', { name: 'Add Fractions, suggested' });
-    await expect(stray).toBeEnabled();
-    canvas.getByRole('button', { name: 'After' }).focus();
-    await userEvent.tab();
-    await expect(stray).toHaveFocus();
-    await userEvent.keyboard('{Enter}');
-    await expect(onStray).toHaveBeenCalledWith('Fractions', expect.anything());
+    // `isDisabled` alone disables one suggestion outside any field.
+    const alone = canvas.getByRole('button', { name: 'Add Fractions, suggested' });
+    await expect(alone).toBeDisabled();
+    await userEvent.click(alone, { pointerEventsCheck: 0 });
+    await expect(onStray).not.toHaveBeenCalled();
 };
 
 /**

@@ -308,22 +308,19 @@ $tag-colors: (
 
 /* ------------------------------------------------------------ interactive */
 
-/* Selectable (and the deprecated operational) tag: the tag is the button. */
-.plus-tag--selectable,
-.plus-tag--action {
+/* Selectable tag: the tag is the button. */
+.plus-tag--selectable {
     appearance: none;
     cursor: pointer;
 }
 
 .plus-tag--selectable:hover,
-.plus-tag--action:hover,
 .plus-tag--link:not(.plus-tag--split):hover,
 .plus-tag--split:has(> .plus-tag__link:hover) {
     background-color: var(--plus-tag-hovered);
 }
 
 .plus-tag--selectable:active,
-.plus-tag--action:active,
 .plus-tag--link:not(.plus-tag--split):active,
 .plus-tag--split:has(> .plus-tag__link:active) {
     background-color: var(--plus-tag-pressed);
