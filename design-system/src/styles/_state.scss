@@ -43,13 +43,25 @@
 // standalone forced-colors block of a part's own.
 // `$important: true` marks the ring's declarations `!important`, for a native
 // control (Radio) still overriding a Bootstrap rule of its own.
+//
+// `$hovered-selector` / `$pressed-selector` / `$selected-selector` /
+// `$disabled-selector` replace the default selector list for that state, for
+// an adopter whose hover/press/selection reads on a compound selector the
+// default list does not spell (Tag's `:has()` split-link group, for
+// instance). The declarations still flow through the one named-token map and
+// `plus-state-apply`, which is the part `check:state-mixin` is a guard on —
+// only the selector shape is the adopter's own.
 @mixin plus-state(
     $states: (),
     $ring: true,
     $ring-offset: var(--size-element-stroke-lg),
     $ring-token: --ds-border-focused,
     $high-contrast: false,
-    $important: false
+    $important: false,
+    $hovered-selector: null,
+    $pressed-selector: null,
+    $selected-selector: null,
+    $disabled-selector: null
 ) {
     $bang: null;
     @if $important {
@@ -57,38 +69,64 @@
     }
     $hovered: map.get($states, 'hovered');
     @if $hovered {
-        &:hover,
-        &[data-hovered] {
-            @include plus-state-apply($hovered);
+        @if $hovered-selector {
+            #{$hovered-selector} {
+                @include plus-state-apply($hovered);
+            }
+        } @else {
+            &:hover,
+            &[data-hovered] {
+                @include plus-state-apply($hovered);
+            }
         }
     }
 
     $pressed: map.get($states, 'pressed');
     @if $pressed {
-        &:active,
-        &[data-pressed] {
-            @include plus-state-apply($pressed);
+        @if $pressed-selector {
+            #{$pressed-selector} {
+                @include plus-state-apply($pressed);
+            }
+        } @else {
+            &:active,
+            &[data-pressed] {
+                @include plus-state-apply($pressed);
+            }
         }
     }
 
     $selected: map.get($states, 'selected');
     @if $selected {
-        &.active,
-        &[aria-selected='true'],
-        &[aria-current='true'],
-        &[data-selected] {
-            @include plus-state-apply($selected);
+        @if $selected-selector {
+            #{$selected-selector} {
+                @include plus-state-apply($selected);
+            }
+        } @else {
+            &.active,
+            &[aria-selected='true'],
+            &[aria-current='true'],
+            &[data-selected] {
+                @include plus-state-apply($selected);
+            }
         }
     }
 
     $disabled: map.get($states, 'disabled');
     @if $disabled {
-        &:disabled,
-        &[aria-disabled='true'],
-        &[data-disabled] {
-            @include plus-state-apply($disabled);
-            pointer-events: none;
-            cursor: not-allowed;
+        @if $disabled-selector {
+            #{$disabled-selector} {
+                @include plus-state-apply($disabled);
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+        } @else {
+            &:disabled,
+            &[aria-disabled='true'],
+            &[data-disabled] {
+                @include plus-state-apply($disabled);
+                pointer-events: none;
+                cursor: not-allowed;
+            }
         }
     }
 

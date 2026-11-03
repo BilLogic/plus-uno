@@ -99,30 +99,34 @@
             transform: translateX(calc(var(--plus-toggle-track-w) - var(--plus-toggle-track-h)));
         }
 
-        // Hover steps the track to its named hovered step.
-        &:hover:not(:disabled):not(:checked) {
-            background-color: var(--ds-background-neutral-bold-hovered) !important;
-        }
-
-        &:checked:hover:not(:disabled) {
-            background-color: var(--ds-background-selected-bold-hovered) !important;
-        }
-
+        // Hover steps the track to its named hovered step — unchecked or
+        // checked, each its own call since the track reads a different token
+        // per position. Disabled keeps one fill for both positions; the thumb
+        // says which.
+        //
         // Keyboard focus is the ring Checkbox and Radio draw, through the
         // state mixin: 2px of `border.focused`, 2px off the track. A pointer
         // focus draws none. The ring sits outside the track, on the page the
         // track is laid on, not on the track's own fill.
-        @include plus-state();
+        @include plus-state(
+            $states: (
+                hovered: (background-color: var(--ds-background-neutral-bold-hovered) !important),
+                disabled: (cursor: not-allowed, background-color: var(--ds-background-disabled) !important),
+            ),
+            $hovered-selector: '&:hover:not(:disabled):not(:checked)',
+            $disabled-selector: '&:disabled, &:disabled:checked'
+        );
+
+        @include plus-state(
+            $states: (
+                hovered: (background-color: var(--ds-background-selected-bold-hovered) !important),
+            ),
+            $ring: false,
+            $hovered-selector: '&:checked:hover:not(:disabled)'
+        );
 
         &:focus-visible {
             box-shadow: none;
-        }
-
-        // Disabled keeps one fill for both positions; the thumb says which.
-        &:disabled,
-        &:disabled:checked {
-            cursor: not-allowed;
-            background-color: var(--ds-background-disabled) !important;
         }
 
         &:disabled::after {

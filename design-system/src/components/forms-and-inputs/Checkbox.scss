@@ -111,33 +111,30 @@
         }
 
         // Hover state: the input's hovered fill, edged in the brand border.
-        &:hover:not(:disabled):not(:indeterminate) {
-            border-color: var(--ds-border-brand);
-            background-color: var(--ds-background-input-hovered);
-        }
+        // Focus state: the state mixin's ring, 2px wide and 2px off the box,
+        // as Button and Radio draw it. A pointer focus draws nothing.
+        // Disabled state: Atlassian's disabled colors, under the disabled fade.
+        @include plus-state(
+            $states: (
+                hovered: (border-color: var(--ds-border-brand), background-color: var(--ds-background-input-hovered)),
+                disabled: (opacity: var(--ds-opacity-disabled), cursor: not-allowed, border-color: var(--ds-border-disabled), background-color: var(--ds-background-disabled)),
+            ),
+            $hovered-selector: '&:hover:not(:disabled):not(:indeterminate)',
+            $disabled-selector: '&:disabled'
+        );
 
         // A checked or mixed box keeps its mark on hover, and its fill steps to
         // the named hovered step, opaque, under the mark drawn by `::before`
         // and `::after`. The edge takes the same step: there is no hovered
         // border role, and `check:intent-roles` bars only the resting `.bold`
         // fill from an edge.
-        &:checked:hover:not(:disabled):not(:indeterminate),
-        &:indeterminate:hover:not(:disabled) {
-            background-color: var(--ds-background-selected-bold-hovered);
-            border-color: var(--ds-background-selected-bold-hovered);
-        }
-
-        // Focus state: the state mixin's ring, 2px wide and 2px off the box,
-        // as Button and Radio draw it. A pointer focus draws nothing.
-        @include plus-state();
-
-        // Disabled state: Atlassian's disabled colors, under the disabled fade.
-        &:disabled {
-            opacity: var(--ds-opacity-disabled);
-            cursor: not-allowed;
-            border-color: var(--ds-border-disabled);
-            background-color: var(--ds-background-disabled);
-        }
+        @include plus-state(
+            $states: (
+                hovered: (background-color: var(--ds-background-selected-bold-hovered), border-color: var(--ds-background-selected-bold-hovered)),
+            ),
+            $ring: false,
+            $hovered-selector: '&:checked:hover:not(:disabled):not(:indeterminate), &:indeterminate:hover:not(:disabled)'
+        );
 
         // A disabled checked or mixed box keeps the disabled fill and edge;
         // its mark is `icon.disabled`.

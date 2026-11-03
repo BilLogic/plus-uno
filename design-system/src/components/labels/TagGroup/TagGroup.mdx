@@ -179,10 +179,10 @@ A single tag standing alone does not need it.
 
 ### The gap lives here, not on the tag.
 
-Atlassian's tag carries its own margin, which then has to be switched off with
-a `hasMargin` escape hatch whenever a parent uses `gap` — an API that exists
-only to undo a decision made in the wrong place. `Tag` sets `margin: 0` and
-this sets `gap`, so there is nothing to undo and nothing to double up.
+A tag that carries its own margin needs an escape hatch whenever a parent uses
+`gap` — an API that exists only to undo a decision made in the wrong place.
+`Tag` sets `margin: 0` and this sets `gap`, so there is nothing to undo and
+nothing to double up.
 
 ```jsx
 // Incorrect — the row's spacing is now defined in two places, and the next
