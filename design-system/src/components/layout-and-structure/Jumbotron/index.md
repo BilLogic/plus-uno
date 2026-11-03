@@ -60,6 +60,6 @@ From `design-system/src/components/layout-and-structure/Jumbotron/Jumbotron.scss
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `ListGroup` · `MediaObject` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

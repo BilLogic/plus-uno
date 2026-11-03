@@ -40,6 +40,6 @@ From `design-system/src/components/layout-and-structure/MediaObject/MediaObject.
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
