@@ -366,34 +366,34 @@ test('Field: hover turns the border border.focused, subtle hover the neutral sub
 
 /* ─── NavPills ───────────────────────────────────────────────────────────── */
 
-test('NavPills: hover 08, pressed 12, focus a ring with no fill, selected or not', () => {
+test('NavPills: hovered, pressed, focus a ring with no fill, selected or not', () => {
   const file = 'components/navigation/NavPills/NavPills.scss';
   for (const pill of ['.plus-nav-pills .nav-link', '.nav-pills .plus-nav-item-pill']) {
-    expectRule(file, `${pill}:hover${NOT}`, { 'background-color': layer('--color-on-surface-state-08') });
-    expectRule(file, `${pill}:active${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+    expectRule(file, `${pill}:hover${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+    expectRule(file, `${pill}:active${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
     expectRule(file, `${pill}:focus-visible${NOT}`, RING_OUTSIDE);
     expectNoFill(file, `${pill}:focus-visible${NOT}`);
 
     // The primary border carries selection, by class or by attribute; the
     // steps lay over it.
     for (const selected of ['.active', '[aria-selected=true]', '[aria-current=page]', '[aria-current=true]']) {
-      expectRule(file, `${pill}${selected}:hover`, { 'background-color': layer('--color-primary-state-08') });
-      expectRule(file, `${pill}${selected}:active`, { 'background-color': layer('--color-primary-state-12') });
+      expectRule(file, `${pill}${selected}:hover`, { 'background-color': layer('--ds-background-selected-hovered') });
+      expectRule(file, `${pill}${selected}:active`, { 'background-color': layer('--ds-background-selected-pressed') });
       expectRule(file, `${pill}${selected}:focus-visible`, RING_OUTSIDE);
       expectNoFill(file, `${pill}${selected}:focus-visible`);
     }
   }
 
   const item = '.plus-nav-pills .nav-item';
-  expectRule(file, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectNoFill(file, `${item}.pseudo-focus > .nav-link${NOT}`);
   expectRule(file, `${item}.pseudo-focus > .nav-link${NOT}`, RING_OUTSIDE);
-  expectRule(file, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': layer('--color-primary-state-12') });
+  expectRule(file, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': layer('--ds-background-selected-pressed') });
   expectNoFill(file, `${item}.pseudo-focus > .nav-link.active`);
   expectRule(file, `${item}.pseudo-focus > .nav-link.active`, RING_OUTSIDE);
 
   expectRule(file, '.plus-nav-pills .dropdown .dropdown-toggle:active', {
-    'background-color': layer('--color-on-surface-state-12'),
+    'background-color': layer('--ds-background-neutral-subtle-pressed'),
   });
 });
 
@@ -423,16 +423,16 @@ test('CloseButton: named hovered and pressed steps, focus the ring alone, on bot
 
 /* ─── Pagination ─────────────────────────────────────────────────────────── */
 
-test('Pagination: hover 08, pressed 12, current page 16, focus a ring with no fill', () => {
+test('Pagination: hovered, pressed, current page selected, focus a ring with no fill', () => {
   const file = 'components/navigation/Pagination/Pagination.scss';
   const link = '.plus-pagination .page-item:not(.disabled):not(.active) .page-link';
-  expectRule(file, `${link}:hover`, { 'background-color': layer('--color-secondary-state-08') });
-  expectRule(file, `${link}:active`, { 'background-color': layer('--color-secondary-state-12') });
+  expectRule(file, `${link}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${link}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(file, `${link}:focus-visible`, RING_INSIDE);
   expectNoFill(file, `${link}:focus-visible`);
   assert.equal(declarations(sheet(file), `${link}:focus`), null, 'a pointer focus draws a state of its own');
   expectRule(file, '.plus-pagination .page-item.active .page-link', {
-    'background-color': layer('--color-secondary-state-16'),
+    'background-color': layer('--ds-background-selected'),
   });
 });
 

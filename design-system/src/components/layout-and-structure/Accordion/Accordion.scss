@@ -5,9 +5,9 @@
  *
  * States per Figma:
  * - Default: surface bg, outline-variant border
- * - Expanded: primary-state-16 bg, outline-variant border
+ * - Expanded: selected bg, outline-variant border
  * - Focus: inverse-primary outline (2px)
- * - Pressed: neutral-state-12 bg
+ * - Pressed: neutral-subtle-pressed bg
  * - Disabled: 38% opacity
  */
 
@@ -74,9 +74,9 @@
         flex-direction: row;
 
         // --- EXPANDED STATE ---
-        // Per Figma: primary-state-16 background when expanded
+        // Per Figma: selected background when expanded
         &:not(.collapsed) {
-            background-color: var(--color-primary-state-16) !important;
+            background-color: var(--ds-background-selected) !important;
             color: var(--color-on-surface-variant) !important;
             box-shadow: none !important;
             border-bottom: none !important;
@@ -90,20 +90,20 @@
         // --- HOVER STATE (must come after collapsed/expanded base states) ---
         // Hover on COLLAPSED items (not yet opened)
         &.collapsed:hover:not(:disabled) {
-            background-color: var(--color-on-surface-state-08) !important;
+            background-color: var(--ds-background-neutral-subtle-hovered) !important;
             cursor: pointer;
         }
 
         // Hover on EXPANDED items
         &:not(.collapsed):hover:not(:disabled) {
-            background-color: color-mix(in srgb, var(--color-primary-state-16), black 8%) !important;
+            background-color: var(--ds-background-selected-hovered) !important;
             cursor: pointer;
         }
 
         // --- PRESSED STATE ---
         &:active,
         &.pressed {
-            background-color: var(--color-on-surface-state-12) !important;
+            background-color: var(--ds-background-neutral-subtle-pressed) !important;
         }
 
         // --- FOCUS STATE ---
@@ -189,16 +189,16 @@
 
             // Hover state
             &:hover {
-                background-color: var(--color-on-surface-state-08) !important;
+                background-color: var(--ds-background-neutral-subtle-hovered) !important;
             }
 
-            // Per Figma: Expanded state uses primary-state-16 bg
+            // Per Figma: Expanded state uses selected bg
             &:not(.collapsed) {
-                background-color: var(--color-primary-state-16) !important;
+                background-color: var(--ds-background-selected) !important;
             }
 
             &:not(.collapsed):hover {
-                background-color: color-mix(in srgb, var(--color-primary-state-16), black 8%) !important;
+                background-color: var(--ds-background-selected-hovered) !important;
             }
 
             // Per Figma: Focus state uses 2px inverse-primary BOTTOM border only

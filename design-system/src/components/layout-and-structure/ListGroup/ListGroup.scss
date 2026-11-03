@@ -49,7 +49,7 @@
         &.plus-list-group-item--active {
             z-index: 2;
             color: var(--color-primary-text); // Primary Text
-            background-color: var(--color-primary-state-08); // Primary 08 Opacity
+            background-color: var(--ds-background-selected);
             border-color: var(--color-outline-variant); // Keep border or change? Usually active has border change?
             // User requested active colors. Default BS removes border or colors it.
             // We keep it simple to match design system "Selected/Active" state.
@@ -57,7 +57,7 @@
 
         // --- HOVER STATE ---
         &:hover:not(.disabled) {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         // --- DISABLED STATE ---
