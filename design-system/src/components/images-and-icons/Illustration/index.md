@@ -29,6 +29,6 @@ From `design-system/src/components/images-and-icons/Illustration/Illustration.sc
 
 ## Related
 
-Same group: `Avatar` · `AvatarGroup` · `Tile`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

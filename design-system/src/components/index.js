@@ -22,6 +22,7 @@ export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
 export * from '@/components/forms-and-inputs';
+export { default as AiIcon } from '@/components/images-and-icons/AiIcon';
 export { default as Avatar } from '@/components/images-and-icons/Avatar';
 export { default as AvatarGroup } from '@/components/images-and-icons/AvatarGroup';
 export { default as Illustration } from '@/components/images-and-icons/Illustration';

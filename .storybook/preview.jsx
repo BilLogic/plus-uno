@@ -215,7 +215,6 @@ const preview = {
               "Date time picker",
               "Dropdown menu",
               "File upload",
-              "Inline edit",
               "Input group",
               "Label & caption",
               "Number input",
@@ -234,7 +233,8 @@ const preview = {
             [
               "Logo",
               "Tile",
-              "Illustrations"
+              "Illustrations",
+              "AI icon"
             ],
             "Labels",
             [
