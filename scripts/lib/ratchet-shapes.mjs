@@ -131,6 +131,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/react-bootstrap-imports.json',
+    check: 'check:react-bootstrap-imports',
+    command: 'node scripts/check-react-bootstrap-imports.mjs --update',
+    prose: 'why',
+    // `<path>` -> count of react-bootstrap import statements. A count may fall;
+    // one that reaches zero leaves the record, and the stale sweep asks for a
+    // regenerate.
+    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
+  },
+  {
     file: 'scripts/baselines/atlassian-benchmark.json',
     check: 'check:atlassian-benchmark',
     command: 'npm run benchmark:atlassian -- --update',
