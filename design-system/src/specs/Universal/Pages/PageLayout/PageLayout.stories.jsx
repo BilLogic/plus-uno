@@ -15,7 +15,7 @@
 
 import React from 'react';
 import PageLayout from './PageLayout';
-import Card from '@/components/layout-and-structure/Card/Card';
+import PatternCard from '@/patterns/PatternCard';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, TextField, TextArea } from '@/components';
@@ -97,9 +97,9 @@ export const Overview = {
                 }}
             >
                 {Array(4).fill(0).map((_, i) => (
-                    <Card key={i} className="p-3">
+                    <PatternCard key={i} className="p-3">
                         <h3 className="h6">Card {i + 1}</h3>
-                    </Card>
+                    </PatternCard>
                 ))}
             </div>
         </PageLayout>
@@ -237,12 +237,12 @@ export const Interactive = {
                     }}
                 >
                     {Array(4).fill(0).map((_, i) => (
-                        <Card key={i} className="p-3">
+                        <PatternCard key={i} className="p-3">
                             <h2 className="h5">Card {i + 1}</h2>
                             <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
                                 Content
                             </p>
-                        </Card>
+                        </PatternCard>
                     ))}
                 </div>
             </div>

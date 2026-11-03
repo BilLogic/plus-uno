@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, NavPills, NavTabs, Radio, Range, Rating, Toggle, Button, IconButton } from '@/components';
+import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, NavTabs, Radio, Range, Rating, Toggle, Button, IconButton } from '@/components';
 
 /**
  * Two control heights: 32 for everything, 24 compact for buttons in table rows
@@ -186,23 +186,19 @@ Breadcrumbs.play = async ({ canvasElement }) => {
     }
 };
 
-/** Nav tabs and Nav pills follow the button: 32, labels 14/20 medium; a selected tab is semibold. */
+/** Nav tabs follow the button: 32, labels 14/20 medium; a selected tab is semibold. */
 export const Tabs = () => (
     <div style={stack}>
         <NavTabs activeKey="1" onSelect={() => {}} aria-label="Tabs">
             <NavTabs.Item eventKey="1">Home</NavTabs.Item>
             <NavTabs.Item eventKey="2">Profile</NavTabs.Item>
         </NavTabs>
-        <NavPills activeKey="1" onSelect={() => {}} aria-label="Pills">
-            <NavPills.Item eventKey="1">Day</NavPills.Item>
-            <NavPills.Item eventKey="2">Week</NavPills.Item>
-        </NavPills>
     </div>
 );
 
 Tabs.play = async ({ canvasElement }) => {
     const links = canvasElement.querySelectorAll('.nav-link');
-    await expect(links).toHaveLength(4);
+    await expect(links).toHaveLength(2);
     for (const link of links) {
         await expect(heightOf(link), `${link.textContent} height`).toBe(32);
         // Selected or not, a label stays medium: the indicator and the color mark selection.

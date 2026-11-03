@@ -169,6 +169,14 @@
     width: 100%;
 }
 
+.plus-user-feedback-modal-divider {
+    width: 100%;
+    height: var(--size-element-stroke-sm);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-border-bold);
+    opacity: 0.1;
+}
+
 .plus-user-feedback-modal-body {
     display: flex;
     flex-direction: column;

@@ -277,13 +277,7 @@ const preview = {
               "Page header",
               "Panel",
               "Scrollbar",
-              "Visually hidden",
-              "Card",
-              "Collapse",
-              "Divider",
-              "Jumbotron",
-              "List group",
-              "Media object"
+              "Visually hidden"
             ],
             "Loading",
             [
@@ -305,11 +299,8 @@ const preview = {
             [
               "Breadcrumbs",
               "Pagination",
-              "Scrollspy",
               "Sidebar tab",
-              "Tabs",
-              "Nav pills",
-              "Navbar"
+              "Tabs"
             ],
             "Overlays and layering",
             [

@@ -23,11 +23,12 @@
         max-width: 162px;
     }
 
-    .plus-card-content,
-    .plus-card-body,
-    .plus-card-description {
-        padding: 0 !important;
-        margin: 0 !important;
+    &.plus-pattern-card-pad-sm .plus-pattern-card-inner {
+        padding: 0;
+    }
+
+    .plus-pattern-card-content,
+    .plus-pattern-card-body {
         height: 100%;
     }
 }

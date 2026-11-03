@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
-import Divider from '@/components/layout-and-structure/Divider';
 import SmartTag from '@/components/labels/SmartTag';
 import './RecommendedLessons.scss';
 
@@ -57,7 +56,7 @@ const RecommendedLessons = ({
         : '275.33px';
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={cardClasses}
             style={{
@@ -66,11 +65,8 @@ const RecommendedLessons = ({
                 flexShrink: 0, // Prevent shrinking in flex containers (carousel)
                 ...style // Allow style prop to override if needed
             }}
-            paddingSize={null}
-            gapSize={null}
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="sm"
         >
             {/* Image thumbnail (placeholder if no image provided) */}
             <div className="plus-recommended-lessons-image">
@@ -100,11 +96,7 @@ const RecommendedLessons = ({
                 </div>
 
                 {/* Divider */}
-                <Divider
-                    size="1px"
-                    style="light"
-                    className="plus-recommended-lessons-divider"
-                />
+                <div className="plus-recommended-lessons-divider" role="separator" />
 
                 {/* Bottom section with button and status indicators */}
                 <div className="plus-recommended-lessons-bottom">
@@ -124,7 +116,7 @@ const RecommendedLessons = ({
                     </div>
                 </div>
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

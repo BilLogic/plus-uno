@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import NavTabs from '@/components/navigation/NavTabs';
 import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
@@ -50,15 +50,12 @@ const DataVisualization = ({
     ];
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-data-viz-card ${className}`}
             style={style}
-            paddingSize="sm"
-            gapSize="lg"
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="lg"
         >
             <NavTabs
                 activeKey={activeTab}
@@ -112,7 +109,7 @@ const DataVisualization = ({
                     </div>
                 )}
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

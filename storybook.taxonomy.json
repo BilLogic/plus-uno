@@ -65,13 +65,7 @@
       "Page header",
       "Panel",
       "Scrollbar",
-      "Visually hidden",
-      "Card",
-      "Collapse",
-      "Divider",
-      "Jumbotron",
-      "List group",
-      "Media object"
+      "Visually hidden"
     ],
     "Loading": [
       "Progress bar",
@@ -90,11 +84,8 @@
     "Navigation": [
       "Breadcrumbs",
       "Pagination",
-      "Scrollspy",
       "Sidebar tab",
-      "Tabs",
-      "Nav pills",
-      "Navbar"
+      "Tabs"
     ],
     "Overlays and layering": [
       "Popup",
@@ -238,13 +229,7 @@
         "Page header",
         "Panel",
         "Scrollbar",
-        "Visually hidden",
-        "Card",
-        "Collapse",
-        "Divider",
-        "Jumbotron",
-        "List group",
-        "Media object"
+        "Visually hidden"
       ],
       "Loading",
       [
@@ -266,11 +251,8 @@
       [
         "Breadcrumbs",
         "Pagination",
-        "Scrollspy",
         "Sidebar tab",
-        "Tabs",
-        "Nav pills",
-        "Navbar"
+        "Tabs"
       ],
       "Overlays and layering",
       [

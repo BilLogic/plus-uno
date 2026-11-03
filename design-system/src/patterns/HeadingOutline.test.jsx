@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 // Module paths rather than the barrels, so the rest stays light.
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from './PatternCard';
 import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import Modal from '@/components/messaging/Modal';
 import Sidebar from '@/components/navigation/Sidebar';
@@ -39,7 +39,7 @@ describe('the page outline', () => {
         render(
             <Surface title="Sessions">
                 <PatternSection>
-                    <Card title="Wrapped" />
+                    <PatternCard title="Wrapped" />
                 </PatternSection>
             </Surface>,
         );
@@ -49,11 +49,11 @@ describe('the page outline', () => {
     it('titles a card one level below its section', () => {
         render(
             <Surface title="Sessions">
-                <Card title="On the page" />
+                <PatternCard title="On the page" />
                 <PatternSection title="This week">
-                    <Card title="In a section" subtitle="Two students" />
+                    <PatternCard title="In a section" description="Two students" />
                     <PatternSection title="Monday">
-                        <Card title="In a subsection" />
+                        <PatternCard title="In a subsection" />
                     </PatternSection>
                 </PatternSection>
             </Surface>,
@@ -74,7 +74,7 @@ describe('a dialog', () => {
         render(
             <Modal show title="Edit session" description="Changes apply to the series." onClose={() => {}}>
                 <PatternSection title="When">
-                    <Card title="Monday" />
+                    <PatternCard title="Monday" />
                 </PatternSection>
             </Modal>,
         );

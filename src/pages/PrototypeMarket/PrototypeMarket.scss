@@ -465,4 +465,12 @@ html.market-active #root {
     padding: var(--size-modal-pad-md, 24px);
     color: var(--color-on-surface-variant, #666);
   }
+
+  &__divider {
+    width: 100%;
+    height: var(--size-element-stroke-sm);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-border-bold);
+    opacity: 0.1;
+  }
 }

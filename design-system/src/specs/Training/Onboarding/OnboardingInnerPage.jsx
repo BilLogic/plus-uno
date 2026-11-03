@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { Button, Card } from '@/components';
+import { Button } from '@/components';
+import PatternCard from '@/patterns/PatternCard';
 import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 
 const OnboardingInnerPage = () => {
@@ -34,18 +35,16 @@ const OnboardingInnerPage = () => {
                 </div>
 
                 {/* Reflection */}
-                <Card className="w-100">
-                    <Card.Body>
-                        <h5 className="h6 fw-bold mb-3">Reflection</h5>
-                        <Form.Group className="mb-3">
-                            <Form.Label>What's one specific action you plan to take in your next session based on what you learned in this module?</Form.Label>
-                            <Form.Control as="textarea" rows={3} placeholder="Type your answer here..." />
-                        </Form.Group>
-                        <div className="d-flex justify-content-end">
-                            <Button appearance="primary" text="Submit" />
-                        </div>
-                    </Card.Body>
-                </Card>
+                <PatternCard className="w-100">
+                    <h5 className="h6 fw-bold mb-3">Reflection</h5>
+                    <Form.Group className="mb-3">
+                        <Form.Label>What's one specific action you plan to take in your next session based on what you learned in this module?</Form.Label>
+                        <Form.Control as="textarea" rows={3} placeholder="Type your answer here..." />
+                    </Form.Group>
+                    <div className="d-flex justify-content-end">
+                        <Button appearance="primary" text="Submit" />
+                    </div>
+                </PatternCard>
             </div>
         </DashboardLayout>
     );

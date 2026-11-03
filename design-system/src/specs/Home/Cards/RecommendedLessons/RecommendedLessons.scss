@@ -21,9 +21,7 @@
         max-width: 285px;
     }
 
-    .plus-card-content,
-    .plus-card-body,
-    .plus-card-description {
+    .plus-pattern-card-inner {
         padding: 0 !important;
         margin: 0 !important;
     }
@@ -139,9 +137,8 @@
 
 .plus-recommended-lessons-divider {
     width: 100%;
-
-    .plus-divider-line {
-        background-color: var(--color-outline-variant, #bec8ca);
-        opacity: 0.38;
-    }
+    height: var(--size-element-stroke-sm);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-border);
+    opacity: 0.38;
 }

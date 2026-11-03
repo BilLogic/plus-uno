@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Button, TextField, Checkbox } from '@/components';
+import { Button, TextField, Checkbox } from '@/components';
+import PatternCard from '@/patterns/PatternCard';
 import { Form as BootstrapForm } from 'react-bootstrap';
 
 /**
@@ -17,7 +18,7 @@ const LoginForm = () => {
     };
 
     return (
-        <Card style={{ maxWidth: '400px', margin: '0 auto' }}>
+        <PatternCard style={{ maxWidth: "400px", margin: "0 auto" }}>
             <div className="p-4">
                 <div className="text-center mb-4">
                     <h3 className="h3">Sign In</h3>
@@ -71,7 +72,7 @@ const LoginForm = () => {
                     </div>
                 </BootstrapForm>
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

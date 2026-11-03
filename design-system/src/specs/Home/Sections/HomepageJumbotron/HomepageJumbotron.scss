@@ -64,6 +64,9 @@
 // Divider - respects parent padding
 .plus-homepage-jumbotron-divider {
     width: 100%;
+    height: var(--size-element-stroke-sm);
+    border-radius: var(--size-element-radius-sm);
+    background-color: var(--ds-border);
 }
 
 .plus-homepage-jumbotron-tab-badge {
