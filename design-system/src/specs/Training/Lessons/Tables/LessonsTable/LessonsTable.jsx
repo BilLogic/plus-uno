@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
-import Progress from '@/components/loading/Progress';
+import ProgressBar from '@/components/loading/ProgressBar';
 import SmartTag from '@/components/labels/SmartTag';
 import AiIndicator from '@/specs/Training/Lessons/Elements/AiIndicator/AiIndicator';
 import StatusIndicators from '@/specs/Training/Onboarding/Elements/StatusIndicators/StatusIndicators';
@@ -179,7 +179,7 @@ const LessonsTable = ({
                                 {showProgress && (
                                     <td className="lessons-table__cell">
                                         <div style={{ width: '100px' }}>
-                                            <Progress value={lesson.progress || 0} size="small" />
+                                            <ProgressBar value={lesson.progress || 0} ariaLabel="Lesson progress" />
                                         </div>
                                     </td>
                                 )}

@@ -35,7 +35,7 @@ From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scs
 
 ## Related
 
-Same group: `Progress` · `Skeleton` · `Spinner`
+Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

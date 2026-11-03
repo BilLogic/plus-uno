@@ -9,7 +9,7 @@ import { RecommendedLessons } from '@/specs/Home/Cards';
 import { IconButton } from '@/components';
 import DonutChart from '@/dataviz/part-to-whole/DonutChart/DonutChart';
 import { BarChart } from '@/dataviz';
-import Progress from '@/components/loading/Progress/Progress';
+import ProgressBar from '@/components/loading/ProgressBar/ProgressBar';
 
 import imgGivingEffectivePraise from '../assets/giving-effective-praise.png';
 import imgReactingToErrors from '../assets/reacting-to-errors.png';
@@ -103,14 +103,11 @@ function MonthlyTutoringLoadCard() {
                         </div>
                         <div
                             className="home-redesign-breakdown-progress-wrap"
-                            style={{ ['--color-primary']: segment.color, ['--progress-delay']: `${MONTHLY_REVEAL_DELAY + index * 160}ms` }}
+                            style={{ ['--plus-progressbar-fill-color']: segment.color, ['--progress-delay']: `${MONTHLY_REVEAL_DELAY + index * 160}ms` }}
                         >
-                            <Progress
+                            <ProgressBar
                                 value={(segment.hours / TOTAL_HOURS) * 100}
-                                min={0}
-                                max={100}
-                                size="small"
-                                showLabel={false}
+                                ariaLabel={`${segment.label} hours`}
                                 className="home-redesign-breakdown-progress"
                             />
                         </div>

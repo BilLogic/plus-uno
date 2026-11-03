@@ -75,6 +75,7 @@ Use for padding, margin, and gaps.
 --size-modal-radius-lg
 --size-modal-radius-md
 --size-modal-radius-sm
+--size-progressbar-height
 --size-row-comfortable
 --size-row-compact
 --size-row-default
@@ -92,6 +93,9 @@ Use for padding, margin, and gaps.
 --size-section-radius-lg
 --size-section-radius-md
 --size-section-radius-sm
+--size-spinner-lg
+--size-spinner-md
+--size-spinner-sm
 --size-surface-border
 --size-surface-container-gap-md
 --size-surface-container-pad-x

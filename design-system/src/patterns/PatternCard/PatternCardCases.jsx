@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Progress } from '@/components';
+import { Button, ProgressBar } from '@/components';
 import PatternCard from '@/patterns/PatternCard';
 
 /**
@@ -43,7 +43,10 @@ export const CardJobs = () => (
             {metric}
         </PatternCard>
         <PatternCard title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
-            <Progress value={68} label="68% of goals met" showLabel />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <ProgressBar value={68} ariaLabel="68% of goals met" />
+                <p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
+            </div>
         </PatternCard>
         <PatternCard
             title="Algebra I · Thursday"

@@ -3,11 +3,13 @@
 
 # Spinner
 
+`Spinner` — an animated ring that says a wait is in progress, with no duration to report. `size` is a pixel diameter; `appearance="inherit"` takes the surrounding text color, `"invert"` is for a bold or colored background.
+
 **Import:** `import { Spinner } from '@/components';`
 
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
-**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — StyleVariants, Styles, Sizes, Overview, Interactive
+**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Invert, Interactive
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
@@ -15,27 +17,31 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | enum | `'border'` | Animation variant type |
-| `size` | enum | — | Size variant |
+| `size` | enum | `24` | A pixel diameter |
+| `appearance` | enum | `'inherit'` | inherit takes the surrounding text color; invert is for a bold background |
+| `label` | string | `'Loading'` | Read by assistive tech; never shown. |
 | `className` | string | `''` | — |
-| `role` | string | `'status'` | — |
 
 ## Variants
 
-**`variant`** — `border` · `grow` · `growing` · `rotating` · `stacking` · `default`
+**`size`** — `16` · `24` · `48`
 
-**`size`** — `sm`
+**`appearance`** — `inherit` · `invert`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-on-surface-variant`
+`--ds-icon-inverse` · `--plus-spinner-size`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `GenerativeBorder` · `Progress` · `Skeleton`
+Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `Spinner` is the right call, only what it accepts.

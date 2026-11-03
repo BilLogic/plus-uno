@@ -1,0 +1,27 @@
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as ProgressBarStories from './ProgressBar.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "progress-bar",
+      "name": "Progress Bar",
+      "componentSetNodeId": "49:6872",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={ProgressBarStories} />
+
+<Title />
+
+A determinate bar for a task whose proportion done is known.
+
+<Canvas of={ProgressBarStories.Overview} />
+
+<ArgTypes of={ProgressBarStories} />
