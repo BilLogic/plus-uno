@@ -203,9 +203,8 @@ const LessonsTable = ({
                                                     ['in-progress', 'started'].includes(lesson.status) ? 'Continue' :
                                                         'Start'
                                             }
-                                            style="primary"
-                                            fill="filled"
-                                            size="small"
+                                            appearance="primary"
+                                            spacing="compact"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onLessonContinue?.(lesson);

@@ -115,24 +115,19 @@ const SessionDetailsOneTimeSessionModalBody = () => (
             {/* Tabs using ButtonGroup */}
             <div style={{ display: 'flex', width: '100%' }}>
                 <ButtonGroup
-                    fill="tonal"
                     className="w-100"
                 >
                     <Button
                         text="Session info"
-                        active={true}
-                        style="primary"
-                        fill="tonal"
-                        block
+                        isSelected={true}
+                        shouldFitContainer
                     />
                     <Button
                         text="Attendees"
-                        trailingVisual={
+                        iconAfter={
                             <Badge text="20" style="secondary" size="b3" />
                         }
-                        style="secondary"
-                        fill="tonal"
-                        block
+                        shouldFitContainer
                     />
                 </ButtonGroup>
             </div>
@@ -196,10 +191,10 @@ const SessionDetailsOneTimeSessionModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <UnavailableButton block />
+                <UnavailableButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <AvailableButton block />
+                <AvailableButton shouldFitContainer />
             </div>
         </div>
     </div>

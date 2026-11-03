@@ -267,9 +267,7 @@ export const AllSessionsTableRow = ({
             >
                 <Button
                     text="Details"
-                    size="small"
-                    style="primary"
-                    fill="outline"
+                    spacing="compact"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDetails?.();
@@ -522,9 +520,8 @@ export const Interactive = () => {
                     <Button
                         key={status}
                         text={status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
-                        size="small"
-                        style="primary"
-                        fill={statusFilter === status ? 'filled' : 'outline'}
+                        spacing="compact"
+                        isSelected={statusFilter === status}
                         onClick={() => setStatusFilter(status)}
                     />
                 ))}

@@ -217,7 +217,7 @@ const expectStats = async (canvasElement, inRow) => {
  */
 const expectButtons = async (canvasElement, list) => {
     for (const { el, name } of list) {
-        const primaries = el.querySelectorAll('.plus-btn--primary.plus-btn--filled');
+        const primaries = el.querySelectorAll('.plus-btn--primary');
         await expect(primaries.length, `${name} has at most one primary`).toBeLessThanOrEqual(1);
     }
     const page = content(canvasElement);
@@ -227,7 +227,7 @@ const expectButtons = async (canvasElement, list) => {
         await expect(rect(b).height, `"${b.textContent.trim()}" is a medium button`).toBeCloseTo(height, 0);
     }
     for (const b of page.querySelectorAll('.plus-btn--icon-only')) {
-        await expect(b.classList.contains('plus-btn--small') && b.classList.contains('plus-btn--outline'), 'a pager is small and outlined').toBe(true);
+        await expect(b.classList.contains('plus-btn--compact') && b.classList.contains('plus-btn--default'), 'a pager is compact and default').toBe(true);
         await expect(b.getAttribute('aria-label'), 'a pager has a name').toBeTruthy();
     }
 };

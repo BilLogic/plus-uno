@@ -29,11 +29,11 @@ const LessonsOverviewPage = () => {
                         </Form.Select>
                     </div>
                     <div className="d-flex gap-2 align-items-center">
-                        <Button style="secondary" fill="outline" size="small" text="Expand All" />
+                        <Button spacing="compact" text="Expand All" />
                         <Form.Select size="sm" style={{ width: 'auto' }}>
                             <option>Sort by Name</option>
                         </Form.Select>
-                        <ButtonGroup size="sm">
+                        <ButtonGroup spacing="compact">
                             <ToggleButton
                                 id="list-btn"
                                 type="radio"
@@ -84,7 +84,7 @@ const LessonsOverviewPage = () => {
                                     <td className="py-3 px-4"><Badge bg="light" text="dark" className="border">{lesson.area}</Badge></td>
                                     <td className="py-3 px-4"><Badge bg="warning" text="dark">{lesson.status}</Badge></td>
                                     <td className="py-3 px-4">{lesson.duration}</td>
-                                    <td className="py-3 px-4"><Button style="primary" fill="text" size="small" text="Start" /></td>
+                                    <td className="py-3 px-4"><Button appearance="subtle" spacing="compact" text="Start" /></td>
                                 </tr>
                             ))}
                         </tbody>

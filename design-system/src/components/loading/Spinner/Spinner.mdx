@@ -180,10 +180,10 @@ every variant, deliberately — a spinner is not a status color.
 ```jsx
 // Incorrect — the button resizes as the label is swapped for a spinner, and
 // the row jumps.
-<Button>{saving ? <Spinner size="sm" /> : 'Save'}</Button>
+<Button appearance="primary">{saving ? <Spinner size="sm" /> : 'Save'}</Button>
 
 // Correct — keep the label, put the spinner beside it, and disable.
-<Button disabled={saving}>
+<Button appearance="primary" isDisabled={saving}>
     {saving && <Spinner size="sm" variant="border" />} Save
 </Button>
 ```

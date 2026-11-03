@@ -17,7 +17,7 @@ export default {
  * Success outline button for tutors to confirm availability.
  */
 export const AvailableButton = ({ block = false, ...props }) => (
-    <Button text="Available" style="success" fill="outline" size="medium" block={block} {...props} />
+    <Button text="Available" shouldFitContainer={block} {...props} />
 );
 
 /**
@@ -25,7 +25,7 @@ export const AvailableButton = ({ block = false, ...props }) => (
  * Danger outline button for tutors to mark unavailability.
  */
 export const UnavailableButton = ({ block = false, ...props }) => (
-    <Button text="Unavailable" style="danger" fill="outline" size="medium" block={block} {...props} />
+    <Button text="Unavailable" shouldFitContainer={block} {...props} />
 );
 
 // ─── Stories ─────────────────────────────────────────────────

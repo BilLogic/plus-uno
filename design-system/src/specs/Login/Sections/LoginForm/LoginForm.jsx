@@ -61,7 +61,7 @@ const LoginForm = () => {
                         />
                     </div>
 
-                    <Button btnStyle="primary" btnFill="filled" style={{ width: '100%' }} type="submit">
+                    <Button appearance="primary" shouldFitContainer type="submit">
                         Sign In
                     </Button>
 

@@ -70,24 +70,19 @@ export const SessionInfo_PostSignUp = () => (
                 {/* Tabs using ButtonGroup */}
                 <div style={{ display: 'flex', width: '100%' }}>
                     <ButtonGroup
-                        fill="tonal"
                         className="w-100"
                     >
                         <Button
                             text="Session info"
-                            active={true}
-                            style="primary"
-                            fill="tonal"
-                            block
+                            isSelected={true}
+                            shouldFitContainer
                         />
                         <Button
                             text="Attendees"
-                            trailingVisual={
+                            iconAfter={
                                 <Badge text="20" style="secondary" size="b3" />
                             }
-                            style="secondary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                     </ButtonGroup>
                 </div>
@@ -143,7 +138,7 @@ export const SessionInfo_PostSignUp = () => (
                 {/* Footer Buttons - using CTA Tutor View components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <RequestCallOffButton />
-                    <JoinSessionButton block />
+                    <JoinSessionButton shouldFitContainer />
                 </div>
             </div>
         }
@@ -185,24 +180,19 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                 {/* Tabs */}
                 <div style={{ display: 'flex', width: '100%' }}>
                     <ButtonGroup
-                        fill="tonal"
                         className="w-100"
                     >
                         <Button
                             text="Session info"
-                            style="secondary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                         <Button
                             text="Attendees"
-                            active={true}
-                            trailingVisual={
+                            isSelected={true}
+                            iconAfter={
                                 <Badge text="20" style="secondary" size="b3" />
                             }
-                            style="primary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                     </ButtonGroup>
                 </div>
@@ -301,7 +291,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                 <div className="d-flex justify-content-between align-items-center" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <RequestCallOffButton />
                     <div style={{ flex: 1 }}>
-                        <JoinSessionButton block />
+                        <JoinSessionButton shouldFitContainer />
                     </div>
                 </div>
             </div>
@@ -345,24 +335,19 @@ export const OneTimeSession_PreFillIn = () => (
                 {/* Tabs using ButtonGroup */}
                 <div style={{ display: 'flex', width: '100%' }}>
                     <ButtonGroup
-                        fill="tonal"
                         className="w-100"
                     >
                         <Button
                             text="Session info"
-                            active={true}
-                            style="primary"
-                            fill="tonal"
-                            block
+                            isSelected={true}
+                            shouldFitContainer
                         />
                         <Button
                             text="Attendees"
-                            trailingVisual={
+                            iconAfter={
                                 <Badge text="20" style="secondary" size="b3" />
                             }
-                            style="secondary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                     </ButtonGroup>
                 </div>
@@ -420,7 +405,7 @@ export const OneTimeSession_PreFillIn = () => (
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <CloseButton />
                     <div style={{ flex: 1 }}>
-                        <FillInButton block />
+                        <FillInButton shouldFitContainer />
                     </div>
                 </div>
             </div>
@@ -632,9 +617,8 @@ export const FillIn_ReviewChoices = () => {
                         <div style={{ flex: 1 }}>
                             <Button
                                 text="Confirm & complete fill-in"
-                                style="primary"
-                                fill="filled"
-                                block
+                                appearance="primary"
+                                shouldFitContainer
                             />
                         </div>
                     </div>
@@ -695,7 +679,7 @@ export const Unregister_PostSignUp = () => {
                     <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                         <BackButton />
                         <div style={{ flex: 1 }}>
-                            <SubmitRequestButton disabled={!isChecked} block />
+                            <SubmitRequestButton isDisabled={!isChecked} shouldFitContainer />
                         </div>
                     </div>
                 </div>

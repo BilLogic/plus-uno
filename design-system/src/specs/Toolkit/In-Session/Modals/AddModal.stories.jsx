@@ -116,7 +116,7 @@ export const AddTutor = () => (
 
                 {/* Footer */}
                 <div className="d-flex justify-content-end">
-                    <Button text="Add tutor" style="primary" fill="filled" size="small" onClick={() => {}} />
+                    <Button text="Add tutor" appearance="primary" spacing="compact" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -212,7 +212,7 @@ export const AddStudent = () => (
 
                 {/* Footer */}
                 <div className="d-flex justify-content-end">
-                    <Button text="Add Student" style="primary" fill="filled" size="small" onClick={() => {}} />
+                    <Button text="Add Student" appearance="primary" spacing="compact" onClick={() => {}} />
                 </div>
             </div>
         }

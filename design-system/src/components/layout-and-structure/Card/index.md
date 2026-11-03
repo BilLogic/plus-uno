@@ -26,7 +26,7 @@ Universal card component for creating self-contained containers that display rel
 | `items` | arrayOf or string or node | — | — |
 | `footer` | string | — | — |
 | `links` | arrayOf (required) | — | — |
-| `actionButton` | enum | — | Preferred: maps to Button `leadingVisual` / `trailingVisual` |
+| `actionButton` | enum | — | Maps to Button `iconBefore` / `iconAfter` |
 | `paddingSize` | enum | `'md'` | Card padding size |
 | `gapSize` | enum | `'md'` | Card gap size |
 | `radiusSize` | enum | `'sm'` | Card border radius size |

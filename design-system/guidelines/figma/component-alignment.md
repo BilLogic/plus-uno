@@ -34,21 +34,19 @@ Figma Variables  ←  sync:tokens → design-system/src/tokens/
 
 ## Registry entry shape
 
-Each component (e.g. `Button`) may map to **multiple Figma component sets** when Figma splits variants by `fill`:
+Each component (e.g. `Button`) may map to **multiple Figma component sets** when Figma splits variants by one prop:
 
-| Figma set | Code `fill` | Example node |
-|-----------|-------------|--------------|
-| Filled buttons | `filled` | `33:2470` |
-| Tonal buttons | `tonal` | `979:20977` |
-| Text buttons | `text` | _(pending node-id)_ |
-| Outline buttons | `outline` | _(pending node-id)_ |
+| Figma set | Code prop | Example |
+|-----------|-----------|---------|
+| Button | `appearance`, `spacing` | The Updated section on the Core Button page |
+| Vertical button | `vertical` | Its own page in Core |
 
-One code component (`Button`) + `fill` prop → pick the correct Figma set from registry.
+One code component (`Button`) + `appearance` and `spacing` props → pick the correct Figma set from registry.
 
 ### Required fields per set
 
 - `componentSetNodeId` — parent component set (purple diamond), not a single variant
-- `codeDefaults` — props always applied (e.g. `{ "fill": "tonal" }`)
+- `codeDefaults` — props always applied (e.g. `{ "appearance": "primary" }`)
 - `variantProps` — Figma variant property name → code prop name
 - `variantValueMap` — Figma enum label → code enum value
 
@@ -70,7 +68,7 @@ Only after user opts in and supplies a Figma URL.
 
 1. Extract component usage from prototype (imports from `@/components`, spec group indexes (e.g. `@/specs/Universal/Pages`))
 2. For each usage, lookup registry:
-   - **Hit** → place **component instance** with variant props; apply `codeDefaults` (e.g. `fill`)
+   - **Hit** → place **component instance** with variant props; apply `codeDefaults` (e.g. `appearance`)
    - **Miss** → stop and report; do not draw a substitute shape
 3. Layout/spacing → bind Figma variables, never raw hex/px
 4. Record returned `node-id`s in `prototypes/<name>/<name>-manifest.json`

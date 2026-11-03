@@ -126,19 +126,14 @@ const UnsavedChangesModal = () => {
                 <div style={{ flex: '1 0 0' }}>
                     <Button
                         text="Exit without saving"
-                        style="secondary"
-                        fill="tonal"
-                        size="medium"
-                        block={true}
+                        shouldFitContainer={true}
                     />
                 </div>
                 <div style={{ flex: '1 0 0' }}>
                     <Button
                         text="Save & Exit"
-                        style="primary"
-                        fill="filled"
-                        size="medium"
-                        block={true}
+                        appearance="primary"
+                        shouldFitContainer={true}
                     />
                 </div>
             </div>

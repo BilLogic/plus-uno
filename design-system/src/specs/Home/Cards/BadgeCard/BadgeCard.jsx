@@ -81,9 +81,6 @@ const BadgeCard = ({
                         {buttonText && (
                             <Button
                                 text={buttonText}
-                                style="primary"
-                                fill="tonal"
-                                size="medium"
                                 onClick={onButtonClick}
                             />
                         )}

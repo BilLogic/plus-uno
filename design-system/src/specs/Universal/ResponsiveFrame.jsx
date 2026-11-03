@@ -130,10 +130,8 @@ const ResponsiveFrame = ({ breakpoint = 'native', children }) => {
                         >
                             <Button
                                 text="Fullscreen"
-                                style="secondary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="up-right-from-square"
+                                spacing="compact"
+                                iconBefore="up-right-from-square"
                                 onClick={openInNewTab}
                                 aria-label="Open preview full-window in a new tab"
                             />

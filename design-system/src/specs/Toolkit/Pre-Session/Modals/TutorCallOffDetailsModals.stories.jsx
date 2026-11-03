@@ -53,12 +53,10 @@ export const PreReview_TutorRequest = () => (
 
                 {/* Step 2: Tabs using ButtonGroup with tonal fill */}
                 <ButtonGroup
-                    style="primary"
-                    fill="tonal"
                     className="w-100"
                     buttons={[
-                        { text: 'Tutor request', active: true, style: 'primary' },
-                        { text: 'Supervisor review', style: 'secondary' }
+                        { text: 'Tutor request', isSelected: true },
+                        { text: 'Supervisor review' }
                     ]}
                 />
 
@@ -103,7 +101,7 @@ export const PreReview_TutorRequest = () => (
                 {/* Step 4: Footer Buttons */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <CloseButton block className="flex-grow-1" />
-                    <WithdrawRequestButton block className="flex-grow-1" />
+                    <WithdrawRequestButton shouldFitContainer className="flex-grow-1" />
                 </div>
             </div>
         }
@@ -176,8 +174,8 @@ export const PreReview_WithdrawRequest = () => (
 
                 {/* Footer Buttons */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <CancelButton block className="flex-grow-1" />
-                    <ConfirmWithdrawalButton block className="flex-grow-1" />
+                    <CancelButton shouldFitContainer className="flex-grow-1" />
+                    <ConfirmWithdrawalButton shouldFitContainer className="flex-grow-1" />
                 </div>
             </div>
         }
@@ -239,7 +237,7 @@ export const PreReview_RequestWithdrawn = () => (
 
                 {/* Footer Button */}
                 <div className="d-flex">
-                    <ViewUpdatedScheduleButton block fill="filled" />
+                    <ViewUpdatedScheduleButton shouldFitContainer appearance="primary" />
                 </div>
             </div>
         }
@@ -280,8 +278,6 @@ export const PostReview_SupervisorReview = () => (
 
                 {/* Tabs - Supervisor review is active */}
                 <ButtonGroup
-                    style="primary"
-                    fill="tonal"
                     className="w-100"
                     buttons={[
                         { text: 'Tutor request', style: 'secondary' },
@@ -362,12 +358,10 @@ export const PostReview_TutorRequest = () => (
 
                 {/* Tabs - Tutor request is active */}
                 <ButtonGroup
-                    style="primary"
-                    fill="tonal"
                     className="w-100"
                     buttons={[
-                        { text: 'Tutor request', active: true, style: 'primary' },
-                        { text: 'Supervisor review', style: 'secondary' }
+                        { text: 'Tutor request', isSelected: true },
+                        { text: 'Supervisor review' }
                     ]}
                 />
 

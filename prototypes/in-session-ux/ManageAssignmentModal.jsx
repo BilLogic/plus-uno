@@ -163,8 +163,8 @@ const ManageAssignmentModal = ({ onClose }) => {
                     padding: '16px 24px',
                     borderTop: '1px solid var(--color-outline-variant)'
                 }}>
-                    <Button text="Close" style="secondary" fill="outline" size="medium" onClick={onClose} />
-                    <Button text="Update Assignments" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={onClose} />
+                    <Button text="Update Assignments" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         </div>

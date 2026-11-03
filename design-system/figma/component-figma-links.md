@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-66 docs-page links + 102 style/variant entries across 71 components.
+66 docs-page links + 95 style/variant entries across 71 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -94,13 +94,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Badge | Dismissible Badges | `1056:32356` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356) | verified |
 | Components | Badge | Static Badges | `25:568` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568) | verified |
 | Components | Breadcrumb | Breadcrumb | `27:618` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618) | verified |
-| Components | Button | _Button | `31:548` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=31-548) | verified |
-| Components | Button | _Vertical_Button | `7204:6902` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-6902) | verified |
-| Components | Button | Filled buttons | `33:2470` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=33-2470) | verified |
-| Components | Button | Outlined buttons | `968:18597` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=968-18597) | verified |
-| Components | Button | Text buttons | `979:19814` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-19814) | verified |
-| Components | Button | Tonal buttons | `979:20977` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-20977) | verified |
-| Components | Button | Vertical outlined buttons | `7204:9586` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-9586) | verified |
 | Components | ButtonGroup | Button Group | `34:5212` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212) | verified |
 | Components | Card | Card | `4241:27817` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817) | verified |
 | Components | Card | Overview Card | `12785:189314` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=12785-189314) | verified |

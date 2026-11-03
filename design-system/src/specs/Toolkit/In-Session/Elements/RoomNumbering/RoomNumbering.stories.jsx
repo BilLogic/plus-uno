@@ -126,14 +126,14 @@ export const Interactive = () => {
             {/* Controls */}
             <div className="d-flex flex-wrap" style={{ gap: 'var(--size-element-gap-sm)' }}>
                 {!assigned ? (
-                    <Button text="Run initial assignment" style="primary" fill="filled" size="small" leadingVisual="wand-magic-sparkles" onClick={runAssignment} />
+                    <Button text="Run initial assignment" appearance="primary" spacing="compact" iconBefore="wand-magic-sparkles" onClick={runAssignment} />
                 ) : (
                     <>
-                        <Button text="Move Ethan → Maya" style="primary" fill="outline" size="small" onClick={moveEthan} />
-                        <Button text="Add Zoe → Savannah" style="primary" fill="outline" size="small" disabled={zoeAdded} onClick={addZoe} />
-                        <Button text="Mark Liam absent" style="primary" fill="outline" size="small" onClick={absentLiam} />
-                        <Button text="Overflow Maya (borrow)" style="warning" fill="outline" size="small" onClick={overflowMaya} />
-                        <Button text="Reset" style="secondary" fill="ghost" size="small" onClick={reset} />
+                        <Button text="Move Ethan → Maya" spacing="compact" onClick={moveEthan} />
+                        <Button text="Add Zoe → Savannah" spacing="compact" isDisabled={zoeAdded} onClick={addZoe} />
+                        <Button text="Mark Liam absent" spacing="compact" onClick={absentLiam} />
+                        <Button text="Overflow Maya (borrow)" spacing="compact" onClick={overflowMaya} />
+                        <Button text="Reset" appearance="subtle" spacing="compact" onClick={reset} />
                     </>
                 )}
             </div>

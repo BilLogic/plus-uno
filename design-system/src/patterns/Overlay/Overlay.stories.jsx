@@ -15,8 +15,8 @@ const body = (
 
 const footer = (primary) => (
     <>
-        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
-        <Button text={primary} style="primary" fill="filled" size="small" onClick={() => {}} />
+        <Button text="Cancel" spacing="compact" onClick={() => {}} />
+        <Button text={primary} appearance="primary" spacing="compact" onClick={() => {}} />
     </>
 );
 

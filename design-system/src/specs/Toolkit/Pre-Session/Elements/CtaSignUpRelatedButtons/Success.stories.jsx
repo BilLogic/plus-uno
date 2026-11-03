@@ -14,8 +14,7 @@ export default {
  * Success Button
  * Filled success button for success actions
  * Uses design system Button component with:
- * - style="success" for success color
- * - fill="filled" for filled background
+ * - appearance="primary"
  * - leadingVisual="check" for check icon
  */
 export const Overview = () => (
@@ -31,9 +30,8 @@ export const Overview = () => (
             <div style={{ maxWidth: '200px' }}>
                 <Button
                     text="Copied"
-                    leadingVisual="check"
-                    style="success"
-                    fill="filled"
+                    iconBefore="check"
+                    appearance="primary"
                 />
             </div>
         </section>
@@ -47,9 +45,8 @@ export const Overview = () => (
 export const SuccessButton = ({ text = "Copied", ...props }) => (
     <Button
         text={text}
-        leadingVisual="check"
-        style="success"
-        fill="filled"
+        iconBefore="check"
+        appearance="primary"
         {...props}
     />
 );

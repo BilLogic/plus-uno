@@ -113,9 +113,7 @@ export const SignInTableRow = ({
             >
                 <Button
                     text="Sign Up"
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                     onClick={onSignUp}
                 />
             </div>
@@ -248,9 +246,7 @@ const SignInTableRowSupervisor = ({
             >
                 <Button
                     text="Sign Up"
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                     onClick={onSignUp}
                 />
             </div>

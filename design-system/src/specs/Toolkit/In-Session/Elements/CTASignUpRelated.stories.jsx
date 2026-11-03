@@ -19,16 +19,16 @@ export const CtaSignUpRelated = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Continue</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Continue (# selected)" style="primary" />
-                <Button text="Continue (0 selected)" style="primary" disabled />
+                <Button text="Continue (# selected)" appearance="primary" />
+                <Button text="Continue (0 selected)" appearance="primary" isDisabled />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Confirm & Complete</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Confirm & complete sign-up" style="primary" />
-                <Button text="Confirm & complete sign-up" style="primary" disabled />
+                <Button text="Confirm & complete sign-up" appearance="primary" />
+                <Button text="Confirm & complete sign-up" appearance="primary" isDisabled />
             </div>
         </section>
 
@@ -36,15 +36,15 @@ export const CtaSignUpRelated = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Schedule</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Icon 'eye' for check my schedule */}
-                <Button text="Check my schedule" leadingVisual="eye" style="primary" />
+                <Button text="Check my schedule" iconBefore="eye" appearance="primary" />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Navigation</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Close" style="primary" fill="outline" />
-                <Button text="Back" style="primary" fill="outline" />
+                <Button text="Close" />
+                <Button text="Back" />
             </div>
         </section>
 
@@ -54,12 +54,12 @@ export const CtaSignUpRelated = () => (
                 {/* Dark gray button, closest is probably secondary or needs custom style. 
                     Using 'secondary' for now based on 'secondary' text color in Figma code. 
                     Icon 'copy' for copy message. */}
-                <Button text="Copy recruitment message" leadingVisual="copy" style="secondary" />
-                <Button text="Copy recruitment message" leadingVisual="copy" style="secondary" disabled />
+                <Button text="Copy recruitment message" iconBefore="copy" />
+                <Button text="Copy recruitment message" iconBefore="copy" isDisabled />
             </div>
             <div style={{ marginTop: 'var(--size-card-gap-md)' }}>
                 {/* Success state */}
-                <Button text="Copied" leadingVisual="check" style="success" />
+                <Button text="Copied" iconBefore="check" appearance="primary" />
             </div>
         </section>
     </div>

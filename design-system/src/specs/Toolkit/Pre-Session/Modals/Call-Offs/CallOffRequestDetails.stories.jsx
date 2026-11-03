@@ -246,7 +246,7 @@ export const CallOff_Request_Details = () => (
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <BackButton />
                     <div style={{ flex: 1 }}>
-                        <SubmitRequestButton disabled={true} block />
+                        <SubmitRequestButton isDisabled={true} shouldFitContainer />
                     </div>
                 </div>
             </div>

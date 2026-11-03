@@ -138,22 +138,18 @@ const TutorHomePageSkillsOverview = ({
                             <h4 className="h4">Your Impact</h4>
                             <div className="plus-tutor-home-impact-controls">
                                 <Button
-                                    style="primary"
-                                    fill="outline"
-                                    size="small"
-                                    leadingVisual="arrow-left"
+                                    spacing="compact"
+                                    iconBefore="arrow-left"
                                     onClick={() => setActiveImpactPage(Math.max(1, activeImpactPage - 1))}
-                                    disabled={activeImpactPage === 1}
+                                    isDisabled={activeImpactPage === 1}
                                     title="Previous page"
                                     aria-label="Previous page"
                                 />
                                 <Button
-                                    style="primary"
-                                    fill="outline"
-                                    size="small"
-                                    leadingVisual="arrow-right"
+                                    spacing="compact"
+                                    iconBefore="arrow-right"
                                     onClick={() => setActiveImpactPage(Math.min(3, activeImpactPage + 1))}
-                                    disabled={activeImpactPage === 3}
+                                    isDisabled={activeImpactPage === 3}
                                     title="Next page"
                                     aria-label="Next page"
                                 />
@@ -172,22 +168,18 @@ const TutorHomePageSkillsOverview = ({
                         <h4 className="h4">Personalized Recommendations</h4>
                         <div className="plus-tutor-home-recommendations-controls">
                             <Button
-                                style="primary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-left"
+                                spacing="compact"
+                                iconBefore="arrow-left"
                                 onClick={() => scrollCarousel('left')}
-                                disabled={!canScrollLeft}
+                                isDisabled={!canScrollLeft}
                                 title="Scroll left"
                                 aria-label="Scroll recommendations left"
                             />
                             <Button
-                                style="primary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-right"
+                                spacing="compact"
+                                iconBefore="arrow-right"
                                 onClick={() => scrollCarousel('right')}
-                                disabled={!canScrollRight}
+                                isDisabled={!canScrollRight}
                                 title="Scroll right"
                                 aria-label="Scroll recommendations right"
                             />

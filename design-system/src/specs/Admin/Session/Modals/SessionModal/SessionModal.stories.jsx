@@ -77,8 +77,7 @@ export const Overview = {
                 
                 <Button
                     text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
+                    appearance="primary"
                     onClick={() => setShowModal(!showModal)}
                 />
 
@@ -113,8 +112,7 @@ export const Interactive = {
                 </h6>
                 <Button
                     text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
+                    appearance="primary"
                     onClick={() => setShowModal(!showModal)}
                 />
                 <SessionModal

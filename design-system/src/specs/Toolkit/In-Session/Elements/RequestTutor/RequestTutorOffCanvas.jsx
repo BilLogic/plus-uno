@@ -166,7 +166,7 @@ export const RequestTutorOffCanvas = ({
 
     const Footer = ({ primary }) => (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)', borderTop: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`, paddingTop: 'var(--size-card-pad-y-md, 16px)' }}>
-            <Button text="Exit" style="secondary" fill="ghost" size="medium" onClick={onClose} />
+            <Button text="Exit" appearance="subtle" onClick={onClose} />
             {primary}
         </div>
     );
@@ -218,7 +218,7 @@ export const RequestTutorOffCanvas = ({
                 />
             </>
         );
-        footer = <Footer primary={<Button text="Next" style="primary" fill="filled" size="medium" trailingVisual="arrow-right" onClick={() => setStep('preview')} />} />;
+        footer = <Footer primary={<Button text="Next" appearance="primary" iconAfter="arrow-right" onClick={() => setStep('preview')} />} />;
     } else {
         // preview / sent — same for both roles (tutor starts here)
         title = 'Send message to Slack';
@@ -237,10 +237,8 @@ export const RequestTutorOffCanvas = ({
                 primary={
                     <Button
                         text={sent ? 'Sent to Slack' : 'Send to Slack'}
-                        style={sent ? 'success' : 'primary'}
-                        fill="filled"
-                        size="medium"
-                        leadingVisual={sent ? 'check' : 'paper-plane'}
+                        appearance="primary"
+                        iconBefore={sent ? 'check' : 'paper-plane'}
                         onClick={() => {
                             if (sent) return;
                             setStep('sent');

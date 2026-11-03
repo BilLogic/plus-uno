@@ -131,12 +131,10 @@ const PrototypeCard = ({
         <div className="prototype-card__upvote-wrap">
           <Button
           className="prototype-card__upvote-btn"
-          style="secondary"
-          fill="tonal"
-          active={isUpvoted}
-          size="small"
-          disabled={isNotDeployed}
-          leadingVisual={<i className={`${isUpvoted ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
+          isSelected={isUpvoted}
+          spacing="compact"
+          isDisabled={isNotDeployed}
+          iconBefore={<i className={`${isUpvoted ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
           text={upvoteCount > 0 ? String(upvoteCount) : undefined}
           onClick={(e) => {
             e.stopPropagation();

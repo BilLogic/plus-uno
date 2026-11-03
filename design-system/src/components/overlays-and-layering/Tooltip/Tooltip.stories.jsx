@@ -63,25 +63,25 @@ function TooltipVariantsDemos() {
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TOP</span>
                 <Tooltip text="Tooltip on top" placement="top" show={true}>
-                    <Button text="Top" />
+                    <Button appearance="primary" text="Top" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">BOTTOM</span>
                 <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
-                    <Button text="Bottom" />
+                    <Button appearance="primary" text="Bottom" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LEFT</span>
                 <Tooltip text="Tooltip on left" placement="left" show={true}>
-                    <Button text="Left" />
+                    <Button appearance="primary" text="Left" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">RIGHT</span>
                 <Tooltip text="Tooltip on right" placement="right" show={true}>
-                    <Button text="Right" />
+                    <Button appearance="primary" text="Right" />
                 </Tooltip>
             </div>
         </div>
@@ -94,19 +94,19 @@ function TooltipSizesDemos() {
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">SMALL</span>
                 <Tooltip text="Small tooltip" size="small" placement="top" show={true}>
-                    <Button text="Small" />
+                    <Button appearance="primary" text="Small" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">DEFAULT</span>
                 <Tooltip text="Default tooltip" size="default" placement="top" show={true}>
-                    <Button text="Default" />
+                    <Button appearance="primary" text="Default" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LARGE</span>
                 <Tooltip text="Large tooltip" size="large" placement="top" show={true}>
-                    <Button text="Large" />
+                    <Button appearance="primary" text="Large" />
                 </Tooltip>
             </div>
         </div>
@@ -145,7 +145,7 @@ export const Interactive = {
     render: (args) => (
         <div style={tooltipPlaygroundPadding}>
             <Tooltip {...args}>
-                <Button text="Hover or focus me" />
+                <Button appearance="primary" text="Hover or focus me" />
             </Tooltip>
         </div>
     ),
@@ -161,7 +161,7 @@ export const Overview = {
     render: (args) => (
         <div style={tooltipPlaygroundPadding}>
             <Tooltip {...args}>
-                <Button text="Hover me" />
+                <Button appearance="primary" text="Hover me" />
             </Tooltip>
         </div>
     ),

@@ -93,14 +93,14 @@ export const PairWithLabels = () => (
     <DoDont>
         <Do caption="An icon beside its label. The label says what it does, and a screen reader reads the label.">
             <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
-                <Button text="Reschedule" leadingVisual="calendar-days" style="default" fill="outline" />
-                <Button text="Message" leadingVisual="comment" style="default" fill="outline" />
+                <Button text="Reschedule" iconBefore="calendar-days" />
+                <Button text="Message" iconBefore="comment" />
             </span>
         </Do>
         <Dont caption="Icons alone for actions people use rarely. Each one costs the reader a guess.">
             <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
-                <Button leadingVisual="calendar-days" title="Reschedule" aria-label="Reschedule" style="default" fill="outline" />
-                <Button leadingVisual="comment" title="Message" aria-label="Message" style="default" fill="outline" />
+                <Button iconBefore="calendar-days" title="Reschedule" aria-label="Reschedule" />
+                <Button iconBefore="comment" title="Message" aria-label="Message" />
             </span>
         </Dont>
     </DoDont>

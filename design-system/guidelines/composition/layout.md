@@ -54,7 +54,7 @@ export default function MyPageWithModal() {
 
     return (
         <div>
-            <Button text="Open Modal" style="primary" fill="filled" onClick={() => setShowModal(true)} />
+            <Button text="Open Modal" appearance="primary" onClick={() => setShowModal(true)} />
 
             <Modal
                 show={showModal}

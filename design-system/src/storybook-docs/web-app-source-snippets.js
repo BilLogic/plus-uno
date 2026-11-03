@@ -41,16 +41,12 @@ export const webAppSourceSnippets = {
     button: snippet([
         '<Button',
         '  text="Button"',
-        '  style="primary"',
-        '  fill="filled"',
-        '  size="medium"',
+        '  appearance="primary"',
         '/>'
     ]),
     buttonGroup: snippet([
         '<ButtonGroup',
-        '  size="medium"',
-        '  style="primary"',
-        '  fill="tonal"',
+        '  appearance="default"',
         '  vertical={false}',
         '  buttons={[',
         '    { text: "Left" },',
@@ -114,8 +110,8 @@ export const webAppSourceSnippets = {
         '  title="Plan your next session"',
         '  description="See who is on your roster, review their progress and join the call from one place."',
         '  actions={<>',
-        '    <Button text="Get started" style="primary" fill="filled" />',
-        '    <Button text="Learn more" style="secondary" fill="outline" />',
+        '    <Button text="Get started" appearance="primary" />',
+        '    <Button text="Learn more" />',
         '  </>}',
         '/>'
     ]),
@@ -143,8 +139,8 @@ export const webAppSourceSnippets = {
         '  width="sm"',
         '  height="hug"',
         '  showBottomButtons',
-        '  primaryButton={{ text: "Primary", style: "primary", fill: "filled" }}',
-        '  secondaryButton={{ text: "Secondary", style: "secondary", fill: "tonal" }}',
+        '  primaryButton={{ text: "Primary", appearance: "primary" }}',
+        '  secondaryButton={{ text: "Secondary" }}',
         '  onClose={() => {}}',
         '/>'
     ]),
@@ -174,7 +170,7 @@ export const webAppSourceSnippets = {
     ]),
     popover: snippet([
         '<div className="plus-popover-overview-static">',
-        '  <Button type="button" text="Toggle popover" style="primary" />',
+        '  <Button type="button" text="Toggle popover" appearance="primary" />',
         '  <RBPopover className="plus-popover" placement="right">',
         '    <RBPopover.Header className="plus-popover-title">Popover title</RBPopover.Header>',
         '    <RBPopover.Body className="plus-popover-body">',
@@ -230,7 +226,7 @@ export const webAppSourceSnippets = {
         '  size="default"',
         '  show',
         '>',
-        '  <Button text="Hover me" />',
+        '  <Button appearance="primary" text="Hover me" />',
         '</Tooltip>'
     ]),
     formInput: snippet([

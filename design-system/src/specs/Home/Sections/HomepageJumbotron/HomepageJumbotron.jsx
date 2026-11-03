@@ -102,17 +102,14 @@ const HomepageJumbotron = ({
                         <div className="plus-homepage-jumbotron-actions">
                             <Button
                                 text="Sign up now"
-                                style="primary"
-                                fill="filled"
-                                size="small"
-                                leadingVisual="paper-plane"
+                                appearance="primary"
+                                spacing="compact"
+                                iconBefore="paper-plane"
                                 onClick={onSignUp}
                             />
                             <Button
                                 text="View schedule"
-                                style="secondary"
-                                fill="tonal"
-                                size="small"
+                                spacing="compact"
                                 onClick={onViewSchedule}
                             />
                         </div>
@@ -151,10 +148,9 @@ const HomepageJumbotron = ({
                         <div className="plus-homepage-jumbotron-actions">
                             <Button
                                 text="Submit Your Reflection"
-                                style="primary"
-                                fill="filled"
-                                size="small"
-                                leadingVisual="paper-plane"
+                                appearance="primary"
+                                spacing="compact"
+                                iconBefore="paper-plane"
                                 onClick={onSubmitReflection}
                             />
                         </div>

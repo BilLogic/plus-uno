@@ -331,10 +331,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
                         <Button
                             text="Save and Update"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
-                            disabled={!basicInfoChanged}
+                            appearance="primary"
+                            isDisabled={!basicInfoChanged}
                             onClick={handleBasicInfoSave}
                         />
                     </div>
@@ -481,10 +479,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', width: '100%' }}>
                         <Button
                             text="Save and Update"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
-                            disabled={!bgMatchingChanged}
+                            appearance="primary"
+                            isDisabled={!bgMatchingChanged}
                             onClick={handleBgMatchingSave}
                         />
                     </div>

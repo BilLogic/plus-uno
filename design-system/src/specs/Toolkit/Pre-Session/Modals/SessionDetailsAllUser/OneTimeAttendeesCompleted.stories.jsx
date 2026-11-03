@@ -172,22 +172,18 @@ export const OneTimeAttendeesCompleted = () => (
 
                 {/* Tabs using ButtonGroup */}
                 <div style={{ display: 'flex', width: '100%' }}>
-                    <ButtonGroup fill="tonal" className="w-100">
+                    <ButtonGroup className="w-100">
                         <Button
                             text="Session info"
-                            style="secondary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                         <Button
                             text="Attendees"
-                            active={true}
-                            trailingVisual={
+                            isSelected={true}
+                            iconAfter={
                                 <Badge text="20" style="secondary" size="b3" />
                             }
-                            style="primary"
-                            fill="tonal"
-                            block
+                            shouldFitContainer
                         />
                     </ButtonGroup>
                 </div>
@@ -217,7 +213,7 @@ export const OneTimeAttendeesCompleted = () => (
                 >
                     <RequestCallOffButton />
                     <div style={{ flex: 1 }}>
-                        <JoinSessionButton block />
+                        <JoinSessionButton shouldFitContainer />
                     </div>
         </div>
     </div>

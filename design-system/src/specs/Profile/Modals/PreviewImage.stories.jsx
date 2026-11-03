@@ -322,9 +322,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
             >
                 <Button
                     text="Save"
-                    style="primary"
-                    fill="filled"
-                    size="medium"
+                    appearance="primary"
                 />
             </div>
 

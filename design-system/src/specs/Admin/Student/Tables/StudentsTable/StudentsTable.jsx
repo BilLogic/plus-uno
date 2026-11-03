@@ -158,9 +158,8 @@ const StudentsTable = ({
                             <td className="students-table__cell students-table__cell--action">
                                 <Button
                                     text="View goals"
-                                    style="primary"
-                                    fill="text"
-                                    size="small"
+                                    appearance="subtle"
+                                    spacing="compact"
                                     onClick={(e) => handleViewGoalsClick(student, e)}
                                 />
                             </td>

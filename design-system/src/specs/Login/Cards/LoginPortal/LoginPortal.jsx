@@ -36,12 +36,9 @@ export default function LoginPortal({
                     <Button
                         className="login-portal-demo-role-buttons__btn"
                         text="Admin"
-                        style="primary"
-                        fill="outline"
-                        size="large"
-                        block
+                        shouldFitContainer
                         vertical
-                        leadingVisual={
+                        iconBefore={
                             <i
                                 className="fa-solid fa-user-gear login-portal-demo-role-icon"
                                 aria-hidden="true"
@@ -51,12 +48,9 @@ export default function LoginPortal({
                     <Button
                         className="login-portal-demo-role-buttons__btn"
                         text="Tutor"
-                        style="primary"
-                        fill="outline"
-                        size="large"
-                        block
+                        shouldFitContainer
                         vertical
-                        leadingVisual={
+                        iconBefore={
                             <i
                                 className="fa-solid fa-chalkboard-user login-portal-demo-role-icon"
                                 aria-hidden="true"
@@ -67,17 +61,15 @@ export default function LoginPortal({
                 <div className="login-portal-disabled-button">
                     <Button
                         text="Log in"
-                        style="secondary"
-                        fill="text"
-                        size="medium"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
 
                 <LoginOrDivider text="or" />
 
-                <Button text="Back to log in portal" style="primary" fill="tonal" size="medium" block />
+                <Button text="Back to log in portal" shouldFitContainer />
             </div>
         );
     }
@@ -96,11 +88,9 @@ export default function LoginPortal({
                 <div className="login-portal-disabled-button">
                     <Button
                         text="Continue"
-                        style="default"
-                        fill="text"
-                        size="medium"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
             </div>
@@ -167,11 +157,9 @@ export default function LoginPortal({
                 <div className="login-portal-disabled-button">
                     <Button
                         text="Continue"
-                        style="default"
-                        fill="text"
-                        size="medium"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
             </div>
@@ -251,11 +239,9 @@ export default function LoginPortal({
                 <div className="login-portal-disabled-button">
                     <Button
                         text="Continue"
-                        style="default"
-                        fill="text"
-                        size="medium"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
             </div>
@@ -278,7 +264,7 @@ export default function LoginPortal({
 
             <LoginOrDivider text="or" />
 
-            <Button text="Try a demo" style="primary" fill="tonal" size="medium" block />
+            <Button text="Try a demo" shouldFitContainer />
         </div>
     );
 }

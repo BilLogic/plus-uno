@@ -11,8 +11,8 @@ const DESCRIPTION = 'See who is on your roster, review their progress and join t
 
 const actions = (
     <>
-        <Button text="Get started" style="primary" fill="filled" />
-        <Button text="Learn more" style="secondary" fill="outline" />
+        <Button text="Get started" appearance="primary" />
+        <Button text="Learn more" />
     </>
 );
 
@@ -167,7 +167,7 @@ export const Interactive = {
                 actionPreset === 'none'
                     ? undefined
                     : actionPreset === 'primary'
-                        ? <Button text="Get started" style="primary" fill="filled" />
+                        ? <Button text="Get started" appearance="primary" />
                         : actions
             }
             media={mediaPreset === 'none' ? undefined : placeholderMedia('Image')}

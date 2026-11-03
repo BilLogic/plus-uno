@@ -20,8 +20,8 @@ export const SessionActionsButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Join Session</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Join: Tonal fill, Disabled aspect in design */}
-                <Button text="Join" style="secondary" fill="tonal" />
-                <Button text="Join" style="secondary" fill="tonal" disabled />
+                <Button text="Join" />
+                <Button text="Join" isDisabled />
             </div>
         </section>
 
@@ -29,7 +29,7 @@ export const SessionActionsButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Session Details</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Details: Outline */}
-                <Button text="Details" style="primary" fill="outline" />
+                <Button text="Details" />
             </div>
         </section>
 
@@ -37,8 +37,8 @@ export const SessionActionsButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Sign Up</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Sign Up: Outline */}
-                <Button text="Sign Up" style="primary" fill="outline" />
-                <Button text="Sign Up" style="primary" fill="outline" disabled />
+                <Button text="Sign Up" />
+                <Button text="Sign Up" isDisabled />
             </div>
         </section>
     </div>

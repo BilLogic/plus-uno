@@ -308,10 +308,9 @@ export const ListItemRow = ({
                 {insightAvailable ? (
                     <Button
                         text="View Insights"
-                        style="primary"
-                        fill="ghost"
-                        size="small"
-                        leadingVisual="lightbulb"
+                        appearance="subtle"
+                        spacing="compact"
+                        iconBefore="lightbulb"
                     />
                 ) : (
                     <span

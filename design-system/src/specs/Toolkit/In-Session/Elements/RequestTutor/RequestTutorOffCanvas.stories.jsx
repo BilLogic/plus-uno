@@ -35,7 +35,7 @@ const Stage = ({ children, open, onOpen }) => (
         }}
     >
         <div style={{ padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)' }}>
-            {!open && <Button text="Open request panel" style="primary" fill="filled" size="medium" leadingVisual="user-plus" onClick={onOpen} />}
+            {!open && <Button text="Open request panel" appearance="primary" iconBefore="user-plus" onClick={onOpen} />}
         </div>
         {children}
     </div>

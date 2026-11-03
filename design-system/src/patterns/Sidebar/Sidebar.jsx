@@ -126,10 +126,9 @@ const PatternSidebar = ({
                     elemAfter={tab.status === 'live' ? <Count appearance="dot" style="success" label="Live" /> : undefined}
                     actionsOnHover={(
                         <Button
-                            style="default"
-                            fill="ghost"
-                            size="small"
-                            leadingVisual="xmark"
+                            appearance="subtle"
+                            spacing="compact"
+                            iconBefore="xmark"
                             aria-label={`Close ${tab.title}`}
                             onClick={close}
                         />
@@ -182,9 +181,8 @@ const PatternSidebar = ({
                             <>
                                 {item.actionsOnHover}
                                 <Button
-                                style="default"
-                                fill="ghost"
-                                size="small"
+                                appearance="subtle"
+                                spacing="compact"
                                 text="Close all"
                                 aria-label={`Close all ${item.text} tabs`}
                                 onClick={() => onTabsCloseAll?.(item)}
@@ -194,10 +192,9 @@ const PatternSidebar = ({
                     })}
                     <span className="plus-pattern-sidebar__chevron">
                         <Button
-                            style="default"
-                            fill="ghost"
-                            size="small"
-                            leadingVisual={expanded ? 'chevron-down' : 'chevron-right'}
+                            appearance="subtle"
+                            spacing="compact"
+                            iconBefore={expanded ? 'chevron-down' : 'chevron-right'}
                             aria-label={`${item.text} tabs`}
                             aria-expanded={expanded}
                             aria-controls={listId}

@@ -19,7 +19,7 @@ export const CtaSupervisorViewButtons = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Recruit / Fill In</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Recruit/Fill in" leadingVisual="user" style="primary" />
+                <Button text="Recruit/Fill in" iconBefore="user" appearance="primary" />
                 {/* Note: 'user-plus' might not be in the icon map I saw earlier, checking map... 
                     Step 181 showed: 'plus', 'xmark', 'check', 'arrow-right', 'chevron-right', 'star', 'user', 'trash', 'upload'.
                     'user-plus' is NOT in the list. I will use 'user' for now or request icon addition if strictly needed. 
@@ -35,23 +35,23 @@ export const CtaSupervisorViewButtons = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Submit Review</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Submit review" style="primary" />
-                <Button text="Submit review" style="primary" disabled />
+                <Button text="Submit review" appearance="primary" />
+                <Button text="Submit review" appearance="primary" isDisabled />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Edit Review</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Edit review" style="primary" />
+                <Button text="Edit review" appearance="primary" />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Cancel / Close</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Cancel" style="primary" fill="outline" />
-                <Button text="Close" style="primary" fill="outline" />
+                <Button text="Cancel" />
+                <Button text="Close" />
             </div>
         </section>
     </div>

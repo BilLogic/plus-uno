@@ -32,7 +32,7 @@ const SessionDate = ({ id }) => <Input id={`${id}-date`} label="Session date" de
 export const ThreeKinds = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
         <div style={col('var(--element-stack-md)')}>
-            <span><Button text="Save changes" style="primary" fill="filled" /></span>
+            <span><Button text="Save changes" appearance="primary" /></span>
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Item</span>
             <span style={tag}>A minimum height, and pad-x larger than pad-y: 32 = 20 line + 2 × 6, pad-x 12. Button, Text field, Tag, a menu or table row.</span>
         </div>
@@ -43,8 +43,8 @@ export const ThreeKinds = () => (
         </div>
         <div style={col('var(--element-stack-md)')}>
             <span style={row('var(--element-inline-md)')}>
-                <Button text="Cancel" style="default" fill="outline" />
-                <Button text="Save" style="primary" fill="filled" />
+                <Button text="Cancel" />
+                <Button text="Save" appearance="primary" />
             </span>
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Wrapper</span>
             <span style={tag}>No fill and no pad. It only arranges its children with a gap or a grid. Section, Button group, Tag group, a form row.</span>
@@ -56,11 +56,11 @@ export const ThreeKinds = () => (
 export const ItemHeights = () => (
     <div style={row('var(--surface-stack-md)')}>
         <div style={col('var(--element-stack-md)')}>
-            <span><Button text="Compact" size="small" style="default" fill="outline" /></span>
+            <span><Button text="Compact" spacing="compact" /></span>
             <span style={tag}>24 · pad-y 2, pad-x 8 · table rows and inline toolbars</span>
         </div>
         <div style={col('var(--element-stack-md)')}>
-            <span><Button text="Default" style="default" fill="outline" /></span>
+            <span><Button text="Default" /></span>
             <span style={tag}>32 · pad-y 6, pad-x 12 · buttons, tabs, menu rows, fields</span>
         </div>
         <div style={col('var(--element-stack-md)')}>
@@ -148,7 +148,7 @@ export const Hierarchy = () => (
                 <div style={{ height: 'var(--section-stack-md)' }} />
                 <Input id="hie-do-name" label="Display name" defaultValue="Maya Chen" />
                 <div style={{ height: 'var(--section-stack-lg)' }} />
-                <span><Button text="Save changes" style="primary" fill="filled" /></span>
+                <span><Button text="Save changes" appearance="primary" /></span>
             </div>
         </Do>
         <Dont caption="Everything 8 apart. The heading and the action are lost in the body.">
@@ -156,7 +156,7 @@ export const Hierarchy = () => (
                 <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Profile</span>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Shown to your students.</span>
                 <Input id="hie-dont-name" label="Display name" defaultValue="Maya Chen" />
-                <span><Button text="Save changes" style="primary" fill="filled" /></span>
+                <span><Button text="Save changes" appearance="primary" /></span>
             </div>
         </Dont>
     </DoDont>
@@ -164,8 +164,8 @@ export const Hierarchy = () => (
 
 const Footer = () => (
     <span style={{ ...row('var(--modal-inline-sm)'), justifyContent: 'flex-end' }}>
-        <Button text="Cancel" style="default" fill="outline" />
-        <Button text="Create session" style="primary" fill="filled" />
+        <Button text="Cancel" />
+        <Button text="Create session" appearance="primary" />
     </span>
 );
 

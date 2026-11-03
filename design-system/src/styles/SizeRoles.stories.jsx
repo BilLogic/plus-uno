@@ -29,8 +29,8 @@ export const Roles = () => (
         <div style={col('var(--element-stack-lg)')}>
             <span style={title}>Control</span>
             <div style={row('var(--element-inline-lg)')}>
-                <Labeled text="--item-height-sm 24"><Button text="Edit" size="small" style="default" fill="outline" /></Labeled>
-                <Labeled text="--item-height-md 32"><Button text="Edit" style="default" fill="outline" /></Labeled>
+                <Labeled text="--item-height-sm 24"><Button text="Edit" spacing="compact" /></Labeled>
+                <Labeled text="--item-height-md 32"><Button text="Edit" /></Labeled>
             </div>
         </div>
         <div style={col('var(--element-stack-lg)')}>
@@ -72,13 +72,13 @@ export const ControlHeights = () => (
         <Do caption={<>A form at 32 (<C>--item-height-md</C>): the field and its buttons share one height.</>}>
             <div style={{ ...row('var(--element-inline-md)'), alignItems: 'flex-end' }}>
                 <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><Input id="size-do" label="Student" placeholder="Search students" /></div>
-                <Button text="Add" style="primary" fill="filled" />
+                <Button text="Add" appearance="primary" />
             </div>
         </Do>
         <Dont caption="A compact 24 button beside a 32 field. Compact is for table rows and inline toolbars only.">
             <div style={{ ...row('var(--element-inline-md)'), alignItems: 'flex-end' }}>
                 <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><Input id="size-dont" label="Student" placeholder="Search students" /></div>
-                <Button text="Add" size="small" style="primary" fill="filled" />
+                <Button text="Add" spacing="compact" appearance="primary" />
             </div>
         </Dont>
     </DoDont>

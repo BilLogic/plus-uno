@@ -99,16 +99,11 @@ export default function LoginNotificationsModal({
             <div className="login-modal-notification__actions">
                 <Button
                     text={secondaryLabel}
-                    style="primary"
-                    fill="tonal"
-                    size="medium"
                     onClick={handleSecondary}
                 />
                 <Button
                     text={primaryLabel}
-                    style="primary"
-                    fill="filled"
-                    size="medium"
+                    appearance="primary"
                     onClick={handlePrimary}
                 />
             </div>

@@ -10,11 +10,11 @@ This design system uses **FontAwesome Free** icons via the string shorthand.
 ## How to Use Icons
 
 ### String Shorthand (Recommended)
-Pass the icon name as a string to `leadingVisual` or `trailingVisual`:
+Pass the icon name as a string to `iconBefore` or `iconAfter`:
 
 ```jsx
-<Button text="Add Item" leadingVisual="plus" />
-<Button text="Next" trailingVisual="arrow-right" />
+<Button appearance="primary" text="Add Item" iconBefore="plus" />
+<Button appearance="primary" text="Next" iconAfter="arrow-right" />
 ```
 
 This automatically renders: `<i className="fa-solid fa-{icon-name}"></i>`
@@ -23,7 +23,7 @@ This automatically renders: `<i className="fa-solid fa-{icon-name}"></i>`
 For custom icons or non-FA icons, pass a React node:
 
 ```jsx
-<Button text="Custom" leadingVisual={<MyCustomIcon />} />
+<Button appearance="primary" text="Custom" iconBefore={<MyCustomIcon />} />
 ```
 
 ---

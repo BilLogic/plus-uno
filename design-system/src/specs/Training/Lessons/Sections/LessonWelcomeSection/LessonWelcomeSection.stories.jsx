@@ -39,7 +39,7 @@ export const Overview = {
         title: 'Welcome back, Tutor!',
         description: 'Sign up for your next session to continue your journey.',
         primaryAction: { text: 'Sign up now', leadingVisual: 'square-plus', onClick: () => console.log('Primary action clicked') },
-        secondaryAction: { text: 'View schedule', style: 'secondary', fill: 'filled', onClick: () => console.log('Secondary action clicked') },
+        secondaryAction: { text: 'View schedule', appearance: 'default', onClick: () => console.log('Secondary action clicked') },
     },
     render: (args) => <LessonWelcomeSection {...args} />
 };

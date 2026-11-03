@@ -26,8 +26,8 @@ const OnboardingOverviewPage = () => {
                     <div className="d-flex justify-content-between align-items-center">
                         <h4 className="h5 fw-bold m-0">Featured Modules</h4>
                         <div className="d-flex gap-2">
-                            <Button style="default" fill="outline" size="small" leadingVisual="arrow-left" aria-label="Previous modules" disabled />
-                            <Button style="primary" fill="outline" size="small" leadingVisual="arrow-right" aria-label="Next modules" />
+                            <Button spacing="compact" iconBefore="arrow-left" aria-label="Previous modules" isDisabled />
+                            <Button spacing="compact" iconBefore="arrow-right" aria-label="Next modules" />
                         </div>
                     </div>
                     <div className="d-flex gap-3 overflow-auto pb-2">
@@ -59,7 +59,7 @@ const OnboardingOverviewPage = () => {
                                         <td className="py-3 px-4">{m.title}</td>
                                         <td className="py-3 px-4">{m.duration}</td>
                                         <td className="py-3 px-4"><Badge bg="secondary">{m.stage}</Badge></td>
-                                        <td className="py-3 px-4"><Button style="primary" fill="text" size="small" text="Start" /></td>
+                                        <td className="py-3 px-4"><Button appearance="subtle" spacing="compact" text="Start" /></td>
                                     </tr>
                                 ))}
                             </tbody>

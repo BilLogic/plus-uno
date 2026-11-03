@@ -72,9 +72,7 @@ const ResourceCard = ({
                 )}
                 <Button
                     text={actionButtonText}
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                     onClick={onActionClick}
                 />
             </div>

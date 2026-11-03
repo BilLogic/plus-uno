@@ -13,8 +13,8 @@ const Plain = ({ children }) => <div className="docs-story sb-unstyled" style={{
 
 const actions = (primary) => (
     <>
-        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
-        <Button text={primary} style="primary" fill="filled" size="small" onClick={() => {}} />
+        <Button text="Cancel" spacing="compact" onClick={() => {}} />
+        <Button text={primary} appearance="primary" spacing="compact" onClick={() => {}} />
     </>
 );
 
@@ -117,8 +117,8 @@ export const TabsAsSteps = () => (
         onClose={() => {}}
         footer={(
             <>
-                <Button text="Back" style="secondary" fill="outline" size="small" onClick={() => {}} />
-                <Button text="Next" style="primary" fill="filled" size="small" onClick={() => {}} />
+                <Button text="Back" spacing="compact" onClick={() => {}} />
+                <Button text="Next" appearance="primary" spacing="compact" onClick={() => {}} />
             </>
         )}
         tabs={[
@@ -137,7 +137,7 @@ export const FewLabels = () => (
         title="Tutor profile"
         style={fit}
         onClose={() => {}}
-        footer={<Button text="Close" style="secondary" fill="outline" size="small" onClick={() => {}} />}
+        footer={<Button text="Close" spacing="compact" onClick={() => {}} />}
         tabs={[
             { key: 'overview', label: 'Overview', content: line('24 sessions this term · 96% attendance') },
             { key: 'sessions', label: 'Sessions', content: line('Session list') },
@@ -154,7 +154,7 @@ export const CrowdedLabels = () => (
         title="Tutor profile"
         style={fit}
         onClose={() => {}}
-        footer={<Button text="Close" style="secondary" fill="outline" size="small" onClick={() => {}} />}
+        footer={<Button text="Close" spacing="compact" onClick={() => {}} />}
         tabs={[
             { key: 'overview', label: 'Overview', content: line('24 sessions this term · 96% attendance') },
             { key: 'upcoming', label: 'Upcoming sessions', content: line('Upcoming') },

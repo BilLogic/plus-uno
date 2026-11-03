@@ -98,23 +98,19 @@ const OnboardingOverviewPage = ({
                         </div>
                         <div className="onboarding-overview-page__controls">
                             <Button
-                                style="default"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-left"
+                                spacing="compact"
+                                iconBefore="arrow-left"
                                 aria-label="Scroll to previous modules"
                                 onClick={() => scrollCarousel('left')}
-                                disabled={!canScrollLeft}
+                                isDisabled={!canScrollLeft}
                                 className={!canScrollLeft ? 'onboarding-overview-page__btn-disabled' : ''}
                             />
                             <Button
-                                style="primary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-right"
+                                spacing="compact"
+                                iconBefore="arrow-right"
                                 aria-label="Scroll to next modules"
                                 onClick={() => scrollCarousel('right')}
-                                disabled={!canScrollRight}
+                                isDisabled={!canScrollRight}
                             />
                         </div>
                     </div>

@@ -274,23 +274,16 @@ const StudentModal = ({
                 <div className="student-modal__footer">
                     <Button
                         text="Delete This Student"
-                        style="danger"
-                        fill="text"
-                        size="medium"
+                        appearance="subtle"
                         onClick={handleDelete}
                     />
                     <Button
                         text="Cancel"
-                        style="secondary"
-                        fill="tonal"
-                        size="medium"
                         onClick={onHide}
                     />
                     <Button
                         text="Save"
-                        style="primary"
-                        fill="filled"
-                        size="medium"
+                        appearance="primary"
                         onClick={handleSave}
                     />
                 </div>

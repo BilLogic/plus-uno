@@ -270,22 +270,18 @@ const PrototypeMarket = () => {
         <div className="prototype-market__sorts" aria-label="Sort controls">
           <Button
             text="Time"
-            style="secondary"
-            fill="outline"
-            size="small"
-            active={sortBy === 'time'}
-            trailingVisual={<i className={`fa-solid ${sortBy === 'time' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
+            spacing="compact"
+            isSelected={sortBy === 'time'}
+            iconAfter={<i className={`fa-solid ${sortBy === 'time' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
             onClick={() => handleSortClick('time')}
             aria-pressed={sortBy === 'time'}
             className="prototype-market__sort-btn"
           />
           <Button
             text="Fidelity"
-            style="secondary"
-            fill="outline"
-            size="small"
-            active={sortBy === 'fidelity'}
-            trailingVisual={<i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
+            spacing="compact"
+            isSelected={sortBy === 'fidelity'}
+            iconAfter={<i className={`fa-solid ${sortBy === 'fidelity' && sortDirection === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'}`} />}
             onClick={() => handleSortClick('fidelity')}
             aria-pressed={sortBy === 'fidelity'}
             className="prototype-market__sort-btn"
@@ -311,9 +307,8 @@ const PrototypeMarket = () => {
           {hasFilters && (
             <Button
               text="Clear filter"
-              style="tertiary"
-              fill="ghost"
-              size="small"
+              appearance="subtle"
+              spacing="compact"
               onClick={() => {
                 setSelectedStages([]);
                 setSelectedPillars([]);
@@ -324,21 +319,19 @@ const PrototypeMarket = () => {
           )}
         </div>
         <ButtonGroup
-          size="small"
-          style="secondary"
-          fill="outline"
+          spacing="compact"
           ariaLabel="View mode"
           buttons={[
             {
               id: 'grid-view',
-              leadingVisual: 'grip',
-              active: viewMode === 'grid',
+              iconBefore: 'grip',
+              isSelected: viewMode === 'grid',
               onClick: () => setViewMode('grid'),
             },
             {
               id: 'list-view',
-              leadingVisual: 'list',
-              active: viewMode === 'list',
+              iconBefore: 'list',
+              isSelected: viewMode === 'list',
               onClick: () => setViewMode('list'),
             },
           ]}
@@ -424,10 +417,8 @@ const PrototypeMarket = () => {
           >
             <Button
               className="prototype-market__modal-close"
-              style="secondary"
-              fill="ghost"
-              size="medium"
-              leadingVisual="xmark"
+              appearance="subtle"
+              iconBefore="xmark"
               onClick={() => setActivePrototype(null)}
               aria-label="Close details"
             />
@@ -449,20 +440,16 @@ const PrototypeMarket = () => {
                 {getPrototypeOpenUrl(activePrototype) && (
                   <Button
                     className="prototype-market__modal-open-prototype"
-                    style="primary"
-                    size="medium"
+                    appearance="primary"
                     text="Open prototype"
-                    trailingVisual={<i className="fa-solid fa-arrow-up-right-from-square" />}
+                    iconAfter={<i className="fa-solid fa-arrow-up-right-from-square" />}
                     onClick={(e) => openPrototypeInNewTab(activePrototype, e)}
                   />
                 )}
                 <Button
                   className="prototype-market__modal-upvote"
-                  style="secondary"
-                  fill="tonal"
-                  active={upvotedIds.has(activePrototype.id)}
-                  size="medium"
-                  leadingVisual={<i className={`${upvotedIds.has(activePrototype.id) ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
+                  isSelected={upvotedIds.has(activePrototype.id)}
+                  iconBefore={<i className={`${upvotedIds.has(activePrototype.id) ? 'fa-solid' : 'fa-regular'} fa-thumbs-up`} />}
                   text={getUpvoteButtonLabel(upvoteCounts[activePrototype.id] || 0)}
                   onClick={() => toggleUpvote(activePrototype.id)}
                 />
@@ -536,11 +523,10 @@ const PrototypeMarket = () => {
               />
               <Button
                 className="prototype-market__modal-send"
-                style="primary"
-                size="medium"
-                leadingVisual="paper-plane"
+                appearance="primary"
+                iconBefore="paper-plane"
                 onClick={submitComment}
-                disabled={!pendingComment.trim()}
+                isDisabled={!pendingComment.trim()}
                 aria-label="Send comment"
               />
             </div>

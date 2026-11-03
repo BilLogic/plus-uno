@@ -121,7 +121,7 @@ Alert, not an EmptyState, for a failure.
 <EmptyState
     header="No students yet"
     description="Add a student to start planning sessions."
-    primaryAction={<Button text="Add student" style="primary" fill="filled" />}
+    primaryAction={<Button text="Add student" appearance="primary" />}
 />
 ```
 
@@ -129,10 +129,10 @@ Alert, not an EmptyState, for a failure.
 
 ```jsx
 // Incorrect: two filled buttons compete.
-<EmptyState primaryAction={<Button text="Add" fill="filled" />} secondaryAction={<Button text="Import" fill="filled" />} />
+<EmptyState primaryAction={<Button text="Add" appearance="primary" />} secondaryAction={<Button text="Import" appearance="primary" />} />
 
 // Correct: the second action is outlined.
-<EmptyState primaryAction={<Button text="Add" fill="filled" />} secondaryAction={<Button text="Import" fill="outline" />} />
+<EmptyState primaryAction={<Button text="Add" appearance="primary" />} secondaryAction={<Button text="Import" />} />
 ```
 
 ### Fill a Table with it, not around it.

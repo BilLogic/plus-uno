@@ -17,11 +17,8 @@ export default function LoginAuthButtons() {
         <div className="login-auth-buttons">
             <Button
                 text="Continue with Google"
-                style="primary"
-                fill="outline"
-                size="medium"
-                block
-                leadingVisual={<img src={googleIcon} alt="" className="login-auth-buttons__google-icon" />}
+                shouldFitContainer
+                iconBefore={<img src={googleIcon} alt="" className="login-auth-buttons__google-icon" />}
             />
 
             <button type="button" className="login-auth-buttons__clever" aria-label="Continue with Clever">

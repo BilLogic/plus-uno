@@ -13,7 +13,7 @@ export default {
     render: () => (
         <RevealRows columns="minmax(0, 1fr) 80px" label="Students">
             {STUDENTS.map((s) => (
-                <RevealRow key={s.id} action={<Button text="Open" style="default" fill="tonal" size="small" aria-label={`Open ${s.name}`} />}>
+                <RevealRow key={s.id} action={<Button text="Open" spacing="compact" aria-label={`Open ${s.name}`} />}>
                     <span>{s.name}</span>
                 </RevealRow>
             ))}

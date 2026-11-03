@@ -128,11 +128,11 @@ comes nearer than 8 to the screen's edge.
 ```jsx
 // A click away and Escape both close it — `rootClose` defaults to true for
 // every trigger but `manual`.
-<Popover trigger={<Button text="Details" />} title="Session 12">…</Popover>
+<Popover trigger={<Button appearance="primary" text="Details" />} title="Session 12">…</Popover>
 
 // With `manual` the caller owns `show`, so nothing dismisses it but the caller.
 // Pass rootClose explicitly if you want the outside click to reach onToggle.
-<Popover trigger={<Button text="Pinned" />} triggerType="manual" show={open}
+<Popover trigger={<Button appearance="primary" text="Pinned" />} triggerType="manual" show={open}
          onToggle={setOpen}>…</Popover>
 ```
 
@@ -144,7 +144,7 @@ comes nearer than 8 to the screen's edge.
 <Popover trigger="What is this?">…</Popover>
 
 // Also fine, and what you want when the trigger needs a Button's own styling.
-<Popover trigger={<Button fill="text" text="What is this?" />}>…</Popover>
+<Popover trigger={<Button appearance="subtle" text="What is this?" />}>…</Popover>
 
 // Incorrect — a `div` is not a control. `aria-expanded` is not added to it,
 // because a state on something with no role is invalid ARIA. Pass a control

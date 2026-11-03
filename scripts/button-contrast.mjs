@@ -6,8 +6,8 @@
  * `design-system/src/lib/tokens.mjs` (#506), because this file imports `node:fs`
  * and so could never be imported by a Storybook story — which is why five
  * stories carried their own copy of the same arithmetic. What is left here is
- * what is genuinely about BUTTONS: reading the `$btn-themes` map, building a
- * ground per style × fill, and reporting.
+ * what is genuinely about BUTTONS: reading the `$btn-appearances` map, building a
+ * ground per appearance and state, and reporting.
  *
  * The re-exports #506 left here as a bridge are gone (#507): `text-contrast.mjs`
  * and `focus-ring.mjs` import the maths from the module itself, so there is one
@@ -26,23 +26,17 @@
  * and the thing to check is the generator's OUTPUT — all of it, whether or not a
  * story exists.
  *
- * The second assertion has no accessibility rule behind it at all. `tertiary`
- * and `info` resolve to the same color on every fill, so two names render one
- * appearance and a caller choosing between them is making a distinction the
- * interface does not draw. No tool compares two token values for equality
+ * The second assertion has no accessibility rule behind it at all. Two
+ * appearances that resolve to the same ground and edge render one look, and a
+ * caller choosing between them is making a distinction the interface does not
+ * draw. No tool compares two token values for equality
  * because no tool knows they were meant to differ. The map is where that
  * intention lives, so the map is where it can be checked.
  *
- * HOW A GROUND IS BUILT, per `Button.scss`'s variant generation:
- *
- *   filled                   ground = Main            label = OnMain
- *   tonal                    ground = StateLayer over the page  label = TextSafe
- *   outline / ghost / text   ground = the page        label = TextSafe
- *
- * State layers are 8%-alpha colors, so `tonal` has to be COMPOSITED before it
- * is read. Reading `rgba(159, 130, 5, 0.08)` as if it were solid gives 2.3:1 and
- * a page of failures that are not there — the same arithmetic mistake the
- * fallback audit made and had to correct.
+ * HOW A GROUND IS BUILT, per `Button.scss`'s appearance map: for each
+ * appearance and each of rest, hovered and pressed, the ground is that state's
+ * token composited over the page, and the label is the appearance's label
+ * token. Default and subtle rest on the page itself.
  *
  * Exported piece by piece so the tests can drive each step over hand-built
  * input rather than over the repo, which is what lets them assert the failures
@@ -95,61 +89,79 @@ export function tokenValues(source) {
 }
 
 /**
- * The `$btn-themes` map, as `{ style, main, onMain, state, text }`.
+ * The `$btn-appearances` map, as
+ * `{ appearance, ground, label, icon, hovered, pressed, edge }`.
  *
- * Parsed from the stylesheet rather than duplicated here, so a style added to
- * the map is measured without anyone remembering to add it in two places —
- * which is the failure mode #304 was: thirteen advertised, eight implemented.
+ * Parsed from the stylesheet rather than duplicated here, so an appearance
+ * added to the map is measured without anyone remembering to add it in two
+ * places. `selected` is the selected state drawn on default and subtle; it is
+ * measured like an appearance.
  *
  * @param {string} source
  */
 export function themeMap(source) {
-  const block = /\$btn-themes:\s*\(([\s\S]*?)\n\);/.exec(source);
+  const block = /\$btn-appearances:\s*\(([\s\S]*?)\n\);/.exec(source);
   if (!block) return [];
   const rows = [];
   const pattern = /'([a-z-]+)':\s*\(([^)]*)\)/g;
   let match = pattern.exec(block[1]);
   while (match) {
     const slots = match[2].split(',').map((s) => s.trim().replace(/^'|'$/g, ''));
-    rows.push({ style: match[1], main: slots[0], onMain: slots[1], state: slots[2], text: slots[3] });
+    rows.push({
+      appearance: match[1],
+      ground: slots[0],
+      label: slots[1],
+      icon: slots[2],
+      hovered: slots[3],
+      pressed: slots[4],
+      edge: slots[5],
+    });
     match = pattern.exec(block[1]);
   }
   return rows;
 }
 
+/** The three grounds an appearance draws, in the order they are read. */
+export const STATES = ['rest', 'hovered', 'pressed'];
+
+const GROUND_SLOT = { rest: 'ground', hovered: 'hovered', pressed: 'pressed' };
+
 /**
- * Ground and label for one style × fill, resolved to colors.
+ * Ground and label for one appearance in one state, resolved to colors. A
+ * ground that is transparent, or an alpha step, is composited over the page
+ * before it is read: reading `rgba(0, 0, 0, 0.08)` as if it were solid gives a
+ * page of failures that are not there.
  *
  * @returns {{ground: object, label: object}|{unresolved: string[]}}
  */
-export function combination(theme, fill, values) {
+export function combination(theme, state, values) {
   const page = parseColor(resolveToken(PAGE_TOKEN, values));
-  const need = fill === 'filled' ? [theme.main, theme.onMain] : [theme.state, theme.text];
-  const unresolved = [PAGE_TOKEN, ...need].filter((token) => !parseColor(resolveToken(token, values)));
+  const groundToken = theme[GROUND_SLOT[state]];
+  const resolved = resolveToken(groundToken, values);
+  const ground = resolved === 'transparent' ? page : parseColor(resolved);
+  const label = parseColor(resolveToken(theme.label, values));
+  const unresolved = [];
+  if (!page) unresolved.push(PAGE_TOKEN);
+  if (!ground) unresolved.push(groundToken);
+  if (!label) unresolved.push(theme.label);
   if (unresolved.length) return { unresolved };
-
-  const label = parseColor(resolveToken(fill === 'filled' ? theme.onMain : theme.text, values));
-  if (fill === 'filled') return { ground: parseColor(resolveToken(theme.main, values)), label };
-  if (fill === 'tonal') return { ground: composite(parseColor(resolveToken(theme.state, values)), page), label };
-  return { ground: page, label };
+  return { ground: composite(ground, page), label };
 }
-
-export const FILLS = ['filled', 'tonal', 'outline', 'ghost', 'text'];
 
 /**
  * Every combination the map generates, measured.
  *
- * @returns {{style: string, fill: string, ratio: number|null, unresolved?: string[]}[]}
+ * @returns {{appearance: string, state: string, ratio: number|null, unresolved?: string[]}[]}
  */
 export function sweep(themes, values) {
   const rows = [];
   for (const theme of themes) {
-    for (const fill of FILLS) {
-      const built = combination(theme, fill, values);
+    for (const state of STATES) {
+      const built = combination(theme, state, values);
       if (built.unresolved) {
-        rows.push({ style: theme.style, fill, ratio: null, unresolved: built.unresolved });
+        rows.push({ appearance: theme.appearance, state, ratio: null, unresolved: built.unresolved });
       } else {
-        rows.push({ style: theme.style, fill, ratio: contrast(built.label, built.ground) });
+        rows.push({ appearance: theme.appearance, state, ratio: contrast(built.label, built.ground) });
       }
     }
   }
@@ -157,29 +169,29 @@ export function sweep(themes, values) {
 }
 
 /**
- * Styles whose FILLED ground is identical to another's.
+ * Appearances that draw the same thing at rest: the same ground and the same
+ * edge. The two rows with one ground, default and subtle, are told apart by
+ * the edge only default draws.
  *
- * Filled is the discriminator: it is the only fill that paints the style's own
- * color, so two styles sharing it share their whole appearance.
- *
- * @returns {string[][]} groups of two or more style names
+ * @returns {string[][]} groups of two or more appearance names
  */
 export function duplicateGrounds(themes, values) {
-  const byHex = new Map();
+  const byLook = new Map();
   for (const theme of themes) {
-    const built = combination(theme, 'filled', values);
+    const built = combination(theme, 'rest', values);
     if (built.unresolved) continue;
-    const hex = toHex(built.ground);
-    if (!byHex.has(hex)) byHex.set(hex, []);
-    byHex.get(hex).push(theme.style);
+    const edge = theme.edge === 'transparent' ? 'transparent' : resolveToken(theme.edge, values);
+    const key = `${toHex(built.ground)} ${edge}`;
+    if (!byLook.has(key)) byLook.set(key, []);
+    byLook.get(key).push(theme.appearance);
   }
-  return [...byHex.values()].filter((group) => group.length > 1).map((group) => group.sort());
+  return [...byLook.values()].filter((group) => group.length > 1).map((group) => group.sort());
 }
 
 /**
  * The two sides of the record, measured — in the shape
  * `scripts/baselines/button-contrast-baseline.json` holds them, which is two arrays of
- * keys: `"style/fill"` for contrast and `"a+b"` for a duplicate pair. This is
+ * keys: `"appearance/state"` for contrast and `"a+b"` for a duplicate pair. This is
  * what `scripts/lib/ratchet.mjs` is handed (#600), and it is the whole of what
  * this module says about the record.
  */
@@ -187,7 +199,7 @@ export function measured(themes, values) {
   return {
     contrast: sweep(themes, values)
       .filter((row) => row.ratio !== null && row.ratio < AA_TEXT)
-      .map((row) => `${row.style}/${row.fill}`),
+      .map((row) => `${row.appearance}/${row.state}`),
     duplicates: duplicateGrounds(themes, values).map((group) => group.join('+')),
   };
 }
@@ -219,17 +231,17 @@ export function findings(themes, values, verdicts = {}) {
 
   for (const row of rows) {
     if (row.ratio === null) {
-      found.push(`${row.style}/${row.fill}: cannot resolve ${row.unresolved.join(', ')}`);
+      found.push(`${row.appearance}/${row.state}: cannot resolve ${row.unresolved.join(', ')}`);
       continue;
     }
-    const key = `${row.style}/${row.fill}`;
+    const key = `${row.appearance}/${row.state}`;
     if (unrecordedContrast.has(key)) {
       found.push(`${key}: label is ${row.ratio}:1 against its ground, under ${AA_TEXT}:1`);
     }
   }
 
   for (const key of duplicates.fresh ?? []) {
-    found.push(`${key}: these styles render the same filled ground, so the names are a distinction the interface does not draw`);
+    found.push(`${key}: these appearances draw the same ground and edge, so the names are a distinction the interface does not draw`);
   }
 
   for (const key of contrast.stale ?? []) {

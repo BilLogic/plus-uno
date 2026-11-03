@@ -49,7 +49,7 @@ export const CardJobs = () => (
             title="Algebra I · Thursday"
             description="4:30 to 5:15 PM"
             minWidth="var(--card-min-width-md)"
-            footer={<Button text="View session" style="primary" fill="tonal" size="small" onClick={() => {}} />}
+            footer={<Button text="View session" spacing="compact" onClick={() => {}} />}
         >
             <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
                 Tutor · Ana Ruiz

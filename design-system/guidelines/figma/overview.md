@@ -46,11 +46,11 @@ export const figmaMeta = {
   props: { /* optional code-side enum/boolean props */ },
   sets: [
     {
-      id: "tonal-buttons",
-      name: "Tonal buttons",
-      componentSetNodeId: "979:20977",
-      codeDefaults: { fill: "tonal" },
-      variantProps: { size: "size", style: "style", state: "state" },
+      id: "primary-buttons",
+      name: "Primary buttons",
+      componentSetNodeId: "123:456",
+      codeDefaults: { appearance: "primary" },
+      variantProps: { spacing: "spacing", appearance: "appearance", state: "state" },
       variantValueMap: { /* Figma enum label → code value */ },
       status: "verified"
     }
@@ -94,10 +94,8 @@ npm run check:token-registry
 
 ## Pilot status (Button)
 
-- [x] Tonal buttons component set → `979:20977` → `Button` with `fill="tonal"`
-- [x] Filled buttons → `33:2470` → `Button` with `fill="filled"`
-- [ ] Text buttons — needs component-set `node-id`
-- [ ] Outline buttons — needs component-set `node-id`
+- [x] Button page in Core → `3497:19482` → `Button` with `appearance` and `spacing`
+- [ ] Button component-set `node-id` — read from the Updated section on the Core Button page
 - [ ] Round-trip validated on prototypes page
 
 ## Quick commands

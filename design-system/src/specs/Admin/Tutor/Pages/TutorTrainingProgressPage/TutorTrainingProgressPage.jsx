@@ -226,16 +226,10 @@ const TutorTrainingProgressPage = ({
                     <div className="tutor-training-progress-page__actions">
                         <Button
                             text="Email Tutors"
-                            style="primary"
-                            fill="outline"
-                            size="medium"
                             onClick={onEmailTutors}
                         />
                         <Button
                             text="Export Reflection Data"
-                            style="primary"
-                            fill="outline"
-                            size="medium"
                             onClick={onExportData}
                         />
                     </div>
@@ -247,15 +241,15 @@ const TutorTrainingProgressPage = ({
                         <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
                             Training Progress Overview
                         </h2>
-                        <ButtonGroup size="medium" style="primary" fill="tonal" className="tutor-training-progress-page__toggle">
-                            <Button
+                        <ButtonGroup className="tutor-training-progress-page__toggle">
+                            <Button appearance="primary"
                                 text="By Tutor"
-                                active={currentViewMode === 'By Tutor'}
+                                isSelected={currentViewMode === 'By Tutor'}
                                 onClick={() => handleViewModeChange('By Tutor')}
                             />
-                            <Button
+                            <Button appearance="primary"
                                 text="By Lesson"
-                                active={currentViewMode === 'By Lesson'}
+                                isSelected={currentViewMode === 'By Lesson'}
                                 onClick={() => handleViewModeChange('By Lesson')}
                             />
                         </ButtonGroup>

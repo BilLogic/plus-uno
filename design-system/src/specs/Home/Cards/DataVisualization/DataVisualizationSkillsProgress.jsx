@@ -108,22 +108,18 @@ const DataVisualizationSkillsProgress = ({
                     {title && <h4 className="h4 plus-data-viz-header-title">{title}</h4>}
                     <div className="plus-data-viz-nav-buttons">
                         <Button
-                            style="primary"
-                            fill="outline"
-                            size="small"
-                            leadingVisual="chart-pie"
+                            spacing="compact"
+                            iconBefore="chart-pie"
                             onClick={() => setActiveTab('skills-overview')}
-                            active={activeTab === 'skills-overview'}
+                            isSelected={activeTab === 'skills-overview'}
                             title="Skills Overview"
                             aria-label="Skills Overview"
                         />
                         <Button
-                            style="primary"
-                            fill="outline"
-                            size="small"
-                            leadingVisual="chart-line"
+                            spacing="compact"
+                            iconBefore="chart-line"
                             onClick={() => setActiveTab('skills-progress')}
-                            active={activeTab === 'skills-progress'}
+                            isSelected={activeTab === 'skills-progress'}
                             title="Skills Progress"
                             aria-label="Skills Progress"
                         />

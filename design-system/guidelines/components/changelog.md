@@ -26,7 +26,7 @@ const meta = {
   component: Button,
   parameters: {
     changelog: [
-      { date: '2026-09-04', kind: 'added', summary: 'A `tonal` fill, for secondary actions on tinted surfaces.' },
+      { date: '2026-09-04', kind: 'added', summary: 'An `isSelected` state, for buttons that stand for the current choice.' },
       { date: '2026-09-01', kind: 'fixed', summary: 'The loading spinner no longer collapses the label width.' },
     ],
   },

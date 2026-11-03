@@ -60,16 +60,14 @@ const ConfirmationPopUp = ({
             className="plus-modal--confirmation-popup"
             primaryButton={{
                 text: copy.primary,
-                style: 'primary',
-                fill: 'filled',
-                size: 'small',
+                appearance: 'primary',
+                spacing: 'compact',
                 onClick: onPrimary || onClose,
             }}
             secondaryButton={{
                 text: copy.secondary,
-                style: 'primary',
-                fill: 'tonal',
-                size: 'small',
+                appearance: 'default',
+                spacing: 'compact',
                 onClick: onSecondary || onClose,
             }}
         />

@@ -142,7 +142,8 @@ describe('Jumbotron', () => {
             const secondary = screen.getByRole('button', { name: 'Read the outline' });
             expect(primary.closest('.plus-jumbotron-actions')).not.toBeNull();
             expect(primary.compareDocumentPosition(secondary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-            expect(primary).toHaveClass('plus-btn--medium');
+            expect(primary).toHaveClass('plus-btn--primary');
+            expect(secondary).toHaveClass('plus-btn--default');
             expect(warn).toHaveBeenCalledWith(expect.stringContaining('primaryButton'));
             expect(warn).toHaveBeenCalledWith(expect.stringContaining('secondaryButton'));
         });

@@ -157,16 +157,10 @@ const TutorStatusWarningsPage = ({
                 <div className="tutor-status-warnings-page__actions">
                     <Button
                         text="Email Tutors"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
                         onClick={onEmailTutors}
                     />
                     <Button
                         text="Export Reflection Data"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
                         onClick={onExportData}
                     />
                 </div>
@@ -263,10 +257,8 @@ const TutorStatusWarningsPage = ({
                         </h2>
                         <Button
                             text="Add Tutor"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
-                            leadingVisual="user-plus"
+                            appearance="primary"
+                            iconBefore="user-plus"
                             onClick={onAddTutor}
                         />
                     </div>

@@ -77,7 +77,7 @@ export const Light = {
         await expect(picked.getByRole('img', { name: '4 of 9 steps' })).toBeInTheDocument();
 
         // One primary action on the screen.
-        await waitFor(() => expect(main.querySelectorAll('.plus-btn--primary.plus-btn--filled').length).toBeLessThanOrEqual(1));
+        await waitFor(() => expect(main.querySelectorAll('.plus-btn--primary').length).toBeLessThanOrEqual(1));
     },
 };
 

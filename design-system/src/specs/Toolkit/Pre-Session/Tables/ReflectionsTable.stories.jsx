@@ -132,8 +132,6 @@ export const ReflectionsTableRow = ({
 
     // Determine action button based on status
     const getActionButtonText = () => status === 'completed' ? 'Details' : 'Start';
-    const getActionButtonFill = () => status === 'completed' ? 'outline' : 'outline';
-    const getActionButtonStyle = () => status === 'completed' ? 'secondary' : 'primary';
 
     return (
         <div
@@ -218,9 +216,7 @@ export const ReflectionsTableRow = ({
             >
                 <Button
                     text={getActionButtonText()}
-                    size="small"
-                    style={getActionButtonStyle()}
-                    fill={getActionButtonFill()}
+                    spacing="compact"
                     onClick={(e) => {
                         e.stopPropagation();
                         onAction?.();

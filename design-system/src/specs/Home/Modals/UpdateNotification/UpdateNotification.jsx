@@ -85,18 +85,13 @@ const UpdateNotification = ({
                         <div className="plus-update-notification__actions">
                             <Button
                                 text="Watch tutorial"
-                                leadingVisual="play"
-                                style="secondary"
-                                fill="tonal"
-                                size="medium"
+                                iconBefore="play"
                                 onClick={onWatchTutorial}
                             />
                             <Button
                                 text="Try AI Coach"
-                                leadingVisual="chart-bar"
-                                style="primary"
-                                fill="filled"
-                                size="medium"
+                                iconBefore="chart-bar"
+                                appearance="primary"
                                 onClick={onTryAiCoach}
                             />
                         </div>

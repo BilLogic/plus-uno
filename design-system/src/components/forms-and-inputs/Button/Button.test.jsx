@@ -2,35 +2,91 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Button from './Button';
 
-describe('Button Component', () => {
-    it('renders with text content', () => {
-        render(<Button>Click Me</Button>);
-        expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+describe('Button', () => {
+    it('renders its text as the accessible name', () => {
+        render(<Button text="Save notes" />);
+        expect(screen.getByRole('button', { name: 'Save notes' })).toBeInTheDocument();
     });
 
-    it('renders different styles/variants', () => {
-        const { container } = render(<Button style="primary" fill="outline">Primary Outline</Button>);
-        const btn = container.querySelector('button');
-        expect(btn).toHaveClass('plus-btn--primary');
-        expect(btn).toHaveClass('plus-btn--outline');
+    it('draws the default appearance at default spacing unless told otherwise', () => {
+        render(<Button text="Plain" />);
+        const button = screen.getByRole('button');
+        expect(button).toHaveClass('plus-btn--default');
+        expect(button).not.toHaveClass('plus-btn--compact');
     });
 
-    it('handles onClick events', () => {
-        const handleClick = vi.fn();
-        render(<Button onClick={handleClick}>Click Me</Button>);
+    it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'])(
+        'draws the %s appearance',
+        (appearance) => {
+            render(<Button appearance={appearance} text={appearance} />);
+            expect(screen.getByRole('button')).toHaveClass(`plus-btn--${appearance}`);
+        },
+    );
+
+    it('draws compact spacing', () => {
+        render(<Button spacing="compact" text="Row action" />);
+        expect(screen.getByRole('button')).toHaveClass('plus-btn--compact');
+    });
+
+    it('fills its container when asked', () => {
+        render(<Button shouldFitContainer text="Wide" />);
+        expect(screen.getByRole('button')).toHaveClass('plus-btn--fit-container');
+    });
+
+    it('calls onClick', () => {
+        const onClick = vi.fn();
+        render(<Button text="Go" onClick={onClick} />);
         fireEvent.click(screen.getByRole('button'));
-        expect(handleClick).toHaveBeenCalledTimes(1);
+        expect(onClick).toHaveBeenCalledTimes(1);
     });
 
-    it('disables button when disabled prop is true', () => {
-        render(<Button disabled>Disabled</Button>);
-        expect(screen.getByRole('button')).toBeDisabled();
+    it('disables the button when isDisabled is set', () => {
+        const onClick = vi.fn();
+        render(<Button isDisabled text="Off" onClick={onClick} />);
+        const button = screen.getByRole('button');
+        expect(button).toBeDisabled();
+        fireEvent.click(button);
+        expect(onClick).not.toHaveBeenCalled();
     });
 
-    it('shows loading state', () => {
-        const { container } = render(<Button loading>Loading</Button>);
-        const btn = container.querySelector('button');
-        expect(btn).toHaveClass('plus-btn--loading');
-        expect(btn).toBeDisabled();
+    it('marks the button selected and pressed when isSelected is set', () => {
+        render(<Button isSelected text="Grid" />);
+        const button = screen.getByRole('button');
+        expect(button).toHaveClass('plus-btn--selected');
+        expect(button).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('leaves aria-pressed off a button that is not a toggle', () => {
+        render(<Button text="Save" />);
+        expect(screen.getByRole('button')).not.toHaveAttribute('aria-pressed');
+    });
+
+    it('blocks interaction and announces busy while loading', () => {
+        const onClick = vi.fn();
+        render(<Button isLoading text="Saving" onClick={onClick} />);
+        const button = screen.getByRole('button');
+        expect(button).toHaveClass('plus-btn--loading');
+        expect(button).toBeDisabled();
+        expect(button).toHaveAttribute('aria-busy', 'true');
+        fireEvent.click(button);
+        expect(onClick).not.toHaveBeenCalled();
+    });
+
+    it('draws Font Awesome glyphs before and after the label', () => {
+        const { container } = render(<Button text="Add" iconBefore="plus" iconAfter="chevron-right" />);
+        expect(container.querySelector('.plus-btn-visual--before i')).toHaveClass('fa-solid', 'fa-plus');
+        expect(container.querySelector('.plus-btn-visual--after i')).toHaveClass('fa-solid', 'fa-chevron-right');
+    });
+
+    it('is square when it has an icon and no label', () => {
+        render(<Button iconBefore="trash" aria-label="Delete" />);
+        expect(screen.getByRole('button', { name: 'Delete' })).toHaveClass('plus-btn--icon-only');
+    });
+
+    it('renders an anchor when given an href', () => {
+        const { container } = render(<Button href="/sessions" text="Sessions" />);
+        const anchor = container.querySelector('a');
+        expect(anchor).toHaveAttribute('href', '/sessions');
+        expect(anchor).toHaveTextContent('Sessions');
     });
 });
