@@ -5,56 +5,68 @@
  * Import all design tokens and component styles here.
  */
 
-// Design Tokens
-// Use @use to include :root blocks and CSS rules (modern Sass syntax)
-// Import token files directly to ensure :root blocks are included
-@use "../tokens/colors" as *;
-// Hand-maintained role layer; see the header of _color_roles.scss. Must follow
-// colors, since most of it aliases values defined there.
-@use "../tokens/color_roles" as *;
-@use "../tokens/primitives" as *;
-@use "../tokens/spacing_semantics" as *;
-@use "../tokens/layout" as *;
-// The new scales, beside the old size tokens; see the header of _scales.scss.
-@use "../tokens/scales" as *;
-@use "../tokens/frame_layers" as *;
-@use "../tokens/fonts" as *;
-@use "../tokens/elevation" as *;
-// The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs),
-// beside the old ones until the components move over. Each mode is a selector
-// on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
-// (more, no-preference, auto); no attribute is light at standard contrast. The
-// Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
-// react-bootstrap follows the mode; it overrides Bootstrap's own `:root` block,
-// so every entry imports Bootstrap's compiled CSS before this file. Regenerate,
-// never edit: `npm run generate:color-tokens`.
-@use "../tokens/color/palette" as *;
-@use "../tokens/color/semantic" as *;
-@use "../tokens/color/elevation" as *;
-@use "../tokens/color/bootstrap-bridge" as *;
-// Legacy names the migration map gives one target, pointed at the `--ds-*`
-// token so untouched components follow the palette and the modes. Must follow
-// the legacy token files above, so the alias wins; names that split by CSS
-// property or by element keep their legacy value until the component sweep.
-@use "../tokens/color/legacy-aliases" as *;
-// The card title's type, shared with PatternCard.
+@use "sass:meta";
+// The card title's type, shared with PatternCard. Mixin only — no CSS output,
+// so it needs no layer.
 @use "card-title" as *;
 
-// Shared skeleton/shimmer loading style (Sidebar, prototypes)
-@import "skeleton";
+// CSS cascade layers: declares precedence once, so legacy-alias precedence is
+// explicit and Bootstrap's CSS can later be deleted as a layer. The
+// `bootstrap` layer is populated by `bootstrap-layer.scss`, which every entry
+// point imports before this file. Unlayered rules (inline styles, stray
+// `!important`) still win over every layer, same as before this change.
+@layer bootstrap, tokens, components;
 
-// Components (using load path - load-path is design-system/components, so imports should be relative to that)
-// Use @import to ensure global scope availability for @extend (e.g. Dropdown extends Checkbox)
-// Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
-// Prototypes and any app that imports main.scss get styles only for uncommented components.
-@import "../components/forms-and-inputs/Button/Button";
-@import "../components/navigation/Breadcrumb/Breadcrumb";
+@layer tokens {
+  // Design Tokens
+  // Loaded via meta.load-css (not @use) so each module's :root blocks and CSS
+  // rules land inside this layer; @use cannot be nested inside an at-rule.
+  @include meta.load-css("../tokens/colors");
+  // Hand-maintained role layer; see the header of _color_roles.scss. Must follow
+  // colors, since most of it aliases values defined there.
+  @include meta.load-css("../tokens/color_roles");
+  @include meta.load-css("../tokens/primitives");
+  @include meta.load-css("../tokens/spacing_semantics");
+  @include meta.load-css("../tokens/layout");
+  // The new scales, beside the old size tokens; see the header of _scales.scss.
+  @include meta.load-css("../tokens/scales");
+  @include meta.load-css("../tokens/frame_layers");
+  @include meta.load-css("../tokens/fonts");
+  @include meta.load-css("../tokens/elevation");
+  // The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs),
+  // beside the old ones until the components move over. Each mode is a selector
+  // on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
+  // (more, no-preference, auto); no attribute is light at standard contrast. The
+  // Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
+  // react-bootstrap follows the mode; it overrides Bootstrap's own `:root` block,
+  // so every entry imports Bootstrap's compiled CSS before this file. Regenerate,
+  // never edit: `npm run generate:color-tokens`.
+  @include meta.load-css("../tokens/color/palette");
+  @include meta.load-css("../tokens/color/semantic");
+  @include meta.load-css("../tokens/color/elevation");
+  @include meta.load-css("../tokens/color/bootstrap-bridge");
+  // Legacy names the migration map gives one target, pointed at the `--ds-*`
+  // token so untouched components follow the palette and the modes. Must follow
+  // the legacy token files above, so the alias wins; names that split by CSS
+  // property or by element keep their legacy value until the component sweep.
+  @include meta.load-css("../tokens/color/legacy-aliases");
+}
 
-@import "../components/layout-and-structure/Divider/Divider";
+@layer components {
+  // Shared skeleton/shimmer loading style (Sidebar, prototypes)
+  @include meta.load-css("skeleton");
 
-@import "../components/forms-and-inputs/ButtonGroup/ButtonGroup";
-// @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
-@import "../components/forms-and-inputs/Dropdown/Dropdown";
+  // Components (using load path - load-path is design-system/components, so imports should be relative to that)
+  // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
+  // Prototypes and any app that imports main.scss get styles only for uncommented components.
+  @include meta.load-css("../components/forms-and-inputs/Button/Button");
+  @include meta.load-css("../components/navigation/Breadcrumb/Breadcrumb");
+
+  @include meta.load-css("../components/layout-and-structure/Divider/Divider");
+
+  @include meta.load-css("../components/forms-and-inputs/ButtonGroup/ButtonGroup");
+  // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
+  @include meta.load-css("../components/forms-and-inputs/Dropdown/Dropdown");
 
 // Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
 // Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
@@ -210,33 +222,33 @@
     border-width: var(--size-card-border-lg);
 }
 
-@import "../components/messaging/Modal/Modal";
+@include meta.load-css("../components/messaging/Modal/Modal");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
-@import "../components/_internal/Navbar/Navbar";
+@include meta.load-css("../components/_internal/Navbar/Navbar");
 // @import "../components/Form/Form"; // forms live under src/components/forms-and-inputs/
 // @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
 // @import "../components/Radio/Radio"; // no Radio in components/
-@import "../components/layout-and-structure/ListGroup/ListGroup";
-@import "../components/layout-and-structure/Carousel/Carousel";
-@import "../components/layout-and-structure/Collapse/Collapse";
-@import "../components/layout-and-structure/Jumbotron/Jumbotron";
-@import "../components/layout-and-structure/MediaObject/MediaObject";
-@import "../components/loading/ProgressBar/ProgressBar";
-@import "../components/loading/Spinner/Spinner";
-@import "../components/_internal/LoadingGif/LoadingGif";
-@import "../components/overlays-and-layering/Popover/Popover";
-@import "../components/navigation/Pagination/Pagination";
-@import "../components/overlays-and-layering/Tooltip/Tooltip";
-@import "../components/messaging/Toast/Toast";
-@import "../components/navigation/Scrollspy/Scrollspy";
+@include meta.load-css("../components/layout-and-structure/ListGroup/ListGroup");
+@include meta.load-css("../components/layout-and-structure/Carousel/Carousel");
+@include meta.load-css("../components/layout-and-structure/Collapse/Collapse");
+@include meta.load-css("../components/layout-and-structure/Jumbotron/Jumbotron");
+@include meta.load-css("../components/layout-and-structure/MediaObject/MediaObject");
+@include meta.load-css("../components/loading/ProgressBar/ProgressBar");
+@include meta.load-css("../components/loading/Spinner/Spinner");
+@include meta.load-css("../components/_internal/LoadingGif/LoadingGif");
+@include meta.load-css("../components/overlays-and-layering/Popover/Popover");
+@include meta.load-css("../components/navigation/Pagination/Pagination");
+@include meta.load-css("../components/overlays-and-layering/Tooltip/Tooltip");
+@include meta.load-css("../components/messaging/Toast/Toast");
+@include meta.load-css("../components/navigation/Scrollspy/Scrollspy");
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
-@import "../components/_internal/Table/Table";
-@import "../components/navigation/NavTabs/NavTabs";
-@import "../components/navigation/NavPills/NavPills";
-@import "../components/messaging/Alert/Alert";
-@import "../components/layout-and-structure/Accordion/Accordion";
-@import "../components/_internal/UserAvatar/UserAvatar";
-@import "../assets/Logo/Logo";
+@include meta.load-css("../components/_internal/Table/Table");
+@include meta.load-css("../components/navigation/NavTabs/NavTabs");
+@include meta.load-css("../components/navigation/NavPills/NavPills");
+@include meta.load-css("../components/messaging/Alert/Alert");
+@include meta.load-css("../components/layout-and-structure/Accordion/Accordion");
+@include meta.load-css("../components/_internal/UserAvatar/UserAvatar");
+@include meta.load-css("../assets/Logo/Logo");
 
 // Base Styles
 html,
@@ -465,3 +477,4 @@ time {
         position: absolute;
     }
 }
+} // @layer components

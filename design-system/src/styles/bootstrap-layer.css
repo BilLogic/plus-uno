@@ -1,0 +1,15 @@
+/* CSS cascade layers: declares the `bootstrap, tokens, components` order and
+ * puts Bootstrap's compiled CSS in the lowest-precedence layer, so it always
+ * loses to tokens and component styles and can later be deleted as a layer.
+ * Every entry point imports this file first, before `main.scss`.
+ *
+ * Also registers Tailwind's own layer names (`theme`, `base`, `utilities`)
+ * below ours: Storybook's docs-only Tailwind (storybook-tailwind.css) imports
+ * `tailwindcss/theme.css` and `tailwindcss/utilities.css` into those layers
+ * AFTER this file, in a later stylesheet. CSS layer priority is set by each
+ * name's FIRST mention anywhere in the document, so without this, Tailwind's
+ * layers would register after (and so outrank) `tokens`/`components`, and its
+ * `--color-primary` etc. would beat ours on every `:root`-level token name
+ * Tailwind's theme also happens to define. */
+@layer bootstrap, theme, base, utilities, tokens, components;
+@import "bootstrap/dist/css/bootstrap.min.css" layer(bootstrap);

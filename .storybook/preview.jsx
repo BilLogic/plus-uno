@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+// Cascade layers (bootstrap, tokens, components): Bootstrap's CSS goes first,
+// in the lowest-precedence layer.
+import '../design-system/src/styles/bootstrap-layer.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
 // Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)

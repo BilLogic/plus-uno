@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ThemeProvider } from 'react-bootstrap';
 import { BrowserRouter } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
 import { PageLayoutShellProvider } from '@/specs/Universal/Pages/PageLayout/PageLayoutShellContext';
 import App from './App';

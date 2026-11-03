@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
 import '../prototypes/home-redesign/src/styles/plus-tokens.scss';
 import App from './App';

@@ -41,6 +41,9 @@
         font-size: var(--font-size-body1, 16px);
         font-weight: var(--font-weight-bold, 700);
         line-height: var(--font-line-height-body1, 1.5);
+        // h4's own typography reset otherwise sets a surface-dark text color,
+        // overriding the header's light-on-dark `color` this title should inherit.
+        color: inherit;
     }
 
     &__close {
