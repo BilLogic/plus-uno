@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, CountTag, NavTabs, Select, SmartTag, StatusTag, Tag, Button, IconButton } from '@/components';
+import { SectionMessage, CountTag, NavTabs, Select, SmartTag, StatusTag, Tag, Button, IconButton } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -266,9 +266,9 @@ const TutorHomePageNewLayout = ({
                                 />
                                 <Button text="Join session" appearance="primary" isDisabled={!selectedSession} />
                             </div>
-                            <Alert style="warning" dismissible={false}>
+                            <SectionMessage appearance="warning" dismissible={false}>
                                 Session links will appear 5 minutes before your scheduled start time.
-                            </Alert>
+                            </SectionMessage>
                         </>
                     )}
                     {sessionTab === 'reflection' && (

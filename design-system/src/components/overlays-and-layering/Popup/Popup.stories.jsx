@@ -1,17 +1,16 @@
 import React from 'react';
-import { Popover as RBPopover } from 'react-bootstrap';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Popover from './Popover';
+import Popup from './Popup';
 import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     title: 'Components/Overlays and layering/Popup',
-    component: Popover,
+    component: Popup,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'Popover component for displaying additional information. Built using react-bootstrap OverlayTrigger and Popover.'
+                component: 'A small panel of secondary content anchored to a trigger, built on Base UI.'
             }
         }
     },
@@ -21,18 +20,18 @@ export default {
         style: { table: { disable: true } },
         triggerLabel: {
             control: 'text',
-            description: 'Button label used as the popover trigger',
+            description: 'Button label used as the popup trigger',
             table: { category: 'Content' }
         },
         title: {
             control: 'text',
-            description: 'Popover title',
+            description: 'Popup title',
             table: { category: 'Content' }
         },
         placement: {
             control: 'select',
             options: ['top', 'bottom', 'left', 'right'],
-            description: 'Popover placement',
+            description: 'Popup placement',
             table: { category: 'Layout' }
         },
         triggerType: {
@@ -57,78 +56,78 @@ export default {
 
 const col = { display: 'flex', flexDirection: 'column', gap: '64px', padding: '48px', alignItems: 'center' };
 
-function PopoverLayoutDemos() {
+function PopupLayoutDemos() {
     return (
         <section style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Popover
-                trigger={<Button text="Popover on Top" />}
+            <Popup
+                trigger={<Button text="Popup on Top" />}
                 placement="top"
-                title="Popover Title"
+                title="Popup Title"
             >
                 And here's some amazing content. It's very engaging. Right?
-            </Popover>
-            <Popover
-                trigger={<Button text="Popover on Bottom" />}
+            </Popup>
+            <Popup
+                trigger={<Button text="Popup on Bottom" />}
                 placement="bottom"
-                title="Popover Title"
+                title="Popup Title"
             >
                 And here's some amazing content. It's very engaging. Right?
-            </Popover>
-            <Popover
-                trigger={<Button text="Popover on Left" />}
+            </Popup>
+            <Popup
+                trigger={<Button text="Popup on Left" />}
                 placement="left"
-                title="Popover Title"
+                title="Popup Title"
             >
                 And here's some amazing content. It's very engaging. Right?
-            </Popover>
-            <Popover
-                trigger={<Button text="Popover on Right" />}
+            </Popup>
+            <Popup
+                trigger={<Button text="Popup on Right" />}
                 placement="right"
-                title="Popover Title"
+                title="Popup Title"
             >
                 And here's some amazing content. It's very engaging. Right?
-            </Popover>
+            </Popup>
         </section>
     );
 }
 
-function PopoverContentDemo() {
+function PopupContentDemo() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">NO TITLE</span>
-            <Popover
+            <Popup
                 trigger={<Button text="Content Only" appearance="primary" />}
                 placement="right"
             >
-                This popover has no title, only body content.
-            </Popover>
+                This popup has no title, only body content.
+            </Popup>
         </section>
     );
 }
 
-function PopoverInteractionStatesDemos() {
+function PopupInteractionStatesDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TRIGGER TYPES</span>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-                <Popover
+                <Popup
                     trigger={<Button text="Click (Default)" appearance="primary" />}
                     triggerType="click"
                 >
                     Clicked to toggle.
-                </Popover>
-                <Popover
+                </Popup>
+                <Popup
                     trigger={<Button text="Hover" appearance="primary" />}
                     triggerType="hover"
                 >
                     Hovered to show.
-                </Popover>
-                <Popover
+                </Popup>
+                <Popup
                     trigger={<Button text="Focus" appearance="primary" />}
                     triggerType="focus"
                 >
                     Focus to show (tab to this button).
-                </Popover>
+                </Popup>
             </div>
         </section>
     );
@@ -136,54 +135,54 @@ function PopoverInteractionStatesDemos() {
 
 export const Layout = () => (
     <div style={col}>
-        <PopoverLayoutDemos />
+        <PopupLayoutDemos />
     </div>
 );
 
 export const Content = () => (
     <div style={col}>
-        <PopoverContentDemo />
+        <PopupContentDemo />
     </div>
 );
 
 export const InteractionStates = () => (
     <div style={col}>
-        <PopoverInteractionStatesDemos />
+        <PopupInteractionStatesDemos />
     </div>
 );
 
 export const Overview = () => (
-    <div className="plus-popover-overview-static">
-        <Button type="button" text="Toggle popover" appearance="primary" />
-        <RBPopover className="plus-popover" placement="right">
-            <RBPopover.Header className="plus-popover-title">Popover title</RBPopover.Header>
-            <RBPopover.Body className="plus-popover-body">
+    <div className="plus-popup-overview-static">
+        <Button type="button" text="Toggle popup" appearance="primary" />
+        <div className="plus-popup">
+            <div className="plus-popup-title">Popup title</div>
+            <div className="plus-popup-body">
                 Body content appears below the title. This overview is non-interactive; use Interactive for
                 click/hover behavior.
-            </RBPopover.Body>
-        </RBPopover>
+            </div>
+        </div>
     </div>
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'jsx', code: webAppSourceSnippets.popover }
+        source: { language: 'jsx', code: webAppSourceSnippets.popup }
     }
 };
 
 export const Interactive = {
     args: {
         triggerLabel: 'Interactive Trigger',
-        title: 'Interactive Popover',
+        title: 'Interactive Popup',
         children: 'Change my placement or title in the controls.',
         placement: 'top',
         triggerType: 'click'
     },
     render: (args) => {
-        const { triggerLabel, ...popoverProps } = args;
+        const { triggerLabel, ...popupProps } = args;
         return (
             <div style={{ padding: '48px', display: 'flex', justifyContent: 'center' }}>
-                <Popover
-                    {...popoverProps}
+                <Popup
+                    {...popupProps}
                     trigger={<Button text={triggerLabel} appearance="primary" />}
                 />
             </div>

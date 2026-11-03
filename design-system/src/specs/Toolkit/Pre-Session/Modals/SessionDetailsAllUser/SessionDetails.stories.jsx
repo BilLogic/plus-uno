@@ -4,7 +4,7 @@ import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import CountTag from '@/components/labels/CountTag';
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 // Import the reusable SessionInfoCard component
@@ -418,7 +418,7 @@ export const OneTimeSession_PreFillIn = () => (
  * Fill-In Review Choices Modal
  * Shows a confirmation modal for reviewing fill-in session selections
  * Uses:
- * - Alert component (warning style, non-dismissible)
+ * - SectionMessage component (warning style, non-dismissible)
  * - Fill-In Schedule table structure (simplified, no checkboxes)
  * - Badge component for "No lead" indicators
  */
@@ -584,11 +584,11 @@ export const FillIn_ReviewChoices = () => {
                         />
                     </div>
 
-                    {/* Warning Alert + Fill-In Schedule Table */}
+                    {/* Warning message + Fill-In Schedule Table */}
                     <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                        <Alert style="warning" dismissible={false}>
+                        <SectionMessage appearance="warning" dismissible={false}>
                             You are filling in for <strong>{fillInSessions.length} sessions</strong>. The following sessions will be added to your schedule.
-                        </Alert>
+                        </SectionMessage>
 
                         {/* Fill-In Schedule Table */}
                         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>

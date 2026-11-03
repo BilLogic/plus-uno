@@ -1,8 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as AlertStories from './Alert.stories.jsx';
-import * as AlertSubStories from './Alert.Subcomponents.stories.jsx';
+import * as SectionMessageStories from './SectionMessage.stories.jsx';
+import * as SectionMessageSubStories from './SectionMessage.Subcomponents.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
@@ -19,18 +19,18 @@ export const figmaMeta = {
   ]
 };
 
-<Meta of={AlertStories} />
+<Meta of={SectionMessageStories} />
 
 <Title />
-Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages.
+Provide contextual feedback messages for typical user actions with the handful of available and flexible section messages.
 
-<DocsTabs of={AlertStories}>
+<DocsTabs of={SectionMessageStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Alert"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/SectionMessage"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -42,7 +42,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 ## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Title optional, dismissible toggle, and rich body content.</>}>
-    <Canvas of={AlertStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={SectionMessageStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -51,8 +51,8 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ## Content
 
-<DocsCanvasShell description={<>Title optional, body-only, non-dismissible, and rich HTML body patterns.</>}>
-    <DsCanvasQuiet of={AlertStories.Content} />
+<DocsCanvasShell description={<>Title optional, body-only, non-dismissible, rich HTML body and action patterns.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Content} />
 </DocsCanvasShell>
 
 </div>
@@ -62,11 +62,11 @@ Provide contextual feedback messages for typical user actions with the handful o
 ## Appearance
 
 <DocsCanvasShell description={<>The six styles, each with its default leading icon, a title and the ×.</>}>
-    <DsCanvasQuiet of={AlertStories.Styles} />
+    <DsCanvasQuiet of={SectionMessageStories.Styles} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Each style's 3px left border in its Border color on its Container 08 ground, with on-surface title, body and link, on the darkest surface step.</>}>
-    <DsCanvasQuiet of={AlertStories.BorderAndText} />
+<DocsCanvasShell description={<>Each style's named background ground with on-surface title, body and link, on the darkest surface step.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.GroundAndText} />
 </DocsCanvasShell>
 
 </div>
@@ -76,7 +76,17 @@ Provide contextual feedback messages for typical user actions with the handful o
 ## Leading icon
 
 <DocsCanvasShell description={<>Each style's default icon on the first line of text, replaced by name or node, and removed with <code>leadingVisual={'{false}'}</code>.</>}>
-    <DsCanvasQuiet of={AlertStories.LeadingIcon} />
+    <DsCanvasQuiet of={SectionMessageStories.LeadingIcon} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Actions
+
+<DocsCanvasShell description={<>Up to two link-button actions after the body, with a divider between them.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Actions} />
 </DocsCanvasShell>
 
 </div>
@@ -85,12 +95,12 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ## Anatomy
 
-<DocsCanvasShell description={<>Internal title and message layout inside the alert shell.</>}>
-    <DsCanvasQuiet of={AlertSubStories.ContentStructure} />
+<DocsCanvasShell description={<>Internal title and message layout inside the shell.</>}>
+    <DsCanvasQuiet of={SectionMessageSubStories.ContentStructure} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code>, centered on the first line of text.</>}>
-    <DsCanvasQuiet of={AlertSubStories.DismissButton} />
+    <DsCanvasQuiet of={SectionMessageSubStories.DismissButton} />
 </DocsCanvasShell>
 
 </div>
@@ -100,7 +110,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 ## Interactive playground
 
 <DocsInteractivePlayground
-    of={AlertStories.Interactive}
+    of={SectionMessageStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}
@@ -123,23 +133,23 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ## When to use
 
-Use `Alert` for a message that belongs to the page and stays there until it is
-resolved or dismissed — a banner explaining why a session cannot be booked, a
-notice that a report is out of date, a confirmation that survives a scroll. It
-takes children, so the message can carry a link or emphasis.
+Use `SectionMessage` for a message that belongs to the page and stays there
+until it is resolved or dismissed — a banner explaining why a session cannot
+be booked, a notice that a report is out of date, a confirmation that
+survives a scroll. It takes children, so the message can carry a link or
+emphasis, and up to two `actions` after the body.
 
 Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
 list is shorter than `Button`'s — there is no `tertiary`, no `light` or `dark`,
-and there are no SMART domain colors, because an alert is always saying
-something about state.
+and there are no SMART domain colors, because a section message is always
+saying something about state.
 
-Each style sets the ground, its role's named background token
-(`--ds-background-success` for success, and so on), a 3px border on the left edge only
-(`--size-element-stroke-xl`) in the style's Border color, and a default leading
-icon, drawn in the style's Icon color on the
-first line of text. The title, the body and any link in it are
-`--color-on-surface` in every style: the style is carried by the border, the
-icon and the ground, not by the text. Every style has 4px corners.
+Each style sets the ground to its role's named background token
+(`--ds-background-success` for success, and so on) and a default leading
+icon, drawn in the style's Icon color on the first line of text. There is no
+border or side stripe — the style is carried by the fill and the icon, not an
+edge. The title, the body and any link in it are `--color-on-surface` in
+every style. Every style has 4px corners.
 
 | Style | Default icon |
 |---|---|
@@ -161,7 +171,7 @@ icon and the ground, not by the text. Every style has 4px corners.
 ```jsx
 // Incorrect — the error is a hundred pixels away from the input it is about,
 // and nothing connects the two.
-<Alert style="danger">Email address is not valid.</Alert>
+<SectionMessage appearance="danger">Email address is not valid.</SectionMessage>
 <TextField id="email" label="Email" value={email} onChange={onEmail} />
 
 // Correct — the field owns its own error state and message.
@@ -181,25 +191,25 @@ icon and the ground, not by the text. Every style has 4px corners.
 ```jsx
 // Incorrect — this renders a close button the author never asked for, and the
 // message the page depends on can be dismissed away.
-<Alert style="warning">This term's schedule is provisional.</Alert>
+<SectionMessage appearance="warning">This term's schedule is provisional.</SectionMessage>
 
 // Correct — say so explicitly when the message must stay.
-<Alert style="warning" dismissible={false}>This term's schedule is provisional.</Alert>
+<SectionMessage appearance="warning" dismissible={false}>This term's schedule is provisional.</SectionMessage>
 ```
 
 ### Replace the icon through `leadingVisual`, not the children.
 
 ```jsx
-// Incorrect — the style's default icon still renders, so this alert has two,
+// Incorrect — the style's default icon still renders, so this message has two,
 // and the one in the children sits in the text instead of on the first line.
-<Alert style="success"><i className="fa-solid fa-trophy" /> Goal reached.</Alert>
+<SectionMessage appearance="success"><i className="fa-solid fa-trophy" /> Goal reached.</SectionMessage>
 
 // Correct — a Font Awesome solid name (or a node) replaces the default.
-<Alert style="success" leadingVisual="trophy">Goal reached.</Alert>
+<SectionMessage appearance="success" leadingVisual="trophy">Goal reached.</SectionMessage>
 
 // Correct — `false` removes it, for a short one-line message such as the
-// sign-in alerts on the Login page.
-<Alert style="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</Alert>
+// sign-in messages on the Login page.
+<SectionMessage appearance="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage>
 ```
 
 ### Dismissal is one-way.
@@ -207,11 +217,11 @@ icon and the ground, not by the text. Every style has 4px corners.
 ```jsx
 // Incorrect — `show` is not a declared prop, and the component checks its own
 // dismissed state and returns null before any passed-through prop is read.
-// Once the user closes this alert, nothing you own brings it back.
-<Alert style="info" show={hasNews}>Three new sessions this week.</Alert>
+// Once the user closes this message, nothing you own brings it back.
+<SectionMessage appearance="info" show={hasNews}>Three new sessions this week.</SectionMessage>
 
 // Correct — remount it with a key when the message genuinely changes.
-{hasNews && <Alert key={newsId} style="info">Three new sessions this week.</Alert>}
+{hasNews && <SectionMessage key={newsId} appearance="info">Three new sessions this week.</SectionMessage>}
 ```
 
 </div>
@@ -220,33 +230,27 @@ icon and the ground, not by the text. Every style has 4px corners.
 
 ## Accessibility
 
-- **It announces assertively.** The underlying alert renders `role="alert"`,
+- **It announces assertively.** The underlying message renders `role="alert"`,
   which implies `aria-live="assertive"` — a screen reader interrupts to read it.
   That is right for something that just went wrong and wrong for ambient
   information; for the latter, prefer plain text on the page.
-- **An alert rendered on mount may not be announced at all.** Live regions
-  announce *changes*. If the alert is present in the first paint, treat it as
+- **A message rendered on mount may not be announced at all.** Live regions
+  announce *changes*. If the message is present in the first paint, treat it as
   ordinary content and make sure the surrounding page still reads correctly.
-- **`title` is not a heading element.** It renders through the underlying alert
-  heading, which is a `div` carrying an `h4` class. Do not rely on it for
-  document structure.
-- **The dismiss button is labeled `Close alert`**, hard-coded. It is the
+- **`title` renders as a real heading**, at `headingLevel` (default `h2`). It
+  joins the page's outline, so pick the level that fits where it sits.
+- **The dismiss button is labeled `Close message`**, hard-coded. It is the
   shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`, centered
   on the title line when there is a title and on the first body line otherwise.
 - **The leading icon is decorative.** It is `aria-hidden`, whether it is the
-  default or one you pass: the alert's role and its text already say what it
+  default or one you pass: the message's role and its text already say what it
   is. The icon differs in shape per style, so danger and warning do not rely
   on color alone to look different, but a screen reader hears neither the
   icon nor the style.
-- **The border holds 3:1.** Each style's Border role clears the 3:1 that
-  WCAG 1.4.11 asks of a non-text edge, on every surface step up to
-  `--color-surface-container-highest`. Warning uses its own darker Border
-  (`#715c00`), because the warning base does not.
 - **Links keep the text color.** A link in the body inherits on-surface and
-  stays underlined, so it is told from the text by its underline, not by
-  Bootstrap's link blue.
+  stays underlined, so it is told from the text by its underline alone.
 - **So say it in the children.** There is no text prefix, so
-  `style="danger"` on its own does not say "error" to a screen reader.
+  `appearance="danger"` on its own does not say "error" to a screen reader.
 
 </div>
 

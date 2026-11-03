@@ -71,12 +71,12 @@ export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/l
 export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/components/loading/Spinner';
 
-export { default as Alert, ALERT_ICONS, ALERT_STYLES } from '@/components/messaging/Alert';
 export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/components/messaging/Banner';
 export { default as EmptyState, EMPTY_STATE_SIZES } from '@/components/messaging/EmptyState';
 export { default as Flag, FLAG_AUTO_CLOSE_MS, FlagContainer } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, createModal } from '@/components/messaging/Modal';
+export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
@@ -88,7 +88,7 @@ export { default as Scrollspy, ScrollspyContent } from '@/components/navigation/
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
-export { default as Popover, acceptsExpandedState } from '@/components/overlays-and-layering/Popover';
+export { default as Popup, acceptsExpandedState } from '@/components/overlays-and-layering/Popup';
 export { default as Tooltip } from '@/components/overlays-and-layering/Tooltip';
 
 export { default as ProgressIndicator, PROGRESS_INDICATOR_APPEARANCES, PROGRESS_INDICATOR_SIZES, PROGRESS_INDICATOR_SPACINGS } from '@/components/status-indicators/ProgressIndicator';

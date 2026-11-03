@@ -3,7 +3,7 @@
 
 # Breadcrumb
 
-Universal element component for navigation breadcrumbs. Uses React Bootstrap Breadcrumb as base. / /* `items` defaults to `[]` even though its prop type is `isRequired`. A required prop is a lint, not a guarantee: React renders anyway, and `items.map` on `undefined` took the whole page down rather than the one breadcrumb. Found by `DocumentedContract.stories.jsx`, and only once this component's page gained a Usage tab: the guard renders each DOCUMENTED prop against fabricated required props, and it cannot fabricate an `arrayOf(shape)`. So documenting `separator` is what first rendered a Breadcrumb with no items, and the crash had been reachable by any caller all along.
+Universal element component for navigation breadcrumbs. / /* `items` defaults to `[]` even though its prop type is `isRequired`. A required prop is a lint, not a guarantee: React renders anyway, and `items.map` on `undefined` took the whole page down rather than the one breadcrumb. Found by `DocumentedContract.stories.jsx`, and only once this component's page gained a Usage tab: the guard renders each DOCUMENTED prop against fabricated required props, and it cannot fabricate an `arrayOf(shape)`. So documenting `separator` is what first rendered a Breadcrumb with no items, and the crash had been reachable by any caller all along.
 
 **Import:** `import { Breadcrumb } from '@/components';`
 
@@ -20,12 +20,13 @@ Universal element component for navigation breadcrumbs. Uses React Bootstrap Bre
 | `items` | arrayOf (required) | `[]` | — |
 | `id` | string | — | — |
 | `separator` | node | `'/'` | — |
+| `label` | string | `'breadcrumb'` | Accessible label for the nav region that wraps the breadcrumbs. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
 ## Tokens touched
 
-`--body-default` · `--bs-breadcrumb-divider` · `--color-on-surface-variant` · `--color-primary-text` · `--item-height-md` · `--size-element-gap-sm`
+`--body-default` · `--color-on-surface-variant` · `--color-primary-text` · `--item-height-md` · `--plus-breadcrumb-divider` · `--size-element-gap-sm`
 
 From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Override these through the token layer, never with a literal.
 

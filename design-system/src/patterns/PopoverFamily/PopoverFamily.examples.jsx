@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Dropdown, TextField, Popover } from '@/components';
+import { Button, Dropdown, TextField, Popup } from '@/components';
 
 /**
  * Live compositions for the Popover family page's do and don't pairs. The
- * Popup is the real Popover component held open, and the Menu is a real
+ * Popup is the real Popup component held open, and the Menu is a real
  * Dropdown held open. The heights and flex layouts below are stage geometry:
  * they reserve room for a layer that floats outside the flow.
  */
@@ -21,7 +21,7 @@ const HeldPopup = ({ title, children }) => {
     React.useEffect(() => { setOpen(true); }, []);
     return (
         <div style={{ minHeight: 300 }}>
-            <Popover
+            <Popup
                 triggerType="manual"
                 show={open}
                 placement="bottom-start"
@@ -29,7 +29,7 @@ const HeldPopup = ({ title, children }) => {
                 trigger={<span style={{ display: 'inline-flex' }}><Button text="Open popup" spacing="compact" /></span>}
             >
                 {children}
-            </Popover>
+            </Popup>
         </div>
     );
 };

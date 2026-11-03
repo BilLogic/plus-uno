@@ -1,5 +1,5 @@
 import React from 'react';
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -19,13 +19,13 @@ export default {
  * 1. One-time session — "Please re-confirm your availability for this session."
  * 2. Recurring session — "Please re-confirm your availability for this recurring session."
  *
- * Uses the Alert component with `warning` style and no title.
+ * Uses the SectionMessage component with `warning` style and no title.
  *
  * Tokens:
- * - Alert style: warning
- * - Typography: body1-txt (light weight) via Alert component
- * - Color: --color-on-surface (text), warning border/background via Alert
- * - Spacing: card pad via Alert component internals
+ * - SectionMessage style: warning
+ * - Typography: body1-txt (light weight) via SectionMessage component
+ * - Color: --color-on-surface (text), warning background via SectionMessage
+ * - Spacing: card pad via SectionMessage component internals
  */
 export const Overview = () => (
     <div
@@ -38,40 +38,40 @@ export const Overview = () => (
     >
         <section>
             <h6 className="h6 mb-3">One-Time Session</h6>
-            <Alert style="warning" dismissible={false}>
+            <SectionMessage appearance="warning" dismissible={false}>
                 Please re-confirm your availability for this session.
-            </Alert>
+            </SectionMessage>
         </section>
 
         <section>
             <h6 className="h6 mb-3">Recurring Session</h6>
-            <Alert style="warning" dismissible={false}>
+            <SectionMessage appearance="warning" dismissible={false}>
                 Please re-confirm your availability for this recurring session.
-            </Alert>
+            </SectionMessage>
         </section>
     </div>
 );
 
 /**
  * One-Time Session
- * Alert for a one-time session availability re-confirmation.
+ * SectionMessage for a one-time session availability re-confirmation.
  */
 export const One_Time_Session = () => (
     <div style={{ maxWidth: '672px' }}>
-        <Alert style="warning" dismissible={false}>
+        <SectionMessage appearance="warning" dismissible={false}>
             Please re-confirm your availability for this session.
-        </Alert>
+        </SectionMessage>
     </div>
 );
 
 /**
  * Recurring Session
- * Alert for a recurring session availability re-confirmation.
+ * SectionMessage for a recurring session availability re-confirmation.
  */
 export const Recurring_Session = () => (
     <div style={{ maxWidth: '672px' }}>
-        <Alert style="warning" dismissible={false}>
+        <SectionMessage appearance="warning" dismissible={false}>
             Please re-confirm your availability for this recurring session.
-        </Alert>
+        </SectionMessage>
     </div>
 );

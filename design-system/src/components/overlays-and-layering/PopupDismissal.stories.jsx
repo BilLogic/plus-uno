@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Popover from './Popover';
+import Popup from './Popup/Popup';
 
 /**
  * Getting a `Popover` shut again.
@@ -59,9 +59,9 @@ export default {
  */
 export const ClickAwayAndEscape = () => (
     <div style={stack}>
-        <Popover trigger={<Button appearance="primary" text="Session 12" />} title="Session 12">
+        <Popup trigger={<Button appearance="primary" text="Session 12" />} title="Session 12">
             Ran 45 minutes over.
-        </Popover>
+        </Popup>
         <p data-testid="pd-elsewhere">Somewhere else on the page.</p>
     </div>
 );
@@ -95,14 +95,14 @@ ClickAwayAndEscape.play = async ({ canvasElement }) => {
  */
 export const ManualIgnoresRootClose = () => (
     <div style={stack}>
-        <Popover
+        <Popup
             trigger={<Button appearance="primary" text="Pinned" />}
             title="Pinned"
             triggerType="manual"
             show
         >
             Stays until the caller says otherwise.
-        </Popover>
+        </Popup>
         <p data-testid="pd-manual-elsewhere">Somewhere else on the page.</p>
     </div>
 );
@@ -140,9 +140,9 @@ ManualIgnoresRootClose.play = async ({ canvasElement }) => {
  */
 export const TriggerSemantics = () => (
     <div style={stack}>
-        <Popover trigger="Learn more" title="Scoring">
+        <Popup trigger="Learn more" title="Scoring">
             Sessions are scored on the rubric agreed at intake.
-        </Popover>
+        </Popup>
     </div>
 );
 
