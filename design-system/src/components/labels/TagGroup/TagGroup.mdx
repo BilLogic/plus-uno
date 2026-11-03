@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagGroupStories from './TagGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -13,9 +13,9 @@ export const figmaMeta = {
     },
     "alignment": {
       "type": "enum",
-      "values": ["left", "right"]
+      "values": ["start", "end"]
     },
-    "disabled": { "type": "boolean" }
+    "isDisabled": { "type": "boolean" }
   },
   "sets": [
     {
@@ -26,7 +26,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray behavior=selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on wrap, left and false; left and right are start and end in code, and disabled is isDisabled. The Tags slot (preferred values Tag and Suggestion) is children. The +n is a gray selectable Tag with no swatch (TagGroup hides it); code sizes the collapsed row by width, where Figma draws two tags and +n. Suggestions are never counted into +n and stay after it; menu items keep their tag's action (selectable toggles, link opens with a trailing arrow); remove stays on the row."
     }
   ]
 };
@@ -74,7 +74,7 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
     <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag is led by a checkbox, empty when off and checked and selected when on, and toggles in place; a link tag is a link with a trailing arrow; a tag still saving, whatever its behavior, is a disabled, busy row; and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
+<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag is led by a checkbox, empty when off and checked and selected when on, and toggles in place; a link tag is a link with a trailing arrow; a tag still saving is a disabled, busy row; and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
     <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
 </DocsCanvasShell>
 
@@ -100,7 +100,7 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 ## Alignment
 
-<DocsCanvasShell description={<><code>alignment="right"</code> lines every row, and the <code>+n</code> of a collapsed row, up on the right edge, for a right-aligned table column.</>}>
+<DocsCanvasShell description={<><code>alignment="end"</code> lines every row, and the <code>+n</code> of a collapsed row, up on the end edge, for a right-aligned table column.</>}>
     <DsCanvasQuiet of={TagGroupStories.AlignmentRight} />
 </DocsCanvasShell>
 
@@ -110,7 +110,7 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 ## Disabled
 
-<DocsCanvasShell description={<><code>disabled</code> disables every Tag and Suggestion in the group, as a disabled field does: no ×, nothing to focus, nothing to press.</>}>
+<DocsCanvasShell description={<><code>isDisabled</code> disables every Tag and Suggestion in the group, as a disabled field does: no ×, nothing to focus, nothing to press.</>}>
     <DsCanvasQuiet of={TagGroupStories.Disabled} />
 </DocsCanvasShell>
 
@@ -147,6 +147,27 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
         </>
     }
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS documentation
+
+Benchmarked against the [ADS documentation](https://atlassian.design/components/tag-group) for this component. The parity table lists each ADS prop and what Tag group does with it.
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS: Tag group</th><th>Tag group</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td><code>label</code></td><td>The accessible name of the list.</td></tr>
+        <tr><td><code>alignment</code> (start, end)</td><td><code>alignment</code> (start, end)</td><td>End lines the set up on the end edge, for a right-aligned table column.</td></tr>
+        <tr><td><code>children</code></td><td><code>children</code></td><td>Tags, and Suggestions that sit after them.</td></tr>
+        <tr><td>None</td><td><code>overflow</code> (wrap, collapse), <code>maxVisible</code>, <code>overflowLabel</code>, <code>onOverflowClick</code></td><td>Collapse fits tags by width and puts the rest behind +n.</td></tr>
+        <tr><td>None</td><td><code>isDisabled</code></td><td>Disables every Tag and Suggestion in the group through TagContext.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -199,19 +220,20 @@ this sets `gap`, so there is nothing to undo and nothing to double up.
 </TagGroup>
 ```
 
-### Disable the group, not the tags.
+### Disable the group, not each tag.
 
-A tag has no `disabled` prop. When the field is disabled, say so once on the
-group and every Tag and Suggestion in it follows.
+When the field is disabled, say so once on the group and every Tag and
+Suggestion in it follows.
 
 ```jsx
-// Incorrect — there is no disabled prop on Tag, so these stay live.
+// Incorrect — one tag disabled, its neighbors live.
 <TagGroup label="Focus areas">
-  <Tag disabled color="blue">Fractions</Tag>
+  <Tag isDisabled color="blue">Fractions</Tag>
+  <Tag color="blue">Ratios</Tag>
 </TagGroup>
 
 // Correct — the group passes it to every member.
-<TagGroup label="Focus areas" disabled={!canEdit}>
+<TagGroup label="Focus areas" isDisabled={!canEdit}>
   <Tag color="blue">Fractions</Tag>
   <Suggestion label="Ratios" onAccept={add} />
 </TagGroup>
@@ -245,14 +267,14 @@ In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
 led by the Dropdown's multi-select checkbox: empty when off, checked and in the
 selected state when on, and the menu stays open so the change is seen. A link
 tag is a link there, to the same address, with a trailing arrow. A tag still
-saving, whatever its behavior, is a disabled, busy row that cannot be pressed.
+saving is a disabled, busy row that cannot be pressed.
 A read-only or removable tag is a static row that only says its words. Remove is only offered on the row, never from the
 menu.
 
-### Right-align for a right-aligned column.
+### End-align for a right-aligned column.
 
-`alignment="right"` belongs in a table column whose other cells are
-right-aligned. Everywhere else, tags read from the left.
+`alignment="end"` belongs in a table column whose other cells are
+right-aligned. Everywhere else, tags read from the start.
 
 </div>
 
@@ -279,7 +301,7 @@ right-aligned. Everywhere else, tags read from the left.
   hidden tag that does something, and Escape closes it with focus back on
   `+n`. A selectable tag in the menu is a toggle button that reports
   `aria-pressed`, and its checkbox is decorative; a link tag is a real link,
-  whose arrow is decorative; a tag still saving, of any behavior, is a
+  whose arrow is decorative; a tag still saving is a
   disabled button with `aria-busy`, out of the tab order; a read-only or removable
   tag is a static row, not a control and not in the tab order.
 - **Suggestions stay reachable.** They are never behind `+n`, so a keyboard

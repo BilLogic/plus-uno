@@ -24,11 +24,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-09-29', kind: 'changed', summary: 'In the `+n` menu, a selectable tag led with the multi-select checkbox, checked and selected when on, and a saving tag of any behavior became a disabled, busy row.' },
-            { date: '2026-09-29', kind: 'changed', summary: '`overflow="collapse"` fit as many tags as the width allowed instead of defaulting `maxVisible` to 5, and `maxVisible` became an optional cap that never squeezed a tag.' },
-            { date: '2026-09-29', kind: 'added', summary: 'A collapsed row put its hidden tags behind a `+n` tag named by its label and count ("+3 more tags") that opened a keyboard-operable menu, where a selectable tag toggled, a link tag stayed a link, and remove stayed on the row.' },
-            { date: '2026-09-29', kind: 'added', summary: '`alignment="right"` lined the tags and `+n` up on the right edge, and `disabled` disabled every Tag and Suggestion in the group through `TagContext`.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'Suggestions were never counted into `+n` and always sat at the end of the row, after the tags and `+n`.' },
+            { date: '2026-11-03', kind: 'changed', summary: '`alignment` takes `start` or `end`, and `isDisabled` disables every Tag and Suggestion in the group through `TagContext`.' },
         ],
         docs: {
             description: {
@@ -90,7 +86,7 @@ Wrapping.play = async ({ canvasElement }) => {
     for (let r = 1; r < rows.length; r += 1) {
         await expect(Math.round(box(rows[r][0]).top - box(rows[r - 1][0]).bottom), 'gap between rows').toBe(8);
     }
-    // Rows start at the left edge by default.
+    // Rows start at the start edge by default.
     for (const row of rows) {
         await expect(Math.round(box(row[0]).left)).toBe(Math.round(box(list).left));
     }
@@ -210,7 +206,7 @@ export const CollapseMenu = () => (
     <div style={{ width: '300px', paddingBottom: '240px' }}>
         <TagGroup label="Subjects" overflow="collapse">
             {SUBJECTS.map((s) => (
-                <Tag key={s} behavior="link" href={`#${s}`} onClick={(e) => e.preventDefault()} color="green">{s}</Tag>
+                <Tag key={s} href={`#${s}`} onClick={(e) => e.preventDefault()} color="green">{s}</Tag>
             ))}
         </TagGroup>
     </div>
@@ -344,20 +340,19 @@ export const MenuKeepsActions = {
             <div style={{ width: '600px', paddingBottom: '240px' }}>
                 <TagGroup label="Filters" overflow="collapse" maxVisible={1}>
                     <Tag color="blue">Science</Tag>
-                    <Tag behavior="selectable" color="blue" isSelected={picked} onClick={() => setPicked((p) => !p)}>
+                    <Tag  color="blue" isSelected={picked} onClick={() => setPicked((p) => !p)}>
                         Mathematics
                     </Tag>
                     <Tag
-                        behavior="link"
                         color="blue"
                         href="#history"
                         onClick={(e) => { e.preventDefault(); onFollow(); }}
                     >
                         History
                     </Tag>
-                    <Tag behavior="removable" color="blue" onRemove={onRemove}>Geography</Tag>
+                    <Tag isRemovable color="blue" onAfterRemoveAction={onRemove}>Geography</Tag>
                     <Tag color="blue">Music</Tag>
-                    <Tag behavior="selectable" color="blue" isLoading onClick={onSaving}>Art</Tag>
+                    <Tag isSelected={false} color="blue" isLoading onClick={onSaving}>Art</Tag>
                     <Tag color="blue" isLoading>Latin</Tag>
                 </TagGroup>
                 <p className="body2-txt">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
@@ -755,15 +750,15 @@ SqueezedFirstReplaced.play = async ({ canvasElement }) => {
 /* --------------------------------------------------------------- alignment */
 
 /**
- * `alignment="right"` lines the tags up on the right edge, for a right-aligned
+ * `alignment="end"` lines the tags up on the right edge, for a right-aligned
  * table column: every wrapped row, and the `+n` of a collapsed one.
  */
 export const AlignmentRight = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '320px' }}>
-        <TagGroup label="Wrapped subjects" alignment="right">
+        <TagGroup label="Wrapped subjects" alignment="end">
             {SUBJECTS.map((s) => <Tag key={s} color="purple" data-testid={`wrap-${s}`}>{s}</Tag>)}
         </TagGroup>
-        <TagGroup label="Collapsed subjects" alignment="right" overflow="collapse">
+        <TagGroup label="Collapsed subjects" alignment="end" overflow="collapse">
             {SUBJECTS.map((s) => <Tag key={s} color="purple">{s}</Tag>)}
         </TagGroup>
     </div>
@@ -788,7 +783,7 @@ AlignmentRight.play = async ({ canvasElement }) => {
 /* ---------------------------------------------------------------- disabled */
 
 /**
- * `disabled` disables every tag and suggestion in the group through the same
+ * `isDisabled` disables every tag and suggestion in the group through the same
  * context a field uses: nothing takes focus, nothing responds, and the group
  * and its controls are announced as disabled.
  */
@@ -797,16 +792,16 @@ export const Disabled = {
     render: ({ onAccept, onSelect }) => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '360px' }}>
             <button type="button">Before</button>
-            <TagGroup label="Focus areas" disabled>
+            <TagGroup label="Focus areas" isDisabled>
                 <Tag color="blue" data-testid="read-only">Read only</Tag>
-                <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
-                <Tag behavior="selectable" color="blue" onClick={onSelect}>Selectable</Tag>
-                <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
+                <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
+                <Tag isSelected={false} color="blue" onClick={onSelect}>Selectable</Tag>
+                <Tag color="blue" href="#tag" data-testid="link">Link</Tag>
                 <Suggestion label="Fractions" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
             </TagGroup>
             <div style={{ width: '200px' }}>
-                <TagGroup label="Collapsed focus areas" overflow="collapse" disabled>
+                <TagGroup label="Collapsed focus areas" overflow="collapse" isDisabled>
                     {SUBJECTS.map((s) => <Tag key={s} color="blue" data-testid={`collapsed-${s}`}>{s}</Tag>)}
                     <Suggestion label="Latin" onAccept={onAccept} />
                 </TagGroup>
@@ -879,9 +874,9 @@ export const RemovableSet = () => {
             {picked.map((s) => (
                 <Tag
                     key={s}
-                    behavior="removable"
+                    isRemovable
                     color="purple"
-                    onRemove={() => setPicked((prev) => prev.filter((x) => x !== s))}
+                    onAfterRemoveAction={() => setPicked((prev) => prev.filter((x) => x !== s))}
                 >
                     {s}
                 </Tag>
@@ -953,6 +948,6 @@ export const Interactive = (args) => (
 Interactive.args = {
     label: 'Subjects',
     overflow: 'wrap',
-    alignment: 'left',
-    disabled: false,
+    alignment: 'start',
+    isDisabled: false,
 };

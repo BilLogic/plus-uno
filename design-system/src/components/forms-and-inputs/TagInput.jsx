@@ -58,8 +58,8 @@ const warn = (message) => {
 };
 
 /**
- * The color to hand Tag. A Tag name goes through as given, so Tag decides and
- * warns about its own aliases. TagInput's aliases resolve here, and anything
+ * The color to hand Tag. A Tag name goes through as given.
+ * TagInput's aliases resolve here, and anything
  * else falls back to gray, each with a development warning.
  */
 const tagColorOf = (color) => {
