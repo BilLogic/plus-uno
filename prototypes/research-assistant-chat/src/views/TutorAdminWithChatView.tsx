@@ -6,7 +6,7 @@ import { PageLayout } from '@plus-ds/specs/Universal/Pages';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';
 import { ResearchAssistantChat } from '../ResearchAssistantChat';
-import '@plus-ds/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
+import '@plus-ds/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss';
 
 const topBarConfig = {
   breadcrumbs: [
@@ -45,7 +45,7 @@ export function TutorAdminWithChatView(): React.ReactElement {
 
   // Loading & Disclosure States (matching Homepage pattern)
   const [shellEntered, setShellEntered] = useState(false);
-  const [contentVisible, setContentVisible] = useState(true);
+  const [contentVisible] = useState(true);
   const [hasEntered, setHasEntered] = useState(false);
   const [hasStageOverview, setHasStageOverview] = useState(false);
   const [hasStageDetails, setHasStageDetails] = useState(false);

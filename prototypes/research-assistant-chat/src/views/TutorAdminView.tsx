@@ -1,7 +1,7 @@
 import React from 'react';
 import { FloatingChatBubble } from '../components/FloatingChatBubble';
 /** Tutor Training Progress page from design system – matches the spec exactly. */
-import TutorTrainingProgressPage from '@plus-ds/specs/Admin/Tutor Admin/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.jsx';
+import TutorTrainingProgressPage from '@plus-ds/specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.jsx';
 
 /**
  * Tutor Admin starting view: design system TutorTrainingProgressPage (sidebar, tabs,

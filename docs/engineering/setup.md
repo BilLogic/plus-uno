@@ -12,6 +12,7 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 - React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
 - SCSS with design tokens from `design-system/src/tokens/`.
+- AI components use Base UI (`@base-ui/react`, headless) for behavior, styled on `--ds-*` tokens — ADR-036.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases

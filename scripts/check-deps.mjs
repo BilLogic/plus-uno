@@ -42,7 +42,8 @@ const ALLOWED = new Map([
     "uno-blueprint",
     "the sb service-blueprint template kit (BilLogic/uno-blueprint, formerly agentic-service-blueprinting) — not the PLUS blueprint estate of the same name. Pinned as a development dependency the way plus-uno-blueprint pins it (#425). `check:cross-repo` reads its harness DOCUMENTS off disk in node_modules rather than importing a module, so there is no specifier to find — the package IS the corpus. Removing it does not break a build; it silently narrows a sweep to two repos, which is why it is declared here rather than left to a checkout somebody may or may not have.",
   ],
-  ["@popperjs/core", "Bootstrap's positioning engine. A peer dependency of the dropdown/tooltip JS, pulled in at runtime rather than imported here."],
+  ["@base-ui/react", "the headless behavior layer for AI components (ADR-036), pinned to uno-blueprint's version. The AI components that wrap it are the next tickets; until the first one imports it, this entry is why it is declared."],
+  ["@popperjs/core","Bootstrap's positioning engine. A peer dependency of the dropdown/tooltip JS, pulled in at runtime rather than imported here."],
   [
     "@storybook/builder-vite",
     "Storybook's Vite builder, under @storybook/react-vite. Suspected removable — the framework is react-vite and nothing names this directly — but proving it needs a full `build-storybook`, which is not this gate's job. Open question on #266.",
