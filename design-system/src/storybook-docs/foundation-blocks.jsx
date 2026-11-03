@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Status } from '@/components';
+import { StatusTag } from '@/components';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 /**
@@ -153,9 +153,9 @@ const Verdict = ({ tone, caption, children }) => {
                 }}
             >
                 <span>
-                    <Status type="state" style={isDo ? 'success' : 'danger'} leadingVisual={isDo ? 'circle-check' : 'circle-xmark'}>
+                    <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} leadingVisual={isDo ? 'circle-check' : 'circle-xmark'}>
                         {isDo ? 'Do' : 'Don’t'}
-                    </Status>
+                    </StatusTag>
                 </span>
                 <span>{caption}</span>
             </figcaption>
