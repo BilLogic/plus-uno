@@ -5,10 +5,10 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 
 export const Control = ({ height, radius, children, ring }) => (
     <span
@@ -63,9 +63,10 @@ Radius tokens standardize how round a corner is, so a session card, a menu and a
 
 Use the token for the role, not the one that matches a pixel value. Values are read from the page.
 
-<FoundationBanner title="How PLUS rounds">
+<Banner appearance="announcement">
+<strong>How PLUS rounds</strong><br />
 Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10. Buttons are the exception at 6 and 4. Cards and the Page round at 16, because containers own their tokens: Table 8, Modal and Popup 12, Menu 10, 12 or 14, Tooltip 6.
-</FoundationBanner>
+</Banner>
 
 <FoundationSubsection title="Controls and elements">
 

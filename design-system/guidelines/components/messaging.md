@@ -6,19 +6,22 @@ summary: Alert, Toast or Modal — choosing by how long the message lives and wh
 
 # Messaging — which component to reach for
 
-Three components: `Alert`, `Toast`, `Modal`. Storybook titles the first
-two with Atlassian's names, Section message and Flag. Generated facts are in
-`design-system/src/components/messaging/index.md`. The choice between them is
-not about severity — all three carry the same semantic palette — it is about how
-long the message lives and whether the user can keep working.
+Five components: `Alert`, `Toast`, `Modal`, `Banner`, `InlineMessage`. Storybook
+titles the first two with Atlassian's names, Section message and Flag. Generated
+facts are in `design-system/src/components/messaging/index.md`. The choice
+between `Alert`, `Toast` and `Modal` is not about severity — all three carry the
+same semantic palette — it is about how long the message lives and whether the
+user can keep working.
 
 ## The choice
 
 | The message… | Reach for | Because |
 |---|---|---|
+| is a prominent notice at the top of the whole page | `Banner` | full width, no dismiss, three appearances (warning, danger, announcement) |
 | belongs to the page and stays until resolved | `Alert` | renders in the flow, dismissible by default |
 | confirms something and should fade | `Toast` | auto-hides after 5000ms by default |
 | must be answered before anything else | `Modal` | takes focus, blocks the page behind a backdrop |
+| is extra detail behind an icon, not shown by default | `InlineMessage` | opens a Popup on demand, so it never pushes layout |
 | is about one form field | none of these | the field's own error state |
 
 That last row is the one that matters most. `TextField`, `TextArea`, `FileUpload`

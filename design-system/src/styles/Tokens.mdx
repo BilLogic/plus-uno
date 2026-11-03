@@ -5,10 +5,10 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 
 <Meta title="Foundations/Tokens" tags={['!dev']} />
 
@@ -23,9 +23,10 @@ import {
 
 Tokens are how the tutor and student apps apply color, type, spacing, radius, borders and elevation. A token has a name that says how to use it and a value that can change by theme, so one choice is made once and every screen follows.
 
-<FoundationBanner title="Two name notations">
+<Banner appearance="announcement">
+<strong>Two name notations</strong><br />
 PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code. To start by task: use tokens in code (Using tokens in code), or choose a token in design (Choose a layer).
-</FoundationBanner>
+</Banner>
 
 Code reads `--ds-*` for color and elevation, `--element-*`, `--card-*`, `--table-*`, `--modal-*` and the other pattern prefixes for spacing and patterns, and `--space-*`, `--radius-*` for primitives. Figma reads local variables grouped into the collections below.
 

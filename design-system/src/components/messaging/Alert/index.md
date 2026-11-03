@@ -42,6 +42,6 @@ From `design-system/src/components/messaging/Alert/Alert.scss`. Override these t
 
 ## Related
 
-Same group: `EmptyState` · `Modal` · `Toast`
+Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `Toast`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
