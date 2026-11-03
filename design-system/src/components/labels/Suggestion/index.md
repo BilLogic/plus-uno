@@ -20,6 +20,7 @@
 | `value` | any | — | `insert` only: what `onAccept` receives. Defaults to `label`. |
 | `text` | string | — | `prompt` only: the text `onAccept` receives. Defaults to `label`. |
 | `onAccept` | func | — | Called with the value (insert) or the text (prompt), then the click event. |
+| `isDisabled` | bool | — | Disables this suggestion. A disabled field or TagGroup disables all of its suggestions through `TagContext`. |
 | `onClick` | func | — | Fires on press, before `onAccept`. It never replaces `onAccept`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

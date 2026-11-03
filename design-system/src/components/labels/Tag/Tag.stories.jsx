@@ -4,12 +4,12 @@ import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
-import Tag, { AVATAR_TAG_TYPES, TAG_BEHAVIORS, TAG_COLORS, TagContext } from './Tag';
+import Tag, { AVATAR_TAG_TYPES, TAG_COLORS, TagContext } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
- * one size (22), four behaviors.
+ * one size (22), selectable, removable and link.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
  * in a real browser. A good assertion here is one a person could make by using
@@ -30,12 +30,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the accent tokens: hover is the subtlest step, pressed subtlest pressed and selected the subtler step. Orange, lime and brown joined the palette, ten colors in all, so `<Tag color="orange">` renders orange where it was yellow with a deprecation warning. A disabled tag is `text.disabled` on `background.disabled`, and a disabled span tag carries `aria-disabled`.' },
-            { date: '2026-10-24', kind: 'changed', summary: "A selected tag is the hue's 16 step, held on hover and press. A pressed × is 12, and a focused × shows the ring with no fill." },
-            { date: '2026-09-29', kind: 'deprecated', summary: '`variant="operational"` started warning in development; a tag that opens something became `behavior="selectable"` with `aria-expanded`.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'A disabled tag that is not a button ended with visually hidden ", disabled" text, so a screen reader announced it as disabled.' },
-            { date: '2026-09-29', kind: 'added', summary: '`resolveTagBehavior` was exported, so a container resolved a tag\'s behavior exactly as Tag did.' },
-            { date: '2026-09-29', kind: 'added', summary: '`TAG_ACCEPTED_COLORS`, `resolveTagColor` and `TAG_COLOR_OF_CURRICULUM` were exported, so a container resolved a tag\'s color, and a curriculum hue\'s Tag color, exactly as Tag did.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isRemovable`, `isSelected`, `isDisabled`, `onAfterRemoveAction`, `removeButtonLabel` and `trailingMetric`. A tag is a link with `href`, a toggle when `isSelected` is true or false, and read-only otherwise.' },
         ],
         docs: {
             description: {
@@ -112,8 +107,8 @@ export const NewColorsContrast = () => (
     <div style={row}>
         {NEW_COLORS.map((color) => (
             <React.Fragment key={color}>
-                <Tag behavior="selectable" color={color} data-testid={`${color}-tag`}>{color}</Tag>
-                <Tag behavior="selectable" color={color} isSelected data-testid={`${color}-selected`}>{`${color} selected`}</Tag>
+                <Tag isSelected={false} color={color} data-testid={`${color}-tag`}>{color}</Tag>
+                <Tag color={color} isSelected data-testid={`${color}-selected`}>{`${color} selected`}</Tag>
                 <Tag type="agent" color={color} data-testid={`${color}-agent`}>{`${color} agent`}</Tag>
             </React.Fragment>
         ))}
@@ -151,12 +146,12 @@ NewColorsContrast.play = async ({ canvasElement }) => {
 export const Behaviors = () => (
     <div style={row}>
         <Tag color="blue" data-testid="read-only">Read only</Tag>
-        <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
-        <Tag behavior="selectable" color="blue" data-testid="selectable">Selectable</Tag>
-        <Tag behavior="selectable" color="blue" isSelected count={12} data-testid="selected">Selected</Tag>
-        <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
-        <Tag behavior="link" color="blue" href="#tag" onRemove={() => {}} data-testid="split">Link with remove</Tag>
-        <Tag behavior="removable" color="blue" onRemove={() => {}} isLoading data-testid="saving">Algebra</Tag>
+        <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
+        <Tag isSelected={false} color="blue" data-testid="selectable">Selectable</Tag>
+        <Tag color="blue" isSelected trailingMetric={12} data-testid="selected">Selected</Tag>
+        <Tag color="blue" href="#tag" data-testid="link">Link</Tag>
+        <Tag color="blue" href="#tag" isRemovable onAfterRemoveAction={() => {}} data-testid="split">Link with remove</Tag>
+        <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} isLoading data-testid="saving">Algebra</Tag>
     </div>
 );
 
@@ -166,7 +161,6 @@ Behaviors.play = async ({ canvasElement }) => {
     for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link', 'split', 'saving']) {
         await expect(px(getComputedStyle(canvas.getByTestId(id)).height), `${id} is 22 tall`).toBe(22);
     }
-    await expect(TAG_BEHAVIORS).toEqual(['read-only', 'removable', 'selectable', 'link']);
 };
 
 /* ------------------------------------------------------------------- types */
@@ -192,9 +186,9 @@ const avatarOf = (tag) => tag.querySelector('[aria-hidden="true"]');
 export const Types = () => (
     <div style={row}>
         <Tag color="blue" data-testid="plain">Algebra</Tag>
-        <Tag type="person" behavior="removable" onRemove={() => {}} data-testid="person">Rosa Chen</Tag>
-        <Tag type="agent" color="purple" behavior="removable" onRemove={() => {}} data-testid="agent">PLUS AI</Tag>
-        <Tag type="team" behavior="removable" onRemove={() => {}} data-testid="team">Math team</Tag>
+        <Tag type="person" isRemovable onAfterRemoveAction={() => {}} data-testid="person">Rosa Chen</Tag>
+        <Tag type="agent" color="purple" isRemovable onAfterRemoveAction={() => {}} data-testid="agent">PLUS AI</Tag>
+        <Tag type="team" isRemovable onAfterRemoveAction={() => {}} data-testid="team">Math team</Tag>
         <Tag type="person" avatar={PHOTO} data-testid="person-photo">Kai Brooks</Tag>
         <Tag type="agent" avatar={PHOTO} data-testid="agent-photo">Tutor bot</Tag>
         <Tag type="team" avatar={PHOTO} data-testid="team-photo">Science team</Tag>
@@ -314,24 +308,23 @@ export const TypeBehaviors = {
             const [saving, setSaving] = useState(false);
             return (
                 <div style={row} data-testid={`${type}-row`}>
-                    <Tag type={type} behavior="removable" onRemove={() => onRemoveSpy(type)} isLoading={saving} data-testid={`${type}-removable`}>{label}</Tag>
-                    <Tag type={type} behavior="selectable" isSelected={on} onClick={() => setOn((v) => !v)} data-testid={`${type}-selectable`}>{`${label} filter`}</Tag>
+                    <Tag type={type} isRemovable onAfterRemoveAction={() => onRemoveSpy(type)} isLoading={saving} data-testid={`${type}-removable`}>{label}</Tag>
+                    <Tag type={type}  isSelected={on} onClick={() => setOn((v) => !v)} data-testid={`${type}-selectable`}>{`${label} filter`}</Tag>
                     <Tag
                         type={type}
-                        behavior="link"
                         href={`#${type}`}
                         onClick={(e) => {
                             e.preventDefault();
                             onFollowSpy(type);
                         }}
-                        onRemove={() => {}}
+                        isRemovable onAfterRemoveAction={() => {}}
                         data-testid={`${type}-link`}
                     >
                         {`${label} page`}
                     </Tag>
                     <button type="button" onClick={() => setSaving((v) => !v)}>{`Save ${type}`}</button>
                     <TagContext.Provider value={{ isDisabled: true }}>
-                        <Tag type={type} behavior="removable" onRemove={() => {}} data-testid={`${type}-disabled`}>{`${label} locked`}</Tag>
+                        <Tag type={type} isRemovable onAfterRemoveAction={() => {}} data-testid={`${type}-disabled`}>{`${label} locked`}</Tag>
                     </TagContext.Provider>
                 </div>
             );
@@ -404,8 +397,8 @@ export const TypeBehaviors = {
  */
 export const PersonFocusRing = () => (
     <div style={row}>
-        <Tag type="person" behavior="selectable" color="teal">Rosa Chen</Tag>
-        <Tag type="person" behavior="removable" onRemove={() => {}}>Kai Brooks</Tag>
+        <Tag type="person" isSelected={false} color="teal">Rosa Chen</Tag>
+        <Tag type="person" isRemovable onAfterRemoveAction={() => {}}>Kai Brooks</Tag>
     </div>
 );
 
@@ -437,8 +430,8 @@ PersonFocusRing.play = async ({ canvasElement }) => {
  */
 export const RemoveFocusRingOnTypes = () => (
     <div style={row}>
-        <Tag type="agent" behavior="removable" onRemove={() => {}}>PLUS AI</Tag>
-        <Tag type="team" behavior="removable" onRemove={() => {}}>Math team</Tag>
+        <Tag type="agent" isRemovable onAfterRemoveAction={() => {}}>PLUS AI</Tag>
+        <Tag type="team" isRemovable onAfterRemoveAction={() => {}}>Math team</Tag>
     </div>
 );
 
@@ -595,7 +588,7 @@ export const Selecting = () => {
             {['Science', 'Mathematics'].map((s) => (
                 <Tag
                     key={s}
-                    behavior="selectable"
+                    
                     color="magenta"
                     isSelected={picked.includes(s)}
                     onClick={() => toggle(s)}
@@ -623,12 +616,12 @@ Selecting.play = async ({ canvasElement }) => {
 /** The accent's own steps, in place of a brightness filter. */
 export const StateLayers = () => (
     <div style={row}>
-        <Tag behavior="selectable" color="blue">Unselected</Tag>
-        <Tag behavior="selectable" color="blue" isSelected>Selected</Tag>
-        <Tag behavior="selectable" color="gray" isSelected>Gray selected</Tag>
-        <Tag behavior="link" color="green" href="#tag">Link</Tag>
-        <Tag behavior="link" color="green" href="#tag" onRemove={() => {}} data-testid="split">Split link</Tag>
-        <Tag behavior="removable" color="purple" onRemove={() => {}} data-testid="removable">Removable</Tag>
+        <Tag isSelected={false} color="blue">Unselected</Tag>
+        <Tag color="blue" isSelected>Selected</Tag>
+        <Tag color="gray" isSelected>Gray selected</Tag>
+        <Tag color="green" href="#tag">Link</Tag>
+        <Tag color="green" href="#tag" isRemovable onAfterRemoveAction={() => {}} data-testid="split">Split link</Tag>
+        <Tag isRemovable color="purple" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
     </div>
 );
 
@@ -708,9 +701,9 @@ export const Removing = {
                     {subjects.map((s) => (
                         <Tag
                             key={s}
-                            behavior="removable"
+                            isRemovable
                             color="blue"
-                            onRemove={() => {
+                            onAfterRemoveAction={() => {
                                 onRemoveSpy(s);
                                 setSubjects((prev) => prev.filter((x) => x !== s));
                             }}
@@ -718,7 +711,7 @@ export const Removing = {
                             {s}
                         </Tag>
                     ))}
-                    <Tag behavior="removable" color="blue" onRemove={() => {}} removeLabel="Drop the maths filter">Maths</Tag>
+                    <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} removeButtonLabel="Drop the maths filter">Maths</Tag>
                 </div>
             );
         };
@@ -736,7 +729,7 @@ export const Removing = {
         await expect(canvas.queryByText('Science')).toBeNull();
         await expect(canvas.getByText('Mathematics')).toBeInTheDocument();
 
-        // `removeLabel` replaces the generated name.
+        // `removeButtonLabel` replaces the generated name.
         await expect(canvas.getByRole('button', { name: 'Drop the maths filter' })).toBeInTheDocument();
 
         // A removable tag is not itself a control: exactly one button per tag.
@@ -746,7 +739,7 @@ export const Removing = {
 
 /**
  * A label that is not text gives the × nothing to be named after, so a row of
- * them would all be "Remove". Development says so unless `removeLabel` is set.
+ * them would all be "Remove". Development says so unless `removeButtonLabel` is set.
  */
 export const RemoveNeedsANameForNodeLabels = {
     render: () => {
@@ -756,8 +749,8 @@ export const RemoveNeedsANameForNodeLabels = {
                 <button type="button" onClick={() => setMounted(true)}>Mount</button>
                 {mounted && (
                     <>
-                        <Tag behavior="removable" onRemove={() => {}}><em>Unnamed</em></Tag>
-                        <Tag behavior="removable" onRemove={() => {}} removeLabel="Remove Named"><em>Named</em></Tag>
+                        <Tag isRemovable onAfterRemoveAction={() => {}}><em>Unnamed</em></Tag>
+                        <Tag isRemovable onAfterRemoveAction={() => {}} removeButtonLabel="Remove Named"><em>Named</em></Tag>
                     </>
                 )}
             </div>
@@ -769,7 +762,7 @@ export const RemoveNeedsANameForNodeLabels = {
         try {
             await userEvent.click(canvas.getByRole('button', { name: 'Mount' }));
             await expect(canvas.getByRole('button', { name: 'Remove Named' })).toBeInTheDocument();
-            const calls = warn.mock.calls.filter(([m]) => String(m).includes('Pass `removeLabel`'));
+            const calls = warn.mock.calls.filter(([m]) => String(m).includes('Pass `removeButtonLabel`'));
             await expect(calls.length, 'only the unnamed one warns').toBeGreaterThan(0);
             await expect(calls.every(([m]) => !String(m).includes('Named'))).toBe(true);
         } finally {
@@ -781,10 +774,10 @@ export const RemoveNeedsANameForNodeLabels = {
 /** Keyboard focus: a 2px Focus Ring 2px outside the tag, the link, or the ×. */
 export const FocusRing = () => (
     <div style={row}>
-        <Tag behavior="selectable" color="teal">Filter</Tag>
-        <Tag behavior="removable" color="teal" onRemove={() => {}}>Chosen</Tag>
-        <Tag behavior="link" color="teal" href="#tag">Go</Tag>
-        <Tag behavior="link" color="teal" href="#tag" onRemove={() => {}} data-testid="split">Split</Tag>
+        <Tag isSelected={false} color="teal">Filter</Tag>
+        <Tag isRemovable color="teal" onAfterRemoveAction={() => {}}>Chosen</Tag>
+        <Tag color="teal" href="#tag">Go</Tag>
+        <Tag color="teal" href="#tag" isRemovable onAfterRemoveAction={() => {}} data-testid="split">Split</Tag>
     </div>
 );
 
@@ -833,14 +826,13 @@ export const LinkWithRemove = {
         <div style={row}>
             <button type="button">Before</button>
             <Tag
-                behavior="link"
                 color="purple"
                 href="#algebra"
                 onClick={(e) => {
                     e.preventDefault();
                     onFollowSpy();
                 }}
-                onRemove={onRemoveSpy}
+                isRemovable onAfterRemoveAction={onRemoveSpy}
             >
                 Algebra
             </Tag>
@@ -879,10 +871,10 @@ export const DisabledInField = () => (
         <button type="button">Before</button>
         <TagContext.Provider value={{ isDisabled: true }}>
             <Tag color="blue" data-testid="read-only">Read only</Tag>
-            <Tag behavior="removable" color="blue" onRemove={() => {}} data-testid="removable">Removable</Tag>
-            <Tag behavior="selectable" color="blue" data-testid="selectable">Selectable</Tag>
-            <Tag behavior="selectable" color="blue" isSelected data-testid="selected">Selected</Tag>
-            <Tag behavior="link" color="blue" href="#tag" data-testid="link">Link</Tag>
+            <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
+            <Tag isSelected={false} color="blue" data-testid="selectable">Selectable</Tag>
+            <Tag color="blue" isSelected data-testid="selected">Selected</Tag>
+            <Tag color="blue" href="#tag" data-testid="link">Link</Tag>
         </TagContext.Provider>
         <button type="button">After</button>
     </div>
@@ -930,7 +922,7 @@ DisabledInField.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- count */
 
 /**
- * A count belongs to a selectable tag, such as a filter's result count. On any
+ * A trailing metric belongs to a selectable tag, such as a filter's result count. On any
  * other behavior it is ignored, and development says so.
  */
 export const CountOnSelectable = {
@@ -938,10 +930,10 @@ export const CountOnSelectable = {
         const [mounted, setMounted] = useState(false);
         return (
             <div style={row}>
-                <Tag behavior="selectable" color="green" count={12}>Science</Tag>
+                <Tag isSelected={false} color="green" trailingMetric={12}>Science</Tag>
                 <button type="button" onClick={() => setMounted(true)}>Mount a removable with a count</button>
                 {mounted && (
-                    <Tag behavior="removable" color="green" count={34} onRemove={() => {}}>History</Tag>
+                    <Tag isRemovable color="green" trailingMetric={34} onAfterRemoveAction={() => {}}>History</Tag>
                 )}
             </div>
         );
@@ -957,7 +949,7 @@ export const CountOnSelectable = {
             await userEvent.click(canvas.getByRole('button', { name: 'Mount a removable with a count' }));
             await expect(canvas.getByText('History')).toBeInTheDocument();
             await expect(canvas.queryByText('34'), 'ignored off selectable').toBeNull();
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`count` is only shown on behavior="selectable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`trailingMetric` is only shown on a selectable tag'));
         } finally {
             warn.mockRestore();
         }
@@ -979,11 +971,10 @@ export const Saving = {
             return (
                 <div style={row}>
                     <span data-testid="removable-wrap">
-                        <Tag behavior="removable" color="yellow" isLoading={saving} onRemove={onRemoveSpy} data-testid="removable">Geometry</Tag>
+                        <Tag isRemovable color="yellow" isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Geometry</Tag>
                     </span>
-                    <Tag behavior="selectable" color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
+                    <Tag isSelected={false} color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
                     <Tag
-                        behavior="link"
                         color="yellow"
                         href="#calculus"
                         isLoading={saving}
@@ -1055,7 +1046,7 @@ export const Saving = {
 export const Truncation = () => (
     <div style={row}>
         <Tag color="blue">Social-Emotional Learning and Advocacy for Every Student</Tag>
-        <Tag behavior="selectable" color="blue">Mastering Content Across Every Grade Band</Tag>
+        <Tag isSelected={false} color="blue">Mastering Content Across Every Grade Band</Tag>
         <Tag color="blue">Short</Tag>
     </div>
 );
@@ -1150,10 +1141,10 @@ export const OnImages = () => (
         <div style={onPicture}>
             <Tag color="blue" isElevated data-testid="read-only">Algebra</Tag>
             <Tag color="green" isElevated>Advocacy</Tag>
-            <Tag behavior="link" color="gray" href="#video" isElevated>Video</Tag>
+            <Tag color="gray" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
-            <Tag behavior="link" color="magenta" href="#lesson" isElevated>Open lesson</Tag>
-            <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}} data-testid="split">
+            <Tag color="magenta" href="#lesson" isElevated>Open lesson</Tag>
+            <Tag color="teal" href="#unit" isElevated isRemovable onAfterRemoveAction={() => {}} data-testid="split">
                 Unit 3
             </Tag>
             <TagContext.Provider value={{ isDisabled: true }}>
@@ -1254,7 +1245,7 @@ export const ElevatedAvatarTypes = () => (
                 </Tag>
             ))}
             {AVATAR_TAG_TYPES.map((type) => (
-                <Tag key={type} type={type} behavior="link" href={`#${type}`} isElevated>
+                <Tag key={type} type={type} href={`#${type}`} isElevated>
                     {`${type} link`}
                 </Tag>
             ))}
@@ -1324,7 +1315,7 @@ export const ElevatedDisabled = () => (
                     </Tag>
                 ))}
                 {TAG_COLORS.map((color) => (
-                    <Tag key={color} color={color} behavior="link" href="#tag" isElevated data-testid={`link-${color}`}>
+                    <Tag key={color} color={color} href="#tag" isElevated data-testid={`link-${color}`}>
                         {`${color} link`}
                     </Tag>
                 ))}
@@ -1398,13 +1389,13 @@ export const ElevatedRemoveFocus = () => (
     <div style={{ ...thumbnail, height: '200px' }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
-            <Tag behavior="link" color="teal" href="#unit" isElevated onRemove={() => {}}>Unit 3</Tag>
+            <Tag color="teal" href="#unit" isElevated isRemovable onAfterRemoveAction={() => {}}>Unit 3</Tag>
             {AVATAR_TAG_TYPES.map((type) => (
-                <Tag key={type} type={type} behavior="link" href={`#${type}`} isElevated onRemove={() => {}}>
+                <Tag key={type} type={type} href={`#${type}`} isElevated isRemovable onAfterRemoveAction={() => {}}>
                     {`${type} link`}
                 </Tag>
             ))}
-            <Tag behavior="link" color="teal" href="#unit" onRemove={() => {}}>Unit 4</Tag>
+            <Tag color="teal" href="#unit" isRemovable onAfterRemoveAction={() => {}}>Unit 4</Tag>
         </div>
     </div>
 );
@@ -1465,10 +1456,10 @@ export const ElevatedOnlyReadOnlyAndLink = {
                 <button type="button" onClick={() => setMounted(true)}>Mount elevated editable tags</button>
                 {mounted && (
                     <>
-                        <Tag behavior="removable" color="purple" isElevated onRemove={() => {}} data-testid="removable">
+                        <Tag isRemovable color="purple" isElevated onAfterRemoveAction={() => {}} data-testid="removable">
                             Geometry
                         </Tag>
-                        <Tag behavior="selectable" color="purple" isElevated>Fractions</Tag>
+                        <Tag isSelected={false} color="purple" isElevated>Fractions</Tag>
                     </>
                 )}
             </div>
@@ -1488,74 +1479,90 @@ export const ElevatedOnlyReadOnlyAndLink = {
                 await expect(s.borderTopColor, `${name} keeps its outline`).toBe(border);
                 await expect(s.backgroundColor, `${name} keeps its clear ground`).toBe(CLEAR);
             }
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for behavior="read-only" or "link"; it is ignored on "removable"'));
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for behavior="read-only" or "link"; it is ignored on "selectable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for a read-only tag or a link; it is ignored on "removable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for a read-only tag or a link; it is ignored on "selectable"'));
         } finally {
             warn.mockRestore();
         }
     },
 };
 
-/* ------------------------------------------------------------- deprecation */
+/* ------------------------------------------------------------- answer chips */
 
 /**
- * The old names keep working. `grey` is `gray` and `variant="dismissible"` is
- * `behavior="removable"`; each says so in development. `orange` is no longer
- * an alias: it is the orange accent, and says nothing.
+ * A row of answer chips: each is a selectable tag, so it toggles with Space or
+ * Enter, publishes `aria-pressed`, and shows the selected step. The caller owns
+ * which are on. This is the shape a form uses where a person picks from a short
+ * list of options.
  */
-export const DeprecatedNames = {
-    render: () => {
-        const [mounted, setMounted] = useState(false);
-        return (
-            <div style={row}>
-                <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
-                {mounted && (
-                    <>
-                        <Tag color="orange" data-testid="orange">Orange</Tag>
-                        <Tag color="grey" data-testid="grey-alias">Grey</Tag>
-                        <Tag variant="dismissible" color="yellow" onRemove={() => {}}>Dismissible</Tag>
-                    </>
-                )}
-            </div>
-        );
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const warn = spyOn(console, 'warn').mockImplementation(() => {});
-        try {
-            await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
-            await expect(getComputedStyle(canvas.getByTestId('orange')).borderTopColor)
-                .toBe(tokenColor(canvasElement, '--ds-border-accent-orange-subtle'));
-            await expect(canvas.getByRole('button', { name: 'Remove Dismissible' })).toBeInTheDocument();
-            await expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('color="orange"'));
-            const greyAlias = canvas.getByTestId('grey-alias');
-            await expect(greyAlias).toHaveClass('plus-tag--gray');
-            await expect(getComputedStyle(greyAlias).borderTopColor)
-                .toBe(tokenColor(canvasElement, '--ds-border-accent-gray-subtle'));
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('color="grey" is deprecated; use "gray"'));
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('variant="dismissible" is deprecated'));
-        } finally {
-            warn.mockRestore();
-        }
-    },
+export const AnswerChips = () => {
+    const options = ['Fractions', 'Ratios', 'Geometry', 'Statistics'];
+    const [chosen, setChosen] = useState(['Ratios']);
+    const toggle = (name) => setChosen((now) => (now.includes(name) ? now.filter((n) => n !== name) : [...now, name]));
+    return (
+        <div style={row} role="group" aria-label="Topics covered">
+            {options.map((name) => (
+                <Tag key={name} color="blue" isSelected={chosen.includes(name)} onClick={() => toggle(name)}>{name}</Tag>
+            ))}
+        </div>
+    );
+};
+
+AnswerChips.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const ratios = canvas.getByRole('button', { name: 'Ratios' });
+    const fractions = canvas.getByRole('button', { name: 'Fractions' });
+    await expect(ratios).toHaveAttribute('aria-pressed', 'true');
+    await expect(fractions).toHaveAttribute('aria-pressed', 'false');
+
+    fractions.focus();
+    await userEvent.keyboard(' ');
+    await expect(fractions, 'Space toggles').toHaveAttribute('aria-pressed', 'true');
+    await userEvent.keyboard('{Enter}');
+    await expect(fractions, 'Enter toggles back').toHaveAttribute('aria-pressed', 'false');
+
+    await userEvent.click(ratios);
+    await expect(ratios, 'a click toggles').toHaveAttribute('aria-pressed', 'false');
+};
+
+/* ------------------------------------------------------------- isDisabled */
+
+/** `isDisabled` disables one tag without a field around it. */
+export const IsDisabled = () => (
+    <div style={row}>
+        <Tag isDisabled color="blue" data-testid="plain">Read only</Tag>
+        <Tag isDisabled isSelected={false} color="blue" data-testid="toggle">Selectable</Tag>
+        <Tag isDisabled isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
+        <Tag color="blue" data-testid="enabled">Enabled</Tag>
+    </div>
+);
+
+IsDisabled.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const fill = tokenColor(canvasElement, '--ds-background-disabled');
+    for (const id of ['plain', 'toggle', 'removable']) {
+        await expect(getComputedStyle(canvas.getByTestId(id)).backgroundColor, `${id} fill`).toBe(fill);
+    }
+    await expect(canvas.getByTestId('toggle')).toBeDisabled();
+    await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'no ×').toBeNull();
+    await expect(getComputedStyle(canvas.getByTestId('enabled')).backgroundColor).not.toBe(fill);
 };
 
 /* -------------------------------------------------------------- playground */
 
 /**
- * Interactive playground. `onRemove` is supplied here rather than exposed as a
+ * Interactive playground. `onAfterRemoveAction` is supplied here rather than exposed as a
  * control: a docs control cannot author a function, and a removable tag with
  * no handler renders no ×.
  */
 export const Interactive = (args) => (
-    <Tag {...args} onClick={(e) => e.preventDefault()} onRemove={() => {}} />
+    <Tag {...args} onClick={(e) => e.preventDefault()} onAfterRemoveAction={() => {}} />
 );
 Interactive.args = {
     text: 'Mathematics',
-    behavior: 'read-only',
     color: 'blue',
     type: 'plain',
-    href: '#mathematics',
-    isSelected: false,
+    isRemovable: false,
+    isDisabled: false,
     isLoading: false,
 };

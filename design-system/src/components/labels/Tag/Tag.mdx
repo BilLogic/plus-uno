@@ -2,15 +2,11 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagStories from './Tag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
-    "behavior": {
-      "type": "enum",
-      "values": ["read-only", "removable", "selectable", "link"]
-    },
     "color": {
       "type": "enum",
       "values": ["gray", "blue", "green", "purple", "magenta", "yellow", "teal"]
@@ -20,6 +16,7 @@ export const figmaMeta = {
       "values": ["plain", "person", "agent", "team"]
     },
     "isSelected": { "type": "boolean" },
+    "isRemovable": { "type": "boolean" },
     "isLoading": { "type": "boolean" },
     "isElevated": { "type": "boolean" }
   },
@@ -37,7 +34,7 @@ export const figmaMeta = {
         "isLoading": "state=saving",
         "isElevated": "elevated"
       },
-      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled comes from TagContext, never a prop; remove? on a link is link plus onRemove; count? is count. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled (from TagContext) and focus × on a link's separate ×; code ignores it on removable and selectable with a warning."
+      "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled is isDisabled, or TagContext for a whole field; remove? on a link is href plus isRemovable; count? is trailingMetric. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled and focus × on a link's separate ×; code ignores it on a removable or selectable tag with a warning."
     }
   ]
 };
@@ -66,7 +63,7 @@ category.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The four behaviors: read-only, removable, selectable and link. Every one is 22 tall, outlined, with neutral text and the color on the border and swatch.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Read-only, removable, selectable and link. Every one is 22 tall, outlined, with neutral text and the color on the border and swatch.</>}>
     <Canvas of={TagStories.Behaviors} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -94,7 +91,7 @@ category.
     <DsCanvasQuiet of={TagStories.AvatarFallback} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Every behavior works on every type: removable, selectable, link with a separate ×, saving, and disabled from the field.</>}>
+<DocsCanvasShell description={<>Every kind of tag works on every type: removable, selectable, link with a separate ×, saving, and disabled.</>}>
     <DsCanvasQuiet of={TagStories.TypeBehaviors} />
 </DocsCanvasShell>
 
@@ -104,7 +101,7 @@ category.
 
 ## Selection
 
-<DocsCanvasShell description={<>A selectable tag is a toggle and publishes <code>aria-pressed</code>. Selected is a full-color border as well as a fill.</>}>
+<DocsCanvasShell description={<>A tag with <code>isSelected</code>, true or false, is a toggle and publishes <code>aria-pressed</code>. Selected is a full-color border as well as a fill.</>}>
     <DsCanvasQuiet of={TagStories.Selecting} />
 </DocsCanvasShell>
 
@@ -112,7 +109,11 @@ category.
     <DsCanvasQuiet of={TagStories.StateLayers} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>count</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count. On any other behavior it is ignored.</>}>
+<DocsCanvasShell description={<>A row of answer chips: each is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on.</>}>
+    <DsCanvasQuiet of={TagStories.AnswerChips} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>trailingMetric</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count. On any other tag it is ignored.</>}>
     <DsCanvasQuiet of={TagStories.CountOnSelectable} />
 </DocsCanvasShell>
 
@@ -126,7 +127,7 @@ category.
     <DsCanvasQuiet of={TagStories.Removing} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>A link with <code>onRemove</code> is two targets: the text is the link, the × is its sibling, and the tab order is link, then ×.</>}>
+<DocsCanvasShell description={<>A link with <code>isRemovable</code> is two targets: the text is the link, the × is its sibling, and the tab order is link, then ×.</>}>
     <DsCanvasQuiet of={TagStories.LinkWithRemove} />
 </DocsCanvasShell>
 
@@ -144,7 +145,7 @@ category.
     <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>In a disabled field an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled: the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
+<DocsCanvasShell description={<>When disabled, an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled: the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
     <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
 </DocsCanvasShell>
 
@@ -178,6 +179,10 @@ category.
     <DsCanvasQuiet of={TagStories.DisabledInField} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<><code>isDisabled</code> disables one tag with no field around it.</>}>
+    <DsCanvasQuiet of={TagStories.IsDisabled} />
+</DocsCanvasShell>
+
 <DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
     <DsCanvasQuiet of={TagStories.Truncation} />
 </DocsCanvasShell>
@@ -197,6 +202,34 @@ category.
         </>
     }
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS documentation
+
+Benchmarked against the [ADS documentation](https://atlassian.design/components/tag) for this component. The parity table lists each ADS prop and what Tag does with it.
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS: Tag</th><th>Tag</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>text</code></td><td><code>text</code> or <code>children</code></td><td>Same.</td></tr>
+        <tr><td><code>color</code></td><td><code>color</code></td><td>Ten accent families; no red, since a tag is never a status.</td></tr>
+        <tr><td><code>isRemovable</code> (default true)</td><td><code>isRemovable</code> (default false)</td><td>A tag in PLUS is read-only unless it says otherwise.</td></tr>
+        <tr><td><code>onAfterRemoveAction</code>, <code>onBeforeRemoveAction</code></td><td><code>onAfterRemoveAction</code></td><td>Called with the text and the event; the caller removes the tag.</td></tr>
+        <tr><td><code>removeButtonLabel</code></td><td><code>removeButtonLabel</code></td><td>Defaults to Remove plus the label.</td></tr>
+        <tr><td><code>href</code>, <code>linkComponent</code>, <code>onClick</code></td><td>Same</td><td>A link with <code>isRemovable</code> has a separate ×.</td></tr>
+        <tr><td><code>elemBefore</code>, <code>swatchBefore</code></td><td>Same</td><td>PLUS draws a 10 swatch by default.</td></tr>
+        <tr><td><code>maxWidth</code></td><td><code>maxWidth</code></td><td>Default 180; the full text is a tooltip.</td></tr>
+        <tr><td><code>trailingMetric</code></td><td><code>trailingMetric</code></td><td>A compact Count tag, on selectable tags.</td></tr>
+        <tr><td>AvatarTag</td><td><code>type</code> (person, agent, team), <code>avatar</code></td><td>One component; the avatar sits in the swatch's place.</td></tr>
+        <tr><td><code>appearance</code> (rounded)</td><td>None</td><td>A person tag is round; every other tag keeps the 4 radius.</td></tr>
+        <tr><td>None</td><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code>, <code>isElevated</code></td><td>Answer chips, a disabled tag, saving, and a tag on an image.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -236,24 +269,26 @@ so a reader tells a category from a meaning without reading the words.
 <Tag color="blue">Chemistry</Tag>
 ```
 
-### Pick the behavior, not the look.
+### Let the props pick the kind of tag.
 
 ```jsx
 // Read-only, the default: a value on show.
 <Tag>Grade 4</Tag>
 
 // Removable: a value the person can take out.
-<Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
+<Tag isRemovable onAfterRemoveAction={drop}>Grade 4</Tag>
 
-// Selectable: a filter, with its result count.
-<Tag behavior="selectable" isSelected={on} onClick={toggle} count={12}>Science</Tag>
+// Selectable: a filter or an answer chip, with its result count.
+<Tag isSelected={on} onClick={toggle} trailingMetric={12}>Science</Tag>
 
 // Link, and a link with a separate ×.
-<Tag behavior="link" href="/subjects/algebra">Algebra</Tag>
-<Tag behavior="link" href="/subjects/algebra" onRemove={drop}>Algebra</Tag>
+<Tag href="/subjects/algebra">Algebra</Tag>
+<Tag href="/subjects/algebra" isRemovable onAfterRemoveAction={drop}>Algebra</Tag>
 ```
 
-`count` is for selectable tags only; anywhere else it is ignored with a warning.
+`isSelected` is a boolean on purpose: `false` is an unselected toggle, and
+leaving it out is a tag that is not selectable. `trailingMetric` is for
+selectable tags only; anywhere else it is ignored with a warning.
 
 ### Name who owns it with a type.
 
@@ -277,20 +312,22 @@ warning.
 ```jsx
 // A subject on a lesson thumbnail, 8 from the corner.
 <Tag color="blue" isElevated>Algebra</Tag>
-<Tag behavior="link" href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
+<Tag href="/lessons/42" color="magenta" isElevated>Open lesson</Tag>
 ```
 
 Read-only and link only: a value is edited off the image. On a removable or
 selectable tag `isElevated` is ignored with a warning.
 
-### Disable the field, not the tag.
+### Disable one tag, or the whole field.
 
-There is no `disabled` prop. A field or group that is disabled says so once,
+`isDisabled` disables one tag. A field or group that is disabled says so once,
 and every tag inside follows:
 
 ```jsx
+<Tag isDisabled>Grade 4</Tag>
+
 <TagContext.Provider value={{ isDisabled: true }}>
-    <Tag behavior="removable" onRemove={drop}>Grade 4</Tag>
+    <Tag isRemovable onAfterRemoveAction={drop}>Grade 4</Tag>
 </TagContext.Provider>
 ```
 
@@ -301,15 +338,6 @@ and every tag inside follows:
 `Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
 `gap` once for the set.
 
-### Renamed props.
-
-`variant` is now `behavior` (`dismissible` is `removable`) and `grey` is now
-`gray`. The old names still work and warn in development. `orange` was an
-alias for `yellow`; it is now the orange accent, so an old `orange` tag turns
-orange. `operational` has
-no direct replacement: a tag that opens something is `behavior="selectable"`
-with `aria-expanded`.
-
 </div>
 
 <div className="sb-ds-doc-section">
@@ -319,7 +347,7 @@ with `aria-expanded`.
 - **A removable tag is not itself a control.** The × is, and a button inside a
   button is invalid, so the tag is a `span` with one button in it.
 - **The × is named from the label.** It announces `Remove Science`;
-  `removeLabel` overrides that when the label is not text.
+  `removeButtonLabel` overrides that when the label is not text.
 - **Selectable publishes `aria-pressed`**, so the state is not only visible.
   Selected also changes the border to the full hue, so it does not rest on a
   change of lightness alone. A selectable tag given `aria-expanded` is a button
@@ -330,13 +358,13 @@ with `aria-expanded`.
 - **Saving is announced once.** The spinner is hidden; a status region beside
   the tag, outside its name, says "Saving". The × and a link stay focusable
   but do nothing until the save lands.
-- **A × needs a name.** When the label is not text, pass `removeLabel`, or the
+- **A × needs a name.** When the label is not text, pass `removeButtonLabel`, or the
   × is named only "Remove" and development warns.
 - **An elevated tag's focus ring has a surface gap.** The 2px between the tag
   (or a link's ×) and the ring is filled in the surface color, so the ring
   reads on a dark picture.
 - **Disabled tags take no focus, and say they are disabled.** They come from
-  a disabled field. A selectable tag is a native disabled button, announced as
+  `isDisabled` or a disabled field. A selectable tag is a native disabled button, announced as
   disabled. Every other tag is a span, which has no disabled state a screen
   reader announces, so it ends with visually hidden text and is read as
   "Science, disabled".

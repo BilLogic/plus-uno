@@ -17,9 +17,9 @@ import './Suggestion.scss';
  * The component does not change itself when accepted; the field that owns the
  * value decides what appears next.
  *
- * NO `disabled` PROP, as Tag has none. Disabled comes from a disabled field
- * or TagGroup through `TagContext`, the value a Tag reads, so a suggestion can never disagree
- * with the tags beside it. Disabled, it is a native disabled button:
+ * DISABLED. `isDisabled` disables one suggestion; a disabled field or TagGroup
+ * disables all of them through `TagContext`, the value a Tag reads, so a
+ * suggestion can never disagree with the tags beside it. Disabled, it is a native disabled button:
  * out of the tab order, announced as disabled, and never accepted.
  */
 
@@ -38,11 +38,13 @@ export const Suggestion = ({
     text,
     onAccept,
     onClick,
+    isDisabled: isDisabledProp = false,
     className = '',
     id,
     ...rest
 }) => {
-    const { isDisabled = false } = useTagContext() || {};
+    const { isDisabled: fieldDisabled = false } = useTagContext() || {};
+    const isDisabled = Boolean(isDisabledProp || fieldDisabled);
     const isPrompt = type === 'prompt';
     // Anything but `prompt` is an insert, so an unknown type still renders one.
     const kind = isPrompt ? 'prompt' : 'insert';
@@ -67,8 +69,7 @@ export const Suggestion = ({
             // the spread, so a stray `aria-label` or `onClick` cannot replace
             // them. A caller's `onClick` still fires, before `onAccept`.
             aria-label={name}
-            // After the spread, so the field's state wins and a stray
-            // `disabled` in `rest` never reaches the button.
+            // After the spread, so a stray `disabled` in `rest` never reaches the button.
             disabled={isDisabled || undefined}
             onClick={(e) => {
                 onClick?.(e);
@@ -99,6 +100,8 @@ Suggestion.propTypes = {
     text: PropTypes.string,
     /** Called with the value (insert) or the text (prompt), then the click event. */
     onAccept: PropTypes.func,
+    /** Disables this suggestion. A disabled field or TagGroup disables all of its suggestions through `TagContext`. */
+    isDisabled: PropTypes.bool,
     /** Fires on press, before `onAccept`. It never replaces `onAccept`. */
     onClick: PropTypes.func,
     className: PropTypes.string,

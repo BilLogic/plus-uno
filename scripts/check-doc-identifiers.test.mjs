@@ -314,12 +314,10 @@ test('an enum named by a constant is read, not skipped — the #276 blind spot',
     'utf8',
   );
   const props = new Map(parsePropTypes(source, 'Tag').map((p) => [p.name, p.enumValues]));
-  // Before this was taught to resolve `PropTypes.oneOf(TAG_VARIANTS)`, both of
-  // these were null, which the check reads as "no enum" — so every
-  // `variant="…"` on the Tag page resolved to nothing at all, silently.
-  assert.deepEqual(props.get('behavior'), ['read-only', 'removable', 'selectable', 'link']);
-  assert.deepEqual(props.get('variant'), ['read-only', 'dismissible', 'selectable', 'operational']);
-  assert.ok(props.get('color').includes('magenta'));
+  // Before this was taught to resolve `PropTypes.oneOf(TAG_COLORS)`, the
+  // value was null, which the check reads as "no enum" — so every `color="…"`
+  // on the Tag page resolved to nothing at all, silently.
+  assert.deepEqual(props.get('color'), ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown']);
 });
 
 test('a comma inside a prop\'s JSDoc does not delete the prop', () => {

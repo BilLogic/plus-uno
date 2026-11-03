@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SuggestionStories from './Suggestion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,7 +21,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from a disabled field's or TagGroup's TagContext, never a prop."
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
     }
   ]
 };
@@ -68,7 +68,7 @@ as Tag, so it sits in the tag row where the value will land.
     <DsCanvasQuiet of={SuggestionStories.AcceptIntoTags} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same disabled ground, a dashed neutral edge so it still reads as a suggestion, and disabled words. It follows the field, and cannot be focused or accepted.</>}>
+<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same disabled ground, a dashed neutral edge so it still reads as a suggestion, and disabled words. It follows the field or `isDisabled`, and cannot be focused or accepted.</>}>
     <DsCanvasQuiet of={SuggestionStories.DisabledBesideTags} />
 </DocsCanvasShell>
 
@@ -101,6 +101,25 @@ as Tag, so it sits in the tag row where the value will land.
         </>
     }
 />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS documentation
+
+Benchmarked against the [ADS documentation](https://atlassian.design/components/tag) for this component. The parity table lists each ADS prop and what Suggestion does with it.
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS: closest pattern</th><th>Suggestion</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>None</td><td><code>label</code>, <code>type</code> (insert, prompt), <code>value</code>, <code>text</code></td><td>ADS has no suggestion component; the closest ADS pattern is a button that proposes a value.</td></tr>
+        <tr><td><code>onClick</code></td><td><code>onAccept</code>, <code>onClick</code></td><td>Accept hands back the value or the text; onClick fires first.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Also follows a disabled field or Tag group through TagContext.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -140,7 +159,7 @@ message or fills the text box, and stops offering the suggestion.
 ```jsx
 // Incorrect: a Tag styled as a suggestion is not a button, so nobody can
 // accept it with a keyboard.
-<Tag behavior="read-only" color="purple">Relationships</Tag>
+<Tag color="purple">Relationships</Tag>
 
 // Correct: insert hands back the value; the field turns it into a Tag.
 <Suggestion label="Relationships" value="focus-relationships" onAccept={addFocusArea} />
@@ -154,14 +173,16 @@ message or fills the text box, and stops offering the suggestion.
 A suggestion sits in a tag row, so its label is a value's name, not a
 sentence. For a prompt, pass the full words as `text` and a short `label`.
 
-### Disabled comes from the field or TagGroup.
+### Disable one suggestion, or the field.
 
-Disabled comes from a disabled field or `TagGroup` through `TagContext`: inside
-one, a suggestion reads the same value a Tag does and is disabled with the tags
-beside it. Like Tag, it has no `disabled` prop of its own.
+`isDisabled` disables one suggestion. A disabled field or `TagGroup` disables
+every suggestion in it through `TagContext`, the same value a Tag reads, so a
+suggestion is disabled with the tags beside it.
 
 ```jsx
-<TagGroup label="Focus areas" disabled={!canEdit}>
+<Suggestion label="Ratios" isDisabled onAccept={add} />
+
+<TagGroup label="Focus areas" isDisabled={!canEdit}>
   <Tag color="blue">Fractions</Tag>
   <Suggestion label="Ratios" onAccept={add} />
 </TagGroup>
