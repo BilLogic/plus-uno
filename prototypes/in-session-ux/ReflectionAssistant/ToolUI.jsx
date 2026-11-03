@@ -196,7 +196,7 @@ export const QuestionFlow = ({
                                 borderRadius: '8px',
                                 border: '1px solid',
                                 borderColor: isSelected ? 'var(--color-primary, #0472a8)' : 'var(--chat-outline, #e5e7eb)',
-                                background: isSelected ? 'var(--color-primary-state-08, rgba(4, 114, 168, 0.08))' : 'transparent',
+                                background: isSelected ? 'var(--ds-background-selected)' : 'transparent',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
                                 display: 'flex',
@@ -204,7 +204,7 @@ export const QuestionFlow = ({
                                 alignItems: 'center'
                             }}
                         >
-                            <span style={{ fontSize: '14px', fontWeight: 500, color: isSelected ? 'var(--color-primary, #0472a8)' : 'var(--chat-on-surface, #111827)' }}>
+                            <span style={{ fontSize: '14px', fontWeight: 500, color: isSelected ? 'var(--ds-text-selected)' : 'var(--chat-on-surface, #111827)' }}>
                                 {option.label}
                             </span>
                             {isSelected && (

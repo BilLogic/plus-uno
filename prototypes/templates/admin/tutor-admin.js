@@ -172,10 +172,10 @@ function buildSidebarNavigation() {
             navItem.style.borderRadius = `var(--size-element-radius-sm)`;
             navItem.style.textDecoration = 'none';
             navItem.style.color = item.selected 
-                ? 'var(--color-primary)' 
+                ? 'var(--ds-text-selected)' 
                 : 'var(--color-on-surface)';
             navItem.style.backgroundColor = item.selected 
-                ? 'var(--color-primary-state-08)' 
+                ? 'var(--ds-background-selected)' 
                 : 'transparent';
             
             if (item.icon) {
@@ -190,7 +190,7 @@ function buildSidebarNavigation() {
             
             navItem.addEventListener('mouseenter', () => {
                 if (!item.selected) {
-                    navItem.style.backgroundColor = 'var(--color-primary-state-08)';
+                    navItem.style.backgroundColor = 'var(--ds-background-neutral-subtle-hovered)';
                 }
             });
             

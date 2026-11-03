@@ -86,7 +86,7 @@
   border-radius: 24px 0 0 0;
 
   &:hover {
-    background: var(--color-surface-state-08);
+    background: var(--ds-background-neutral-subtle-hovered);
   }
 }
 
@@ -111,7 +111,7 @@
 .sb-ai-agent__logo-container {
   position: relative;
   border-radius: 179.437px;
-  background: var(--color-surface-state-08);
+  background: var(--ds-background-neutral);
   overflow: hidden;
   flex-shrink: 0;
   display: flex;
@@ -188,7 +188,7 @@
   color: var(--color-on-surface-variant);
 
   &:hover {
-    background: var(--color-surface-container-state-12);
+    background: var(--ds-background-neutral-subtle-hovered);
     color: var(--color-on-surface);
   }
 
@@ -219,7 +219,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--color-outline-state-12);
+    background: var(--ds-background-neutral-hovered);
     border-radius: 4px;
   }
 }
@@ -834,7 +834,7 @@
   width: 32px;
   height: 32px;
   border-radius: 1332px;
-  background: var(--color-primary-state-08);
+  background: var(--ds-background-brand-subtlest);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -842,7 +842,7 @@
   font-weight: 400;
   font-size: 18.667px;
   line-height: 1.571;
-  color: var(--color-primary-text);
+  color: var(--ds-text-brand);
   text-align: center;
   flex-shrink: 0;
 }
@@ -938,7 +938,7 @@
   transition: all 0.15s ease;
 
   &:hover {
-    background: var(--color-inverse-surface-state-12);
+    background: var(--ds-background-neutral-bold-hovered);
     transform: scale(1.05);
   }
 
