@@ -22,7 +22,7 @@
  * Colors:
  * - Modal background: --color-surface-container-high (#e7e8eb)
  * - Modal border: --color-outline-variant
- * - "Exit without saving" button: tonal secondary (--color-secondary-state-08 bg, --color-secondary-text text)
+ * - "Exit without saving" button: tonal secondary (--ds-background-neutral bg, --color-secondary-text text)
  * - "Save & Exit" button: filled primary (--color-primary bg, --color-on-primary text)
  * 
  * Spacing:

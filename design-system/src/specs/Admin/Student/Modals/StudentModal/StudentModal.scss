@@ -55,7 +55,7 @@
         }
 
         &:hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
             color: var(--color-on-surface);
         }
     }
@@ -75,7 +75,7 @@
         gap: var(--size-element-gap-md, 10px);
         padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
         border: none;
-        background-color: var(--color-secondary-state-08);
+        background-color: var(--ds-background-neutral);
         color: var(--color-secondary-text);
         cursor: pointer;
         transition: background-color 0.2s ease;
@@ -89,12 +89,12 @@
         }
 
         &--active {
-            background-color: var(--color-primary-state-08);
+            background-color: var(--ds-background-selected);
             color: var(--color-primary-text);
         }
 
         .student-modal__tab-badge {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
             padding: 0 var(--size-element-pad-x-sm, 8px);
             border-radius: var(--size-element-radius-full);
         }
@@ -212,7 +212,7 @@
                 border-radius: var(--size-table-radius-md);
 
                 &:hover {
-                    background-color: var(--color-on-surface-state-08);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
             }
 

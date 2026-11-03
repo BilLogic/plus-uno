@@ -45,7 +45,7 @@
         background-color: transparent !important;
 
         &.training-progress-table__row--hover:hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         .training-progress-table__cell {
@@ -96,7 +96,7 @@
         border-radius: var(--size-element-radius-sm);
 
         &:hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         &.training-progress-table__expand-btn--level-2 {

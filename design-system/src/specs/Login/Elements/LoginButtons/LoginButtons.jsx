@@ -40,7 +40,7 @@ export default function LoginButtons() {
 
                 <div
                     style={{
-                        backgroundColor: 'var(--color-on-surface-state-12)',
+                        backgroundColor: 'var(--ds-background-disabled)',
                         borderRadius: 'var(--size-element-radius-md)',
                         opacity: 'var(--color-disabled-opacity)',
                     }}
@@ -63,7 +63,7 @@ export default function LoginButtons() {
 
                 <div
                     style={{
-                        backgroundColor: 'var(--color-on-surface-state-12)',
+                        backgroundColor: 'var(--ds-background-disabled)',
                         borderRadius: 'var(--size-element-radius-md)',
                         opacity: 'var(--color-disabled-opacity)',
                     }}
