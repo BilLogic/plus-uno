@@ -108,7 +108,7 @@
     &__info {
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-pad-x-sm, 8px);
+        gap: var(--element-pad-compact, 8px);
         padding: 0 var(--size-element-pad-y-sm, 4px);
         width: 100%;
     }

@@ -99,7 +99,7 @@
     align-items: center;
     gap: var(--size-element-gap-sm);
     width: 100%;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+    padding: var(--size-element-pad-y-md) var(--element-pad-default);
     border: 0;
     background: none;
     color: var(--ds-text);
@@ -138,7 +138,7 @@
 
 .plus-select-hint {
     display: block;
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-default);
     color: var(--ds-text-subtle);
     font: var(--body-small);
 }

@@ -73,7 +73,7 @@
         align-items: center;
         justify-content: center;
         gap: var(--size-element-gap-md, 10px);
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px);
         border: none;
         background-color: var(--ds-background-neutral);
         color: var(--color-secondary-text);
@@ -95,7 +95,7 @@
 
         .student-modal__tab-badge {
             background-color: var(--ds-background-neutral-subtle-hovered);
-            padding: 0 var(--size-element-pad-x-sm, 8px);
+            padding: 0 var(--element-pad-compact, 8px);
             border-radius: var(--size-element-radius-full);
         }
     }
@@ -141,7 +141,7 @@
         background-color: var(--color-surface);
         border: 0.8px solid var(--color-outline-variant);
         border-radius: var(--size-element-radius-sm, 2px);
-        padding: var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px);
+        padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px);
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-normal);
         color: var(--color-on-surface-variant);

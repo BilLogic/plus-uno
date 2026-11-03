@@ -66,7 +66,7 @@ const CallOffFormOrganism = ({
                 }}>
                     <Alert
                         style="warning"
-                        dismissable={false}
+                        dismissible={false}
                         className="mb-0"
                     >
                         {/* Figma Node 221:171732: Alert content has specific padding and gap */}

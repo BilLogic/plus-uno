@@ -26,7 +26,7 @@ import * as SpacingStories from './Spacing.stories.jsx';
 Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or Element inside a component), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Primitives hold the raw numbers and stay hidden: designers and code bind the semantic token, never a primitive and never a typed number.
 
 ```css
-padding: var(--card-pad-md);
+padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
@@ -86,8 +86,8 @@ Spacing has two layers.
   `--space-050` is 8. They are hidden in Figma, and nothing binds them.
 - **Semantic tokens** point at a primitive and name a job, as
   `Collection/property-variant` in Figma, and the same words joined by dashes
-  in code: `Card/pad-md` is `--card-pad-md`. A collection with a single
-  property skips the variant (`--modal-pad`).
+  in code: `Section/pad-x-md` is `--size-section-pad-x-md`. A collection with a
+  single property skips the variant (`--table-stack`).
 
 Name the relationship first, then pick the token. If you cannot name the
 context a value belongs to, step back to the box that holds it.
@@ -448,7 +448,7 @@ Group by proximity, match the token to the container you are in, and take every 
 
 <DoDont>
 <Do caption="A card pads with a card token, so the content breathes at the card scale.">
-<div style={{ padding: 'var(--card-pad-md)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
+<div style={{ padding: 'var(--card-pad-default)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Do>
 <Dont caption="An element token on a card squeezes the content to a button-sized pad.">
 <div style={{ padding: 'var(--element-pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
@@ -458,7 +458,7 @@ Group by proximity, match the token to the container you are in, and take every 
 **Never hardcode spacing.** Always use the variable; the code token is the same name with `var()`.
 
 <DoDont>
-<Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-md)</C></Do>
+<Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-default)</C></Do>
 <Dont caption="A literal 13 matches no step on the scale and will not follow a token change."><C>padding: 13px</C></Dont>
 </DoDont>
 

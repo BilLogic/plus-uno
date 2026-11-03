@@ -321,7 +321,7 @@ export const Interactive = {
 /**
  * In every color mode a section has no fill, its title is the body text, its
  * description the subtle text, and the selected toolbar sits on the selected
- * background. The deprecated `background="container"` still draws the well.
+ * background.
  */
 export const ColorModes = {
     render: () => (
@@ -332,9 +332,6 @@ export const ColorModes = {
             <PatternSection data-probe="toolbar" title="Students" toolbar={<SelectedToolbar />}>
                 {slotContent('Table')}
             </PatternSection>
-            <PatternSection data-probe="well" title="Legacy well" background="container">
-                {slotContent('Content slot')}
-            </PatternSection>
         </div>
     ),
     parameters: { docs: { disable: true } },
@@ -343,14 +340,12 @@ export const ColorModes = {
         const title = plain.querySelector('.plus-pattern-section-title');
         const desc = plain.querySelector('.plus-pattern-section-description');
         const bulk = canvasElement.querySelector('.plus-section-toolbar--selected');
-        const well = canvasElement.querySelector('[data-probe="well"]');
         await inEveryColorMode(async (mode) => {
             await expect(getComputedStyle(plain).backgroundColor, `${mode}: no fill`).toBe('rgba(0, 0, 0, 0)');
             await expect(getComputedStyle(plain).paddingTop, `${mode}: no pad`).toBe('0px');
             await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(getComputedStyle(desc).color, `${mode}: the description`).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
             await expect(getComputedStyle(bulk).backgroundColor, `${mode}: the bulk bar`).toBe(tokenColor(canvasElement, '--ds-background-selected'));
-            await expect(getComputedStyle(well).backgroundColor, `${mode}: the legacy well`).toBe(tokenColor(canvasElement, '--ds-surface-container'));
         });
     },
 };

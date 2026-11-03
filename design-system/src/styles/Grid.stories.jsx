@@ -51,7 +51,7 @@ export const ColumnSpans = () => (
     </div>
 );
 
-const ground = { padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
+const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
 
 /** Keep the gutter 16 at every width. */
 export const Gutter = () => (
@@ -82,7 +82,7 @@ export const SpanWholeColumns = () => (
 );
 
 const ModalBox = ({ width }) => (
-    <div style={{ width, maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', padding: 'var(--modal-pad)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
+    <div style={{ width, maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', padding: 'var(--modal-pad-x-default)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
         <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Add a tutor</span>
         <span style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--modal-inline-sm)' }}>
             <Button text="Cancel" />

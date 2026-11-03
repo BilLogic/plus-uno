@@ -9,12 +9,12 @@ import Alert from '@/components/messaging/Alert';
  *
  * @param {object} props
  * @param {React.ReactNode} props.children - Alert message content.
- * @param {boolean} [props.dismissable=true] - Whether the alert can be dismissed.
+ * @param {boolean} [props.dismissible=true] - Whether the alert can be dismissed.
  * @returns {React.ReactElement}
  */
-export default function LoginAlertBanner({ children, dismissable = true }) {
+export default function LoginAlertBanner({ children, dismissible = true }) {
     return (
-        <Alert style="primary" leadingVisual={false} dismissable={dismissable}>
+        <Alert style="primary" leadingVisual={false} dismissible={dismissible}>
             {children}
         </Alert>
     );
@@ -22,5 +22,5 @@ export default function LoginAlertBanner({ children, dismissable = true }) {
 
 LoginAlertBanner.propTypes = {
     children: PropTypes.node,
-    dismissable: PropTypes.bool,
+    dismissible: PropTypes.bool,
 };

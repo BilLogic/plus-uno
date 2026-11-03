@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
@@ -40,32 +40,6 @@ import './PatternSection.scss';
 
 export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
-
-/*
- * `padding` and `background` predate the Figma Section, which has neither.
- * They keep working so no call site breaks, and say so once per prop.
- */
-const DEPRECATED = {
-    padding: 'the Surface around a section supplies its pad',
-    background: 'a section has no fill; for a region with a fill of its own, use Surface or Card',
-};
-const warned = new Set();
-
-/** Clears the once-per-prop memory, so tests can watch the warning again. */
-export const resetPatternSectionWarnings = () => warned.clear();
-
-const useDeprecatedProps = (passed) => {
-    const names = Object.keys(DEPRECATED).filter((name) => passed[name] !== undefined).join(' ');
-    useEffect(() => {
-        if (!names || process.env.NODE_ENV === 'production') return;
-        names.split(' ').forEach((name) => {
-            if (warned.has(name)) return;
-            warned.add(name);
-            // eslint-disable-next-line no-console
-            console.warn(`[PatternSection] \`${name}\` is deprecated: ${DEPRECATED[name]}. Leave it off.`);
-        });
-    }, [names]);
-};
 
 const inferType = ({ header, toolbar, tabs }) => {
     if (header) return 'custom';
@@ -190,21 +164,15 @@ const PatternSection = ({
     side,
     footer,
     level: rankProp,
-    padding,
     gap = 'md',
-    background,
     className = '',
     style,
     children,
     ...props
 }) => {
-    useDeprecatedProps({ padding, background });
-
     const classes = [
         'plus-pattern-section',
-        padding !== undefined && `plus-pattern-section-pad-${padding}`,
         `plus-pattern-section-gap-${gap}`,
-        background !== undefined && `plus-pattern-section-bg-${background}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -318,12 +286,8 @@ PatternSection.propTypes = {
     footer: PropTypes.node,
     /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
-    /** Deprecated: a section has no pad; the Surface around it supplies one */
-    padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
     /** Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: a section has no fill. `container` still draws the translucent well */
-    background: PropTypes.oneOf(['none', 'container']),
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot; with `layout="split"`, the main column */

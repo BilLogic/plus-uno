@@ -52,7 +52,7 @@ const BadgeCard = ({
                 <div className="plus-badge-card__title">
                     <h3 className="h6 font-weight-semibold plus-badge-card__title-text">{title}</h3>
                     {tooltipText ? (
-                        <Tooltip text={tooltipText} placement="top" size="default">
+                        <Tooltip text={tooltipText} placement="top">
                             <button type="button" className="plus-badge-card__info" aria-label="More information">
                                 <i className="fa-solid fa-circle-info" aria-hidden="true" />
                             </button>

@@ -20,7 +20,7 @@ export const webAppSourceSnippets = {
         '<Alert',
         '  style="primary"',
         '  title="With Title"',
-        '  dismissable',
+        '  dismissible',
         '>',
         '  Alert with title and message text.',
         '</Alert>'
@@ -256,7 +256,6 @@ export const webAppSourceSnippets = {
         '<Tooltip',
         '  text="Tooltip text"',
         '  placement="top"',
-        '  size="default"',
         '  show',
         '>',
         '  <Button appearance="primary" text="Hover me" />',

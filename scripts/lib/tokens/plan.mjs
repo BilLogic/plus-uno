@@ -127,15 +127,12 @@ export const MOTION_EASINGS = {
  * A family PR's row deletes the OLD declaration (in `_spacing_semantics.scss`
  * or `_frame_layers.scss`) once its callers move to the role token; this list
  * then loses that line in the same PR, by hand, alongside it.
+ *
+ * The original six (`--size-element-pad-x-md/sm`, `--card-pad-md/sm/lg`,
+ * `--modal-pad`) migrated their callers and lost both rows; the list is empty
+ * until the next old name becomes unambiguous enough to alias.
  */
-export const LEGACY_ALIASES = [
-  { old: '--size-element-pad-x-md', role: '--element-pad-default' },
-  { old: '--size-element-pad-x-sm', role: '--element-pad-compact' },
-  { old: '--card-pad-md', role: '--card-pad-default' },
-  { old: '--card-pad-sm', role: '--card-pad-compact' },
-  { old: '--card-pad-lg', role: '--card-pad-spacious' },
-  { old: '--modal-pad', role: '--modal-pad-x-default' },
-];
+export const LEGACY_ALIASES = [];
 
 /** The five old-name prefixes the "still on old size tokens" ratchet tracks. */
 export const OLD_SIZE_PREFIXES = ['--size-element-', '--card-', '--section-', '--modal-', '--surface-'];

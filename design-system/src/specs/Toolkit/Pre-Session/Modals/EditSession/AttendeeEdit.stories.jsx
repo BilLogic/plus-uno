@@ -57,7 +57,7 @@ const RosterPanel = ({ title, addLabel, items }) => (
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: 'var(--size-element-pad-y-sm) var(--size-element-pad-x-sm)',
+                padding: 'var(--size-element-pad-y-sm) var(--element-pad-compact)',
                 overflowY: 'auto',
                 flex: 1,
             }}

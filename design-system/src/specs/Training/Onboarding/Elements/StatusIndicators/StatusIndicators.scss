@@ -9,7 +9,7 @@
     justify-content: center;
     border-radius: var(--size-element-radius-md, 8px);
     min-width: 36px;
-    padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+    padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
     gap: var(--size-element-gap-md, 8px);
 
     i {
@@ -20,7 +20,7 @@
     // Size variants
     &--small {
         min-width: 28px;
-        padding: var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px);
+        padding: var(--size-element-pad-y-sm, 4px) var(--element-pad-compact, 8px);
 
         i {
             font-size: 12px;
@@ -29,7 +29,7 @@
 
     &--medium {
         min-width: 36px;
-        padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+        padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
 
         i {
             font-size: 14px;

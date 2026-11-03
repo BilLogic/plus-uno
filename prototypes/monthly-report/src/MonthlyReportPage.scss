@@ -48,7 +48,7 @@
 
 .month-badge {
     background: var(--color-surface-container);
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
     border-radius: var(--size-element-radius-full);
     font-weight: 600;
 }
@@ -211,7 +211,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--size-element-gap-xs);
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
     border-radius: var(--size-element-radius-full);
     font-size: 12px;
     font-weight: 600;
@@ -575,7 +575,7 @@
     gap: var(--size-element-gap-md);
     background: var(--color-surface-container);
     border-radius: var(--size-element-radius-md);
-    padding: var(--size-element-pad-x-md);
+    padding: var(--element-pad-default);
 }
 
 .time-insight-icon {
@@ -773,7 +773,7 @@
     background: var(--color-surface-container);
     border-left: 3px solid var(--color-primary);
     border-radius: var(--size-element-radius-sm);
-    padding: var(--size-element-pad-x-md);
+    padding: var(--element-pad-default);
 }
 
 .quote-text {

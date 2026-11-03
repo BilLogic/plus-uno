@@ -50,7 +50,7 @@
 
 // Table header row
 .plus-choice-grid-column-header {
-    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
     text-align: center;
     color: var(--color-on-surface);
     font: var(--plus-choice-grid-label-font, var(--body-default));
@@ -59,7 +59,7 @@
 
 // Row label column
 .plus-choice-grid-row-label {
-    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
     text-align: left;
     color: var(--color-on-surface);
     font: var(--plus-choice-grid-label-font, var(--body-default));
@@ -69,7 +69,7 @@
 
 // Grid cells
 .plus-choice-grid-cell {
-    padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
+    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
     text-align: center;
     vertical-align: middle;
     background-color: var(--color-surface-container-low);

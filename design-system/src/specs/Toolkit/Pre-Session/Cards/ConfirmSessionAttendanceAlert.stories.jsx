@@ -33,7 +33,7 @@ export const SessionTimeChange_OneTime = () => (
     <AlertContainer>
         <Alert
             style="warning"
-            dismissable={true}
+            dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
@@ -51,7 +51,7 @@ export const SessionTimeChange_Recurring = () => (
     <AlertContainer>
         <Alert
             style="warning"
-            dismissable={true}
+            dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
@@ -69,7 +69,7 @@ export const SessionCanceled = () => (
     <AlertContainer>
         <Alert
             style="danger"
-            dismissable={true}
+            dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>

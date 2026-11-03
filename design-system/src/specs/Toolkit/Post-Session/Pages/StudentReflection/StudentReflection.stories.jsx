@@ -113,9 +113,6 @@ export const Unfilled = {
     render: () => renderShell(STATE_PROPS.unfilled),
 };
 
-/** @deprecated Prefer Unfilled — kept so old Storybook URLs / HMR keep working. */
-export const Empty = Unfilled;
-
 /** Figma state=filled: the happy path. Its AI follow-up is a proposal, not shipped. */
 export const Filled = {
     render: () => renderShell(STATE_PROPS.filled),

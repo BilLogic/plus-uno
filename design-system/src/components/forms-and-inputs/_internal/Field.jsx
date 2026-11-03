@@ -174,7 +174,7 @@ export const FieldLabel = ({
     return (
         <div className="plus-field-label-row">
             {label}
-            <Tooltip text={info} placement="top" size="small">
+            <Tooltip text={info} placement="top">
                 <button
                     type="button"
                     className="plus-field-info"

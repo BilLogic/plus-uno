@@ -25,7 +25,7 @@ describe('Alert Component', () => {
 
     it('calls onDismiss when close button is clicked', () => {
         const handleDismiss = vi.fn();
-        render(<Alert onDismiss={handleDismiss} dismissable={true}>Dismiss Me</Alert>);
+        render(<Alert onDismiss={handleDismiss} dismissible={true}>Dismiss Me</Alert>);
 
         const closeButton = screen.getByRole('button', { name: /close alert/i });
         fireEvent.click(closeButton);
@@ -33,8 +33,8 @@ describe('Alert Component', () => {
         expect(handleDismiss).toHaveBeenCalledTimes(1);
     });
 
-    it('does not render close button when dismissable is false', () => {
-        render(<Alert dismissable={false}>Cannot Dismiss</Alert>);
+    it('does not render close button when dismissible is false', () => {
+        render(<Alert dismissible={false}>Cannot Dismiss</Alert>);
         expect(screen.queryByRole('button', { name: /close alert/i })).not.toBeInTheDocument();
     });
 });

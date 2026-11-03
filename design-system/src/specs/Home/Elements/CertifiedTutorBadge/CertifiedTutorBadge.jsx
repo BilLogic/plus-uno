@@ -21,41 +21,23 @@ import claimedV2Full from '@/assets/images/tutor-badges/claimed-v2-full.png';
 /**
  * CertifiedTutorBadge Component
  * Displays a hexagonal badge for certified tutors
- * 
+ *
  * @param {string} type - Badge type: 'unclaimed', 'claimed-v1', or 'claimed-v2'
- * @param {string} variant - Legacy prop: 'red' maps to 'claimed-v1', 'teal' maps to 'claimed-v2'
- * @param {string} size - Size variant: 'thumbnail', 'modal', or 'full' (also supports 'small'/'large' for backward compatibility)
+ * @param {string} size - Size variant: 'thumbnail', 'modal', or 'full'
  * @param {string} className - Additional CSS classes
  * @param {string} id - Element ID
  * @param {React.ReactNode} children - Optional content to replace badge image
  */
 export const CertifiedTutorBadge = ({
     type,
-    variant,
     size = 'full',
     className = '',
     id,
     children
 }) => {
-    // Support legacy variant prop for backward compatibility
-    let badgeType = type;
-    if (!badgeType && variant) {
-        badgeType = variant === 'red' ? 'claimed-v1' : variant === 'teal' ? 'claimed-v2' : 'claimed-v1';
-    }
-    badgeType = badgeType || 'claimed-v1';
-    
-    // Map size to image key
-    const sizeMap = {
-        'thumbnail': 'thumbnail',
-        'modal': 'modal',
-        'full': 'full',
-        // Legacy size support
-        'small': 'thumbnail',
-        'large': 'full'
-    };
-    
-    const sizeKey = sizeMap[size] || 'full';
-    
+    const badgeType = type || 'claimed-v1';
+    const sizeKey = size;
+
     // Get the appropriate badge image based on type and size
     let badgeImage;
     if (badgeType === 'unclaimed') {
@@ -80,7 +62,7 @@ export const CertifiedTutorBadge = ({
     return (
         <div
             id={id}
-            className={`plus-certified-tutor-badge plus-certified-tutor-badge--${badgeType} plus-certified-tutor-badge--${size} ${variant ? `plus-certified-tutor-badge--${variant}` : ''} ${className}`}
+            className={`plus-certified-tutor-badge plus-certified-tutor-badge--${badgeType} plus-certified-tutor-badge--${size} ${className}`}
             aria-label={`Certified Tutor Badge - ${badgeType} - ${size}`}
         >
             {children || (
@@ -102,10 +84,8 @@ export const CertifiedTutorBadge = ({
 CertifiedTutorBadge.propTypes = {
     /** Badge type */
     type: PropTypes.oneOf(['unclaimed', 'claimed-v1', 'claimed-v2']),
-    /** Legacy color variant (for backward compatibility: 'red' maps to 'claimed-v1', 'teal' maps to 'claimed-v2') */
-    variant: PropTypes.oneOf(['red', 'teal']),
     /** Size variant of the badge */
-    size: PropTypes.oneOf(['thumbnail', 'modal', 'full', 'small', 'large']),
+    size: PropTypes.oneOf(['thumbnail', 'modal', 'full']),
     /** Additional CSS classes */
     className: PropTypes.string,
     /** Element ID */

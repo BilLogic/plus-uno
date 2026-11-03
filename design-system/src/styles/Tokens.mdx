@@ -153,7 +153,7 @@ Code prefixes keep the names they were generated with, so the Frame is `--surfac
 Bind the token and nothing else. A token never takes a fallback, and the layer comes from what the thing is.
 
 - A token is used bare: `var(--ds-text)`, never with a second value after a comma. That fallback is a fifth, unthemed color: it hides a missing token and drifts from every mode.
-- Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-md`); a filter chip takes the element layer (`--element-pad-x-md`).
+- Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-default`); a filter chip takes the element layer (`--element-pad-x-md`).
 - Spell tokens and copy in American English: gray, color, behavior.
 
 **Use the token bare.** A helper line under a field.
@@ -210,10 +210,10 @@ Features bind semantic tokens. A primitive is a building block that only defines
 
 <DoDont>
 <Do caption="The card follows any change to the card radius.">
-<div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Card/radius (semantic)</C></div>
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Card/radius (semantic)</C></div>
 </Do>
 <Dont caption="The same 16 today, but it stays put when the card radius changes.">
-<div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Radius/radius-100 (primitive)</C></div>
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Radius/radius-100 (primitive)</C></div>
 </Dont>
 </DoDont>
 

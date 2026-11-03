@@ -58,7 +58,7 @@ const App = () => {
                         flexDirection: 'column',
                         gap: 'var(--size-element-gap-sm, 8px)',
                         textAlign: 'left',
-                        padding: 'var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 16px)',
+                        padding: 'var(--size-element-pad-y-md, 8px) var(--element-pad-default, 16px)',
                         backgroundColor: 'var(--color-surface-container-high, #f0f0f0)',
                         borderRadius: 'var(--size-element-radius-md, 4px)',
                     }}

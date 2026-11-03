@@ -70,7 +70,7 @@ $dropdown-themes: (
         align-items: center;
         justify-content: center;
         gap: var(--size-element-gap-sm);
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        padding: var(--size-element-pad-y-md) var(--element-pad-default);
         font: var(--body-default);
         font-weight: var(--type-weight-medium);
         border: var(--size-element-stroke-sm) solid transparent;
@@ -391,7 +391,7 @@ $dropdown-themes: (
         .pdropdown-default-toggle,
         .pdropdown-split-text-btn,
         .pdropdown-split-toggle-btn {
-            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
             font: var(--body-default);
             font-weight: var(--type-weight-medium);
 
@@ -430,7 +430,7 @@ $dropdown-themes: (
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+        padding: var(--size-element-pad-y-md) var(--element-pad-default);
         font: var(--body-default);
         font-weight: var(--type-weight-medium);
         border: var(--size-element-stroke-sm) solid transparent;
@@ -445,7 +445,7 @@ $dropdown-themes: (
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm);
+        padding: var(--size-element-pad-y-md) var(--element-pad-compact);
         border: var(--size-element-stroke-sm) solid transparent;
         border-radius: 0 var(--size-element-radius-md) var(--size-element-radius-md) 0;
         cursor: pointer;

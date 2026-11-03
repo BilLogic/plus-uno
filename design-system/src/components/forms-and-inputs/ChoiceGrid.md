@@ -9,7 +9,7 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGrid.mdx`
 
@@ -25,7 +25,6 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 | `values` | object | `{}` | Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. |
 | `disabled` | bool | `false` | Disable the choice grid |
 | `readOnly` | bool | `false` | Shown and focusable, not changeable. |
-| `size` | enum | — | Option-label font size in px, and the control width that goes with it. Unset keeps the default rendering. |
 | `onChange` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
@@ -34,19 +33,17 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 
 **`type`** — `radio` · `checkbox`
 
-**`size`** — `12` · `14` · `16`
-
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-large` · `--body-small` · `--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--layout-control-checkbox` · `--plus-choice-grid-control-size` · `--plus-choice-grid-label-font` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
+`--body-default` · `--color-on-surface` · `--color-on-surface-variant` · `--color-surface-container-low` · `--element-pad-default` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGrid.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

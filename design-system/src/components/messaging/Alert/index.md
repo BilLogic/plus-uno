@@ -24,7 +24,6 @@ Uses the standard React children pattern for content (matching React Bootstrap c
 | `children` | node (required) | — | Alert content - supports text, JSX, or React components |
 | `leadingVisual` | bool or string or node | `true` | The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it |
 | `dismissible` | bool | `true` | Whether the alert can be dismissed |
-| `dismissable` | bool | — | Whether the alert can be dismissed |
 | `onDismiss` | func | — | Callback when alert is dismissed |
 | `className` | string | `''` | Additional CSS classes |
 

@@ -9,7 +9,7 @@ Design-system tooltip wrapper around Bootstrap OverlayTrigger.
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Sizes, Interactive, Overview
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
@@ -20,7 +20,6 @@ Design-system tooltip wrapper around Bootstrap OverlayTrigger.
 | `text` | node (required) | — | Tooltip text |
 | `placement` | enum | `'top'` | Tooltip placement |
 | `trigger` | string or arrayOf | `['hover'` | — |
-| `size` | enum | `'default'` | Tooltip size |
 | `children` | node (required) | — | — |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -31,8 +30,6 @@ Design-system tooltip wrapper around Bootstrap OverlayTrigger.
 ## Variants
 
 **`placement`** — `top` · `bottom` · `left` · `right`
-
-**`size`** — `small` · `default` · `large`
 
 Anything not listed is not a valid value.
 

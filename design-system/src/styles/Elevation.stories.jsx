@@ -25,7 +25,7 @@ const tile = (surface, shadow) => ({
     flexDirection: 'column',
     justifyContent: 'flex-end',
     gap: 'var(--card-stack-sm)',
-    padding: 'var(--card-pad-sm)',
+    padding: 'var(--card-pad-compact)',
     borderRadius: 'var(--card-radius)',
     background: `var(${surface})`,
     boxShadow: shadow ? `var(${shadow})` : 'none',
@@ -37,7 +37,7 @@ const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
 /** The four surface levels, each with the shadow it pairs with. */
 export const Overview = () => (
     <ModeCompare>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
             {LEVELS.map((l) => (
                 <div key={l.name} style={tile(l.surface, l.shadow)}>
                     <span style={{ font: 'var(--heading-xsmall)' }}>{l.name}</span>
@@ -53,11 +53,11 @@ export const Overview = () => (
 /** A card at rest, a card lifted while it is dragged, and a well inside a card. */
 export const Cards = () => (
     <ModeCompare>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
             <PatternCard title="At rest" description="The raised pair, no border." />
             <PatternCard title="Dragged" description="The overlay pair while it moves." dragging />
             <PatternCard title="With a well" description="A recessed strip inside the card.">
-                <div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius-sm)', background: 'var(--ds-surface-container)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
+                <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius-sm)', background: 'var(--ds-surface-container)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
                     12 sessions this week
                 </div>
             </PatternCard>
@@ -65,7 +65,7 @@ export const Cards = () => (
     </ModeCompare>
 );
 
-const ground = { padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
+const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
 
 /** Lift a surface with its shadow, never with a darker gray. */
 export const LiftWithShadow = () => (

@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button/Button';
 import PatternCard from '@/patterns/PatternCard';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import './Jumbotron.scss';
 
 /*
- * The deprecated props each say so once per session in development, however
- * many Jumbotrons render them. The set is module state; tests clear it.
+ * `align="center"` does not go with side media, and says so once per session
+ * in development. The set is module state; tests clear it.
  */
 const warned = new Set();
 
@@ -20,17 +19,6 @@ const warnOnce = (key, message) => {
 
 /** Clears the once-per-session record of deprecation warnings. For tests. */
 export const resetJumbotronDeprecationWarnings = () => warned.clear();
-
-const DEPRECATIONS = {
-    subtitle: '`subtitle` is deprecated; use `description`.',
-    fluid: '`fluid` is deprecated; use `container="band"`.',
-    primaryButton: '`primaryButton` is deprecated; put a filled Button in `actions`.',
-    secondaryButton: '`secondaryButton` is deprecated; put an outlined Button in `actions`, after the filled one.',
-    paddingSize: '`paddingSize` is deprecated; the card pads at Card/pad-lg. It still sets the card padding for now.',
-    gapSize: '`gapSize` is deprecated and has no effect; the spacing comes from the Section tokens.',
-    radiusSize: '`radiusSize` is deprecated and has no effect; the card takes Card/radius and the band is square.',
-    children: '`children` is deprecated; a Jumbotron is a title, one `description` line and `actions`.',
-};
 
 /**
  * Jumbotron: the one hero block at the top of a landing or overview page.
@@ -47,11 +35,6 @@ const DEPRECATIONS = {
  *   480 of text, 16 of gutter and 400 of image, so 944 with Card/pad-lg — and
  *   below that the media moves on top, inside the padding.
  * - One state: the buttons carry their own. No loading state.
- *
- * `subtitle`, `fluid`, `primaryButton`, `secondaryButton`, `paddingSize`,
- * `gapSize`, `radiusSize` and `children` still work and warn once in
- * development; where a new prop and its old one are both given, the new one
- * wins.
  */
 const Jumbotron = ({
     title,
@@ -59,36 +42,16 @@ const Jumbotron = ({
     actions,
     media,
     mediaPosition = 'top',
-    container,
+    container = 'card',
     align = 'start',
-    // Deprecated
-    subtitle,
-    fluid,
-    primaryButton,
-    secondaryButton,
-    paddingSize,
-    gapSize,
-    radiusSize,
-    children,
     className = '',
     id,
     style,
     ...props
 }) => {
-    const legacy = { subtitle, fluid, primaryButton, secondaryButton, paddingSize, gapSize, radiusSize, children };
-    const used = Object.keys(legacy).filter((key) => legacy[key] != null && legacy[key] !== false);
-    const usedKey = used.join(',');
-
     const placement = media ? (mediaPosition === 'side' ? 'side' : 'top') : 'none';
     const sideForcesStart = placement === 'side' && align === 'center';
     const resolvedAlign = sideForcesStart ? 'start' : align === 'center' ? 'center' : 'start';
-    const resolvedContainer = container ?? (fluid ? 'band' : 'card');
-    const resolvedDescription = description ?? subtitle;
-
-    useEffect(() => {
-        if (!usedKey) return;
-        usedKey.split(',').forEach((key) => warnOnce(key, DEPRECATIONS[key]));
-    }, [usedKey]);
 
     useEffect(() => {
         if (sideForcesStart) {
@@ -96,31 +59,15 @@ const Jumbotron = ({
         }
     }, [sideForcesStart]);
 
-    let resolvedActions = actions;
-    if (resolvedActions == null && (primaryButton || secondaryButton)) {
-        // The defaults are spread first, so a caller's props still win.
-        resolvedActions = (
-            <>
-                {primaryButton && (
-                    <Button text="Primary Action" appearance="primary" {...primaryButton} />
-                )}
-                {secondaryButton && (
-                    <Button text="Secondary Action" {...secondaryButton} />
-                )}
-            </>
-        );
-    }
-
     const content = (
         <div className="plus-jumbotron-content">
-            {(title || resolvedDescription) && (
+            {(title || description) && (
                 <div className="plus-jumbotron-header">
                     {title && <h1 className="plus-jumbotron-title">{title}</h1>}
-                    {resolvedDescription && <p className="plus-jumbotron-description">{resolvedDescription}</p>}
+                    {description && <p className="plus-jumbotron-description">{description}</p>}
                 </div>
             )}
-            {children != null && <div className="plus-jumbotron-body">{children}</div>}
-            {resolvedActions && <div className="plus-jumbotron-actions">{resolvedActions}</div>}
+            {actions && <div className="plus-jumbotron-actions">{actions}</div>}
         </div>
     );
 
@@ -130,7 +77,7 @@ const Jumbotron = ({
 
     // A card's top media is its full-bleed image slot; everywhere else the
     // media sits in the layout with the content.
-    const cardImage = resolvedContainer === 'card' && placement === 'top';
+    const cardImage = container === 'card' && placement === 'top';
     const layout = (
         <div className="plus-jumbotron-layout">
             {!cardImage && placement === 'top' && mediaNode}
@@ -141,7 +88,7 @@ const Jumbotron = ({
 
     const classes = [
         'plus-jumbotron',
-        `plus-jumbotron--${resolvedContainer}`,
+        `plus-jumbotron--${container}`,
         `plus-jumbotron--align-${resolvedAlign}`,
         `plus-jumbotron--media-${placement}`,
         className,
@@ -155,7 +102,7 @@ const Jumbotron = ({
         </HeadingLevelContext.Provider>
     );
 
-    if (resolvedContainer === 'band') {
+    if (container === 'band') {
         return (
             <div id={id} className={classes} style={style} {...props}>
                 {body}
@@ -168,7 +115,7 @@ const Jumbotron = ({
             id={id}
             className={classes}
             style={style}
-            padding={paddingSize ?? 'lg'}
+            padding="lg"
             image={cardImage ? mediaNode : undefined}
             {...props}
         >
@@ -176,15 +123,6 @@ const Jumbotron = ({
         </PatternCard>
     );
 };
-
-const buttonShape = PropTypes.shape({
-    text: PropTypes.string,
-    onClick: PropTypes.func,
-    appearance: PropTypes.string,
-    spacing: PropTypes.string,
-    icon: PropTypes.string,
-    iconPosition: PropTypes.string,
-});
 
 Jumbotron.propTypes = {
     /** The page's title, rendered as its one h1 at Heading/large 24: a page with a Jumbotron gives its Surface no `title`. */
@@ -201,22 +139,6 @@ Jumbotron.propTypes = {
     container: PropTypes.oneOf(['card', 'band']),
     /** Text alignment; side media keeps it `start` */
     align: PropTypes.oneOf(['start', 'center']),
-    /** Deprecated: use `description` */
-    subtitle: PropTypes.node,
-    /** Deprecated: body content; a Jumbotron is a title, a description and actions */
-    children: PropTypes.node,
-    /** Deprecated: put a filled Button in `actions` */
-    primaryButton: buttonShape,
-    /** Deprecated: put an outlined Button in `actions` */
-    secondaryButton: buttonShape,
-    /** Deprecated: use `container="band"` */
-    fluid: PropTypes.bool,
-    /** Deprecated: still sets the card padding (Card/pad-sm · md · lg) */
-    paddingSize: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: no effect */
-    gapSize: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: no effect */
-    radiusSize: PropTypes.oneOf(['sm', 'md', 'lg']),
     className: PropTypes.string,
     id: PropTypes.string,
     style: PropTypes.object,

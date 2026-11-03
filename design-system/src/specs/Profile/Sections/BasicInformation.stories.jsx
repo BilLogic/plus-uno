@@ -43,7 +43,7 @@
  * - Card border-radius: var(--size-section-radius-md, 12px)
  * - Field gap (between fields): var(--size-element-gap-sm, 8px)
  * - Label-to-input gap: var(--size-small-gap-xs, 4px)
- * - Input padding: var(--size-element-pad-x-md, 10px) / var(--size-element-pad-y-md, 6px)
+ * - Input padding: var(--element-pad-default, 10px) / var(--size-element-pad-y-md, 6px)
  * - Input border-radius: var(--size-border-radius-50, 2px)
  * 
  * Width: ~848px (from Figma)

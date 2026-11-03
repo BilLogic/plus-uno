@@ -334,7 +334,7 @@
         th {
             background-color: var(--color-info-container);
             color: var(--color-on-info-container);
-            padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+            padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
             text-align: left;
             font-weight: var(--font-weight-semibold-1);
             border-bottom: var(--size-element-border) solid var(--color-outline-variant);
@@ -352,7 +352,7 @@
         td {
             background-color: var(--color-surface);
             color: var(--color-on-surface-variant);
-            padding: var(--size-element-pad-y-md, 8px) var(--size-element-pad-x-md, 12px);
+            padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
             vertical-align: top;
             border-bottom: var(--size-element-border) solid var(--color-outline-variant);
 
@@ -401,7 +401,7 @@
         min-height: 100px;
         border: 1px solid var(--color-outline-variant);
         border-radius: var(--size-element-radius-sm);
-        padding: var(--size-element-pad-y-sm, 8px) var(--size-element-pad-x-sm, 8px);
+        padding: var(--size-element-pad-y-sm, 8px) var(--element-pad-compact, 8px);
         font-family: var(--font-family-body);
         font-size: var(--font-size-body3);
         color: var(--color-on-surface);

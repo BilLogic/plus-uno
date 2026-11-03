@@ -274,7 +274,6 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 <Tooltip
                                     text="Get notifications sent to an alternate email address"
                                     placement="right"
-                                    size="small"
                                     id="tooltip-bi-additional-email"
                                 >
                                     <span
@@ -350,7 +349,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
                                 Status &amp; Clearance
                             </span>
-                            <Tooltip text={<InfoTooltipContent />} placement="right" size="small" id="tooltip-status-interactive">
+                            <Tooltip text={<InfoTooltipContent />} placement="right" id="tooltip-status-interactive">
                                 <span
                                     style={{
                                         display: 'inline-flex',
@@ -429,7 +428,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
                                 Background &amp; Matching
                             </span>
-                            <Tooltip text={<InfoTooltipContent />} placement="right" size="small" id="tooltip-bg-interactive">
+                            <Tooltip text={<InfoTooltipContent />} placement="right" id="tooltip-bg-interactive">
                                 <span
                                     style={{
                                         display: 'inline-flex',

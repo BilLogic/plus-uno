@@ -38,7 +38,7 @@ const SessionAttendeeListItem = ({
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-sm)',
                 padding: isEditMode
-                    ? 'var(--size-element-pad-y-lg) var(--size-element-pad-x-sm)'
+                    ? 'var(--size-element-pad-y-lg) var(--element-pad-compact)'
                     : 'var(--size-element-pad-y-lg) 0',
                 borderRadius: 'var(--size-element-radius-md)',
                 backgroundColor: isEditMode ? 'var(--color-surface-container-highest)' : 'transparent',

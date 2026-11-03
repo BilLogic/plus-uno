@@ -111,7 +111,7 @@ export function StrategyHeatmap({
               minHeight: CELL_HEIGHT,
               display: 'flex',
               alignItems: 'center',
-              padding: 'var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-sm, 8px)',
+              padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-compact, 8px)',
               fontSize: 'var(--font-size-body2, 14px)',
               fontWeight: 600,
               color: t.text,
@@ -197,7 +197,7 @@ function QuoteBox({ text, theme = 'dark' }: { text: string; theme?: 'light' | 'd
       style={{
         width: 200,
         minHeight: 60,
-        padding: 'var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-md, 10px)',
+        padding: 'var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px)',
         borderRadius: 'var(--size-border-radius-radius-200, 8px)',
         background: t.quoteBg,
         border: `1px solid ${t.quoteBorder}`,

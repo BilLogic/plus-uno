@@ -10,7 +10,7 @@
 @use '../../styles/screen-grid' as *;
 
 .plus-pattern-modal {
-    @include screen-grid-width(var(--modal-pad));
+    @include screen-grid-width(var(--modal-pad-x-default));
     @include screen-grid-width-steps;
 
     /* Modal/body-min-height: Figma holds the body at 96, one step of the space scale. */
@@ -19,7 +19,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--modal-stack-md);
-    padding: var(--modal-pad);
+    padding: var(--modal-pad-x-default);
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);
@@ -33,14 +33,6 @@
 .plus-pattern-modal-height-fill {
     height: $overlay-max-height;
 }
-
-/* Deprecated sizing props: the old Modal/* tokens, for the callers that still pass them. */
-.plus-pattern-modal.plus-pattern-modal-pad-sm { padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); }
-.plus-pattern-modal.plus-pattern-modal-pad-md { padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); }
-.plus-pattern-modal.plus-pattern-modal-pad-lg { padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg); }
-.plus-pattern-modal.plus-pattern-modal-gap-sm { gap: var(--size-modal-gap-sm); }
-.plus-pattern-modal.plus-pattern-modal-gap-md { gap: var(--size-modal-gap-md); }
-.plus-pattern-modal.plus-pattern-modal-gap-lg { gap: var(--size-modal-gap-lg); }
 
 /* Header: title + close */
 .plus-pattern-modal-header {
@@ -74,7 +66,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
     margin-left: auto;
     background: transparent;
     border: none;
