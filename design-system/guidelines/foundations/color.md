@@ -79,7 +79,7 @@ selected one `--ds-background-selected` with its own `-hovered` and `-pressed`,
 and a role's bold fill takes that role's `-bold-hovered` and `-bold-pressed`
 (`--ds-background-brand-bold-hovered`). Where the base fill cannot change, such
 as an avatar or an image, lay `--ds-interaction-hovered` or `-pressed` over it.
-Focus is never a fill: the focus ring shows it.
+Focus is never a fill: a 2px ring on `--ds-border-focused` shows it, and its radius is the control's radius plus 2.
 
 ```css
 .my-element:hover {
@@ -95,10 +95,25 @@ Focus is never a fill: the focus ring shows it.
 }
 
 .my-element:focus-visible {
-  outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-  outline-offset: var(--size-element-stroke-lg);
+  outline: var(--border-focused) solid var(--ds-border-focused);
+  outline-offset: var(--stroke-2);
 }
 ```
+
+## Modes
+
+Light and dark, each with an increased contrast version, make four modes; `auto` follows `prefers-color-scheme` and `prefers-contrast`. The page sets `data-color-mode` (`light`, `dark`, `auto`) and `data-contrast-mode` (`no-preference`, `more`, `auto`). Tokens map per theme: never map your own values. Dark is not light inverted: raised and overlay surfaces get lighter as they rise.
+
+## Roles
+
+Pick the role by meaning: neutral, brand, information, success, warning, danger, discovery, accent (no meaning), inverse (on a bold ground), input (form fields). Danger, warning, success, information and discovery come in default, subtler, subtle and bold. On a bold fill text and icons take the inverse tokens; a bold warning fill takes `--ds-text-warning-inverse`.
+
+## Disabled, links, selected and PLUS AI
+
+- Disabled is a color, not an opacity: `--ds-text-disabled`, `--ds-background-disabled`, `--ds-border-disabled`. The opacity token is for images only.
+- A link takes `--ds-link`, underlined at rest in running text. The link color has a pressed step and no hovered step. Never use brand, selected or focused colors for a link.
+- Selected is the blue `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`, paired with a second cue such as a check or a border.
+- PLUS AI is the discovery role (purple): "AI recommended" and Suggestion take discovery.
 
 ## Rules
 
@@ -123,9 +138,7 @@ ring.
 ## Data-viz color
 
 Charts take the `--ds-chart-*` tokens, generated with the rest of the `--ds-`
-set (ADR-035), and follow Atlassian's
-[data-visualization color guidance](https://atlassian.design/foundations/color/data-visualization-color)
-where PLUS does not say otherwise below. In code, never name a chart color by
+set (ADR-035). In code, never name a chart color by
 hand: `design-system/src/dataviz/palette.js` (exported as `chartPalette` from
 `@/components`) says which token does which job, and the Highcharts theme in
 `chartTheme.js` applies it. Every color does one job.
@@ -146,7 +159,7 @@ legends `--ds-text`, tick labels `--ds-text-subtle`, grid lines and axes
 ### Categorical order
 
 Assign series in this order, never skipping a slot. Past six, fold the
-smallest into "Other" (Atlassian's limit is five or six); 7 and 8 exist for
+smallest into "Other" (five or six is the limit); 7 and 8 exist for
 overflow only, as darker reprises of 1 and 4. The theme wraps back to slot 1
 after 8, which repeats a color: group the series before it gets there.
 
@@ -165,13 +178,12 @@ Neighbors stay apart under protan and deutan simulation (deltaE ≥ 8) and for
 full color vision (deltaE ≥ 15), in both plans, light and dark. The order
 leaves out red, which reads as danger, green, which reads as success, and teal,
 which reads as the brand. Slot 2 is the same yellow as `--ds-chart-warning`,
-as Atlassian's slot 4 is its warning orange: a chart uses either categorical or
+so a chart uses either categorical or
 status colors, never both.
 
 ### Sequential and diverging ramps
 
-Atlassian publishes no sequential or diverging guidance, so PLUS builds both
-from its chart tokens.
+Both ramps are built from the chart tokens.
 
 - **Sequential** runs `--ds-background-accent-<hue>-subtler`, then
   `--ds-chart-<hue>-bold`, `-bolder` and `-boldest`. Each step sits further
@@ -191,8 +203,8 @@ from its chart tokens.
 
 Use the status tokens only when a value means a status. The `-bold` step is the
 more extreme level of the same status: highest priority on
-`--ds-chart-danger-bold`, high on `--ds-chart-danger`. PLUS success is green and
-warning is yellow, where Atlassian's are lime and orange, so they match the
+`--ds-chart-danger-bold`, high on `--ds-chart-danger`. Success is green and
+warning is yellow, so they match the
 `--ds-*-success` and `-warning` roles. Status colors are hard to tell apart with
 a color-vision deficiency, so a status always carries an icon, a label or a
 signed value too.

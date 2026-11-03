@@ -1,217 +1,353 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
-import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+} from '@/storybook-docs/foundation-page.jsx';
 import * as TypographyStories from './Typography.stories.jsx';
+
+export const Sample = ({ font, weight, children = 'Tutors plan the week from here' }) => (
+    <span style={{ font: `var(${font})`, fontWeight: weight ? `var(${weight})` : undefined, color: 'var(--ds-text)' }}>{children}</span>
+);
 
 <Meta of={TypographyStories} />
 
-<Title />
-
-PLUS sets text in three families of style: **Heading**, **Body** and
-**Metric**. There are seven Heading sizes, three Body sizes and three Metric
-sizes, following Atlassian's type scale, set in the Noto family: Noto Serif
-for the four large headings, Noto Sans for everything else, Noto Sans Mono for
-code. Pick a style by where the text sits on
-the page, not by how big it should look. The older registers (Display, H1–H6
-and the B1–B3 body styles) are legacy, and new work never applies them.
-
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18313-50621"
-    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_type.scss"
+<FoundationHero
+    title="Typography"
+    summary="Heading, Body, Metric and Code are the text styles for all work."
 />
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+<FoundationContents />
 
-<div className="sb-ds-doc-section">
-### Type scale
+<FoundationSection title="Overview">
 
-Each style is one token that sets the weight, size, line height and family at
-once: `font: var(--heading-medium)`. In Figma, each style is a text style whose
-every property is bound to a variable, so a later change edits a variable and
-never a component.
+Noto Serif (weight 500) for headings 32 to 20, Noto Sans for headings 16 to 12, metrics and body text, and a monospace face for code: seven Heading sizes, three Body sizes in regular, medium and bold, and three Metric sizes, each a text style bound to the typography variables. Pick a style by where the text sits on the page, not by how big it should look.
+
+```css
+font: var(--heading-medium);
+font: var(--body-default);
+font: var(--metric-large);
+```
+
+Figma holds the text styles Heading/*, Body/*, Metric/* and Code/default, bound to the typography collection (font size, line height, family, weight).
+
+</FoundationSection>
+
+<FoundationSection title="About typography">
+
+Typography is the system of fonts and text styles. It carries communication, reinforces the product's voice and guides how people feel using it. Follow three principles, together with the color and spacing tokens.
+
+<FoundationBanner title="Type choices">
+Headings 32 to 20 are Noto Serif at weight 500; headings 16 to 12 and metrics are Noto Sans at 600. Code/default is 12/16. There is no separate button style: labels use Body/default/medium.
+</FoundationBanner>
+
+<FoundationSubsection title="Optimize for readability">
+Help every reader understand easily, regardless of ability. Use Body/large for long reading, such as a lesson or a help article.
+</FoundationSubsection>
+
+<FoundationSubsection title="Create visual harmony">
+Keep type consistent and cohesive, and use hierarchy and space to simplify complex information.
+</FoundationSubsection>
+
+<FoundationSubsection title="Contextualize for different users">
+Tutors and students read on laptops and desktops, so check each size on a desktop screen from 768 up.
+</FoundationSubsection>
+
+In the app, headings 32 to 20 are Noto Serif at weight 500, and headings 16 to 12 and metrics are Noto Sans at 600. Body is Noto Sans at 400, 500 and 600 (bold). Code is Noto Sans Mono. Text styles are used in Figma and the matching typography tokens in code, with the typography collection holding family, size, line height and weight.
+
+<RefTable
+    head={['Family', 'Used for', 'Weights in use', 'Token']}
+    rows={[
+        ['Noto Serif', 'Headings 32 to 20', '500', <C>--type-family-heading-serif</C>],
+        ['Noto Sans', 'Headings 16 to 12, Body and Metric', '400, 500, 600', <><C>--type-family-heading</C> · <C>--type-family-body</C></>],
+        ['Noto Sans Mono', 'Code', '400', <C>--type-family-code</C>],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Type scale">
+
+Heading/*, Body/* and Metric/* are the text styles for all new work. Every property of each style is bound to a variable in the typography collection. The tokens are the contract: a later change edits a variable, never a component. Sizes are in rem, where 1rem is 16px, so people can scale text in their browser.
 
 <Canvas of={TypographyStories.TypeScale} sourceState="none" />
 
-<TokenTable
-    rows={[
-        { token: '--type-family-heading-serif', figma: 'Family/heading-serif', use: 'Heading xxlarge to medium (32 to 20): page, section and modal titles' },
-        { token: '--type-family-heading', figma: 'Family/heading', use: 'Heading small to xxsmall (16 to 12) and metrics' },
-        { token: '--type-family-body', figma: 'Family/body', use: 'Body text and labels' },
-        { token: '--type-family-code', figma: 'Family/code', use: 'Code samples, token names and property values' },
-        { token: '--type-family-brand-heading', figma: 'Family/brand-heading', use: 'Marketing and brand headlines' },
-        { token: '--type-family-brand-body', figma: 'Family/brand-body', use: 'Marketing and brand body text' },
-        { token: '--type-weight-regular', figma: 'Weight/regular', use: 'Body text' },
-        { token: '--type-weight-medium', figma: 'Weight/medium', use: 'Button and tab labels, and Noto Serif headings' },
-        { token: '--type-weight-semibold', figma: 'Weight/semibold', use: 'Headings and metrics' },
-        { token: '--type-tracking-tighter', figma: 'Letter spacing/tighter', use: 'Heading xxlarge (32): -0.02em' },
-        { token: '--type-tracking-tight', figma: 'Letter spacing/tight', use: 'Heading xlarge and large (28, 24): -0.01em' },
-        { token: '--type-tracking-none', figma: 'Letter spacing/none', use: 'Everything 20 and under: 0' },
-    ]}
-/>
-</div>
+<FoundationSubsection title="Weights in use">
 
-<div className="sb-ds-doc-section">
-### Family roles
-
-Noto Serif sets the four large headings, the titles of pages, sections and
-modals. Noto Sans sets the small headings, which are card titles, table headers
-and form section labels, plus body text, labels and metrics. Noto Sans Mono sets
-code. A quote takes the body family; Noto Serif italic belongs only to editorial
-contexts such as an article pull quote. Fraunces is not part of the system.
+Body comes in three weights. Regular is for paragraphs, medium is for labels and text beside an icon, and bold (600, semibold) is for emphasis, used sparingly.
 
 <RefTable
-    head={['Style', 'Size', 'Family', 'Weight', 'Tracking']}
+    head={['Style', 'Size/line', 'Weight', 'Role', 'Sample']}
     rows={[
-        [<C>--heading-xxlarge</C>, '32 / 36', 'Noto Serif', '500', '-0.02em'],
-        [<C>--heading-xlarge</C>, '28 / 32', 'Noto Serif', '500', '-0.01em'],
-        [<C>--heading-large</C>, '24 / 28', 'Noto Serif', '500', '-0.01em'],
-        [<C>--heading-medium</C>, '20 / 24', 'Noto Serif', '500', '0'],
-        [<C>--heading-small</C>, '16 / 20', 'Noto Sans', '600', '0'],
-        [<C>--heading-xsmall</C>, '14 / 20', 'Noto Sans', '600', '0'],
-        [<C>--heading-xxsmall</C>, '12 / 16', 'Noto Sans', '600', '0'],
-        [<C>--metric-*</C>, '28 · 24 · 16', 'Noto Sans, tabular numbers', '600', '0'],
-        [<C>--body-large</C>, '16 / 24', 'Noto Sans', '400 · 500', '0'],
-        [<C>--body-default</C>, '14 / 20', 'Noto Sans', '400 · 500', '0'],
-        [<C>--body-small</C>, '12 / 16', 'Noto Sans', '400 · 500', '0'],
+        ['Body/default/regular', '14/20', '400', 'Paragraphs and descriptions', <Sample font="--body-default" weight="--type-weight-regular" />],
+        ['Body/default/medium', '14/20', '500', 'Labels, and text beside an icon', <Sample font="--body-default" weight="--type-weight-medium" />],
+        ['Body/default/bold', '14/20', '600', 'Emphasis, used sparingly', <Sample font="--body-default" weight="--type-weight-semibold" />],
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Tuning notes
+</FoundationSubsection>
 
-- **Atlassian's sizes and 4px line-height grid are kept.** Two changes: headings
-  are weight 600 rather than 653, except the four Noto Serif headings at 500, which read heavy beside 400 body text at 600 (the Serif file is loaded at 500 to 600 only). Body/small stays 12 / 16 so no fixed-height component grows.
-- **Tracking** can't live in a `font` shorthand, so the three large headings
-  carry a companion token, `--heading-large-tracking`, set as `letter-spacing`
-  beside the `font`.
-- **Numbers line up.** Metrics, tables, table cells and times set
-  `font-variant-numeric: tabular-nums`. A `font` shorthand resets it, so a
-  metric sets it after its own `font`, and `table`, `th`, `td` and `time` also
-  set `font-feature-settings: "tnum"`, which the shorthand leaves alone.
-- **Code** is 0.875em of the text around it.
-- **Loading.** The families come from Google Fonts as variable files with
-  `font-display: swap`; the browser fetches the Latin subset first and
-  Vietnamese or other accented ranges only when a page uses them. Each stack
-  names a fallback (`Noto Sans Fallback`, `Noto Serif Fallback`) that is a
-  system face scaled with `size-adjust`, so text doesn't jump when Noto
-  arrives. In Figma the Noto families must be installed locally.
-</div>
+</FoundationSection>
 
-<div className="sb-ds-doc-section">
-### Heading levels
+<FoundationSection title="Heading levels">
 
-Headings step down one size per nesting level, and containers use a fixed
-title size.
+Headings step down one size per nesting level, and containers use a fixed title size.
 
 <Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Labels
+<RefTable
+    head={['Level', 'Style']}
+    rows={[
+        ['Page title', 'Heading/large · 24 · the page\'s one h1'],
+        ['Section title', 'Heading/medium · 20 · h2'],
+        ['Subsection title', 'Heading/small · 16 · h3'],
+        ['Modal title', 'Heading/medium · 20 · the dialog\'s h1, named by aria-labelledby'],
+        ['Card, popup and flag title', 'Heading/xsmall · 14 · one level below its section'],
+        ['Group label (menu group, table head)', 'Heading/xxsmall · 12 · a group or a head cell, never a heading'],
+    ]}
+/>
 
-Button and tab labels are `--body-default` at `--type-weight-medium` (500).
-There is no separate button style, as in Atlassian. In Figma, changing the
-weight of a styled text node drops its style, so a label carries no text style
-and binds four variables instead: Font size/0875, Line height/125, Family/body
-and Weight/medium.
+</FoundationSection>
+
+<FoundationSection title="Using headings">
+
+Headings introduce a new section of content. They are sized to contrast with the content and to make the structure easy to see.
+
+- Use a heading style, not bold text or a change of size. Heading styles carry the structure that assistive technology reads.
+- Heading levels (h1 to h6) go in a descending sequence. A page has one h1, usually its title, and never skips a level, such as an h2 followed by an h4.
+- Heading/xxlarge and xlarge are for hero and marketing content. Heading/large is a page title, such as a form title. Heading/medium suits components with room, such as modals. Heading/small and xsmall title small components where space is limited, such as a card or a flag.
+- Heading/xxsmall is used sparingly, matched with Body/small, for fine print and group labels.
+
+</FoundationSection>
+
+<FoundationSection title="Labels">
+
+A label uses Body/default/medium (Noto Sans 500). There is no separate button style: use the medium style for button, tab and menu labels and apply it directly, with no variables bound inline. In code it is `font: var(--body-default)` with `font-weight: var(--type-weight-medium)`.
+
+<DoDont>
+<Do caption="Body/default/medium on a button or tab label.">
+<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
+</Do>
+<Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
+<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
+</Dont>
+</DoDont>
 
 <Canvas of={TypographyStories.LabelStyle} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Code
+</FoundationSection>
 
-`--code` sets code samples, token names and property values in Noto Sans
-Mono, at 0.875em of the text around it, so a code span follows its paragraph's
-size. In Figma docs the style is Code/default, 12/16.
+<FoundationSection title="Using body and metric">
+
+- Body/large is the size for long-form content, where a comfortable read matters.
+- Body/default is the size in components or wherever space is limited, for detailed or descriptive content.
+- Body/small is for secondary content such as fine print or semantic messages. Use it sparingly.
+- Weights: every body size comes in three styles, regular, medium and bold. Use Regular for paragraphs, Medium as the default inside components and beside icons (button, tab and menu labels), and Bold for emphasis in body text, sparingly. PLUS bold is 600 (semibold), through the bold weight token.
+- In code it stays one size token plus a weight token: `font: var(--body-default); font-weight: var(--type-weight-medium)`.
+- Use medium beside an icon, because icon stroke width is designed to align with medium weight text. Do not use heading styles inside components; use body with a heavier weight instead.
+- Use Metric when a number is the point, such as a session count or a score. Metric sizes are large, medium and small.
+- PLUS has no paragraph-spacing style. Space paragraphs and blocks with the Section and stack tokens (see Spacing).
+
+</FoundationSection>
+
+<FoundationSection title="Code">
+
+Code is code-only. Code/default (12/16) sets code samples, token names and property values in Figma docs. Code is Noto Sans Mono. In code, `var(--code)` sets 0.875em of the parent size in the code font, so a code span follows the text around it.
 
 <Canvas of={TypographyStories.CodeStyle} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Usage
+</FoundationSection>
 
-**Step one size per nesting level.** The page title is `--heading-large` 24
-(h1), a section `--heading-medium` 20 (h2), a subsection `--heading-small` 16
-(h3). Never skip a step; there is nothing below a subsection. Containers have
-fixed titles: a modal's is `--heading-medium` 20, and a card's, a popup's and a
-flag's is `--heading-xsmall` 14, over a `--body-default` description.
+<FoundationSection title="Usage">
+
+Pick the style by the text's place on the page.
+
+<FoundationSubsection title="Step one size per nesting level">
+
+Page title Heading/large 24 (h1), section Heading/medium 20 (h2), subsection Heading/small 16 (h3). Never skip a step; there is nothing below a subsection. Containers have fixed titles: a modal's is Heading/medium 20, and a card's, a popup's and a flag's Heading/xsmall 14 over a Body/default description.
 
 <Canvas of={TypographyStories.OneStepPerLevel} sourceState="none" />
 
-**Take the tag from where the heading sits.** One h1 per page. A modal's title
-is the dialog's h1, named by `aria-labelledby`. A card title is tagged one
-level below its section. A title hidden by a tabs-only header keeps its level,
-visually hidden. Group labels (`--heading-xxsmall` 12) name a menu group or a
-head cell and are never headings.
-
-**Keep xxlarge and xlarge for heroes.** `--heading-xxlarge` 32 and
-`--heading-xlarge` 28 are for heroes, empty states and metric-heavy dashboards
-only, never for a page title.
-
-**Body/default runs the interface.** Every control label is 14/20, which is
-what sets the 24 and 32 Item heights. `--body-large` is for reading text, such
-as lessons and help articles. `--body-small` is for meta text, Tag, Status,
-Count and tooltips.
-
-**Numbers take Metric.** Stat cards and counts use `--metric-large` 28,
-`-medium` 24 or `-small` 16, as plain text, never as headings.
-
-**Change the token, not the text.** Never type a size, and never detach a
-style.
+<DoDont>
+<Do caption="Page 24, section 20, subsection 16: one step per level.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<Sample font="--heading-large">Sessions</Sample>
+<Sample font="--heading-medium">This week</Sample>
+<Sample font="--heading-small">Upcoming</Sample>
+<span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Three sessions are scheduled before Friday.</span>
 </div>
-
-<div className="sb-ds-doc-section">
-### Accessibility
-
-- Heading tags follow the page's outline, not the size: one h1 per page, and
-  no skipped levels. The style and the tag are chosen separately.
-- Body text is never under 12, and running text uses `--body-default` 14 or
-  `--body-large` 16.
-- Sizes are in rem, so text scales with the browser's font size setting.
-  Never fix a line's height in pixels around text.
-- Text color comes from the text tokens in **Color**, which clear 4.5:1 on
-  every surface.
+</Do>
+<Dont caption="Sizes picked by feel: a hero size for the page, a section smaller than its subsection.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<Sample font="--heading-xxlarge">Sessions</Sample>
+<Sample font="--heading-xsmall">This week</Sample>
+<Sample font="--heading-medium">Upcoming</Sample>
+<span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Three sessions are scheduled before Friday.</span>
 </div>
+</Dont>
+</DoDont>
 
-<div className="sb-ds-doc-section">
-### Legacy registers
+</FoundationSubsection>
 
-Display, Headline (H1–H3), Title (H4–H6) and the Body registers are
-deprecated. Existing components keep them until they are rebuilt. Use this
-map to move text onto the live scale.
+<FoundationSubsection title="Take the tag from where the heading sits">
+
+One h1 per page. A modal's title is the dialog's h1, named by `aria-labelledby`. A card title is tagged one level below its section. A title hidden by a tabs-only header keeps its level, visually hidden. Group labels (Heading/xxsmall 12) name a menu group or a head cell and are never headings.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep xxlarge and xlarge for heroes">
+
+Heading/xxlarge 32 and Heading/xlarge 28 are for heroes, empty states and metric-heavy dashboards only, never for a page title.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Body/default runs the interface">
+
+Every control label is 14/20, which is what sets the 24, 32 and 40 item heights. Body/large is for reading text such as lessons and help articles; Body/small for meta text, Tag, Status, Count and tooltips.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Numbers take Metric">
+
+Stat cards and counts use Metric/large 28, medium 24 and small 16, as plain text, never as headings.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Change the token, not the text">
+
+Every style binds the typography variables, so a later change to a size, line height, family or weight edits a variable and no component needs touching. Never type a size, and never detach a style.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Truncate and wrap">
+
+Text that may be longer than its box either stops or wraps, and the component decides which. Names and titles stop; text that is the content wraps.
+
+- A title or a name truncates to one line with an ellipsis. Give people the full text on hover or in the detail view.
+- A description stops at 3 lines unless the component is set to wrap.
+- Set wrap only when the whole text is the content, such as a session note or a help answer. In a table cell, truncate is the default and wrap is chosen per column.
+- Never shrink the type to make a long name fit.
+
+<FoundationSubsection title="Truncate a long name to one line">
+
+A student name in a roster row.
+
+<DoDont>
+<Do caption="One line with an ellipsis. The Status keeps its place.">
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+<span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
+<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+</div>
+</Do>
+<Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+<span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
+<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
+</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Tracking and quotes">
 
 <RefTable
-    head={['Legacy', 'Size', 'Use instead']}
+    head={['Style', 'Tracking', 'Where']}
     rows={[
-        ['Display 1–4', '80 · 72 · 64 · 56', <C>--heading-xxlarge</C>],
-        ['H1 · H2', '40 · 32', <C>--heading-xxlarge</C>],
-        ['H3', '28', <C>--heading-xlarge</C>],
-        ['H4', '24', <><C>--heading-large</C> (page title)</>],
-        ['H5', '20', <><C>--heading-medium</C> (section and modal title)</>],
-        ['H6', '16', <><C>--heading-small</C> (subsection title)</>],
-        ['B1, Lead, Blockquote', '16 · 20', <C>--body-large</C>],
-        ['B2', '14', <><C>--body-default</C>; semibold becomes <C>--body-default</C> with <C>--type-weight-semibold</C>, or <C>--heading-xsmall</C> for a title</>],
-        ['B3', '12', <><C>--body-small</C>; semibold becomes <C>--heading-xxsmall</C> for a title</>],
-        ['Special/Code', '14', <C>--code</C>],
+        ['Heading/xxlarge · 32', '−2%', 'Hero and empty-state headings.'],
+        ['Heading/xlarge · 28 and Heading/large · 24', '−1%', 'Page titles and large metrics.'],
+        ['Heading/medium · 20 and below', '0', 'Everything else, including Body and Metric.'],
     ]}
 />
 
-In code the legacy registers are the `h1`–`h6` elements and classes,
-`.display1-txt` to `.display4-txt`, `.body1-txt` to `.body3-txt`, and the
-`--type-h1` to `--type-body3` composites.
+A quote takes the body family, such as "I finally understand fractions," in Body/large. Do not add a decorative face for it.
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+<FoundationSubsection title="Use a heading style">
+
+Introduce a section with a heading style, not with bold body text.
+
+<DoDont>
+<Do caption="Heading/small, tagged as the section's heading.">
+<h3 style={{ margin: 0, font: 'var(--heading-small)' }}>Next session</h3>
+</Do>
+<Dont caption="Bold body text looks like a heading but carries no structure.">
+<span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Do not skip heading levels">
+
+Headings step down one level at a time.
+
+<DoDont>
+<Do caption="h1, then h2, then h3.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<span><C>h1</C> <Sample font="--heading-large">Tutor dashboard</Sample></span>
+<span><C>h2</C> <Sample font="--heading-medium">Upcoming sessions</Sample></span>
+<span><C>h3</C> <Sample font="--heading-small">Grade 6 math</Sample></span>
 </div>
-
-<div className="sb-ds-doc-section">
-
-### Related
-
-- **Color**, for the text tokens: `--ds-text`, `--ds-text-subtle`, `--ds-text-subtlest`.
-- **Spacing**, for the 14/20 label that sets the 24 and 32 Item heights.
-- **Iconography**, for icon sizes beside text.
-- **Accessibility**, for heading levels across a page.
-
+</Do>
+<Dont caption="An h3 straight after the h1 skips the h2.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<span><C>h1</C> <Sample font="--heading-large">Tutor dashboard</Sample></span>
+<span><C>h3</C> <Sample font="--heading-small">Grade 6 math</Sample></span>
 </div>
+</Dont>
+</DoDont>
 
-</div>
+</FoundationSubsection>
+
+<FoundationSubsection title="Numbers take Metric">
+
+Use Metric to emphasize a number; a serif heading style makes the figure read as a title.
+
+<DoDont>
+<Do caption="Metric/large for the figure.">
+<Sample font="--metric-large">1,284</Sample><div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+</Do>
+<Dont caption="Heading/medium for a number.">
+<Sample font="--heading-medium">1,284</Sample><div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Heading levels help people using screen readers and other assistive technology navigate a page and scan grouped content. Keep one h1 per page and descend one level at a time.
+- The text style sets the look and the tag sets the structure: the page's h1 is Heading/large, a section's h2 Heading/medium and a subsection's h3 Heading/small.
+- Group labels (Heading/xxsmall) name a `role="group"` or a table head cell and are never headings.
+- A modal's title is the dialog's h1, named by `aria-labelledby`.
+- Text color comes from the `color/text/*` tokens, whose pairs clear 4.5:1 on their grounds in all four modes (see Color).
+- Sizes are in rem, so text follows the reader's browser setting. A code span is 0.875em of the text around it, so it follows the reader's text size too.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'Text color on a surface (color/text/default, color/text/subtle).', href: '?path=/docs/foundations-color--docs' },
+        { title: 'Spacing', description: 'The 14/20 label that sets the 24 and 32 item heights.', href: '?path=/docs/foundations-spacing--docs' },
+        { title: 'Iconography', description: 'Icon glyph sizes beside text (12, 16, 20, 24).', href: '?path=/docs/foundations-iconography--docs' },
+    ]}
+/>
+
+</FoundationSection>

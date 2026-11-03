@@ -1,128 +1,211 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
-import { TokenTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+} from '@/storybook-docs/foundation-page.jsx';
 import * as IconsStories from './Icons.stories.jsx';
+
+export const Glyph = ({ name, size = '--icon-md', family = 'fa-solid' }) => (
+    <i className={`${family} fa-${name}`} aria-hidden="true" style={{ fontSize: `var(${size})`, width: `var(${size})`, height: `var(${size})`, color: 'var(--ds-icon)' }} />
+);
 
 <Meta of={IconsStories} />
 
-<Title />
-
-Icons are small symbols that help people find their way and act faster. PLUS
-draws every icon from Font Awesome Free, at one of three sizes, in an icon
-color token. This page holds the rules every icon follows.
-
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-53331"
-    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_scales.scss"
+<FoundationHero
+    title="Iconography"
+    summary="Icons are small symbols that help people find their way and act faster."
 />
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+<FoundationContents />
 
-<div className="sb-ds-doc-section">
-### Principles
+<FoundationSection title="Overview">
 
-**Use symbols people already recognize.** Pick the glyph most people read the
-same way: a calendar for dates, a bell for notifications, a gear for settings.
-A clever metaphor costs the reader a guess.
+This page holds the rules every icon follows. The icon component itself lives on Components, Images and icons, next to Avatar, Image, Logo and Tile.
 
-**Keep shapes simple.** Font Awesome glyphs are drawn for small sizes. Prefer
-the plainest glyph that says it, and use one glyph for one meaning across the
-product.
+```jsx
+<i className="fa-solid fa-calendar-days" />
+```
+
+Sizes bind to the icon size tokens: 12 is `--icon-sm`, 16 is `--icon-md` and 24 is `--icon-lg`. Figma draws the Icon from the Size/Icon variables.
+
+</FoundationSection>
+
+<FoundationSection title="Principles">
+
+<FoundationSubsection title="Use symbols people already recognize">
+Pick the glyph most people read the same way: a calendar for dates, a bell for notifications, a gear for settings. A clever metaphor costs the reader a guess.
 
 <Canvas of={IconsStories.OneGlyphOneMeaning} sourceState="none" />
+</FoundationSubsection>
 
-**Pair icons with text labels where you can.** A label says what the icon
-means and helps people who use a screen reader. Leave an icon alone only for a
-well-known action in a tight space, such as close or more, and give it a name.
+<FoundationSubsection title="Keep shapes simple">
+Font Awesome glyphs are drawn to read at 12 to 24. Prefer the plainest glyph that says it, and use one glyph for one meaning across the product.
+</FoundationSubsection>
+
+<FoundationSubsection title="Pair icons with text labels where possible">
+A label says what the icon means and helps people who use a screen reader. Leave an icon alone only for a well-known action in a tight space, and name it in code.
 
 <Canvas of={IconsStories.PairWithLabels} sourceState="none" />
-</div>
+</FoundationSubsection>
 
-<div className="sb-ds-doc-section">
-### Sizes: 12, 16 and 24
+<FoundationSubsection title="Use icons intentionally">
+Before adding an icon, ask whether a label does the job better. Leave out icons that are not needed.
+</FoundationSubsection>
 
-Icons come in three sizes, bound to the icon size tokens. The box is exactly
-the size, so an icon never adds height to the line it sits in.
+</FoundationSection>
+
+<FoundationSection title="Sizes: 12, 16 and 24">
+
+Icons come in three sizes, bound to the Size/Icon tokens. The box is exactly the size, so an icon never adds height to the line it sits in.
+
+<FoundationBanner title="Sizes and source">
+Icons come in 12, 16 and 24. 12 is for chevrons, which are always 12, field validation icons, compact text, small contained elements such as tags, badges and statuses, and secondary actions. PLUS draws icons from Font Awesome Free, so stroke, corner and end-cap rules do not apply.
+</FoundationBanner>
 
 <Canvas of={IconsStories.Sizes} sourceState="none" />
 
-<TokenTable
+<RefTable
+    head={['Size (px)', 'Figma token', 'Code', 'Use']}
     rows={[
-        { token: '--icon-sm', figma: 'Size/Icon/sm', use: 'Chevrons, small text, validation, inside tags and table headers' },
-        { token: '--icon-md', figma: 'Size/Icon/md', use: 'The default, beside 14 and 16 text' },
-        { token: '--icon-lg', figma: 'Size/Icon/lg', use: 'Empty states, section headers, standalone status marks' },
+        ['12', <C>Size/Icon/sm</C>, <C>--icon-sm</C>, 'Chevrons, field validation, compact text and compact parts such as tags, badges, statuses, secondary actions and table headers.'],
+        ['16', <C>Size/Icon/md</C>, <C>--icon-md</C>, 'The default, beside 14 and 16 text in buttons, menus, fields and lists.'],
+        ['24', <C>Size/Icon/lg</C>, <C>--icon-lg</C>, 'Empty states, section headers and standalone status marks. Above 24, use a Tile.'],
     ]}
 />
 
-**Larger means Tile.** 24 is the largest icon. A bigger or decorative mark,
-such as a list-item badge, a tool logo or an empty-state picture, goes in a
-Tile, which sets its size, corner and color in one place.
+An icon sits in space the way any box does: give it room with the spacing tokens, not with a larger glyph.
+
+</FoundationSection>
+
+<FoundationSection title="Above 24, use a Tile">
+
+24 is the top of the scale. A bigger or decorative mark, such as a list-item badge, a tool logo or an empty-state picture, goes in a Tile, which sets its size, corner and color in one place.
 
 <Canvas of={IconsStories.LargerMeansTile} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Font Awesome Free
+</FoundationSection>
 
-Code loads Font Awesome Free 7. Use only its three free families: `fa-solid`,
-`fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands
-fa-figma` and `fa-brands fa-github`.
+<FoundationSection title="Font Awesome Free and color tokens">
 
-```jsx
-<i className="fa-solid fa-calendar-days" aria-hidden="true" />
-```
-
-Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only
-names are not licensed here, and they render as a blank square. Components
-that take an icon, such as Button's `iconBefore` and Tile's `icon`, take
-the glyph's name (`calendar-days`) and draw it solid.
+Use Font Awesome Free only: `fa-solid`, `fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands fa-figma` and `fa-brands fa-github`. Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are not licensed here and render blank. Check a glyph name against the Free set before you use it.
 
 <Canvas of={IconsStories.Families} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Color
-
-Color an icon with an icon token, never a picked value. An icon beside a label
-defaults to `--ds-icon-subtle`. A status icon takes its role's icon token, such
-as `--ds-icon-success` or `--ds-icon-danger`, and warning's icon is the darker
-`--ds-icon-warning`, never the yellow warning fill. On a bold fill, an icon
-takes `--ds-icon-inverse`.
+Color an icon with a color token, never a picked hex. A status icon takes its hue's icon token, such as `--ds-icon-success` or `--ds-icon-danger`; any other icon matches the text beside it.
 
 <Canvas of={IconsStories.Colors} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Accessibility
+</FoundationSection>
 
-- A decorative icon, one beside a label that already says what it means,
-  takes `aria-hidden="true"`.
-- An icon with no label, such as a close button, gets a name on its control:
-  `aria-label="Close"`. The name says what the control does, not what the
-  glyph shows.
-- Icons that carry meaning, such as status icons and the focus of a control,
-  clear 3:1 against their surface. The icon tokens do in every mode.
-- Never let an icon be the only cue for a status. Pair it with a word.
-</div>
+<FoundationSection title="Usage">
 
-<div className="sb-ds-doc-section">
-### Legacy icon sizes
+<FoundationSubsection title="Pick the mark by what it has to do">
+An Icon backs up a label at the size of its text; a Tile frames an icon, logo or picture as a square object; the Logo marks PLUS itself; Image places a picture in content.
+</FoundationSubsection>
 
-The older sizes named icons after type registers (b3 to h1, and HUGE) inside
-line boxes taller than the glyph. Components that already use them keep them.
-Don't use them in new work: use the three sizes above.
-</div>
+<FoundationSubsection title="Contribution and adding new icons">
+Before a glyph joins the product, check four things. Does a similar icon already exist? Can an existing one serve more than one purpose? Could it be confused with another icon in the same view? Would a label do the job better? A new glyph is proposed through the Intake, and a design lead approves it.
+</FoundationSubsection>
 
-<div className="sb-ds-doc-section">
+</FoundationSection>
 
-### Related
+<FoundationSection title="Common icons">
 
-- **Tile**, for a mark larger than 24.
-- **Illustration**, for the hand-drawn characters on empty states and onboarding.
-- **Size roles**, for the icon sizes beside control and media sizes.
-- **Color**, for the icon tokens.
-- **Typography**, for the text an icon sits beside.
+Use the same glyph for the same job everywhere. These cover most of what a tutor sees.
 
-</div>
+<FoundationExample>
+<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--element-stack-lg)' }}>
+    {[['Add', 'plus'], ['Remove', 'minus'], ['Confirm', 'check'], ['Close', 'xmark'], ['Delete', 'trash'], ['Edit', 'pen'], ['Search', 'magnifying-glass'], ['Settings', 'gear'], ['Session or schedule', 'calendar-days'], ['Person', 'user'], ['Session note', 'clipboard'], ['Notification', 'bell'], ['Information', 'circle-info']].map(([job, name]) => (
+        <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}>
+            <Glyph name={name} />
+            <span>{job}</span>
+            <C>{name}</C>
+        </li>
+    ))}
+</ul>
+</FoundationExample>
 
-</div>
+- Zoom has no Font Awesome Free glyph. A Zoom link is not an icon; partner and tool logos go in a Tile, never in the Logo set.
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+Use an icon to back up a label, at the size of its text, with a symbol people already know.
+
+<FoundationSubsection title="Use Free families and Free names only">
+
+Solid, regular and brands are licensed here, including brand glyphs.
+
+<DoDont>
+<Do caption="Free families render everywhere.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+    <Glyph name="figma" family="fa-brands" /><Glyph name="calendar-days" family="fa-regular" />
+    <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
+</span>
+</Do>
+<Dont caption="Light, thin, sharp and duotone are Pro, so the icon renders as a blank.">
+<C>fa-light fa-calendar-days</C>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use 16 by default, 12 sparingly">
+
+Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
+
+<DoDont>
+<Do caption="A 16 icon leads the label; the chevron is 12.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size="--icon-sm" /></span>
+</Do>
+<Dont caption="A 12 icon as the main way-finding mark is too small to read beside the label.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" size="--icon-sm" />Add tutor</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use a symbol people recognize">
+
+<DoDont>
+<Do caption="A bell for notifications.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="bell" />Notifications</span>
+</Do>
+<Dont caption="A gear reads as settings, so it misleads here.">
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="gear" />Notifications</span>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Icons help, but the label and the code carry the meaning.
+- Pair an icon with a text label wherever there is room. Where an icon stands alone for a well-known action in a tight space, name it in code so a screen reader announces it.
+- Color icons with color tokens. Icon and text color tokens are built to keep enough contrast against the surface they sit on, which a picked hex does not.
+- Keep each glyph to one meaning across the product, so the same icon reads the same way on every screen.
+- Decorative icons carry `aria-hidden="true"`.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Icon', description: 'The icon component (Components, Images and icons).', href: '?path=/docs/components-images-and-icons-icon--docs' },
+        { title: 'Tile', description: 'A mark larger than 24.', href: '?path=/docs/components-images-and-icons-tile--docs' },
+        { title: 'Logos', description: 'The PLUS mark.', href: '?path=/docs/foundations-logos--docs' },
+        { title: 'Color', description: 'Icon and tile colors.', href: '?path=/docs/foundations-color--docs' },
+    ]}
+/>
+
+</FoundationSection>

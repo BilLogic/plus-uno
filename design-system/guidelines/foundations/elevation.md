@@ -19,7 +19,7 @@ own fill (`color.md` § Surface Colors).
 | `--elevation-light-3` | Floating layers still on legacy tokens (Specs pages not yet swept) |
 | `--elevation-light-4` | Legacy, unused |
 | `--elevation-light-5` | Dialogs |
-| `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, listboxes, popovers, tooltips, toasts and the floating sidebar: `elevation.surface.overlay` + `elevation.shadow.overlay` |
+| `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, listboxes, popups, tooltips, flags and the floating sidebar: `elevation.surface.overlay` + `elevation.shadow.overlay` |
 
 ## Shadow Values
 
@@ -41,7 +41,7 @@ take the overlay pair like every other floating layer.
 
 A card names the surface role, which pairs the fill with its shadow
 (`design-system/src/tokens/_elevation.scss`). A layer on the new color tokens
-(a modal, menu, popover, tooltip or toast) names the overlay pair directly:
+(a modal, menu, popup, tooltip or flag) names the overlay pair directly:
 `--ds-surface-overlay` with `--ds-shadow-overlay`, whose 1px ring is the edge,
 so it draws no border.
 
@@ -74,13 +74,13 @@ so it draws no border.
 |----------------|----------------------|
 | Cards at rest | none: a 1px outline-variant border |
 | Clickable cards on hover or drag | `--elevation-light-2` |
-| Modals, menus, dropdowns, listboxes, popovers, tooltips, toasts, the floating sidebar | `--ds-surface-overlay` + `--ds-shadow-overlay` |
+| Modals, menus, dropdowns, listboxes, popups, tooltips, flags, the floating sidebar | `--ds-surface-overlay` + `--ds-shadow-overlay` |
 | Floating layers still on legacy tokens, until they move | `--elevation-light-3` |
 | Dialogs | `--elevation-light-5` |
 
 Every floating layer takes the overlay pair, `elevation.surface.overlay` with
-`elevation.shadow.overlay`: menus and dropdowns, Listbox, Popover, Tooltip,
-Toast and Flag, the Frame's floating sidebar, and modals. A modal is set apart from a menu by the blanket under it
+`elevation.shadow.overlay`: menus and dropdowns, Listbox, Popup, Tooltip,
+Flag, the Frame's floating sidebar, and modals. A modal is set apart from a menu by the blanket under it
 (`--ds-blanket`), not by a heavier shadow.
 
 ## Rules
@@ -88,3 +88,13 @@ Toast and Flag, the Frame's floating sidebar, and modals. A modal is set apart f
 1. **Use sparingly** - Elevation should create meaningful hierarchy
 2. **Match to context** - Higher elevation for more important overlays
 3. **Never hardcode shadows** - Always use elevation tokens
+
+
+## Foundation rules
+
+- Five levels: sunken (the frame), default (the page), raised (cards), overlay (menus, popups, flags, the open sidebar, modals, dragged cards) and overflow (a shadow only). A surface lifts by its shadow, never by a darker fill.
+- A card rests on the raised pair with no border; a clickable card lifts to the overlay shadow on hover and settles back on press.
+- The tooltip is the one floating layer off the overlay pair: `--ds-background-neutral-bold` with `--ds-text-inverse`.
+- Layers stack by the `--layout-z-index-*` tokens, never by a raw number.
+- Raise one focal point; group related overlay actions in one toolbar.
+

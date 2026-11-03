@@ -1,12 +1,12 @@
 ---
-summary: The fourteen foundations, following Atlassian's set
+summary: The fourteen foundations, in the order they are documented
 ---
 
 <!-- Tier: 2 -->
 
 # Foundations
 
-The fourteen foundations, following Atlassian's set. A new foundation doc has
+The fourteen foundations. A new foundation doc has
 exactly one correct slot; a foundation earns a folder only when it needs a second
 topic, which today only `content/` does.
 
@@ -36,6 +36,10 @@ does and is deleted when its generated list of components is empty.
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no
 template inviting someone to fill in a heading with "TODO".
+
+## Page order
+
+Storybook and Figma list the foundations in the same order: Foundations overview, Tokens, Color, Typography, Spacing, Layout & grid, Elevation, Border, Radius, Iconography, Illustrations, Logos, Motion, then Accessibility. Each page follows one shape: hero, contents, the foundation's sections, Accessibility, Related.
 
 ## Reading order
 

@@ -1,22 +1,34 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+    TokenSwatches,
+} from '@/storybook-docs/foundation-page.jsx';
 import * as AccessibilityStories from './Accessibility.stories.jsx';
+
 
 <Meta of={AccessibilityStories} />
 
-<Title />
+<FoundationHero
+    title="Accessibility"
+    summary="The rules every PLUS screen meets, built into the tokens and patterns."
+/>
 
-These are the accessibility rules every PLUS screen meets. Most of them are
-built into the tokens and the patterns, so a screen built from them meets the
-rules by default. Each component page adds the rules for its own name, role
-and keyboard behavior.
+<FoundationContents />
 
-<ResourcesBlock githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/styles" />
+<FoundationSection title="Overview">
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+These are the accessibility rules every PLUS screen meets. Most of them are built into the tokens and the patterns, so a screen built from them meets the rules by default. Each component page adds the rules for its own name, role and keyboard behavior. Each foundation page owns the rules for its own subject: contrast in Color, heading order in Typography, the focus ring in Border and Radius, reduced motion in Motion.
 
-<div className="sb-ds-doc-section">
-### Heading levels
+</FoundationSection>
+
+<FoundationSection title="Heading levels">
 
 **A heading's tag is its place in the outline. Its style is its look.** Choose
 the two separately. A heading that has to look small but sits high in the
@@ -43,10 +55,10 @@ class as well. New work sets `font: var(--heading-*)` and needs neither.
 In the docs, the `.sbdocs hN` rules apply to MDX prose only: each is fenced
 with `:not(:where(.docs-story *))`, so a story's own headings draw at their
 real size. A new rule of that kind needs the same fence.
-</div>
 
-<div className="sb-ds-doc-section">
-### The top of the outline
+</FoundationSection>
+
+<FoundationSection title="The top of the outline">
 
 **Every page's outline starts with an `h1`.** The rule above places a heading
 within the outline; this one says the outline has a top.
@@ -69,10 +81,10 @@ its `title`. The browser suite asserts the rule instead: every
 page story renders an `h1`, and no other heading precedes it. The page stories
 are the spec pages plus the area overviews, and `npm run check:page-outline`
 holds that list.
-</div>
 
-<div className="sb-ds-doc-section">
-### Contrast
+</FoundationSection>
+
+<FoundationSection title="Contrast">
 
 Text clears 4.5:1 and icons, borders and the focus ring clear 3:1 against what
 they sit on, in light and dark. Under increased contrast the bars are 7:1 and
@@ -83,10 +95,10 @@ pair keeps the contrast, so it is never checked one component at a time.
 
 Never put a neutral text token on a bold fill, or an inverse token on a
 surface. **Color** shows every pair, measured, in both modes.
-</div>
 
-<div className="sb-ds-doc-section">
-### Focus
+</FoundationSection>
+
+<FoundationSection title="Focus">
 
 Focus is shown by the **focus ring**, never by a fill.
 
@@ -97,18 +109,18 @@ Focus is shown by the **focus ring**, never by a fill.
   including cards, table rows and list items, has the same visible indicator.
 
 <Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Disabled
+</FoundationSection>
+
+<FoundationSection title="Disabled">
 
 A disabled component is dimmed as a whole to `--ds-opacity-disabled` (0.4),
 rather than recoloring its parts. Disabled elements are not focus targets, and
 they keep their label, so people can still tell what is unavailable.
-</div>
 
-<div className="sb-ds-doc-section">
-### Charts
+</FoundationSection>
+
+<FoundationSection title="Charts">
 
 Every chart describes itself to screen readers: its type, its axes, each
 series and each point, and its data can be read with the keyboard. A chart is
@@ -121,10 +133,10 @@ module and sets `landmarkVerbosity: 'disabled'`. A chart that builds its own
 options carries `accessibility: chartTheme.accessibility` itself. Never wrap a
 chart in `aria-hidden` to quiet a labeling warning: that hides the keyboard
 proxies the module creates.
-</div>
 
-<div className="sb-ds-doc-section">
-### Automated checks
+</FoundationSection>
+
+<FoundationSection title="Automated checks">
 
 Every story runs axe in the Storybook test suite, and a story may not add a
 violation, so a component that breaks a rule here is caught before it ships.
@@ -134,16 +146,18 @@ violation, so a component that breaks a rule here is caught before it ships.
 ```bash
 npx vitest --project=storybook --run <path>
 ```
-</div>
 
-<div className="sb-ds-doc-section">
+</FoundationSection>
 
-### Related
+<FoundationSection title="Related">
 
-- **Color**, for every text and icon pair, measured in each mode.
-- **Typography**, for the heading styles and sizes.
-- **Iconography**, for when an icon needs a name and when it is decorative.
+<FoundationRelated
+    items={[
+        { title: "Color", description: "Contrast pairs for every token.", href: "?path=/docs/foundations-color--docs" },
+        { title: "Typography", description: "Heading levels and text styles.", href: "?path=/docs/foundations-typography--docs" },
+        { title: "Border", description: "The focus ring.", href: "?path=/docs/foundations-border--docs" },
+        { title: "Motion", description: "Reduced motion.", href: "?path=/docs/foundations-motion--docs" },
+    ]}
+/>
 
-</div>
-
-</div>
+</FoundationSection>

@@ -1,0 +1,244 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+} from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Foundations/Tokens" tags={['!dev']} />
+
+<FoundationHero
+    title="Design tokens"
+    summary="Design tokens are a single source of truth to name and store design decisions for the PLUS apps."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Overview">
+
+Tokens are how the tutor and student apps apply color, type, spacing, radius, borders and elevation. A token has a name that says how to use it and a value that can change by theme, so one choice is made once and every screen follows.
+
+<FoundationBanner title="Two name notations">
+PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code. To start by task: use tokens in code (Using tokens in code), or choose a token in design (Choose a layer).
+</FoundationBanner>
+
+Code reads `--ds-*` for color and elevation, `--element-*`, `--card-*`, `--table-*`, `--modal-*` and the other pattern prefixes for spacing and patterns, and `--space-*`, `--radius-*` for primitives. Figma reads local variables grouped into the collections below.
+
+</FoundationSection>
+
+<FoundationSection title="What are design tokens?">
+
+Design tokens are name and value pairings that represent small, repeatable design decisions. A token can be a color, a font style, a unit of white space or a corner radius made for one specific need.
+
+For example, instead of picking one of many grays for helper text under a field, apply `color/text/subtle`. It is the same decision everywhere the app shows helper text, in every theme.
+
+<FoundationExample caption="The helper line takes color/text/subtle: var(--ds-text-subtle).">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+    <span style={{ font: 'var(--body-default)' }}>School</span>
+    <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Choose the school the student attends.</span>
+</div>
+</FoundationExample>
+
+</FoundationSection>
+
+<FoundationSection title="What are themes?">
+
+A theme is a collection of token values designed to achieve a certain look. In Figma a theme is a variable mode: switching the mode re-resolves every token bound on the frame.
+
+<RefTable
+    head={['Collection', 'Modes', 'What changes']}
+    rows={[
+        [<C>color / foundations</C>, 'Light · Dark · Light IC · Dark IC', 'Color and elevation values. IC is the high-contrast version of each.'],
+        [<C>spacing / layout</C>, '768 · 1024 · 1440', 'Topbar, sidebar, grid, content and modal widths per breakpoint.'],
+        ['All others', 'Value', 'One value, no theme.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Why use design tokens?">
+
+- Dark and high-contrast themes, and responsive layouts, work by swapping token values, not by redrawing screens.
+- Designers and developers share one name per decision, which cuts handoff questions.
+- When the visual language changes, the change is made once in the token, not found and replaced in every file.
+- Color is generated in the repo and pushed to Figma: the repo plans hold the primitives and `color / foundations`, and Figma follows. Spacing, layout, typography and the other families are authored in Figma and flow to code through the scale and frame-layer token files.
+
+</FoundationSection>
+
+<FoundationSection title="Primitives and semantic tokens">
+
+Primitives are the raw palette and scale. Semantic tokens give each one a job. Features only ever use the semantic layer.
+
+- Primitives live in `color / primitives` and `spacing / primitives`. They are hidden from publishing and used only to define semantic tokens. They have no meaning, so a primitive cannot respond to a theme.
+- Semantic tokens live in `color / foundations`, `spacing / foundations`, `spacing / layout`, `spacing / patterns`, `typography` and `opacity`. A semantic token aliases a primitive, and in `color / foundations` each mode aliases a different one.
+
+</FoundationSection>
+
+<FoundationSection title="Collections">
+
+<RefTable
+    head={['Collection', 'Layer', 'Modes']}
+    rows={[
+        [<C>color / primitives</C>, 'Primitive, hidden', 'Value'],
+        [<C>color / foundations</C>, 'Semantic', 'Light, Dark, Light IC, Dark IC'],
+        [<C>opacity</C>, 'Semantic', 'Value'],
+        [<C>typography</C>, 'Semantic', 'Value'],
+        [<C>spacing / primitives</C>, 'Primitive, hidden', 'Value'],
+        [<C>spacing / foundations</C>, 'Semantic', 'Value'],
+        [<C>spacing / layout</C>, 'Semantic', '768 · 1024 · 1440'],
+        [<C>spacing / patterns</C>, 'Semantic', 'Value'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="How to read design token names">
+
+Knowing how to read token names helps you find the right token faster in a design and in code. A token's name describes how it should be used, and each part communicates one piece of that.
+
+- Foundation: the kind of visual attribute, such as color, elevation or space.
+- Property: the UI element the token applies to, such as text, border, background or surface.
+- Modifier: extra detail such as a color role, emphasis or interaction state. Not every token has one: `color/text` is the default body text color.
+- Pattern tokens read `Collection/property-variant`, for example `Card/radius-sm`: the Card pattern, its radius, the small variant.
+- Numeric steps: the number is the rem value × 100 with zero padding, so 050 = 0.5rem = 8px and 100 = 1rem = 16px. A fractional step keeps the extra digit: 0625 = 0.625rem = 10px, 03125 = 0.3125rem = 5px, 00625 = 1px.
+
+<RefTable
+    head={['Figma name', 'Foundation', 'Property', 'Modifier', 'Code']}
+    rows={[
+        [<C>color/text/subtle</C>, 'color', 'text', 'subtle', <C>var(--ds-text-subtle)</C>],
+        [<C>color/border/focused</C>, 'color', 'border', 'focused', <C>var(--ds-border-focused)</C>],
+        [<C>elevation/surface/raised</C>, 'elevation', 'surface', 'raised', <C>var(--ds-surface-raised)</C>],
+        [<C>Card/radius-sm</C>, 'Card (pattern)', 'radius', 'sm', <C>var(--card-radius-sm)</C>],
+        [<C>Element/radius-lg</C>, 'Element', 'radius', 'lg', <C>var(--element-radius-lg)</C>],
+        [<C>Space/space-0625</C>, 'Space (primitive)', 'space', '0625 = 10px', <C>var(--space-0625)</C>],
+    ]}
+/>
+
+Names look different in different tools. In code a color token drops its foundation and a trailing default and gains the `ds` prefix; a pattern token lowercases the collection and joins with dashes.
+
+</FoundationSection>
+
+<FoundationSection title="Choose a layer">
+
+Start from what the thing is, pick the layer, then the token. A value only one component needs stays inside that component.
+
+<RefTable
+    head={['What it is', 'Layer', 'Figma', 'Code prefix']}
+    rows={[
+        ['Atomic interactive control (button, input, tag)', 'element', 'spacing / foundations, Element/*', <C>--element-*</C>],
+        ['Bounded content container (info card, data card)', 'card', 'spacing / patterns, Card/*', <C>--card-*</C>],
+        ['Page region or column (sidebar, main content)', 'section', 'spacing / patterns, Section/*', <C>--section-*</C>],
+        ['Tabular data (rows, cells, headers)', 'table', 'spacing / patterns, Table/*', <C>--table-*</C>],
+        ['Modal (confirmation, detail panel)', 'modal', 'spacing / patterns, Modal/*', <C>--modal-*</C>],
+        ['Layout: topbar, sidebar, grid, content and modal width', 'layout', 'spacing / layout, Topbar, Sidebar, Grid, Content, Screen, Drawer', <C>--layout-*</C>],
+        ['The Frame around the Page, and the Page', 'frame, page', 'spacing / patterns, Frame/*; spacing / layout, Page/*', <><C>--surface-container-*</C> · <C>--surface-*</C></>],
+        ['The Blanket, the layer under a modal', 'blanket', 'spacing / patterns, Blanket/*', <C>--overlay-*</C>],
+        ['A floating layer with no Blanket (menu, popup, tooltip, flag)', 'popup', 'spacing / patterns, Popup, Menu and Tooltip', <C>--popover-*</C>],
+        ['A value one component needs that no shared role covers (a size-20 Tile’s radius 5)', 'component-scoped', 'spacing / patterns, Tile/*, Drawer/*', <><C>--tile-*</C> · <C>--drawer-*</C></>],
+    ]}
+/>
+
+Code prefixes keep the names they were generated with, so the Frame is `--surface-container-*` and the Blanket `--overlay-*` in code. Pick the layer by the pattern's name, and copy the code prefix from this table.
+
+</FoundationSection>
+
+<FoundationSection title="Using tokens in code">
+
+Bind the token and nothing else. A token never takes a fallback, and the layer comes from what the thing is.
+
+- A token is used bare: `var(--ds-text)`, never with a second value after a comma. That fallback is a fifth, unthemed color: it hides a missing token and drifts from every mode.
+- Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-md`); a filter chip takes the element layer (`--element-pad-x-md`).
+- Spell tokens and copy in American English: gray, color, behavior.
+
+**Use the token bare.** A helper line under a field.
+
+<DoDont>
+<Do caption="The token alone. A missing token fails loudly in review."><C>color: var(--ds-text-subtle);</C></Do>
+<Dont caption="A hex written in place of the token keeps working in one mode only, so the drift is never noticed."><C>color: #626f86;</C></Dont>
+</DoDont>
+
+<FoundationSubsection title="Using tokens in design">
+
+Bind a variable instead of a style value: select the layer, open the fill, stroke, radius or gap field and pick the variable by name. Set the mode on the frame to see another theme; every bound token re-resolves. Search the picker with the Figma name (`color/text/subtle`).
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Design token examples">
+
+<RefTable
+    head={['Family', 'Example', 'Page']}
+    rows={[
+        ['Color', <C>color/text/subtle</C>, 'Color'],
+        ['Elevation', <C>elevation/surface/raised</C>, 'Elevation'],
+        ['Space', <C>Card/pad-md</C>, 'Spacing'],
+        ['Typography', <C>Heading/medium</C>, 'Typography'],
+        ['Radius', <C>Element/radius-lg</C>, 'Radius'],
+        ['Border', <C>Border/focused</C>, 'Border'],
+    ]}
+/>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+<FoundationSubsection title="Choose by meaning">
+
+Choose tokens based on meaning, not on a specific value.
+
+<DoDont>
+<Do caption="Use the token whose name and description fit the situation: helper text is text, subtle.">
+<span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Helper text under a field</span><br /><C>color/text/subtle</C>
+</Do>
+<Dont caption="Don't use a token because the color appears to match. It will not switch in Dark or the high-contrast modes.">
+<span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Helper text under a field</span><br /><C>neutral/800 (a primitive)</C>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Never bind a primitive in a component">
+
+Features bind semantic tokens. A primitive is a building block that only defines semantic tokens.
+
+<DoDont>
+<Do caption="The card follows any change to the card radius.">
+<div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Card/radius (semantic)</C></div>
+</Do>
+<Dont caption="The same 16 today, but it stays put when the card radius changes.">
+<div style={{ padding: 'var(--card-pad-sm)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-small)' }}>Session card<br /><C>Radius/radius-100 (primitive)</C></div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Color pairs in `color / foundations` are checked per mode, including Light IC and Dark IC, so choosing by meaning keeps text and borders at the contrast the theme intends.
+- Hard-coded or primitive colors skip that check and can fail in another theme.
+- Test a screen in every color mode before shipping, not only Light.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'Roles, surfaces and states.', href: '?path=/docs/foundations-color--docs' },
+        { title: 'Spacing', description: 'Space steps and the pattern pad, gap and stack tokens.', href: '?path=/docs/foundations-spacing--docs' },
+        { title: 'Radius', description: 'The height ÷ 4 rule, with buttons at 6 and 4, and the focus ring.', href: '?path=/docs/foundations-radius--docs' },
+        { title: 'Border', description: 'Stroke widths and the focus color pair.', href: '?path=/docs/foundations-border--docs' },
+        { title: 'Typography', description: 'Type tokens and text styles.', href: '?path=/docs/foundations-typography--docs' },
+        { title: 'Elevation', description: 'Surface and shadow tokens.', href: '?path=/docs/foundations-elevation--docs' },
+    ]}
+/>
+
+</FoundationSection>

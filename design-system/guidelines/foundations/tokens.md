@@ -20,11 +20,11 @@ summary: Tokens — Overview & Decision Tree
 | Bounded content container (info card, data card) | **card** | `--size-card-*` |
 | Page region or column (sidebar, main content) | **section** | `--size-section-*` |
 | Tabular data (rows, cells, headers) | **table** | `--size-table-*` |
-| Overlay or dialog (confirmation, detail panel) | **modal** | `--size-modal-*` |
+| Modal (confirmation, detail panel) | **modal** | `--size-modal-*` |
 | Page frame: topbar, sidebar, grid, content width, modal width | **layout** | `--layout-*` (per breakpoint) |
-| The frame around the content box, and the rounded content box (the `Frame` pattern; its spacing tokens keep the Figma name) | **surface container**, **surface** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
-| Full-screen layer under a modal, and its scrim | **overlay** | `--overlay-*` |
-| Floating layer with no scrim (menu, popup, tooltip, flag) | **popover** | `--popover-*` |
+| The Frame around the content box, and the rounded Page inside it (code keeps the older prefixes) | **Frame**, **Page** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
+| The Blanket: the full-screen layer under a modal | **Blanket** | `--overlay-*` |
+| Floating layer with no Blanket (menu, popup, tooltip, flag) | **Popup** | `--popover-*` |
 | A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |
 
 The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-pad-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
@@ -35,3 +35,13 @@ The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/p
 - [Spacing](spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
 - [Typography](typography.md) — Font families, weights, classes, sizing
 - [Elevation](elevation.md) — Shadow depth tokens
+
+
+## Reading and binding tokens
+
+- A token's name says how to use it: foundation, property, modifier. In Figma the parts join with slashes (`color/text/subtle`); in code a color token drops its foundation and gains the `ds` prefix (`--ds-text-subtle`), and a pattern token lowercases the collection and joins with dashes (`Card/radius-sm` is `--card-radius-sm`).
+- Numeric steps are the rem value × 100: `space-050` is 8, `space-100` is 16, `space-0625` is 10.
+- A token is used bare. Never write a fallback: `var(--ds-text)`, not `var(--ds-text, #172b4d)`.
+- Choose by meaning, never by a matching value. Never bind a primitive in a component.
+- Themes are variable modes: `color / foundations` has Light, Dark, Light IC and Dark IC; `spacing / layout` has 768, 1024 and 1440.
+

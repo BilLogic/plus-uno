@@ -220,7 +220,7 @@ test("elevation.md's hierarchy table says the same steps", () => {
     return Number(/--elevation-light-(\d)/.exec(row)[1]);
   };
   const rowOf = (words) => hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
-  for (const layer of [/modals/i, /menus/i, /dropdowns/i, /listboxes/i, /popovers/i, /tooltips/i, /toasts/i, /floating sidebar/i]) {
+  for (const layer of [/modals/i, /menus/i, /dropdowns/i, /listboxes/i, /popups/i, /tooltips/i, /flags/i, /floating sidebar/i]) {
     const row = rowOf(layer);
     assert.ok(row, `elevation.md's hierarchy table has no row matching ${layer}`);
     assert.match(row, /--ds-surface-overlay/, `elevation.md does not put ${layer} on the overlay surface`);
