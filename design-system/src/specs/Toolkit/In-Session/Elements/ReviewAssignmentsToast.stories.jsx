@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toast } from '@/components/messaging/Toast';
+import { Flag } from '@/components/messaging/Flag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -17,7 +17,7 @@ export default {
  */
 export const ForLeads = () => (
     <div style={{ width: '672px' }}>
-        <Toast
+        <Flag
             style="secondary"
             title="Review Assignments"
             timestamp="11 mins ago"
@@ -44,7 +44,7 @@ export const ForLeads = () => (
                 </a>
                 ?{' '}
             </span>
-        </Toast>
+        </Flag>
     </div>
 );
 
@@ -55,7 +55,7 @@ export const ForLeads = () => (
  */
 export const ForAll = () => (
     <div style={{ width: '672px' }}>
-        <Toast
+        <Flag
             style="secondary"
             title="Review Assignments"
             timestamp="11 mins ago"
@@ -70,7 +70,7 @@ export const ForAll = () => (
             >
                 Your student roster was just updated. Take a moment to review your new assignments.
             </span>
-        </Toast>
+        </Flag>
     </div>
 );
 
@@ -82,7 +82,7 @@ export const ForAll = () => (
  */
 export const WarmupPhase = () => (
     <div style={{ width: '672px' }}>
-        <Toast
+        <Flag
             style="info"
             title="Warmup phase in progress."
             show={true}
@@ -100,6 +100,6 @@ export const WarmupPhase = () => (
                     Remember to check in with each student and mark them as helped.
                 </span>
             </span>
-        </Toast>
+        </Flag>
     </div>
 );

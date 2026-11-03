@@ -327,8 +327,11 @@ describe("only registry components", () => {
     // and Tree select did for the same reason. 66: Date tag and Smart tag
     // split out of Status tag, and Status tag's own entry folded into the
     // split rather than staying a third registry row. Phase D backfills
-    // Figma from the rebuilt code and the registry entries return.
-    assert.equal(names.length, 64);
+    // Figma from the rebuilt code and the registry entries return. 67:
+    // AvatarGroup gained its own story + figmaMeta (+1), and Table split
+    // into Static table, Dynamic table and Tree table, one Figma page each
+    // (+2 net, replacing the single Table row).
+    assert.equal(names.length, 67);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

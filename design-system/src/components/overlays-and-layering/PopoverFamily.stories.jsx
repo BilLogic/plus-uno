@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { Dropdown, Toast, ToastContainer } from '@/components';
+import { Dropdown, Flag, FlagContainer } from '@/components';
 import Popover from './Popover/Popover';
 import Tooltip from './Tooltip/Tooltip';
 
@@ -369,14 +369,14 @@ TooltipSize.play = async ({ canvasElement }) => {
 // ---------------------------------------------------------------------------
 
 export const FlagsStack = () => (
-    <ToastContainer data-testid="pf-flags">
-        <Toast style="success" title="Changes saved" show autohide={false} data-testid="pf-flag-1">
+    <FlagContainer data-testid="pf-flags">
+        <Flag style="success" title="Changes saved" show autohide={false} data-testid="pf-flag-1">
             Your session notes are saved.
-        </Toast>
-        <Toast style="danger" title="Upload failed" show data-testid="pf-flag-2">
+        </Flag>
+        <Flag style="danger" title="Upload failed" show data-testid="pf-flag-2">
             The file was larger than 10 MB.
-        </Toast>
-    </ToastContainer>
+        </Flag>
+    </FlagContainer>
 );
 
 FlagsStack.play = async ({ canvasElement }) => {

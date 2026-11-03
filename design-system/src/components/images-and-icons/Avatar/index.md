@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Avatar/Avatar.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Avatar/Avatar.stories.jsx` — Initials, Sizes, DefaultSize, Shapes, Fallbacks, Colors, Status, Naming, Group, GroupFits, GroupSizeAndShape, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Avatar/Avatar.stories.jsx` — Initials, Sizes, DefaultSize, Shapes, Fallbacks, Colors, Status, Naming, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/Avatar/Avatar.mdx`
 

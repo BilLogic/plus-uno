@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Card, Dropdown, Modal, Popover, Table, Toast } from '@/components';
+import { Card, Dropdown, Modal, Popover, Table, Flag } from '@/components';
 import { PatternCard, PatternSection, Surface } from '@/patterns';
 
 /**
@@ -122,7 +122,7 @@ export const PopupAndFlagTitles = () => (
         >
             Shared with the student.
         </Popover>
-        <Toast style="info" title="Session moved" show onClose={() => {}}>Now Thursday at 4:00 PM.</Toast>
+        <Flag style="info" title="Session moved" show onClose={() => {}}>Now Thursday at 4:00 PM.</Flag>
     </div>
 );
 

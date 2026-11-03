@@ -170,7 +170,7 @@ proposal does (`background.selected` is `color.background.selected`, so
 | Tile | rest `background.neutral.subtle`; hovered `background.neutral.subtle.hovered`; selected `background.selected` + `border.selected` |
 | Popover: menu, popup, flag | `elevation.surface.overlay` + `elevation.shadow.overlay` |
 | Tooltip | `background.neutral.bold` + `text.inverse` |
-| Toast | `elevation.surface.overlay` + `elevation.shadow.overlay` + `icon.<role>` |
+| Flag | `elevation.surface.overlay` + `elevation.shadow.overlay` + `icon.<role>` |
 | Alert (inline) | `background.<role>` + `icon.<role>` + `color.text` |
 | Overlay (scrim) | `color.blanket` |
 | Modal | `elevation.surface.overlay` + `elevation.shadow.overlay` |

@@ -3,22 +3,22 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Toast, { ToastContainer } from './Toast';
+import Flag, { FlagContainer } from './Flag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     title: 'Components/Messaging/Flag',
-    component: Toast,
+    component: Flag,
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
             { date: '2026-10-25', kind: 'changed', summary: 'The flag moved to the new color tokens: the overlay surface and shadow, whose 1px ring replaces the border, with the role icon colors (info is blue) and color.text and color.text.subtle for the words.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'The toast became the Popover family\'s Flag: one surface 400 wide, padded 16, with the style shown in a 16 icon, the title in heading.xsmall and the × in CloseButton\'s default tone. Success and info close after 8 seconds; warning and danger stay. `ToastContainer` sits bottom-left by default, fixed 8 from the screen edge, with flags 16 apart.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The flag became the Popover family\'s Flag: one surface 400 wide, padded 16, with the style shown in a 16 icon, the title in heading.xsmall and the × in CloseButton\'s default tone. Success and info close after 8 seconds; warning and danger stay. `FlagContainer` sits bottom-left by default, fixed 8 from the screen edge, with flags 16 apart.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton in its inverse tone on every header color: a fixed 24×24 box with a 16px × and a visible focus ring.' },
         ],
         docs: {
             description: {
-                component: 'Toast component for displaying notifications. Based on react-bootstrap Toast.'
+                component: 'Flag component for displaying notifications. Based on react-bootstrap Toast.'
             }
         }
     },
@@ -34,7 +34,7 @@ export default {
         position: {
             control: 'select',
             options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
-            description: 'Toast position (for container)',
+            description: 'Flag position (for container)',
             table: { category: 'Layout' }
         },
         title: {
@@ -67,51 +67,51 @@ export default {
     }
 };
 
-function ToastVariantsDemos() {
+function FlagVariantsDemos() {
     return (
-        <ToastContainer className="p-3" containerPosition="static">
-            <Toast title="Primary Toast" style="primary" timestamp="Just now" autohide={false}>
-                This is a primary toast.
-            </Toast>
-            <Toast title="Secondary Toast" style="secondary" timestamp="Just now" autohide={false}>
-                This is a secondary toast (default).
-            </Toast>
-            <Toast title="Success Toast" style="success" timestamp="2 mins ago" autohide={false}>
+        <FlagContainer className="p-3" containerPosition="static">
+            <Flag title="Primary Flag" style="primary" timestamp="Just now" autohide={false}>
+                This is a primary flag.
+            </Flag>
+            <Flag title="Secondary Flag" style="secondary" timestamp="Just now" autohide={false}>
+                This is a secondary flag (default).
+            </Flag>
+            <Flag title="Success Flag" style="success" timestamp="2 mins ago" autohide={false}>
                 Action completed successfully!
-            </Toast>
-            <Toast title="Danger Toast" style="danger" timestamp="10 mins ago">
+            </Flag>
+            <Flag title="Danger Flag" style="danger" timestamp="10 mins ago">
                 Something went wrong.
-            </Toast>
-            <Toast title="Warning Toast" style="warning">
+            </Flag>
+            <Flag title="Warning Flag" style="warning">
                 Please be careful.
-            </Toast>
-            <Toast title="Info Toast" style="info" autohide={false}>
+            </Flag>
+            <Flag title="Info Flag" style="info" autohide={false}>
                 Here is some information.
-            </Toast>
-        </ToastContainer>
+            </Flag>
+        </FlagContainer>
     );
 }
 
 export const Styles = () => (
     <div className="d-flex flex-column gap-3">
-        <ToastVariantsDemos />
+        <FlagVariantsDemos />
     </div>
 );
 
 export const Overview = () => (
-    <ToastContainer className="p-3" containerPosition="static">
-        <Toast title="Secondary Toast" style="secondary" timestamp="Just now" autohide={false}>
-            This is a secondary toast (default).
-        </Toast>
-    </ToastContainer>
+    <FlagContainer className="p-3" containerPosition="static">
+        <Flag title="Secondary Flag" style="secondary" timestamp="Just now" autohide={false}>
+            This is a secondary flag (default).
+        </Flag>
+    </FlagContainer>
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'jsx', code: webAppSourceSnippets.toast }
+        source: { language: 'jsx', code: webAppSourceSnippets.flag }
     }
 };
 
-const ToastInteractiveWrapper = ({ style, position, title, children, show, autohide, delay }) => {
+const FlagInteractiveWrapper = ({ style, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);
 
     React.useEffect(() => {
@@ -119,9 +119,9 @@ const ToastInteractiveWrapper = ({ style, position, title, children, show, autoh
     }, [show]);
 
     return (
-        <div className="plus-toast-interactive-demo">
-            <ToastContainer position={position} className="p-3">
-                <Toast
+        <div className="plus-flag-interactive-demo">
+            <FlagContainer position={position} className="p-3">
+                <Flag
                     show={isOpen}
                     onClose={() => setIsOpen(false)}
                     title={title}
@@ -131,22 +131,22 @@ const ToastInteractiveWrapper = ({ style, position, title, children, show, autoh
                     autohide={autohide}
                 >
                     {children}
-                </Toast>
-            </ToastContainer>
-            <div className="plus-toast-interactive-demo__trigger">
-                <Button appearance="primary" text="Trigger Toast" onClick={() => setIsOpen(true)} />
+                </Flag>
+            </FlagContainer>
+            <div className="plus-flag-interactive-demo__trigger">
+                <Button appearance="primary" text="Trigger Flag" onClick={() => setIsOpen(true)} />
             </div>
         </div>
     );
 };
 
-export const Interactive = (args) => <ToastInteractiveWrapper {...args} />;
+export const Interactive = (args) => <FlagInteractiveWrapper {...args} />;
 Interactive.args = {
     show: false,
     style: 'success',
     position: 'top-end',
-    title: 'Toast Title',
-    children: 'This is an interactive toast message.',
+    title: 'Flag Title',
+    children: 'This is an interactive flag message.',
     autohide: false,
     delay: 3000
 };
@@ -155,27 +155,27 @@ Interactive.parameters = {
     docs: {
         description: {
             story:
-                'Preview keeps the toast centered. In product code, `position` on `ToastContainer` still controls fixed corner placement.',
+                'Preview keeps the flag centered. In product code, `position` on `FlagContainer` still controls fixed corner placement.',
         },
     },
 };
 
-const TOAST_STYLES = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
+const FLAG_STYLE_LIST = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
 
 /**
- * One flag per style, stacked. `toastProps(style)` supplies what
+ * One flag per style, stacked. `flagProps(style)` supplies what
  * differs per story (test id, visibility, body); `children` follows the stack.
  */
-const ToastPerStyle = ({ toastProps, children }) => (
+const FlagPerStyle = ({ flagProps, children }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
-        {TOAST_STYLES.map((style) => (
-            <Toast
+        {FLAG_STYLE_LIST.map((style) => (
+            <Flag
                 key={style}
                 style={style}
-                title={`${style} toast`}
+                title={`${style} flag`}
                 timestamp="Just now"
                 autohide={false}
-                {...toastProps(style)}
+                {...flagProps(style)}
             />
         ))}
         {children}
@@ -192,8 +192,8 @@ const ToastPerStyle = ({ toastProps, children }) => (
 export const Dismiss = () => {
     const [closed, setClosed] = useState([]);
     return (
-        <ToastPerStyle
-            toastProps={(style) => ({
+        <FlagPerStyle
+            flagProps={(style) => ({
                 show: !closed.includes(style),
                 onClose: () => setClosed((list) => [...list, style]),
                 'data-testid': `dismiss-${style}`,
@@ -201,7 +201,7 @@ export const Dismiss = () => {
             })}
         >
             <span className="body2-txt" data-testid="dismiss-closed">{closed.join(' ')}</span>
-        </ToastPerStyle>
+        </FlagPerStyle>
     );
 };
 
@@ -209,15 +209,15 @@ Dismiss.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const ring = tokenColor(canvasElement, '--ds-border-focused');
 
-    for (const style of TOAST_STYLES) {
-        const toast = canvas.getByTestId(`dismiss-${style}`);
-        const button = within(toast).getByRole('button', { name: 'Close' });
-        const ground = getComputedStyle(toast).backgroundColor;
+    for (const style of FLAG_STYLE_LIST) {
+        const flag = canvas.getByTestId(`dismiss-${style}`);
+        const button = within(flag).getByRole('button', { name: 'Close' });
+        const ground = getComputedStyle(flag).backgroundColor;
 
         // The × closes the row, one inline-lg gap after the content.
-        const rowGap = px(getComputedStyle(toast).columnGap);
+        const rowGap = px(getComputedStyle(flag).columnGap);
         await expect(rowGap, `${style}: row gap`).toBe(12);
-        const content = toast.querySelector('.plus-toast-content').getBoundingClientRect();
+        const content = flag.querySelector('.plus-flag-content').getBoundingClientRect();
         await expect(Math.round(button.getBoundingClientRect().left - content.right), `${style}: content → × gap`).toBe(rowGap);
 
         // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1.
@@ -244,8 +244,8 @@ Dismiss.play = async ({ canvasElement }) => {
  * and the message color.text.subtle on every style.
  */
 export const FlagContent = () => (
-    <ToastPerStyle
-        toastProps={(style) => ({
+    <FlagPerStyle
+        flagProps={(style) => ({
             show: true,
             'data-testid': `flag-${style}`,
             children: `The ${style} flag's message.`,
@@ -268,12 +268,12 @@ FlagContent.play = async ({ canvasElement }) => {
     const text = tokenColor(canvasElement, '--ds-text');
     const textSubtle = tokenColor(canvasElement, '--ds-text-subtle');
 
-    for (const style of TOAST_STYLES) {
-        const toast = canvas.getByTestId(`flag-${style}`);
-        await expect(getComputedStyle(toast).backgroundColor, `${style}: one surface`).toBe(surface);
-        await expect(getComputedStyle(toast.querySelector('.plus-toast-title')).color, `${style}: title`).toBe(text);
-        await expect(getComputedStyle(toast.querySelector('.plus-toast-body')).color, `${style}: message`).toBe(textSubtle);
-        const icon = toast.querySelector('.plus-toast-icon i');
+    for (const style of FLAG_STYLE_LIST) {
+        const flag = canvas.getByTestId(`flag-${style}`);
+        await expect(getComputedStyle(flag).backgroundColor, `${style}: one surface`).toBe(surface);
+        await expect(getComputedStyle(flag.querySelector('.plus-flag-title')).color, `${style}: title`).toBe(text);
+        await expect(getComputedStyle(flag.querySelector('.plus-flag-body')).color, `${style}: message`).toBe(textSubtle);
+        const icon = flag.querySelector('.plus-flag-icon i');
         await expect(getComputedStyle(icon).color, `${style}: icon`).toBe(tokenColor(canvasElement, ICON_COLOR[style]));
         await expect(getComputedStyle(icon).fontSize, `${style}: icon 16`).toBe('16px');
     }
@@ -283,14 +283,14 @@ FlagContent.play = async ({ canvasElement }) => {
  * A style outside the list renders as the default, secondary.
  */
 export const UnknownStyle = () => (
-    <Toast style="not-a-style" title="Unknown style" show autohide={false} data-testid="unknown-style">
+    <Flag style="not-a-style" title="Unknown style" show autohide={false} data-testid="unknown-style">
         Falls back to secondary.
-    </Toast>
+    </Flag>
 );
 
 UnknownStyle.play = async ({ canvasElement }) => {
-    const toast = within(canvasElement).getByTestId('unknown-style');
-    await expect(toast).toHaveClass('secondary');
-    const icon = toast.querySelector('.plus-toast-icon i');
+    const flag = within(canvasElement).getByTestId('unknown-style');
+    await expect(flag).toHaveClass('secondary');
+    const icon = flag.querySelector('.plus-flag-icon i');
     await expect(getComputedStyle(icon).color).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
 };

@@ -20,7 +20,7 @@ The Popover family is the set of floating layers that never block the page: Menu
 
 ### Purpose
 
-Popover names the pattern and the token collection for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popover` component and the Flag is the `Toast` component.
+Popover names the pattern and the token collection for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popover` component and the Flag is the `Flag` component.
 
 </div>
 
@@ -60,7 +60,7 @@ The four layers are built from existing components. These are the main propertie
 <tbody>
 <tr><td>Menu</td><td><code>Dropdown</code></td><td><code>size</code> (<code>default</code> or <code>small</code>), <code>items</code>. An item has <code>text</code>, an optional <code>description</code>, <code>leadingIcon</code>, <code>selected</code> and <code>header</code>.</td></tr>
 <tr><td>Popup</td><td><code>Popover</code></td><td><code>width</code> (<code>sm</code>, <code>md</code> or <code>lg</code>, default <code>sm</code>), <code>title</code>, <code>placement</code>, <code>triggerType</code>, <code>trigger</code>, children as the body.</td></tr>
-<tr><td>Flag</td><td><code>Toast</code></td><td><code>style</code> (<code>info</code>, <code>success</code>, <code>warning</code> or <code>danger</code>), <code>title</code>, children as the description, <code>autohide</code>, <code>delay</code>. <code>ToastContainer</code> places the stack.</td></tr>
+<tr><td>Flag</td><td><code>Flag</code></td><td><code>style</code> (<code>info</code>, <code>success</code>, <code>warning</code> or <code>danger</code>), <code>title</code>, children as the description, <code>autohide</code>, <code>delay</code>. <code>FlagContainer</code> places the stack.</td></tr>
 <tr><td>Tooltip</td><td><code>Tooltip</code></td><td><code>text</code>, <code>placement</code> (<code>top</code>, <code>bottom</code>, <code>left</code> or <code>right</code>), <code>trigger</code>, <code>delayShow</code>, <code>delayHide</code>.</td></tr>
 </tbody>
 </DocsTable>

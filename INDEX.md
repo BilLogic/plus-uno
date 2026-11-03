@@ -91,7 +91,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | Nine container components sorted by what is being contained, plus the three pairs that get confused |
 | [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
-| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
+| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Flag or Modal — choosing by how long the message lives and whether it blocks |
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Six navigation components sorted by what the user is moving between |
 | [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popover (Popup) — hover description versus click-triggered content |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
