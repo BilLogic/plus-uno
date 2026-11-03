@@ -9,7 +9,7 @@ import GenerativeBorder, { GENERATIVE_BORDER_RADII } from './GenerativeBorder';
 /**
  * `GenerativeBorder` -- the border that shows PLUS AI is generating content.
  *
- * Benchmark: atlassian.design/components/generative-border. Like it, the ring
+ * Benchmark: atlassian.design/rovo-ui/generative-border. Like it, the ring
  * appears while content is being generated and goes away when generation ends.
  * PLUS draws it as a 2px stroke in flat lagoon and purple segments.
  *
