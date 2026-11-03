@@ -1,5 +1,6 @@
 .npm-cache/
 storybook-static/
+archive-storybook-static/
 storybook_*.txt
 # Dependencies
 **/node_modules/
