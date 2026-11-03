@@ -104,25 +104,6 @@ as Tag, so it sits in the tag row where the value will land.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-## ADS documentation
-
-Benchmarked against the [ADS documentation](https://atlassian.design/components/tag) for this component. The parity table lists each ADS prop and what Suggestion does with it.
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS: closest pattern</th><th>Suggestion</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>None</td><td><code>label</code>, <code>type</code> (insert, prompt), <code>value</code>, <code>text</code></td><td>ADS has no suggestion component; the closest ADS pattern is a button that proposes a value.</td></tr>
-        <tr><td><code>onClick</code></td><td><code>onAccept</code>, <code>onClick</code></td><td>Accept hands back the value or the text; onClick fires first.</td></tr>
-        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Also follows a disabled field or Tag group through TagContext.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>

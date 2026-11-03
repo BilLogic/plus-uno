@@ -165,6 +165,21 @@ test('7. a retired heading is caught at `##` — with the remedy, not just a ver
   assert.deepEqual(checkFile(COMPONENT, ok, true), []);
 });
 
+test('7d. "ADS parity" and "ADS documentation" are retired — no Atlassian citation comes back', () => {
+  const broken = page({ examples: ['Overview'], usage: ['When to use', 'ADS parity', 'Related'] });
+  assert.ok(
+    checkFile(COMPONENT, broken, true).some((f) => /"ADS parity" was retired — drop the citation/.test(f)),
+  );
+
+  const broken2 = page({
+    examples: ['Overview'],
+    usage: ['When to use', 'ADS documentation', 'Related'],
+  });
+  assert.ok(
+    checkFile(COMPONENT, broken2, true).some((f) => /"ADS documentation" was retired — drop the citation/.test(f)),
+  );
+});
+
 test('7b. a retired heading demoted to `###` is still caught — where #253 left them', () => {
   // The failure this exists for: #253 wrote these as `###`, and `HEADING` only
   // matches `##` (3c), so assertion 7 reading `sections` alone would see none of

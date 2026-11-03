@@ -92,7 +92,7 @@ A button triggers an action and lets people know what happens next.
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>A primary button at default spacing: the call to action of a page or area. <a href="https://atlassian.design/components/button">ADS documentation</a></>}
+    description="A primary button at default spacing: the call to action of a page or area."
 >
     <Canvas
         of={ButtonStories.Overview}
@@ -325,31 +325,6 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 - Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## ADS parity
-
-<DocsTable>
-<thead>
-<tr><th>ADS</th><th>PLUS</th><th>Note</th></tr>
-</thead>
-<tbody>
-<tr><td><code>appearance</code>: default, primary, subtle, warning, danger, discovery</td><td>Same six</td><td>Matches.</td></tr>
-<tr><td>An AI-branded appearance</td><td>Not adopted</td><td>PLUS has no such action.</td></tr>
-<tr><td><code>spacing</code>: default, compact</td><td>Same; 32 and 24</td><td>Matches.</td></tr>
-<tr><td><code>iconBefore</code>, <code>iconAfter</code> (Atlassian icon components)</td><td>Same props; a Font Awesome Free glyph name or a node at 16</td><td>The icon library differs.</td></tr>
-<tr><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code></td><td>Same</td><td>Selected keeps the blue selected role; ADS moves it to a neutral treatment behind a flag.</td></tr>
-<tr><td><code>shouldFitContainer</code></td><td>Same</td><td>Matches.</td></tr>
-<tr><td>Radius 6 at default spacing and 4 at compact</td><td>Same</td><td><code>--element-radius-item-sm</code> and <code>--element-radius-md</code>.</td></tr>
-<tr><td>Text truncates with an ellipsis</td><td>Same</td><td>One line, ellipsis at the end.</td></tr>
-<tr><td><code>CustomThemeButton</code> (deprecated)</td><td>Not built</td><td>ADS recommends Pressable.</td></tr>
-</tbody>
-</DocsTable>
-
-[ADS documentation: Button](https://atlassian.design/components/button)
 
 </div>
 
