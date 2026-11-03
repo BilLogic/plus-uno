@@ -47,18 +47,7 @@ export const figmaMeta = {
       ]
     }
   },
-  "sets": [
-    {
-      "id": "storybook-resources",
-      "name": "Button page (Core)",
-      "componentSetNodeId": "3497:19482",
-      "isComponentSet": false,
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-      "source": "storybook-mdx",
-      "status": "docs-page",
-      "notes": "The Button page in Core holds Link icon button: Updated components, Docs and Playground. Read-only from code."
-    }
-  ]
+  "sets": []
 };
 
 <Meta of={LinkIconButtonStories} />
@@ -71,7 +60,6 @@ A link icon button navigates with an icon and no visible label. It renders an an
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/LinkIconButton"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -83,7 +71,7 @@ A link icon button navigates with an icon and no visible label. It renders an an
 
 ## Overview
 
-<DocsCanvasShell description={<>A default link icon button at default spacing. <a href="https://atlassian.design/components/button/link-icon-button">ADS documentation</a></>}>
+<DocsCanvasShell description={<>A default link icon button at default spacing.</>}>
     <Canvas of={LinkIconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -255,27 +243,6 @@ Use a link icon button when an icon alone opens another page or site and space i
 - It has no disabled state. Disabled links leave the tab order and do not say why; use validation and error messages instead.
 - `target="_blank"` adds `rel="noopener noreferrer"`; say so in the label if it opens a new tab.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## ADS parity
-
-<DocsTable>
-<thead>
-<tr><th>ADS</th><th>PLUS</th><th>Note</th></tr>
-</thead>
-<tbody>
-<tr><td><code>label</code> (required)</td><td><code>label</code> (required), set as <code>aria-label</code> and <code>title</code></td><td>Same contract.</td></tr>
-<tr><td><code>icon</code></td><td><code>icon</code>: a Font Awesome Free glyph name or a node</td><td>The icon library differs.</td></tr>
-<tr><td><code>appearance</code>, <code>spacing</code>, <code>shape</code></td><td>Same values</td><td>Matches Icon button.</td></tr>
-<tr><td><code>href</code> and link props</td><td><code>href</code>, <code>target</code>, <code>rel</code></td><td><code>target="_blank"</code> adds <code>rel</code> by default.</td></tr>
-<tr><td><code>isDisabled</code>, <code>isLoading</code></td><td>Not built</td><td>ADS advises against disabling links.</td></tr>
-</tbody>
-</DocsTable>
-
-[ADS documentation: Link icon button](https://atlassian.design/components/button/link-icon-button)
 
 </div>
 

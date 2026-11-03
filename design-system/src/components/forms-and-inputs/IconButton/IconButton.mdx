@@ -53,18 +53,7 @@ export const figmaMeta = {
       "type": "boolean"
     }
   },
-  "sets": [
-    {
-      "id": "storybook-resources",
-      "name": "Button page (Core)",
-      "componentSetNodeId": "3497:19482",
-      "isComponentSet": false,
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-      "source": "storybook-mdx",
-      "status": "docs-page",
-      "notes": "The Button page in Core holds Icon button: Updated components, Docs and Playground. Read-only from code."
-    }
-  ]
+  "sets": []
 };
 
 <Meta of={IconButtonStories} />
@@ -77,7 +66,6 @@ An icon button is a button with an icon and no visible label. Its required `labe
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/IconButton"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -89,7 +77,7 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 ## Overview
 
-<DocsCanvasShell description={<>A default icon button at default spacing. <a href="https://atlassian.design/components/button/icon-button">ADS documentation</a></>}>
+<DocsCanvasShell description={<>A default icon button at default spacing.</>}>
     <Canvas of={IconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -282,29 +270,6 @@ Put related icon buttons in a Button group, and use `isSelected` for a choice be
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## ADS parity
-
-<DocsTable>
-<thead>
-<tr><th>ADS</th><th>PLUS</th><th>Note</th></tr>
-</thead>
-<tbody>
-<tr><td><code>label</code> (required, visually hidden text)</td><td><code>label</code> (required), set as <code>aria-label</code> and <code>title</code></td><td>Same contract; the name reaches assistive technology the same way.</td></tr>
-<tr><td><code>icon</code> (Atlassian icon component)</td><td><code>icon</code>: a Font Awesome Free glyph name or a node</td><td>The icon library differs.</td></tr>
-<tr><td><code>appearance</code>: default, subtle, primary, discovery</td><td>Same four</td><td>Matches. Warning and danger stay on Button.</td></tr>
-<tr><td><code>spacing</code>: default, compact</td><td>Same; 32 and 24</td><td>Matches.</td></tr>
-<tr><td><code>shape</code>: default, circle</td><td>Same</td><td>Matches.</td></tr>
-<tr><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code></td><td>Same</td><td>Selected keeps the blue selected role.</td></tr>
-<tr><td><code>isTooltipDisabled</code>, <code>tooltip</code> props</td><td>Not built</td><td>The tooltip is the native <code>title</code>.</td></tr>
-</tbody>
-</DocsTable>
-
-[ADS documentation: Icon button](https://atlassian.design/components/button/icon-button)
 
 </div>
 

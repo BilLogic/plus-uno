@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (68)
+## UI components (71)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -37,10 +37,13 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
 - [Footer](../../src/components/_internal/Footer/index.md)
 - [GenerativeBorder](../../src/components/loading/GenerativeBorder/index.md)
+- [IconButton](../../src/components/forms-and-inputs/IconButton/index.md)
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)
 - [Jumbotron](../../src/components/layout-and-structure/Jumbotron/index.md)
+- [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
+- [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - [ListGroup](../../src/components/layout-and-structure/ListGroup/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
 - [MediaObject](../../src/components/layout-and-structure/MediaObject/index.md)

@@ -8,8 +8,7 @@ export const ICON_BUTTON_SHAPES = ['default', 'circle'];
 
 /**
  * Icon button: a button that is an icon and nothing else. `label` is required
- * because it is the button's accessible name and its tooltip. Props follow
- * Atlassian's Icon button (https://atlassian.design/components/button/icon-button).
+ * because it is the button's accessible name and its tooltip..
  */
 export const IconButton = ({
     icon,

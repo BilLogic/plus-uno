@@ -3,7 +3,7 @@
 
 # LinkButton
 
-Link button: navigates, and looks like a button. It renders an anchor, so it has no disabled or loading state. Props follow Atlassian's Link button (https://atlassian.design/components/button/link-button).
+Link button: navigates, and looks like a button. It renders an anchor, so it has no disabled or loading state.
 
 **Import:** `import { LinkButton } from '@/components';`
 
@@ -39,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `LinkIconButton` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 

@@ -3,7 +3,7 @@
 
 # LinkIconButton
 
-Link icon button: an icon that navigates. It renders an anchor with an accessible `label`, and has no disabled or loading state. Props follow Atlassian's Link icon button (https://atlassian.design/components/button/link-icon-button).
+Link icon button: an icon that navigates. It renders an anchor with an accessible `label`, and has no disabled or loading state.
 
 **Import:** `import { LinkIconButton } from '@/components';`
 
@@ -37,7 +37,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `LinkButton` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 

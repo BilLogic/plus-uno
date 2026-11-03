@@ -823,19 +823,7 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "storybook-resources",
-            "name": "Button page (Core)",
-            "componentSetNodeId": "3497:19482",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "The Button page in Core holds Icon button: Updated components, Docs and Playground. Read-only from code."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+        "sets": []
       }
     },
     "Illustration": {
@@ -1006,19 +994,7 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "storybook-resources",
-            "name": "Button page (Core)",
-            "componentSetNodeId": "3497:19482",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "The Button page in Core holds Link button: Updated components, Docs and Playground. Read-only from code."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+        "sets": []
       }
     },
     "LinkIconButton": {
@@ -1066,19 +1042,7 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "storybook-resources",
-            "name": "Button page (Core)",
-            "componentSetNodeId": "3497:19482",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "The Button page in Core holds Link icon button: Updated components, Docs and Playground. Read-only from code."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+        "sets": []
       }
     },
     "ListGroup": {

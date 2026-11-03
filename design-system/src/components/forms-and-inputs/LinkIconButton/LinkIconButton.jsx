@@ -4,9 +4,7 @@ import { IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '../Icon
 
 /**
  * Link icon button: an icon that navigates. It renders an anchor with an
- * accessible `label`, and has no disabled or loading state. Props follow
- * Atlassian's Link icon button
- * (https://atlassian.design/components/button/link-icon-button).
+ * accessible `label`, and has no disabled or loading state.
  */
 export const LinkIconButton = ({ href, target, rel, ...props }) => (
     <IconButton

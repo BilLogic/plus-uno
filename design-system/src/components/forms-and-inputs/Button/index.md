@@ -28,8 +28,6 @@
 | `isDisabled` | bool | `false` | — |
 | `isSelected` | bool | — | — |
 | `isLoading` | bool | `false` | Show a spinner in place of the label and block interaction |
-| `href` | string | — | — |
-| `target` | string | — | — |
 | `type` | string | `'button'` | — |
 | `as` | elementType | — | — |
 | `iconBefore` | string or node | — | Font Awesome glyph before the label |
@@ -53,7 +51,7 @@ From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Overrid
 
 ## Related
 
-Same group: `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
+Same group: `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 

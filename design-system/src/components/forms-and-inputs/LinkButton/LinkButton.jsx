@@ -4,8 +4,7 @@ import { Button, BUTTON_APPEARANCES } from '../Button/Button';
 
 /**
  * Link button: navigates, and looks like a button. It renders an anchor, so it
- * has no disabled or loading state. Props follow Atlassian's Link button
- * (https://atlassian.design/components/button/link-button).
+ * has no disabled or loading state.
  */
 export const LinkButton = ({ href, target, rel, children, text, ...props }) => (
     <Button
