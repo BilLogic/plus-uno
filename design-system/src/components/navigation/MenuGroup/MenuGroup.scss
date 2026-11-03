@@ -1,0 +1,74 @@
+@use '../../../styles/state' as *;
+
+.plus-menu-group {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    min-width: 200px;
+    padding: var(--space-050) 0;
+
+    &--compact .plus-menu-item {
+        padding-block: var(--space-050);
+    }
+}
+
+.plus-menu-section {
+    &--separated {
+        border-top: var(--border-default) solid var(--ds-border);
+        margin-top: var(--space-050);
+        padding-top: var(--space-050);
+    }
+}
+
+.plus-menu-section-title {
+    font: var(--body-small);
+    color: var(--ds-text-subtlest);
+    text-transform: uppercase;
+    padding: var(--space-075) var(--space-150) var(--space-025);
+}
+
+.plus-menu-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: var(--space-100);
+    padding: var(--space-100) var(--space-150);
+    border: none;
+    background: none;
+    border-radius: var(--radius-050);
+    color: var(--ds-text);
+    text-decoration: none;
+    cursor: pointer;
+    font: var(--body-default);
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        selected: (background-color: var(--ds-background-selected)),
+        disabled: (color: var(--ds-text-disabled)),
+    ));
+}
+
+.plus-menu-item-icon {
+    display: inline-flex;
+    flex: none;
+    color: var(--ds-icon-subtle);
+}
+
+.plus-menu-item-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-align: start;
+}
+
+.plus-menu-item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.plus-menu-item-description {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}

@@ -1,0 +1,35 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as MenuGroupStories from './MenuGroup.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "menu-item",
+      "name": "Menu item",
+      "componentSetNodeId": "20625:91",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20625-91",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={MenuGroupStories} />
+
+<Title />
+
+<DocsTabs of={MenuGroupStories}>
+
+<DocsTab tab="examples">
+
+A scrollable, titled list of action and navigation rows.
+
+<Canvas of={MenuGroupStories.ButtonAndLinkItems} />
+
+<ArgTypes of={MenuGroupStories} />
+
+</DocsTab>
+
+</DocsTabs>

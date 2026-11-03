@@ -305,6 +305,7 @@ const preview = {
             [
               "Breadcrumbs",
               "Link",
+              "Menu group",
               "Pagination",
               "Scrollspy",
               "Sidebar tab",

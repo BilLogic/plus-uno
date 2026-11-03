@@ -1258,6 +1258,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245484"
       }
     },
+    "MenuGroup": {
+      "code": {
+        "import": "@/components/navigation",
+        "export": "default",
+        "mdxPath": "design-system/src/components/navigation/MenuGroup/MenuGroup.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
+        "storybookId": "components-navigation-menu-group--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "menu-item",
+            "name": "Menu item",
+            "componentSetNodeId": "20625:91",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20625-91",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ]
+      }
+    },
     "Modal": {
       "code": {
         "import": "@/components/messaging",
