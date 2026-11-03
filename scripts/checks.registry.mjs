@@ -259,6 +259,16 @@ export const CHECKS = [
       'GLOSSARY.md staying a glossary in the plugin format: no fenced code, no heading deeper than a `###` cluster, every section and cluster holding `**Term**:` entries and every entry a definition, a table only in § Two vocabularies (ADR-023), and prose lines ratcheted against scripts/baselines/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their glossaries to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
   },
   {
+    name: 'check:ads-language',
+    script: 'node scripts/check-ads-language.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ads-language.mjs',
+    baseline: 'scripts/baselines/ads-language.json',
+    guards:
+      'the old component language not coming back while the library moves to the ADS names: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, counted per rule and per file in design-system/src, prototypes and src. A count may fall and never rise; a migration PR lowers the record with `npm run check:ads-language -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
     name: 'check:retired-spelling',
     script: 'node scripts/check-retired-spelling.mjs',
     pkg: 'root',

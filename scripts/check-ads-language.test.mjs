@@ -1,0 +1,101 @@
+// The ADS language ratchet, mutation-tested: each rule proven by a fixture that breaks it.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import { BASELINE, measure, run } from './check-ads-language.mjs';
+
+const src = (file, text) => ({ path: file, text });
+const countOf = (sources, key) => measure(sources).get(key)?.count;
+
+/** A scratch repo root holding a baseline record of `counts`. */
+function scratch(counts) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-language-'));
+  fs.mkdirSync(path.join(root, path.dirname(BASELINE)), { recursive: true });
+  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', counts }, null, 2));
+  return root;
+}
+
+test('a state step custom property is counted per line, and the token definitions are out of scope', () => {
+  const css = '.a { color: var(--color-primary-state-08); background: var(--color-danger-state-12); }\n.b { x: var(--color-primary-state-16) }\n';
+  assert.equal(countOf([src('design-system/src/components/A/A.scss', css)], 'state-step design-system/src/components/A/A.scss'), 2);
+  assert.equal(measure([src('design-system/src/tokens/_colors.scss', '--color-primary-state-08: #000;')]).size, 0);
+  assert.equal(measure([src('a.scss', 'var(--color-primary-state-082)')]).size, 0, 'only the 08 / 12 / 16 steps');
+});
+
+test('legacy components count as tags and imports, and a longer name is not its prefix', () => {
+  const jsx = "import { Alert, Button } from '@/components';\n<Alert>hi</Alert>\n<AlertTitle />\n<Badge />\n<BadgeVariants />\n";
+  const found = measure([src('src/App.jsx', jsx)]);
+  assert.equal(found.get('component:Alert src/App.jsx').count, 2, 'one import and one tag, not AlertTitle');
+  assert.equal(found.get('component:Badge src/App.jsx').count, 1);
+  assert.equal(found.get('component:BadgeVariants src/App.jsx').count, 1);
+});
+
+test("React-Bootstrap's Overlay is not the Overlay pattern", () => {
+  const bootstrap = "import { Overlay } from 'react-bootstrap';\n<Overlay show />\n";
+  assert.equal(measure([src('design-system/src/Tooltip.jsx', bootstrap)]).size, 0);
+  const pattern = "import { Overlay } from '@/patterns';\n<Overlay />\n";
+  assert.equal(countOf([src('design-system/src/P.jsx', pattern)], 'component:Overlay design-system/src/P.jsx'), 2);
+});
+
+test('retired props, classes and words are counted; inline CSS and SVG fill are not', () => {
+  const jsx = '<Button style="primary" fill="filled" size="small" />\n<svg fill="none" /><p style="color: red">x</p>\n';
+  const found = measure([src('a.jsx', jsx)]);
+  assert.equal(found.get('prop:style a.jsx').count, 1);
+  assert.equal(found.get('prop:fill a.jsx').count, 1);
+  assert.equal(found.get('prop:size a.jsx').count, 1);
+  const css = '.plus-btn--tonal {}\n/* the surface container */\n.x { z: var(--color-scrim); } /* Rovo */\n';
+  const words = measure([src('a.scss', css)]);
+  assert.equal(words.get('class:plus-btn a.scss').count, 1);
+  assert.equal(words.get('word:surface-container a.scss').count, 1);
+  assert.equal(words.get('word:scrim a.scss').count, 1);
+  assert.equal(words.get('word:Rovo a.scss').count, 1);
+});
+
+test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on purpose', () => {
+  assert.equal(measure([src('docs/knowledge/archive/x.mdx', 'Rovo scrim')]).size, 0);
+  assert.equal(measure([src('docs/adr/001.mdx', 'Rovo')]).size, 0);
+  assert.equal(measure([src('design-system/src/G.mdx', '_Avoid_: "scrim", "Rovo"\n')]).size, 0);
+});
+
+test('a fixture with a new -state-08 fails against the baseline', () => {
+  const root = scratch({});
+  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', '.a { c: var(--color-info-state-08) }')] });
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].message, /state-step/);
+  assert.equal(findings[0].file, 'design-system/src/A.scss');
+  assert.equal(findings[0].line, 1);
+});
+
+test('a count that rises fails, and one that falls passes', () => {
+  const key = 'state-step design-system/src/A.scss';
+  const two = '.a { c: var(--color-info-state-08) }\n.b { c: var(--color-info-state-12) }\n';
+  const one = '.a { c: var(--color-info-state-08) }\n';
+  const three = `${two}.c { c: var(--color-info-state-16) }\n`;
+  const root = scratch({ [key]: 2 });
+  assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', two)] }), []);
+  assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', one)] }), [], 'lowering a count passes');
+  const rose = run({ repoRoot: root, sources: [src('design-system/src/A.scss', three)] });
+  assert.equal(rose.length, 1);
+  assert.match(rose[0].message, /rose: 3 x state-step against a baseline of 2/);
+});
+
+test('a pair that reaches zero is stale until the baseline is regenerated', () => {
+  const root = scratch({ 'word:Rovo design-system/src/A.mdx': 1 });
+  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.mdx', 'PLUS AI')] });
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].message, /--update/);
+});
+
+test('a missing baseline fails loudly rather than passing', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-language-'));
+  const findings = run({ repoRoot: root, sources: [] });
+  assert.equal(findings.length, 1);
+  assert.match(findings[0].message, /no baseline is recorded/);
+});
+
+test('the live tree holds its own baseline', () => {
+  assert.deepEqual(run(), []);
+});
