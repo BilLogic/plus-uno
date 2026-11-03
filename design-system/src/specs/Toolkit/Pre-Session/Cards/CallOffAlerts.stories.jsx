@@ -24,7 +24,7 @@ export const ConfirmationAlert = ({
 }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-warning-state-16)',
+            backgroundColor: 'var(--ds-background-warning)',
             border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
@@ -76,7 +76,7 @@ export const ConfirmationAlert = ({
 const UpdateAlert = ({ title, description, onClose }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-primary-container-state-16)',
+            backgroundColor: 'var(--ds-background-brand-subtlest)',
             border: '1px solid var(--color-primary)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
@@ -131,7 +131,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
 const TimeWarningAlert = ({ onClose }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-warning-state-08)',
+            backgroundColor: 'var(--ds-background-warning)',
             border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',

@@ -156,8 +156,8 @@ export const TableHeaderRow = () => (
  * Cell padding: var(--size-table-cell-x), var(--size-table-cell-y)
  * 
  * Interactive states:
- * - Hover: background changes to --color-on-surface-state-08
- * - Pressed: background changes to --color-on-surface-state-16
+ * - Hover: background changes to --ds-background-neutral-subtle-hovered
+ * - Pressed: background changes to --ds-background-neutral-subtle-pressed
  */
 export const TableRow = ({
     studentName,
@@ -178,8 +178,8 @@ export const TableRow = ({
 
     const stateStyles = {
         default: {},
-        hover: { backgroundColor: 'var(--color-on-surface-state-08)' },
-        pressed: { backgroundColor: 'var(--color-on-surface-state-16)' }
+        hover: { backgroundColor: 'var(--ds-background-neutral-subtle-hovered)' },
+        pressed: { backgroundColor: 'var(--ds-background-neutral-subtle-pressed)' }
     };
 
     const handleMouseEnter = interactive && !forcedState ? () => setCurrentState('hover') : undefined;

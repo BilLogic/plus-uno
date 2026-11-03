@@ -29,13 +29,13 @@ export const Overview = {
 };
 
 /**
- * The loading skeleton bars paint Mastering-Content 16, the variable Figma binds
+ * The loading skeleton bars paint the Mastering-Content background, the token
  * to them, and name no token that does not exist.
  */
 Overview.play = async ({ canvasElement }) => {
     const bars = within(canvasElement).getAllByTestId('skeleton-bar');
     await expect(bars).toHaveLength(3);
-    const want = tokenColor(canvasElement, '--color-mastering-content-state-16');
+    const want = tokenColor(canvasElement, '--ds-background-smart-mastering-content');
     for (const bar of bars) {
         await expect(getComputedStyle(bar).backgroundColor, 'skeleton bar color').toBe(want);
         for (const name of tokenNames(bar.style.backgroundColor)) {

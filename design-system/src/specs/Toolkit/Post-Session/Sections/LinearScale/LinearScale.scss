@@ -1,6 +1,6 @@
 /**
  * Post-Session Linear Scale — Figma Sections · Linear Scale `10819:11602`.
- * Shell: primary-state-08 · section radius-md · col-8 (445px), drawn around
+ * Shell: brand-subtlest · section radius-md · col-8 (445px), drawn around
  * the ChoiceGroup's scale row so the question sits above it.
  * Row: wrapping end labels (flex) + the 1–5 radios · gap-lg between groups.
  */
@@ -15,7 +15,7 @@
         gap: var(--size-section-gap-lg);
         min-width: 0;
         padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
-        background-color: var(--color-primary-state-08);
+        background-color: var(--ds-background-brand-subtlest);
         border-radius: var(--size-section-radius-md);
     }
 

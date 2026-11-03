@@ -83,7 +83,7 @@ export const PreReview_TutorRequest = () => (
                                 <span
                                     className="body2-txt font-weight-semibold"
                                     style={{
-                                        backgroundColor: 'var(--color-danger-state-08)',
+                                        backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
                                         borderRadius: 'var(--size-element-radius-full)',
                                         padding: '0 var(--size-element-pad-x-sm)',
@@ -304,7 +304,7 @@ export const PostReview_SupervisorReview = () => (
                             <span
                                 className="body2-txt"
                                 style={{
-                                    backgroundColor: 'var(--color-success-state-08)',
+                                    backgroundColor: 'var(--ds-background-success)',
                                     color: 'var(--color-success-text)',
                                     borderRadius: 'var(--size-element-radius-full)',
                                     padding: '0 var(--size-element-pad-x-sm)'
@@ -391,7 +391,7 @@ export const PostReview_TutorRequest = () => (
                                 <span
                                     className="body2-txt font-weight-semibold"
                                     style={{
-                                        backgroundColor: 'var(--color-danger-state-08)',
+                                        backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
                                         borderRadius: 'var(--size-element-radius-full)',
                                         padding: '0 var(--size-element-pad-x-sm)',
@@ -430,7 +430,7 @@ const StateLabel = ({ stage, tab }) => (
         textAlign: 'center',
         marginBottom: 'var(--size-modal-gap-md)',
         padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
-        backgroundColor: 'var(--color-primary-state-08)',
+        backgroundColor: 'var(--ds-background-brand-subtlest)',
         borderRadius: 'var(--size-element-radius-md)'
     }}>
         <div className="h6" style={{ color: 'var(--color-primary-text)', marginBottom: '4px' }}>

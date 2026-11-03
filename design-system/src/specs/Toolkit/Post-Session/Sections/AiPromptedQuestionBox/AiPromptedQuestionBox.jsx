@@ -37,7 +37,7 @@ const AiPromptedQuestionBox = ({
         alignItems: 'flex-start',
         padding: 'var(--size-section-pad-y-sm) var(--size-section-pad-x-sm)',
         borderRadius: 'var(--size-section-radius-md, 12px)',
-        backgroundColor: 'var(--color-mastering-content-state-16)',
+        backgroundColor: 'var(--ds-background-smart-mastering-content)',
         width: '100%',
         maxWidth: 'var(--col-9)',
     };
@@ -46,7 +46,7 @@ const AiPromptedQuestionBox = ({
         const skeletonBar = {
             height: 'var(--font-size-body3)',
             borderRadius: 'var(--size-element-radius-md)',
-            backgroundColor: 'var(--color-mastering-content-state-16)',
+            backgroundColor: 'var(--ds-background-smart-mastering-content)',
         };
         return (
             <div className={className} role="status" aria-live="polite" style={shellStyle}>
