@@ -150,8 +150,8 @@
     width: 28px;
     height: 28px;
     border-radius: var(--size-element-radius-md);
-    background: var(--color-primary-state-08);
-    color: var(--color-primary);
+    background: var(--ds-background-brand-subtlest);
+    color: var(--ds-text-brand);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1254,7 +1254,7 @@
  * come from Alert itself, as they do for the warning and success insights.
  */
 .insight-alert {
-    background: var(--color-tertiary-container-state-08);
+    background: var(--ds-background-accent-teal-subtlest);
     border-color: var(--color-tertiary-border);
 }
 
