@@ -497,6 +497,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // the --ds- tokens.
     // 1: Status tag's date borders moved onto the --ds- tokens, and two washes went.
     expect(withAlpha).toBe(1);
+    // 403: Divider was retired and its `.plus-divider-line` hex fallback went
+    // with it.
     // 1711: ProgressRing's `--color-progress-ring-fill`, once undefined, was
     // pointed at `--color-warning-container` (the only token matching its
     // #FFE17A fallback), and became comparable.
@@ -535,7 +537,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 404: the Labels moved onto the --ds- tokens, and their 27 color fallbacks went.
     // 402: Skeleton's fill and shimmer moved onto color.skeleton tokens, and
     // their two hex fallbacks went.
-    expect(comparable).toBe(403);
+    expect(comparable).toBe(402);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
