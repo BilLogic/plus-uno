@@ -3,6 +3,7 @@
  * Implements radio component using React Bootstrap Form.Check
  * with Design System tokens to match Figma specifications exactly.
  */
+@use '../../styles/state' as *;
 
 .plus-form-radio-wrapper {
     display: flex;
@@ -66,20 +67,17 @@
         // the radio's edge, as Checkbox and Button draw it. The outline follows
         // the round border. A ring touching the edge merged into a checked
         // radio's border and stopped reading as focus.
+        @include plus-state($important: true);
+
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused) !important;
-            outline-offset: var(--size-element-stroke-lg);
             border-color: var(--ds-border-brand) !important;
             accent-color: var(--ds-background-selected-bold) !important;
-            box-shadow: none !important;
         }
 
         // Regular :focus state - update colors but don't show focus ring
         &:focus:not(:focus-visible) {
-            outline: none !important;
             border-color: var(--ds-border-brand) !important;
             accent-color: var(--ds-background-selected-bold) !important;
-            box-shadow: none !important;
         }
 
         // Hover state: the input's hovered fill when unchecked; the named

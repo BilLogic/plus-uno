@@ -29,6 +29,7 @@
  * list them.
  */
 @use '../label-heights' as label;
+@use '../../../styles/state' as *;
 
 $tag-colors: (
     'gray': (
@@ -361,11 +362,13 @@ $tag-colors: (
     outline: none;
 }
 
-/* Focus: a 2px Focus Ring 2px outside the tag. */
-.plus-tag:focus-visible,
+/* Focus: the state mixin's 2px ring, 2px outside the tag. */
+.plus-tag {
+    @include plus-state();
+}
+
 .plus-tag--split:has(> .plus-tag__link:focus-visible) {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    @include plus-ring();
 }
 
 /* --------------------------------------------------------------- remove × */
@@ -415,8 +418,7 @@ $tag-colors: (
 
 /* Focus: a 2px Focus Ring 2px outside the ×, and no fill. */
 .plus-tag__remove:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    @include plus-ring();
 }
 
 /* ---------------------------------------------------------------- saving */
@@ -577,8 +579,10 @@ $tag-colors: (
  * filled in the surface color, so the ring reads on a dark picture. The gap is
  * a spread shadow under the outline, so it follows the tag's corners.
  *
- * The ring is restated rather than inherited: check:focus-ring scores each
- * rule on its own strongest indicator, and the white gap alone would fail it.
+ * The ring is restated literally rather than through `plus-ring`:
+ * check:focus-ring scores each rule on its own strongest indicator by reading
+ * the stylesheet's text, so an `@include` it cannot expand would leave only
+ * the white gap's box-shadow in this block, which alone fails it.
  */
 .plus-tag--elevated:focus-visible,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {

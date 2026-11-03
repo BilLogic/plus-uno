@@ -286,6 +286,13 @@ Truncation.play = async ({ canvasElement }) => {
     await userEvent.tab();
     await expect(long, 'the truncated Status is the next tab stop').toHaveFocus();
     await expect(canvas.getByTestId('short')).not.toHaveAttribute('tabindex');
+
+    // The state mixin's ring: 2px of `border.focused`, 2px off the tag.
+    const ring = getComputedStyle(long);
+    await expect(ring.outlineStyle, 'ring style').toBe('solid');
+    await expect(px(ring.outlineWidth), 'ring width').toBe(2);
+    await expect(px(ring.outlineOffset), 'ring sits 2px outside').toBe(2);
+    await expect(ring.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
     const tooltip = await within(document.body).findByRole('tooltip');
     await expect(tooltip).toHaveTextContent(full);
     await userEvent.tab({ shift: true });

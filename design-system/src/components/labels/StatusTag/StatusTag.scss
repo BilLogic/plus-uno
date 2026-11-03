@@ -18,6 +18,7 @@
  * a Figma inside stroke does, so the height and the padding stay exact.
  */
 @use '../label-heights' as label;
+@use '../../../styles/state' as *;
 
 .plus-status {
     --plus-status-height: #{label.$status-height};
@@ -125,9 +126,8 @@ $status-state: (
 }
 
 /* Focusable only while truncated, as the tooltip's trigger. */
-.plus-status:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+.plus-status {
+    @include plus-state();
 }
 
 /* Forced colors drop box-shadows; a real border keeps the edge. */

@@ -288,6 +288,16 @@ export const CHECKS = [
       'components staying on the themed `--ds-*` color tokens: the legacy `--color-*` tokens and hex fallbacks inside `var()` are light-only and stay light in dark mode, so their uses are counted per rule and per file in design-system/src/components, design-system/src/ai and prototypes. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:legacy-colors -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
+    name: 'check:state-mixin',
+    script: 'node scripts/check-state-mixin.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-state-mixin.mjs',
+    baseline: 'scripts/baselines/state-mixin.json',
+    guards:
+      'the state mixin (`design-system/src/styles/_state.scss`) staying the one place a focus ring is drawn: a hand-rolled `outline: none` reset, the legacy `--color-focus-ring` token and a hand-written forced-colors `Highlight` ring are counted per rule and per file in design-system/src/components and design-system/src/patterns, excluding the mixin\'s own file. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:state-mixin -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
     name: 'check:react-bootstrap-imports',
     script: 'node scripts/check-react-bootstrap-imports.mjs',
     pkg: 'root',
