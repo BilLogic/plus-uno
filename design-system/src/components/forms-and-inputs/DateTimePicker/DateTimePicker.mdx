@@ -14,17 +14,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "unpublished",
       "isComponentSet": true,
-      "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-    },
-    {
-      "id": "time-field",
-      "name": "_Time Field",
-      "componentSetNodeId": "16560:4508",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-      "source": "manual",
-      "status": "unpublished",
-      "isComponentSet": true,
-      "notes": "The time half, state × filled? × spacing: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
+      "notes": "A date field and a time field side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`. The time half is the public `Time picker` set — see its own page."
     }
   ]
 };
@@ -32,7 +22,7 @@ export const figmaMeta = {
 <Meta of={DateTimePickerStories} />
 
 <Title />
-A date field and a time field read as one moment.
+A date field and a time field read as one moment. Composed from DatePicker and Time picker, below.
 
 <DocsTabs of={DateTimePickerStories}>
 

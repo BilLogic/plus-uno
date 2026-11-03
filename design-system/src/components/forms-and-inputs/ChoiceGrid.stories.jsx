@@ -46,6 +46,12 @@ export default {
             description: 'Disable the choice grid',
             table: { category: 'Behavior' },
         },
+        size: {
+            control: 'select',
+            options: [12, 14, 16],
+            description: 'Option-label font size in px, and the control width that goes with it. Unset keeps the default rendering.',
+            table: { category: 'Design' },
+        },
     },
 };
 
@@ -149,6 +155,33 @@ export const Layout = () => (
         />
     </div>
 );
+
+/** `size` sets the option-label font and the control width that goes with it. */
+export const Size = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
+        {[12, 14, 16].map((size) => (
+            <div key={size}>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">{size}</span>
+                <ChoiceGrid
+                    id={`choice-grid-size-${size}`}
+                    name={`choice-grid-size-${size}`}
+                    type="radio"
+                    rows={singleRow}
+                    columns={overviewColumns}
+                    values={{ 'row-1': 'col-2' }}
+                    size={size}
+                    onChange={() => {}}
+                />
+            </div>
+        ))}
+    </div>
+);
+Size.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const wrappers = canvas.getAllByRole('radio', { name: 'Row 1 Column 2' })
+        .map((radio) => radio.closest('.plus-choice-grid-wrapper'));
+    await expect(wrappers.map((w) => w.getAttribute('data-size'))).toEqual(['12', '14', '16']);
+};
 
 export const InteractionStates = () => (
     <div style={{ maxWidth: '800px' }}>

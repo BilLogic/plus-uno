@@ -10,7 +10,7 @@ import DateTimePicker from './DateTimePicker/DateTimePicker';
  * differs, the other person's time.
  */
 export default {
-    title: 'Components/Forms and inputs/Date time picker behavior',
+    title: 'Components/Forms and inputs/Date time picker/Behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
@@ -40,19 +40,19 @@ export const BothHalvesAreTheSharedField = () => (
 BothHalvesAreTheSharedField.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const plain = within(canvas.getByTestId('dt-plain'));
-    const date = plain.getByRole('textbox', { name: 'Session time Date' });
+    const date = plain.getByRole('combobox', { name: 'Session time Date' });
     const time = plain.getByRole('textbox', { name: 'Session time Time' });
     await expect(date.closest('.plus-field')).not.toBeNull();
     await expect(date.closest('.plus-field').querySelector('.plus-field__trailing .fa-calendar-day')).not.toBeNull();
     await expect(time.closest('.plus-field')).not.toBeNull();
-    await expect(time.closest('.plus-field').querySelector('.plus-field__trailing .plus-datetime-am-pm-toggle')).not.toBeNull();
+    await expect(time.closest('.plus-field').querySelector('.plus-field__trailing .plus-time-picker__period-toggle')).not.toBeNull();
     await expect(canvasElement.querySelector('.form-control, .input-group, .form-label')).toBeNull();
 
     const invalid = canvas.getByTestId('dt-invalid');
     const boxes = [...invalid.querySelectorAll('.plus-field')];
     await expect(boxes).toHaveLength(2);
     for (const box of boxes) await expect(box).toHaveClass('plus-field--invalid');
-    await expect(within(invalid).getByRole('textbox', { name: 'Session end Date' })).toHaveAttribute('aria-invalid', 'true');
+    await expect(within(invalid).getByRole('combobox', { name: 'Session end Date' })).toHaveAttribute('aria-invalid', 'true');
 };
 /** The date half opens the shared calendar, 4px under the date field (which sits clear of the 8 screen gap). */
 /** The date half opens the shared calendar, 4px under the date field. */
@@ -63,7 +63,7 @@ export const CalendarOpensFourPixelsBelow = () => (
 );
 
 CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
-    const date = within(canvasElement).getByRole('textbox', { name: 'Session time Date' });
+    const date = within(canvasElement).getByRole('combobox', { name: 'Session time Date' });
     await userEvent.click(date);
     const popup = await waitFor(() => {
         const found = document.body.querySelector('.plus-date-popup');
@@ -87,7 +87,7 @@ export const PeriodMenuOpensFourPixelsBelow = () => (
 );
 
 PeriodMenuOpensFourPixelsBelow.play = async ({ canvasElement }) => {
-    const toggle = canvasElement.querySelector('.plus-datetime-am-pm-toggle');
+    const toggle = canvasElement.querySelector('.plus-time-picker__period-toggle');
     await userEvent.click(toggle);
     const menu = await waitFor(() => {
         const found = canvasElement.querySelector('.dropdown-menu.show');
@@ -130,7 +130,7 @@ TimeZoneCaption.play = async ({ args, canvasElement }) => {
     await expect(other.getAttribute('aria-describedby')).toContain(caption.id);
 
     // The value is stored in UTC: 1:00 AM in Los Angeles is 08:00 UTC.
-    await userEvent.click(other.querySelector('.plus-datetime-am-pm-toggle'));
+    await userEvent.click(other.querySelector('.plus-time-picker__period-toggle'));
     await userEvent.click(await within(other).findByRole('button', { name: 'AM' }));
     await waitFor(() => expect(args.onChange).toHaveBeenCalled());
     const last = args.onChange.mock.calls.at(-1)[0];
@@ -165,7 +165,7 @@ UnknownTimeZone.play = async ({ args, canvasElement }) => {
     await expect(field.getAttribute('aria-describedby') ?? '').not.toMatch(/time-zone/);
 
     // Stored in the viewer's own zone: 1:00 AM local on 21 Oct 2026.
-    await userEvent.click(field.querySelector('.plus-datetime-am-pm-toggle'));
+    await userEvent.click(field.querySelector('.plus-time-picker__period-toggle'));
     await userEvent.click(await within(field).findByRole('button', { name: 'AM' }));
     await waitFor(() => expect(args.onChange).toHaveBeenCalled());
     const last = args.onChange.mock.calls.at(-1)[0];

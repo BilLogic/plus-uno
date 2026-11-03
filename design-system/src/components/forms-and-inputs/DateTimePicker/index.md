@@ -3,6 +3,8 @@
 
 # DateTimePicker
 
+Composed from DatePicker and TimePicker, laid out as labeled sections with a shared time-zone caption under the time.
+
 **Import:** `import { DateTimePicker } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx`
@@ -56,13 +58,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-border-focused` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--item-height-sm` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

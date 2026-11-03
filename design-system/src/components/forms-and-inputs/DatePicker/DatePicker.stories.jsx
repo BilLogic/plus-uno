@@ -6,7 +6,7 @@ import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
 
 export default {
-    title: 'Components/Forms and inputs/Date picker',
+    title: 'Components/Forms and inputs/Date time picker/Date picker',
     component: DatePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {

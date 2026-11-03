@@ -1,7 +1,7 @@
 /**
- * Date and Time Picker — only what is its own. Both halves are `_Field`, which
- * owns the box, the border, the fill, the size and every state; the calendar
- * is the shared `Calendar` and the AM/PM menu the PLUS Dropdown.
+ * Date and Time Picker — only what is its own. The date and time halves are
+ * the real DatePicker and TimePicker; this file lays out the wrapper, the
+ * group label, the section labels and the time-zone caption around them.
  */
 
 .plus-datetime-wrapper {
@@ -62,87 +62,14 @@
 }
 
 /* ============================================
-   DATE — the calendar icon in Trailing
-   ============================================ */
-
-.plus-datetime-calendar-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--ds-icon-subtle);
-    cursor: pointer;
-}
-
-.plus-field--disabled .plus-datetime-calendar-icon,
-.plus-field--readonly .plus-datetime-calendar-icon {
-    cursor: default;
-}
-
-/* ============================================
-   TIME — the AM/PM menu in Trailing
-   ============================================ */
-
-.plus-datetime-am-pm-dropdown {
-    height: var(--item-height-sm);
-
-    // The toggle is 24, like a button in a field's Trailing slot.
-    > :not(.dropdown-menu) {
-        height: 100%;
-    }
-}
-
-.plus-datetime-am-pm-toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-xs);
-    height: 100%;
-    padding: 0;
-    border: 0;
-    border-radius: var(--size-element-radius-sm);
-    background: transparent;
-    color: var(--ds-text-brand);
-    font: inherit;
-    font-weight: var(--type-weight-semibold);
-    cursor: pointer;
-
-    .fa-caret-down {
-        color: var(--ds-icon-brand);
-    }
-
-    &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-border);
-    }
-
-    &:disabled {
-        color: inherit;
-        cursor: default;
-    }
-
-    .plus-field--invalid & {
-        color: var(--ds-text-danger);
-
-        .fa-caret-down {
-            color: var(--ds-icon-danger);
-        }
-    }
-
-    .plus-field--valid & {
-        color: var(--ds-text-success);
-
-        .fa-caret-down {
-            color: var(--ds-icon-success);
-        }
-    }
-}
-
-/* ============================================
    DISABLED
    ============================================ */
 
-.plus-datetime-wrapper:has(.plus-datetime-date-input:disabled) .plus-datetime-label,
-.plus-datetime-wrapper:has(.plus-datetime-time-input:disabled) .plus-datetime-label {
-    color: var(--ds-text-subtle);
+.plus-datetime-wrapper:has(.plus-datetime-date-field .plus-date-picker__input:disabled),
+.plus-datetime-wrapper:has(.plus-datetime-time-field .plus-time-picker__input:disabled) {
+    .plus-datetime-label {
+        color: var(--ds-text-subtle);
+    }
 }
 
 /* Time zone caption — Figma `_Form Caption` under the time: the viewer's zone,

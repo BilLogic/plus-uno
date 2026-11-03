@@ -47,6 +47,12 @@ export default {
             description: 'Disable the slider',
             table: { category: 'Behavior' },
         },
+        size: {
+            control: 'select',
+            options: [8, 12, 16],
+            description: 'The dot and bar in px; the track follows at 4/6/8. Unset keeps the default rendering.',
+            table: { category: 'Design' },
+        },
         id: { control: false, table: { disable: true, category: 'Development' } },
         name: { control: false, table: { disable: true, category: 'Development' } },
         defaultValue: { control: false, table: { disable: true, category: 'Development' } },
@@ -132,6 +138,22 @@ Interactive.args = {
     max: 100,
     step: 1,
     isDisabled: false,
+};
+
+/** `size` scales the dot and the bar in px; the track between them follows a step behind. */
+export const Size = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
+        <Range id="range-size-8" label="8" defaultValue={50} size={8}/>
+        <Range id="range-size-12" label="12" defaultValue={50} size={12}/>
+        <Range id="range-size-16" label="16" defaultValue={50} size={16}/>
+    </div>
+);
+Size.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const wrapper = (name) => canvas.getByRole('slider', { name }).closest('.plus-form-range-wrapper');
+    await expect(wrapper('8')).toHaveAttribute('data-size', '8');
+    await expect(wrapper('12')).toHaveAttribute('data-size', '12');
+    await expect(wrapper('16')).toHaveAttribute('data-size', '16');
 };
 
 /** `onChange` receives the value as a number, then the event. */

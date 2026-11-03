@@ -23,6 +23,8 @@ const Range = ({
     defaultValue,
     step = 1,
     isDisabled = false,
+    /** The dot and bar, in px (`8` · `12` · `16`); the track between them follows at `4` · `6` · `8`. Unset keeps the default rendering. */
+    size,
     onChange,
     className = '',
     style,
@@ -72,7 +74,7 @@ const Range = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <div className="plus-form-range-wrapper">
+        <div className="plus-form-range-wrapper" data-size={size}>
             {label && (
                 <Form.Label
                     htmlFor={fieldId}
@@ -113,6 +115,8 @@ Range.propTypes = {
     defaultValue: PropTypes.number,
     step: PropTypes.number,
     isDisabled: PropTypes.bool,
+    /** The dot and bar, in px; the track follows. Unset keeps the default rendering. */
+    size: PropTypes.oneOf([8, 12, 16]),
     /** Called with the new value as a number, then the change event. */
     onChange: PropTypes.func,
     className: PropTypes.string,

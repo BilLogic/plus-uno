@@ -534,7 +534,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
         "githubLink": null,
         "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-        "storybookId": "components-forms-and-inputs-date-picker--docs"
+        "storybookId": "components-forms-and-inputs-date-time-picker-date-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -592,17 +592,7 @@
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          },
-          {
-            "id": "time-field",
-            "name": "_Time Field",
-            "componentSetNodeId": "16560:4508",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The time half, state × filled? × spacing: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
+            "notes": "A date field and a time field side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`. The time half is the public `Time picker` set — see its own page."
           }
         ]
       }
@@ -2242,6 +2232,31 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
+      }
+    },
+    "TimePicker": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
+        "storybookId": "components-forms-and-inputs-date-time-picker-time-picker--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "time-picker",
+            "name": "Time picker",
+            "componentSetNodeId": "16560:4508",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "Hours, minutes and an AM/PM menu that opens 4px (`gap-xs`) below: state × filled? × spacing. Same field anatomy as DatePicker. In code it is `TimePicker.jsx`."
+          }
+        ]
       }
     },
     "Toggle": {
