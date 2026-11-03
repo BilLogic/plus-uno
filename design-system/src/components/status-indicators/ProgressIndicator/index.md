@@ -20,7 +20,7 @@ A row of dots showing where you are along the steps of a journey. Unlike `Progre
 | `values` | array (required) | — | — |
 | `selectedIndex` | number (required) | — | — |
 | `appearance` | enum | `'default'` | — |
-| `size` | enum | `'medium'` | — |
+| `size` | number | `8` | — |
 | `spacing` | enum | `'comfortable'` | — |
 | `onSelect` | func | — | — |
 | `ariaControls` | string | — | — |
@@ -30,15 +30,13 @@ A row of dots showing where you are along the steps of a journey. Unlike `Progre
 
 **`appearance`** — `default` · `primary` · `help` · `inverted`
 
-**`size`** — `medium` · `large`
-
 **`spacing`** — `comfortable` · `cozy` · `compact`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral-bold` · `--ds-border-focused` · `--ds-icon-inverse` · `--element-inline-md` · `--element-inline-sm` · `--element-stack-sm` · `--size-075` · `--size-element-stroke-lg` · `--space-050`
+`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral-bold` · `--ds-border-focused` · `--ds-icon-inverse` · `--element-inline-md` · `--element-inline-sm` · `--element-stack-sm` · `--plus-progress-indicator-dot-size` · `--size-element-stroke-lg` · `--space-050`
 
 From `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss`. Override these through the token layer, never with a literal.
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './ProgressIndicator.scss';
 
 export const PROGRESS_INDICATOR_APPEARANCES = ['default', 'primary', 'help', 'inverted'];
-export const PROGRESS_INDICATOR_SIZES = ['medium', 'large'];
+export const PROGRESS_INDICATOR_SIZES = [8, 12];
 export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
 
 /**
@@ -18,7 +18,7 @@ export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
  * @param {string[]} props.values - One entry per step. Only `.length` and index are used to render dots; each entry becomes a dot's accessible name when `onSelect` is set.
  * @param {number} props.selectedIndex - The current step, zero-based.
  * @param {'default'|'primary'|'help'|'inverted'} [props.appearance='default']
- * @param {'medium'|'large'} [props.size='medium']
+ * @param {8|12} [props.size=8] - The dot diameter, in pixels.
  * @param {'comfortable'|'cozy'|'compact'} [props.spacing='comfortable']
  * @param {(selection: { index: number }) => void} [props.onSelect] - Present → dots become buttons.
  * @param {string} [props.ariaControls] - Id of the panel the dots control.
@@ -28,7 +28,7 @@ const ProgressIndicator = ({
     values,
     selectedIndex,
     appearance = 'default',
-    size = 'medium',
+    size = 8,
     spacing = 'comfortable',
     onSelect,
     ariaControls,
@@ -42,9 +42,9 @@ const ProgressIndicator = ({
             className={[
                 'plus-progress-indicator',
                 `plus-progress-indicator--${appearance}`,
-                `plus-progress-indicator--${size}`,
                 `plus-progress-indicator--${spacing}`,
             ].join(' ')}
+            style={{ '--plus-progress-indicator-dot-size': `${size}px` }}
             role="group"
             aria-label={label}
         >
@@ -73,7 +73,7 @@ ProgressIndicator.propTypes = {
     values: PropTypes.array.isRequired,
     selectedIndex: PropTypes.number.isRequired,
     appearance: PropTypes.oneOf(PROGRESS_INDICATOR_APPEARANCES),
-    size: PropTypes.oneOf(PROGRESS_INDICATOR_SIZES),
+    size: PropTypes.number,
     spacing: PropTypes.oneOf(PROGRESS_INDICATOR_SPACINGS),
     onSelect: PropTypes.func,
     ariaControls: PropTypes.string,

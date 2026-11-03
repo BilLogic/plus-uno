@@ -79,8 +79,8 @@ export const Appearances = () => (
 
 export const Sizes = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-        <ProgressIndicator values={VALUES} selectedIndex={1} size="medium" />
-        <ProgressIndicator values={VALUES} selectedIndex={1} size="large" />
+        <ProgressIndicator values={VALUES} selectedIndex={1} size={8} />
+        <ProgressIndicator values={VALUES} selectedIndex={1} size={12} />
     </div>
 );
 

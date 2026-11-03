@@ -1,6 +1,8 @@
 /**
- * ProgressIndicator styles. Every dot is a circle on `--icon-sm`; `size="large"`
- * steps it up to `--icon-md`. `spacing` sets the gap between dots.
+ * ProgressIndicator styles. Every dot is a circle whose diameter is the
+ * `size` prop, set as `--plus-progress-indicator-dot-size` inline (pixels,
+ * not a word — `tokens-over-literals` covers spacing and color, not an
+ * arbitrary per-instance diameter). `spacing` sets the gap between dots.
  */
 
 .plus-progress-indicator {
@@ -19,8 +21,8 @@
 
 .plus-progress-indicator__dot {
     flex-shrink: 0;
-    width: var(--space-050);
-    height: var(--space-050);
+    width: var(--plus-progress-indicator-dot-size, var(--space-050));
+    height: var(--plus-progress-indicator-dot-size, var(--space-050));
     border-radius: 50%;
     border: none;
     padding: 0;
@@ -28,11 +30,6 @@
     opacity: 0.4;
     cursor: default;
     transition: opacity 0.15s ease, background-color 0.15s ease;
-}
-
-.plus-progress-indicator--large .plus-progress-indicator__dot {
-    width: var(--size-075);
-    height: var(--size-075);
 }
 
 button.plus-progress-indicator__dot {
