@@ -31,11 +31,15 @@ Atlassian's structure, guidance, do and don'ts and wording, then adapt them to
 PLUS: the tutoring context, PLUS component names, our tokens. The page cites the
 atlassian.design page it adapts.
 
-- **Order:** the Figma page in the BS4 library first. Bill reviews it. The
-  Storybook MDX is written from the reviewed Figma page, never ahead of it.
+- **Order:** code and Storybook first. The component and its Storybook MDX are
+  built to Atlassian best practice on the Core docs-parts template structure
+  (Component, Pattern, Foundation, AI, Overview, Index). The Figma page in the
+  BS4 library is backfilled from the shipped code afterwards, one family at a
+  time through the single-writer Figma queue.
 - **One standard:** the same sections, in the same order and voice, on every
-  page. Figma's section list is `figma/page-documentation.md` § The Docs frame;
-  the MDX carries the same sections in that order.
+  page. The MDX carries the Core docs-parts sections; Figma's section list is
+  `figma/page-documentation.md` § The Docs frame, and the backfilled page
+  mirrors the MDX one-to-one.
 
 ## The MDX page shell
 
