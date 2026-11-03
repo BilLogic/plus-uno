@@ -1,5 +1,5 @@
 /*
- * Toast Component Styles: the Popover family's Flag (Figma Pattern/Flag).
+ * Flag Component Styles: the Popover family's Flag (Figma Pattern/Flag).
  * One surface, Popover/width-flag 400, pad Popover/pad 16, radius
  * Popover/radius 12, on the overlay pair (elevation.surface.overlay with
  * elevation.shadow.overlay, whose 1px ring is its edge, so no border). Icon,
@@ -10,9 +10,9 @@
 
 @use '../../../styles/icon-glyph' as *;
 
-.plus-toast.toast,
-.plus-toast,
-.toast.plus-toast {
+.plus-flag.toast,
+.plus-flag,
+.toast.plus-flag {
     display: flex;
     align-items: flex-start;
     gap: var(--element-inline-lg);
@@ -24,13 +24,13 @@
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
 
-    // Bootstrap hides a toast that is not `.show` with display: none; keep that.
+    // Bootstrap hides a flag that is not `.show` with display: none; keep that.
     &:not(.show) {
         display: none;
     }
 
     // --- ICON: 16, in a box one title line tall ---
-    .plus-toast-icon {
+    .plus-flag-icon {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -47,7 +47,7 @@
     }
 
     // --- CONTENT: title, then the message ---
-    .plus-toast-content {
+    .plus-flag-content {
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
@@ -55,26 +55,26 @@
         min-width: 0;
     }
 
-    .plus-toast-header {
+    .plus-flag-header {
         display: flex;
         align-items: baseline;
         gap: var(--element-inline-md);
     }
 
-    .plus-toast-title {
+    .plus-flag-title {
         flex: 1 1 auto;
         min-width: 0;
         font: var(--heading-xsmall);
         color: var(--ds-text);
     }
 
-    .plus-toast-timestamp {
+    .plus-flag-timestamp {
         flex-shrink: 0;
         font: var(--body-small);
         color: var(--ds-text-subtle);
     }
 
-    .plus-toast-body {
+    .plus-flag-body {
         font: var(--body-default);
         color: var(--ds-text-subtle);
     }
@@ -99,35 +99,35 @@
     // --- STYLE VARIANTS: the icon's color ---
     // One block per role, written out: check:text-contrast reads token names
     // from source, so a loop that interpolated the role would hide them.
-    &.danger .plus-toast-icon {
+    &.danger .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-danger);
         }
     }
 
-    &.success .plus-toast-icon {
+    &.success .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-success);
         }
     }
 
-    &.warning .plus-toast-icon {
+    &.warning .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-warning);
         }
     }
 
-    &.info .plus-toast-icon {
+    &.info .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-information);
         }
     }
 
-    &.primary .plus-toast-icon {
+    &.primary .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-brand);
@@ -136,7 +136,7 @@
 }
 
 // --- TOAST CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
-.plus-toast-container,
+.plus-flag-container,
 .toast-container {
     z-index: var(--layout-z-index-flag);
     display: flex;
@@ -150,8 +150,8 @@
     }
 }
 
-// Storybook interactive: keep toasts inside the preview (override BS position-fixed + corner utilities)
-.plus-toast-interactive-demo {
+// Storybook interactive: keep flags inside the preview (override BS position-fixed + corner utilities)
+.plus-flag-interactive-demo {
     position: relative;
     box-sizing: border-box;
     min-height: 280px;
@@ -161,7 +161,7 @@
     padding: var(--size-spacing-medium-space-400);
 }
 
-.plus-toast-interactive-demo .plus-toast-container.toast-container {
+.plus-flag-interactive-demo .plus-flag-container.toast-container {
     position: absolute !important;
     margin: 0 !important;
     top: 50% !important;
@@ -171,7 +171,7 @@
     transform: translate(-50%, -50%) !important;
 }
 
-.plus-toast-interactive-demo__trigger {
+.plus-flag-interactive-demo__trigger {
     position: absolute;
     left: 50%;
     bottom: var(--size-spacing-medium-space-400);

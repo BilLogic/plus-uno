@@ -49,7 +49,7 @@ percentage when `label` is not given — `label` wins.
 
 `Progress` updates its `aria-valuenow` on every render, which assistive
 technology polls rather than announces. If a change genuinely needs to
-interrupt, that is `Toast` — see
+interrupt, that is `Flag` — see
 `design-system/guidelines/components/messaging.md`.
 
 ## Related

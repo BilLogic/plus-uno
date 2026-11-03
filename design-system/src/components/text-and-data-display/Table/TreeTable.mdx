@@ -1,0 +1,102 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TreeTableStories from './TreeTable.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "modelNote": "The Tree table page: records nested up to three levels, built from `_Tree row`. No code component draws it yet; this page composes the indentation from the shared `TableRow`/`TableCell` parts the Static and Dynamic tables already use. Listed here as a docs page, not a set to write back to.",
+  "sets": [
+    {
+      "id": "tree-table-page",
+      "name": "Tree table (page)",
+      "componentSetNodeId": "19685:27043",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
+      "source": "manual",
+      "status": "docs-page",
+      "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
+    }
+  ]
+};
+
+<Meta of={TreeTableStories} />
+
+<Title />
+
+Records that nest, up to three levels. No code component owns the nesting yet — this page composes the indentation from the same shared parts the Static and Dynamic tables use.
+
+<DocsTabs of={TreeTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A branch's title cell carries a chevron; depth sets the cell's left pad. The chevron is static here — expand and collapse are not wired up in code.</>}
+>
+
+<Canvas of={TreeTableStories.Overview} />
+
+</DocsCanvasShell>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a Tree table for records that nest — a curriculum of units and lessons, a
+folder of sessions. For a flat list, use the Static or Dynamic table instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- **No component yet.** There is no `TreeTable` export. This page composes the
+  look from `TableRow` and `TableCell`, the same parts `Table` is built from,
+  so a project that needs nesting today builds it the same way.
+- **Depth is a left pad**, `--size-table-cell-pad-x` plus 20px per level, on
+  the row's title cell.
+- **Expand and collapse are unbuilt.** The chevron shown here does not toggle
+  anything; building that behavior is open work.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a flat grid people only read, use the Static table.
+- For a flat table people sort, filter, select or page, use the Dynamic table.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -10,9 +10,9 @@ authored half (#166), counted rather than assumed.
 | [Alert](Alert/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Banner](Banner/index.md) | 5 | ✕ | ✕ | ✕ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
+| [Flag](Flag/index.md) | 13 | ✅ | ✅ | ✅ |
 | [InlineMessage](InlineMessage/index.md) | 8 | ✕ | ✕ | ✕ |
 | [Modal](Modal/index.md) | 33 | ✅ | ✅ | ✅ |
-| [Toast](Toast/index.md) | 13 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 4/6 (67%) · Correct/incorrect 4/6 (67%) · Accessibility 4/6 (67%)
 

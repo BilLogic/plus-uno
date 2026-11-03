@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as TableStories from './Table.stories.jsx';
+import * as StaticTableStories from './StaticTable.stories.jsx';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
@@ -30,37 +30,17 @@ export const figmaMeta = {
       "source": "manual",
       "status": "docs-page",
       "notes": "The Static table page: the Static table set and the shared _Table parts it is built from."
-    },
-    {
-      "id": "dynamic-table-page",
-      "name": "Dynamic table (page)",
-      "componentSetNodeId": "19685:27042",
-      "isComponentSet": false,
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
-      "source": "manual",
-      "status": "docs-page",
-      "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
-    },
-    {
-      "id": "tree-table-page",
-      "name": "Tree table (page)",
-      "componentSetNodeId": "19685:27043",
-      "isComponentSet": false,
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
-      "source": "manual",
-      "status": "docs-page",
-      "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
     }
   ]
 };
 
-<Meta of={TableStories} />
+<Meta of={StaticTableStories} />
 
 <Title />
 
-Data table for tabular content. Cells accept any node, so a row can carry Badges, formatted currency, or a Button used as a sort trigger.
+A fixed grid people read. Cells accept any node, so a row can carry Badges, formatted currency, or an icon. Nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.
 
-<DocsTabs of={TableStories}>
+<DocsTabs of={StaticTableStories}>
 
 <DocsTab tab="examples">
 
@@ -82,7 +62,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
     description={<>Default table with hover enabled and medium density.</>}
 >
 
-<Canvas of={TableStories.Overview} />
+<Canvas of={StaticTableStories.Overview} />
 
 </DocsCanvasShell>
 
@@ -97,11 +77,11 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
     description={<>Striped rows and bordered cells are independent switches.</>}
 >
 
-<Canvas of={TableStories.Striped} />
+<Canvas of={StaticTableStories.Striped} />
 
-<Canvas of={TableStories.Bordered} />
+<Canvas of={StaticTableStories.Bordered} />
 
-<Canvas of={TableStories.FramedAndLines} />
+<Canvas of={StaticTableStories.FramedAndLines} />
 
 </DocsCanvasShell>
 
@@ -116,7 +96,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
     description={<>Rows are 32, 40 or 48 tall at minimum: pick by how much each row holds, not by screen width.</>}
 >
 
-<Canvas of={TableStories.Sizes} />
+<Canvas of={StaticTableStories.Sizes} />
 
 </DocsCanvasShell>
 
@@ -131,7 +111,22 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
     description={<>Text, a muted second line, wrapping, the title emphasis, text, number and icon alignment, a leading slot, an error and a loading cell.</>}
 >
 
-<Canvas of={TableStories.Cells} />
+<Canvas of={StaticTableStories.Cells} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Head cells
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>The head cell holds a label and an optional type icon. It aligns as text, number or icon, and a label too long for its width ends in an ellipsis.</>}
+>
+
+<Canvas of={StaticTableStories.HeadCells} />
 
 </DocsCanvasShell>
 
@@ -146,7 +141,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
     description={<>A row rests, is highlighted, selected or disabled.</>}
 >
 
-<Canvas of={TableStories.RowStates} />
+<Canvas of={StaticTableStories.RowStates} />
 
 </DocsCanvasShell>
 
@@ -154,16 +149,14 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-## Summary and footer
+## Summary
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>The summary row closes the table with one calculation per column. The footer states the range.</>}
+    description={<>The summary row closes the table with one calculation per column.</>}
 >
 
-<Canvas of={TableStories.Summary} />
-
-<Canvas of={TableStories.Footer} />
+<Canvas of={StaticTableStories.Summary} />
 
 </DocsCanvasShell>
 
@@ -171,29 +164,14 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
-## Static table
+## The Static table
 
 <DocsCanvasShell
     attachSourceBelow
     description={<>A fixed grid people read: rows rest or are highlighted, and nothing hovers.</>}
 >
 
-<Canvas of={TableStories.Static} />
-
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Empty state
-
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>With no rows the header stays and `emptyState` takes the body as one message row.</>}
->
-
-<Canvas of={TableStories.Empty} />
+<Canvas of={StaticTableStories.Static} />
 
 </DocsCanvasShell>
 
@@ -203,7 +181,7 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 ## Interactive playground
 
-<DocsInteractivePlayground of={TableStories.Overview} />
+<DocsInteractivePlayground of={StaticTableStories.Overview} />
 
 </div>
 
@@ -217,14 +195,22 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 <div className="sb-ds-doc-section">
 
+## When to use
+
+Use `StaticTable` for a grid people only read: a record, a summary, a rate
+card. A table people sort, filter, select or page is a Dynamic table.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Usage notes
 
-- **Sorting is not built in.** The consuming page owns sort state and passes already-ordered `rows`. To make a header sortable, put a text-fill `Button` in that header's `text`.
 - **Per-cell control** — pass `{ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }` instead of a bare value. `align` is `text`, `number` or `icon`.
 - **Row size** — `size` (`density` is the older name) is `sm`, `md` or `lg`, at 32, 40 and 48 from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
 - **Long text** truncates to one line with an ellipsis and shows the full text in a tooltip; pass `overflow: 'wrap'` for a cell that should wrap.
 - **One title column** — `titleColumn` is the index of the column that names the record.
-- **Static or Dynamic** — use `StaticTable` for a grid people only read. A table people sort, filter, select or page is a Dynamic table.
+- **No hover, no sort.** `StaticTable` renders `Table` with `hover` forced off. Nothing in it reaches for the Dynamic table's sorting, selection or paging.
 
 </div>
 
@@ -232,10 +218,10 @@ Data table for tabular content. Cells accept any node, so a row can carry Badges
 
 ## Related
 
+- For a table people sort, filter, select or page, use the Dynamic table.
+- For records that nest, use the Tree table.
 - For a list of records with no columns to line up, use `ListGroup`.
-- For splitting a long result set across pages, use `Pagination`.
 - For a status or a count inside a cell, use `Badge`.
-- For a row-select control, use `Checkbox` with an `aria-label` — the column heading does not name it.
 
 </div>
 

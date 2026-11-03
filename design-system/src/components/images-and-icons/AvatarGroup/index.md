@@ -9,6 +9,10 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 **Source:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx`
 
+**Stories:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.stories.jsx` — Group, GroupFits, Sizes, GroupSizeAndShape, Interactive
+
+**Storybook page:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -25,8 +29,6 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 Same group: `AiIcon` · `Avatar` · `Illustration` · `Tile` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `AvatarGroup` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

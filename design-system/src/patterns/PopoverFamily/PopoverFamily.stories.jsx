@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
-import { Button, Dropdown, Popover, Toast, ToastContainer, Tooltip } from '@/components';
+import { Button, Dropdown, Popover, Flag, FlagContainer, Tooltip } from '@/components';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 
 /** The popup widths, Popover/width-sm · md · lg. */
@@ -163,16 +163,16 @@ const flagKinds = [
 /** Flags: 400 wide, 16 apart. In use they sit bottom-left; the newest is at the bottom. */
 export const Flags = {
     render: () => (
-        <ToastContainer containerPosition="static">
+        <FlagContainer containerPosition="static">
             {flagKinds.map(([style, title]) => (
-                <Toast key={style} style={style} title={title} show autohide={false}>
+                <Flag key={style} style={style} title={title} show autohide={false}>
                     One or two sentences on what happened and what to do next.
-                </Toast>
+                </Flag>
             ))}
-        </ToastContainer>
+        </FlagContainer>
     ),
     play: async ({ canvasElement }) => {
-        const flags = canvasElement.querySelectorAll('.plus-toast');
+        const flags = canvasElement.querySelectorAll('.plus-flag');
         await expect(flags).toHaveLength(4);
         await expect(flags[0].getBoundingClientRect().width, 'Popover/width-flag').toBe(400);
         const gap = flags[1].getBoundingClientRect().top - flags[0].getBoundingClientRect().bottom;

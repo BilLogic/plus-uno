@@ -245,12 +245,12 @@ export const webAppSourceSnippets = {
     spinner: snippet([
         '<Spinner />'
     ]),
-    toast: snippet([
-        '<ToastContainer className="p-3" style={{ position: "static" }}>',
-        '  <Toast title="Secondary Toast" style="secondary" timestamp="Just now">',
-        '    This is a secondary toast (default).',
-        '  </Toast>',
-        '</ToastContainer>'
+    flag: snippet([
+        '<FlagContainer className="p-3" style={{ position: "static" }}>',
+        '  <Flag title="Secondary Flag" style="secondary" timestamp="Just now">',
+        '    This is a secondary flag (default).',
+        '  </Flag>',
+        '</FlagContainer>'
     ]),
     tooltip: snippet([
         '<Tooltip',

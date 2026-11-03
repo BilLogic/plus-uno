@@ -1,0 +1,159 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AvatarGroupStories from './AvatarGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "size": {
+      "type": "enum",
+      "values": ["16", "20", "24", "32", "40", "48", "96", "128"]
+    },
+    "shape": {
+      "type": "enum",
+      "values": ["circle", "square"]
+    }
+  },
+  "sets": []
+};
+
+<Meta of={AvatarGroupStories} />
+
+<Title />
+A row of avatars that overlap, with the rest behind a `+n`. The group owns the
+overlap, the ring between neighbors, and how many fit on the row.
+
+<DocsTabs of={AvatarGroupStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/AvatarGroup"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Eight sizes, the same as `Avatar`. 16 to 48 are the Media sizes; 96 and 128 are for profiles.</>}>
+    <Canvas of={AvatarGroupStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Shape and color
+
+<DocsCanvasShell description={<>The group's size and shape win over each avatar's own, so the row stays even.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.GroupSizeAndShape} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Group
+
+<DocsCanvasShell description={<><code>max</code> counts the <code>+n</code> in, so seven people with a max of five show four avatars and <code>+3</code>. The <code>+3</code> opens the rest by name.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Group} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Within <code>max</code> there is no <code>+n</code>.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.GroupFits} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AvatarGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `AvatarGroup` for a short set of people that would crowd a line: the
+attendees of a session, the members of a team. Past `max`, the rest fold into
+a `+n` menu, reachable by name.
+
+Use plain `Avatar` elements, not `AvatarGroup`, where there is room to name
+each person beside their picture.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Let the group set the size and shape.
+
+`AvatarGroup` passes its `size` and `shape` to every `Avatar` child, so the
+row stays even even when a child sets its own.
+
+```jsx
+<AvatarGroup label="Session attendees" max={5}>
+    {people.map((p) => <Avatar key={p.id} name={p.name} src={p.photo} />)}
+</AvatarGroup>
+```
+
+### `max` counts the `+n` in.
+
+Five people with `max={5}` show all five; a sixth pushes one into `+2` —
+`max` is the most avatars the row ever shows, the `+n` included.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Name the group.** `label` names the group for assistive technology —
+  "Session attendees" — the same way `Avatar`'s `label` names a person.
+- **The `+n` is a named button.** It reads "+3, 3 more people", opens a menu
+  of the hidden people by name, reached with Tab and closed with Escape.
+- **Every shown avatar keeps its own name.** The group changes `size` and
+  `shape`, never an avatar's accessible name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single person or agent, use `Avatar`.
+- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

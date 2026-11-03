@@ -1,15 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as ToastStories from './Toast.stories.jsx';
+import * as FlagStories from './Flag.stories.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "sets": [
     {
-      "id": "toast",
-      "name": "Toast",
+      "id": "flag",
+      "name": "Flag",
       "componentSetNodeId": "44:4803",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
       "source": "node-chart",
@@ -18,17 +18,17 @@ export const figmaMeta = {
   ]
 };
 
-<Meta of={ToastStories} />
+<Meta of={FlagStories} />
 
 <Title />
 
-<DocsTabs of={ToastStories}>
+<DocsTabs of={FlagStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock 
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Toast"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Flag"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
 />
@@ -40,7 +40,7 @@ export const figmaMeta = {
 ## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Semantic styles in a static container for documentation.</>}>
-    <Canvas of={ToastStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={FlagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -49,12 +49,12 @@ export const figmaMeta = {
 
 ## Appearance
 
-<DocsCanvasShell description={<>Semantic toast styles for success, warning, error, and informational notifications.</>}>
-    <DsCanvasQuiet of={ToastStories.Styles} />
+<DocsCanvasShell description={<>Semantic flag styles for success, warning, error, and informational notifications.</>}>
+    <DsCanvasQuiet of={FlagStories.Styles} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code> in its default tone, last in the flag's row.</>}>
-    <DsCanvasQuiet of={ToastStories.Dismiss} />
+    <DsCanvasQuiet of={FlagStories.Dismiss} />
 </DocsCanvasShell>
 
 </div>
@@ -64,7 +64,7 @@ export const figmaMeta = {
 ## Interactive playground
 
 <DocsInteractivePlayground
-    of={ToastStories.Interactive}
+    of={FlagStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}
@@ -87,12 +87,12 @@ export const figmaMeta = {
 
 ## When to use
 
-Use `Toast` to confirm something that has already happened and needs no reply —
+Use `Flag` to confirm something that has already happened and needs no reply —
 saved, sent, copied. It appears over the page, times out, and takes nothing with
 it when it goes.
 
 `show` and `onClose` are yours; the component holds no state. `delay` is the
-timeout in milliseconds and `autohide` turns it off. `ToastContainer` positions a
+timeout in milliseconds and `autohide` turns it off. `FlagContainer` positions a
 stack of them.
 
 </div>
@@ -101,14 +101,14 @@ stack of them.
 
 ## Usage notes
 
-### Nothing important goes only in a toast.
+### Nothing important goes only in a flag.
 
 ```jsx
 // Incorrect — five seconds, then gone, and it took the only copy of the error
-// with it. An error the user must act on is not a toast.
-<Toast style="danger" title="Upload failed" show={failed} onClose={dismiss}>
+// with it. An error the user must act on is not a flag.
+<Flag style="danger" title="Upload failed" show={failed} onClose={dismiss}>
     The file was larger than 10 MB.
-</Toast>
+</Flag>
 
 // Correct — a failure that needs a decision stays on the page.
 <Alert style="danger" title="Upload failed">The file was larger than 10 MB.</Alert>
@@ -118,16 +118,16 @@ stack of them.
 
 ```jsx
 // delay is ignored when autohide is false, and setting delay={0} also disables
-// the timer — the toast then waits for its close button.
-<Toast title="Report ready" show={ready} onClose={dismiss} autohide={false}>
+// the timer — the flag then waits for its close button.
+<Flag title="Report ready" show={ready} onClose={dismiss} autohide={false}>
     Your export is on the downloads page.
-</Toast>
+</Flag>
 ```
 
 ### Keep `dismissible` on.
 
-It is on by default and is the only way to close a toast that is not timing out.
-Turning it off with `autohide={false}` leaves a toast that never goes away.
+It is on by default and is the only way to close a flag that is not timing out.
+Turning it off with `autohide={false}` leaves a flag that never goes away.
 
 </div>
 
@@ -137,17 +137,17 @@ Turning it off with `autohide={false}` leaves a toast that never goes away.
 
 - **Only danger and warning interrupt.** Those two styles are `role="alert"`
   with `aria-live="assertive"`. Every other style is `role="status"` with
-  `aria-live="polite"`, so a success toast waits for the screen reader to finish
-  what it is saying. Every style is `aria-atomic`, so the toast is read as one
+  `aria-live="polite"`, so a success flag waits for the screen reader to finish
+  what it is saying. Every style is `aria-atomic`, so the flag is read as one
   message.
 - **An eight-second timeout is a timing limit.** Success and info flags close
   after 8 seconds; warning and danger stay until they are dismissed, because
   they ask for something to be done. Content that disappears on its own has to
   be dismissible or extendable to satisfy WCAG's timing rule. The close button
   is what does that here, which is why it is on by default.
-- **Announcement needs the region to already exist.** A toast mounted at the same
-  moment as its container may not be announced at all. Render `ToastContainer`
-  with the page and put toasts into it.
+- **Announcement needs the region to already exist.** A flag mounted at the same
+  moment as its container may not be announced at all. Render `FlagContainer`
+  with the page and put flags into it.
 - **The close button is named "Close".** It is the shared `CloseButton` in its
   default tone on the flag's surface, with an `aria-hidden` ×. The × and its
   focus ring are at least 3:1 on that surface.
