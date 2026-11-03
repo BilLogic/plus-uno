@@ -80,7 +80,6 @@
     "--color-on-background",
     "--color-on-surface-variant-2",
     "--color-on-surface-variant-3",
-    "--color-on-surface-variant-light",
-    "--color-progress-ring-fill"
+    "--color-on-surface-variant-light"
   ]
 }
