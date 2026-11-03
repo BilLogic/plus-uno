@@ -298,6 +298,7 @@ const preview = {
             "Navigation",
             [
               "Breadcrumbs",
+              "Link",
               "Pagination",
               "Sidebar tab",
               "Tabs"

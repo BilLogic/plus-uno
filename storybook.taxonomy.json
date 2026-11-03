@@ -83,6 +83,7 @@
     ],
     "Navigation": [
       "Breadcrumbs",
+      "Link",
       "Pagination",
       "Sidebar tab",
       "Tabs"
@@ -250,6 +251,7 @@
       "Navigation",
       [
         "Breadcrumbs",
+        "Link",
         "Pagination",
         "Sidebar tab",
         "Tabs"
