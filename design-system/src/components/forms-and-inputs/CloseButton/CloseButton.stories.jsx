@@ -107,13 +107,12 @@ Tones.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(inverse.querySelector('i')).color).toBe(surface);
     }
 
-    // Hover and press paint the tone's state layer: 8% and 12% of the ×'s own
-    // color. A synthetic event never sets :hover or :active, so each state is
+    // Hover and press paint the tone's named hovered and pressed steps. A synthetic event never sets :hover or :active, so each state is
     // forced and the browser's cascade decides what it looks like.
     const states = [
-        ['Dismiss default example', '--color-on-surface-variant-state-08', '--color-on-surface-variant-state-12'],
-        ['Dismiss inverse example on a dark ground', '--color-surface-state-08', '--color-surface-state-12'],
-        ['Dismiss inverse example on a colored ground', '--color-surface-state-08', '--color-surface-state-12'],
+        ['Dismiss default example', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed'],
+        ['Dismiss inverse example on a dark ground', '--ds-interaction-inverse-hovered', '--ds-interaction-inverse-pressed'],
+        ['Dismiss inverse example on a colored ground', '--ds-interaction-inverse-hovered', '--ds-interaction-inverse-pressed'],
     ];
     for (const [name, hoverToken, pressedToken] of states) {
         const button = canvas.getByRole('button', { name });

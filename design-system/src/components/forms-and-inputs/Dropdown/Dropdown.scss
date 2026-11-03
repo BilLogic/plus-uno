@@ -29,18 +29,31 @@
 }
 
 // --- COLOR THEMES (mirrors Button.scss) ---
-// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Border. An edge takes the
+// Index: 1:Main, 2:OnMain, 3:TonalFill, 4:TextSafe, 5:Border. An edge takes the
 // intent's `-border` role (`_color_roles.scss`), not its base. Warning's border
 // role is #715c00 rather than its base, so a warning edge differs from its fill.
+// Named hover and pressed steps per intent: opaque, from the color migration map.
+// Index: 1:FilledHovered, 2:FilledPressed, 3:TonalHovered, 4:TonalPressed
+$dropdown-states: (
+    'primary': ('--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', '--ds-background-brand-subtlest-hovered', '--ds-background-brand-subtlest-pressed'),
+    'secondary': ('--ds-background-neutral-bold-hovered', '--ds-background-neutral-bold-pressed', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed'),
+    'tertiary': ('--ds-background-accent-teal-bolder-hovered', '--ds-background-accent-teal-bolder-pressed', '--ds-background-accent-teal-subtler-hovered', '--ds-background-accent-teal-subtler-pressed'),
+    'success': ('--ds-background-success-bold-hovered', '--ds-background-success-bold-pressed', '--ds-background-success-subtler-hovered', '--ds-background-success-subtler-pressed'),
+    'danger': ('--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', '--ds-background-danger-subtler-hovered', '--ds-background-danger-subtler-pressed'),
+    'warning': ('--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed', '--ds-background-warning-subtler-hovered', '--ds-background-warning-subtler-pressed'),
+    'info': ('--ds-background-information-bold-hovered', '--ds-background-information-bold-pressed', '--ds-background-information-subtler-hovered', '--ds-background-information-subtler-pressed'),
+    'default': ('--ds-background-neutral-hovered', '--ds-background-neutral-pressed', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed')
+);
+
 $dropdown-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-border'),
-    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-border'),
-    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-border'),
-    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-border'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-border'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-border'),
-    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-border'),
-    'default': ('--color-neutral', '--color-on-neutral', '--color-neutral-state-08', '--color-neutral-text', '--color-neutral')
+    'primary': ('--color-primary', '--color-on-primary', '--ds-background-brand-subtlest', '--color-primary-text', '--color-primary-border'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--ds-background-neutral', '--color-secondary-text', '--color-secondary-border'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--ds-background-accent-teal-subtler', '--color-tertiary-text', '--color-tertiary-border'),
+    'success': ('--color-success', '--color-on-success', '--ds-background-success-subtler', '--color-success-text', '--color-success-border'),
+    'danger': ('--color-danger', '--color-on-danger', '--ds-background-danger-subtler', '--color-danger-text', '--color-danger-border'),
+    'warning': ('--color-warning', '--color-on-warning', '--ds-background-warning-subtler', '--color-warning-text', '--color-warning-border'),
+    'info': ('--color-info', '--color-on-info', '--ds-background-information-subtler', '--color-info-text', '--color-info-border'),
+    'default': ('--color-neutral', '--color-on-neutral', '--ds-background-neutral', '--color-neutral-text', '--color-neutral')
 );
 
 // =============================================================================
@@ -462,9 +475,12 @@ $dropdown-themes: (
     $col-state: string.unquote(list.nth($config, 3));
     $col-text: string.unquote(list.nth($config, 4));
     $col-border: string.unquote(list.nth($config, 5));
-    // The pressed step of the same layer: `--color-x-state-08` → `-state-12`.
-    // A toggle takes Button's steps: hover 08, pressed 12.
-    $col-state-pressed: string.unquote(string.slice($col-state, 1, -3) + '12');
+    // A toggle takes Button's steps.
+    $steps: map.get($dropdown-states, $theme);
+    $col-bold-hovered: list.nth($steps, 1);
+    $col-bold-pressed: list.nth($steps, 2);
+    $col-tonal-hovered: list.nth($steps, 3);
+    $col-tonal-pressed: list.nth($steps, 4);
 
     // Regular dropdown - COMPOUND selector .pdropdown.pdropdown-#{$theme}
     .pdropdown.pdropdown-#{$theme} {
@@ -482,14 +498,14 @@ $dropdown-themes: (
             }
 
             &:hover {
-                // The shadow state layer over the fill, not a filter, so the label and icon keep their color
-                @include state-layer($theme, '--color-shadow-state-08');
+                // The bold hovered and pressed steps over the fill, not a filter, so the label and icon keep their color
+                @include state-layer($theme, $col-bold-hovered);
             }
 
             // PRESSED/ACTIVE STATE: Only background changes, NOT icon color
             &:active,
             &.active {
-                @include state-layer($theme, '--color-shadow-state-12');
+                @include state-layer($theme, $col-bold-pressed);
 
                 // Ensure icon color stays the same on pressed
                 &::after {
@@ -515,13 +531,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    @include state-layer($theme, '--color-shadow-state-08');
+                    @include state-layer($theme, $col-tonal-hovered);
                 }
 
                 // PRESSED/ACTIVE: Only background changes
                 &:active,
                 &.active {
-                    @include state-layer($theme, '--color-shadow-state-12');
+                    @include state-layer($theme, $col-tonal-pressed);
                 }
             }
         }
@@ -543,13 +559,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    background-color: var($col-state);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
 
-                // PRESSED/ACTIVE: the intent's own 12, with no shadow layer on top
+                // PRESSED/ACTIVE: the neutral pressed step, with no layer on top
                 &:active,
                 &.active {
-                    background-color: var($col-state-pressed);
+                    background-color: var(--ds-background-neutral-subtle-pressed);
                     --plus-dropdown-state-layer: transparent;
                 }
             }
@@ -572,13 +588,13 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    background-color: var($col-state);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
 
-                // PRESSED/ACTIVE: the intent's own 12, with no shadow layer on top
+                // PRESSED/ACTIVE: the neutral pressed step, with no layer on top
                 &:active,
                 &.active {
-                    background-color: var($col-state-pressed);
+                    background-color: var(--ds-background-neutral-subtle-pressed);
                     --plus-dropdown-state-layer: transparent;
                 }
             }
@@ -597,14 +613,14 @@ $dropdown-themes: (
             color: var($col-on-main);
 
             &:hover {
-                // The shadow state layer over the fill, not a filter, so the label and icon keep their color
-                @include state-layer($theme, '--color-shadow-state-08');
+                // The bold hovered and pressed steps over the fill, not a filter, so the label and icon keep their color
+                @include state-layer($theme, $col-bold-hovered);
             }
 
             // PRESSED/ACTIVE: Only background changes, NOT icon color
             &:active,
             &.active {
-                @include state-layer($theme, '--color-shadow-state-12');
+                @include state-layer($theme, $col-bold-pressed);
             }
         }
 
@@ -629,12 +645,12 @@ $dropdown-themes: (
                 border-color: transparent;
 
                 &:hover {
-                    @include state-layer($theme, '--color-shadow-state-08');
+                    @include state-layer($theme, $col-tonal-hovered);
                 }
 
                 &:active,
                 &.active {
-                    @include state-layer($theme, '--color-shadow-state-12');
+                    @include state-layer($theme, $col-tonal-pressed);
                 }
             }
 
@@ -658,12 +674,12 @@ $dropdown-themes: (
                 color: var($col-text);
 
                 &:hover {
-                    background-color: var($col-state);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
 
                 &:active,
                 &.active {
-                    background-color: var($col-state-pressed);
+                    background-color: var(--ds-background-neutral-subtle-pressed);
                 }
             }
 
@@ -680,12 +696,12 @@ $dropdown-themes: (
                 }
 
                 &:hover {
-                    background-color: var($col-state);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
 
                 &:active,
                 &.active {
-                    background-color: var($col-state-pressed);
+                    background-color: var(--ds-background-neutral-subtle-pressed);
                 }
             }
         }
@@ -702,12 +718,12 @@ $dropdown-themes: (
                 color: var($col-text);
 
                 &:hover {
-                    background-color: var($col-state);
+                    background-color: var(--ds-background-neutral-subtle-hovered);
                 }
 
                 &:active,
                 &.active {
-                    background-color: var($col-state-pressed);
+                    background-color: var(--ds-background-neutral-subtle-pressed);
                 }
             }
 

@@ -162,25 +162,35 @@ test('Sidebar: an open-tab parent hovers on the neutral subtle hovered step', ()
 const BUTTON = 'components/forms-and-inputs/Button/Button.scss';
 const INTENTS = ['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
 
-test('Button: filled and tonal lay the shadow 08 on hover and 12 when pressed', () => {
+test('Button: filled and tonal lay their role steps on hover and when pressed', () => {
+  const steps = {
+    primary: ['brand-bold', 'brand-subtlest'],
+    secondary: ['neutral-bold', 'neutral'],
+    tertiary: ['accent-teal-bolder', 'accent-teal-subtler'],
+    success: ['success-bold', 'success-subtler'],
+    warning: ['warning-bold', 'warning-subtler'],
+    danger: ['danger-bold', 'danger-subtler'],
+    info: ['information-bold', 'information-subtler'],
+  };
   for (const intent of INTENTS) {
-    for (const fill of ['filled', 'tonal']) {
+    const [bold, subtle] = steps[intent];
+    for (const [fill, role] of [['filled', bold], ['tonal', subtle]]) {
       const base = `.plus-btn--${intent}.plus-btn--${fill}`;
-      expectRule(BUTTON, `${base}:hover`, { '--plus-btn-state-layer': layer('--color-shadow-state-08') });
+      expectRule(BUTTON, `${base}:hover`, { '--plus-btn-state-layer': layer(`--ds-background-${role}-hovered`) });
       for (const pressed of [':active', '.active']) {
-        expectRule(BUTTON, `${base}${pressed}`, { '--plus-btn-state-layer': layer('--color-shadow-state-12') });
+        expectRule(BUTTON, `${base}${pressed}`, { '--plus-btn-state-layer': layer(`--ds-background-${role}-pressed`) });
       }
     }
   }
 });
 
-test("Button: outline and ghost take the intent's 08 on hover and 12 when pressed", () => {
+test('Button: outline and ghost take the neutral subtle steps on hover and when pressed', () => {
   for (const intent of INTENTS) {
     for (const fill of ['outline', 'ghost', 'text']) {
       const base = `.plus-btn--${intent}.plus-btn--${fill}`;
-      expectRule(BUTTON, `${base}:hover`, { 'background-color': layer(`--color-${intent}-state-08`) });
+      expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
       for (const pressed of [':active', '.active']) {
-        expectRule(BUTTON, `${base}${pressed}`, { 'background-color': layer(`--color-${intent}-state-12`) });
+        expectRule(BUTTON, `${base}${pressed}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
       }
     }
   }
@@ -209,16 +219,25 @@ test('Dropdown items: neutral hovered and pressed, selected neutral ink with its
 });
 
 test('Dropdown toggles: the same steps as Button', () => {
-  for (const intent of ['primary', 'secondary', 'tertiary', 'success', 'danger', 'warning', 'info']) {
+  const steps = {
+    primary: ['brand-bold', 'brand-subtlest'],
+    secondary: ['neutral-bold', 'neutral'],
+    tertiary: ['accent-teal-bolder', 'accent-teal-subtler'],
+    success: ['success-bold', 'success-subtler'],
+    danger: ['danger-bold', 'danger-subtler'],
+    warning: ['warning-bold', 'warning-subtler'],
+    info: ['information-bold', 'information-subtler'],
+  };
+  for (const [intent, [bold, subtle]] of Object.entries(steps)) {
     const at = (fill) => `.pdropdown.pdropdown-${intent}${fill ? `.pdropdown-${fill}` : ''} .pdropdown-toggle`;
-    expectRule(DROPDOWN, `${at('')}:hover`, { '--plus-dropdown-state-layer': layer('--color-shadow-state-08') });
-    expectRule(DROPDOWN, `${at('')}:active`, { '--plus-dropdown-state-layer': layer('--color-shadow-state-12') });
-    expectRule(DROPDOWN, `${at('tonal')}:hover`, { '--plus-dropdown-state-layer': layer('--color-shadow-state-08') });
-    expectRule(DROPDOWN, `${at('tonal')}:active`, { '--plus-dropdown-state-layer': layer('--color-shadow-state-12') });
+    expectRule(DROPDOWN, `${at('')}:hover`, { '--plus-dropdown-state-layer': layer(`--ds-background-${bold}-hovered`) });
+    expectRule(DROPDOWN, `${at('')}:active`, { '--plus-dropdown-state-layer': layer(`--ds-background-${bold}-pressed`) });
+    expectRule(DROPDOWN, `${at('tonal')}:hover`, { '--plus-dropdown-state-layer': layer(`--ds-background-${subtle}-hovered`) });
+    expectRule(DROPDOWN, `${at('tonal')}:active`, { '--plus-dropdown-state-layer': layer(`--ds-background-${subtle}-pressed`) });
     for (const fill of ['outline', 'ghost']) {
-      expectRule(DROPDOWN, `${at(fill)}:hover`, { 'background-color': layer(`--color-${intent}-state-08`) });
+      expectRule(DROPDOWN, `${at(fill)}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
       expectRule(DROPDOWN, `${at(fill)}:active`, {
-        'background-color': layer(`--color-${intent}-state-12`),
+        'background-color': layer('--ds-background-neutral-subtle-pressed'),
         '--plus-dropdown-state-layer': 'transparent',
       });
     }
@@ -380,14 +399,14 @@ test('NavPills: hover 08, pressed 12, focus a ring with no fill, selected or not
 
 /* ─── CloseButton ────────────────────────────────────────────────────────── */
 
-test('CloseButton: hover 08, pressed 12, focus the ring alone, on both tones', () => {
+test('CloseButton: named hovered and pressed steps, focus the ring alone, on both tones', () => {
   const file = 'components/forms-and-inputs/CloseButton/CloseButton.scss';
-  for (const [btn, role] of [
-    ['.plus-close-btn', '--color-on-surface-variant'],
-    ['.plus-close-btn--inverse', '--color-surface'],
+  for (const [btn, hovered, pressed] of [
+    ['.plus-close-btn', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed'],
+    ['.plus-close-btn--inverse', '--ds-interaction-inverse-hovered', '--ds-interaction-inverse-pressed'],
   ]) {
-    expectRule(file, `${btn}:hover`, { 'background-color': layer(`${role}-state-08`) });
-    expectRule(file, `${btn}:active`, { 'background-color': layer(`${role}-state-12`) });
+    expectRule(file, `${btn}:hover`, { 'background-color': layer(hovered) });
+    expectRule(file, `${btn}:active`, { 'background-color': layer(pressed) });
     for (const focus of [`${btn}:focus`, `${btn}:focus-visible`]) {
       const decls = declarations(sheet(file), focus);
       assert.ok(!decls || !('background-color' in decls), `${focus} fills focus with ${decls?.['background-color']}`);

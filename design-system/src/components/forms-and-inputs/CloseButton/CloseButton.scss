@@ -32,11 +32,11 @@
     }
 
     &:hover {
-        background-color: var(--color-on-surface-variant-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:active {
-        background-color: var(--color-on-surface-variant-state-12);
+        background-color: var(--ds-background-neutral-subtle-pressed);
     }
 
     &:focus {
@@ -71,11 +71,11 @@
     }
 
     &:hover {
-        background-color: var(--color-surface-state-08);
+        background-color: var(--ds-interaction-inverse-hovered);
     }
 
     &:active {
-        background-color: var(--color-surface-state-12);
+        background-color: var(--ds-interaction-inverse-pressed);
     }
 
     &:focus-visible::after {

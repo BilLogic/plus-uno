@@ -172,9 +172,10 @@ export const Interactive = {
 };
 
 /**
- * The state steps, read from the cascade: hover lays the 08 state layer,
- * pressed the 12. A filled or tonal button lays the shadow layer over its
- * fill; an outline or ghost button takes its intent's own layer.
+ * The state steps, read from the cascade: hover and pressed take the named
+ * steps. A filled button lays its role's bold step over its fill, a tonal
+ * button its subtle step; an outline or ghost button takes the neutral subtle
+ * step.
  */
 export const StateSteps = {
     parameters: { docs: { disable: true } },
@@ -194,16 +195,20 @@ export const StateSteps = {
         };
         const layer = (style) => style.getPropertyValue('--plus-btn-state-layer').trim();
 
-        for (const name of ['Filled', 'Tonal']) {
+        const layers = {
+            Filled: ['--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed'],
+            Tonal: ['--ds-background-brand-subtlest-hovered', '--ds-background-brand-subtlest-pressed'],
+        };
+        for (const [name, [hovered, pressed]] of Object.entries(layers)) {
             const button = canvas.getByRole('button', { name });
-            await expect(read(button, ':hover', layer), `${name} hover`).toBe(tokenColor(canvasElement, '--color-shadow-state-08'));
-            await expect(read(button, ':active', layer), `${name} pressed`).toBe(tokenColor(canvasElement, '--color-shadow-state-12'));
+            await expect(read(button, ':hover', layer), `${name} hover`).toBe(tokenColor(canvasElement, hovered));
+            await expect(read(button, ':active', layer), `${name} pressed`).toBe(tokenColor(canvasElement, pressed));
         }
         for (const name of ['Outline', 'Ghost']) {
             const button = canvas.getByRole('button', { name });
             const fill = (style) => style.backgroundColor;
-            await expect(read(button, ':hover', fill), `${name} hover`).toBe(tokenColor(canvasElement, '--color-primary-state-08'));
-            await expect(read(button, ':active', fill), `${name} pressed`).toBe(tokenColor(canvasElement, '--color-primary-state-12'));
+            await expect(read(button, ':hover', fill), `${name} hover`).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
+            await expect(read(button, ':active', fill), `${name} pressed`).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
         }
     },
 };
