@@ -1,0 +1,422 @@
+/* Layout for the Recording, Tutor and Session search pages.
+   Patterns carry the surfaces; these classes only place things inside them. */
+
+.cm-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-150);
+    min-width: 0;
+}
+
+.cm-muted {
+    margin: 0;
+    color: var(--ds-text-subtle);
+}
+
+.cm-body {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+.cm-small {
+    margin: 0;
+    font: var(--body-small);
+}
+
+.cm-strong {
+    font-weight: 600;
+}
+
+.cm-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-050);
+}
+
+.cm-person {
+    display: flex;
+    align-items: center;
+    gap: var(--space-050);
+    min-width: 0;
+}
+
+.cm-when {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- Session search ---------- */
+
+.cm-search {
+    flex: 1 1 16rem;
+    min-width: 0;
+}
+
+/* ---------- Tutor ---------- */
+
+.cm-tutor-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-100);
+}
+
+.cm-tutor-head__who {
+    display: flex;
+    align-items: center;
+    gap: var(--space-100);
+}
+
+.cm-tutor-head__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-025);
+}
+
+.cm-pattern__rate {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text);
+    white-space: nowrap;
+}
+
+.cm-bar {
+    position: relative;
+    height: var(--space-050);
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-neutral);
+}
+
+.cm-bar__fill {
+    height: 100%;
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-danger-bold);
+}
+
+/* Flagged by the AI, still waiting on a verdict. */
+.cm-bar__pending {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-danger-subtler);
+}
+
+.cm-bar__threshold {
+    position: absolute;
+    top: calc(-1 * var(--space-025));
+    bottom: calc(-1 * var(--space-025));
+    width: var(--space-0125);
+    background-color: var(--ds-text);
+}
+
+/* ---------- Recording ---------- */
+
+.cm-recording {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(20rem, 1fr);
+    gap: var(--space-150);
+    align-items: start;
+}
+
+.cm-recording__video {
+    aspect-ratio: 16 / 9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-050);
+    background-color: var(--ds-surface-sunken);
+    border-radius: var(--size-card-radius-md);
+    color: var(--ds-icon-subtle);
+}
+
+.cm-recording__video-icon {
+    font-size: 3rem;
+}
+
+.cm-transport {
+    display: flex;
+    align-items: center;
+    gap: var(--space-100);
+    margin-top: var(--space-100);
+}
+
+.cm-timeline {
+    position: relative;
+    flex: 1;
+    height: var(--space-050);
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-neutral);
+}
+
+.cm-timeline__progress {
+    position: absolute;
+    inset: 0 auto 0 0;
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-brand-bold);
+}
+
+.cm-marker {
+    position: absolute;
+    top: 50%;
+    width: var(--space-075);
+    height: var(--space-075);
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: var(--space-0125) solid var(--ds-surface-raised);
+    border-radius: var(--radius-full);
+    background-color: var(--ds-background-danger-bold);
+    cursor: pointer;
+}
+
+.cm-marker--added {
+    background-color: var(--ds-background-brand-bold);
+}
+
+.cm-marker:focus-visible,
+.cm-line:focus-visible {
+    outline: var(--space-0125) solid var(--ds-border-focused);
+    outline-offset: var(--space-0125);
+}
+
+.cm-time {
+    margin: 0;
+    min-width: 6rem;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    font-variant-numeric: tabular-nums;
+}
+
+.cm-decision {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-100);
+}
+
+.cm-claim {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-025);
+    min-width: 0;
+}
+
+.cm-claim__label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-050);
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.cm-claim__text {
+    margin: 0;
+    font: var(--heading-small);
+    color: var(--ds-text);
+}
+
+.cm-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-050);
+}
+
+.cm-counter {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    font-variant-numeric: tabular-nums;
+}
+
+.cm-verdict {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-100);
+}
+
+.cm-annotate {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-050);
+    padding-top: var(--space-100);
+    border-top: 1px solid var(--ds-border);
+}
+
+.cm-annotate__title {
+    margin: 0;
+    font: var(--body-large);
+    font-weight: 600;
+    color: var(--ds-text);
+}
+
+.cm-annotate__required {
+    color: var(--ds-text-danger);
+}
+
+.cm-field-label {
+    margin: 0 0 var(--space-025);
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.cm-submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-100);
+}
+
+.cm-transcript__head-tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-050);
+}
+
+.cm-lines {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--space-050) 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0125);
+    max-height: 38rem;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+}
+
+/* While the add form is open the list gives up the form's height. */
+.cm-transcript.is-adding .cm-lines {
+    max-height: 26rem;
+}
+
+.cm-line-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-025);
+    border-radius: var(--size-element-radius-md);
+}
+
+.cm-line-row:hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
+.cm-line-row.is-current {
+    background-color: var(--ds-background-selected);
+}
+
+.cm-line-row.is-flagged {
+    background-color: var(--ds-background-danger-subtler);
+}
+
+/* The line a violation is being added to, while the form is open. */
+.cm-line-row.is-adding {
+    background-color: var(--ds-background-selected);
+    outline: var(--space-0125) solid var(--ds-border-selected);
+}
+
+.cm-line {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    gap: var(--space-100);
+    padding: var(--space-050) var(--space-075);
+    text-align: left;
+    border: none;
+    border-radius: var(--size-element-radius-md);
+    background: transparent;
+    color: var(--ds-text);
+    cursor: pointer;
+}
+
+.cm-stamp {
+    flex-shrink: 0;
+    min-width: 2.75rem;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    font-variant-numeric: tabular-nums;
+}
+
+.cm-line__text {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-050);
+    min-width: 0;
+    font: var(--body-small);
+}
+
+.cm-line__speaker {
+    font-weight: 600;
+}
+
+/* Hidden until its line is pointed at; keyboard focus shows it too. */
+.cm-add-line {
+    flex-shrink: 0;
+    margin: var(--space-025) var(--space-025) 0 0;
+    opacity: 0;
+    transition: opacity 120ms ease;
+}
+
+.cm-line-row:hover .cm-add-line,
+.cm-line-row.is-adding .cm-add-line,
+.cm-add-line:hover,
+.cm-add-line:focus-visible {
+    opacity: 1;
+}
+
+/* A violation the supervisor added, under its line or at its moment. */
+.cm-added {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-050);
+    padding: var(--space-0125) var(--space-075) var(--space-050) calc(2.75rem + var(--space-100) + var(--space-075));
+    font: var(--body-small);
+}
+
+.cm-moment {
+    display: flex;
+    align-items: center;
+    gap: var(--space-100);
+    padding: var(--space-050) var(--space-075);
+    border-radius: var(--size-element-radius-md);
+    background-color: var(--ds-background-selected);
+}
+
+.cm-moment .cm-added {
+    padding: 0;
+}
+
+.cm-add-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-050);
+    margin: var(--space-025) 0 var(--space-050);
+    padding: var(--space-050) var(--space-075);
+    border: 1px solid var(--ds-border);
+    border-radius: var(--size-element-radius-md);
+    background-color: var(--ds-surface-raised);
+}
+
+.cm-add-form > * {
+    min-width: 0;
+}
+
+.cm-add-form textarea {
+    width: 100%;
+}
+
+@media (max-width: 64rem) {
+    .cm-recording {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
