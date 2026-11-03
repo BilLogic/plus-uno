@@ -1,0 +1,10 @@
+// The count after a filter's name. It reads as part of the label, one step
+// quieter, and takes the selected color when the filter is on.
+.plus-filter-btn .plus-filter-btn__metric {
+    margin-inline-start: var(--element-inline-sm);
+    color: var(--ds-text-subtlest);
+}
+
+.plus-filter-btn.plus-btn--selected .plus-filter-btn__metric {
+    color: inherit;
+}

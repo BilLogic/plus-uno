@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as VerticalButtonStories from './VerticalButton.stories.jsx';
+
+<Meta of={VerticalButtonStories} />
+
+<Title />
+A vertical button stacks an icon over a short label at one size, 60 by 60.
+
+<DocsTabs of={VerticalButtonStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={VerticalButtonStories.Overview} />
+
+<ArgTypes of={VerticalButtonStories} />
+
+</DocsTab>
+
+</DocsTabs>

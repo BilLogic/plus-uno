@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as FilterButtonStories from './FilterButton.stories.jsx';
+
+<Meta of={FilterButtonStories} />
+
+<Title />
+A filter button opens or toggles a filter and can show a count of what is applied.
+
+<DocsTabs of={FilterButtonStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={FilterButtonStories.Overview} />
+
+<ArgTypes of={FilterButtonStories} />
+
+</DocsTab>
+
+</DocsTabs>

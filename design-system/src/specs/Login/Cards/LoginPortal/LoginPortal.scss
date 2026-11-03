@@ -40,37 +40,6 @@
     width: 100%;
 }
 
-.login-portal-demo-role-buttons__btn {
-    flex: 1;
-}
-
-.login-portal-demo-role-icon {
-    color: var(--color-primary);
-}
-
-// Override default Button icon sizing for this specific vertical button pattern.
-// Button.scss draws icons at 16; this card needs
-// Fontawesome/Solid/H2 (28px) like the Figma spec.
-//
-// Use higher specificity (and !important) so this wins regardless of CSS load order.
-.login-portal-demo-role-buttons .plus-btn .plus-btn-visual {
-    font-size: var(--font-size-fa-h2-solid) !important;
-    line-height: var(--font-line-height-fa-h2-solid) !important;
-}
-
-// If Font Awesome is rendering SVGs, make sure they scale with the font-size above.
-.login-portal-demo-role-buttons .plus-btn .plus-btn-visual svg {
-    width: 1em;
-    height: 1em;
-}
-
-// Override label typography for the Admin/Tutor demo buttons to match Title/H5
-// (20px) while keeping the icon at H2 (28px). This recreates the Figma ratio.
-.login-portal-demo-role-buttons .plus-btn .plus-btn-text {
-    font-size: var(--font-size-h5);
-    line-height: var(--font-line-height-h5);
-}
-
 .login-portal-terms {
     display: flex;
     align-items: center;

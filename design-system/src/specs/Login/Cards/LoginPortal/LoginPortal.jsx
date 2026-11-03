@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '@/components/forms-and-inputs/Button';
+import VerticalButton from '@/components/forms-and-inputs/VerticalButton';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import {
@@ -33,30 +34,8 @@ export default function LoginPortal({
                 </div>
 
                 <div className="login-portal-demo-role-buttons">
-                    <Button
-                        className="login-portal-demo-role-buttons__btn"
-                        text="Admin"
-                        shouldFitContainer
-                        vertical
-                        iconBefore={
-                            <i
-                                className="fa-solid fa-user-gear login-portal-demo-role-icon"
-                                aria-hidden="true"
-                            />
-                        }
-                    />
-                    <Button
-                        className="login-portal-demo-role-buttons__btn"
-                        text="Tutor"
-                        shouldFitContainer
-                        vertical
-                        iconBefore={
-                            <i
-                                className="fa-solid fa-chalkboard-user login-portal-demo-role-icon"
-                                aria-hidden="true"
-                            />
-                        }
-                    />
+                    <VerticalButton icon="user-gear" label="Admin" />
+                    <VerticalButton icon="chalkboard-user" label="Tutor" />
                 </div>
                 <div className="login-portal-disabled-button">
                     <Button
