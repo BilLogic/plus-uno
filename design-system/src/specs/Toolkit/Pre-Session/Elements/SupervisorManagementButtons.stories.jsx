@@ -30,43 +30,43 @@ export default {
 // ─── Filled Primary Buttons ──────────────────────────────────
 
 export const CreateSessionButton = ({ block = false, ...props }) => (
-    <Button text="Create Session" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="Create Session" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 export const SaveChangesButton = ({ block = false, ...props }) => (
-    <Button text="Save Changes" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="Save Changes" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 export const SaveButton = ({ block = false, ...props }) => (
-    <Button text="Save" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="Save" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 export const ContinueButton = ({ block = false, ...props }) => (
-    <Button text="Continue" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="Continue" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 export const ConfirmButton = ({ block = false, ...props }) => (
-    <Button text="Confirm" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="Confirm" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 export const IUnderstandButton = ({ block = false, ...props }) => (
-    <Button text="I Understand" style="primary" fill="filled" size="medium" block={block} {...props} />
+    <Button text="I Understand" appearance="primary" shouldFitContainer={block} {...props} />
 );
 
 // ─── Outline Primary Buttons ─────────────────────────────────
 
 export const CancelButton = ({ block = false, ...props }) => (
-    <Button text="Cancel" style="primary" fill="outline" size="medium" block={block} {...props} />
+    <Button text="Cancel" shouldFitContainer={block} {...props} />
 );
 
 export const BackButton = ({ block = false, ...props }) => (
-    <Button text="Back" style="primary" fill="outline" size="medium" block={block} {...props} />
+    <Button text="Back" shouldFitContainer={block} {...props} />
 );
 
 // ─── Outline Danger Button ───────────────────────────────────
 
 export const ConfirmCancelButton = ({ block = false, ...props }) => (
-    <Button text="Confirm" style="danger" fill="outline" size="medium" block={block} {...props} />
+    <Button text="Confirm" shouldFitContainer={block} {...props} />
 );
 
 // ─── Overview Story ──────────────────────────────────────────
@@ -88,11 +88,11 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Filled Primary</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
-                <CreateSessionButton block />
-                <SaveChangesButton block />
-                <SaveButton block />
-                <ContinueButton block />
-                <ConfirmButton block />
+                <CreateSessionButton shouldFitContainer />
+                <SaveChangesButton shouldFitContainer />
+                <SaveButton shouldFitContainer />
+                <ContinueButton shouldFitContainer />
+                <ConfirmButton shouldFitContainer />
             </div>
         </section>
 
@@ -109,7 +109,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Outline Danger</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
-                <ConfirmCancelButton block />
+                <ConfirmCancelButton shouldFitContainer />
             </div>
         </section>
 
@@ -117,7 +117,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Filled Primary - Acknowledgment</h6>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
-                <IUnderstandButton block />
+                <IUnderstandButton shouldFitContainer />
             </div>
         </section>
     </div>

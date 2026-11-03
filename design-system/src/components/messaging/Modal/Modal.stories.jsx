@@ -136,14 +136,12 @@ function ModalContentDemos() {
                         showBottomButtons
                         primaryButton={{
                             text: 'Primary',
-                            style: 'primary',
-                            fill: 'filled',
+                            appearance: 'primary',
                             onClick: () => console.log('Primary clicked'),
                         }}
                         secondaryButton={{
                             text: 'Secondary',
-                            style: 'secondary',
-                            fill: 'tonal',
+                            appearance: 'default',
                             onClick: () => console.log('Secondary clicked'),
                         }}
                         onClose={() => {}}
@@ -164,14 +162,12 @@ function ModalContentDemos() {
                         showBottomButtons
                         primaryButton={{
                             text: 'Primary',
-                            style: 'primary',
-                            fill: 'filled',
+                            appearance: 'primary',
                             onClick: () => console.log('Primary clicked'),
                         }}
                         secondaryButton={{
                             text: 'Secondary',
-                            style: 'secondary',
-                            fill: 'tonal',
+                            appearance: 'default',
                             onClick: () => console.log('Secondary clicked'),
                         }}
                         onClose={() => {}}
@@ -272,14 +268,12 @@ function ModalScrollableDemo() {
                     showBottomButtons
                     primaryButton={{
                         text: 'Primary',
-                        style: 'primary',
-                        fill: 'filled',
+                        appearance: 'primary',
                         onClick: () => console.log('Primary clicked'),
                     }}
                     secondaryButton={{
                         text: 'Secondary',
-                        style: 'secondary',
-                        fill: 'tonal',
+                        appearance: 'default',
                         onClick: () => console.log('Secondary clicked'),
                     }}
                     onClose={() => {}}
@@ -339,7 +333,7 @@ function ModalOptionDemos() {
                 renderAs="inline"
                 title="Share report"
                 description="People with the link can view it."
-                headerActions={<Button style="secondary" fill="ghost" size="small" leadingVisual="link" title="Copy link" />}
+                headerActions={<Button appearance="subtle" spacing="compact" iconBefore="link" title="Copy link" />}
                 dividers
                 body="Header actions sit before the close button; dividers rule off the header and footer."
                 primaryButton={{ text: 'Done' }}
@@ -394,8 +388,7 @@ export const Interactive = {
                     args.showBottomButtons
                         ? {
                               text: 'Primary',
-                              style: 'primary',
-                              fill: 'filled',
+                              appearance: 'primary',
                               onClick: () => console.log('Primary clicked'),
                           }
                         : null
@@ -404,8 +397,7 @@ export const Interactive = {
                     args.showBottomButtons
                         ? {
                               text: 'Secondary',
-                              style: 'secondary',
-                              fill: 'tonal',
+                              appearance: 'default',
                               onClick: () => console.log('Secondary clicked'),
                           }
                         : null

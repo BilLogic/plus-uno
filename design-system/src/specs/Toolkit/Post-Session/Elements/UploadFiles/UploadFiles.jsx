@@ -54,16 +54,13 @@ const UploadFiles = ({
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 <Button
                     text="Upload Folder"
-                    style="primary"
-                    fill="filled"
-                    size="small"
+                    appearance="primary"
+                    spacing="compact"
                     onClick={onUploadFolder}
                 />
                 <Button
                     text="Choose a file"
-                    style="primary"
-                    fill="tonal"
-                    size="small"
+                    spacing="compact"
                     onClick={onChooseFile}
                 />
             </div>

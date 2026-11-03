@@ -282,9 +282,8 @@ const GroupTrainingProgressTable = ({
                     <td className="training-progress-table__cell training-progress-table__cell--action">
                         <Button
                             text="Assign"
-                            style="default"
-                            fill="ghost"
-                            size="small"
+                            appearance="subtle"
+                            spacing="compact"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onAssignClick && onAssignClick(item);

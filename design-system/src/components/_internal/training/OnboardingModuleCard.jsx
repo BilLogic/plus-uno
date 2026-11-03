@@ -19,9 +19,9 @@ const OnboardingModuleCard = ({ title, duration, state = 'default', stage = 'not
                 </div>
                 <div className="mt-2">
                     {stage === 'completed' ? (
-                        <Button style="success" fill="tonal" size="small" text="Completed" disabled />
+                        <Button spacing="compact" text="Completed" isDisabled />
                     ) : (
-                        <Button style="primary" fill="filled" size="small" text="Start" />
+                        <Button appearance="primary" spacing="compact" text="Start" />
                     )}
                 </div>
             </Card.Body>

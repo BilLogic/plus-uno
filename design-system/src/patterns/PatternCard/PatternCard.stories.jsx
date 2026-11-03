@@ -99,7 +99,7 @@ const sessionBody = (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
 );
 
-const viewSession = <Button text="View session" style="primary" fill="text" size="small" onClick={() => {}} />;
+const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
 
 /** The three sizes: each sets the pad, the radius and the minimum width together. */
 function PatternCardSizesDemo() {
@@ -403,7 +403,7 @@ export const Anatomy = () => (
             image={imagePlaceholder('16:9')}
             title="Ana Ruiz"
             description="Algebra I · Thu 4:00 PM"
-            actions={<Button leadingVisual="ellipsis-vertical" style="primary" fill="ghost" size="small" aria-label="More actions" onClick={() => {}} />}
+            actions={<Button iconBefore="ellipsis-vertical" appearance="subtle" spacing="compact" aria-label="More actions" onClick={() => {}} />}
             footer={viewSession}
         >
             {sessionBody}

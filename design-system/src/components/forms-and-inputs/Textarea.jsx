@@ -151,18 +151,15 @@ const Textarea = ({
                 <div className="plus-field-actions">
                     <Button
                         text="Cancel"
-                        size="small"
-                        style="secondary"
-                        fill="outline"
-                        disabled={edit.saving}
+                        spacing="compact"
+                        isDisabled={edit.saving}
                         onClick={edit.cancel}
                     />
                     <Button
                         text="Save"
-                        size="small"
-                        style="primary"
-                        fill="filled"
-                        disabled={edit.saving}
+                        spacing="compact"
+                        appearance="primary"
+                        isDisabled={edit.saving}
                         onClick={edit.save}
                     />
                 </div>

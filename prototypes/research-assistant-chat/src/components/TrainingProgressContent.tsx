@@ -64,9 +64,9 @@ export function TrainingProgressContent(): React.ReactElement {
         <section className="tutor-training-progress-page__overview-section" aria-labelledby="training-progress-overview-title">
           <header className="tutor-training-progress-page__overview-header">
             <h2 id="training-progress-overview-title" className="h4" style={{ color: 'var(--color-on-surface)' }}>Training Progress Overview</h2>
-            <ButtonGroup size="medium" style="primary" fill="tonal" className="tutor-training-progress-page__toggle">
-              <Button text="By Tutor" active={currentViewMode === 'By Tutor'} onClick={() => setCurrentViewMode('By Tutor')} />
-              <Button text="By Lesson" active={currentViewMode === 'By Lesson'} onClick={() => setCurrentViewMode('By Lesson')} />
+            <ButtonGroup className="tutor-training-progress-page__toggle">
+              <Button appearance="primary" text="By Tutor" isSelected={currentViewMode === 'By Tutor'} onClick={() => setCurrentViewMode('By Tutor')} />
+              <Button appearance="primary" text="By Lesson" isSelected={currentViewMode === 'By Lesson'} onClick={() => setCurrentViewMode('By Lesson')} />
             </ButtonGroup>
           </header>
           <div className="tutor-training-progress-page__overview-cards">

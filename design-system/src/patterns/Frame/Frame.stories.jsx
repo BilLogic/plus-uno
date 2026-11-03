@@ -445,13 +445,13 @@ const WithModal = (args) => {
                 sidebar={(
                     <>
                         <Sidebar user="tutor" activeTabId="home" />
-                        <Button text="Preferences" fill="outline" onClick={() => setOpen(true)} />
+                        <Button text="Preferences" onClick={() => setOpen(true)} />
                     </>
                 )}
                 {...args}
             >
                 <div>
-                    <Button text="Page settings" onClick={() => setOpen(true)} />
+                    <Button appearance="primary" text="Page settings" onClick={() => setOpen(true)} />
                 </div>
                 {slot('Content slot')}
             </Frame>

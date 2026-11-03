@@ -93,10 +93,10 @@ const ReconfirmTutorAvailabilityModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <CancelButton block />
+                <CancelButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <ConfirmButton block />
+                <ConfirmButton shouldFitContainer />
             </div>
         </div>
     </div>

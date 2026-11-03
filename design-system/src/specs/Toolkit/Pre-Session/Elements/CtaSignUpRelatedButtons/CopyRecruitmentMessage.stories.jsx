@@ -14,9 +14,8 @@ export default {
  * Copy Recruitment Message Button
  * Tonal secondary button for copying recruitment message
  * Uses design system Button component with:
- * - style="secondary" for secondary color
- * - fill="tonal" for tonal background
- * - leadingIcon="copy" for copy icon
+ * - appearance="default"
+ * - iconBefore="copy" for copy icon
  */
 export const Overview = () => (
     <div
@@ -31,9 +30,7 @@ export const Overview = () => (
             <div style={{ maxWidth: '250px' }}>
                 <Button
                     text="Copy recruitment message"
-                    leadingIcon="copy"
-                    style="secondary"
-                    fill="tonal"
+                    iconBefore="copy"
                 />
             </div>
         </section>
@@ -43,10 +40,8 @@ export const Overview = () => (
             <div style={{ maxWidth: '250px' }}>
                 <Button
                     text="Copy recruitment message"
-                    leadingIcon="copy"
-                    style="secondary"
-                    fill="tonal"
-                    disabled
+                    iconBefore="copy"
+                    isDisabled
                 />
             </div>
         </section>
@@ -60,10 +55,8 @@ export const Overview = () => (
 export const CopyRecruitmentMessageButton = ({ disabled = false, ...props }) => (
     <Button
         text="Copy recruitment message"
-        leadingIcon="copy"
-        style="secondary"
-        fill="tonal"
-        disabled={disabled}
+        iconBefore="copy"
+        isDisabled={disabled}
         {...props}
     />
 );

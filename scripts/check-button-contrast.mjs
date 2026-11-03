@@ -111,14 +111,14 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
    * red number.
    */
   const worst = rows
-    .filter((row) => row.ratio !== null && !contrast.entries.has(`${row.style}/${row.fill}`))
+    .filter((row) => row.ratio !== null && !contrast.entries.has(`${row.appearance}/${row.state}`))
     .sort((a, b) => a.ratio - b.ratio)[0];
 
   return (
-    `${rows.length} combinations from ${themes.length} styles; ` +
-    `every label clears ${AA_TEXT}:1 and every style renders its own ground ` +
+    `${rows.length} combinations from ${themes.length} appearances; ` +
+    `every label clears ${AA_TEXT}:1 and every appearance renders its own ground ` +
     `(${baselined} baselined)\n` +
-    `  tightest unbaselined: ${worst.style}/${worst.fill} at ${worst.ratio}:1`
+    `  tightest unbaselined: ${worst.appearance}/${worst.state} at ${worst.ratio}:1`
   );
 }
 

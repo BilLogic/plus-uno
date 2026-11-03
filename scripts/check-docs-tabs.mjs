@@ -72,7 +72,10 @@ const MDX_ROOT = 'design-system/src';
  */
 const USAGE_HEADINGS = new Set([
   'When to use',
+  'Usage',
+  'Content guidelines',
   'Accessibility',
+  'ADS parity',
   'Usage notes',
   'Related',
   'Why `showLabel` cannot take the name away',

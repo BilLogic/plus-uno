@@ -14,9 +14,8 @@ export default {
  * View Details Button
  * Filled primary button for viewing details
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="filled" for filled background
- * - leadingIcon="square-plus" for plus icon
+ * - appearance="primary"
+ * - iconBefore="square-plus" for plus icon
  * - width: 194px (fixed width)
  */
 export const Overview = () => (
@@ -32,10 +31,9 @@ export const Overview = () => (
             <div style={{ width: '194px' }}>
                 <Button
                     text="Check my schedule"
-                    leadingVisual="eye"
-                    style="primary"
-                    fill="filled"
-                    block
+                    iconBefore="eye"
+                    appearance="primary"
+                    shouldFitContainer
                 />
             </div>
         </section>
@@ -49,10 +47,9 @@ export const Overview = () => (
 export const CheckScheduleButton = ({ text = "Check my schedule", ...props }) => (
     <Button
         text={text}
-        leadingVisual="eye"
-        style="primary"
-        fill="filled"
-        block
+        iconBefore="eye"
+        appearance="primary"
+        shouldFitContainer
         {...props}
     />
 );

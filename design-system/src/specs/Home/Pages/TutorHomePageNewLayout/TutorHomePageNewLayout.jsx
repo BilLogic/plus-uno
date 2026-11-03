@@ -101,21 +101,17 @@ const SESSION_COPY = {
 const PagerControls = ({ label, onPrevious, onNext, previousDisabled, nextDisabled }) => (
     <>
         <Button
-            style="primary"
-            fill="outline"
-            size="small"
-            leadingVisual="arrow-left"
+            spacing="compact"
+            iconBefore="arrow-left"
             onClick={onPrevious}
-            disabled={previousDisabled}
+            isDisabled={previousDisabled}
             aria-label={`Previous ${label}`}
         />
         <Button
-            style="primary"
-            fill="outline"
-            size="small"
-            leadingVisual="arrow-right"
+            spacing="compact"
+            iconBefore="arrow-right"
             onClick={onNext}
-            disabled={nextDisabled}
+            isDisabled={nextDisabled}
             aria-label={`Next ${label}`}
         />
     </>
@@ -224,8 +220,8 @@ const TutorHomePageNewLayout = ({
                 className="plus-home-new__header"
                 actions={(
                     <>
-                        <Button text="Sign up now" style="primary" fill="filled" leadingVisual="paper-plane" />
-                        <Button text="View schedule" style="secondary" fill="tonal" />
+                        <Button text="Sign up now" appearance="primary" iconBefore="paper-plane" />
+                        <Button text="View schedule" />
                     </>
                 )}
             >
@@ -233,7 +229,7 @@ const TutorHomePageNewLayout = ({
                     <img className="plus-home-new__callout-art" src={badgeThumbnail} alt="" />
                     <p className="plus-home-new__callout-title">Certified Tutor</p>
                     <p className="plus-home-new__secondary">20/20 lessons complete</p>
-                    <Button text="Claim" style="secondary" fill="tonal" className="plus-home-new__callout-action" />
+                    <Button text="Claim" className="plus-home-new__callout-action" />
                 </div>
             </PatternSection>
 
@@ -255,7 +251,7 @@ const TutorHomePageNewLayout = ({
                     <p className="plus-home-new__body">{SESSION_COPY[sessionTab]}</p>
                     {sessionTab === 'sign-up' && (
                         <div className="plus-home-new__inline">
-                            <Button text="Edit sign-ups" style="secondary" fill="tonal" leadingVisual="pen" />
+                            <Button text="Edit sign-ups" iconBefore="pen" />
                         </div>
                     )}
                     {sessionTab === 'session' && (
@@ -268,7 +264,7 @@ const TutorHomePageNewLayout = ({
                                     value={selectedSession ?? ''}
                                     onChange={setSelectedSession}
                                 />
-                                <Button text="Join session" style="primary" fill="filled" disabled={!selectedSession} />
+                                <Button text="Join session" appearance="primary" isDisabled={!selectedSession} />
                             </div>
                             <Alert style="warning" dismissible={false}>
                                 Session links will appear 5 minutes before your scheduled start time.
@@ -277,7 +273,7 @@ const TutorHomePageNewLayout = ({
                     )}
                     {sessionTab === 'reflection' && (
                         <div className="plus-home-new__inline">
-                            <Button text="Submit Your Reflection" style="primary" fill="filled" leadingVisual="paper-plane" />
+                            <Button text="Submit Your Reflection" appearance="primary" iconBefore="paper-plane" />
                         </div>
                     )}
                 </div>
@@ -377,7 +373,7 @@ const TutorHomePageNewLayout = ({
                                 padding="sm"
                                 title={lesson.title}
                                 image={lesson.image && <img className="plus-home-new__thumb" src={lesson.image} alt="" />}
-                                footer={<Button text="Review" style="secondary" fill="tonal" aria-label={`Review ${lesson.title}`} onClick={() => onReviewLesson?.(lesson.id)} />}
+                                footer={<Button text="Review" aria-label={`Review ${lesson.title}`} onClick={() => onReviewLesson?.(lesson.id)} />}
                             >
                                 <div className="plus-home-new__inline plus-home-new__inline--wrap">
                                     {CATEGORY_AREA[lesson.category]

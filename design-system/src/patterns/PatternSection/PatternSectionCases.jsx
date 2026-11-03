@@ -63,7 +63,7 @@ export const CardOwnsCommit = () => (
             <PatternCard
                 title="Note for Thursday"
                 description="Visible to the tutor lead"
-                footer={<Button text="Save note" style="primary" fill="filled" size="small" onClick={() => {}} />}
+                footer={<Button text="Save note" appearance="primary" spacing="compact" onClick={() => {}} />}
             >
                 {noteBody}
             </PatternCard>
@@ -77,7 +77,7 @@ export const SectionFooterCommits = () => (
         <PatternSection
             title="Session notes"
             description="Thursday · Algebra I"
-            footer={<Button text="Save note" style="primary" fill="text" size="small" onClick={() => {}} />}
+            footer={<Button text="Save note" appearance="subtle" spacing="compact" onClick={() => {}} />}
         >
             <PatternCard title="Note for Thursday" description="Visible to the tutor lead">
                 {noteBody}

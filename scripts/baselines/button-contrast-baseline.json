@@ -1,11 +1,7 @@
 {
-  "measured": "2026-08-29",
+  "measured": "2026-11-03",
   "why": "Color-token decisions Button cannot make for itself. The set may shrink and must never grow: an entry that stops failing is itself reported, so a fix cannot be made and then quietly forgotten here.",
   "contrast": [],
-  "duplicates": [
-    "info+tertiary"
-  ],
-  "notes": {
-    "info+tertiary": "--color-info is `var(--color-tertiary)` in _colors.scss, and so is every other info slot. Decided 2026-10-24: info keeps the alias, so the shared ground is intended. Recorded so a second duplicate still fails."
-  }
+  "duplicates": [],
+  "notes": {}
 }

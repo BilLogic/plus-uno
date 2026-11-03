@@ -168,9 +168,7 @@ const TrainingProgressCard = ({
                                 </p>
                                 <Button
                                     text="Continue Training"
-                                    style="secondary"
-                                    fill="tonal"
-                                    size="small"
+                                    spacing="compact"
                                     onClick={onContinueClick}
                                 />
                             </div>

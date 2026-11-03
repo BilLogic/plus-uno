@@ -106,10 +106,10 @@ const DuringSpecificDayPeriodModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <CancelButton block />
+                <CancelButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <ConfirmCancelButton block />
+                <ConfirmCancelButton shouldFitContainer />
             </div>
         </div>
     </div>

@@ -212,9 +212,7 @@ export const FillInTableRow = ({
             >
                 <Button
                     text="Fill in"
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                     onClick={onFillIn}
                 />
             </div>

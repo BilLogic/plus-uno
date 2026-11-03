@@ -94,8 +94,8 @@ Components automatically apply appropriate typography based on size prop:
 <h2 className="h2">Section Heading</h2>
 
 // Component with size prop
-<Button size="medium">Medium Button</Button>  // Uses h6 typography
-<Button size="small">Small Button</Button>    // Uses body3-txt
+<Button appearance="primary">Medium Button</Button>  // Uses h6 typography
+<Button appearance="primary" spacing="compact">Small Button</Button>    // Uses body3-txt
 ```
 
 ## Rules

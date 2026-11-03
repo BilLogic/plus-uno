@@ -1,57 +1,53 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonStories from './Button.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button } from '@/components';
 import {
-    ColorStylesSection,
-    FillTreatmentsSection,
-    InteractionStatesSection,
-    ButtonContentSection,
-    LayoutSection,
-    SizesDocDescription
-} from './button-segmented-demos.jsx';
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
-    "style": {
+    "appearance": {
       "type": "enum",
       "values": [
+        "default",
         "primary",
-        "secondary",
-        "tertiary",
-        "success",
+        "subtle",
         "warning",
         "danger",
-        "info",
+        "discovery"
+      ]
+    },
+    "spacing": {
+      "type": "enum",
+      "values": [
         "default",
-        "social-emotional",
-        "mastering-content",
-        "advocacy",
-        "relationship",
-        "technology-tools"
+        "compact"
       ]
     },
-    "fill": {
-      "type": "enum",
-      "values": [
-        "filled",
-        "tonal",
-        "outline",
-        "ghost",
-        "text"
-      ]
+    "iconBefore": {
+      "type": "string"
     },
-    "size": {
-      "type": "enum",
-      "values": [
-        "small",
-        "medium",
-        "large"
-      ]
+    "iconAfter": {
+      "type": "string"
     },
-    "disabled": {
+    "isSelected": {
+      "type": "boolean"
+    },
+    "isDisabled": {
+      "type": "boolean"
+    },
+    "isLoading": {
+      "type": "boolean"
+    },
+    "shouldFitContainer": {
       "type": "boolean"
     },
     "text": {
@@ -61,284 +57,13 @@ export const figmaMeta = {
   "sets": [
     {
       "id": "storybook-resources",
-      "name": "Buttons docs page (MDX link)",
+      "name": "Button page (Core)",
       "componentSetNodeId": "3497:19482",
       "isComponentSet": false,
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
       "source": "storybook-mdx",
       "status": "docs-page",
-      "notes": "Verified 2026-06-13: opens Buttons overview with all component sets — not a single component set. Use fill-specific sets below for write-back."
-    },
-    {
-      "id": "filled-buttons",
-      "name": "Filled buttons",
-      "componentSetNodeId": "33:2470",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=33-2470",
-      "codeDefaults": {
-        "fill": "filled"
-      },
-      "variantProps": {
-        "size": "size",
-        "style": "style",
-        "state": "state"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        },
-        "state": {
-          "rest (default)": {
-            "disabled": false,
-            "active": false
-          },
-          "hover": {
-            "disabled": false,
-            "active": false
-          },
-          "pressed": {
-            "disabled": false,
-            "active": true
-          },
-          "focus": {
-            "disabled": false,
-            "active": false
-          },
-          "disabled": {
-            "disabled": true,
-            "active": false
-          }
-        }
-      },
-      "status": "verified",
-      "verifiedAt": "2026-06-13"
-    },
-    {
-      "id": "tonal-buttons",
-      "name": "Tonal buttons",
-      "componentSetNodeId": "979:20977",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-20977",
-      "codeDefaults": {
-        "fill": "tonal"
-      },
-      "variantProps": {
-        "size": "size",
-        "style": "style",
-        "state": "state"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        },
-        "state": {
-          "rest (default)": {
-            "disabled": false,
-            "active": false
-          },
-          "hover": {
-            "disabled": false,
-            "active": false
-          },
-          "pressed": {
-            "disabled": false,
-            "active": true
-          },
-          "focus": {
-            "disabled": false,
-            "active": false
-          },
-          "disabled": {
-            "disabled": true,
-            "active": false
-          }
-        }
-      },
-      "status": "verified",
-      "verifiedAt": "2026-06-13"
-    },
-    {
-      "id": "outlined-buttons",
-      "name": "Outlined buttons",
-      "componentSetNodeId": "968:18597",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=968-18597",
-      "codeDefaults": {
-        "fill": "outline"
-      },
-      "variantProps": {
-        "size": "size",
-        "style": "style",
-        "state": "state"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        },
-        "state": {
-          "rest (default)": {
-            "disabled": false,
-            "active": false
-          },
-          "hover": {
-            "disabled": false,
-            "active": false
-          },
-          "pressed": {
-            "disabled": false,
-            "active": true
-          },
-          "focus": {
-            "disabled": false,
-            "active": false
-          },
-          "disabled": {
-            "disabled": true,
-            "active": false
-          }
-        }
-      },
-      "status": "verified",
-      "verifiedAt": "2026-06-13"
-    },
-    {
-      "id": "text-buttons",
-      "name": "Text buttons",
-      "componentSetNodeId": "979:19814",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=979-19814",
-      "codeDefaults": {
-        "fill": "text"
-      },
-      "variantProps": {
-        "size": "size",
-        "style": "style",
-        "state": "state"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        },
-        "state": {
-          "rest (default)": {
-            "disabled": false,
-            "active": false
-          },
-          "hover": {
-            "disabled": false,
-            "active": false
-          },
-          "pressed": {
-            "disabled": false,
-            "active": true
-          },
-          "focus": {
-            "disabled": false,
-            "active": false
-          },
-          "disabled": {
-            "disabled": true,
-            "active": false
-          }
-        }
-      },
-      "status": "verified",
-      "verifiedAt": "2026-06-13"
-    },
-    {
-      "id": "vertical-outlined-buttons",
-      "name": "Vertical outlined buttons",
-      "componentSetNodeId": "7204:9586",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-9586",
-      "codeDefaults": {
-        "fill": "outline",
-        "vertical": true
-      },
-      "variantProps": {
-        "size": "size",
-        "style": "style",
-        "state": "state"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        },
-        "state": {
-          "rest (default)": {
-            "disabled": false,
-            "active": false
-          },
-          "hover": {
-            "disabled": false,
-            "active": false
-          },
-          "pressed": {
-            "disabled": false,
-            "active": true
-          },
-          "focus": {
-            "disabled": false,
-            "active": false
-          },
-          "disabled": {
-            "disabled": true,
-            "active": false
-          }
-        }
-      },
-      "status": "verified",
-      "verifiedAt": "2026-06-13",
-      "notes": "Maps to Button with fill=outline and vertical=true."
-    },
-    {
-      "id": "button-base",
-      "name": "_Button",
-      "componentSetNodeId": "31:548",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=31-548",
-      "codeDefaults": {},
-      "variantProps": {
-        "size": "size"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        }
-      },
-      "source": "designer-supplied",
-      "status": "verified",
-      "isComponentSet": true,
-      "notes": "The base shape every horizontal fill set nests, by size only (3 variants): the label row, padding and corners. Not used on its own; in code it is Button's size, with fill, style and state coming from the fill set around it."
-    },
-    {
-      "id": "vertical-button-base",
-      "name": "_Vertical_Button",
-      "componentSetNodeId": "7204:6902",
-      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=7204-6902",
-      "codeDefaults": {
-        "vertical": true
-      },
-      "variantProps": {
-        "size": "size"
-      },
-      "variantValueMap": {
-        "size": {
-          "small": "small",
-          "medium (default)": "medium",
-          "large": "large"
-        }
-      },
-      "source": "designer-supplied",
-      "status": "verified",
-      "isComponentSet": true,
-      "notes": "The base shape that Vertical outlined buttons nest, by size only (3 variants): icon over label. Not used on its own; in code it is Button with vertical=true and a size."
+      "notes": "The Button page in Core: Updated components, Docs and Playground. Read-only from code."
     }
   ]
 };
@@ -346,7 +71,7 @@ export const figmaMeta = {
 <Meta of={ButtonStories} />
 
 <Title />
-Buttons are interactive elements that are used to perform actions on a page.
+A button triggers an action and lets people know what happens next.
 
 <DocsTabs of={ButtonStories}>
 
@@ -367,7 +92,7 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Default primary filled button at medium size—typical call-to-action usage.</>}
+    description={<>A primary button at default spacing: the call to action of a page or area. <a href="https://atlassian.design/components/button">ADS documentation</a></>}
 >
     <Canvas
         of={ButtonStories.Overview}
@@ -381,30 +106,87 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Anatomy
 
-<ButtonContentSection />
+<DocsCanvasShell description={<>A button with an icon before and an icon after the label.</>}>
+    <Canvas of={ButtonStories.Icons} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-</div>
+1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
+2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
+3. **Label.** Body/default at the medium weight. It says what the action does.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
+5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
 
-<div className="sb-ds-doc-section">
-
-## Appearance
-
-<div className="space-y-10 md:space-y-12">
-    <ColorStylesSection />
-    <FillTreatmentsSection />
-
-</div>
+Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Sizes
+## Properties
 
-<DocsCanvasShell description={<SizesDocDescription />}>
-    <Canvas of={ButtonStories.SizesFilledRow} story={{ inline: true }} sourceState="none" />
+<DocsTable>
+<thead>
+<tr><th>Property</th><th>Values</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>text</code></td><td>string</td><td>none</td><td>The label. Children work too.</td></tr>
+<tr><td><code>appearance</code></td><td><code>default</code>, <code>primary</code>, <code>subtle</code>, <code>warning</code>, <code>danger</code>, <code>discovery</code></td><td><code>default</code></td><td>The visual style.</td></tr>
+<tr><td><code>spacing</code></td><td><code>default</code> (32), <code>compact</code> (24)</td><td><code>default</code></td><td>Height and padding. Compact is for tables and tight toolbars.</td></tr>
+<tr><td><code>iconBefore</code>, <code>iconAfter</code></td><td>a Font Awesome Free glyph name, or a node</td><td>none</td><td>An icon before or after the label.</td></tr>
+<tr><td><code>isSelected</code></td><td>boolean</td><td><code>false</code></td><td>Marks the button selected and sets <code>aria-pressed</code>.</td></tr>
+<tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Prevents interaction. Avoid it; see Usage.</td></tr>
+<tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>Shows a spinner in place of the label and blocks interaction.</td></tr>
+<tr><td><code>shouldFitContainer</code></td><td>boolean</td><td><code>false</code></td><td>Stretches the button to the width of its container.</td></tr>
+<tr><td><code>href</code>, <code>target</code></td><td>string</td><td>none</td><td>Renders an anchor. Use it for navigation.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+### Appearance
+
+<DocsCanvasShell description={<>One of each appearance.</>}>
+    <Canvas of={ButtonStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most actions that are not the main call to action of a page or area. Less prominent than primary. Example: "Reschedule session".</td></tr>
+<tr><td>Primary</td><td>The main call to action or a form submission. One per page or area. Example: "Book session".</td></tr>
+<tr><td>Subtle</td><td>Secondary actions next to a primary button, and places where it is already clear items are interactive, such as toolbars and button groups. Example: "Cancel" beside "Save notes".</td></tr>
+<tr><td>Warning</td><td>Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week".</td></tr>
+<tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording".</td></tr>
+<tr><td>Discovery</td><td>The call to action for a new experience. Example: "Try the new schedule view".</td></tr>
+</tbody>
+</DocsTable>
+
+### Spacing
+
+<DocsCanvasShell description={<>Default draws 32; compact draws 24. Radius is 6 and 4, and the icon-to-label gap is 4.</>}>
+    <Canvas of={ButtonStories.Spacing} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### Width
+
+<DocsCanvasShell description={<><code>shouldFitContainer</code> fills the parent, as in a narrow Card footer or a mobile sheet.</>}>
+    <Canvas of={ButtonStories.FitContainer} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+### Truncation
+
+<DocsCanvasShell description={<>A label that does not fit ends in an ellipsis. Screen readers still read the full text.</>}>
+    <Canvas of={ButtonStories.Truncation} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -413,15 +195,47 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 ## States
 
-<InteractionStatesSection />
+<DocsCanvasShell description={<>Selected, disabled and loading. Hover, pressed and focus are the browser's own.</>}>
+    <Canvas of={ButtonStories.States} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the appearance's hovered fill. The label and icon keep their colors.</td></tr>
+<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## Tokens
 
-<LayoutSection />
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: primary, warning, danger, discovery</td><td><code>--ds-background-brand-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, <code>-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Label and icon</td><td><code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code> (default, subtle); <code>--ds-text-inverse</code> and <code>--ds-icon-inverse</code> (primary, danger, discovery); <code>--ds-text-warning-inverse</code> (warning); the selected and disabled roles.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Height</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>.</td></tr>
+<tr><td>Padding</td><td>12: <code>--element-pad-x-md</code>. Compact 8: <code>--element-pad-x-sm</code>.</td></tr>
+<tr><td>Radius</td><td>6: <code>--element-radius-item-sm</code>. Compact 4: <code>--element-radius-md</code>.</td></tr>
+<tr><td>Icon-to-label gap</td><td>4: <code>--element-inline-sm</code>.</td></tr>
+<tr><td>Label</td><td>Body/default at the medium weight; icons at 16 (<code>--icon-md</code>).</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -452,55 +266,53 @@ Buttons are interactive elements that are used to perform actions on a page.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `Button` for anything the user *does*: submit, confirm, open a dialog, run an
-export, dismiss a step. It is the only component in `actions` that carries a
-click handler of its own, and it is the element the rest of the system composes
-when it needs an action — `Modal`, `Card` and `Jumbotron` all render `Button`
-from their `primaryButton` / `secondaryButton` props.
+Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, pass `href` so it renders a link.
 
-Use it for navigation too, but pass `href`: the component forwards `href` and
-`target` to the underlying element, which renders an anchor. That keeps
-middle-click and "open in new tab" working, which a click handler on a `button`
-does not.
+### One primary action per area.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: '8px' }}><Button appearance="primary" text="Book session" /><Button appearance="subtle" text="Cancel" /></div>}
+    doCaption="One primary button, with the secondary action subtle beside it."
+    dontExample={<div style={{ display: 'flex', gap: '8px' }}><Button appearance="primary" text="Book session" /><Button appearance="primary" text="Cancel" /></div>}
+    dontCaption="Two primary buttons in one area compete for attention."
+/>
+
+### Pick the spacing for the surrounding space.
+
+Default spacing for most places; compact for tables and tight spaces, such as a row of student sessions.
+
+### Keep a form's submit button pressable.
+
+<DoDontPair
+    doExample={<div><Button appearance="primary" text="Save notes" /><p style={{ margin: '8px 0 0' }}>Complete the session notes to continue.</p></div>}
+    doCaption="Explain what is missing with validation text under the field."
+    dontExample={<Button appearance="primary" text="Save notes" isDisabled />}
+    dontCaption="A disabled submit button gives no direction and leaves the tab order."
+/>
+
+### Align the primary button with its group.
+
+Right-align buttons in focused tasks and modal dialogs, with the primary on the right. Left-align on single-page forms and full-page tasks with a lot of content, with the primary on the left.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Content guidelines
 
-### Loading is not a substitute for feedback.
-
-```jsx
-// Incorrect — the label goes transparent, so for a ten-second export the
-// button reads as an empty box for ten seconds.
-<Button text="Export report" loading={isExporting} />
-
-// Correct — keep the label, and say what is happening next to it.
-<Button text="Export report" disabled={isExporting} />
-{isExporting && <Spinner />}
-```
-
-### `style` carries two vocabularies; only one of them means severity.
-
-`success`, `warning` and `danger` say something happened. The five SMART
-domains — `social-emotional`, `mastering-content`, `advocacy`, `relationship`,
-`technology-tools` — are subject colors, and a button wearing one is about
-that domain, not about an outcome. The props table lists all thirteen values
-side by side; the enum does not tell you which half you are in.
-
-```jsx
-// Incorrect — advocacy is the color of a curriculum domain. Nothing about it
-// says "this deletes something".
-<Button text="Delete session" style="advocacy" />
-
-// Correct — severity from the semantic set, domain color where the button is
-// genuinely about that domain.
-<Button text="Delete session" style="danger" />
-<Button text="Open advocacy plan" style="advocacy" />
-```
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use sentence case: "Add student".</td><td>Title case or all capitals: "Add Student", "ADD STUDENT".</td></tr>
+<tr><td>Keep the label short and free of punctuation: "Save notes".</td><td>"Save the notes for this session."</td></tr>
+<tr><td>Start with a verb and name what is acted on: "Confirm session time".</td><td>Vague labels such as "OK", "Yes" or "Submit".</td></tr>
+<tr><td>Use the same words as the heading and related text in view.</td><td>Different words for the same action within one view.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -508,50 +320,37 @@ side by side; the enum does not tell you which half you are in.
 
 ## Accessibility
 
-- **Icon-only sizing.** With no `text` and no children the component adds
-  `plus-btn--icon-only`, which sets a square box: 32×32 at `medium` and 24×24
-  at `small`. `large` is deprecated and draws 32×32 like `medium`. No size
-  meets the 44×44 minimum in
-  `design-system/guidelines/foundations/accessibility.md`, so leave room
-  around an icon-only button, and give it a text label where touch matters.
-- **Icon-only naming.** A string `leadingVisual` / `trailingVisual` renders as
-  `<i aria-hidden="true">`, so an icon-only button has no accessible name unless
-  you pass `aria-label` or the `title` prop.
-- **Loading.** `loading` sets `disabled` and `aria-disabled`, drops the click
-  handler, and the stylesheet paints the label transparent while a CSS spinner
-  runs. Nothing is announced. If the wait matters to a screen-reader user, put
-  the status in a live region beside the button.
-- **Disabled.** `disabled` sets both the native attribute and `aria-disabled`.
-  A natively disabled button leaves the tab order, so any explanation of *why*
-  it is disabled must live outside the button, where it can still be reached.
-- **Pass-through.** Unrecognized props are spread onto the rendered element, so
-  `aria-pressed`, `aria-expanded`, `aria-controls` and `aria-describedby` all
-  work without a wrapper.
+- A button performs an action; a link navigates. Use the right element so screen readers announce the right role.
+- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Use validation and on-screen directions instead, and never attach a tooltip to one.
+- An icon-only button needs a name: pass `aria-label`.
+- Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
+- Selected is not color alone: `isSelected` sets `aria-pressed`.
+- The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
-### An icon-only button needs a name and needs room.
+</div>
 
-```jsx
-// Incorrect — no text and no children means icon-only, which renders 32×32
-// at the default medium size with no accessible name at all.
-<Button leadingVisual="trash" style="danger" />
+<div className="sb-ds-doc-section">
 
-// Correct — the name is supplied by hand, and where touch matters the
-// button carries its label too.
-<Button leadingVisual="trash" style="danger" aria-label="Delete session" />
-<Button leadingVisual="trash" style="danger" text="Delete session" />
-```
+## ADS parity
 
-### A group of buttons is not a selection control.
+<DocsTable>
+<thead>
+<tr><th>ADS</th><th>PLUS</th><th>Note</th></tr>
+</thead>
+<tbody>
+<tr><td><code>appearance</code>: default, primary, subtle, warning, danger, discovery</td><td>Same six</td><td>Matches.</td></tr>
+<tr><td>An AI-branded appearance</td><td>Not adopted</td><td>PLUS has no such action.</td></tr>
+<tr><td><code>spacing</code>: default, compact</td><td>Same; 32 and 24</td><td>Matches.</td></tr>
+<tr><td><code>iconBefore</code>, <code>iconAfter</code> (Atlassian icon components)</td><td>Same props; a Font Awesome Free glyph name or a node at 16</td><td>The icon library differs.</td></tr>
+<tr><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code></td><td>Same</td><td>Selected keeps the blue selected role; ADS moves it to a neutral treatment behind a flag.</td></tr>
+<tr><td><code>shouldFitContainer</code></td><td>Same</td><td>Matches.</td></tr>
+<tr><td>Radius 6 at default spacing and 4 at compact</td><td>Same</td><td><code>--element-radius-item-sm</code> and <code>--element-radius-md</code>.</td></tr>
+<tr><td>Text truncates with an ellipsis</td><td>Same</td><td>One line, ellipsis at the end.</td></tr>
+<tr><td><code>CustomThemeButton</code> (deprecated)</td><td>Not built</td><td>ADS recommends Pressable.</td></tr>
+</tbody>
+</DocsTable>
 
-```jsx
-// Incorrect — `active` is a class. Nothing announces which one is chosen.
-<Button text="Week" active={range === 'week'} onClick={() => setRange('week')} />
-<Button text="Month" active={range === 'month'} onClick={() => setRange('month')} />
-
-// Correct — extra props are spread onto the element, so state can be declared.
-<Button text="Week" active={range === 'week'} aria-pressed={range === 'week'}
-        onClick={() => setRange('week')} />
-```
+[ADS documentation: Button](https://atlassian.design/components/button)
 
 </div>
 
@@ -559,10 +358,11 @@ side by side; the enum does not tell you which half you are in.
 
 ## Related
 
+- To act with an icon alone, use Icon button.
+- To navigate in the look of text, use Link button.
 - For a set of choices the user picks between, use `ChoiceGroup`.
 - For a menu of actions behind one trigger, use `Dropdown`.
 - To show that work is under way on the page rather than in the control, use `Progress`.
-- To label a state rather than act on it, use `Badge`.
 
 </div>
 

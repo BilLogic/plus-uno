@@ -102,7 +102,7 @@ const Home = () => {
                             <AvatarGroup people={students} label={`Your students: ${students.map((s) => firstName(s.name)).join(', ')}`} />
                         </div>
                     </div>
-                    <LinkButton to={sessionPath} text="Open session" style="default" fill="ghost" size="small" trailingVisual="chevron-right" />
+                    <LinkButton to={sessionPath} text="Open session" appearance="subtle" spacing="compact" iconAfter="chevron-right" />
                 </div>
 
                 <div className="tr-home__prep">
@@ -117,7 +117,7 @@ const Home = () => {
                 </div>
 
                 <div className="tr-home__join">
-                    <Button text="Join session" style="primary" fill="filled" disabled aria-describedby="home-join-note" />
+                    <Button text="Join session" appearance="primary" isDisabled aria-describedby="home-join-note" />
                     <span id="home-join-note" className="tr-home__note">{`Join opens at ${MATH_7.joinOpensAt}`}</span>
                 </div>
             </PatternCard>
@@ -130,7 +130,7 @@ const Home = () => {
                             <b>{`Reflect on ${ALGEBRA_1.title}`}</b>
                             <span>{`${ALGEBRA_1.shortDate} session`}</span>
                         </span>
-                        <LinkButton to={`/sessions/${ALGEBRA_1.id}/after`} text="Continue reflection" style="default" fill="outline" size="small" />
+                        <LinkButton to={`/sessions/${ALGEBRA_1.id}/after`} text="Continue reflection" appearance="default" spacing="compact" />
                     </div>
                 </div>
                 <div className="tr-home__stack tr-home__stack--tight">
@@ -144,12 +144,12 @@ const Home = () => {
             </PatternCard>
 
             <PatternCard className="tr-home__card tr-home__span-8" padding="lg" role="region" aria-labelledby="home-students">
-                <CardHead id="home-students" title="Your students this week" end={<LinkButton to="/students" text="All students" style="default" fill="ghost" size="small" />} />
+                <CardHead id="home-students" title="Your students this week" end={<LinkButton to="/students" text="All students" appearance="subtle" spacing="compact" />} />
                 <RevealRows columns="minmax(0, 1fr) 136px 150px 64px" label="Your students">
                     {students.map((s) => (
                         <RevealRow
                             key={s.id}
-                            action={<LinkButton to={`/students/${s.id}`} text="Open" style="default" fill="tonal" size="small" aria-label={`Open ${s.name}`} />}
+                            action={<LinkButton to={`/students/${s.id}`} text="Open" appearance="default" spacing="compact" aria-label={`Open ${s.name}`} />}
                         >
                             <span className="tr-home__student">
                                 <Avatar initials={s.initials} tone={s.tone} size="md" />
@@ -163,7 +163,7 @@ const Home = () => {
             </PatternCard>
 
             <PatternCard className="tr-home__card tr-home__span-4" padding="lg" role="region" aria-labelledby="home-picked">
-                <CardHead id="home-picked" title="Picked for you" end={<LinkButton to="/lessons" text="All lessons" style="default" fill="ghost" size="small" />} />
+                <CardHead id="home-picked" title="Picked for you" end={<LinkButton to="/lessons" text="All lessons" appearance="subtle" spacing="compact" />} />
                 <Link className="tr-home__pick" to={`/lessons/${PICKED_LESSON.id}`}>
                     <img src={PICKED_LESSON.image} alt="" />
                     <span className="tr-home__pick-title">{PICKED_LESSON.title}</span>

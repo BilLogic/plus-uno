@@ -139,21 +139,20 @@ const Card = ({
                         <div className="plus-card-action-button ms-auto">
                             <Button
                                 text={actionButton.text || 'Action'}
-                                style={actionButton.style || 'primary'}
-                                fill={actionButton.fill || 'filled'}
-                                size={actionButton.size || 'medium'}
+                                appearance={actionButton.appearance || 'primary'}
+                                spacing={actionButton.spacing}
                                 onClick={(e) => {
                                     if (e) e.stopPropagation();
                                     if (actionButton.onClick) actionButton.onClick(e);
                                 }}
-                                leadingVisual={
-                                    actionButton.leadingVisual
+                                iconBefore={
+                                    actionButton.iconBefore
                                     ?? ((actionButton.iconPosition || 'left') !== 'right'
                                         ? actionButton.icon
                                         : undefined)
                                 }
-                                trailingVisual={
-                                    actionButton.trailingVisual
+                                iconAfter={
+                                    actionButton.iconAfter
                                     ?? ((actionButton.iconPosition || 'left') === 'right'
                                         ? actionButton.icon
                                         : undefined)
@@ -186,15 +185,12 @@ Card.propTypes = {
     actionButton: PropTypes.shape({
         text: PropTypes.string,
         onClick: PropTypes.func,
-        style: PropTypes.string,
-        fill: PropTypes.string,
-        size: PropTypes.string,
-        /** Preferred: maps to Button `leadingVisual` / `trailingVisual` */
-        leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-        trailingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-        /** @deprecated Prefer leadingVisual/trailingVisual */
+        appearance: PropTypes.string,
+        spacing: PropTypes.string,
+        /** Maps to Button `iconBefore` / `iconAfter` */
+        iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+        iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
         icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-        /** @deprecated Prefer leadingVisual/trailingVisual */
         iconPosition: PropTypes.oneOf(['left', 'right']),
     }),
     paddingSize: PropTypes.oneOf(['sm', 'md', 'lg']),

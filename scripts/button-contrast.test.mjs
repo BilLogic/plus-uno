@@ -8,9 +8,9 @@
  * `scripts/lib/ratchet.mjs` in #599, where it is asserted against every live
  * baseline record by `scripts/lib/ratchet-conformance.mjs` — and in #600 this
  * check's own read of its record went with it. What is tested here is what
- * stayed: reading the `$btn-themes` map, building a ground per style × fill,
- * the duplicate-ground assertion, the two sides the record is written in, and
- * the wording of every verdict the ratchet can hand back.
+ * stayed: reading the `$btn-appearances` map, building a ground per appearance
+ * and state, the duplicate-ground assertion, the two sides the record is
+ * written in, and the wording of every verdict the ratchet can hand back.
  *
  * The point of this file is that the check can FAIL. A guard exercised only
  * against the repo, which is green by construction once the baseline is
@@ -21,6 +21,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { toHex } from '../design-system/src/lib/tokens.mjs';
 import {
   combination,
   duplicateGrounds,
@@ -48,87 +49,90 @@ test('tokenValues reads both color vocabularies and the ramps --ds- tokens alias
   assert.equal(values.has('--space-2'), false);
 });
 
-test('a theme map written in --ds- tokens is swept like a --color- one', () => {
+test('a map written in --ds- tokens is swept through the palette aliases', () => {
   const values = tokenValues(`:root {
     --color-surface: #f9f9fc;
     --palette-lagoon-700: #147b84;
     --palette-neutral-0: #ffffff;
-    --palette-lagoon-100: #e6f4f5;
-    --palette-lagoon-800: #106972;
     --palette-yellow-300: #f5e08a;
     --ds-background-brand-bold: var(--palette-lagoon-700);
+    --ds-background-brand-bold-hovered: var(--palette-lagoon-700);
+    --ds-background-brand-bold-pressed: var(--palette-lagoon-700);
     --ds-text-inverse: var(--palette-neutral-0);
-    --ds-background-brand-subtlest: var(--palette-lagoon-100);
-    --ds-text-brand: var(--palette-lagoon-800);
-    --ds-text-warning: var(--palette-yellow-300);
+    --ds-text-pale: var(--palette-yellow-300);
   }`);
   const themes = themeMap(`
-$btn-themes: (
-    'brand': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-background-brand-subtlest', '--ds-text-brand'),
-    'pale': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-background-brand-subtlest', '--ds-text-warning')
+$btn-appearances: (
+    'brand': ('--ds-background-brand-bold', '--ds-text-inverse', '--i', '--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', 'transparent'),
+    'pale': ('--ds-background-brand-bold', '--ds-text-pale', '--i', '--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', 'transparent')
 );`);
   const rows = sweep(themes, values);
   assert.equal(rows.filter((row) => row.ratio === null).length, 0, 'every --ds- slot resolves through its palette alias');
-  assert.deepEqual(measured(themes, values).contrast, ['pale/tonal', 'pale/outline', 'pale/ghost', 'pale/text']);
+  assert.deepEqual(measured(themes, values).contrast, ['pale/rest', 'pale/hovered', 'pale/pressed']);
   assert.deepEqual(measured(themes, values).duplicates, ['brand+pale']);
 });
 
 test('themeMap reads the map rather than a copy of it', () => {
   const themes = themeMap(`
-$btn-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-hovered', '--color-primary-text', '--c', '--oc'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-hovered', '--color-danger-text', '--c', '--oc')
+$btn-appearances: (
+    'primary': ('--g', '--l', '--i', '--h', '--p', 'transparent'),
+    'danger': ('--dg', '--dl', '--di', '--dh', '--dp', '--e')
 );`);
   assert.equal(themes.length, 2);
   assert.deepEqual(themes[0], {
-    style: 'primary',
-    main: '--color-primary',
-    onMain: '--color-on-primary',
-    state: '--color-primary-hovered',
-    text: '--color-primary-text',
+    appearance: 'primary',
+    ground: '--g',
+    label: '--l',
+    icon: '--i',
+    hovered: '--h',
+    pressed: '--p',
+    edge: 'transparent',
   });
 });
 
-/** A two-style map with one failing combination, built to fail. */
+/** A two-appearance map with one failing combination, built to fail. */
 const FAILING = {
   themes: [
-    { style: 'ok', main: '--ok', onMain: '--on-ok', state: '--ok-08', text: '--ok-text' },
-    { style: 'bad', main: '--bad', onMain: '--on-bad', state: '--bad-08', text: '--bad-text' },
+    { appearance: 'ok', ground: '--ok', label: '--on-ok', hovered: '--ok', pressed: '--ok', edge: 'transparent' },
+    { appearance: 'bad', ground: '--bad', label: '--on-bad', hovered: '--ok', pressed: '--ok', edge: 'transparent' },
   ],
   values: new Map([
     ['--color-surface', '#ffffff'],
     ['--ok', '#00404a'], ['--on-ok', '#ffffff'],
-    ['--ok-08', 'rgba(0, 64, 74, 0.08)'], ['--ok-text', '#00404a'],
     ['--bad', '#9f8205'], ['--on-bad', '#ffffff'],
-    ['--bad-08', 'rgba(159, 130, 5, 0.08)'], ['--bad-text', '#5b4a00'],
   ]),
 };
 
-test('the sweep reports a filled label under AA', () => {
+test('the sweep reports a label under AA', () => {
   const rows = sweep(FAILING.themes, FAILING.values);
-  const bad = rows.find((row) => row.style === 'bad' && row.fill === 'filled');
+  const bad = rows.find((row) => row.appearance === 'bad' && row.state === 'rest');
   assert.ok(bad.ratio < 4.5, `expected a failure, got ${bad.ratio}`);
-  const ok = rows.find((row) => row.style === 'ok' && row.fill === 'filled');
+  const ok = rows.find((row) => row.appearance === 'ok' && row.state === 'rest');
   assert.ok(ok.ratio >= 4.5);
 });
 
-test('a tonal ground is composited, so an 8% state layer is not read as paint', () => {
-  const rows = sweep(FAILING.themes, FAILING.values);
-  const tonal = rows.find((row) => row.style === 'bad' && row.fill === 'tonal');
-  // Read as solid this is ~1.3:1; composited over white it clears AA easily.
-  assert.ok(tonal.ratio > 4.5, `expected the composited ratio, got ${tonal.ratio}`);
+test('a transparent ground is the page, and an alpha step is composited over it', () => {
+  const values = new Map([
+    ['--color-surface', '#ffffff'], ['--label', '#000000'], ['--clear', 'transparent'], ['--step', 'rgba(0, 0, 0, 0.08)'],
+  ]);
+  const theme = { appearance: 'subtle', ground: '--clear', label: '--label', hovered: '--step', pressed: '--step', edge: 'transparent' };
+  const rest = combination(theme, 'rest', values);
+  assert.equal(toHex(rest.ground), '#ffffff');
+  const hovered = combination(theme, 'hovered', values);
+  assert.notEqual(toHex(hovered.ground), '#ffffff', 'an 8% step over white is not white');
+  assert.notEqual(toHex(hovered.ground), '#000000', 'and is not read as solid black');
 });
 
 test('the measured side is the record shape, and the failure is in it', () => {
   // What the ratchet is handed (#600): two arrays of keys, the shape
   // `scripts/baselines/button-contrast-baseline.json` holds.
-  assert.deepEqual(measured(FAILING.themes, FAILING.values), { contrast: ['bad/filled'], duplicates: [] });
+  assert.deepEqual(measured(FAILING.themes, FAILING.values), { contrast: ['bad/rest'], duplicates: [] });
 });
 
 test('findings words a failure the ratchet called new, and says nothing about a recorded one', () => {
-  const loud = findings(FAILING.themes, FAILING.values, { contrast: { fresh: ['bad/filled'] } });
+  const loud = findings(FAILING.themes, FAILING.values, { contrast: { fresh: ['bad/rest'] } });
   assert.equal(loud.length, 1);
-  assert.match(loud[0], /^bad\/filled: label is 3\.7:1/);
+  assert.match(loud[0], /^bad\/rest: label is 3\.7:1/);
 
   // Nothing new is nothing said. Which keys are new is the ratchet's call and
   // is asserted once, over all twelve records, in ratchet-conformance.mjs.
@@ -136,79 +140,53 @@ test('findings words a failure the ratchet called new, and says nothing about a 
 });
 
 test('a baseline entry that no longer fails is itself a finding', () => {
-  const found = findings(FAILING.themes, FAILING.values, { contrast: { stale: ['ok/filled'] } });
+  const found = findings(FAILING.themes, FAILING.values, { contrast: { stale: ['ok/rest'] } });
   assert.equal(found.length, 1);
-  assert.match(found[0], /baseline entry "ok\/filled" no longer fails/);
+  assert.match(found[0], /baseline entry "ok\/rest" no longer fails/);
 });
 
-test('duplicateGrounds finds two styles pointing at one color', () => {
+test('duplicateGrounds finds two appearances drawing one look, and an edge tells two apart', () => {
   const themes = [
-    { style: 'tertiary', main: '--t', onMain: '--on', state: '--s', text: '--x' },
-    { style: 'info', main: '--i', onMain: '--on', state: '--s', text: '--x' },
-    { style: 'danger', main: '--d', onMain: '--on', state: '--s', text: '--x' },
+    { appearance: 'a', ground: '--t', label: '--x', hovered: '--t', pressed: '--t', edge: 'transparent' },
+    { appearance: 'b', ground: '--i', label: '--x', hovered: '--t', pressed: '--t', edge: 'transparent' },
+    { appearance: 'c', ground: '--i', label: '--x', hovered: '--t', pressed: '--t', edge: '--line' },
   ];
   const values = new Map([
-    ['--color-surface', '#ffffff'],
-    ['--t', '#0e8175'], ['--i', 'var(--t)'], ['--d', '#ba1a1a'],
-    ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
+    ['--color-surface', '#ffffff'], ['--t', '#0e8175'], ['--i', 'var(--t)'], ['--x', '#ffffff'], ['--line', '#888888'],
   ]);
-  assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
-  assert.deepEqual(measured(themes, values).duplicates, ['info+tertiary']);
+  assert.deepEqual(duplicateGrounds(themes, values), [['a', 'b']]);
+  assert.deepEqual(measured(themes, values).duplicates, ['a+b']);
 
-  const found = findings(themes, values, { duplicates: { fresh: ['info+tertiary'] } });
-  assert.match(found.at(-1), /^info\+tertiary: these styles render the same filled ground/);
+  const found = findings(themes, values, { duplicates: { fresh: ['a+b'] } });
+  assert.match(found.at(-1), /^a\+b: these appearances draw the same ground and edge/);
   assert.deepEqual(findings(themes, values, {}), []);
 });
 
 test('a duplicate baseline entry that no longer duplicates is a finding', () => {
-  const themes = [{ style: 'solo', main: '--t', onMain: '--on', state: '--s', text: '--x' }];
-  const values = new Map([
-    ['--color-surface', '#ffffff'], ['--t', '#00404a'],
-    ['--on', '#ffffff'], ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
-  ]);
+  const themes = [{ appearance: 'solo', ground: '--t', label: '--x', hovered: '--t', pressed: '--t', edge: 'transparent' }];
+  const values = new Map([['--color-surface', '#ffffff'], ['--t', '#00404a'], ['--x', '#ffffff']]);
   const found = findings(themes, values, { duplicates: { stale: ['a+b'] } });
   assert.deepEqual(found, ['baseline entry "a+b" no longer duplicates — remove it']);
 });
 
 test('an unresolvable token is reported, not scored', () => {
-  const themes = [{ style: 'ghosted', main: '--missing', onMain: '--on', state: '--s', text: '--x' }];
-  const values = new Map([
-    ['--color-surface', '#ffffff'], ['--on', '#ffffff'],
-    ['--s', 'rgba(0,0,0,0.08)'], ['--x', '#000000'],
-  ]);
-  const built = combination(themes[0], 'filled', values);
+  const themes = [{ appearance: 'ghosted', ground: '--missing', label: '--x', hovered: '--x', pressed: '--x', edge: 'transparent' }];
+  const values = new Map([['--color-surface', '#ffffff'], ['--x', '#000000']]);
+  const built = combination(themes[0], 'rest', values);
   assert.deepEqual(built.unresolved, ['--missing']);
   assert.match(findings(themes, values)[0], /cannot resolve --missing/);
 });
 
-test('against the real repo, every label clears AA and the one duplicate is info', () => {
+test('against the real repo, every label clears AA and every appearance draws its own look', () => {
   const { values, themes } = readRepo();
   const rows = sweep(themes, values);
 
-  // Every combination resolves — no token in the map is missing.
+  // Every combination resolves: no token in the map is missing.
   assert.equal(rows.filter((row) => row.ratio === null).length, 0);
-
-  // No failures. Filled warning was the one at 3.70:1 with a white label; it
-  // takes the ink now and keeps its yellow, and the tightest row is that one.
   assert.deepEqual(rows.filter((row) => row.ratio < 4.5), []);
-  const warning = rows.find((row) => row.style === 'warning' && row.fill === 'filled');
-  assert.equal(warning.ratio, 4.62);
-
-  // And the one duplicate, kept: info is an alias of tertiary by decision.
-  assert.deepEqual(duplicateGrounds(themes, values), [['info', 'tertiary']]);
-});
-
-test('against the real repo, the generated --ds- tokens resolve beside the legacy ones', () => {
-  const { values } = readRepo();
-  const theme = {
-    style: 'brand',
-    main: '--ds-background-brand-bold',
-    onMain: '--ds-text-inverse',
-    state: '--ds-background-brand-subtlest',
-    text: '--ds-text-brand',
-  };
-  for (const fill of ['filled', 'tonal', 'outline']) {
-    assert.equal(combination(theme, fill, values).unresolved, undefined, `${fill} resolves`);
-  }
-  assert.ok(values.has('--color-primary'), 'the legacy set is still read');
+  assert.deepEqual(duplicateGrounds(themes, values), []);
+  assert.deepEqual(
+    themes.map((theme) => theme.appearance),
+    ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'selected'],
+  );
 });

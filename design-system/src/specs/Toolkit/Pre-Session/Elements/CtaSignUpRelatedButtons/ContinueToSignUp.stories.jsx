@@ -14,9 +14,8 @@ export default {
  * Continue to Sign-Up Button
  * Filled primary button for continuing to sign-up flow
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="filled" for filled background
- * - leadingIcon="square-plus" for plus icon
+ * - appearance="primary"
+ * - iconBefore="square-plus" for plus icon
  */
 export const Overview = () => (
     <div
@@ -31,9 +30,8 @@ export const Overview = () => (
             <div style={{ maxWidth: '200px' }}>
                 <Button
                     text="Continue to sign-up"
-                    leadingIcon="square-plus"
-                    style="primary"
-                    fill="filled"
+                    iconBefore="square-plus"
+                    appearance="primary"
                 />
             </div>
         </section>
@@ -43,10 +41,9 @@ export const Overview = () => (
             <div style={{ maxWidth: '200px' }}>
                 <Button
                     text="Continue to sign-up"
-                    leadingIcon="square-plus"
-                    style="primary"
-                    fill="filled"
-                    disabled
+                    iconBefore="square-plus"
+                    appearance="primary"
+                    isDisabled
                 />
             </div>
         </section>
@@ -60,10 +57,9 @@ export const Overview = () => (
 export const ContinueToSignUpButton = ({ disabled = false, ...props }) => (
     <Button
         text="Continue to sign-up"
-        leadingIcon="square-plus"
-        style="primary"
-        fill="filled"
-        disabled={disabled}
+        iconBefore="square-plus"
+        appearance="primary"
+        isDisabled={disabled}
         {...props}
     />
 );

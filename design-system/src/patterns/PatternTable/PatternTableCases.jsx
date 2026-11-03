@@ -33,7 +33,7 @@ const SortHead = ({ children, sort, align }) => (
 );
 
 const RowActions = ({ label }) => (
-    <Button leadingVisual="ellipsis" style="primary" fill="ghost" size="small" aria-label={label} onClick={() => {}} />
+    <Button iconBefore="ellipsis" appearance="subtle" spacing="compact" aria-label={label} onClick={() => {}} />
 );
 
 const Pager = ({ range, pages }) => (
@@ -115,9 +115,9 @@ const RosterSection = () => (
                 selection="2 selected"
                 bulkActions={(
                     <>
-                        <Button text="Message" style="primary" fill="ghost" size="small" onClick={() => {}} />
-                        <Button text="Export" style="primary" fill="ghost" size="small" onClick={() => {}} />
-                        <Button text="Remove" style="primary" fill="ghost" size="small" onClick={() => {}} />
+                        <Button text="Message" appearance="subtle" spacing="compact" onClick={() => {}} />
+                        <Button text="Export" appearance="subtle" spacing="compact" onClick={() => {}} />
+                        <Button text="Remove" appearance="subtle" spacing="compact" onClick={() => {}} />
                     </>
                 )}
                 onClear={() => {}}

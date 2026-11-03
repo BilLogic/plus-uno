@@ -20,16 +20,16 @@ export const SupervisorSignUpMgmtButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Management Actions</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Add: Plus icon, Outline */}
-                <Button leadingVisual="plus" style="primary" fill="outline" aria-label="Add to fill-in list" />
+                <Button iconBefore="plus" aria-label="Add to fill-in list" />
 
                 {/* Remove: Minus icon, Outline */}
-                <Button leadingVisual="minus" style="primary" fill="outline" aria-label="Remove from fill-in list" />
+                <Button iconBefore="minus" aria-label="Remove from fill-in list" />
 
                 {/* Copy: Copy icon, Outline */}
-                <Button leadingVisual="copy" style="primary" fill="outline" aria-label="Copy recruitment message" />
+                <Button iconBefore="copy" aria-label="Copy recruitment message" />
 
                 {/* Success: Check icon, Filled Success */}
-                <Button leadingVisual="check" style="success" aria-label="Success" />
+                <Button iconBefore="check" appearance="primary" aria-label="Success" />
             </div>
         </section>
     </div>

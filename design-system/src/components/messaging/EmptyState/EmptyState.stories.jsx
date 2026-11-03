@@ -41,8 +41,8 @@ export default {
     },
 };
 
-const primary = <Button text="Add student" style="primary" fill="filled" />;
-const secondary = <Button text="Import a list" style="secondary" fill="outline" />;
+const primary = <Button text="Add student" appearance="primary" />;
+const secondary = <Button text="Import a list" />;
 
 /* ------------------------------------------------------------------ default */
 
@@ -83,7 +83,7 @@ export const WithIcon = () => (
         icon="calendar-plus"
         header="No sessions this week"
         description="Schedule a session and it will show up here."
-        primaryAction={<Button text="Schedule a session" style="primary" fill="filled" />}
+        primaryAction={<Button text="Schedule a session" appearance="primary" />}
     />
 );
 
@@ -105,7 +105,7 @@ export const Compact = () => (
         icon="user-group"
         header="No students yet"
         description="Add a student to see them here."
-        primaryAction={<Button text="Add student" style="primary" fill="filled" size="small" />}
+        primaryAction={<Button text="Add student" appearance="primary" spacing="compact" />}
     />
 );
 
@@ -128,7 +128,7 @@ export const InATable = () => (
                 icon="user-group"
                 header="No students yet"
                 description="Add a student to see them here."
-                primaryAction={<Button text="Add student" style="primary" fill="filled" size="small" />}
+                primaryAction={<Button text="Add student" appearance="primary" spacing="compact" />}
             />
         )}
     />

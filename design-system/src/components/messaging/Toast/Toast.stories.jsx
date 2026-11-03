@@ -134,7 +134,7 @@ const ToastInteractiveWrapper = ({ style, position, title, children, show, autoh
                 </Toast>
             </ToastContainer>
             <div className="plus-toast-interactive-demo__trigger">
-                <Button text="Trigger Toast" onClick={() => setIsOpen(true)} />
+                <Button appearance="primary" text="Trigger Toast" onClick={() => setIsOpen(true)} />
             </div>
         </div>
     );

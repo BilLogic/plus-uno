@@ -59,7 +59,7 @@ export default {
  */
 export const ClickAwayAndEscape = () => (
     <div style={stack}>
-        <Popover trigger={<Button text="Session 12" />} title="Session 12">
+        <Popover trigger={<Button appearance="primary" text="Session 12" />} title="Session 12">
             Ran 45 minutes over.
         </Popover>
         <p data-testid="pd-elsewhere">Somewhere else on the page.</p>
@@ -96,7 +96,7 @@ ClickAwayAndEscape.play = async ({ canvasElement }) => {
 export const ManualIgnoresRootClose = () => (
     <div style={stack}>
         <Popover
-            trigger={<Button text="Pinned" />}
+            trigger={<Button appearance="primary" text="Pinned" />}
             title="Pinned"
             triggerType="manual"
             show

@@ -35,15 +35,13 @@ const DeleteTutorModal = ({
                 <div className="delete-tutor-modal__actions">
                     <Button
                         text="Delete Tutor"
-                        style="danger"
-                        fill="text"
+                        appearance="subtle"
                         onClick={onDelete}
                         className="delete-tutor-modal__delete-btn"
                     />
                     <Button
                         text="Keep Tutor"
-                        style="primary"
-                        fill="filled"
+                        appearance="primary"
                         onClick={onHide}
                     />
                 </div>

@@ -85,8 +85,8 @@ export const AutoExcuse_Confirmation = () => (
 
                 {/* Footer Buttons - using tutor view components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <SeeSessionsFillInButton block />
-                    <ViewUpdatedScheduleButton block fill="filled" />
+                    <SeeSessionsFillInButton shouldFitContainer />
+                    <ViewUpdatedScheduleButton shouldFitContainer appearance="primary" />
                 </div>
             </div>
         }

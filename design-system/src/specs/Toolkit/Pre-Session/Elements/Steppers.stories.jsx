@@ -54,17 +54,13 @@ const Stepper = ({
                 leadingVisual={{
                     type: 'button',
                     text: '−',
-                    style: 'primary',
-                    fill: 'outline',
-                    size: 'medium',
+                    appearance: 'default',
                     disabled: isMinusDisabled,
                 }}
                 trailingVisual={{
                     type: 'button',
                     text: '+',
-                    style: 'primary',
-                    fill: 'outline',
-                    size: 'medium',
+                    appearance: 'default',
                     disabled: isPlusDisabled,
                 }}
                 className="stepper-input-group"

@@ -128,7 +128,7 @@ export const Popups = {
                                 show={open}
                                 placement="bottom-start"
                                 title="Session notes"
-                                trigger={<span style={anchor}><Button text={`Popup ${width}`} style="secondary" fill="outline" size="small" /></span>}
+                                trigger={<span style={anchor}><Button text={`Popup ${width}`} spacing="compact" /></span>}
                             >
                                 {width === 'lg' ? noteList : 'Notes stay with the session.'}
                             </Popover>
@@ -187,7 +187,7 @@ export const Tooltips = {
             {({ open }) => (
                 <>
                     <Tooltip id="pfam-tooltip-short" show={open} placement="top" text="Copy link">
-                        <span style={anchor}><Button text="Copy" style="secondary" fill="outline" size="small" /></span>
+                        <span style={anchor}><Button text="Copy" spacing="compact" /></span>
                     </Tooltip>
                     <Tooltip
                         id="pfam-tooltip-long"
@@ -195,7 +195,7 @@ export const Tooltips = {
                         placement="bottom"
                         text="Copies the session link so you can paste it into a message to the student's family"
                     >
-                        <span style={anchor}><Button text="Share" style="secondary" fill="outline" size="small" /></span>
+                        <span style={anchor}><Button text="Share" spacing="compact" /></span>
                     </Tooltip>
                 </>
             )}
@@ -224,7 +224,7 @@ export const Interactive = {
                     width={args.width}
                     placement={args.placement}
                     title={args.title}
-                    trigger={<span style={anchor}><Button text="Open popup" style="secondary" fill="outline" size="small" /></span>}
+                    trigger={<span style={anchor}><Button text="Open popup" spacing="compact" /></span>}
                 >
                     Notes stay with the session.
                 </Popover>

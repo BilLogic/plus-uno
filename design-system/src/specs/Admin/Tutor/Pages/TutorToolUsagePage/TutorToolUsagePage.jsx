@@ -140,16 +140,10 @@ const TutorToolUsagePage = ({
                 <div className="tutor-tool-usage-page__actions">
                     <Button
                         text="Email Tutors"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
                         onClick={onEmailTutors}
                     />
                     <Button
                         text="Export Reflection Data"
-                        style="primary"
-                        fill="outline"
-                        size="medium"
                         onClick={onExportData}
                     />
                 </div>

@@ -189,11 +189,9 @@ const SideNavBar = ({
             <div className="post-session-side-nav__submit">
                 <Button
                     text="Submit"
-                    style={canSubmit ? 'primary' : 'default'}
-                    fill="filled"
-                    size="medium"
-                    disabled={!canSubmit}
-                    block
+                    appearance={canSubmit ? 'primary' : 'default'}
+                    isDisabled={!canSubmit}
+                    shouldFitContainer
                     onClick={() => onSubmit?.()}
                 />
             </div>

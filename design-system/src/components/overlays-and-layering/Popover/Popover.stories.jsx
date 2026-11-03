@@ -61,28 +61,28 @@ function PopoverLayoutDemos() {
     return (
         <section style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popover
-                trigger={<Button text="Popover on Top" style="secondary" />}
+                trigger={<Button text="Popover on Top" />}
                 placement="top"
                 title="Popover Title"
             >
                 And here's some amazing content. It's very engaging. Right?
             </Popover>
             <Popover
-                trigger={<Button text="Popover on Bottom" style="secondary" />}
+                trigger={<Button text="Popover on Bottom" />}
                 placement="bottom"
                 title="Popover Title"
             >
                 And here's some amazing content. It's very engaging. Right?
             </Popover>
             <Popover
-                trigger={<Button text="Popover on Left" style="secondary" />}
+                trigger={<Button text="Popover on Left" />}
                 placement="left"
                 title="Popover Title"
             >
                 And here's some amazing content. It's very engaging. Right?
             </Popover>
             <Popover
-                trigger={<Button text="Popover on Right" style="secondary" />}
+                trigger={<Button text="Popover on Right" />}
                 placement="right"
                 title="Popover Title"
             >
@@ -97,7 +97,7 @@ function PopoverContentDemo() {
         <section>
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">NO TITLE</span>
             <Popover
-                trigger={<Button text="Content Only" style="primary" />}
+                trigger={<Button text="Content Only" appearance="primary" />}
                 placement="right"
             >
                 This popover has no title, only body content.
@@ -112,19 +112,19 @@ function PopoverInteractionStatesDemos() {
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TRIGGER TYPES</span>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <Popover
-                    trigger={<Button text="Click (Default)" style="info" />}
+                    trigger={<Button text="Click (Default)" appearance="primary" />}
                     triggerType="click"
                 >
                     Clicked to toggle.
                 </Popover>
                 <Popover
-                    trigger={<Button text="Hover" style="info" />}
+                    trigger={<Button text="Hover" appearance="primary" />}
                     triggerType="hover"
                 >
                     Hovered to show.
                 </Popover>
                 <Popover
-                    trigger={<Button text="Focus" style="info" />}
+                    trigger={<Button text="Focus" appearance="primary" />}
                     triggerType="focus"
                 >
                     Focus to show (tab to this button).
@@ -154,7 +154,7 @@ export const InteractionStates = () => (
 
 export const Overview = () => (
     <div className="plus-popover-overview-static">
-        <Button type="button" text="Toggle popover" style="primary" />
+        <Button type="button" text="Toggle popover" appearance="primary" />
         <RBPopover className="plus-popover" placement="right">
             <RBPopover.Header className="plus-popover-title">Popover title</RBPopover.Header>
             <RBPopover.Body className="plus-popover-body">
@@ -184,7 +184,7 @@ export const Interactive = {
             <div style={{ padding: '48px', display: 'flex', justifyContent: 'center' }}>
                 <Popover
                     {...popoverProps}
-                    trigger={<Button text={triggerLabel} style="primary" />}
+                    trigger={<Button text={triggerLabel} appearance="primary" />}
                 />
             </div>
         );

@@ -220,10 +220,8 @@ const StudentAdminPage = ({
                         </h2>
                         <Button
                             text="Add Student"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
-                            leadingVisual="user-plus"
+                            appearance="primary"
+                            iconBefore="user-plus"
                             onClick={onAddStudent}
                         />
                     </div>

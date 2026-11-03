@@ -31,12 +31,8 @@ const OptionChip = ({
         <Button
             type="button"
             text={label}
-            style="primary"
-            fill={selected ? 'filled' : 'tonal'}
-            size="medium"
-            disabled={disabled}
-            active={selected}
-            aria-pressed={selected}
+            isDisabled={disabled}
+            isSelected={selected}
             onClick={disabled ? undefined : onClick}
             className={`post-session-option-chip ${className}`.trim()}
         />

@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 
 const ACTION_CONFIG = {
-    start: { text: 'Start', style: 'primary', fill: 'outline' },
-    continue: { text: 'Continue', style: 'primary', fill: 'outline' },
-    edit: { text: 'Edit', style: 'secondary', fill: 'outline' },
+    start: { text: 'Start', appearance: 'default' },
+    continue: { text: 'Continue', appearance: 'default' },
+    edit: { text: 'Edit', appearance: 'default' },
 };
 
 /**
@@ -21,10 +21,9 @@ const ReflectionFormActions = ({ action = 'start', onClick, disabled = false }) 
     return (
         <Button
             text={config.text}
-            style={config.style}
-            fill={config.fill}
-            size="small"
-            disabled={disabled}
+            appearance={config.appearance}
+            spacing="compact"
+            isDisabled={disabled}
             onClick={onClick}
         />
     );

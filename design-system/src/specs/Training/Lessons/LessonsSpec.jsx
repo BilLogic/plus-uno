@@ -57,7 +57,7 @@ export const LessonsSpec = () => {
             )
         },
         { key: 'duration', label: 'Duration' },
-        { key: 'actions', label: '', render: () => <Button style="primary" fill="text" leadingVisual="chevron-right" aria-label="Open lesson" /> }
+        { key: 'actions', label: '', render: () => <Button appearance="subtle" iconBefore="chevron-right" aria-label="Open lesson" /> }
     ];
 
     return (
@@ -80,22 +80,20 @@ export const LessonsSpec = () => {
                     </div>
 
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                        <Button style="secondary" fill="outline" size="small" text="Expand All" />
+                        <Button spacing="compact" text="Expand All" />
                         <div className="d-flex gap-1 bg-white border rounded p-1">
                             <Button
-                                style="primary"
-                                fill={view === 'list' ? 'tonal' : 'text'}
-                                leadingVisual="list-ul"
-                                size="small"
+                                appearance="subtle" isSelected={view === 'list'}
+                                iconBefore="list-ul"
+                                spacing="compact"
                                 aria-label="List view"
                                 aria-pressed={view === 'list'}
                                 onClick={() => setView('list')}
                             />
                             <Button
-                                style="primary"
-                                fill={view === 'grid' ? 'tonal' : 'text'}
-                                leadingVisual="table-cells-large"
-                                size="small"
+                                appearance="subtle" isSelected={view === 'grid'}
+                                iconBefore="table-cells-large"
+                                spacing="compact"
                                 aria-label="Grid view"
                                 aria-pressed={view === 'grid'}
                                 onClick={() => setView('grid')}
@@ -121,7 +119,7 @@ export const LessonsSpec = () => {
                                         <span className="body3-txt text-muted">{lesson.duration}</span>
                                     </div>
                                     <div className="body2-txt mb-3">{lesson.competencyArea}</div>
-                                    <Button style="primary" fill="outline" text="Start Lesson" className="w-100" />
+                                    <Button text="Start Lesson" className="w-100" />
                                 </Card>
                             ))}
                         </div>

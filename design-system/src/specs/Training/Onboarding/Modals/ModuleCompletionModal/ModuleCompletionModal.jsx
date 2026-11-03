@@ -55,12 +55,10 @@ const ModuleCompletionModal = ({
                 <div className="module-completion-modal__button-container">
                     <Button
                         text={buttonText}
-                        style="primary"
-                        fill="filled"
-                        size="medium"
-                        leadingVisual="arrow-right-from-bracket"
+                        appearance="primary"
+                        iconBefore="arrow-right-from-bracket"
                         onClick={onContinue}
-                        block
+                        shouldFitContainer
                     />
                 </div>
             </div>

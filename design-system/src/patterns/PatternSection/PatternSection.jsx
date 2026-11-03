@@ -134,7 +134,7 @@ export const SectionToolbar = ({
                 <div className="plus-section-toolbar__start">
                     <span className="plus-section-toolbar__selection" aria-live="polite">{selection}</span>
                     {bulkActions && <div className="plus-section-toolbar__slot">{bulkActions}</div>}
-                    {onClear && <Button text={clearLabel} style="primary" fill="text" size="small" onClick={onClear} />}
+                    {onClear && <Button text={clearLabel} appearance="subtle" spacing="compact" onClick={onClear} />}
                 </div>
             </div>
         );
@@ -255,7 +255,7 @@ const PatternSection = ({
                     <div className={type === 'toolbar' ? 'plus-pattern-section-toolbar' : 'plus-pattern-section-tabs'}>
                         {bottomRow}
                         {type !== 'toolbar' && onAddView && (
-                            <Button text={addViewLabel} style="primary" fill="text" size="small" leadingVisual="plus" onClick={onAddView} />
+                            <Button text={addViewLabel} appearance="subtle" spacing="compact" iconBefore="plus" onClick={onAddView} />
                         )}
                     </div>
                 )}

@@ -75,11 +75,10 @@ export const StartingZoomSession = () => (
                 {/* Launch Zoom Button */}
                 <Button
                     text="Launch Zoom"
-                    style="primary"
-                    fill="filled"
-                    size="small"
-                    leadingVisual="video"
-                    block
+                    appearance="primary"
+                    spacing="compact"
+                    iconBefore="video"
+                    shouldFitContainer
                     onClick={() => {}}
                 />
             </div>

@@ -85,8 +85,8 @@ const ModalBox = ({ width }) => (
     <div style={{ width, maxWidth: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', padding: 'var(--modal-pad)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
         <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Add a tutor</span>
         <span style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--modal-inline-sm)' }}>
-            <Button text="Cancel" style="default" fill="outline" />
-            <Button text="Add" style="primary" fill="filled" />
+            <Button text="Cancel" />
+            <Button text="Add" appearance="primary" />
         </span>
     </div>
 );
@@ -123,14 +123,14 @@ export const AlignContainers = () => (
         <Do caption={<>The card spans six columns; its buttons hug their labels, 8 apart (<C>--element-inline-md</C>).</>}>
             <div style={{ ...ground, ...grid12 }}>
                 <div style={{ gridColumn: 'span 12' }}>
-                    <PatternCard title="Weekly report" footer={<span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}><Button text="Cancel" style="default" fill="outline" /><Button text="Save" style="primary" fill="filled" /></span>} />
+                    <PatternCard title="Weekly report" footer={<span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}><Button text="Cancel" /><Button text="Save" appearance="primary" /></span>} />
                 </div>
             </div>
         </Do>
         <Dont caption="Buttons stretched to columns. Their widths now change with the screen and the labels float.">
             <div style={{ ...ground, ...grid12 }}>
                 <div style={{ gridColumn: 'span 12' }}>
-                    <PatternCard title="Weekly report" footer={<span style={{ ...grid12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', width: '100%' }}><Button text="Cancel" style="default" fill="outline" block /><Button text="Save" style="primary" fill="filled" block /></span>} />
+                    <PatternCard title="Weekly report" footer={<span style={{ ...grid12, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', width: '100%' }}><Button text="Cancel" shouldFitContainer /><Button text="Save" appearance="primary" shouldFitContainer /></span>} />
                 </div>
             </div>
         </Dont>

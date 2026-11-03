@@ -117,12 +117,10 @@ const NumberInput = ({
 
     const stepper = (direction, icon, words, atBound) => (
         <Button
-            size="small"
-            style="secondary"
-            fill="outline"
-            leadingVisual={icon}
+            spacing="compact"
+            iconBefore={icon}
             className="plus-field-stepper"
-            disabled={disabled || atBound}
+            isDisabled={disabled || atBound}
             onClick={() => stepBy(direction)}
         >
             <span className="visually-hidden">{`${words} ${fieldName}`}</span>

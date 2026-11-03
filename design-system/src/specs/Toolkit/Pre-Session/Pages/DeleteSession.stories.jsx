@@ -104,10 +104,10 @@ const MainContent = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                <Button size="default" fill="outline" style="primary" leadingVisual="plus">
+                <Button iconBefore="plus">
                     Create New Sessions
                 </Button>
-                <Button size="default" fill="filled" style="primary" leadingVisual="calendar">
+                <Button appearance="primary" iconBefore="calendar">
                     Fill in
                 </Button>
             </div>

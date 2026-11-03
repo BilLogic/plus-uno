@@ -139,9 +139,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
             >
                 <Button
                     text="Details"
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                 />
             </div>
         </div>

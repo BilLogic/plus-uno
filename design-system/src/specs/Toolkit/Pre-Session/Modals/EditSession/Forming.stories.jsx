@@ -94,24 +94,19 @@ const FormingModalBody = () => (
         {/* Tab Navigation - ButtonGroup */}
         <div style={{ display: 'flex', width: '100%' }}>
             <ButtonGroup
-                fill="tonal"
                 className="w-100"
             >
                 <Button
                     text="Session info"
-                    active={true}
-                    style="primary"
-                    fill="tonal"
-                    block
+                    isSelected={true}
+                    shouldFitContainer
                 />
                 <Button
                     text="Attendees"
-                    trailingVisual={
+                    iconAfter={
                         <Badge text="20" style="secondary" size="b3" />
                     }
-                    style="secondary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
             </ButtonGroup>
         </div>
@@ -205,10 +200,10 @@ const FormingModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <CancelButton block />
+                <CancelButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <SaveChangesButton block />
+                <SaveChangesButton shouldFitContainer />
             </div>
         </div>
     </div>

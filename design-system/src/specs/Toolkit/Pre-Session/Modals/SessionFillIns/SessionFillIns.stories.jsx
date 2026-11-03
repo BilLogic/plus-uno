@@ -100,10 +100,8 @@ export const FillIn_EmptyState = () => (
                 <div className="d-flex" style={{ width: '100%' }}>
                     <Button
                         text="Refresh Page"
-                        style="primary"
-                        fill="outline"
-                        block
-                        leadingVisual={<i className="fa-solid fa-arrows-rotate" aria-hidden />}
+                        shouldFitContainer
+                        iconBefore={<i className="fa-solid fa-arrows-rotate" aria-hidden />}
                     />
                 </div>
             </div>
@@ -212,7 +210,7 @@ export const FillIn = () => (
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <CloseButton />
                     <CopyRecruitmentMessageButton />
-                    <Button text="Continue (0 selected)" style="primary" fill="filled" disabled block />
+                    <Button text="Continue (0 selected)" appearance="primary" isDisabled shouldFitContainer />
                 </div>
             </div>
         }
@@ -335,7 +333,7 @@ export const ConsentForm = () => (
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <BackButton />
                     <div style={{ flex: 1 }}>
-                        <Button text="Confirm & continue" style="primary" fill="filled" block />
+                        <Button text="Confirm & continue" appearance="primary" shouldFitContainer />
                     </div>
                 </div>
             </div>
@@ -392,14 +390,12 @@ export const SessionDetails = () => (
                 </div>
                 {/* Tabs: Session info (active) | Attendees (20) (design system ButtonGroup, Badge) */}
                 <div style={{ display: 'flex', width: '100%' }}>
-                    <ButtonGroup fill="tonal" className="w-100">
-                        <Button text="Session info" active={true} style="primary" fill="tonal" block />
+                    <ButtonGroup className="w-100">
+                        <Button text="Session info" isSelected={true} shouldFitContainer />
                         <Button
                             text="Attendees"
-                            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
-                            style="secondary"
-                            fill="tonal"
-                            block
+                            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+                            shouldFitContainer
                         />
                     </ButtonGroup>
                 </div>
@@ -444,7 +440,7 @@ export const SessionDetails = () => (
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     <CloseButton />
                     <div style={{ flex: 1 }}>
-                        <FillInButton block />
+                        <FillInButton shouldFitContainer />
                     </div>
                 </div>
             </div>
@@ -521,7 +517,7 @@ export const Confirmation = () => {
                     <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
                         <BackButton />
                         <div style={{ flex: 1 }}>
-                            <Button text="Confirm fill-in" style="primary" fill="filled" block />
+                            <Button text="Confirm fill-in" appearance="primary" shouldFitContainer />
                         </div>
                     </div>
                 </div>

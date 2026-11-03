@@ -26,7 +26,7 @@ const HeldPopup = ({ title, children }) => {
                 show={open}
                 placement="bottom-start"
                 title={title}
-                trigger={<span style={{ display: 'inline-flex' }}><Button text="Open popup" style="secondary" fill="outline" size="small" /></span>}
+                trigger={<span style={{ display: 'inline-flex' }}><Button text="Open popup" spacing="compact" /></span>}
             >
                 {children}
             </Popover>
@@ -54,7 +54,7 @@ export const PopupForm = () => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
                 <Input label="Student" placeholder="Select a student" size="small" />
                 <Input label="Note" placeholder="Write a note" size="small" />
-                <div><Button text="Save" style="primary" fill="filled" size="small" onClick={() => {}} /></div>
+                <div><Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} /></div>
             </div>
         </HeldPopup>
     </Plain>

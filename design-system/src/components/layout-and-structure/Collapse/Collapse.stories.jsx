@@ -165,9 +165,9 @@ function CollapseStateDemos() {
                     External state management using <code>isOpen</code> prop.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                    <Button onClick={() => setControlledOpen(true)} text="Open" style="primary" fill="filled" />
-                    <Button onClick={() => setControlledOpen(false)} text="Close" style="secondary" fill="outline" />
-                    <Button onClick={() => setControlledOpen(!controlledOpen)} text="Toggle" style="tertiary" fill="ghost" />
+                    <Button onClick={() => setControlledOpen(true)} text="Open" appearance="primary" />
+                    <Button onClick={() => setControlledOpen(false)} text="Close" />
+                    <Button onClick={() => setControlledOpen(!controlledOpen)} text="Toggle" appearance="subtle" />
                 </div>
                 <div className={`collapse ${controlledOpen ? 'show' : ''}`}>
                     <Card body="This content is controlled externally." showBorder />
@@ -180,9 +180,9 @@ function CollapseStateDemos() {
                     Control multiple collapse sections independently or simultaneously.
                 </p>
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                    <Button onClick={() => setOpen1(!open1)} text="Toggle First" size="sm" />
-                    <Button onClick={() => setOpen2(!open2)} text="Toggle Second" size="sm" />
-                    <Button onClick={() => { setOpen1(true); setOpen2(true); }} text="Open Both" size="sm" style="secondary" />
+                    <Button appearance="primary" onClick={() => setOpen1(!open1)} text="Toggle First" spacing="compact" />
+                    <Button appearance="primary" onClick={() => setOpen2(!open2)} text="Toggle Second" spacing="compact" />
+                    <Button onClick={() => { setOpen1(true); setOpen2(true); }} text="Open Both" spacing="compact" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
                     <div className={`collapse ${open1 ? 'show' : ''}`} style={{ width: '100%' }}>

@@ -44,9 +44,8 @@ export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
             {(removeState === 'text' || removeState === 'button') && (
                 <Button
                     text="Remove"
-                    size="small"
-                    style="danger"
-                    fill={removeState === 'button' ? 'tonal' : 'ghost'}
+                    spacing="compact"
+                    appearance="subtle" isSelected={removeState === 'button'}
                     onClick={() => console.log('Remove clicked')}
                 />
             )}

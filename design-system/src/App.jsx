@@ -25,7 +25,7 @@ const App = () => {
                                 <Jumbotron
                                     title="Welcome to PLUS Design System"
                                     description="This is the React implementation of the PLUS Design System."
-                                    actions={<Button text="Get started" style="primary" fill="filled" />}
+                                    actions={<Button text="Get started" appearance="primary" />}
                                 />
                             </Col>
                         </Row>
@@ -34,8 +34,8 @@ const App = () => {
                                 <div className="p-4 bg-white rounded shadow-sm">
                                     <h4>Migration Complete</h4>
                                     <p>All core components have been migrated to React.</p>
-                                    <Button btnStyle="primary" btnFill="outline" className="mr-2">View Storybook</Button>
-                                    <Button btnStyle="secondary" btnFill="outline">Documentation</Button>
+                                    <Button appearance="primary" className="mr-2">View Storybook</Button>
+                                    <Button>Documentation</Button>
                                 </div>
                             </Col>
                         </Row>

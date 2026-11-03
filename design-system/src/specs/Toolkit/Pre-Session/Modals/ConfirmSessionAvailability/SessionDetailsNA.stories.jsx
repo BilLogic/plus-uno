@@ -118,24 +118,19 @@ const SessionDetailsNAModalBody = () => (
             {/* Tabs using ButtonGroup */}
             <div style={{ display: 'flex', width: '100%' }}>
                 <ButtonGroup
-                    fill="tonal"
                     className="w-100"
                 >
                     <Button
                         text="Session info"
-                        active={true}
-                        style="primary"
-                        fill="tonal"
-                        block
+                        isSelected={true}
+                        shouldFitContainer
                     />
                     <Button
                         text="Attendees"
-                        trailingVisual={
+                        iconAfter={
                             <Badge text="20" style="secondary" size="b3" />
                         }
-                        style="secondary"
-                        fill="tonal"
-                        block
+                        shouldFitContainer
                     />
                 </ButtonGroup>
             </div>
@@ -197,7 +192,7 @@ const SessionDetailsNAModalBody = () => (
             }}
         >
             <RequestCallOffButton />
-            <JoinSessionButton block />
+            <JoinSessionButton shouldFitContainer />
         </div>
     </div>
 );

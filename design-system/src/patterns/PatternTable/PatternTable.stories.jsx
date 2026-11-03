@@ -37,7 +37,7 @@ const tableContent = (
 
 /** The Section header carries the title and the actions; the table has no toolbar of its own. */
 const sectionActions = (
-    <Button text="Add member" style="primary" fill="filled" size="small" onClick={() => {}} />
+    <Button text="Add member" appearance="primary" spacing="compact" onClick={() => {}} />
 );
 
 const paginationSlot = (
@@ -52,7 +52,7 @@ const emptyStateSlot = (
         <i className="fa-regular fa-folder" aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: 'var(--ds-icon-subtle)' }} />
         <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>No members yet</span>
         <span style={{ font: 'var(--body-small)' }}>Members you invite show up here.</span>
-        <Button text="Invite a member" style="primary" fill="text" size="small" onClick={() => {}} />
+        <Button text="Invite a member" appearance="subtle" spacing="compact" onClick={() => {}} />
     </>
 );
 

@@ -274,16 +274,14 @@ export const Interactive = () => {
                     <div className="btn-group" role="group" aria-label="Show dropdown toggle">
                         <Button
                             text="Yes"
-                            size="small"
-                            style="primary"
-                            fill={showDropdown ? 'filled' : 'outline'}
+                            spacing="compact"
+                            isSelected={showDropdown}
                             onClick={() => setShowDropdown(true)}
                         />
                         <Button
                             text="No"
-                            size="small"
-                            style="primary"
-                            fill={!showDropdown ? 'filled' : 'outline'}
+                            spacing="compact"
+                            isSelected={!showDropdown}
                             onClick={() => setShowDropdown(false)}
                         />
                     </div>

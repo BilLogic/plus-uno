@@ -19,23 +19,17 @@ export default function LoginButtons() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <Button
                     text="Try a demo"
-                    style="primary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
 
                 <Button
                     text="Back to log in portal"
-                    style="primary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
 
                 <Button
                     text="Continue"
-                    style="primary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
 
                 <div
@@ -47,18 +41,16 @@ export default function LoginButtons() {
                 >
                     <Button
                         text="Continue"
-                        style="default"
-                        fill="text"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
 
                 <Button
                     text="Log in"
-                    style="primary"
-                    fill="filled"
-                    block
+                    appearance="primary"
+                    shouldFitContainer
                 />
 
                 <div
@@ -70,10 +62,9 @@ export default function LoginButtons() {
                 >
                     <Button
                         text="Log in"
-                        style="secondary"
-                        fill="text"
-                        block
-                        disabled
+                        appearance="subtle"
+                        shouldFitContainer
+                        isDisabled
                     />
                 </div>
             </div>

@@ -211,10 +211,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     </div>
                     <Button
                         aria-label="Close"
-                        leadingVisual={<i className="fas fa-xmark" aria-hidden />}
-                        style="secondary"
-                        fill="ghost"
-                        size="medium"
+                        iconBefore={<i className="fas fa-xmark" aria-hidden />}
+                        appearance="subtle"
                         onClick={onClose}
                     />
                 </div>
@@ -224,7 +222,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     <div className="modal-header-reveal" style={{ animationDelay: '100ms' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                             <h2 id="student-insights-modal-title" className="h4" style={{ margin: 0 }}>{currentStudent?.name}</h2>
-                            <Button text="Update goals" style="primary" fill="filled" size="medium" trailingVisual={<i className="fa-solid fa-pencil" aria-hidden />} onClick={() => setActiveContentTab('goals')} />
+                            <Button text="Update goals" appearance="primary" iconAfter={<i className="fa-solid fa-pencil" aria-hidden />} onClick={() => setActiveContentTab('goals')} />
                         </div>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                             {statusTags.map((tag, i) => (
@@ -245,13 +243,10 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 <div style={{ padding: '0 24px 4px', width: '100%', height: 'fit-content', boxSizing: 'border-box', marginTop: '0', marginBottom: 0 }}>
                     <div className="modal-header-reveal" style={{ animationDelay: '200ms' }}>
                         <ButtonGroup
-                            fill="tonal"
-                            size="medium"
                             buttons={contentTabLabels.map((label, i) => ({
                                 id: contentTabIds[i],
                                 text: label,
-                                style: activeContentTab === contentTabIds[i] ? 'primary' : 'secondary',
-                                active: activeContentTab === contentTabIds[i],
+                                isSelected: activeContentTab === contentTabIds[i],
                                 onClick: () => setActiveContentTab(contentTabIds[i])
                             }))}
                             ariaLabel="Content sections"

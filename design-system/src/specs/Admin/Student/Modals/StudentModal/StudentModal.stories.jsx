@@ -75,20 +75,17 @@ export const Overview = {
                 <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
                     <Button
                         text={showModal ? "Hide Modal" : "Show Modal"}
-                        style="primary"
-                        fill="filled"
+                        appearance="primary"
                         onClick={() => setShowModal(!showModal)}
                     />
                     <Button
                         text="Info Variant"
-                        style={variant === 'info' ? 'primary' : 'secondary'}
-                        fill={variant === 'info' ? 'filled' : 'outlined'}
+                        isSelected={variant === 'info'}
                         onClick={() => setVariant('info')}
                     />
                     <Button
                         text="Sessions Variant"
-                        style={variant === 'sessions' ? 'primary' : 'secondary'}
-                        fill={variant === 'sessions' ? 'filled' : 'outlined'}
+                        isSelected={variant === 'sessions'}
                         onClick={() => setVariant('sessions')}
                     />
                 </div>
@@ -144,8 +141,7 @@ export const Interactive = {
                 </h6>
                 <Button
                     text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
+                    appearance="primary"
                     onClick={() => setShowModal(!showModal)}
                 />
                 <StudentModal
@@ -198,8 +194,7 @@ export const InfoVariant = {
                 <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Info Variant</h6>
                 <Button
                     text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
+                    appearance="primary"
                     onClick={() => setShowModal(!showModal)}
                 />
                 <StudentModal
@@ -239,8 +234,7 @@ export const SessionsVariant = {
                 <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Sessions Variant</h6>
                 <Button
                     text={showModal ? "Hide Modal" : "Show Modal"}
-                    style="primary"
-                    fill="filled"
+                    appearance="primary"
                     onClick={() => setShowModal(!showModal)}
                 />
                 <StudentModal

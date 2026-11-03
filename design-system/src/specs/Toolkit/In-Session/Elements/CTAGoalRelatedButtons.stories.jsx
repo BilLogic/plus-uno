@@ -19,39 +19,39 @@ export const CtaGoalRelatedButtons = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Set Goals</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Set goals" leadingVisual="plus" style="primary" />
-                <Button text="Set goals" leadingVisual="plus" style="primary" disabled />
+                <Button text="Set goals" iconBefore="plus" appearance="primary" />
+                <Button text="Set goals" iconBefore="plus" appearance="primary" isDisabled />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Mark Goals</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Mark goals as checked" leadingVisual="check" style="primary" />
-                <Button text="Mark goals as checked" leadingVisual="check" style="primary" disabled />
+                <Button text="Mark goals as checked" iconBefore="check" appearance="primary" />
+                <Button text="Mark goals as checked" iconBefore="check" appearance="primary" isDisabled />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Undo Check</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Undo goals check" leadingVisual="rotate-left" style="secondary" fill="tonal" />
+                <Button text="Undo goals check" iconBefore="rotate-left" />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Update Goals</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Update goals" leadingVisual="pen-to-square" style="primary" />
-                <Button text="Update goals" leadingVisual="pen-to-square" style="primary" disabled />
+                <Button text="Update goals" iconBefore="pen-to-square" appearance="primary" />
+                <Button text="Update goals" iconBefore="pen-to-square" appearance="primary" isDisabled />
             </div>
         </section>
 
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Save Goals</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
-                <Button text="Save goals" leadingVisual="floppy-disk" style="primary" />
-                <Button text="Save goals" leadingVisual="floppy-disk" style="primary" disabled />
+                <Button text="Save goals" iconBefore="floppy-disk" appearance="primary" />
+                <Button text="Save goals" iconBefore="floppy-disk" appearance="primary" isDisabled />
             </div>
         </section>
     </div>

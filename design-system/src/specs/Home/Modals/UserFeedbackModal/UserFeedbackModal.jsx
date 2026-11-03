@@ -215,12 +215,10 @@ const UserFeedbackModal = ({
                                     <Button
                                         key={btn.id}
                                         text={btn.text}
-                                        leadingVisual={btn.leadingVisual}
-                                        active={btn.active}
+                                        iconBefore={btn.leadingVisual}
+                                        isSelected={btn.active}
                                         onClick={btn.onClick}
-                                        fill={btn.active ? 'tonal' : 'outline'}
-                                        size="medium"
-                                        style="primary"
+                                        isSelected={btn.active}
                                         className="plus-user-feedback-modal-type-btn"
                                     />
                                 ))}
@@ -242,12 +240,11 @@ const UserFeedbackModal = ({
                                             {Array.from({ length: severityCount }, (_, index) => (
                                                 <Button
                                                     key={`severity-${index}`}
-                                                    leadingVisual={severityLeadingVisual(severityIcon)}
-                                                    active={severity === index}
+                                                    iconBefore={severityLeadingVisual(severityIcon)}
+                                                    isSelected={severity === index}
                                                     onClick={() => handleSeverityChange(index)}
-                                                    fill={severity === index ? 'tonal' : 'outline'}
-                                                    size="small"
-                                                    style="primary"
+                                                    spacing="compact"
+                                                    isSelected={severity === index}
                                                     className="plus-user-feedback-modal-severity-btn"
                                                     aria-label={`Level ${index + 1} of ${severityCount}`}
                                                     aria-pressed={severity === index}
@@ -282,10 +279,9 @@ const UserFeedbackModal = ({
                                 <div className="plus-user-feedback-modal-add-images">
                                     <Button
                                         text="Add images (< 2 mb)"
-                                        leadingVisual="paperclip"
-                                        style="secondary"
-                                        fill="ghost"
-                                        size="small"
+                                        iconBefore="paperclip"
+                                        appearance="subtle"
+                                        spacing="compact"
                                         className="plus-user-feedback-modal-add-images-btn"
                                     />
                                 </div>
@@ -315,9 +311,7 @@ const UserFeedbackModal = ({
                             </div>
                             <Button
                                 text={config.buttonText}
-                                style="primary"
-                                fill="filled"
-                                size="medium"
+                                appearance="primary"
                                 onClick={handleSubmit}
                             />
                         </div>

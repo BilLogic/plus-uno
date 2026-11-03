@@ -358,7 +358,7 @@ AddonsInSlots.play = async ({ canvasElement }) => {
     const buttons = within(invite.querySelector('.plus-field__trailing')).getAllByRole('button');
     await expect(buttons.map((button) => button.textContent)).toEqual(['Copy', 'Send']);
     for (const button of buttons) {
-        await expect(button.classList.contains('plus-btn--small')).toBe(true);
+        await expect(button.classList.contains('plus-btn--compact')).toBe(true);
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(24);
     }
     await expect(Math.round(invite.getBoundingClientRect().height)).toBe(32);

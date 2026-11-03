@@ -321,10 +321,8 @@ export const BasicInformationSection = ({ changed = false }) => {
             >
                 <Button
                     text="Save and Update"
-                    style="primary"
-                    fill="filled"
-                    size="medium"
-                    disabled={!changed}
+                    appearance="primary"
+                    isDisabled={!changed}
                 />
             </div>
         </div>

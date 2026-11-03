@@ -85,9 +85,9 @@ export const UploadProfilePic = ({ state = 'unfilled', avatarSrc }) => {
                 Accepted formats: PNG, JPG, or JPEG
             </span>
             {isFilled ? (
-                <Button text="Update photo" style="primary" fill="tonal" size="small" />
+                <Button text="Update photo" spacing="compact" />
             ) : (
-                <Button text="Upload photo" style="primary" fill="filled" size="small" />
+                <Button text="Upload photo" appearance="primary" spacing="compact" />
             )}
         </div>
     );

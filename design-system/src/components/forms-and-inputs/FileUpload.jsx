@@ -158,10 +158,8 @@ const FileUpload = ({
                     />
                     {!readOnly && (<Button
                         text={buttonText}
-                        style="primary"
-                        fill="filled"
-                        size="medium"
-                        disabled={disabled}
+                        appearance="primary"
+                        isDisabled={disabled}
                         onClick={handleButtonClick}
                         onFocus={handleFocus}
                         onBlur={handleBlur}

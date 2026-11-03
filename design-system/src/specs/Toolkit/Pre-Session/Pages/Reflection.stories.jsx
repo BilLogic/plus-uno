@@ -51,7 +51,7 @@ const MainContent = ({
 
         {/* Fill in Button - aligned right */}
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button size="default" fill="filled" style="primary" leadingVisual="user-plus" text="Fill in" />
+            <Button appearance="primary" iconBefore="user-plus" text="Fill in" />
         </div>
 
         {/* Nav Tabs */}

@@ -176,10 +176,8 @@ const P1Content = ({ lessonTitle, estimatedTime, onRatingChange }) => {
             <div className="lesson-content__actions lesson-content__actions--single">
                 <Button
                     text="Next"
-                    style="primary"
-                    fill="filled"
-                    size="medium"
-                    disabled={confidenceRating === 'rest' || experienceRating === 'rest'}
+                    appearance="primary"
+                    isDisabled={confidenceRating === 'rest' || experienceRating === 'rest'}
                 />
             </div>
         </div>
@@ -251,8 +249,8 @@ const P2Content = ({ onPrevious, onNext }) => (
 
         {/* Actions */}
         <div className="lesson-content__actions">
-            <Button text="Previous" style="primary" fill="outline" size="medium" onClick={onPrevious} />
-            <Button text="Next" style="primary" fill="filled" size="medium" onClick={onNext} />
+            <Button text="Previous" onClick={onPrevious} />
+            <Button text="Next" appearance="primary" onClick={onNext} />
         </div>
     </div>
 );
@@ -314,8 +312,8 @@ const P3Content = ({ onPrevious, onNext }) => (
 
         {/* Actions */}
         <div className="lesson-content__actions">
-            <Button text="Previous" style="primary" fill="outline" size="medium" onClick={onPrevious} />
-            <Button text="Next" style="primary" fill="filled" size="medium" onClick={onNext} />
+            <Button text="Previous" onClick={onPrevious} />
+            <Button text="Next" appearance="primary" onClick={onNext} />
         </div>
     </div>
 );
@@ -403,8 +401,8 @@ const P4Content = ({ onPrevious, onNext }) => {
 
             {/* Actions */}
             <div className="lesson-content__actions">
-                <Button text="Previous" style="primary" fill="outline" size="medium" onClick={onPrevious} />
-                <Button text="Next" style="primary" fill="filled" size="medium" onClick={onNext} />
+                <Button text="Previous" onClick={onPrevious} />
+                <Button text="Next" appearance="primary" onClick={onNext} />
             </div>
         </div>
     );
@@ -442,13 +440,11 @@ const P5Content = ({ lessonTitle, onPrevious, onNext }) => {
 
             {/* Actions */}
             <div className="lesson-content__actions">
-                <Button text="Previous" style="primary" fill="filled" size="medium" onClick={onPrevious} />
+                <Button text="Previous" appearance="primary" onClick={onPrevious} />
                 <Button
                     text="Next"
-                    style="primary"
-                    fill="filled"
-                    size="medium"
-                    disabled={finalRating === 'rest'}
+                    appearance="primary"
+                    isDisabled={finalRating === 'rest'}
                     onClick={onNext}
                 />
             </div>

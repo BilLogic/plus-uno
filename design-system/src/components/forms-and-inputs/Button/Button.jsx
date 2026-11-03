@@ -3,43 +3,27 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './Button.scss';
 import RBButton from 'react-bootstrap/Button';
-import { useDeprecatedLargeSize } from '../../../lib/useDeprecatedLargeSize';
 
-/**
- * Button Component
- * Universal interactive element slightly favoring Figma spec over Bootstrap defaults.
- */
-const ButtonContent = ({
-    children,
-    text,
-    leadingVisual,
-    trailingVisual,
-    // Helps with styling context if needed, though mostly for layout
-    vertical = false
-}) => {
+export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'];
+export const BUTTON_SPACINGS = ['default', 'compact'];
+
+/** The icon slots and the label, in order. */
+const ButtonContent = ({ children, text, iconBefore, iconAfter }) => {
     const content = text || children;
 
-    // Helper to render visuals
-    const renderVisual = (visual, position) => {
-        if (!visual) return null;
-        let visualContent;
-        if (typeof visual === 'string') {
-            visualContent = <i className={`fa-solid fa-${visual}`} aria-hidden="true" />;
-        } else {
-            visualContent = visual;
-        }
-        return (
-            <span className={`plus-btn-visual plus-btn-visual--${position}`}>
-                {visualContent}
-            </span>
-        );
+    const renderIcon = (icon, position) => {
+        if (!icon) return null;
+        const glyph = typeof icon === 'string'
+            ? <i className={`fa-solid fa-${icon}`} aria-hidden="true" />
+            : icon;
+        return <span className={`plus-btn-visual plus-btn-visual--${position}`}>{glyph}</span>;
     };
 
     return (
         <>
-            {renderVisual(leadingVisual, 'leading')}
+            {renderIcon(iconBefore, 'before')}
             {content && <span className="plus-btn-text">{content}</span>}
-            {renderVisual(trailingVisual, 'trailing')}
+            {renderIcon(iconAfter, 'after')}
         </>
     );
 };
@@ -47,14 +31,13 @@ const ButtonContent = ({
 ButtonContent.propTypes = {
     children: PropTypes.node,
     text: PropTypes.string,
-    leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    trailingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    vertical: PropTypes.bool
+    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 /**
- * Button Component
- * Universal interactive element slightly favoring Figma spec over Bootstrap defaults.
+ * Button: triggers an action. Props follow Atlassian's Button
+ * (https://atlassian.design/components/button).
  */
 export const Button = ({
     // Content
@@ -63,85 +46,68 @@ export const Button = ({
     title,
 
     // Appearance
-    style = 'primary',
-    fill = 'filled',
-    size = 'medium',
+    appearance = 'default',
+    spacing = 'default',
+    shouldFitContainer = false,
     className,
-    block = false,
 
     // Behavior
     onClick,
-    disabled = false,
-    active = false,
-    loading = false,
+    isDisabled = false,
+    isSelected,
+    isLoading = false,
     href,
     target,
     type = 'button',
     as: Component,
 
-    // Visuals
-    leadingVisual,
-    trailingVisual,
+    // Icons
+    iconBefore,
+    iconAfter,
     vertical = false,
 
-    // Dev
     id,
     ...props
 }) => {
-    useDeprecatedLargeSize('Button', size);
-
-    // RBButton handles 'href' internally if passed (renders as anchor)
-    // RBButton handles 'type' default to 'button'
+    const iconOnly = !text && !children;
 
     const btnClasses = classNames(
         'plus-btn',
-        `plus-btn--${style}`,
-        `plus-btn--${fill}`,
-        `plus-btn--${size}`,
+        `plus-btn--${appearance}`,
         {
+            'plus-btn--compact': spacing === 'compact',
             'plus-btn--vertical': vertical,
-            'plus-btn--block': block,
-            'plus-btn--loading': loading,
-            'plus-btn--icon-only': !text && !children,
-            // RB handles 'disabled' class but we enforce ours too
-            'active': active
+            'plus-btn--fit-container': shouldFitContainer,
+            'plus-btn--loading': isLoading,
+            'plus-btn--selected': isSelected,
+            'plus-btn--icon-only': iconOnly,
         },
         className
-    );
-
-    const content = (
-        <ButtonContent
-            text={text}
-            leadingVisual={leadingVisual}
-            trailingVisual={trailingVisual}
-            vertical={vertical}
-        >
-            {children}
-        </ButtonContent>
     );
 
     return (
         <RBButton
             id={id}
-            as={Component} // Allow polymorphic 'as' prop
-            variant="" // Disable default BS variants to usage only class-based styling
+            as={Component}
+            variant=""
             href={href}
             target={target}
             type={type}
             className={btnClasses}
-            onClick={!loading ? onClick : undefined}
-            disabled={disabled || loading}
-            aria-disabled={disabled || loading}
+            onClick={!isLoading ? onClick : undefined}
+            disabled={isDisabled || isLoading}
+            aria-disabled={isDisabled || isLoading}
+            aria-busy={isLoading || undefined}
+            aria-pressed={isSelected}
             title={title}
-            active={active}
             {...props}
         >
-            {content}
+            <ButtonContent text={text} iconBefore={iconBefore} iconAfter={iconAfter}>
+                {children}
+            </ButtonContent>
         </RBButton>
     );
 };
-
-Button.Content = ButtonContent;
 
 Button.propTypes = {
     // Content
@@ -150,36 +116,27 @@ Button.propTypes = {
     title: PropTypes.string,
 
     // Appearance
-    style: PropTypes.oneOf([
-        'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info', 'default',
-        'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
-    ]),
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost', 'text']),
-    /**
-     * `medium` draws 32 and is the default. `small` draws 24 compact, for table
-     * rows and inline toolbars only. `large` is deprecated: it draws like
-     * `medium` and warns in development.
-     */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    block: PropTypes.bool,
+    appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
+    /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. */
+    spacing: PropTypes.oneOf(BUTTON_SPACINGS),
+    shouldFitContainer: PropTypes.bool,
     className: PropTypes.string,
 
     // Behavior
     onClick: PropTypes.func,
-    disabled: PropTypes.bool,
-    active: PropTypes.bool,
-    loading: PropTypes.bool,
+    isDisabled: PropTypes.bool,
+    isSelected: PropTypes.bool,
+    isLoading: PropTypes.bool,
     href: PropTypes.string,
     target: PropTypes.string,
     type: PropTypes.string,
     as: PropTypes.elementType,
 
-    // Visuals
-    leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    trailingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    // Icons: a Font Awesome Free glyph name (`plus`) or a node.
+    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     vertical: PropTypes.bool,
 
-    // Dev
     id: PropTypes.string,
 };
 

@@ -253,9 +253,7 @@ export const CallOffsTableRow = ({
             >
                 <Button
                     text={getActionButtonText()}
-                    size="small"
-                    style="secondary"
-                    fill="outline"
+                    spacing="compact"
                     onClick={(e) => {
                         e.stopPropagation();
                         onAction?.();
@@ -490,16 +488,14 @@ export const Interactive = () => {
                 </span>
                 <Button
                     text="Tutors"
-                    size="small"
-                    style="primary"
-                    fill={userType === 'tutors' ? 'filled' : 'outline'}
+                    spacing="compact"
+                    isSelected={userType === 'tutors'}
                     onClick={() => setUserType('tutors')}
                 />
                 <Button
                     text="Supervisors"
-                    size="small"
-                    style="primary"
-                    fill={userType === 'supervisors' ? 'filled' : 'outline'}
+                    spacing="compact"
+                    isSelected={userType === 'supervisors'}
                     onClick={() => setUserType('supervisors')}
                 />
 
@@ -510,16 +506,14 @@ export const Interactive = () => {
                 </span>
                 <Button
                     text="Pending"
-                    size="small"
-                    style="primary"
-                    fill={callOffState === 'pending' ? 'filled' : 'outline'}
+                    spacing="compact"
+                    isSelected={callOffState === 'pending'}
                     onClick={() => setCallOffState('pending')}
                 />
                 <Button
                     text="Past"
-                    size="small"
-                    style="primary"
-                    fill={callOffState === 'past' ? 'filled' : 'outline'}
+                    spacing="compact"
+                    isSelected={callOffState === 'past'}
                     onClick={() => setCallOffState('past')}
                 />
             </div>

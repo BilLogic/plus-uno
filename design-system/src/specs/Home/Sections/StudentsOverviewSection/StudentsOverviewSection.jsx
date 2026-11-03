@@ -319,9 +319,7 @@ const StudentsOverviewSection = ({
                         </h5>
                         <Button
                             text="View all"
-                            style="primary"
-                            fill="ghost"
-                            size="medium"
+                            appearance="subtle"
                             onClick={onViewAll}
                         />
                     </div>
@@ -360,9 +358,7 @@ const StudentsOverviewSection = ({
                     </h5>
                     <Button
                         text="View all"
-                        style="primary"
-                        fill="ghost"
-                        size="medium"
+                        appearance="subtle"
                         onClick={onViewAll}
                     />
                 </div>

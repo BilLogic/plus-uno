@@ -48,10 +48,7 @@ const ContentBlurb = ({
             {/* Action Button */}
             <Button
                 text={buttonText}
-                style="primary"
-                fill="outline"
-                size="medium"
-                trailingVisual="up-right-from-square"
+                iconAfter="up-right-from-square"
                 onClick={onButtonClick}
                 className="content-blurb__button"
             />

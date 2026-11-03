@@ -7,7 +7,7 @@ import './ButtonGroup.scss';
 /**
  * ButtonGroup Component
  * Groups related buttons together with connected styling.
- * Supports horizontal and vertical layouts with consistent sizing.
+ * Supports horizontal and vertical layouts with consistent spacing.
  */
 const ButtonGroup = ({
     // Content
@@ -15,9 +15,8 @@ const ButtonGroup = ({
     children,
 
     // Design
-    size = 'medium',
-    style = 'primary',
-    fill = 'tonal', // Tonal is default per Figma spec
+    appearance = 'default',
+    spacing = 'default',
     vertical = false,
     block = false,
 
@@ -27,9 +26,6 @@ const ButtonGroup = ({
     ariaLabel,
     ...props
 }) => {
-    // Map size to React Bootstrap size prop
-    const bsSize = size === 'small' ? 'sm' : size === 'large' ? 'lg' : undefined;
-
     // Build class names
     const groupClasses = [
         'plus-button-group',
@@ -45,9 +41,8 @@ const ButtonGroup = ({
             return React.Children.map(children, (child) => {
                 if (React.isValidElement(child)) {
                     return React.cloneElement(child, {
-                        size: child.props.size || size,
-                        style: child.props.style || style,
-                        fill: child.props.fill || fill,
+                        spacing: child.props.spacing || spacing,
+                        appearance: child.props.appearance || appearance,
                     });
                 }
                 return child;
@@ -57,15 +52,14 @@ const ButtonGroup = ({
         return buttons.map((buttonConfig, index) => (
             <Button
                 key={buttonConfig.id || index}
-                size={buttonConfig.size || size}
-                style={buttonConfig.style || style}
-                fill={buttonConfig.fill || fill}
+                spacing={buttonConfig.spacing || spacing}
+                appearance={buttonConfig.appearance || appearance}
                 text={buttonConfig.text}
-                leadingVisual={buttonConfig.leadingVisual}
-                trailingVisual={buttonConfig.trailingVisual}
+                iconBefore={buttonConfig.iconBefore}
+                iconAfter={buttonConfig.iconAfter}
                 onClick={buttonConfig.onClick}
-                disabled={buttonConfig.disabled}
-                active={buttonConfig.active}
+                isDisabled={buttonConfig.isDisabled}
+                isSelected={buttonConfig.isSelected}
                 href={buttonConfig.href}
                 {...buttonConfig.props}
             />
@@ -76,7 +70,6 @@ const ButtonGroup = ({
         <RBButtonGroup
             id={id}
             vertical={vertical}
-            size={bsSize}
             className={groupClasses}
             role="group"
             aria-label={ariaLabel}
@@ -93,13 +86,12 @@ ButtonGroup.propTypes = {
     buttons: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string,
         onClick: PropTypes.func,
-        size: PropTypes.string,
-        style: PropTypes.string,
-        fill: PropTypes.string,
-        leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-        trailingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-        disabled: PropTypes.bool,
-        active: PropTypes.bool,
+        spacing: PropTypes.string,
+        appearance: PropTypes.string,
+        iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+        iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+        isDisabled: PropTypes.bool,
+        isSelected: PropTypes.bool,
         href: PropTypes.string,
         id: PropTypes.string,
         props: PropTypes.object
@@ -108,15 +100,10 @@ ButtonGroup.propTypes = {
     children: PropTypes.node,
 
     // Design
-    /** Size of buttons in the group */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    /** Color style theme */
-    style: PropTypes.oneOf([
-        'primary', 'secondary', 'tertiary',
-        'success', 'warning', 'danger', 'info'
-    ]),
-    /** Fill variant for buttons */
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
+    /** Appearance for every button in the group */
+    appearance: PropTypes.oneOf(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery']),
+    /** Spacing for every button in the group: default 32, compact 24 */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** Stack buttons vertically */
     vertical: PropTypes.bool,
     /** Whether the group takes full width */

@@ -2,9 +2,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import Button from './Button';
-import { ButtonSizesFilledRowContainer } from './button-segmented-demos.jsx';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import Button, { BUTTON_APPEARANCES } from './Button';
 
 const icons = {
     'none': null,
@@ -19,6 +18,44 @@ const icons = {
     'upload': 'upload'
 };
 
+/**
+ * What each appearance paints, by token: ground, label, icon, hovered and
+ * pressed ground, and the edge. The tests read the cascade against these, so a
+ * rule that drifts from the token fails here.
+ */
+const PAINT = {
+    default: {
+        ground: '--ds-background-neutral-subtle', label: '--ds-text-subtle', icon: '--ds-icon-subtle',
+        hovered: '--ds-background-neutral-subtle-hovered', pressed: '--ds-background-neutral-subtle-pressed',
+        edge: '--ds-border-input',
+    },
+    primary: {
+        ground: '--ds-background-brand-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
+        hovered: '--ds-background-brand-bold-hovered', pressed: '--ds-background-brand-bold-pressed',
+    },
+    subtle: {
+        ground: '--ds-background-neutral-subtle', label: '--ds-text-subtle', icon: '--ds-icon-subtle',
+        hovered: '--ds-background-neutral-subtle-hovered', pressed: '--ds-background-neutral-subtle-pressed',
+    },
+    warning: {
+        ground: '--ds-background-warning-bold', label: '--ds-text-warning-inverse', icon: '--ds-icon-warning-inverse',
+        hovered: '--ds-background-warning-bold-hovered', pressed: '--ds-background-warning-bold-pressed',
+    },
+    danger: {
+        ground: '--ds-background-danger-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
+        hovered: '--ds-background-danger-bold-hovered', pressed: '--ds-background-danger-bold-pressed',
+    },
+    discovery: {
+        ground: '--ds-background-discovery-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
+        hovered: '--ds-background-discovery-bold-hovered', pressed: '--ds-background-discovery-bold-pressed',
+    },
+};
+
+const label = (appearance) => appearance.charAt(0).toUpperCase() + appearance.slice(1);
+const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
+/** A hover or pressed read with the transition out of the way. */
+const settled = (button) => { button.style.transition = 'none'; };
+
 export default {
     title: 'Components/Forms and inputs/Button/Button',
     component: Button,
@@ -26,9 +63,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-24', kind: 'changed', summary: 'Pressed lays the 12 state layer, a step past hover\'s 08. Keyboard focus draws the 2px focus ring 2px off the edge, with no fill.' },
-            { date: '2026-10-23', kind: 'changed', summary: '`medium` draws 32 and `small` draws 24 compact, for table rows and inline toolbars only. Every label is Body/default (14/20) at the medium weight, and every icon draws at 16.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `appearance` (default, primary, subtle, warning, danger, discovery), `spacing` (default 32, compact 24), `isSelected`, `isDisabled`, `isLoading`, `shouldFitContainer`, `iconBefore` and `iconAfter`. Radius is 6 at default spacing and 4 at compact, the icon-to-label gap is 4, and hover and pressed take named tokens.' },
         ],
         docs: {
             toc: {
@@ -45,62 +80,54 @@ export default {
             description: 'Button label text',
             table: { category: 'Content' }
         },
-        leadingVisual: {
+        iconBefore: {
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,
-            description: 'Icon at start of button',
+            description: 'Font Awesome glyph before the label',
             table: { category: 'Content' }
         },
-        trailingVisual: {
+        iconAfter: {
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,
-            description: 'Icon at end of button',
+            description: 'Font Awesome glyph after the label',
             table: { category: 'Content' }
         },
 
         // DESIGN
-        style: {
+        appearance: {
             control: 'select',
-            options: [
-                'primary', 'secondary', 'tertiary',
-                'success', 'warning', 'danger', 'info',
-                'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools', 'default'
-            ],
+            options: BUTTON_APPEARANCES,
             table: { category: 'Design' }
         },
-        fill: {
-            control: 'select',
-            options: ['filled', 'tonal', 'outline', 'ghost'],
-            table: { category: 'Design' }
-        },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: '`medium` 32 (default) · `small` 24 compact, for table rows and inline toolbars only · `large` deprecated, draws like `medium`',
+        spacing: {
+            control: 'inline-radio',
+            options: ['default', 'compact'],
+            description: '`default` draws 32. `compact` draws 24, for tables and tight toolbars.',
             table: { category: 'Design' }
         },
         vertical: {
             table: { disable: true, category: 'Design' }
         },
-        block: {
+        shouldFitContainer: {
             control: 'boolean',
-            description: 'Full width button',
+            description: 'Stretch to the width of the container',
             table: { category: 'Design' }
         },
 
         // BEHAVIOR
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        active: {
-            table: { disable: true, category: 'Behavior' }
-        },
-        loading: {
+        isSelected: {
             control: 'boolean',
-            description: 'Show loading spinner',
+            table: { category: 'Behavior' }
+        },
+        isLoading: {
+            control: 'boolean',
+            description: 'Show a spinner in place of the label and block interaction',
             table: { category: 'Behavior' }
         },
         href: {
@@ -132,9 +159,7 @@ export default {
 };
 
 /**
- * Docs-only: hero `Overview` on Button.mdx (React preview + HTML source from PLUS web-app).
- * The canvas uses the design-system `Button`; the code panel is overridden to match production
- * (JSP + Bootstrap `btn btn-primary` in `java/docroot/...`).
+ * Docs-only: hero `Overview` on Button.mdx (React preview + source from PLUS web-app).
  */
 export const Overview = {
     parameters: {
@@ -145,12 +170,133 @@ export const Overview = {
             }
         }
     },
-    render: () => <Button text="Button" style="primary" fill="filled" size="medium" />
+    render: () => <Button text="Button" appearance="primary" />
 };
 
-/** Docs-only embed for Button.mdx (`Canvas`); sidebar hidden via meta `!dev`. */
-export const SizesFilledRow = {
-    render: () => <ButtonSizesFilledRowContainer />
+/** One of each appearance. */
+export const Appearances = {
+    render: () => (
+        <div style={row}>
+            {BUTTON_APPEARANCES.map((appearance) => (
+                <Button key={appearance} appearance={appearance} text={label(appearance)} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const [appearance, paint] of Object.entries(PAINT)) {
+            const button = canvas.getByRole('button', { name: label(appearance) });
+            settled(button);
+            const style = getComputedStyle(button);
+            await expect(style.backgroundColor, `${appearance} ground`).toBe(tokenColor(canvasElement, paint.ground));
+            await expect(style.color, `${appearance} label`).toBe(tokenColor(canvasElement, paint.label));
+            const edge = paint.edge ? tokenColor(canvasElement, paint.edge) : 'rgba(0, 0, 0, 0)';
+            await expect(style.borderTopColor, `${appearance} edge`).toBe(edge);
+        }
+    },
+};
+
+/** Default draws 32; compact draws 24. Radius is 6 and 4, the icon-to-label gap 4. */
+export const Spacing = {
+    render: () => (
+        <div style={row}>
+            <Button appearance="primary" text="Default" iconBefore="plus" />
+            <Button appearance="primary" spacing="compact" text="Compact" iconBefore="plus" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const defaults = canvas.getByRole('button', { name: 'Default' });
+        const compact = canvas.getByRole('button', { name: 'Compact' });
+        await expect(Math.round(defaults.getBoundingClientRect().height), 'default height').toBe(32);
+        await expect(Math.round(compact.getBoundingClientRect().height), 'compact height').toBe(24);
+        await expect(px(getComputedStyle(defaults).borderTopLeftRadius), 'default radius').toBe(6);
+        await expect(px(getComputedStyle(compact).borderTopLeftRadius), 'compact radius').toBe(4);
+        await expect(px(getComputedStyle(defaults).paddingLeft), 'default padding').toBe(tokenLength(canvasElement, '--element-pad-x-md'));
+        await expect(px(getComputedStyle(compact).paddingLeft), 'compact padding').toBe(tokenLength(canvasElement, '--element-pad-x-sm'));
+        for (const button of [defaults, compact]) {
+            await expect(px(getComputedStyle(button).columnGap), 'icon-to-label gap').toBe(4);
+            await expect(px(getComputedStyle(button.querySelector('.plus-btn-visual i')).fontSize), 'icon size').toBe(16);
+            const text = getComputedStyle(button.querySelector('.plus-btn-text'));
+            await expect(text.fontSize, 'label size').toBe('14px');
+            await expect(text.fontWeight, 'label weight').toBe('500');
+        }
+    },
+};
+
+/** Icons before and after the label. */
+export const Icons = {
+    render: () => (
+        <div style={row}>
+            <Button text="Icon before" iconBefore="star" />
+            <Button text="Icon after" iconAfter="arrow-right" />
+            <Button text="Both" iconBefore="user" iconAfter="chevron-right" />
+        </div>
+    ),
+};
+
+/** Selected, disabled and loading. */
+export const States = {
+    render: () => (
+        <div style={row}>
+            <Button text="Selected" isSelected />
+            <Button text="Disabled" appearance="primary" isDisabled />
+            <Button text="Loading" appearance="primary" isLoading />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+
+        const selected = canvas.getByRole('button', { name: 'Selected' });
+        settled(selected);
+        await expect(selected).toHaveAttribute('aria-pressed', 'true');
+        await expect(getComputedStyle(selected).backgroundColor, 'selected ground').toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(selected).color, 'selected label').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+
+        const disabled = canvas.getByRole('button', { name: 'Disabled' });
+        settled(disabled);
+        await expect(disabled).toBeDisabled();
+        await expect(getComputedStyle(disabled).backgroundColor, 'disabled ground').toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        await expect(getComputedStyle(disabled).color, 'disabled label').toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await expect(getComputedStyle(disabled).opacity, 'a color change, not a dim').toBe('1');
+
+        const loading = canvas.getByRole('button', { name: 'Loading' });
+        settled(loading);
+        await expect(loading).toBeDisabled();
+        await expect(loading).toHaveAttribute('aria-busy', 'true');
+        await expect(getComputedStyle(loading).backgroundColor, 'loading keeps its ground').toBe(tokenColor(canvasElement, PAINT.primary.ground));
+        await expect(getComputedStyle(loading.querySelector('.plus-btn-text')).opacity, 'label is hidden').toBe('0');
+        await expect(getComputedStyle(loading, '::after').content, 'spinner').not.toBe('none');
+    },
+};
+
+/** Fills the width of its container. */
+export const FitContainer = {
+    render: () => (
+        <div style={{ width: '320px' }}>
+            <Button appearance="primary" text="Full width button" shouldFitContainer />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button', { name: 'Full width button' });
+        await expect(Math.round(button.getBoundingClientRect().width)).toBe(320);
+    },
+};
+
+/** A label that does not fit ends in an ellipsis; the full text stays readable. */
+export const Truncation = {
+    render: () => (
+        <div style={{ width: '160px' }}>
+            <Button text="This text is truncated to fit within the container" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button');
+        const text = button.querySelector('.plus-btn-text');
+        await expect(getComputedStyle(text).textOverflow).toBe('ellipsis');
+        await expect(button.getBoundingClientRect().width).toBeLessThanOrEqual(160);
+        await expect(button).toHaveAccessibleName('This text is truncated to fit within the container');
+    },
 };
 
 /**
@@ -159,56 +305,42 @@ export const SizesFilledRow = {
 export const Interactive = {
     args: {
         text: 'Interactive Button',
-        style: 'primary',
-        fill: 'filled',
-        size: 'medium',
-        leadingVisual: 'none',
-        trailingVisual: 'none',
-        disabled: false,
-        loading: false,
-        block: false
+        appearance: 'default',
+        spacing: 'default',
+        iconBefore: 'none',
+        iconAfter: 'none',
+        isDisabled: false,
+        isSelected: false,
+        isLoading: false,
+        shouldFitContainer: false
     },
-    render: args => <Button {...args} />
+    render: ({ isSelected, ...args }) => <Button {...args} isSelected={isSelected || undefined} />
 };
 
 /**
- * The state steps, read from the cascade: hover and pressed take the named
- * steps. A filled button lays its role's bold step over its fill, a tonal
- * button its subtle step; an outline or ghost button takes the neutral subtle
+ * Hover and pressed take the named tokens, laid straight on the container: a
+ * bold appearance its own bold step, default and subtle the neutral subtle
  * step.
  */
 export const StateSteps = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
-            <Button text="Filled" style="primary" fill="filled" />
-            <Button text="Tonal" style="primary" fill="tonal" />
-            <Button text="Outline" style="primary" fill="outline" />
-            <Button text="Ghost" style="primary" fill="ghost" />
+        <div style={row}>
+            {BUTTON_APPEARANCES.map((appearance) => (
+                <Button key={appearance} appearance={appearance} text={label(appearance)} />
+            ))}
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const read = (button, pseudo, measure) => {
-            button.style.transition = 'none';
-            return withForcedPseudo(button, pseudo, () => measure(getComputedStyle(button)));
+        const read = (button, pseudo) => {
+            settled(button);
+            return withForcedPseudo(button, pseudo, () => getComputedStyle(button).backgroundColor);
         };
-        const layer = (style) => style.getPropertyValue('--plus-btn-state-layer').trim();
-
-        const layers = {
-            Filled: ['--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed'],
-            Tonal: ['--ds-background-brand-subtlest-hovered', '--ds-background-brand-subtlest-pressed'],
-        };
-        for (const [name, [hovered, pressed]] of Object.entries(layers)) {
-            const button = canvas.getByRole('button', { name });
-            await expect(read(button, ':hover', layer), `${name} hover`).toBe(tokenColor(canvasElement, hovered));
-            await expect(read(button, ':active', layer), `${name} pressed`).toBe(tokenColor(canvasElement, pressed));
-        }
-        for (const name of ['Outline', 'Ghost']) {
-            const button = canvas.getByRole('button', { name });
-            const fill = (style) => style.backgroundColor;
-            await expect(read(button, ':hover', fill), `${name} hover`).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
-            await expect(read(button, ':active', fill), `${name} pressed`).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
+        for (const [appearance, paint] of Object.entries(PAINT)) {
+            const button = canvas.getByRole('button', { name: label(appearance) });
+            await expect(read(button, ':hover'), `${appearance} hovered`).toBe(tokenColor(canvasElement, paint.hovered));
+            await expect(read(button, ':active'), `${appearance} pressed`).toBe(tokenColor(canvasElement, paint.pressed));
         }
     },
 };
@@ -216,17 +348,17 @@ export const StateSteps = {
 /** Tabbing onto a button draws the 2px focus ring 2px off its edge, and no fill. */
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
-    render: () => <Button text="Save" style="primary" fill="outline" />,
+    render: () => <Button text="Save" />,
     play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole('button', { name: 'Save' });
-        button.style.transition = 'none';
+        settled(button);
         await userEvent.tab();
         await expect(document.activeElement).toBe(button);
         const style = getComputedStyle(button);
         await waitFor(() => expect(style.outlineStyle).toBe('solid'));
         await expect(px(style.outlineWidth), 'ring width').toBe(2);
         await expect(px(style.outlineOffset), 'ring gap').toBe(2);
-        await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--color-focus-ring'));
+        await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
         await expect(style.backgroundColor, 'no focus fill').toBe('rgba(0, 0, 0, 0)');
     },
 };
