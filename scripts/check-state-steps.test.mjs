@@ -270,7 +270,7 @@ test('NavTabs: neutral subtle hovered and pressed on every tab, focus a ring wit
   expectRule(NAV, '.plus-nav-tabs .dropdown .dropdown-toggle:active', { 'background-color': pressed });
 });
 
-/* ─── Checkbox, Radio, Switch ────────────────────────────────────────────── */
+/* ─── Checkbox, Radio, Toggle ────────────────────────────────────────────── */
 
 /*
  * Checkbox and Radio are on the new tokens: an unchecked control hovers to the
@@ -301,19 +301,19 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
   assert.equal(checked['background-image'], undefined, 'a checked radio redraws its dot on hover; the checked rule draws it');
 });
 
-test('Switch: hover steps the track, neutral off and brand bold on', () => {
-  const file = 'components/forms-and-inputs/Switch.scss';
-  const input = '.plus-form-switch .form-check-input[type=checkbox]';
+test('Toggle: hover steps the track, neutral bold off and selected bold on', () => {
+  const file = 'components/forms-and-inputs/Toggle.scss';
+  const input = '.plus-toggle .form-check-input[type=checkbox]';
   expectRule(file, `${input}:hover:not(:disabled):not(:checked)`, {
-    'background-color': layer('--ds-background-neutral-subtle-hovered'),
+    'background-color': layer('--ds-background-neutral-bold-hovered'),
   });
   expectRule(file, `${input}:checked:hover:not(:disabled)`, {
-    'background-color': layer('--ds-background-brand-bold-hovered'),
+    'background-color': layer('--ds-background-selected-bold-hovered'),
   });
 });
 
 /*
- * THE FOCUS GAP. Button, Checkbox, Radio and Switch draw the same keyboard ring: 2px
+ * THE FOCUS GAP. Button, Checkbox, Radio and Toggle draw the same keyboard ring: 2px
  * of the focus-ring role, 2px off the control's edge. The Radio's ring was an
  * inverse-primary halo touching its border, and on a checked radio the two
  * merged into one thick primary edge that did not read as focus. The ring is
@@ -322,7 +322,7 @@ test('Switch: hover steps the track, neutral off and brand bold on', () => {
 for (const [name, file, selector, ring] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
   ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible', DS_RING_OUTSIDE],
-  ['Switch', 'components/forms-and-inputs/Switch.scss', '.plus-form-switch .form-check-input[type=checkbox]:focus-visible', RING_OUTSIDE],
+  ['Toggle', 'components/forms-and-inputs/Toggle.scss', '.plus-toggle .form-check-input[type=checkbox]:focus-visible', DS_RING_OUTSIDE],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {
     expectRule(file, selector, ring);

@@ -12,7 +12,7 @@ import { Modal, Form } from 'react-bootstrap';
 import TutorSessionsTable from '@/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 import Select from '@/components/forms-and-inputs/Select';
 import Input from '@/components/forms-and-inputs/Input';
 import Pagination from '@/components/navigation/Pagination/Pagination';
@@ -239,13 +239,11 @@ const TutorModal = ({
                                 </Form.Group>
 
                                 <div className="tutor-modal__lead-toggle">
-                                    <Switch
+                                    <Toggle
                                         id="tutor-lead-edit"
                                         label="This tutor is a lead"
-                                        size="medium"
-                                        checked={formData.isLead}
-                                        onChange={(checked) => setFormData({ ...formData, isLead: checked })}
-                                    />
+                                        isChecked={formData.isLead}
+                                        onChange={(checked) => setFormData({ ...formData, isLead: checked })}/>
                                 </div>
                             </Form>
                         </div>
@@ -255,12 +253,10 @@ const TutorModal = ({
                     {mode === 'edit' && activeTab === 'sessions' && (
                         <div className="tutor-modal__sessions-tab">
                             <div className="tutor-modal__sessions-toggle">
-                                <Switch
+                                <Toggle
                                     id="show-future-sessions"
                                     label="Show Future Sessions"
-                                    size="medium"
-                                    checked={showFutureSessions}
-                                />
+                                    isChecked={showFutureSessions}/>
                             </div>
 
                             <TutorSessionsTable
@@ -366,13 +362,11 @@ const TutorModal = ({
                                 </div>
 
                                 <div className="tutor-modal__lead-toggle">
-                                    <Switch
+                                    <Toggle
                                         id="tutor-lead-add"
                                         label="This tutor is a lead"
-                                        size="medium"
-                                        checked={formData.isLead}
-                                        onChange={(checked) => setFormData({ ...formData, isLead: checked })}
-                                    />
+                                        isChecked={formData.isLead}
+                                        onChange={(checked) => setFormData({ ...formData, isLead: checked })}/>
                                 </div>
                             </Form>
                         </div>

@@ -144,8 +144,8 @@ const LoadingSpinner = () => (
 const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = false }) => {
     const [zoom, setZoom] = useState(zoomValue);
 
-    const handleZoomChange = (e) => {
-        setZoom(Number(e.target.value));
+    const handleZoomChange = (next) => {
+        setZoom(next);
     };
 
     const handleMinus = () => {
@@ -281,9 +281,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                             max={100}
                             value={zoom}
                             onChange={handleZoomChange}
-                            size="medium"
-                            style={{ flex: '1 0 0' }}
-                        />
+                            style={{ flex: '1 0 0' }}/>
                     ) : (
                         <Range
                             id="zoom-range-static"
@@ -292,9 +290,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                             min={0}
                             max={100}
                             defaultValue={zoomValue}
-                            size="medium"
-                            style={{ flex: '1 0 0' }}
-                        />
+                            style={{ flex: '1 0 0' }}/>
                     )}
                     <i
                         className="fa-solid fa-plus"

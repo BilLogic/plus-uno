@@ -264,14 +264,14 @@ export const webAppSourceSnippets = {
     ]),
     formRadio: snippet([
         '<>',
-        '  <Radio id="radio-overview-1" name="radio-overview" label="Option 1" value="option1" checked />',
-        '  <Radio id="radio-overview-2" name="radio-overview" label="Option 2" value="option2" />',
+        '  <Radio id="radio-overview-1" name="radio-overview" label="Option 1" value="option1" isChecked/>',
+        '  <Radio id="radio-overview-2" name="radio-overview" label="Option 2" value="option2"/>',
         '</>'
     ]),
-    formSwitch: snippet([
-        '<Switch',
-        '  id="switch-overview"',
-        '  name="switch-overview"',
+    formToggle: snippet([
+        '<Toggle',
+        '  id="toggle-overview"',
+        '  name="toggle-overview"',
         '  label="Wi-Fi"',
         '  defaultChecked',
         '/>'
@@ -299,8 +299,7 @@ export const webAppSourceSnippets = {
         '  min={0}',
         '  max={100}',
         '  value={value}',
-        '  onChange={(e) => setValue(parseFloat(e.target.value))}',
-        '  size="medium"',
+        '  onChange={(next) => setValue(next)}',
         '/>'
     ]),
     formRating: snippet([

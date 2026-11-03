@@ -56,9 +56,8 @@ const LoginForm = () => {
                         <Checkbox
                             id="remember-me"
                             label="Remember me for 30 days"
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.target.checked)}
-                        />
+                            isChecked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}/>
                     </div>
 
                     <Button appearance="primary" shouldFitContainer type="submit">

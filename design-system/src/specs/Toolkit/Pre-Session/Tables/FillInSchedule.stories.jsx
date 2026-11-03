@@ -93,12 +93,10 @@ export const TableRow = ({
                   * distinguish it, so they are the name (#213).
                   */}
                 <Checkbox
-                    checked={isChecked}
+                    isChecked={isChecked}
                     onChange={handleCheckboxChange}
-                    size="small"
-                    disabled={effectiveState === 'disabled'}
-                    aria-label={`Select the session on ${date}, ${timeRange}`}
-                />
+                    isDisabled={effectiveState === 'disabled'}
+                    aria-label={`Select the session on ${date}, ${timeRange}`}/>
             </div>
 
             {/* Date & Time Cell */}

@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CheckboxStories from './Checkbox.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Checkbox } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,7 +22,7 @@ export const figmaMeta = {
 <Meta of={CheckboxStories} />
 
 <Title />
-Use checkbox when a user needs to select more than one option from a list.
+A checkbox lets a person select one or more options from a list, or confirm a single setting. [ADS documentation](https://atlassian.design/components/checkbox/usage).
 
 <DocsTabs of={CheckboxStories}>
 
@@ -38,10 +39,65 @@ Use checkbox when a user needs to select more than one option from a list.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Single checkbox with label.</>}>
+<DocsCanvasShell attachSourceBelow description={<>A checkbox is a box and a label in a 24 row.</>}>
     <Canvas of={CheckboxStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>1 Box</td><td>An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.</td></tr>
+        <tr><td>2 Label</td><td>14/20 text beside the box. It names the checkbox. A required marker follows it.</td></tr>
+        <tr><td>3 Description</td><td>Optional 12/16 text under the label that describes the choice. It does not name it.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the checkbox. Without a label, pass <code>aria-label</code>.</td></tr>
+        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
+        <tr><td><code>isIndeterminate</code></td><td>boolean</td><td><code>false</code></td><td>The mixed state. Display only.</td></tr>
+        <tr><td><code>isInvalid</code></td><td>boolean</td><td><code>false</code></td><td>Danger edge on the unselected box only.</td></tr>
+        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Out of the tab order, disabled fill.</td></tr>
+        <tr><td><code>isRequired</code></td><td>boolean</td><td><code>false</code></td><td>Draws the marker and requires the box natively.</td></tr>
+        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
+        <tr><td><code>description</code></td><td>node</td><td>none</td><td>PLUS addition. Linked with <code>aria-describedby</code>.</td></tr>
+        <tr><td><code>appearance</code></td><td><code>plain</code>, <code>card</code></td><td><code>plain</code></td><td>PLUS addition. <code>card</code> draws the choice as a bordered tile.</td></tr>
+        <tr><td><code>id</code>, <code>name</code>, <code>value</code></td><td>string</td><td>generated id</td><td><code>name</code> is a form key, not an id.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Unselected, selected, mixed and disabled.</>}>
+    <DsCanvasQuiet of={CheckboxStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Invalid marks the unselected box. A selected box keeps its fill.</>}>
+    <DsCanvasQuiet of={CheckboxStories.Invalid} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
+    <DsCanvasQuiet of={CheckboxStories.ReadOnly} />
 </DocsCanvasShell>
 
 </div>
@@ -50,36 +106,22 @@ Use checkbox when a user needs to select more than one option from a list.
 
 ## Content
 
-<DocsCanvasShell description={<>Label text lengths and the required indicator.</>}>
+<DocsCanvasShell description={<>A long label wraps inside its row. The required marker follows the label.</>}>
     <DsCanvasQuiet of={CheckboxStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Small, medium (default), and large.</>}>
-    <DsCanvasQuiet of={CheckboxStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Unchecked, checked, indeterminate, disabled, and required.</>}>
-    <DsCanvasQuiet of={CheckboxStories.InteractionStates} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
-    <DsCanvasQuiet of={CheckboxStories.ReadOnly} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
     <DsCanvasQuiet of={CheckboxStories.DescriptionAndCard} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Grouped checkboxes
+
+<DocsCanvasShell description={<>A parent box shows the mixed state while some, not all, children are selected.</>}>
+    <DsCanvasQuiet of={CheckboxStories.SelectAll} />
 </DocsCanvasShell>
 
 </div>
@@ -112,12 +154,26 @@ Use checkbox when a user needs to select more than one option from a list.
 
 ## When to use
 
-Use `Checkbox` for one independent yes/no — an opt-in, a "select this row", a
-single term to accept. Each checkbox stands alone: several of them are several
-independent booleans, not one answer with several parts.
+Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form.
 
-`indeterminate` is the third visual state, applied imperatively to the input, and
-it is what a "select all" control needs when only some rows are ticked.
+Individual checkboxes have two states, selected and unselected. When checkboxes are grouped, a parent shows a third, mixed state while some, not all, of its children are selected.
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <div><Checkbox label="Email me a summary" /></div>,
+            doCaption: 'Keep the label short and descriptive, with no punctuation after it.',
+            dontExample: <div><Checkbox label="Check this box if you would like to receive an email summary." /></div>,
+            dontCaption: "A sentence as a label reads as an instruction and ends in punctuation. Name the choice instead.",
+        },
+        {
+            doExample: <div><Checkbox label="I accept the terms" isInvalid /></div>,
+            doCaption: 'Pair an invalid checkbox with a message that says what to do.',
+            dontExample: <div><Checkbox label="I accept the terms" isInvalid isDisabled /></div>,
+            dontCaption: "A disabled box cannot take focus, so a screen reader never reaches the reason it is off. Use validation instead.",
+        },
+    ]}
+/>
 
 </div>
 
@@ -127,32 +183,26 @@ it is what a "select all" control needs when only some rows are ticked.
 
 ### Read-only is not disabled.
 
-`readOnly` shows an answer the person may read but not change: the box stays in
-the tab order at full contrast, says `aria-readonly`, and ignores clicks and
-Space. `disabled` takes it out of the tab order and grays it, for a box that does
-not apply right now.
+`isReadOnly` shows an answer the person may read but not change: the box stays in the tab order at full contrast, says `aria-readonly`, and ignores clicks and Space. `isDisabled` takes it out of the tab order and grays it, for a box that does not apply right now.
 
 ### A description describes; the label names.
 
-`description` renders under the label and is wired with `aria-describedby`, so
-it is read after the name instead of becoming part of it. `appearance="card"`
-draws the box, label and description as one bordered tile.
+`description` renders under the label and is wired with `aria-describedby`, so it is read after the name instead of becoming part of it.
 
 ### Pick controlled or uncontrolled and stay there.
 
 ```jsx
-// Incorrect — `checked` being defined puts the component in controlled mode,
+// Incorrect: `isChecked` being defined puts the component in controlled mode,
 // which makes `defaultChecked` dead. The two never apply together.
-<Checkbox id="terms" label="I accept" checked={accepted} defaultChecked />
+<Checkbox id="terms" label="I accept" isChecked={accepted} defaultChecked />
 
-// Correct — controlled needs a handler; uncontrolled needs neither.
-<Checkbox id="terms" label="I accept" checked={accepted} onChange={onAccept} />
+// Correct: controlled needs a handler; uncontrolled needs neither.
+<Checkbox id="terms" label="I accept" isChecked={accepted} onChange={onAccept} />
 ```
 
-### `indeterminate` is display only.
+### `isIndeterminate` is display only.
 
-The underlying value is still checked or unchecked. Clicking an indeterminate
-box resolves it like any other, so it cannot be used as a third stored value.
+The underlying value is still checked or unchecked. Clicking a mixed box resolves it like any other, so it cannot be used as a third stored value.
 
 </div>
 
@@ -160,60 +210,38 @@ box resolves it like any other, so it cannot be used as a third stored value.
 
 ## Accessibility
 
-- **The label is wired for you, `id` or no `id`.** The component derives one id
-  through `useFieldId` and hands it to the underlying form check, which renders
-  the `label` with a matching `htmlFor`, so a caller who passes neither `id` nor
-  `name` still gets a label that names the input. `Input` and `Textarea` reach
-  the same place by the same route.
-- **`name` is not an id.** It is a form key, it is not unique on the page, and no
-  element carries it as one; it no longer stands in for a missing `id`.
-- **A checkbox with no `label` has no accessible name.** Nothing substitutes for
-  it — not a neighboring `<span>`, not the column it sits under. Where the
-  design has no room for visible text, pass `aria-label`; it is spread onto the
-  input.
-- **`required` is forwarded.** Unlike `Input`, the `required` prop reaches the
-  input element as well as drawing the asterisk, so native validation applies.
-  The asterisk itself is a span marked `aria-label="required"`.
-- **`indeterminate` is set on the DOM node.** An effect finds the input and sets
-  its `indeterminate` property, which is the only way to express that state —
-  it is a property, not an attribute. Screen readers report it as "mixed".
-- **No error state.** There is no `validation` prop and no message slot; a
-  checkbox that fails validation needs its message rendered and linked by the
-  caller with `aria-describedby`, which is spread onto the input.
-- **Group it.** Nothing in the component connects one checkbox to the next.
-  Related checkboxes need a `fieldset` and `legend`, per
-  `design-system/guidelines/foundations/accessibility.md`.
+- **The label is wired for you, `id` or no `id`.** The component derives an id and hands it to the input and the label, so a caller who passes neither `id` nor `name` still gets a label that names the input.
+- **A checkbox with no `label` has no accessible name.** Where the design has no room for visible text, pass `aria-label`; it is spread onto the input.
+- **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen.
+- **Include an error message for a required or invalid box**, for example "Select an option".
+- **`isRequired` reaches the input**, so native validation applies. The marker is a span marked `aria-label="required"`.
+- **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
+- **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none.
+- **Group related boxes** in a `fieldset` with a `legend`, or let ChoiceGroup own the set.
 
-### A checkbox with no `label` has no name — give it one, visible or not.
+</div>
 
-```jsx
-// Incorrect — a row-select checkbox in a table. Nothing names it, and the
-// column it sits in does not: a screen reader reads "checkbox", four times.
-<Checkbox checked={selected} onChange={onSelect} />
+<div className="sb-ds-doc-section">
 
-// Correct — no room for visible text, so the name goes in `aria-label`.
-<Checkbox checked={selected} onChange={onSelect}
-          aria-label={`Select the session on ${date}`} />
+## ADS parity
 
-// Also correct — there is room, so the text is the label.
-<Checkbox label="Email me a summary" checked={emailMe} onChange={onEmailMe} />
-```
-
-### A group of checkboxes is a group; say so.
-
-```jsx
-// Incorrect — three independent checkboxes with no shared question. A screen
-// reader hears three unrelated booleans.
-<Checkbox id="mon" label="Monday" />
-<Checkbox id="tue" label="Tuesday" />
-
-// Correct — either name the group, or let ChoiceGroup own the whole set.
-<fieldset>
-  <legend>Available days</legend>
-  <Checkbox id="mon" label="Monday" />
-  <Checkbox id="tue" label="Tuesday" />
-</fieldset>
-```
+<DocsTable>
+    <thead>
+        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>isIndeterminate</code></td><td><code>isIndeterminate</code></td><td>Same.</td></tr>
+        <tr><td><code>isInvalid</code></td><td><code>isInvalid</code></td><td>Same. Marks the unselected box only.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
+        <tr><td><code>isRequired</code></td><td><code>isRequired</code></td><td>Same.</td></tr>
+        <tr><td><code>label</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>size</code></td><td>not shipped</td><td>ADS deprecates it. PLUS draws one size.</td></tr>
+        <tr><td><code>xcss</code>, <code>testId</code></td><td>not shipped</td><td>Style through tokens; test by role and name.</td></tr>
+        <tr><td>none</td><td><code>isReadOnly</code>, <code>description</code>, <code>appearance</code></td><td>PLUS additions for answers a person reads and for choices that need a hint.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
@@ -221,11 +249,11 @@ box resolves it like any other, so it cannot be used as a third stored value.
 
 ## Related
 
-- For a setting that takes effect immediately, use `Switch`.
-- For one answer from several options, use `ChoiceGroup`.
-- For a group of checkboxes, use `ChoiceGroup` with `type="checkbox"`. A group is the group component's job: it owns the value and the group label, where Checkboxes mapped by hand in each screen own neither.
-- For a rows-by-columns matrix of choices, use `ChoiceGrid`.
-- For choices in a popup, use `Select`.
+- To turn a setting on or off at once, use Toggle.
+- For one answer from several options, use Radio, or ChoiceGroup for the whole set.
+- For a group of checkboxes, use ChoiceGroup with `type="checkbox"`. It owns the value and the group label.
+- For a rows-by-columns matrix of choices, use ChoiceGrid.
+- For choices in a popup, use Select.
 
 </div>
 

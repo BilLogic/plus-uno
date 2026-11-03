@@ -2,29 +2,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
-import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Radio.scss';
 
 /**
  * Radio — single option within a named radio group.
- * Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
+ * Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
  */
 const Radio = ({
     id,
     name,
     label,
     value,
-    checked,
+    isChecked,
     defaultChecked,
-    size = 'medium',
-    disabled = false,
+    /** Marks the unselected radio as failing validation. A selected radio does not change. */
+    isInvalid = false,
+    isDisabled = false,
     /**
      * Shown, focusable, not changeable. ARIA allows `aria-readonly` on a
      * radiogroup and not on a radio, so a lone Radio carries the behavior and
      * the group (ChoiceGroup) carries the announcement.
      */
-    readOnly = false,
+    isReadOnly = false,
+    isRequired = false,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description,
     /** `card` draws the option as a bordered tile. */
@@ -37,7 +38,7 @@ const Radio = ({
     style,
     ...props
 }) => {
-    const isControlled = checked !== undefined;
+    const isControlled = isChecked !== undefined;
     /**
      * One id for this option's input and the `for` `Form.Check` puts on its
      * label (#222).
@@ -58,17 +59,16 @@ const Radio = ({
      * A caller who passes `id` gets exactly that id back.
      */
     const fieldId = useFieldId(id);
-    useDeprecatedLargeSize('Radio', size);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
     const { descriptionId, inputProps } = choiceInputProps({
-        fieldId, description, readOnly, onChange, onClick, describedBy,
+        fieldId, description, readOnly: isReadOnly, onChange, onClick, describedBy,
     });
 
     const wrapperClasses = [
         'plus-form-radio-wrapper',
-        `plus-form-radio-${size}`,
-        disabled ? 'plus-form-radio-disabled' : '',
-        choiceClasses({ appearance, readOnly, description }),
+        isDisabled ? 'plus-form-radio-disabled' : '',
+        isInvalid ? 'plus-form-radio-invalid' : '',
+        choiceClasses({ appearance, readOnly: isReadOnly, description }),
         className
     ].filter(Boolean).join(' ');
 
@@ -79,9 +79,11 @@ const Radio = ({
                 id={fieldId}
                 name={name}
                 value={value}
-                checked={isControlled ? checked : undefined}
+                checked={isControlled ? isChecked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
-                disabled={disabled}
+                disabled={isDisabled}
+                required={isRequired || undefined}
+                aria-invalid={isInvalid || undefined}
                 onFocus={onFocus}
                 onBlur={onBlur}
                 label={label}
@@ -99,16 +101,12 @@ Radio.propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.node,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    checked: PropTypes.bool,
+    isChecked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
-    /**
-     * Every size draws a 24 row with a 14/20 label; `small` keeps its smaller
-     * mark. `large` is deprecated: it draws like `medium` and warns in
-     * development.
-     */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
+    isInvalid: PropTypes.bool,
+    isDisabled: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
+    isRequired: PropTypes.bool,
     description: PropTypes.node,
     appearance: PropTypes.oneOf(['plain', 'card']),
     onChange: PropTypes.func,

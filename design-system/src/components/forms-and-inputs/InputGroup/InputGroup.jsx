@@ -184,11 +184,10 @@ const InputGroupCheckbox = ({
 }) => (
     <span className={`plus-input-group-addon plus-input-group-checkbox ${className}`.trim()} {...props}>
         <Checkbox
-            checked={checked}
-            disabled={disabled}
+            isChecked={checked}
+            isDisabled={disabled}
             onChange={onChange || (() => {})}
-            aria-label={ariaLabel}
-        />
+            aria-label={ariaLabel}/>
     </span>
 );
 
@@ -221,11 +220,10 @@ const InputGroupRadio = ({
         <span className={`plus-input-group-addon plus-input-group-radio ${className}`.trim()} {...props}>
             <Radio
                 name={groupName}
-                checked={checked}
-                disabled={disabled}
+                isChecked={checked}
+                isDisabled={disabled}
                 onChange={onChange || (() => {})}
-                aria-label={ariaLabel}
-            />
+                aria-label={ariaLabel}/>
         </span>
     );
 };

@@ -42,13 +42,11 @@ export const ConfirmationAlert = ({
               * same string to the accessibility tree (#213).
               */}
             <Checkbox
-                size="small"
-                required
-                checked={checked}
+                isRequired
+                isChecked={checked}
                 onChange={onChange}
                 aria-label={label}
-                style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }}
-            />
+                style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }}/>
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
                 {label}
                 <span style={{ color: 'var(--color-danger)' }}> *</span>

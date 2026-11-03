@@ -1,0 +1,157 @@
+/**
+ * Toggle — a track and a thumb, in a 24 row with the label.
+ * 16: track 32×16, thumb 12. 20: track 40×20, thumb 16. Pad 2 on both.
+ * Off: neutral bold track. On: selected bold track. The thumb is `icon.inverse`.
+ * Keyboard focus is the 2px ring on `border.focused`, 2px off the track.
+ */
+
+.plus-toggle-wrapper {
+    --plus-toggle-track-h: 16px;
+    --plus-toggle-track-w: 32px;
+    --plus-toggle-pad: 2px;
+    --plus-toggle-thumb: calc(var(--plus-toggle-track-h) - 2 * var(--plus-toggle-pad));
+
+    display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
+    align-items: center;
+    width: 100%;
+
+    .form-check {
+        padding-left: 0;
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: var(--size-element-gap-sm, 8px);
+    }
+
+    .form-check.form-switch {
+        padding-left: 0;
+    }
+}
+
+.plus-toggle-20 {
+    --plus-toggle-track-h: 20px;
+    --plus-toggle-track-w: 40px;
+}
+
+.plus-toggle {
+    // A choice row is 24 (`--item-height-sm`), its label 14/20. Only a labeled
+    // control is a row: without a label React-Bootstrap drops `.form-check` (it
+    // keeps `.form-switch`), and the bare track keeps its own size.
+    &.form-switch {
+        padding-left: 0;
+        min-height: auto;
+    }
+
+    &.form-switch.form-check {
+        min-height: var(--item-height-sm);
+    }
+
+    .form-check-input[type="checkbox"],
+    &.form-switch .form-check-input {
+        width: var(--plus-toggle-track-w) !important;
+        height: var(--plus-toggle-track-h) !important;
+        min-width: var(--plus-toggle-track-w) !important;
+        min-height: var(--plus-toggle-track-h) !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        flex-shrink: 0;
+        float: none !important;
+        border: 0 !important;
+        border-radius: var(--size-element-radius-full, 999px) !important;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        position: relative;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: none !important;
+        background-color: var(--ds-background-neutral-bold) !important;
+        box-sizing: border-box;
+
+        // Kill Bootstrap switch pseudo chrome
+        &::before {
+            display: none !important;
+            content: none !important;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            top: var(--plus-toggle-pad);
+            left: var(--plus-toggle-pad);
+            width: var(--plus-toggle-thumb);
+            height: var(--plus-toggle-thumb);
+            border-radius: var(--size-element-radius-full, 999px);
+            background-color: var(--ds-icon-inverse);
+            transition: transform 0.2s ease;
+            display: block;
+            box-shadow: none;
+        }
+
+        &:checked {
+            background-color: var(--ds-background-selected-bold) !important;
+        }
+
+        &:checked::after {
+            transform: translateX(calc(var(--plus-toggle-track-w) - var(--plus-toggle-track-h)));
+        }
+
+        // Hover steps the track to its named hovered step.
+        &:hover:not(:disabled):not(:checked) {
+            background-color: var(--ds-background-neutral-bold-hovered) !important;
+        }
+
+        &:checked:hover:not(:disabled) {
+            background-color: var(--ds-background-selected-bold-hovered) !important;
+        }
+
+        // Keyboard focus is the ring Checkbox and Radio draw: 2px of
+        // `border.focused`, 2px off the track. A pointer focus draws none.
+        &:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        &:focus-visible {
+            // @grounds: --color-surface --color-surface-container
+            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+            outline-offset: var(--size-element-stroke-lg);
+            box-shadow: none;
+        }
+
+        // Disabled keeps one fill for both positions; the thumb says which.
+        &:disabled,
+        &:disabled:checked {
+            cursor: not-allowed;
+            background-color: var(--ds-background-disabled) !important;
+        }
+
+        &:disabled::after {
+            background-color: var(--ds-icon-disabled);
+        }
+    }
+
+    .form-check-label {
+        color: var(--ds-text);
+        cursor: pointer;
+        user-select: none;
+        flex: 1;
+        padding-left: 0;
+        margin: 0;
+        font: var(--body-default);
+        display: flex;
+        align-items: center;
+    }
+
+    .form-check-input:disabled ~ .form-check-label {
+        opacity: var(--ds-opacity-disabled);
+        cursor: not-allowed;
+    }
+}
+
+.plus-toggle-disabled {
+    .form-check-label {
+        cursor: not-allowed;
+    }
+}

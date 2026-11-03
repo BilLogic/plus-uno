@@ -2,30 +2,30 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
-import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
 import './Checkbox.scss';
 
 /**
  * Checkbox — single boolean control with optional indeterminate state.
- * Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
+ * Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
  */
 const Checkbox = ({
     id,
     name,
     label,
     value,
-    checked,
+    isChecked,
     defaultChecked,
-    indeterminate = false,
-    size = 'medium',
-    disabled = false,
+    isIndeterminate = false,
+    /** Marks the unselected box as failing validation. A selected box does not change. */
+    isInvalid = false,
+    isDisabled = false,
     /**
-     * Shown and announced, not changeable. Unlike `disabled` the box stays in
+     * Shown and announced, not changeable. Unlike `isDisabled` the box stays in
      * the tab order and keeps full contrast, so the answer can still be read.
      */
-    readOnly = false,
-    required = false,
+    isReadOnly = false,
+    isRequired = false,
     /** Secondary text under the label. It describes the box; it does not name it. */
     description,
     /** `card` draws the choice as a bordered tile. */
@@ -40,7 +40,7 @@ const Checkbox = ({
 }) => {
     const wrapperRef = useRef(null);
     const inputRef = useRef(null);
-    const isControlled = checked !== undefined;
+    const isControlled = isChecked !== undefined;
     /**
      * `Form.Check` gives its label a `for` from the id it is handed, so an id of
      * `undefined` produced a label that named nothing — the same defect #206
@@ -50,7 +50,6 @@ const Checkbox = ({
      * `name` is a form key, not an id, so it no longer stands in for one (#213).
      */
     const fieldId = useFieldId(id);
-    useDeprecatedLargeSize('Checkbox', size);
 
     // Callback ref to get the actual input element from Form.Check
     const setInputRef = useCallback((node) => {
@@ -64,26 +63,26 @@ const Checkbox = ({
 
     useEffect(() => {
         if (inputRef.current) {
-            inputRef.current.indeterminate = indeterminate;
+            inputRef.current.indeterminate = isIndeterminate;
         }
-    }, [indeterminate]);
+    }, [isIndeterminate]);
 
     const { 'aria-describedby': describedBy, ...inputRest } = props;
     const { descriptionId, inputProps } = choiceInputProps({
-        fieldId, description, readOnly, onChange, onClick, describedBy,
+        fieldId, description, readOnly: isReadOnly, onChange, onClick, describedBy,
     });
 
     const wrapperClasses = [
         'plus-form-checkbox-wrapper',
-        `plus-form-checkbox-${size}`,
-        indeterminate ? 'plus-form-checkbox-indeterminate' : '',
-        disabled ? 'plus-form-checkbox-disabled' : '',
-        required ? 'plus-form-checkbox-required' : '',
-        choiceClasses({ appearance, readOnly, description }),
+        isIndeterminate ? 'plus-form-checkbox-indeterminate' : '',
+        isDisabled ? 'plus-form-checkbox-disabled' : '',
+        isRequired ? 'plus-form-checkbox-required' : '',
+        isInvalid ? 'plus-form-checkbox-invalid' : '',
+        choiceClasses({ appearance, readOnly: isReadOnly, description }),
         className
     ].filter(Boolean).join(' ');
 
-    const labelContent = required && label ? (
+    const labelContent = isRequired && label ? (
         <>
             {label}
             <span className="plus-form-checkbox-required-asterisk" aria-label="required">*</span>
@@ -98,17 +97,18 @@ const Checkbox = ({
                     id={fieldId}
                     name={name}
                     value={value}
-                    checked={isControlled ? checked : undefined}
+                    checked={isControlled ? isChecked : undefined}
                     defaultChecked={!isControlled ? defaultChecked : undefined}
-                    disabled={disabled}
-                    required={required}
+                    disabled={isDisabled}
+                    required={isRequired}
                     onFocus={onFocus}
                     onBlur={onBlur}
                     label={labelContent}
                     className="plus-form-checkbox"
                     {...inputRest}
                     {...inputProps}
-                    aria-readonly={readOnly || undefined}
+                    aria-readonly={isReadOnly || undefined}
+                    aria-invalid={isInvalid || undefined}
                 />
             </div>
             <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
@@ -121,18 +121,13 @@ Checkbox.propTypes = {
     name: PropTypes.string,
     label: PropTypes.node,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    checked: PropTypes.bool,
+    isChecked: PropTypes.bool,
     defaultChecked: PropTypes.bool,
-    indeterminate: PropTypes.bool,
-    /**
-     * Every size draws a 24 row with a 14/20 label; `small` keeps its smaller
-     * mark. `large` is deprecated: it draws like `medium` and warns in
-     * development.
-     */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
-    required: PropTypes.bool,
+    isIndeterminate: PropTypes.bool,
+    isInvalid: PropTypes.bool,
+    isDisabled: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
+    isRequired: PropTypes.bool,
     description: PropTypes.node,
     appearance: PropTypes.oneOf(['plain', 'card']),
     onChange: PropTypes.func,

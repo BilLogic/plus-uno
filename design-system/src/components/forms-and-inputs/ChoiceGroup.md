@@ -30,7 +30,6 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
 | `other` | shape | — | Adds an "Other" answer with a text box after the options. `value` is the answer it adds (default `'other'`); `text` and `onTextChange` hold what was typed. Typing chooses it. |
 | `appearance` | enum | `'plain'` | Passed to every choice. `card` draws each as a bordered tile. |
-| `size` | enum | `'medium'` | — |
 | `required` | bool | `false` | The group needs an answer. Marked on the legend. |
 | `disabled` | bool | `false` | — |
 | `readOnly` | bool | `false` | Shown and focusable, not changeable. |
@@ -46,8 +45,6 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 
 **`appearance`** — `plain` · `card`
 
-**`size`** — `small` · `medium` · `large`
-
 Anything not listed is not a valid value.
 
 ## Tokens touched
@@ -58,7 +55,7 @@ From `design-system/src/components/forms-and-inputs/ChoiceGroup.scss`. Override 
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

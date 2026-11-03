@@ -130,9 +130,9 @@ NameWithoutId.play = async ({ canvasElement }) => {
  */
 export const RadioGroupWithoutIds = () => (
     <div style={stack}>
-        <Radio name="cadence" label="Every session" value="every" defaultChecked />
-        <Radio name="cadence" label="Every other session" value="alternate" />
-        <Radio name="cadence" label="Once a month" value="monthly" />
+        <Radio name="cadence" label="Every session" value="every" defaultChecked/>
+        <Radio name="cadence" label="Every other session" value="alternate"/>
+        <Radio name="cadence" label="Once a month" value="monthly"/>
         <ChoiceGroup name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );
@@ -308,7 +308,7 @@ export const ExplicitIds = () => (
         <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
         <TagInput id="la-topics" name="topics" label="Topics" options={['Algebra']} tags={['Algebra']} />
-        <Radio id="la-cadence" name="cadence" label="Every session" value="every" />
+        <Radio id="la-cadence" name="cadence" label="Every session" value="every"/>
         <ChoiceGroup id="la-reminder" name="reminder" legend="Reminder" options={reminderOptions} />
     </div>
 );

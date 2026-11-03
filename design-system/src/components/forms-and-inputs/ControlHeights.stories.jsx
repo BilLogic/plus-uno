@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, spyOn, within } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 
 import {
     Breadcrumb,
@@ -12,7 +12,7 @@ import {
     Radio,
     Range,
     Rating,
-    Switch,
+    Toggle,
 } from '@/components';
 
 /**
@@ -20,11 +20,9 @@ import {
  * and inline toolbars and for choice rows. Every control label is 14/20 and
  * every icon draws at 16, whatever the size prop says.
  *
- * Button takes `spacing`: default draws 32 and compact draws 24. The other
- * controls keep their `size` prop: `medium` draws 32, `small` draws 24, and
- * `large` is deprecated: it draws like `medium` and warns in development.
+ * Button takes `spacing`: default draws 32 and compact draws 24.
  *
- * Checkbox, Radio and Switch rows are 24 at every size. Range, Rating,
+ * Checkbox, Radio and Toggle rows are 24. Range, Rating,
  * Breadcrumb and Close button are 32. Button group, Nav pills and Nav tabs
  * follow the button.
  */
@@ -98,32 +96,6 @@ ButtonInHeading.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(button.querySelector('i')).fontSize).toBe('16px');
 };
 
-/** `size="large"` is deprecated on these controls: it draws like `medium` and warns in development. */
-let largeWarn;
-export const LargeWarns = {
-    beforeEach: () => {
-        largeWarn = spyOn(console, 'warn').mockImplementation(() => {});
-        return () => largeWarn.mockRestore();
-    },
-    render: () => (
-        <div style={stack}>
-            <Checkbox size="large" label="Large checkbox" />
-            <Radio size="large" name="large" label="Large radio" />
-            <Switch size="large" label="Large switch" />
-            <Range size="large" label="Large range" value={40} onChange={() => {}} />
-        </div>
-    ),
-    play: async () => {
-        const messages = largeWarn.mock.calls.map((call) => String(call[0]));
-        for (const component of ['Checkbox', 'Radio', 'Switch', 'Range']) {
-            await expect(
-                messages.some((m) => m.startsWith(`[${component}]`) && m.includes('size="large" is deprecated')),
-                `${component} warns`,
-            ).toBe(true);
-        }
-    },
-};
-
 /** Button group follows the button. */
 export const Groups = () => (
     <div style={stack}>
@@ -148,57 +120,50 @@ Close.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(button.querySelector('i')).fontSize).toBe('16px');
 };
 
-const CHOICE_SIZES = ['small', 'medium', 'large'];
+const TOGGLE_SIZES = [16, 20];
 
-/** Checkbox, Radio and Switch rows are 24 at every size, labels 14/20. */
+/** Checkbox, Radio and Toggle rows are 24, labels 14/20. */
 export const ChoiceRows = () => (
     <div style={stack}>
-        {CHOICE_SIZES.map((size) => (
-            <div key={size} style={stack}>
-                <Checkbox size={size} label={`Checkbox ${size}`} />
-                <Radio size={size} name={`radio-${size}`} label={`Radio ${size}`} />
-                <Switch size={size} label={`Switch ${size}`} />
-            </div>
+        <Checkbox label="Checkbox"/>
+        <Radio name="radio-row" label="Radio"/>
+        {TOGGLE_SIZES.map((size) => (
+            <Toggle key={size} size={size} label={`Toggle ${size}`}/>
         ))}
-        <Switch inputProps={{ 'aria-label': 'Bare switch' }} />
+        <Toggle aria-label="Bare toggle"/>
     </div>
 );
 
 ChoiceRows.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const size of CHOICE_SIZES) {
-        for (const [role, name] of [
-            ['checkbox', `Checkbox ${size}`],
-            ['radio', `Radio ${size}`],
-            ['switch', `Switch ${size}`],
-        ]) {
-            const input = canvas.getByRole(role, { name });
-            const line = input.closest('.form-check');
-            await expect(heightOf(line), `${name} row`).toBe(24);
-            await expectLabel(line.querySelector('.form-check-label'), name, '400');
-        }
+    for (const [role, name] of [
+        ['checkbox', 'Checkbox'],
+        ['radio', 'Radio'],
+        ['switch', 'Toggle 16'],
+        ['switch', 'Toggle 20'],
+    ]) {
+        const input = canvas.getByRole(role, { name });
+        const line = input.closest('.form-check');
+        await expect(heightOf(line), `${name} row`).toBe(24);
+        await expectLabel(line.querySelector('.form-check-label'), name, '400');
     }
     // Without a label it is not a row: the bare track keeps its own height.
-    const bare = canvas.getByRole('switch', { name: 'Bare switch' });
+    const bare = canvas.getByRole('switch', { name: 'Bare toggle' });
     await expect(heightOf(bare.parentElement)).toBeLessThan(24);
 };
 
-/** Range is 32 at every size, label 14/20. */
+/** Range is 32, label 14/20. */
 export const Ranges = () => (
     <div style={{ ...stack, width: '320px', alignItems: 'stretch' }}>
-        {CHOICE_SIZES.map((size) => (
-            <Range key={size} size={size} label={`Range ${size}`} value={40} onChange={() => {}} />
-        ))}
+        <Range label="Range" value={40} onChange={() => {}}/>
     </div>
 );
 
 Ranges.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const size of CHOICE_SIZES) {
-        const slider = canvas.getByRole('slider', { name: `Range ${size}` });
-        await expect(heightOf(slider), `${size} slider`).toBe(32);
-        await expectLabel(canvasElement.querySelector(`label[for="${slider.id}"]`), `${size} label`, '400');
-    }
+    const slider = canvas.getByRole('slider', { name: 'Range' });
+    await expect(heightOf(slider), 'slider').toBe(32);
+    await expectLabel(canvasElement.querySelector(`label[for="${slider.id}"]`), 'range label', '400');
 };
 
 /** Rating items are 32 with a 16 star. */
