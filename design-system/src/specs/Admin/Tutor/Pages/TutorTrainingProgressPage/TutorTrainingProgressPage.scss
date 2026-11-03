@@ -117,21 +117,21 @@
     }
 
     button.plus-btn {
-        background-color: var(--color-secondary-state-08);
+        background-color: var(--ds-background-neutral);
         color: var(--color-secondary-text);
         border: none;
 
         &:hover {
-            background-color: var(--color-secondary-state-12);
+            background-color: var(--ds-background-neutral-hovered);
         }
 
         &.active,
         &[aria-pressed="true"] {
-            background-color: var(--color-primary-state-08) !important;
+            background-color: var(--ds-background-selected) !important;
             color: var(--color-primary-text) !important;
 
             &:hover {
-                background-color: var(--color-primary-state-12) !important;
+                background-color: var(--ds-background-selected-hovered) !important;
             }
         }
     }

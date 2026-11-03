@@ -62,7 +62,7 @@
     // Increase state (success)
     &--increase {
         .plus-card-badge-inner {
-            background-color: var(--color-success-state-08);
+            background-color: var(--ds-background-success-subtler);
         }
 
         .plus-card-badge-text {
@@ -73,7 +73,7 @@
     // Decrease state (danger)
     &--decrease {
         .plus-card-badge-inner {
-            background-color: var(--color-danger-state-08);
+            background-color: var(--ds-background-danger-subtler);
         }
 
         .plus-card-badge-text {

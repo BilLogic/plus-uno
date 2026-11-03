@@ -46,7 +46,7 @@
         background-color: transparent !important;
 
         &.students-table__row--hover:hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         .students-table__cell {
@@ -92,7 +92,7 @@
                 border: none;
 
                 &.plus-badge--info {
-                    background-color: var(--color-info-state-08, rgba(14, 129, 117, 0.08));
+                    background-color: var(--ds-background-information-subtler);
                     color: var(--color-info-text, #005a50);
                 }
             }
