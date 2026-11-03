@@ -1479,8 +1479,8 @@ export const ElevatedOnlyReadOnlyAndLink = {
                 await expect(s.borderTopColor, `${name} keeps its outline`).toBe(border);
                 await expect(s.backgroundColor, `${name} keeps its clear ground`).toBe(CLEAR);
             }
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for or "link"; it is ignored on "removable"'));
-            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for or "link"; it is ignored on "selectable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for a read-only tag or a link; it is ignored on "removable"'));
+            await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`isElevated` is only for a read-only tag or a link; it is ignored on "selectable"'));
         } finally {
             warn.mockRestore();
         }

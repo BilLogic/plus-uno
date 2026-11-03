@@ -232,7 +232,7 @@ export const Tag = ({
     // a removable tag it would crowd the ×; elsewhere it would read as a Count tag
     // sitting beside a tag rather than part of it.
     if (trailingMetric !== undefined && trailingMetric !== null && !isSelectable) {
-        warn(`[Tag] \`count\` is only shown on behavior="selectable"; it is ignored on "${resolved}".`);
+        warn(`[Tag] \`trailingMetric\` is only shown on a selectable tag; it is ignored on "${resolved}".`);
     }
     const showCount = isSelectable && trailingMetric !== undefined && trailingMetric !== null;
 
@@ -240,7 +240,7 @@ export const Tag = ({
     // followed: a value is edited off the image, where the outline reads.
     const canElevate = resolved === 'read-only' || isLink;
     if (isElevated && !canElevate) {
-        warn(`[Tag] \`isElevated\` is only for behavior="read-only" or "link"; it is ignored on "${resolved}".`);
+        warn(`[Tag] \`isElevated\` is only for a read-only tag or a link; it is ignored on "${resolved}".`);
     }
 
     // The × renders for removable, and for a link with `isRemovable`. Never in a
