@@ -1,0 +1,57 @@
+/*
+ * Banner: a full-width strip at the top of a page. One fill, no radius (it
+ * sits flush against the viewport edge) and no colored side stripe — the fill
+ * and the icon alone carry the meaning.
+ */
+
+.plus-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--element-inline-md);
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--element-pad-y-md) var(--element-pad-x-md);
+    border-radius: 0;
+}
+
+.plus-banner-icon {
+    flex: none;
+    font-size: var(--icon-md);
+    line-height: 1;
+    margin-block-start: 0.125em;
+}
+
+.plus-banner-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    font: var(--body-default);
+
+    a {
+        color: inherit;
+        text-decoration: underline;
+        font-weight: var(--type-weight-medium);
+    }
+}
+
+.plus-banner--warning {
+    background-color: var(--ds-background-warning);
+    color: var(--ds-text-warning);
+
+    .plus-banner-icon {
+        color: var(--ds-icon-warning);
+    }
+}
+
+.plus-banner--danger {
+    background-color: var(--ds-background-danger);
+    color: var(--ds-text-danger);
+
+    .plus-banner-icon {
+        color: var(--ds-icon-danger);
+    }
+}
+
+.plus-banner--announcement {
+    background-color: var(--ds-background-neutral);
+    color: var(--ds-text);
+}

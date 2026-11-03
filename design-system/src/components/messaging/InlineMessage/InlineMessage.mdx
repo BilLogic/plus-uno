@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as InlineMessageStories from './InlineMessage.stories.jsx';
+
+<Meta of={InlineMessageStories} />
+
+<Title />
+An icon trigger that opens a Popup with the message.
+
+<DocsTabs of={InlineMessageStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={InlineMessageStories.Overview} />
+
+<ArgTypes of={InlineMessageStories} />
+
+</DocsTab>
+
+</DocsTabs>

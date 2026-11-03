@@ -1,0 +1,26 @@
+/*
+ * InlineMessage: the trigger is an IconButton (its own styles, tinted inline
+ * per appearance); this file only styles the popup's content. The popup
+ * surface itself is Popover's.
+ */
+
+.plus-inline-message-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+}
+
+.plus-inline-message-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-sm);
+}
+
+.plus-inline-message-title {
+    font: var(--heading-small);
+}
+
+.plus-inline-message-secondary {
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}

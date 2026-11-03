@@ -87,39 +87,6 @@ export const FoundationSubsection = ({ title, children }) => (
     </div>
 );
 
-const BANNER_TONES = {
-    information: { fill: 'var(--ds-background-information-subtler)', icon: 'var(--ds-icon-information)', glyph: 'fa-circle-info' },
-    warning: { fill: 'var(--ds-background-warning-subtler)', icon: 'var(--ds-icon-warning)', glyph: 'fa-triangle-exclamation' },
-};
-
-/**
- * A Banner in the page: a filled panel with a leading icon and no colored
- * edge. Its tone comes from the fill and the icon alone.
- */
-export const FoundationBanner = ({ title, appearance = 'information', children }) => {
-    const t = BANNER_TONES[appearance];
-    return (
-        <aside
-            style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: 'var(--element-inline-lg)',
-                padding: 'var(--card-pad-sm)',
-                borderRadius: 'var(--element-radius-lg)',
-                background: t.fill,
-                color: 'var(--ds-text)',
-                font: 'var(--body-default)',
-            }}
-        >
-            <i className={`fa-solid ${t.glyph}`} aria-hidden="true" style={{ fontSize: 'var(--icon-md)', color: t.icon }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', minWidth: 0 }}>
-                {title && <strong style={{ font: 'var(--heading-small)' }}>{title}</strong>}
-                <div>{children}</div>
-            </div>
-        </aside>
-    );
-};
-
 /** Related pages, last on the page. Each item is `{ title, description, href }`. */
 export const FoundationRelated = ({ items }) => (
     <ul

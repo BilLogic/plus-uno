@@ -5,10 +5,10 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 import * as IconsStories from './Icons.stories.jsx';
 
 export const Glyph = ({ name, size = '--icon-md', family = 'fa-solid' }) => (
@@ -64,9 +64,10 @@ Before adding an icon, ask whether a label does the job better. Leave out icons 
 
 Icons come in three sizes, bound to the Size/Icon tokens. The box is exactly the size, so an icon never adds height to the line it sits in.
 
-<FoundationBanner title="Sizes and source">
+<Banner appearance="announcement">
+<strong>Sizes and source</strong><br />
 Icons come in 12, 16 and 24. 12 is for chevrons, which are always 12, field validation icons, compact text, small contained elements such as tags, badges and statuses, and secondary actions. PLUS draws icons from Font Awesome Free, so stroke, corner and end-cap rules do not apply.
-</FoundationBanner>
+</Banner>
 
 <Canvas of={IconsStories.Sizes} sourceState="none" />
 

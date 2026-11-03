@@ -2,15 +2,15 @@
  * MaintenanceAlert Component
  *
  * Top-of-page warning banner announcing a scheduled-maintenance window.
- * Built on top of the PLUS Alert component so dismiss, title, and color
- * tokens stay aligned with the design system.
+ * Built on the PLUS Banner component.
  *
  * Figma Spec: node-id=2370-194322
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Alert from '@/components/messaging/Alert/Alert';
+import Banner from '@/components/messaging/Banner/Banner';
+import CloseButton from '@/components/forms-and-inputs/CloseButton';
 
 const MaintenanceAlert = ({
     title = 'Scheduled Maintenance',
@@ -24,26 +24,36 @@ const MaintenanceAlert = ({
     id,
     className = '',
 }) => {
+    const [show, setShow] = useState(true);
+
+    if (!show) return null;
+
+    const handleDismiss = () => {
+        setShow(false);
+        if (onDismiss) onDismiss();
+    };
+
     return (
-        <Alert
+        <Banner
             id={id}
-            style="warning"
-            title={title}
-            dismissable={dismissable}
-            onDismiss={onDismiss}
+            appearance="warning"
             className={`plus-maintenance-alert ${className}`}
         >
-            <span>{greeting} {intro} </span>
-            <strong>{startTime}</strong>
-            <span> to </span>
-            <strong>{endTime}</strong>
-            <span>. {closing}</span>
-        </Alert>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--element-inline-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                    <strong>{title}</strong>
+                    <span>
+                        {greeting} {intro} <strong>{startTime}</strong> to <strong>{endTime}</strong>. {closing}
+                    </span>
+                </div>
+                {dismissable && <CloseButton what="maintenance notice" onClick={handleDismiss} />}
+            </div>
+        </Banner>
     );
 };
 
 MaintenanceAlert.propTypes = {
-    /** Alert heading */
+    /** Banner heading */
     title: PropTypes.string,
     /** Salutation that opens the message */
     greeting: PropTypes.string,
@@ -57,7 +67,7 @@ MaintenanceAlert.propTypes = {
     closing: PropTypes.string,
     /** Whether the dismiss (X) button is shown */
     dismissable: PropTypes.bool,
-    /** Callback fired when the user dismisses the alert */
+    /** Callback fired when the user dismisses the banner */
     onDismiss: PropTypes.func,
     /** HTML id attribute */
     id: PropTypes.string,
