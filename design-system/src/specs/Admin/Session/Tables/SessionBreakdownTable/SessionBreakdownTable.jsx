@@ -10,7 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './SessionBreakdownTable.scss';
 
 const SessionBreakdownTable = ({
@@ -63,7 +63,7 @@ const SessionBreakdownTable = ({
     };
 
     const getTutorTypeBadgeStyle = (type) => {
-        return type === 'Lead' ? 'info' : 'secondary';
+        return type === 'Lead' ? 'info' : 'neutral';
     };
 
     return (
@@ -92,17 +92,17 @@ const SessionBreakdownTable = ({
                                 <span className="body3-txt">{student.studentName}</span>
                             </td>
                             <td>
-                                <Badge style="info" size="b3">
+                                <StatusTag appearance="info">
                                     {student.studentStatus}
-                                </Badge>
+                                </StatusTag>
                             </td>
                             <td>
                                 <span className="body3-txt">{student.tutorName}</span>
                             </td>
                             <td>
-                                <Badge style={getTutorTypeBadgeStyle(student.tutorType)} size="b3">
+                                <StatusTag appearance={getTutorTypeBadgeStyle(student.tutorType)}>
                                     {student.tutorType}
-                                </Badge>
+                                </StatusTag>
                             </td>
                             <td>
                                 <span className="body3-txt">{student.timeSpent}</span>

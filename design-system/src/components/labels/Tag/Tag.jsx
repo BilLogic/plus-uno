@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Count from '../Count';
+import CountTag from '../CountTag';
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './Tag.scss';
@@ -9,10 +9,10 @@ import './Tag.scss';
  * `Tag` — a category: a subject, a focus area, a person, anything that is not a
  * number or a changing condition.
  *
- * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count. Is it the condition
- * something is in, and can that condition change? Status. Otherwise, Tag.
+ * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count tag. Is it the condition
+ * something is in, and can that condition change? Status tag. Otherwise, Tag.
  *
- * OUTLINED, SO IT NEVER READS AS A STATUS. A Status is filled because its color
+ * OUTLINED, SO IT NEVER READS AS A STATUS. A Status tag is filled because its color
  * is a meaning; a Tag is outlined because its color is only a category. The text
  * stays neutral, and the hue sits on the border and on a 10px swatch. One size,
  * 22 tall, for every behavior.
@@ -93,7 +93,7 @@ export const resolveTagColor = (color) => {
 
 /**
  * Each SMART subject, by its token name, and the accent its SMART tokens alias:
- * the Tag color a curriculum Badge style draws, and the hue a SMART area's
+ * the Tag color a SMART subject draws, and the hue a SMART area's
  * swatch falls back to. The SMART layer (`color.*.smart.{subject}`) holds the
  * same pairing in the tokens; a SMART area reads those through
  * `StaticBadgeSmart`, so this map and the tokens must name the same accent.
@@ -289,7 +289,7 @@ export const Tag = ({
     const isLink = resolved === TAG_BEHAVIOR.LINK;
 
     // A count is a filter's result count, so it belongs to selectable only. On
-    // a removable tag it would crowd the ×; elsewhere it would read as a Count
+    // a removable tag it would crowd the ×; elsewhere it would read as a Count tag
     // sitting beside a tag rather than part of it.
     if (count !== undefined && count !== null && !isSelectable) {
         warn(`[Tag] \`count\` is only shown on behavior="selectable"; it is ignored on "${resolved}".`);
@@ -437,7 +437,7 @@ export const Tag = ({
                     >
                         {lead}
                         {labelNode}
-                        {showCount && <Count value={count} size="small" />}
+                        {showCount && <CountTag value={count} spacing="compact" />}
                     </button>,
                 )}
                 {status}
@@ -527,7 +527,7 @@ Tag.propTypes = {
     type: PropTypes.oneOf(TAG_TYPES),
     /** The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. */
     avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. */
+    /** `selectable` only: a compact neutral Count tag, such as a filter's result count. Ignored with a warning elsewhere. */
     count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. */
     elemBefore: PropTypes.node,

@@ -7,7 +7,7 @@ import { SessionTimeInput } from '@/specs/Toolkit/Pre-Session/Elements/NewFormTi
 import { Stepper } from '@/specs/Toolkit/Pre-Session/Elements/Steppers.stories';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import CountTag from '@/components/labels/CountTag';
 import { CancelButton, SaveChangesButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
 export default {
@@ -104,7 +104,7 @@ const FormingModalBody = () => (
                 <Button
                     text="Attendees"
                     iconAfter={
-                        <Badge text="20" style="secondary" size="b3" />
+                        <CountTag value={20} />
                     }
                     shouldFitContainer
                 />

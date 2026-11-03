@@ -39,7 +39,7 @@ export default {
         },
         displayMode: {
             control: { type: 'select' },
-            options: ['tags', 'badges', 'text'],
+            options: ['tags', 'text'],
             table: { category: 'Design' }
         },
         label: {
@@ -141,7 +141,6 @@ export const Modes = {
     render: () => (
         <div className="sb-select-interactive-override" style={grid}>
             <Select label="Multi (tags)" mode="multi" options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
-            <Select label="Multi (badges)" mode="multi" displayMode="badges" options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
             <Select label="Searchable" searchable options={sampleOptions} placeholder="Type to search" />
             <Select label="Creatable" mode="multi" creatable options={sampleOptions} placeholder="Type to search or create" />
         </div>

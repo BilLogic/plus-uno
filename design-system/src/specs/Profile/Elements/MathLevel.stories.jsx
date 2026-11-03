@@ -51,7 +51,6 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select Math Topics"
-                displayMode="badges"
                 searchable={true}
                 creatable={false}
                 size="medium"

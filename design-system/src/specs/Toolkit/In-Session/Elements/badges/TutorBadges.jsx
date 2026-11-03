@@ -1,30 +1,14 @@
 import React from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export const TutorBadge = ({ className = '' }) => (
-    <Badge
-        text="You"
-        style="info"
-        size="b3"
-        className={`fw-normal ${className}`}
-    />
+    <StatusTag appearance="info" className={`fw-normal ${className}`}>You</StatusTag>
 );
 
 export const LeadBadge = ({ className = '' }) => (
-    <Badge
-        text="Lead"
-        style="info"
-        size="b3"
-        className={`fw-normal ${className}`}
-    />
+    <StatusTag appearance="info" className={`fw-normal ${className}`}>Lead</StatusTag>
 );
 
 export const CountBadge = ({ count, className = '' }) => (
-    <Badge
-        text={String(count)}
-        style="info"
-        size="b3"
-        leadingVisual={<i className="fa-solid fa-user-group"></i>}
-        className={`fw-normal ${className}`}
-    />
+    <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-group"></i>} className={`fw-normal ${className}`}>{String(count)}</StatusTag>
 );

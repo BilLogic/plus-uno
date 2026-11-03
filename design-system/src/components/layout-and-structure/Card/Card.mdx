@@ -143,11 +143,11 @@ for spacing.
 ```jsx
 // Incorrect — both are declared as PropTypes.string, so a node here warns
 // even though it happens to render.
-<Card header={<Badge text="Live" />} footer={<Timestamp value={t} />} />
+<Card header={<StatusTag appearance="neutral">Live</StatusTag>} footer={<Timestamp value={t} />} />
 
 // Correct — strings in the string slots, nodes in the body.
 <Card header="Live session" footer="Updated 4 minutes ago">
-  <Badge text="Live" style="success" />
+  <StatusTag appearance="success">Live</StatusTag>
 </Card>
 ```
 

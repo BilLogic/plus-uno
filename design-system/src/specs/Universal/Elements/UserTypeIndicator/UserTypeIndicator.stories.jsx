@@ -15,15 +15,15 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `User-role pill with five variants. Each variant is themed with a PLUS Badge style so colors, radius, and typography stay in sync with the design system.
+                component: `User-role pill with five variants. Each variant is themed with a Status tag appearance so colors, radius, and typography stay in sync with the design system.
 
-| Type | Badge style | Label |
+| Type | Status tag appearance | Label |
 |------|-------------|-------|
 | lead tutor | info | Lead |
-| regular tutor | primary | Tutor |
+| regular tutor | info | Tutor |
 | tutor supervisors | mastering-content | Super |
 | system admin | relationship | Admin |
-| type5 | secondary | Demo |`
+| type5 | neutral | Demo |`
             }
         }
     }
@@ -47,13 +47,13 @@ export const Overview = {
 
 /**
  * Interactive
- * Pick a user type and size inline.
+ * Pick a user type and spacing inline.
  */
 export const Interactive = {
     render: (args) => <UserTypeIndicator {...args} />,
     args: {
         type: 'lead tutor',
-        size: 'b3',
+        spacing: 'default',
     },
     argTypes: {
         type: {
@@ -61,9 +61,9 @@ export const Interactive = {
             options: ['lead tutor', 'regular tutor', 'tutor supervisors', 'system admin', 'type5'],
             table: { category: 'Design' }
         },
-        size: {
+        spacing: {
             control: { type: 'select' },
-            options: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'b1', 'b2', 'b3'],
+            options: ['default', 'compact', 'spacious'],
             table: { category: 'Design' }
         }
     }

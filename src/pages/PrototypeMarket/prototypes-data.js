@@ -24,13 +24,13 @@ export const STAGE_META = {
 };
 
 export const PILLAR_META = {
-  admin: { label: 'Admin', badgeStyle: 'primary' },
-  home: { label: 'Home', badgeStyle: 'secondary' },
-  login: { label: 'Login', badgeStyle: 'tertiary' },
-  profile: { label: 'Profile', badgeStyle: 'tertiary' },
-  toolkit: { label: 'Toolkit', badgeStyle: 'secondary' },
-  training: { label: 'Training', badgeStyle: 'primary' },
-  universal: { label: 'Universal', badgeStyle: 'tertiary' },
+  admin: { label: 'Admin', badgeStyle: 'info' },
+  home: { label: 'Home', badgeStyle: 'neutral' },
+  login: { label: 'Login', badgeStyle: 'neutral' },
+  profile: { label: 'Profile', badgeStyle: 'neutral' },
+  toolkit: { label: 'Toolkit', badgeStyle: 'neutral' },
+  training: { label: 'Training', badgeStyle: 'info' },
+  universal: { label: 'Universal', badgeStyle: 'neutral' },
 };
 
 /**

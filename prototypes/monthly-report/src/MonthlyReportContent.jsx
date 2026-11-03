@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Alert from '@/components/messaging/Alert/Alert';
 import Progress from '@/components/loading/Progress/Progress';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
@@ -456,7 +456,7 @@ export default function MonthlyReportContent() {
                     <h1 className="header-title">Your Month in Review, {reportData.userName}</h1>
                     <div className="header-meta">
                         <div className="month-badge-container">
-                            <Badge text={reportData.monthLabel} style="primary" size="default" fill="tonal" />
+                            <StatusTag appearance="info">{reportData.monthLabel}</StatusTag>
                         </div>
                     </div>
                 </div>
@@ -620,7 +620,7 @@ export default function MonthlyReportContent() {
                                 const state = getState(index);
                                 const isExpanded = activeKey === index;
                                 const displayStatus = state === 'reviewed' ? 'Reviewed' : state === 'under_review' ? 'Under Review' : 'Locked';
-                                const badgeStyle = state === 'reviewed' ? 'success' : state === 'under_review' ? 'primary' : 'neutral';
+                                const badgeStyle = state === 'reviewed' ? 'success' : state === 'under_review' ? 'info' : 'neutral';
 
                                 return (
                                     <div
@@ -652,19 +652,19 @@ export default function MonthlyReportContent() {
                                                         {dim.title}
                                                         {dim.startHere && (
                                                             <span style={{ marginLeft: 'var(--size-element-gap-sm)', display: 'inline-block' }}>
-                                                                <Badge style="primary" size="small" fill="tonal">
+                                                                <StatusTag appearance="info">
                                                                     <i className="fa-solid fa-arrow-right" style={{ marginRight: '4px' }}></i>
                                                                     Start Here
-                                                                </Badge>
+                                                                </StatusTag>
                                                             </span>
                                                         )}
                                                     </h4>
                                                     <p className="growth-card-subtitle">{dim.subStatus}</p>
                                                 </div>
                                                 <div className="growth-card-status">
-                                                    <Badge style={badgeStyle} size="small">
+                                                    <StatusTag appearance={badgeStyle}>
                                                         {displayStatus}
-                                                    </Badge>
+                                                    </StatusTag>
                                                     {state === 'locked' && (
                                                         <span className="locked-hint">
                                                             <i className="fa-solid fa-lock"></i>

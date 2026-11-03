@@ -145,105 +145,6 @@
         "sets": []
       }
     },
-    "Badge": {
-      "code": {
-        "import": "@/components/labels",
-        "export": "default",
-        "mdxPath": "design-system/src/components/labels/Badge/Badge.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Badge",
-        "source": "design-system/src/components/labels/Badge/Badge.jsx",
-        "storybookId": "components-labels-deprecated-badge--docs",
-        "props": {
-          "style": {
-            "type": "enum",
-            "values": [
-              "primary",
-              "secondary",
-              "tertiary",
-              "success",
-              "warning",
-              "danger",
-              "info",
-              "social-emotional",
-              "mastering-content",
-              "advocacy",
-              "relationship",
-              "technology-tools"
-            ]
-          },
-          "size": {
-            "type": "enum",
-            "values": [
-              "h1",
-              "h2",
-              "h3",
-              "h4",
-              "h5",
-              "h6",
-              "b1",
-              "b2",
-              "b3"
-            ]
-          },
-          "dismissible": {
-            "type": "boolean"
-          },
-          "counter": {
-            "type": "string|number"
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "storybook-resources",
-            "name": "Badge docs page (MDX link)",
-            "componentSetNodeId": "3497:19481",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "Verified 2026-06-13: Badge documentation overview — not a single component set."
-          },
-          {
-            "id": "static-badges",
-            "name": "Static Badges",
-            "componentSetNodeId": "25:568",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568",
-            "codeDefaults": {
-              "dismissible": false
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13"
-          },
-          {
-            "id": "dismissible-badges",
-            "name": "Dismissible Badges",
-            "componentSetNodeId": "1056:32356",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356",
-            "codeDefaults": {
-              "dismissible": true
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13"
-          },
-          {
-            "id": "counter-badges",
-            "name": "Counter",
-            "componentSetNodeId": "3998:68735",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735",
-            "codeDefaults": {
-              "dismissible": false
-            },
-            "status": "verified",
-            "verifiedAt": "2026-06-13",
-            "notes": "Maps to Badge with counter prop set. variantProps TBD — add from Figma variant inspection."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481"
-      }
-    },
     "Breadcrumb": {
       "code": {
         "import": "@/components/navigation",
@@ -616,25 +517,16 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499"
       }
     },
-    "Count": {
+    "CountTag": {
       "code": {
         "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/labels/Count/Count.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Count",
-        "source": "design-system/src/components/labels/Count/Count.jsx",
-        "storybookId": "components-labels-status-count-tag-count--docs",
+        "mdxPath": "design-system/src/components/labels/CountTag/CountTag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/CountTag",
+        "source": "design-system/src/components/labels/CountTag/CountTag.jsx",
+        "storybookId": "components-labels-status-count-tag-count-tag--docs",
         "props": {
           "appearance": {
-            "type": "enum",
-            "values": [
-              "subtle",
-              "bold",
-              "inverse",
-              "dot"
-            ]
-          },
-          "style": {
             "type": "enum",
             "values": [
               "neutral",
@@ -645,14 +537,23 @@
               "discovery"
             ]
           },
-          "size": {
+          "spacing": {
             "type": "enum",
             "values": [
-              "medium",
-              "small"
+              "default",
+              "compact"
             ]
           },
-          "ring": {
+          "isBold": {
+            "type": "boolean"
+          },
+          "isInverse": {
+            "type": "boolean"
+          },
+          "isDot": {
+            "type": "boolean"
+          },
+          "hasRing": {
             "type": "boolean"
           }
         }
@@ -661,14 +562,14 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "count",
-            "name": "Count",
+            "id": "count-tag",
+            "name": "Count tag",
             "componentSetNodeId": "17876:46653",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the Status, Count & Tag page, beside the Counter set it replaces. Figma values carry a (default) suffix on subtle, neutral and medium; ring? is ring in code. Inverse exists in neutral only, and dot in medium only. Docs page: node 17883:1895."
+            "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle, neutral and default; hasRing is the ring in Figma. Inverse exists in neutral only, and dot at default spacing only. Docs page: node 17883:1895."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
@@ -1755,7 +1656,7 @@
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9094-10342",
         "deliberate": {
-          "displayMode": "Code has a third value, `text`, a comma-separated list with no Figma column; `badges` is kept on both sides until the screens that draw Badge chips move to Tags."
+          "displayMode": "Code has a second value, `text`, a comma-separated list with no Figma column."
         }
       }
     },
@@ -1966,14 +1867,14 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
       }
     },
-    "Status": {
+    "StatusTag": {
       "code": {
         "import": "@/components/labels",
         "export": "default",
-        "mdxPath": "design-system/src/components/labels/Status/Status.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Status",
-        "source": "design-system/src/components/labels/Status/Status.jsx",
-        "storybookId": "components-labels-status-count-tag-status--docs",
+        "mdxPath": "design-system/src/components/labels/StatusTag/StatusTag.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/StatusTag",
+        "source": "design-system/src/components/labels/StatusTag/StatusTag.jsx",
+        "storybookId": "components-labels-status-count-tag-status-tag--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -1982,7 +1883,7 @@
               "date"
             ]
           },
-          "style": {
+          "appearance": {
             "type": "enum",
             "values": [
               "neutral",
@@ -1990,14 +1891,20 @@
               "warning",
               "danger",
               "info",
-              "discovery"
+              "discovery",
+              "social-emotional",
+              "mastering-content",
+              "advocacy",
+              "relationship",
+              "technology-tools"
             ]
           },
-          "size": {
+          "spacing": {
             "type": "enum",
             "values": [
-              "medium",
-              "large"
+              "default",
+              "compact",
+              "spacious"
             ]
           },
           "leadingVisual": {
@@ -2012,14 +1919,14 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "status",
-            "name": "Status",
+            "id": "status-tag",
+            "name": "Status tag",
             "componentSetNodeId": "17876:1653",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the Status, Count & Tag page, beside the Static Badges it replaces. Figma values carry a (default) suffix on state, neutral and medium. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
+            "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on state, neutral and default. leadingVisual? and count? are booleans in Figma; in code leadingVisual takes the icon and count takes the number. Figma's label text is children. Date exists in neutral, warning and danger only. Docs page: node 17882:1647."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647"

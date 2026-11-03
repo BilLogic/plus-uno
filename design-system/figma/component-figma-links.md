@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-66 docs-page links + 95 style/variant entries across 71 components.
+65 docs-page links + 92 style/variant entries across 70 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -17,7 +17,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Accordion | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
 | Components | AiLabel | `17560:1166` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166) |
 | Components | Alert | `3496:1444` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444) |
-| Components | Badge | `3497:19481` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19481) |
 | Components | Breadcrumb | `3497:19484` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484) |
 | Components | Button | `3497:19482` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482) |
 | Components | ButtonGroup | `3497:19489` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489) |
@@ -29,7 +28,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | ChoiceGroup | `18265:52386` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386) |
 | Components | CloseButton | `17827:827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827) |
 | Components | Collapse | `3497:19499` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19499) |
-| Components | Count | `17883:1895` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895) |
+| Components | CountTag | `17883:1895` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895) |
 | Components | DateAndTimePicker | `13549:6703` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703) |
 | Components | DatePicker | `9279:4480` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480) |
 | Components | Divider | `4992:30871` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4992-30871) |
@@ -59,7 +58,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | SidebarTab | `17118:120` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120) |
 | Components | Skeleton | `17885:47731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731) |
 | Components | Spinner | `3497:19485` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485) |
-| Components | Status | `17882:1647` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647) |
+| Components | StatusTag | `17882:1647` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17882-1647) |
 | Components | Suggestion | `17885:57` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57) |
 | Components | Switch | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
 | Components | Table | `17156:122` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122) |
@@ -90,9 +89,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Accordion | accordion | `13667:6004` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13667-6004) | verified |
 | Components | AiLabel | AI label | `17560:1166` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166) | verified |
 | Components | Alert | alert | `11:324` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324) | verified |
-| Components | Badge | Counter | `3998:68735` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3998-68735) | verified |
-| Components | Badge | Dismissible Badges | `1056:32356` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1056-32356) | verified |
-| Components | Badge | Static Badges | `25:568` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=25-568) | verified |
 | Components | Breadcrumb | Breadcrumb | `27:618` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618) | verified |
 | Components | ButtonGroup | Button Group | `34:5212` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212) | verified |
 | Components | Card | Card | `4241:27817` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4241-27817) | verified |
@@ -105,7 +101,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | CloseButton | Close button | `17827:827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827) | verified |
 | Components | CloseButton | Remove button | `17827:846` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846) | verified |
 | Components | Collapse | Collapse | `59:16038` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=59-16038) | verified |
-| Components | Count | Count | `17876:46653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653) | verified |
+| Components | CountTag | Count tag | `17876:46653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653) | verified |
 | Components | DateAndTimePicker | _Time Field | `16560:4508` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508) | unpublished |
 | Components | DateAndTimePicker | DateAndTimePicker | `18804:38420` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420) | unpublished |
 | Components | DatePicker | _Calendar | `18819:40157` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157) | unpublished |
@@ -157,7 +153,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Spinner | Spinner Growing | `9296:3061` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061) | verified |
 | Components | Spinner | Spinner Rotating | `9297:3104` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104) | verified |
 | Components | Spinner | Spinner Stacking | `9297:3156` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156) | verified |
-| Components | Status | Status | `17876:1653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653) | verified |
+| Components | StatusTag | Status tag | `17876:1653` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-1653) | verified |
 | Components | Suggestion | Suggestion | `17878:1769` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769) | verified |
 | Components | Switch | Form Switch Button | `82:16570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570) | verified |
 | Components | Tag | Tag | `17877:47506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506) | verified |

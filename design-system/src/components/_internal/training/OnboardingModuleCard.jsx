@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Badge } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { Button } from '@/components'; // Assuming generic Button component exists
 
 const OnboardingModuleCard = ({ title, duration, state = 'default', stage = 'not started' }) => {

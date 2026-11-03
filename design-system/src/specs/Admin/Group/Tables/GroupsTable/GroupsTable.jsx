@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './GroupsTable.scss';
 
 const GroupsTable = ({
@@ -123,13 +123,9 @@ const GroupsTable = ({
 
                             {/* Group Size column */}
                             <td className="groups-table__cell groups-table__cell--size">
-                                <Badge
-                                    style="info"
-                                    size="b3"
-                                    className="groups-table__size-badge"
-                                >
+                                <StatusTag appearance="info" className="groups-table__size-badge">
                                     {group.size}
-                                </Badge>
+                                </StatusTag>
                             </td>
 
                             {/* Action column */}

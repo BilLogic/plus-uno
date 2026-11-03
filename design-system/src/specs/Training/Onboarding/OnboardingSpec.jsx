@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Table, Button, Badge } from '@/components';
+import { Card, Table, Button, StatusTag } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 import PatternSection from '@/patterns/PatternSection';
 import { Select } from '@/components/forms-and-inputs';
@@ -42,7 +42,7 @@ export const OnboardingSpec = () => {
     const columns = [
         { key: 'title', label: 'Module Title' },
         { key: 'duration', label: 'Duration' },
-        { key: 'stage', label: 'Stage', render: (row) => <Badge label={row.stage} type="neutral" /> },
+        { key: 'stage', label: 'Stage', render: (row) => <StatusTag>{row.stage}</StatusTag> },
         { key: 'action', label: 'Action', render: () => <Button text="Start" spacing="compact" /> }
     ];
 

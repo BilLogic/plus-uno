@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import { AttendanceDropdown } from '../Elements/AttendanceDropdown.jsx';
 import { EngagementDropdown } from '../Elements/EngagementDropdown.jsx';
 import { RoomBadge } from '../Elements/badges/RoomBadge.jsx';
@@ -39,12 +39,7 @@ const getStatusConfig = (status) => {
 const StudentBadge = ({ isNew }) => {
     if (!isNew) return null;
     return (
-        <Badge
-            text="New"
-            style="info"
-            size="b3"
-            className="fw-normal"
-        />
+        <StatusTag appearance="info" className="fw-normal">New</StatusTag>
     );
 };
 
@@ -240,12 +235,7 @@ export const TableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <Badge
-                    text={statusConfig.text}
-                    style={statusConfig.style}
-                    size="b3"
-                    className="fw-normal"
-                />
+                <StatusTag appearance={statusConfig.style} className="fw-normal">{statusConfig.text}</StatusTag>
             </div>
 
             {/* Attendance Cell - spans 3 columns */}

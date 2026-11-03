@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -265,12 +265,7 @@ export const ListItemRow = ({
                     overflow: 'hidden',
                 }}
             >
-                <Badge
-                    text={currentStatus.text}
-                    style={currentStatus.style}
-                    size="b3"
-                    className="fw-normal"
-                />
+                <StatusTag appearance={currentStatus.style} className="fw-normal">{currentStatus.text}</StatusTag>
             </div>
 
             {/* Progress/Tags Cell - 3 columns */}
@@ -285,14 +280,7 @@ export const ListItemRow = ({
                 }}
             >
                 {tags.map((tag, index) => (
-                    <Badge
-                        key={index}
-                        text={tag.text}
-                        style="warning"
-                        size="b3"
-                        leadingVisual={tag.signal === 'positive' ? positiveIcon : negativeIcon}
-                        className="fw-normal"
-                    />
+                    <StatusTag appearance="warning" leadingVisual={tag.signal === 'positive' ? positiveIcon : negativeIcon} key={index} className="fw-normal">{tag.text}</StatusTag>
                 ))}
             </div>
 

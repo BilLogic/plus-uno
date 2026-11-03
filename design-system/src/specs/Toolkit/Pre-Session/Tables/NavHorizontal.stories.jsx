@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import CountTag from '@/components/labels/CountTag';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Tables/Nav Horizontal',
@@ -52,12 +52,7 @@ const TabItem = ({ label, count, isSelected, onClick }) => (
     >
         {label}
         <span style={{ display: 'flex', alignItems: 'center' }}>
-            <Badge
-                text={String(count)}
-                style={isSelected ? 'primary' : 'secondary'}
-                size="b3"
-                className="py-0"
-            />
+            <CountTag value={count} isBold={isSelected} className="py-0" />
         </span>
     </button>
 );

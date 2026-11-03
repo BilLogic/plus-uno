@@ -3,7 +3,7 @@
 
 # Select
 
-internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array in multi mode), controlled or not. - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. `displayMode="badges"` keeps the Badge chips for screens that still draw them. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array in multi mode), controlled or not. - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
 
 **Import:** `import { Select } from '@/components';`
 
@@ -64,7 +64,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 **`mode`** — `single` · `multi`
 
-**`displayMode`** — `tags` · `badges` · `text`
+**`displayMode`** — `tags` · `text`
 
 **`size`** — `small` · `medium` · `large`
 

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
-import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
+import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
 
 /**
- * `Count` — a number on its own, as a pill.
+ * `CountTag` — a number on its own, as a pill.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Every assertion is something a person could observe —
@@ -18,18 +18,15 @@ import Count, { COUNT_APPEARANCES, COUNT_SIZES, COUNT_STYLES } from './Count';
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Count',
-    component: Count,
+    title: 'Components/Labels/Status, count & tag/Count tag',
+    component: CountTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
-        ],
         docs: {
             description: {
                 component:
                     'A number on its own: unread items, results, errors. For the condition '
-                    + 'something is in, use Status; for a category, use Tag.',
+                    + 'something is in, use Status tag; for a category, use Tag.',
             },
         },
     },
@@ -61,18 +58,18 @@ const pillOf = (canvas, text) => canvas.getByText(text).parentElement;
 
 /* ----------------------------------------------------------------- stories */
 
-/** The four appearances. Subtle is the default; bold asks for action now; dot is presence. */
+/** Emphasis. Subtle is the default; `isBold` asks for action now; `isInverse` is for filled buttons and dark grounds; `isDot` is presence. */
 export const Appearances = () => (
     <div style={row}>
-        <Count value={12} />
-        <Count value={13} appearance="bold" style="danger" />
+        <CountTag value={12} />
+        <CountTag value={13} isBold appearance="danger" />
         <button type="button" className="btn btn-primary">
-            Review <Count value={14} appearance="inverse" />
+            Review <CountTag value={14} isInverse />
         </button>
         <span style={{ background: 'var(--color-inverse-surface)', padding: '8px', borderRadius: '6px' }}>
-            <Count value={15} appearance="inverse" />
+            <CountTag value={15} isInverse />
         </span>
-        <Count appearance="dot" style="danger" label="New activity" />
+        <CountTag isDot appearance="danger" label="New activity" />
     </div>
 );
 Appearances.play = async ({ canvasElement }) => {
@@ -108,15 +105,15 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(dot).toHaveTextContent('');
 };
 
-/** Both sizes: 20 on its own, 16 inside a Status or Tag. Min-width equals height. */
-export const Sizes = () => (
+/** Both spacings: 20 on its own, 16 (compact) inside a Status tag or Tag. Min-width equals height. */
+export const Spacings = () => (
     <div style={row}>
-        <Count value={1} />
-        <Count value={2} size="small" />
-        <Count value={1204} />
+        <CountTag value={1} />
+        <CountTag value={2} spacing="compact" />
+        <CountTag value={1204} />
     </div>
 );
-Sizes.play = async ({ canvasElement }) => {
+Spacings.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     for (const [text, size] of [['1', 20], ['2', 16]]) {
@@ -139,9 +136,9 @@ Sizes.play = async ({ canvasElement }) => {
 /** `max` caps the number with a `+`. */
 export const Max = () => (
     <div style={row}>
-        <Count value={99} />
-        <Count value={100} />
-        <Count value={12} max={9} />
+        <CountTag value={99} />
+        <CountTag value={100} />
+        <CountTag value={12} max={9} />
     </div>
 );
 Max.play = async ({ canvasElement }) => {
@@ -155,8 +152,8 @@ Max.play = async ({ canvasElement }) => {
 /** A count of 0 renders nothing, unless `showZero`. */
 export const Zero = () => (
     <div style={row}>
-        <span data-testid="hidden">Messages <Count value={0} /></span>
-        <span data-testid="shown">Results <Count value={0} showZero /></span>
+        <span data-testid="hidden">Messages <CountTag value={0} /></span>
+        <span data-testid="shown">Results <CountTag value={0} showZero /></span>
     </div>
 );
 Zero.play = async ({ canvasElement }) => {
@@ -173,13 +170,13 @@ export const Ring = () => (
         <span style={{ position: 'relative', display: 'inline-flex' }}>
             <i className="fa-solid fa-bell" aria-hidden="true" style={{ fontSize: '20px' }} />
             <span style={{ position: 'absolute', top: '-6px', right: '-10px' }}>
-                <Count value={3} appearance="bold" style="danger" ring label="3 notifications" />
+                <CountTag value={3} isBold appearance="danger" hasRing label="3 notifications" />
             </span>
         </span>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
             <i className="fa-solid fa-bell" aria-hidden="true" style={{ fontSize: '20px' }} />
             <span style={{ position: 'absolute', top: '-2px', right: '-2px', display: 'flex' }}>
-                <Count appearance="dot" style="danger" ring label="New notifications" />
+                <CountTag isDot appearance="danger" hasRing label="New notifications" />
             </span>
         </span>
     </div>
@@ -205,23 +202,23 @@ Ring.play = async ({ canvasElement }) => {
  */
 export const Styles = () => (
     <div style={{ display: 'grid', gap: '12px' }}>
-        {['subtle', 'bold'].flatMap((appearance) => COUNT_SIZES.map((size) => (
-            <div key={`${appearance}-${size}`} style={row}>
-                {COUNT_STYLES.map((style) => (
-                    <Count
-                        key={style}
+        {[false, true].flatMap((isBold) => COUNT_TAG_SPACINGS.map((spacing) => (
+            <div key={`${isBold}-${spacing}`} style={row}>
+                {COUNT_TAG_APPEARANCES.map((appearance) => (
+                    <CountTag
+                        key={appearance}
                         value={12}
+                        isBold={isBold}
                         appearance={appearance}
-                        style={style}
-                        size={size}
-                        label={`${appearance} ${style} ${size}`}
+                        spacing={spacing}
+                        label={`${isBold ? 'bold' : 'subtle'} ${appearance} ${spacing}`}
                     />
                 ))}
             </div>
         )))}
         <div style={row}>
-            {COUNT_STYLES.map((style) => (
-                <Count key={style} appearance="dot" style={style} label={`dot ${style}`} />
+            {COUNT_TAG_APPEARANCES.map((appearance) => (
+                <CountTag key={appearance} isDot appearance={appearance} label={`dot ${appearance}`} />
             ))}
         </div>
     </div>
@@ -252,13 +249,13 @@ Styles.play = async ({ canvasElement }) => {
     };
 
     for (const [appearance, styles] of Object.entries(expected)) {
-        for (const size of COUNT_SIZES) {
+        for (const size of COUNT_TAG_SPACINGS) {
             for (const [style, [ground, ink]] of Object.entries(styles)) {
                 const name = `${appearance} ${style} ${size}`;
                 const s = getComputedStyle(pill(name));
                 await expect(s.backgroundColor, `${name} ground`).toBe(token(ground));
                 await expect(s.color, `${name} ink`).toBe(token(ink));
-                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'small' ? 16 : 20);
+                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'compact' ? 16 : 20);
             }
         }
     }
@@ -292,15 +289,15 @@ export const DotNeedsALabel = () => {
             <button type="button" onClick={() => setUnnamed((v) => !v)}>
                 {unnamed ? 'Remove the unnamed dot' : 'Mount an unnamed dot'}
             </button>
-            {named && <Count appearance="dot" style="success" label="Online" />}
-            {unnamed && <span data-testid="unnamed"><Count appearance="dot" /></span>}
+            {named && <CountTag isDot appearance="success" label="Online" />}
+            {unnamed && <span data-testid="unnamed"><CountTag isDot /></span>}
         </div>
     );
 };
 DotNeedsALabel.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    const countWarnings = () => warn.mock.calls.filter(([m]) => String(m).includes('[Count]'));
+    const countWarnings = () => warn.mock.calls.filter(([m]) => String(m).includes('[CountTag]'));
     try {
         await userEvent.click(canvas.getByRole('button', { name: 'Mount a named dot' }));
         await expect(canvas.getByRole('img', { name: 'Online' })).toBeInTheDocument();
@@ -318,58 +315,13 @@ DotNeedsALabel.play = async ({ canvasElement }) => {
 /** With a label, a number is read as information rather than a bare digit. */
 export const LabeledNumber = () => (
     <button type="button" className="btn btn-outline-secondary">
-        Messages <Count value={4} label="4 unread" />
+        Messages <CountTag value={4} label="4 unread" />
     </button>
 );
 LabeledNumber.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('button', { name: 'Messages 4 unread' })).toBeInTheDocument();
     await expect(canvas.queryByRole('img')).toBeNull();
-};
-
-/**
- * The old names keep working. `positive`, `negative` and `information` render
- * exactly as `success`, `danger` and `info`, with a development warning that
- * names the replacement. The counts mount on a button press after the console
- * is watched.
- */
-export const DeprecatedStyleNames = () => {
-    const [mounted, setMounted] = useState(false);
-    return (
-        <div style={{ display: 'grid', gap: '12px' }}>
-            <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
-            <div style={row}>
-                <Count value={1} appearance="bold" style="success" data-testid="success" />
-                <Count value={2} appearance="bold" style="danger" data-testid="danger" />
-                <Count value={3} style="info" data-testid="info" />
-            </div>
-            {mounted && (
-                <div style={row}>
-                    <Count value={1} appearance="bold" style="positive" data-testid="positive" />
-                    <Count value={2} appearance="bold" style="negative" data-testid="negative" />
-                    <Count value={3} style="information" data-testid="information" />
-                </div>
-            )}
-        </div>
-    );
-};
-DeprecatedStyleNames.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-        await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
-        for (const [old, current] of [['positive', 'success'], ['negative', 'danger'], ['information', 'info']]) {
-            const a = getComputedStyle(canvas.getByTestId(old));
-            const b = getComputedStyle(canvas.getByTestId(current));
-            await expect(a.backgroundColor, `${old} fills as ${current}`).toBe(b.backgroundColor);
-            await expect(a.color, `${old} reads as ${current}`).toBe(b.color);
-        }
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="positive" is deprecated; use style="success"'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="negative" is deprecated; use style="danger"'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="information" is deprecated; use style="info"'));
-    } finally {
-        warn.mockRestore();
-    }
 };
 
 /* -------------------------------------------------------------- playground */
@@ -380,16 +332,17 @@ export const Interactive = {
         value: 12,
         max: 99,
         showZero: false,
-        appearance: 'subtle',
-        style: 'neutral',
-        size: 'medium',
-        ring: false,
+        appearance: 'neutral',
+        spacing: 'default',
+        isBold: false,
+        isInverse: false,
+        isDot: false,
+        hasRing: false,
         label: '',
     },
     argTypes: {
-        appearance: { control: 'inline-radio', options: COUNT_APPEARANCES },
-        style: { control: 'select', options: COUNT_STYLES },
-        size: { control: 'inline-radio', options: COUNT_SIZES },
+        appearance: { control: 'select', options: COUNT_TAG_APPEARANCES },
+        spacing: { control: 'inline-radio', options: COUNT_TAG_SPACINGS },
     },
-    render: (args) => <Count {...args} label={args.label || (args.appearance === 'dot' ? 'Notification' : undefined)} />,
+    render: (args) => <CountTag {...args} label={args.label || (args.isDot ? 'Notification' : undefined)} />,
 };

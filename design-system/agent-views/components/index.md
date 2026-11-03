@@ -8,15 +8,13 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (72)
+## UI components (70)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)
 - [AvatarGroup](../../src/components/images-and-icons/AvatarGroup/index.md)
-- [Badge](../../src/components/labels/Badge/index.md)
-- [BadgeVariants](../../src/components/labels/BadgeVariants.md)
 - [Breadcrumb](../../src/components/navigation/Breadcrumb/index.md)
 - [Button](../../src/components/forms-and-inputs/Button/index.md)
 - [ButtonGroup](../../src/components/forms-and-inputs/ButtonGroup/index.md)
@@ -30,7 +28,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Code](../../src/components/text-and-data-display/Code/index.md)
 - [CodeBlock](../../src/components/text-and-data-display/CodeBlock/index.md)
 - [Collapse](../../src/components/layout-and-structure/Collapse/index.md)
-- [Count](../../src/components/labels/Count/index.md)
+- [CountTag](../../src/components/labels/CountTag/index.md)
 - [DateAndTimePicker](../../src/components/forms-and-inputs/DateAndTimePicker.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [Divider](../../src/components/layout-and-structure/Divider/index.md)
@@ -68,7 +66,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
 - [Spinner](../../src/components/loading/Spinner/index.md)
 - [StaticBadgeSmart](../../src/components/_internal/StaticBadgeSmart/index.md)
-- [Status](../../src/components/labels/Status/index.md)
+- [StatusTag](../../src/components/labels/StatusTag/index.md)
 - [Suggestion](../../src/components/labels/Suggestion/index.md)
 - [Switch](../../src/components/forms-and-inputs/Switch.md)
 - [Table](../../src/components/_internal/Table/index.md)

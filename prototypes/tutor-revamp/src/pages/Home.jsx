@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Illustration, StaticBadgeSmart, Status } from '@/components';
+import { Button, Illustration, StaticBadgeSmart, StatusTag } from '@/components';
 import { PatternCard } from '@/patterns';
 import {
     Agenda,
@@ -95,7 +95,7 @@ const Home = () => {
                     <div className="tr-home__next-title">
                         <div className="tr-home__next-h">
                             <h2 id="home-next">{MATH_7.title}</h2>
-                            <Status type="date" style="warning">{MATH_7.startsIn}</Status>
+                            <StatusTag type="date" appearance="warning">{MATH_7.startsIn}</StatusTag>
                         </div>
                         <div className="tr-home__next-meta">
                             <span>{`${MATH_7.school}, ${MATH_7.teacher}’s class`}</span>
@@ -124,7 +124,7 @@ const Home = () => {
 
             <PatternCard className="tr-home__card tr-home__span-4 tr-home__todo" padding="lg" role="region" aria-labelledby="home-overdue">
                 <div className="tr-home__stack">
-                    <CardHead id="home-overdue" title="Overdue" end={<Status style="warning">{ALGEBRA_1.reflection}</Status>} />
+                    <CardHead id="home-overdue" title="Overdue" end={<StatusTag appearance="warning">{ALGEBRA_1.reflection}</StatusTag>} />
                     <div className="tr-home__overdue">
                         <span className="tr-home__overdue-text">
                             <b>{`Reflect on ${ALGEBRA_1.title}`}</b>
@@ -138,7 +138,7 @@ const Home = () => {
                     <Agenda
                         label="Today"
                         linkAs={Link}
-                        items={AGENDA.map((a) => ({ ...a, status: a.status ? <Status style="info">{a.status}</Status> : undefined }))}
+                        items={AGENDA.map((a) => ({ ...a, status: a.status ? <StatusTag appearance="info">{a.status}</StatusTag> : undefined }))}
                     />
                 </div>
             </PatternCard>
@@ -156,7 +156,7 @@ const Home = () => {
                                 <b>{s.name}</b>
                             </span>
                             <Sparkline points={s.practice} domain={[0, 24]} label={`${firstName(s.name)}’s practice minutes, last 7 sessions`} />
-                            <span><Status style={s.focus.style}>{s.focus.label}</Status></span>
+                            <span><StatusTag appearance={s.focus.style}>{s.focus.label}</StatusTag></span>
                         </RevealRow>
                     ))}
                 </RevealRows>

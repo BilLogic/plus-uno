@@ -198,7 +198,7 @@ test('a fabricated prop and a fabricated variant both fail the check', () => {
     '',
     '```jsx',
     '<Button text="Save" emphasis="loud" />',
-    '<Badge text="New" size="h9" />',
+    '<StatusTag appearance="info" spacing="huge" />',
     '```',
     '',
     'Written inline, `fill="translucent"` is the same claim.',
@@ -206,7 +206,7 @@ test('a fabricated prop and a fabricated variant both fail the check', () => {
   ].join('\n');
   const output = findingsIn({ '__regression-props.md': page }).join('\n');
   assert.match(output, /emphasis is not a prop of Button/);
-  assert.match(output, /Badge size="h9"/);
+  assert.match(output, /StatusTag spacing="huge"/);
   assert.match(output, /fill="translucent"/);
 });
 
@@ -345,7 +345,7 @@ test('a comma inside a prop\'s JSDoc does not delete the prop', () => {
   assert.deepEqual(names, ['text', 'swatchBefore', 'isSelected']);
 });
 
-test('the commented props of the real Tag and BadgeVariants all survive', () => {
+test('the commented props of the real Tag and StatusTag all survive', () => {
   // The same defect measured on the corpus rather than a fixture: 11 of the 17
   // props it dropped repo-wide were on #276's own two components, because they
   // are the most heavily commented in the tree. A fixture proves the scan; this
@@ -359,11 +359,11 @@ test('the commented props of the real Tag and BadgeVariants all survive', () => 
     assert.ok(tag.includes(name), `Tag.${name} was dropped`);
   }
 
-  const badge = parsePropTypes(
-    read('design-system/src/components/labels/BadgeVariants.jsx'), 'BadgeVariants',
+  const status = parsePropTypes(
+    read('design-system/src/components/labels/StatusTag/StatusTag.jsx'), 'StatusTag',
   ).map((p) => p.name);
-  for (const name of ['spacing', 'color', 'iconBefore', 'maxWidth', 'label']) {
-    assert.ok(badge.includes(name), `BadgeVariants.${name} was dropped`);
+  for (const name of ['spacing', 'appearance', 'leadingVisual', 'maxWidth', 'count']) {
+    assert.ok(status.includes(name), `StatusTag.${name} was dropped`);
   }
 });
 

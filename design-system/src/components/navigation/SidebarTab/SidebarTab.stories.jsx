@@ -4,7 +4,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { Button, Count, Status } from '@/components';
+import { Button, CountTag, StatusTag } from '@/components';
 import SidebarTab from '@/components/navigation/SidebarTab';
 
 export default {
@@ -282,8 +282,8 @@ export const WithDescription = {
 export const WithElemAfter = {
     render: () => (
         <div style={{ ...sidebarWidth, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
-            <SidebarTab text="Sessions" icon="calendar-alt" elemAfter={<Count value={3} label="3 upcoming" />} />
-            <SidebarTab text="Students" icon="user-graduate" elemAfter={<Status style="success">Live</Status>} />
+            <SidebarTab text="Sessions" icon="calendar-alt" elemAfter={<CountTag value={3} label="3 upcoming" />} />
+            <SidebarTab text="Students" icon="user-graduate" elemAfter={<StatusTag appearance="success">Live</StatusTag>} />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -311,7 +311,7 @@ export const WithActionsOnHover = {
                 text="Sessions"
                 icon="calendar-alt"
                 onClick={onRowClick}
-                elemAfter={<Count value={3} label="3 upcoming" />}
+                elemAfter={<CountTag value={3} label="3 upcoming" />}
                 actionsOnHover={<Button appearance="subtle" spacing="compact" iconBefore="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
             />
         </div>

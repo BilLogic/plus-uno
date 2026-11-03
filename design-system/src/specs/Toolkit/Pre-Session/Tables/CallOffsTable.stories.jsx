@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -234,11 +234,7 @@ export const CallOffsTableRow = ({
                 }}
             >
                 {(callOffState === 'pending' && late) || callOffState === 'past' ? (
-                    <Badge
-                        text={getBadgeText()}
-                        style={getBadgeStyle()}
-                        size="b2"
-                    />
+                    <StatusTag appearance={getBadgeStyle()}>{getBadgeText()}</StatusTag>
                 ) : null}
             </div>
 

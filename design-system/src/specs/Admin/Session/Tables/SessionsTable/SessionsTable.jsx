@@ -10,7 +10,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './SessionsTable.scss';
 
 /**
@@ -82,9 +82,9 @@ const SessionsTable = ({
     const renderMetricCell = (value) => {
         const style = getMetricStyle(value);
         return (
-            <Badge style={style} size="b3">
+            <StatusTag appearance={style}>
                 {value}%
-            </Badge>
+            </StatusTag>
         );
     };
 
@@ -121,9 +121,9 @@ const SessionsTable = ({
                                 <span className="body3-txt">{session.shift}</span>
                             </td>
                             <td>
-                                <Badge style="secondary" size="b3">
+                                <StatusTag appearance="neutral">
                                     {session.school}
-                                </Badge>
+                                </StatusTag>
                             </td>
                             <td>
                                 <span className="body3-txt">{session.teacher}</span>

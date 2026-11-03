@@ -41,6 +41,6 @@ From `design-system/src/components/labels/AiLabel/AiLabel.scss`. Override these 
 
 ## Related
 
-Same group: `Badge` · `BadgeVariants` · `Count` · `Status` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `CountTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -134,12 +134,12 @@ const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
 
 /**
  * Components whose empty state is to render nothing, and the one value that
- * gives them something to render. The same reasoning as `show`: a Count with no
+ * gives them something to render. The same reasoning as `show`: a CountTag with no
  * number is hidden by contract, so every variant would look broken when it is
  * simply empty.
  */
 const RENDERS_WITH = {
-  Count: { value: 1 },
+  CountTag: { value: 1 },
 };
 
 function baseProps(props, componentName) {

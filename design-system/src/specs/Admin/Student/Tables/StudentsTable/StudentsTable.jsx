@@ -9,7 +9,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './StudentsTable.scss';
 
 const StudentsTable = ({
@@ -145,13 +145,9 @@ const StudentsTable = ({
 
                             {/* Latest Status column */}
                             <td className="students-table__cell students-table__cell--status">
-                                <Badge
-                                    style="info"
-                                    size="b3"
-                                    className="students-table__status-badge"
-                                >
+                                <StatusTag appearance="info" className="students-table__status-badge">
                                     {student.status}
-                                </Badge>
+                                </StatusTag>
                             </td>
 
                             {/* Action column */}

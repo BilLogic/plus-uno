@@ -38,6 +38,6 @@ From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override 
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Status` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `CountTag` · `StatusTag` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

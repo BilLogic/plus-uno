@@ -224,27 +224,11 @@ MultiAccumulatesAndRemoves.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(page().queryByRole('option', { name: 'South High' })).toBeNull());
 
-    // The chip is a Tag in a TagGroup, not a Badge.
+    // The chip is a Tag in a TagGroup.
     await expect(canvasElement.querySelector('.plus-tag-group .plus-tag')).not.toBeNull();
-    await expect(canvasElement.querySelector('.plus-badge')).toBeNull();
     await userEvent.click(canvas.getByRole('button', { name: 'Remove South High' }));
     await expect(chosen.textContent).toBe('');
     await expect(page().queryByRole('option', { name: 'South High' })).toBeNull();
-};
-
-/** `displayMode="badges"` keeps the Badge chips for screens that still use them. */
-export const BadgesDisplayKept = () => (
-    <div style={stack}>
-        <Select id="scommit-badges" label="Schools" mode="multi" displayMode="badges" options={schools} defaultValue={['north']} />
-    </div>
-);
-
-BadgesDisplayKept.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvasElement.querySelector('.plus-badge')).not.toBeNull();
-    await expect(canvasElement.querySelector('.plus-tag')).toBeNull();
-    await userEvent.click(canvas.getByRole('button', { name: 'Dismiss' }));
-    await expect(canvasElement.querySelector('.plus-badge')).toBeNull();
 };
 
 /** A filter bar commits once, when the list closes, not on each tick. */
