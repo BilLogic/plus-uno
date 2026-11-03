@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
 import Table from '@/components/_internal/Table';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './StudentsOverviewSection.scss';
 
 /**
@@ -267,21 +267,12 @@ const StudentsOverviewSection = ({
         },
         {
             content: (
-                <Badge
-                    text={student.status}
-                    style="danger"
-                    size="b3"
-                />
+                <StatusTag appearance="danger">{student.status}</StatusTag>
             )
         },
         {
             content: student.focusArea ? (
-                <Badge
-                    text={student.focusArea}
-                    style={student.focusArea.toLowerCase().replace(/\s+/g, '-')}
-                    size="b3"
-                    leadingVisual="circle-dot"
-                />
+                <StatusTag appearance={student.focusArea.toLowerCase().replace(/\s+/g, '-')} leadingVisual="circle-dot">{student.focusArea}</StatusTag>
             ) : (
                 <span className="body1-txt">-</span>
             )

@@ -6,10 +6,6 @@
     "W0qzhXWxFsMwSJzkdV2yal": "Design System - Web App Specs"
   },
   "nodes": {
-    "1056:32356": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
     "10661:10292": {
       "file": "W0qzhXWxFsMwSJzkdV2yal",
       "type": "COMPONENT_SET"
@@ -218,17 +214,9 @@
       "file": "W0qzhXWxFsMwSJzkdV2yal",
       "type": "COMPONENT"
     },
-    "25:568": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
     "27:618": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
-    },
-    "3497:19481": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "PAGE"
     },
     "3497:19482": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
@@ -243,10 +231,6 @@
       "type": "COMPONENT"
     },
     "37:4513": {
-      "file": "zAecJNRdvJzAUOcjV32tRX",
-      "type": "COMPONENT_SET"
-    },
-    "3998:68735": {
       "file": "zAecJNRdvJzAUOcjV32tRX",
       "type": "COMPONENT_SET"
     },

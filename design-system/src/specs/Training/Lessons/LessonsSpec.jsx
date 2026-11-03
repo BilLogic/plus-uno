@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Button, Badge, Select } from '@/components';
+import { Card, Table, Button, StatusTag, Select } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 
 export const LessonsSpec = () => {
@@ -43,17 +43,16 @@ export const LessonsSpec = () => {
             key: 'title', label: 'Lesson Title', render: (row) => (
                 <div className="d-flex align-items-center gap-2">
                     <span className="body2-txt font-weight-bold">{row.title}</span>
-                    {row.showAi && <Badge label="AI" type="neutral" />}
+                    {row.showAi && <StatusTag appearance="discovery">AI</StatusTag>}
                 </div>
             )
         },
         { key: 'competencyArea', label: 'Competency Area' },
         {
             key: 'status', label: 'Status', render: (row) => (
-                <Badge
-                    label={row.status}
-                    type={row.status === 'completed' ? 'success' : row.status === 'in progress' ? 'warning' : 'neutral'}
-                />
+                <StatusTag appearance={row.status === 'completed' ? 'success' : row.status === 'in progress' ? 'warning' : 'neutral'}>
+                    {row.status}
+                </StatusTag>
             )
         },
         { key: 'duration', label: 'Duration' },
@@ -115,7 +114,7 @@ export const LessonsSpec = () => {
                             {lessons.map((lesson, idx) => (
                                 <Card key={idx} title={lesson.title}>
                                     <div className="d-flex justify-content-between mb-2">
-                                        <Badge label={lesson.status} type="neutral" />
+                                        <StatusTag>{lesson.status}</StatusTag>
                                         <span className="body3-txt text-muted">{lesson.duration}</span>
                                     </div>
                                     <div className="body2-txt mb-3">{lesson.competencyArea}</div>

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import { Modal, Form } from 'react-bootstrap';
 import TutorSessionsTable from '@/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Switch from '@/components/forms-and-inputs/Switch';
 import Select from '@/components/forms-and-inputs/Select';
 import Input from '@/components/forms-and-inputs/Input';
@@ -146,9 +146,9 @@ const TutorModal = ({
                                 onClick={() => handleTabClick('sessions')}
                             >
                                 Sessions
-                                <Badge style="info" size="b3" className="tutor-modal__tab-badge">
+                                <StatusTag appearance="info" className="tutor-modal__tab-badge">
                                     {totalEntries}
-                                </Badge>
+                                </StatusTag>
                             </button>
                         </>
                     ) : (

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Table, Badge } from 'react-bootstrap';
+import { Table } from 'react-bootstrap';
+import { StatusTag } from '@/components';
 import { Button } from '@/components';
 import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 import OnboardingModuleCard from '@/components/_internal/training/OnboardingModuleCard';
@@ -58,7 +59,7 @@ const OnboardingOverviewPage = () => {
                                     <tr key={i}>
                                         <td className="py-3 px-4">{m.title}</td>
                                         <td className="py-3 px-4">{m.duration}</td>
-                                        <td className="py-3 px-4"><Badge bg="secondary">{m.stage}</Badge></td>
+                                        <td className="py-3 px-4"><StatusTag>{m.stage}</StatusTag></td>
                                         <td className="py-3 px-4"><Button appearance="subtle" spacing="compact" text="Start" /></td>
                                     </tr>
                                 ))}

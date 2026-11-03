@@ -1,7 +1,7 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ListGroup from './ListGroup';
-import { Badge } from '@/components/labels/Badge';
+import CountTag from '@/components/labels/CountTag';
 
 export default {
     title: 'Components/Layout and structure/List group',
@@ -81,11 +81,11 @@ function ListGroupContentBadgesDemo() {
             <ListGroup>
                 <ListGroup.Item>
                     Item with badge
-                    <Badge counter="14" style="primary" size="b1" />
+                    <CountTag value={14} />
                 </ListGroup.Item>
                 <ListGroup.Item>
                     Item with badge
-                    <Badge counter="2" style="primary" size="b1" />
+                    <CountTag value={2} />
                 </ListGroup.Item>
             </ListGroup>
         </section>

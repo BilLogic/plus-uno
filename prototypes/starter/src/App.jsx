@@ -10,7 +10,7 @@ import './App.css';
  * Available design system imports:
  *   import { Button } from '@/components';
  *   import { Modal } from '@/components';
- *   import { Badge } from '@/components';
+ *   import { StatusTag } from '@/components';
  *   import { Alert } from '@/components';
  *   import { PageLayout } from '@/specs/Universal/Pages';
  *   ... and more from design-system/src/components/

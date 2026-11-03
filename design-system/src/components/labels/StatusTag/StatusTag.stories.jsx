@@ -3,16 +3,19 @@ import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/
 
 import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
-import Status, { STATUS_DATE_STYLES, STATUS_SIZES, STATUS_STYLES, STATUS_TYPES } from './Status';
+import StatusTag, {
+    STATUS_TAG_APPEARANCES, STATUS_TAG_DATE_APPEARANCES, STATUS_TAG_SMART_APPEARANCES, STATUS_TAG_SPACINGS,
+    STATUS_TAG_STATUS_APPEARANCES, STATUS_TAG_TYPES,
+} from './StatusTag';
 
 /**
- * `Status` — the condition something is in.
+ * `StatusTag` — the condition something is in.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Every assertion is something a person could observe —
  * rendered text, roles, focus, the tooltip, computed size and color — and never
  * a class name. Colors are compared against the token they should resolve to,
- * read through a probe element. A Status is found by the `data-testid` a story
+ * read through a probe element. A Status tag is found by the `data-testid` a story
  * gives it, which the component passes through like any other attribute.
  *
  * Contrast is not re-asserted: the a11y ratchet tracks `color-contrast` over
@@ -20,18 +23,15 @@ import Status, { STATUS_DATE_STYLES, STATUS_SIZES, STATUS_STYLES, STATUS_TYPES }
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Status',
-    component: Status,
+    title: 'Components/Labels/Status, count & tag/Status tag',
+    component: StatusTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-09-29', kind: 'deprecated', summary: '`style` started accepting `positive`, `negative` and `information` as deprecated aliases for `success`, `danger` and `info`, rendering the same and warning in development.' },
-        ],
         docs: {
             description: {
                 component:
                     'The condition something is in, whether the system calculated it or a '
-                    + 'person set it. For a number, use Count; for a category, use Tag.',
+                    + 'person set it. For a number, use Count tag; for a category, use Tag.',
             },
         },
     },
@@ -42,11 +42,13 @@ const grid = { display: 'grid', gap: '12px' };
 
 /* ------------------------------------------------------------------ helpers */
 
-const SIZE = { medium: 20, large: 32 };
+const SIZE = { compact: 16, default: 20, spacious: 32 };
 /** Left and right padding when there is no count: Element xs (4) and md (12). */
-const PAD = { medium: 4, large: 12 };
+const PAD = { compact: 4, default: 4, spacious: 12 };
 /** The nested count's height, and its inset from the top and right edges. */
-const COUNT = { medium: { height: 16, inset: 2 }, large: { height: 20, inset: 6 } };
+const COUNT = { default: { height: 16, inset: 2 }, spacious: { height: 20, inset: 6 } };
+/** Spacings that can nest a count: a compact tag is as tall as a compact count. */
+const COUNT_SPACINGS = ['default', 'spacious'];
 
 /** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
@@ -56,6 +58,10 @@ const STATE_COLORS = {
     danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
     info: ['--ds-background-information', '--ds-text-information', '--ds-background-information-pressed'],
     discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content', '--ds-background-smart-mastering-content-pressed'],
+    ...Object.fromEntries(STATUS_TAG_SMART_APPEARANCES.map((subject) => [
+        subject,
+        [`--ds-background-smart-${subject}`, `--ds-text-smart-${subject}`, `--ds-background-smart-${subject}-pressed`],
+    ])),
 };
 
 /** [border, text, icon] per date style. A date is outlined: it has no fill. */
@@ -96,15 +102,15 @@ const tokenWeight = (host, token) => {
 
 /* ----------------------------------------------------------------- stories */
 
-/** The six styles at both sizes. Fill is the style's tinted background, text its (Text), border its pressed step. */
+/** Every appearance at every spacing. Fill is the appearance's tinted background, text its (Text), border its pressed step. */
 export const Styles = () => (
     <div style={grid}>
-        {STATUS_SIZES.map((size) => (
+        {STATUS_TAG_SPACINGS.map((size) => (
             <div key={size} style={row}>
-                {STATUS_STYLES.map((style) => (
-                    <Status key={style} style={style} size={size} data-testid={`${style}-${size}`}>
-                        {style}
-                    </Status>
+                {STATUS_TAG_APPEARANCES.map((appearance) => (
+                    <StatusTag key={appearance} appearance={appearance} spacing={size} data-testid={`${appearance}-${size}`}>
+                        {appearance}
+                    </StatusTag>
                 ))}
             </div>
         ))}
@@ -114,7 +120,7 @@ Styles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
-    for (const size of STATUS_SIZES) {
+    for (const size of STATUS_TAG_SPACINGS) {
         for (const [style, [fill, ink, edge]] of Object.entries(STATE_COLORS)) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
@@ -123,10 +129,10 @@ Styles.play = async ({ canvasElement }) => {
             await expect(s.backgroundColor, `${name} fill`).toBe(token(fill));
             await expect(s.color, `${name} text`).toBe(token(ink));
             await expect(innerBorder(el), `${name} 1px inside border`).toBe(token(edge));
-            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'large' ? 6 : 4);
+            await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 6 : 4);
 
             const label = within(el).getByText(style);
-            await expect(px(getComputedStyle(label).fontSize), `${name} text size`).toBe(size === 'large' ? 14 : 12);
+            await expect(px(getComputedStyle(label).fontSize), `${name} text size`).toBe(size === 'spacious' ? 14 : 12);
             const box = el.getBoundingClientRect();
             const text = label.getBoundingClientRect();
             await expect(text.left - box.left, `${name} left padding`).toBe(PAD[size]);
@@ -134,18 +140,18 @@ Styles.play = async ({ canvasElement }) => {
         }
     }
     // Every style fills with an opaque background token.
-    await expect(alpha(getComputedStyle(canvas.getByTestId('neutral-medium')).backgroundColor)).toBe(1);
-    await expect(alpha(getComputedStyle(canvas.getByTestId('success-medium')).backgroundColor)).toBe(1);
+    await expect(alpha(getComputedStyle(canvas.getByTestId('neutral-default')).backgroundColor)).toBe(1);
+    await expect(alpha(getComputedStyle(canvas.getByTestId('success-default')).backgroundColor)).toBe(1);
 };
 
 /** A date is outlined, with a fixed icon per style: calendar, clock, alert. */
 export const Dates = () => (
     <div style={grid}>
-        {STATUS_SIZES.map((size) => (
+        {STATUS_TAG_SPACINGS.map((size) => (
             <div key={size} style={row}>
-                <Status type="date" size={size} data-testid={`neutral-${size}`}>Due Oct 14</Status>
-                <Status type="date" style="warning" size={size} data-testid={`warning-${size}`}>Due tomorrow</Status>
-                <Status type="date" style="danger" size={size} data-testid={`danger-${size}`}>2 days overdue</Status>
+                <StatusTag type="date" spacing={size} data-testid={`neutral-${size}`}>Due Oct 14</StatusTag>
+                <StatusTag type="date" appearance="warning" spacing={size} data-testid={`warning-${size}`}>Due tomorrow</StatusTag>
+                <StatusTag type="date" appearance="danger" spacing={size} data-testid={`danger-${size}`}>2 days overdue</StatusTag>
             </div>
         ))}
     </div>
@@ -154,7 +160,7 @@ Dates.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
-    for (const size of STATUS_SIZES) {
+    for (const size of STATUS_TAG_SPACINGS) {
         for (const [style, [edge, ink, icon]] of Object.entries(DATE_LOOK)) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
@@ -169,28 +175,29 @@ Dates.play = async ({ canvasElement }) => {
             await expect(getComputedStyle(glyph, '::before').content, `${name} icon is ${icon}`).toBe(glyphOf(canvasElement, icon));
             await expect(glyph).toHaveAttribute('aria-hidden', 'true');
             await expect(getComputedStyle(glyph).color, `${name} icon color`).toBe(token(ink));
-            await expect(px(getComputedStyle(glyph).fontSize), `${name} icon size`).toBe(size === 'large' ? 16 : 12);
+            await expect(px(getComputedStyle(glyph).fontSize), `${name} icon size`).toBe(size === 'spacious' ? 16 : 12);
         }
     }
 };
 
 /**
- * `count` nests a Count of the same style: small (16) in medium, medium (20) in
- * large, inset equally from the top and the right.
+ * `count` nests a Count tag of the same appearance: compact (16) in default,
+ * default (20) in spacious, inset equally from the top and the right. A compact
+ * tag is as tall as a compact count, so it takes none.
  */
 export const WithCount = () => (
     <div style={grid}>
-        {STATUS_SIZES.map((size) => (
+        {COUNT_SPACINGS.map((size) => (
             <div key={size} style={row}>
-                {STATUS_STYLES.map((style) => (
-                    <Status key={style} style={style} size={size} count={38} data-testid={`${style}-${size}`}>
-                        {style}
-                    </Status>
+                {STATUS_TAG_STATUS_APPEARANCES.map((appearance) => (
+                    <StatusTag key={appearance} appearance={appearance} spacing={size} count={38} data-testid={`${appearance}-${size}`}>
+                        {appearance}
+                    </StatusTag>
                 ))}
             </div>
         ))}
         <div style={row}>
-            <Status style="success" count={0} data-testid="zero">Completed</Status>
+            <StatusTag appearance="success" count={0} data-testid="zero">Completed</StatusTag>
         </div>
     </div>
 );
@@ -198,8 +205,8 @@ WithCount.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
-    for (const size of STATUS_SIZES) {
-        for (const [style, [, ink]] of Object.entries(STATE_COLORS)) {
+    for (const size of COUNT_SPACINGS) {
+        for (const [style, [, ink]] of Object.entries(STATE_COLORS).filter(([name]) => STATUS_TAG_STATUS_APPEARANCES.includes(name))) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
             await expect(el.getBoundingClientRect().height, `${name} keeps its height`).toBe(SIZE[size]);
@@ -211,7 +218,7 @@ WithCount.play = async ({ canvasElement }) => {
             await expect(p.top - box.top, `${name} count top inset`).toBe(COUNT[size].inset);
             await expect(box.right - p.right, `${name} count right inset`).toBe(COUNT[size].inset);
 
-            // The count takes the Status style: its subtle tinted background and (Text).
+            // The count takes the Status tag appearance: its subtle tinted background and (Text).
             const ground = style === 'neutral' ? '--ds-background-neutral' : STATE_COLORS[style][0];
             await expect(getComputedStyle(pill).backgroundColor, `${name} count ground`).toBe(token(ground));
             await expect(getComputedStyle(pill).color, `${name} count text`).toBe(token(style === 'neutral' ? '--ds-text' : ink));
@@ -222,27 +229,27 @@ WithCount.play = async ({ canvasElement }) => {
     const zero = canvas.getByTestId('zero');
     await expect(within(zero).queryByText('0')).toBeNull();
     const label = within(zero).getByText('Completed').getBoundingClientRect();
-    await expect(zero.getBoundingClientRect().right - label.right).toBe(PAD.medium);
+    await expect(zero.getBoundingClientRect().right - label.right).toBe(PAD.default);
 };
 
 /** `leadingVisual` adds one icon before the label, in the text color. */
 export const LeadingVisual = () => (
     <div style={row}>
-        <Status style="success" leadingVisual="circle-check" data-testid="medium">Completed</Status>
-        <Status style="warning" leadingVisual="triangle-exclamation" data-testid="warning">Needs review</Status>
-        <Status style="success" size="large" leadingVisual="circle-check" data-testid="large">Completed</Status>
-        <Status
-            style="info"
+        <StatusTag appearance="success" leadingVisual="circle-check" data-testid="default">Completed</StatusTag>
+        <StatusTag appearance="warning" leadingVisual="triangle-exclamation" data-testid="warning">Needs review</StatusTag>
+        <StatusTag appearance="success" spacing="spacious" leadingVisual="circle-check" data-testid="spacious">Completed</StatusTag>
+        <StatusTag
+            appearance="info"
             leadingVisual={<svg width="12" height="12" data-testid="node-visual"><circle cx="6" cy="6" r="6" fill="currentColor" /></svg>}
             data-testid="node"
         >
             Syncing
-        </Status>
+        </StatusTag>
     </div>
 );
 LeadingVisual.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const [id, size] of [['medium', 12], ['large', 16]]) {
+    for (const [id, size] of [['default', 12], ['spacious', 16]]) {
         const el = canvas.getByTestId(id);
         const icon = iconIn(el);
         const label = within(el).getByText('Completed');
@@ -269,10 +276,10 @@ LeadingVisual.play = async ({ canvasElement }) => {
 export const Truncation = () => (
     <div style={row}>
         <button type="button">Before</button>
-        <Status style="info" data-testid="short">In progress</Status>
-        <Status style="info" data-testid="long">
+        <StatusTag appearance="info" data-testid="short">In progress</StatusTag>
+        <StatusTag appearance="info" data-testid="long">
             Waiting on the district data export before the next session
-        </Status>
+        </StatusTag>
     </div>
 );
 Truncation.play = async ({ canvasElement }) => {
@@ -311,10 +318,10 @@ Truncation.play = async ({ canvasElement }) => {
 export const NarrowContainer = () => (
     <div style={grid}>
         <div data-testid="column" style={{ width: '120px', border: '1px dashed var(--color-outline-variant)' }}>
-            <Status style="info" data-testid="clamped">Waiting on the district data export</Status>
+            <StatusTag appearance="info" data-testid="clamped">Waiting on the district data export</StatusTag>
         </div>
         <div style={{ width: '400px' }}>
-            <Status style="info" maxWidth={100} data-testid="capped">Waiting on the district data export</Status>
+            <StatusTag appearance="info" maxWidth={100} data-testid="capped">Waiting on the district data export</StatusTag>
         </div>
     </div>
 );
@@ -347,15 +354,15 @@ export const NeverAButton = () => {
             <button type="button" onClick={() => setMounted(true)}>Mount a Status with onClick</button>
             <span data-testid="clicks">{clicks}</span>
             {mounted && (
-                <Status
-                    style="success"
+                <StatusTag
+                    appearance="success"
                     data-testid="status"
                     onClick={() => setClicks((n) => n + 1)}
                     role="button"
                     tabIndex={0}
                 >
                     Completed
-                </Status>
+                </StatusTag>
             )}
         </div>
     );
@@ -390,8 +397,8 @@ export const DateStyleFallback = () => {
     return (
         <div style={row}>
             <button type="button" onClick={() => setMounted(true)}>Mount a success date</button>
-            <Status type="date" data-testid="neutral">Due Oct 14</Status>
-            {mounted && <Status type="date" style="success" data-testid="fallback">Due Oct 14</Status>}
+            <StatusTag type="date" data-testid="neutral">Due Oct 14</StatusTag>
+            {mounted && <StatusTag type="date" appearance="success" data-testid="fallback">Due Oct 14</StatusTag>}
         </div>
     );
 };
@@ -412,22 +419,22 @@ DateStyleFallback.play = async ({ canvasElement }) => {
 };
 
 /**
- * The weight is pinned at both sizes: regular, from body.small in medium and
- * body.default in large. A Status inside a table header or a heading does not
+ * The weight is pinned at every spacing: regular, from body.small in default and
+ * body.default in spacious. A Status tag inside a table header or a heading does not
  * inherit bold.
  */
 export const PinnedWeight = () => (
     <table>
         <thead>
             <tr>
-                <th><Status style="success" data-testid="th-medium">Completed</Status></th>
-                <th><Status style="success" size="large" data-testid="th-large">Completed</Status></th>
+                <th><StatusTag appearance="success" data-testid="th-default">Completed</StatusTag></th>
+                <th><StatusTag appearance="success" spacing="spacious" data-testid="th-spacious">Completed</StatusTag></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td><Status style="success" data-testid="td-medium">Completed</Status></td>
-                <td><Status style="success" size="large" data-testid="td-large">Completed</Status></td>
+                <td><StatusTag appearance="success" data-testid="td-default">Completed</StatusTag></td>
+                <td><StatusTag appearance="success" spacing="spacious" data-testid="td-spacious">Completed</StatusTag></td>
             </tr>
         </tbody>
     </table>
@@ -440,8 +447,8 @@ PinnedWeight.play = async ({ canvasElement }) => {
 
     const regular = tokenWeight(canvasElement, '--type-weight-regular');
     for (const where of ['th', 'td']) {
-        await expect(weight(`${where}-medium`), `medium in a ${where} is regular`).toBe(regular);
-        await expect(weight(`${where}-large`), `large in a ${where} is regular`).toBe(regular);
+        await expect(weight(`${where}-default`), `default in a ${where} is regular`).toBe(regular);
+        await expect(weight(`${where}-spacious`), `spacious in a ${where} is regular`).toBe(regular);
     }
 };
 
@@ -455,11 +462,11 @@ export const UnknownValuesFallBack = () => {
     return (
         <div style={row}>
             <button type="button" onClick={() => setMounted(true)}>Mount unknown values</button>
-            <Status data-testid="neutral">Not started</Status>
+            <StatusTag data-testid="neutral">Not started</StatusTag>
             {mounted && (
                 <>
-                    <Status style="purple" data-testid="unknown-style">Not started</Status>
-                    <Status type="deadline" style="success" data-testid="unknown-type">Not started</Status>
+                    <StatusTag appearance="purple" data-testid="unknown-style">Not started</StatusTag>
+                    <StatusTag type="deadline" appearance="success" data-testid="unknown-type">Not started</StatusTag>
                 </>
             )}
         </div>
@@ -471,7 +478,7 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
     const warn = spyOn(console, 'warn').mockImplementation(() => {});
     try {
         await userEvent.click(canvas.getByRole('button', { name: 'Mount unknown values' }));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="purple" falls back to neutral'));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('appearance="purple" falls back to neutral'));
         await expect(warn).toHaveBeenCalledWith(expect.stringContaining('type="deadline"'));
 
         // The unknown style renders exactly as neutral.
@@ -491,60 +498,6 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
     }
 };
 
-/**
- * The old names keep working. `positive`, `negative` and `information` are
- * the names Badge variants used, and each renders exactly as the library word
- * that replaced it, on a state and on a date, with a development warning that
- * names the replacement. The Statuses mount on a button press after the
- * console is watched.
- */
-export const DeprecatedStyleNames = () => {
-    const [mounted, setMounted] = useState(false);
-    return (
-        <div style={grid}>
-            <button type="button" onClick={() => setMounted(true)}>Mount the old names</button>
-            <div style={row}>
-                <Status style="success" data-testid="success">Completed</Status>
-                <Status style="danger" data-testid="danger">Overdue</Status>
-                <Status style="info" data-testid="info">In progress</Status>
-                <Status type="date" style="danger" data-testid="date-danger">Due Oct 14</Status>
-            </div>
-            {mounted && (
-                <div style={row}>
-                    <Status style="positive" data-testid="positive">Completed</Status>
-                    <Status style="negative" data-testid="negative">Overdue</Status>
-                    <Status style="information" data-testid="information">In progress</Status>
-                    <Status type="date" style="negative" data-testid="date-negative">Due Oct 14</Status>
-                </div>
-            )}
-        </div>
-    );
-};
-DeprecatedStyleNames.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-        await userEvent.click(canvas.getByRole('button', { name: 'Mount the old names' }));
-        const pairs = [['positive', 'success'], ['negative', 'danger'], ['information', 'info'], ['date-negative', 'date-danger']];
-        for (const [old, current] of pairs) {
-            const a = getComputedStyle(canvas.getByTestId(old));
-            const b = getComputedStyle(canvas.getByTestId(current));
-            await expect(a.backgroundColor, `${old} fills as ${current}`).toBe(b.backgroundColor);
-            await expect(a.color, `${old} reads as ${current}`).toBe(b.color);
-            await expect(a.boxShadow, `${old} is edged as ${current}`).toBe(b.boxShadow);
-            await expect(a.borderTopColor, `${old} is outlined as ${current}`).toBe(b.borderTopColor);
-        }
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="positive" is deprecated; use style="success"'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="negative" is deprecated; use style="danger"'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('style="information" is deprecated; use style="info"'));
-        // An alias is not an unknown value: it never falls back to neutral.
-        const messages = warn.mock.calls.map(([m]) => String(m));
-        await expect(messages.some((m) => m.includes('falls back to neutral'))).toBe(false);
-    } finally {
-        warn.mockRestore();
-    }
-};
-
 /* -------------------------------------------------------------- playground */
 
 /** Interactive playground. */
@@ -552,23 +505,23 @@ export const Interactive = {
     args: {
         children: 'Needs review',
         type: 'state',
-        style: 'warning',
-        size: 'medium',
+        appearance: 'warning',
+        spacing: 'default',
         leadingVisual: '',
         count: 0,
         maxWidth: 200,
     },
     argTypes: {
-        type: { control: 'inline-radio', options: STATUS_TYPES },
-        style: { control: 'select', options: STATUS_STYLES },
-        size: { control: 'inline-radio', options: STATUS_SIZES },
+        type: { control: 'inline-radio', options: STATUS_TAG_TYPES },
+        appearance: { control: 'select', options: STATUS_TAG_APPEARANCES },
+        spacing: { control: 'inline-radio', options: STATUS_TAG_SPACINGS },
     },
     parameters: {
         docs: {
             description: {
-                story: `A date takes only ${STATUS_DATE_STYLES.join(', ')}.`,
+                story: `A date takes only ${STATUS_TAG_DATE_APPEARANCES.join(', ')}.`,
             },
         },
     },
-    render: ({ leadingVisual, ...args }) => <Status {...args} leadingVisual={leadingVisual || undefined} />,
+    render: ({ leadingVisual, ...args }) => <StatusTag {...args} leadingVisual={leadingVisual || undefined} />,
 };

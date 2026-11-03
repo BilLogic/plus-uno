@@ -311,21 +311,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // The population itself, so a selector that quietly stops matching is loud
   // rather than green. 60 components + the one named exception — Tag and
   // TagGroup took it from 48 in #276, AiLabel added one in #269,
-  // BadgeVariants added the last of #276's three, Tile, Count, Status,
+  // Tile, Count, Status,
   // Skeleton and Suggestion added one each, and CloseButton added one when
   // Alert's dismiss control became a shared component, and TagInput added one
   // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
   // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two — the deliberate
   // edit this number is here to force.
   //
-  // BadgeVariants is the one component here documented from a FLAT source
-  // (`labels/BadgeVariants.jsx`, not a directory of its own), which
-  // is the shape `componentIdentity` already recognizes and the shape #276
-  // wanted: the new Badge sits BESIDE the old one rather than replacing it, so
-  // both are visible in one group while the deprecation runs.
-  if (tabbed.length !== 66) {
+  if (tabbed.length !== 64) {
     all.push(
-      `expected 66 tabbed docs pages (65 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 64 tabbed docs pages (63 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

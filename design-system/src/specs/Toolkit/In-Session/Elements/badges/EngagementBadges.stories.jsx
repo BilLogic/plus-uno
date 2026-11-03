@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Badges/Engagement Badges',
-    component: Badge,
+    component: StatusTag,
     parameters: {
         layout: 'centered',
         docs: {
@@ -15,22 +15,15 @@ export default {
         }
     },
     argTypes: {
-        text: { control: 'text' },
-        style: {
+        children: { control: 'text' },
+        appearance: {
             control: 'select',
-            options: ['success', 'warning', 'danger', 'secondary'],
+            options: ['success', 'warning', 'danger', 'neutral'],
             description: 'Green for Fully engaged, Yellow for Partially engaged, Red for Not engaged at all, Gray for N/A and Select.'
         },
-        size: {
-            control: 'select',
-            options: ['b3'],
-            description: 'Engagement badges use "b3" (12px) size.'
-        },
-        trailingVisual: { control: 'boolean', description: 'Show dropdown caret icon' }
     },
 };
 
-const caretIcon = <i className="fa-solid fa-caret-down"></i>;
 
 /**
  * Fully Engaged Badge
@@ -38,20 +31,15 @@ const caretIcon = <i className="fa-solid fa-caret-down"></i>;
  */
 export const FullyEngaged = {
     args: {
-        text: 'Fully engaged',
-        style: 'success',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Fully engaged',
+        appearance: 'success',
     },
 };
 
 export const FullyEngagedStatic = {
     args: {
-        text: 'Fully engaged',
-        style: 'success',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Fully engaged',
+        appearance: 'success',
     },
 };
 
@@ -61,20 +49,15 @@ export const FullyEngagedStatic = {
  */
 export const PartiallyEngaged = {
     args: {
-        text: 'Partially engaged',
-        style: 'warning',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Partially engaged',
+        appearance: 'warning',
     },
 };
 
 export const PartiallyEngagedStatic = {
     args: {
-        text: 'Partially engaged',
-        style: 'warning',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Partially engaged',
+        appearance: 'warning',
     },
 };
 
@@ -84,20 +67,15 @@ export const PartiallyEngagedStatic = {
  */
 export const NotEngagedAtAll = {
     args: {
-        text: 'Not engaged at all',
-        style: 'danger',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Not engaged at all',
+        appearance: 'danger',
     },
 };
 
 export const NotEngagedAtAllStatic = {
     args: {
-        text: 'Not engaged at all',
-        style: 'danger',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Not engaged at all',
+        appearance: 'danger',
     },
 };
 
@@ -107,20 +85,15 @@ export const NotEngagedAtAllStatic = {
  */
 export const NA = {
     args: {
-        text: 'N/A',
-        style: 'secondary',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'N/A',
+        appearance: 'neutral',
     },
 };
 
 export const NAStatic = {
     args: {
-        text: 'N/A',
-        style: 'secondary',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'N/A',
+        appearance: 'neutral',
     },
 };
 
@@ -130,20 +103,15 @@ export const NAStatic = {
  */
 export const Select = {
     args: {
-        text: 'Select',
-        style: 'secondary',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Select',
+        appearance: 'neutral',
     },
 };
 
 export const SelectStatic = {
     args: {
-        text: 'Select',
-        style: 'secondary',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Select',
+        appearance: 'neutral',
     },
 };
 
@@ -169,40 +137,40 @@ export const AllVariations = () => (
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Fully Engaged</h6>
                 <div className="d-flex flex-column gap-2">
-                    <Badge text="Fully engaged" style="success" size="b3" trailingVisual={caretIcon} className="fw-normal" />
-                    <Badge text="Fully engaged" style="success" size="b3" className="fw-normal" />
+                    <StatusTag appearance="success" className="fw-normal">Fully engaged</StatusTag>
+                    <StatusTag appearance="success" className="fw-normal">Fully engaged</StatusTag>
                 </div>
             </div>
 
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Partially Engaged</h6>
                 <div className="d-flex flex-column gap-2">
-                    <Badge text="Partially engaged" style="warning" size="b3" trailingVisual={caretIcon} className="fw-normal" />
-                    <Badge text="Partially engaged" style="warning" size="b3" className="fw-normal" />
+                    <StatusTag appearance="warning" className="fw-normal">Partially engaged</StatusTag>
+                    <StatusTag appearance="warning" className="fw-normal">Partially engaged</StatusTag>
                 </div>
             </div>
 
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Not Engaged At All</h6>
                 <div className="d-flex flex-column gap-2">
-                    <Badge text="Not engaged at all" style="danger" size="b3" trailingVisual={caretIcon} className="fw-normal" />
-                    <Badge text="Not engaged at all" style="danger" size="b3" className="fw-normal" />
+                    <StatusTag appearance="danger" className="fw-normal">Not engaged at all</StatusTag>
+                    <StatusTag appearance="danger" className="fw-normal">Not engaged at all</StatusTag>
                 </div>
             </div>
 
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>N/A</h6>
                 <div className="d-flex flex-column gap-2">
-                    <Badge text="N/A" style="secondary" size="b3" trailingVisual={caretIcon} className="fw-normal" />
-                    <Badge text="N/A" style="secondary" size="b3" className="fw-normal" />
+                    <StatusTag appearance="neutral" className="fw-normal">N/A</StatusTag>
+                    <StatusTag appearance="neutral" className="fw-normal">N/A</StatusTag>
                 </div>
             </div>
 
             <div className="d-flex flex-column gap-3">
                 <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>Select</h6>
                 <div className="d-flex flex-column gap-2">
-                    <Badge text="Select" style="secondary" size="b3" trailingVisual={caretIcon} className="fw-normal" />
-                    <Badge text="Select" style="secondary" size="b3" className="fw-normal" />
+                    <StatusTag appearance="neutral" className="fw-normal">Select</StatusTag>
+                    <StatusTag appearance="neutral" className="fw-normal">Select</StatusTag>
                 </div>
             </div>
         </div>
@@ -222,8 +190,8 @@ export const Interactive = () => {
         { label: 'Fully engaged', value: 'Fully engaged', style: 'success' },
         { label: 'Partially engaged', value: 'Partially engaged', style: 'warning' },
         { label: 'Not engaged at all', value: 'Not engaged at all', style: 'danger' },
-        { label: 'N/A', value: 'N/A', style: 'secondary' },
-        { label: 'Select', value: 'Select', style: 'secondary' }
+        { label: 'N/A', value: 'N/A', style: 'neutral' },
+        { label: 'Select', value: 'Select', style: 'neutral' }
     ];
 
     return (
@@ -297,13 +265,7 @@ export const Interactive = () => {
                     minHeight: '120px'
                 }}
             >
-                <Badge
-                    text={text}
-                    style={style}
-                    size="b3"
-                    trailingVisual={showDropdown ? caretIcon : null}
-                    className="fw-normal"
-                />
+                <StatusTag appearance={style} className="fw-normal">{text}</StatusTag>
             </div>
 
             {/* All States Reference */}
@@ -312,13 +274,7 @@ export const Interactive = () => {
                 <div className="d-flex flex-wrap gap-3 mt-2">
                     {engagementOptions.map(option => (
                         <div key={option.value} className="d-flex flex-column gap-1 align-items-center">
-                            <Badge
-                                text={option.value}
-                                style={option.style}
-                                size="b3"
-                                trailingVisual={caretIcon}
-                                className="fw-normal"
-                            />
+                            <StatusTag appearance={option.style} className="fw-normal">{option.value}</StatusTag>
                             <span className="small text-muted">{option.label}</span>
                         </div>
                     ))}

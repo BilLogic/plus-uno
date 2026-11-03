@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 
 /**
  * Replicates Design System - Web App Specs node 1687-163680: "Manage Assignment" popup.
@@ -93,7 +94,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                 {/* Tabs: Attendance (active, 20), Assignment */}
                 <div style={{ display: 'flex', gap: 0, paddingLeft: '24px', borderBottom: '1px solid var(--color-outline-variant)' }}>
                     <button type="button" style={tabStyle('attendance')} onClick={() => setActiveTab('attendance')}>
-                        Attendance <Badge text="20" style="secondary" size="b3" className="ms-1" />
+                        Attendance <CountTag value={20} className="ms-1" />
                     </button>
                     <button type="button" style={tabStyle('assignment')} onClick={() => setActiveTab('assignment')}>
                         Assignment
@@ -139,7 +140,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                                             <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                                 <i className="fas fa-grip-vertical" style={{ color: 'var(--color-on-surface-variant)', cursor: 'grab' }} aria-hidden />
                                                 <span className="body2-txt">{name}</span>
-                                                <Badge text="Joined" style="success" size="b3" />
+                                                <StatusTag appearance="success">Joined</StatusTag>
                                             </li>
                                         ))}
                                         {tutor.students.length === 0 && (

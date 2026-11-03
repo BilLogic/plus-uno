@@ -31,7 +31,7 @@ export const Overview = () => (
 
         <p className="body1-txt" style={{ marginBottom: 'var(--size-card-gap-lg)' }}>
             Training organisms are built using PLUS Design System components. All pages use
-            PageLayout, Card, Table, Badge, Progress, Button, and other core components.
+            PageLayout, Card, Table, StatusTag, Progress, Button, and other core components.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -112,7 +112,7 @@ export const Overview = () => (
                     Training pages are built using these core PLUS Design System components:
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {['PageLayout', 'NavTabs', 'Card', 'Table', 'Badge', 'Button', 'Progress', 'Pagination', 'Alert', 'Select', 'Input'].map(comp => (
+                    {['PageLayout', 'NavTabs', 'Card', 'Table', 'StatusTag', 'Button', 'Progress', 'Pagination', 'Alert', 'Select', 'Input'].map(comp => (
                         <span 
                             key={comp} 
                             className="body3-txt"

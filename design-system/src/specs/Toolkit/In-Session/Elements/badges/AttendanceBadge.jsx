@@ -1,13 +1,12 @@
 import React from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
-const caretIcon = <i className="fa-solid fa-caret-down"></i>;
+const caretIcon = <i className="fa-solid fa-caret-down" aria-hidden="true"></i>;
 
 // Reusable component
 export const AttendanceBadge = ({ status = 'unknown', showDropdown = true, className = '' }) => {
     let text = 'Select';
-    let style = 'secondary';
-    let trailingVisual = showDropdown ? caretIcon : null;
+    let style = 'neutral';
 
     if (status === 'present') {
         text = 'Joined';
@@ -17,22 +16,13 @@ export const AttendanceBadge = ({ status = 'unknown', showDropdown = true, class
         style = 'danger';
     } else if (status === 'na') {
         text = 'N/A';
-        style = 'secondary';
-        trailingVisual = null; // N/A is typically static or doesn't imply selection in the same way, but let's check. 
-        // User said "missing an n/a state". 
-        // If it's in a dropdown, it might still need a caret if it's selectable?
-        // Usually N/A means "Not Applicable" and might not be a dropdown option, or it IS an option.
-        // I will assume it behaves like others for now. 
-        trailingVisual = showDropdown ? caretIcon : null;
+        style = 'neutral';
     }
 
     return (
-        <Badge
-            size="b3"
-            className={`fw-normal ${className}`}
-            text={text}
-            style={style}
-            trailingVisual={trailingVisual}
-        />
+        <span className={`d-inline-flex align-items-center gap-1 ${className}`.trim()}>
+            <StatusTag appearance={style}>{text}</StatusTag>
+            {showDropdown && caretIcon}
+        </span>
     );
 };

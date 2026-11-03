@@ -3,8 +3,8 @@ import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import Count from '../../labels/Count';
-import Status from '../../labels/Status';
+import CountTag from '../../labels/CountTag';
+import StatusTag from '../../labels/StatusTag';
 import Tag from '../../labels/Tag';
 import TagGroup from '../../labels/TagGroup';
 import Skeleton, { SKELETON_PRESETS, SKELETON_RADII, SKELETON_SHAPES } from './Skeleton';
@@ -83,15 +83,15 @@ export const LabelPresets = () => (
     <div style={row}>
         <span style={pair}>
             <Skeleton preset="status" data-testid="status" />
-            <Status>Completed</Status>
+            <StatusTag>Completed</StatusTag>
         </span>
         <span style={pair}>
             <Skeleton preset="status-spacious" data-testid="status-spacious" />
-            <Status size="large">Completed</Status>
+            <StatusTag spacing="spacious">Completed</StatusTag>
         </span>
         <span style={pair}>
             <Skeleton preset="count" data-testid="count" />
-            <Count value={12} />
+            <CountTag value={12} />
         </span>
         <span style={pair}>
             <Skeleton preset="tag" data-testid="tag" />
@@ -140,7 +140,7 @@ LabelPresets.play = async ({ canvasElement }) => {
 export const PresetWinsOverShape = () => (
     <div style={row}>
         <Skeleton preset="status" shape="text" lines={3} data-testid="status" />
-        <Status>Completed</Status>
+        <StatusTag>Completed</StatusTag>
     </div>
 );
 PresetWinsOverShape.play = async ({ canvasElement }) => {
@@ -407,7 +407,7 @@ export const LoadingTable = () => {
                             {loaded ? (
                                 <>
                                     <span className="body2-txt" style={{ width }}>{name}</span>
-                                    <Status style="success">Active</Status>
+                                    <StatusTag appearance="success">Active</StatusTag>
                                     <Tag text="Algebra" />
                                 </>
                             ) : (

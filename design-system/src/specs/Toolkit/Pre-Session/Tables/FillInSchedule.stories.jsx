@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 export default {
@@ -156,11 +156,7 @@ export const TableRow = ({
                     {tutorCount} (Leads: {leadCount})
                 </span>
                 {hasNoLead && (
-                    <Badge
-                        text="No lead"
-                        style="warning"
-                        size="b3"
-                    />
+                    <StatusTag appearance="warning">No lead</StatusTag>
                 )}
             </div>
         </div>

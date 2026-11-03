@@ -5,7 +5,6 @@ import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { MetricsCard, RecommendedLessons, BadgeCard } from '@/specs/Home/Cards';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
 import './TutorHomePageSkillsOverview.scss';
 
 /**

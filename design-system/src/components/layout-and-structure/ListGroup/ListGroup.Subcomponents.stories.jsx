@@ -1,6 +1,6 @@
 import React from 'react';
 import ListGroup from './ListGroup';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     title: 'Components/Layout and structure/List group',
@@ -55,7 +55,7 @@ function ListGroupItemContentDemo() {
                 <ListGroup.Item action active>
                     <i className="fas fa-user me-3" style={{ color: 'var(--color-primary)' }} />
                     <span className="flex-grow-1">Profile</span>
-                    <Badge style="primary" size="b3">New</Badge>
+                    <StatusTag appearance="info">New</StatusTag>
                 </ListGroup.Item>
                 <ListGroup.Item action disabled>
                     <i className="fas fa-lock me-3" />
@@ -114,7 +114,7 @@ export const ListItemInteractive = {
                     )}
                     <span className="flex-grow-1">{text}</span>
                     {showCounter && (
-                        <Badge style={counterStyle} size={args.size}>{counterValue}</Badge>
+                        <StatusTag appearance={counterStyle}>{counterValue}</StatusTag>
                     )}
                 </ListGroup.Item>
             </ListGroup>
@@ -130,7 +130,7 @@ export const ListItemInteractive = {
         leadingIcon: 'star',
         showCounter: false,
         counterValue: '5',
-        counterStyle: 'primary'
+        counterStyle: 'info'
     },
     argTypes: {
         size: {
@@ -175,7 +175,7 @@ export const ListItemInteractive = {
         },
         counterStyle: {
             control: { type: 'select' },
-            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
+            options: ['neutral', 'success', 'danger', 'warning', 'info'],
             if: { arg: 'showCounter' },
             table: { category: 'Visuals' }
         },

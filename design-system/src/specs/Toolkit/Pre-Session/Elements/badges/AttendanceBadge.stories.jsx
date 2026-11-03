@@ -1,10 +1,10 @@
 import React from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Attendance Badge',
-    component: Badge,
+    component: StatusTag,
     parameters: {
         layout: 'centered',
         docs: {
@@ -14,99 +14,73 @@ export default {
         }
     },
     argTypes: {
-        text: { control: 'text' },
-        style: {
+        children: { control: 'text' },
+        appearance: {
             control: 'select',
-            options: ['success', 'danger', 'secondary'],
+            options: ['success', 'danger', 'neutral'],
             description: 'Green for Joined, Red for Absent, Gray for Unknown.'
         },
-        size: {
-            control: 'select',
-            options: ['b3'],
-            description: 'Attendance badges use "b3" (12px) size.'
-        }
     },
 };
 
 import { AttendanceBadge } from './AttendanceBadge.jsx';
 
-const caretIcon = <i className="fa-solid fa-caret-down"></i>;
 
 // Reusable component for other stories already exported from AttendanceBadge.jsx
 
 
 export const Present = {
     args: {
-        text: 'Joined',
-        style: 'success',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Joined',
+        appearance: 'success',
     },
 };
 
 export const Absent = {
     args: {
-        text: 'Did not join',
-        style: 'danger',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Did not join',
+        appearance: 'danger',
     },
 };
 
 export const Unknown = {
     args: {
-        text: 'Select',
-        style: 'secondary',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'Select',
+        appearance: 'neutral',
     },
 };
 
 export const NA = {
     args: {
-        text: 'N/A',
-        style: 'secondary',
-        size: 'b3',
-        trailingVisual: caretIcon,
-        className: 'fw-normal',
+        children: 'N/A',
+        appearance: 'neutral',
     },
 };
 
 export const PresentStatic = {
     args: {
-        text: 'Joined',
-        style: 'success',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Joined',
+        appearance: 'success',
     },
 };
 
 export const AbsentStatic = {
     args: {
-        text: 'Did not join',
-        style: 'danger',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Did not join',
+        appearance: 'danger',
     },
 };
 
 export const UnknownStatic = {
     args: {
-        text: 'Select',
-        style: 'secondary',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'Select',
+        appearance: 'neutral',
     },
 };
 
 export const NAStatic = {
     args: {
-        text: 'N/A',
-        style: 'secondary',
-        size: 'b3',
-        className: 'fw-normal',
+        children: 'N/A',
+        appearance: 'neutral',
     },
 };

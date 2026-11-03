@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './MetricsCard.scss';
 
 /**
@@ -185,12 +185,7 @@ const MetricItem = ({ value, label, showBadge = false, badgeState = 'increase' }
         const badgeText = badgeState === 'increase' ? '+{#}% since last week' : '-{#}% since last week';
         
         return (
-            <Badge
-                style="success"
-                size="b2"
-                leadingVisual={<i className={`fas fa-${icon}`}></i>}
-                text={badgeText}
-            />
+            <StatusTag appearance="success" leadingVisual={<i className={`fas fa-${icon}`}></i>}>{badgeText}</StatusTag>
         );
     };
 
@@ -214,12 +209,7 @@ const StackedMetricCard = ({ value, label, showBadge = false, badgeState = 'incr
         const badgeText = badgeState === 'increase' ? '+{#}% since last week' : '-{#}% since last week';
         
         return (
-            <Badge
-                style="success"
-                size="b2"
-                leadingVisual={<i className={`fas fa-${icon}`}></i>}
-                text={badgeText}
-            />
+            <StatusTag appearance="success" leadingVisual={<i className={`fas fa-${icon}`}></i>}>{badgeText}</StatusTag>
         );
     };
 

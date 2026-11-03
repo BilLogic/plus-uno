@@ -2,7 +2,8 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 import { AttendanceRosterRow } from '@/specs/Toolkit/Pre-Session/Elements/PopupModalAttendanceRoster.stories';
 import { AvailableButton, UnavailableButton } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorsButton.stories';
 import { Recurring_Session } from '@/specs/Toolkit/Pre-Session/Cards/TutorViewSessionManagement.stories';
@@ -66,7 +67,7 @@ const AttendeesRecurringSessionModalBody = () => (
                         text="Attendees"
                         isSelected={true}
                         iconAfter={
-                            <Badge text="20" style="secondary" size="b3" />
+                            <CountTag value={20} />
                         }
                         shouldFitContainer
                     />
@@ -100,12 +101,7 @@ const AttendeesRecurringSessionModalBody = () => (
                         }}
                     >
                         <span className="h6 m-0">Tutor Roster</span>
-                        <Badge
-                            text="4"
-                            style="info"
-                            size="b3"
-                            leadingVisual={<i className="fa-solid fa-users" />}
-                        />
+                        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
                     </div>
 
                     {/* Panel Body */}
@@ -163,12 +159,7 @@ const AttendeesRecurringSessionModalBody = () => (
                         }}
                     >
                         <span className="h6 m-0">Student Roster</span>
-                        <Badge
-                            text="4"
-                            style="info"
-                            size="b3"
-                            leadingVisual={<i className="fa-solid fa-users" />}
-                        />
+                        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
                     </div>
 
                     {/* Panel Body */}

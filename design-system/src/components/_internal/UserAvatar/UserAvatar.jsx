@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Status from '../../labels/Status';
+import StatusTag from '../../labels/StatusTag';
 import './UserAvatar.scss';
 
 /** The role a user type shows beside the name. Types not listed show none. */
@@ -49,7 +49,7 @@ const UserAvatar = ({
             </div>
 
             {role ? (
-                <Status style="info" className="plus-user-avatar__role">{role}</Status>
+                <StatusTag appearance="info" className="plus-user-avatar__role">{role}</StatusTag>
             ) : null}
 
             {counter && (

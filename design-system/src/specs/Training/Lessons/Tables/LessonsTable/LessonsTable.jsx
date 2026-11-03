@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Progress from '@/components/loading/Progress';
 import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 import AiIndicator from '@/specs/Training/Lessons/Elements/AiIndicator/AiIndicator';
@@ -62,7 +62,7 @@ const LessonsTable = ({
         const { status } = lesson;
 
         if (usePills) {
-            let badgeStyle = 'secondary';
+            let badgeStyle = 'neutral';
             if (['completed', 'complete'].includes(status)) badgeStyle = 'success';
             else if (status === 'in-progress') badgeStyle = 'warning';
             else if (status === 'assigned') badgeStyle = 'info';
@@ -71,7 +71,7 @@ const LessonsTable = ({
                 status === 'not-started' ? 'Not Started' :
                     status.charAt(0).toUpperCase() + status.slice(1);
 
-            return <Badge text={label} style={badgeStyle} size="b3" />;
+            return <StatusTag appearance={badgeStyle}>{label}</StatusTag>;
         }
 
         // Map lesson status to StatusIndicators stage

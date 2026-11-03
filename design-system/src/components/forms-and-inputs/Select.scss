@@ -143,28 +143,6 @@
     font: var(--body-small);
 }
 
-// ── displayMode="badges": the older Badge chips, kept for existing screens ──
-
-.plus-select-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--size-element-gap-sm);
-    flex: 1 1 100%;
-    min-width: 0;
-    max-width: 100%;
-
-    .plus-badge {
-        flex-shrink: 0;
-        font: var(--body-default);
-        color: var(--ds-text-subtle);
-        border: none;
-
-        &.plus-badge--dismissible {
-            border: none;
-        }
-    }
-}
-
 .plus-select-nowrap {
     .plus-field__content {
         flex-wrap: nowrap;
@@ -172,21 +150,10 @@
         overflow-y: hidden;
         scrollbar-width: thin;
     }
-
-    .plus-select-badges {
-        flex-wrap: nowrap;
-        flex: 0 0 auto;
-    }
 }
 
 .plus-select-truncate {
     .plus-field__content {
-        overflow: hidden;
-    }
-
-    .plus-select-badges {
-        position: relative;
-        flex-wrap: nowrap;
         overflow: hidden;
     }
 }

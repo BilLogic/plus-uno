@@ -45,8 +45,8 @@ export const figmaMeta = {
 <Meta of={TagStories} />
 
 <Title />
-Is it a number? Count. Is it the condition something is in, and can that
-condition change? Status. Otherwise, Tag: a subject, a focus area, a person, a
+Is it a number? Count tag. Is it the condition something is in, and can that
+condition change? Status tag. Otherwise, Tag: a subject, a focus area, a person, a
 category.
 
 <DocsTabs of={TagStories}>
@@ -112,7 +112,7 @@ category.
     <DsCanvasQuiet of={TagStories.StateLayers} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>count</code> adds a small neutral Count to a selectable tag, such as a filter's result count. On any other behavior it is ignored.</>}>
+<DocsCanvasShell description={<><code>count</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count. On any other behavior it is ignored.</>}>
     <DsCanvasQuiet of={TagStories.CountOnSelectable} />
 </DocsCanvasShell>
 
@@ -212,13 +212,12 @@ category.
 
 ## When to use
 
-- **Is it a number?** Count.
-- **Is it the condition something is in, and can that condition change?** Status.
+- **Is it a number?** Count tag.
+- **Is it the condition something is in, and can that condition change?** Status tag.
 - **Otherwise** (a subject, a focus area, a person, a category): Tag.
 
 Who set the value no longer decides. A tag is outlined and a status is filled,
-so a reader tells a category from a meaning without reading the words. Until
-Status lands, a state is a `BadgeVariants` status.
+so a reader tells a category from a meaning without reading the words.
 
 </div>
 
@@ -356,9 +355,9 @@ with `aria-expanded`.
 ## Related
 
 - For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
-- For a number on its own, use `Count`.
+- For a number on its own, use `CountTag`.
 - For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a state, use `BadgeVariants` until Status lands.
+- For a state, use `StatusTag`.
 
 </div>
 

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import NavTabs from '@/components/navigation/NavTabs';
 import Button from '@/components/forms-and-inputs/Button';
 import Divider from '@/components/layout-and-structure/Divider';
-import Badge from '@/components/labels/Badge';
+import CountTag from '@/components/labels/CountTag';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
 import './HomepageJumbotron.scss';
 
@@ -72,12 +72,7 @@ const HomepageJumbotron = ({
                     >
                         Session links
                         {' '}
-                        <Badge
-                            counter={sessionLinks.length}
-                            style="primary"
-                            size="b3"
-                            className="plus-homepage-jumbotron-tab-badge"
-                        />
+                        <CountTag value={sessionLinks.length} className="plus-homepage-jumbotron-tab-badge" />
                     </NavTabs.Item>
                     <NavTabs.Item
                         eventKey="reflection"

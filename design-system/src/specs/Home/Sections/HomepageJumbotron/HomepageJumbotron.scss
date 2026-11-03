@@ -69,40 +69,6 @@
 .plus-homepage-jumbotron-tab-badge {
     margin-left: var(--size-element-gap-sm);
     flex-shrink: 0;
-
-    // Tab badge shows only counter (no text) – remove wrapper padding
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-
-    // Session links counter – fixed size, correct font and padding (Figma)
-    .plus-badge-counter {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        box-sizing: border-box;
-
-        // Padding: design token for consistent spacing
-        padding-top: 2px !important;
-        padding-bottom: 2px !important;
-        padding-left: 6px !important;
-        padding-right: 6px !important;
-        margin: 0 !important;
-
-        // Fixed min size so tab doesn't shift (1–2 digits)
-        min-width: 20px !important;
-        height: 20px !important;
-        line-height: 1 !important;
-        border-radius: var(--size-element-radius-full);
-
-        // Font: Body/B3 per design system (12px, medium weight for count)
-        font-family: var(--font-family-body) !important;
-        font-size: var(--font-size-body3) !important;
-        font-weight: var(--font-weight-body3-semibold) !important;
-        line-height: 1 !important;
-        color: var(--color-primary-text, var(--color-on-surface));
-        background-color: var(--ds-background-brand-subtlest);
-    }
 }
 
 // Content Area

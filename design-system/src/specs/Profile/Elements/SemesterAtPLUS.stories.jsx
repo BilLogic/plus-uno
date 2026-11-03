@@ -51,7 +51,6 @@ export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultV
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select semester(s)"
-                displayMode="badges"
                 readonly={true}
                 size="medium"
                 style={{ width: '100%' }}

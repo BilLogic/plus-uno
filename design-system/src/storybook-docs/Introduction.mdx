@@ -1,6 +1,7 @@
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import LinkTo from '@storybook/addon-links/react';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 import Divider from '@/components/layout-and-structure/Divider';
 import Pagination from '@/components/navigation/Pagination';
 import Button from '@/components/forms-and-inputs/Button';
@@ -114,8 +115,8 @@ import Button from '@/components/forms-and-inputs/Button';
         <p className="sb-plus-intro-mini-copy">What the component communicates and what actions it supports.</p>
         <div className="sb-plus-intro-mini-canvas">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge text="Success" style="success" leadingVisual={<i className="fa-solid fa-check" />} />
-            <Badge text="Inbox" style="primary" counter="12" />
+            <StatusTag appearance="success" leadingVisual={<i className="fa-solid fa-check" />}>Success</StatusTag>
+            <CountTag value={12} />
           </div>
         </div>
       </div>

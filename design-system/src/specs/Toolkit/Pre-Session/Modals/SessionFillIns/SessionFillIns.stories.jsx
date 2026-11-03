@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import CountTag from '@/components/labels/CountTag';
 import Alert from '@/components/messaging/Alert';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import Pagination from '@/components/navigation/Pagination';
@@ -346,7 +346,7 @@ ConsentForm.storyName = 'Consent Form';
 /**
  * Session Details
  * Single session detail with Session info / Attendees tabs and Fill-in CTA.
- * Reuses: pre-session/cards/SessionInfoCard, ButtonGroup, Badge, CloseButton, FillInButton; gear + close icons.
+ * Reuses: pre-session/cards/SessionInfoCard, ButtonGroup, CountTag, CloseButton, FillInButton; gear + close icons.
  */
 export const SessionDetails = () => (
     <Modal
@@ -388,13 +388,13 @@ export const SessionDetails = () => (
                         />
                     </div>
                 </div>
-                {/* Tabs: Session info (active) | Attendees (20) (design system ButtonGroup, Badge) */}
+                {/* Tabs: Session info (active) | Attendees (20) (design system ButtonGroup, Count tag) */}
                 <div style={{ display: 'flex', width: '100%' }}>
                     <ButtonGroup className="w-100">
                         <Button text="Session info" isSelected={true} shouldFitContainer />
                         <Button
                             text="Attendees"
-                            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+                            iconAfter={<CountTag value={20} />}
                             shouldFitContainer
                         />
                     </ButtonGroup>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Count, Logo, Sidebar as RoleSidebar, Status } from '@/components';
+import { Button, CountTag, Logo, Sidebar as RoleSidebar, StatusTag } from '@/components';
 import PatternSidebar, {
     clearOpenTabs,
     createOpenTabsStore,
@@ -52,7 +52,7 @@ const sections = [
         id: 'toolkit',
         title: 'Toolkit',
         items: [
-            { id: 'sessions', text: 'Sessions', icon: 'calendar-alt', elemAfter: <Count value={3} label="3 upcoming" /> },
+            { id: 'sessions', text: 'Sessions', icon: 'calendar-alt', elemAfter: <CountTag value={3} label="3 upcoming" /> },
             { id: 'toolkit-students', text: 'Students', icon: 'user-graduate' },
             { id: 'slack', text: 'Slack', icon: 'arrow-up-right-from-square', href: 'https://slack.com/', external: true },
         ],
@@ -251,7 +251,7 @@ export const ItemSlots = {
                 label="Item slots"
                 items={[
                     { id: 'described', text: 'Sessions', icon: 'calendar-alt', description: 'Three upcoming this week' },
-                    { id: 'counted', text: 'Students', icon: 'user-graduate', elemAfter: <Count value={3} label="3 new" /> },
+                    { id: 'counted', text: 'Students', icon: 'user-graduate', elemAfter: <CountTag value={3} label="3 new" /> },
                     {
                         id: 'actions',
                         text: 'Groups',
@@ -298,7 +298,7 @@ const longSections = [
         title: 'Toolkit for supervisors who manage several tutoring groups',
         items: [
             { id: 'long', text: 'Session reflections and post-session feedback for every student', icon: 'clipboard' },
-            { id: 'live', text: 'Students in the live session right now', icon: 'user-graduate', elemAfter: <Status style="success">Live</Status> },
+            { id: 'live', text: 'Students in the live session right now', icon: 'user-graduate', elemAfter: <StatusTag appearance="success">Live</StatusTag> },
             { id: 'described', text: 'Sessions', icon: 'calendar-alt', description: 'Three upcoming this week, one needs a fill-in' },
         ],
     },

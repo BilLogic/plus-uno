@@ -1,5 +1,5 @@
 import React from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import { AttendanceDropdown } from '../AttendanceDropdown.jsx';
 import { AttendanceBadge } from '../badges/AttendanceBadge.jsx';
 import { LeadBadge, CountBadge } from '../badges/TutorBadges.jsx';
@@ -87,7 +87,7 @@ const SessionAttendeeListItem = ({
 
             {/* New Student Badge (Student only) */}
             {userType === 'student' && newStudent && (
-                <Badge text="New" style="info" size="b3" />
+                <StatusTag appearance="info">New</StatusTag>
             )}
 
             {/* Assignment Count (Assignment tab, Tutor) */}

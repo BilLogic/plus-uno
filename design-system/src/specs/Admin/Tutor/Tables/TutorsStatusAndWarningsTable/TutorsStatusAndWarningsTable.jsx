@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Table from '@/components/_internal/Table/Table';
 import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import UserAvatar from '@/components/_internal/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
 
@@ -176,9 +176,9 @@ const TutorsStatusAndWarningsTable = ({
         {
             content: (
                 <div className="flex justify-center">
-                    <Badge style="danger" className="warning-badge">
+                    <StatusTag appearance="danger" className="warning-badge">
                         {tutor.totalWarnings}
-                    </Badge>
+                    </StatusTag>
                 </div>
             ),
             align: 'center',
@@ -187,9 +187,9 @@ const TutorsStatusAndWarningsTable = ({
         {
             content: tutor.micOff > 0 ? (
                 <div className="flex justify-center">
-                    <Badge style="warning" className="metric-badge">
+                    <StatusTag appearance="warning" className="metric-badge">
                         {tutor.micOff}
-                    </Badge>
+                    </StatusTag>
                 </div>
             ) : <div className="flex justify-center"><span className="metric-placeholder">-</span></div>,
             align: 'center',
@@ -198,9 +198,9 @@ const TutorsStatusAndWarningsTable = ({
         {
             content: tutor.camOff > 0 ? (
                 <div className="flex justify-center">
-                    <Badge style="warning" className="metric-badge">
+                    <StatusTag appearance="warning" className="metric-badge">
                         {tutor.camOff}
-                    </Badge>
+                    </StatusTag>
                 </div>
             ) : <div className="flex justify-center"><span className="metric-placeholder">-</span></div>,
             align: 'center',
@@ -209,9 +209,9 @@ const TutorsStatusAndWarningsTable = ({
         {
             content: tutor.absence > 0 ? (
                 <div className="flex justify-center">
-                    <Badge style="warning" className="metric-badge">
+                    <StatusTag appearance="warning" className="metric-badge">
                         {tutor.absence}
-                    </Badge>
+                    </StatusTag>
                 </div>
             ) : <div className="flex justify-center"><span className="metric-placeholder">-</span></div>,
             align: 'center',
@@ -220,9 +220,9 @@ const TutorsStatusAndWarningsTable = ({
         {
             content: (tutor.lateCallOff || tutor.lateCall) > 0 ? (
                 <div className="flex justify-center">
-                    <Badge style="warning" className="metric-badge">
+                    <StatusTag appearance="warning" className="metric-badge">
                         {tutor.lateCallOff || tutor.lateCall}
-                    </Badge>
+                    </StatusTag>
                 </div>
             ) : <div className="flex justify-center"><span className="metric-placeholder">-</span></div>,
             align: 'center',

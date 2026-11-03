@@ -153,7 +153,7 @@ The loading rules, as Do and Don't.
 ### Do: use a label preset when one label loads after its row is on screen.
 
 ```jsx
-<span>Unit 3 review {status ? <Status style="success">{status}</Status> : <Skeleton preset="status" />}</span>
+<span>Unit 3 review {status ? <StatusTag appearance="success">{status}</StatusTag> : <Skeleton preset="status" />}</span>
 ```
 
 ### Do: use plain text bars inside a loading table or card.
@@ -179,7 +179,7 @@ a value.
 <button type="button">Messages <Skeleton preset="count" /></button>
 
 // Correct
-<button type="button">Messages <Count value={unread} /></button>
+<button type="button">Messages <CountTag value={unread} /></button>
 ```
 
 ### Don't: skeleton a Count alone inside a Status or Tag.

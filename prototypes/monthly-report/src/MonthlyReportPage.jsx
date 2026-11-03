@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Alert from '@/components/messaging/Alert';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import './MonthlyReportPage.scss';
@@ -285,10 +285,10 @@ export default function MonthlyReportPage() {
                 <div className="growth-insights-header">
                     <div className="growth-insights-title-row">
                         <h2 className="section-title">Growth Insights</h2>
-                        <Badge style="secondary" size="small">
+                        <StatusTag appearance="neutral">
                             <i className="fa-solid fa-wand-magic-sparkles"></i>
                             Powered by PLUS AI Coach
-                        </Badge>
+                        </StatusTag>
                     </div>
                     <div className="review-progress">
                         Review progress: <span className="review-progress-count">{reviewedCount} of {totalDimensions}</span>
@@ -334,12 +334,9 @@ export default function MonthlyReportPage() {
                                             <p className="growth-card-subtitle">{dim.subStatus}</p>
                                         </div>
                                         <div className="growth-card-status">
-                                            <Badge
-                                                style={state === 'reviewed' ? 'success' : state === 'under_review' ? 'primary' : 'neutral'}
-                                                size="small"
-                                            >
+                                            <StatusTag appearance={state === 'reviewed' ? 'success' : state === 'under_review' ? 'info' : 'neutral'}>
                                                 {state === 'reviewed' ? 'Reviewed' : state === 'under_review' ? 'Under Review' : 'Locked'}
-                                            </Badge>
+                                            </StatusTag>
                                             {state === 'locked' && (
                                                 <span className="locked-hint">
                                                     Complete previous step <i className="fa-solid fa-lock"></i>

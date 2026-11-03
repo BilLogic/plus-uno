@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Table, ButtonGroup, ToggleButton, Badge } from 'react-bootstrap';
-import { Button } from '@/components';
+import { Form, Table, ButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Button, StatusTag } from '@/components';
 import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 
 const LessonsOverviewPage = () => {
@@ -78,11 +78,11 @@ const LessonsOverviewPage = () => {
                                     <td className="py-3 px-4">
                                         <div className="d-flex align-items-center gap-2">
                                             {lesson.title}
-                                            {lesson.ai && <Badge bg="info" className="text-white" style={{ fontSize: '0.6rem' }}>AI</Badge>}
+                                            {lesson.ai && <StatusTag appearance="discovery" spacing="compact">AI</StatusTag>}
                                         </div>
                                     </td>
-                                    <td className="py-3 px-4"><Badge bg="light" text="dark" className="border">{lesson.area}</Badge></td>
-                                    <td className="py-3 px-4"><Badge bg="warning" text="dark">{lesson.status}</Badge></td>
+                                    <td className="py-3 px-4"><StatusTag>{lesson.area}</StatusTag></td>
+                                    <td className="py-3 px-4"><StatusTag appearance="warning">{lesson.status}</StatusTag></td>
                                     <td className="py-3 px-4">{lesson.duration}</td>
                                     <td className="py-3 px-4"><Button appearance="subtle" spacing="compact" text="Start" /></td>
                                 </tr>

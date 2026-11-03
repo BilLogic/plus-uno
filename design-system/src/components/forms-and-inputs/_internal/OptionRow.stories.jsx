@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import Count from '@/components/labels/Count/Count';
+import CountTag from '@/components/labels/CountTag/CountTag';
 import OptionRow from './OptionRow';
 
 /**
@@ -84,7 +84,7 @@ export const LeadingAndTrailing = () => (
             leading={<i className="fa-solid fa-grip-vertical" aria-hidden="true" />}
             trailing={<i className="fa-solid fa-ellipsis" aria-hidden="true" />}
         />
-        <OptionRow label="Unread" leading={<i className="fa-solid fa-inbox" aria-hidden="true" />} trailing={<Count value={12} />} />
+        <OptionRow label="Unread" leading={<i className="fa-solid fa-inbox" aria-hidden="true" />} trailing={<CountTag value={12} />} />
         <OptionRow label="Pennsylvania" trailing={<OptionRow.Chevron />} />
         <OptionRow label="Maria Lopez" description="Grade 7 · Brookfield Middle School" />
     </div>

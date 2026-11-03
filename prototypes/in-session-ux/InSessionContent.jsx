@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import ManageAssignmentModal from './ManageAssignmentModal';
 import StudentInsightsModal from './StudentInsightsModal';
 import { CompactReflectionBar } from './ReflectionAssistant/CompactReflectionBar';
@@ -31,10 +31,10 @@ const InSessionContent = () => {
     };
 
     const STATUS_STYLE_MAP = {
-        'Needs to set goals': 'tertiary',
+        'Needs to set goals': 'neutral',
         'Needs motivation': 'danger',
         'Needs challenge': 'warning',
-        'Needs content help': 'secondary',
+        'Needs content help': 'neutral',
         'On track': 'success'
     };
 
@@ -90,7 +90,7 @@ const InSessionContent = () => {
         }
     };
 
-    const getStatusBadgeStyle = (status) => STATUS_STYLE_MAP[status] || 'secondary';
+    const getStatusBadgeStyle = (status) => STATUS_STYLE_MAP[status] || 'neutral';
 
     return (
         <>
@@ -206,7 +206,7 @@ const InSessionContent = () => {
                                                     {s.name}
                                                 </td>
                                                 <td style={{ padding: '12px 16px' }}>
-                                                    <Badge text={s.status} style={getStatusBadgeStyle(s.status)} size="b3" fill="tonal" />
+                                                    <StatusTag appearance={getStatusBadgeStyle(s.status)}>{s.status}</StatusTag>
                                                 </td>
                                                 <td style={{ padding: '12px 16px' }} onClick={(e) => e.stopPropagation()}>
                                                     <select className="form-select form-select-sm" style={{ width: 'auto', minWidth: '120px' }} value={s.attendance || ''} onChange={() => { }}>

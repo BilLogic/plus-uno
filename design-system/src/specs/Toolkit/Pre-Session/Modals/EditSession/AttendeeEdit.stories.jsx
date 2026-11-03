@@ -2,7 +2,7 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import CountTag from '@/components/labels/CountTag';
 import { RosterItem } from '@/specs/Toolkit/Pre-Session/Elements/EditingAttendanceRosterItems.stories';
 import { CancelButton, SaveChangesButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
 
@@ -113,7 +113,7 @@ const AttendeeEditModalBody = () => (
                     text="Attendees"
                     isSelected={true}
                     iconAfter={
-                        <Badge text="20" style="secondary" size="b3" />
+                        <CountTag value={20} />
                     }
                     shouldFitContainer
                 />

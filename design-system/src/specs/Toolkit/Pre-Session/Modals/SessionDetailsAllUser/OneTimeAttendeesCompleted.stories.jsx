@@ -1,7 +1,8 @@
 import React from 'react';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 
 // Import CTA button components from Tutor View
 import {
@@ -44,11 +45,7 @@ const AttendeeRow = ({ name, status = 'joined' }) => (
         >
             {name}
         </span>
-        <Badge
-            text={status === 'joined' ? 'Joined' : 'Did not join'}
-            style={status === 'joined' ? 'success' : 'danger'}
-            size="b3"
-        />
+        <StatusTag appearance={status === 'joined' ? 'success' : 'danger'}>{status === 'joined' ? 'Joined' : 'Did not join'}</StatusTag>
     </div>
 );
 
@@ -87,12 +84,7 @@ const TutorPanel = ({ tutorName, studentCount, students = [] }) => (
             >
                 {tutorName}
             </span>
-            <Badge
-                text={String(studentCount)}
-                style="info"
-                size="b3"
-                leadingVisual={<i className="fa-solid fa-users" />}
-            />
+            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>{String(studentCount)}</StatusTag>
         </div>
 
         {/* Panel Content - Student Rows */}
@@ -181,7 +173,7 @@ export const OneTimeAttendeesCompleted = () => (
                             text="Attendees"
                             isSelected={true}
                             iconAfter={
-                                <Badge text="20" style="secondary" size="b3" />
+                                <CountTag value={20} />
                             }
                             shouldFitContainer
                         />

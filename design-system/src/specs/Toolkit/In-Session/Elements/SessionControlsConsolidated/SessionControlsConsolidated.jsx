@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import './SessionControlsConsolidated.scss';
 
@@ -24,33 +24,12 @@ import './SessionControlsConsolidated.scss';
 /** Live session-info badges (tonal). Room count is lead-only. */
 const SessionInfoBadges = ({ studentCount, tutorCount, roomCount, showRoom }) => (
     <div className="plus-session-controls__badges">
-        <Badge
-            style="info"
-            size="b3"
-            className="fw-normal"
-            leadingVisual={<i className="fa-solid fa-user-graduate" aria-hidden="true"></i>}
-            text={studentCount}
-            title="Students marked present / listed on roster for this session"
-        />
-        <Badge
-            style="mastering-content"
-            size="b3"
-            className="fw-normal"
-            leadingVisual={<i className="fa-solid fa-chalkboard-user" aria-hidden="true"></i>}
-            text={tutorCount}
-            title="Tutors marked present / listed on roster for this session"
-        />
+        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-graduate" aria-hidden="true"></i>} className="fw-normal" title="Students marked present / listed on roster for this session">{studentCount}</StatusTag>
+        <StatusTag appearance="mastering-content" leadingVisual={<i className="fa-solid fa-chalkboard-user" aria-hidden="true"></i>} className="fw-normal" title="Tutors marked present / listed on roster for this session">{tutorCount}</StatusTag>
         {showRoom && (
-            <Badge
-                style="secondary"
-                size="b3"
-                className="fw-normal"
-                leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>}
-                text={roomCount}
-                title={roomCount === '—'
+            <StatusTag appearance="neutral" leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={roomCount === '—'
                     ? 'Assign students to tutors to size breakout rooms'
-                    : 'Rooms to create in Zoom (includes each tutor\'s buffer)'}
-            />
+                    : 'Rooms to create in Zoom (includes each tutor\'s buffer)'}>{roomCount}</StatusTag>
         )}
     </div>
 );

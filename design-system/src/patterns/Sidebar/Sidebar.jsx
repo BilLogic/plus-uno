@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Count, Divider, SidebarTab } from '@/components';
+import { Button, CountTag, Divider, SidebarTab } from '@/components';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 
@@ -123,7 +123,7 @@ const PatternSidebar = ({
                     leadingVisual={false}
                     href={tab.href}
                     state={activeId === tab.id ? 'selected' : 'enabled'}
-                    elemAfter={tab.status === 'live' ? <Count appearance="dot" style="success" label="Live" /> : undefined}
+                    elemAfter={tab.status === 'live' ? <CountTag isDot appearance="success" label="Live" /> : undefined}
                     actionsOnHover={(
                         <Button
                             appearance="subtle"

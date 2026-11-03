@@ -42,6 +42,6 @@ From `design-system/src/components/labels/TagGroup/TagGroup.scss`. Override thes
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Status` · `Suggestion` · `Tag`
+Same group: `AiLabel` · `CountTag` · `StatusTag` · `Suggestion` · `Tag`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

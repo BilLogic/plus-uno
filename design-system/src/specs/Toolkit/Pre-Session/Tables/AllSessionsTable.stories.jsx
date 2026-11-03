@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -134,7 +134,7 @@ export const AllSessionsTableRow = ({
             case 'in-progress':
                 return { text: 'In progress', style: 'info' };
             case 'upcoming':
-                return { text: 'Upcoming', style: 'secondary' };
+                return { text: 'Upcoming', style: 'neutral' };
             case 'completed':
                 return { text: 'Completed', style: 'success' };
             case 'canceled':
@@ -212,11 +212,7 @@ export const AllSessionsTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <Badge
-                    text={statusConfig.text}
-                    style={statusConfig.style}
-                    size="b3"
-                />
+                <StatusTag appearance={statusConfig.style}>{statusConfig.text}</StatusTag>
             </div>
 
             {/* Tutor Count - spans 1 column */}
@@ -233,11 +229,7 @@ export const AllSessionsTableRow = ({
                     {tutorCount}
                 </span>
                 {needLead && (
-                    <Badge
-                        text="Need Lead"
-                        style="warning"
-                        size="b3"
-                    />
+                    <StatusTag appearance="warning">Need Lead</StatusTag>
                 )}
             </div>
 
