@@ -8,24 +8,9 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-images-and-icons-logo--docs"
   ],
   [
-    "design-system/src/components/_internal/Navbar/",
-    "Navbar",
-    "components-navigation-tabs-nav-pills-navbar-navbar--docs"
-  ],
-  [
-    "design-system/src/components/_internal/Table/",
-    "Table",
-    "components-text-and-data-display-table--docs"
-  ],
-  [
     "design-system/src/components/forms-and-inputs/Button/",
     "Button",
     "components-forms-and-inputs-button-button--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/ButtonGroup/",
-    "ButtonGroup",
-    "components-forms-and-inputs-button-group--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Checkbox.",
@@ -35,27 +20,22 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/ChoiceGrid.",
     "ChoiceGrid",
-    "components-forms-and-inputs-choice-grid--docs"
+    "components-forms-and-inputs-radio-choice-grid--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/ChoiceGroup.",
     "ChoiceGroup",
-    "components-forms-and-inputs-choice-group--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/CloseButton/",
-    "CloseButton",
-    "components-forms-and-inputs-button-close-button--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/DateAndTimePicker.",
-    "DateAndTimePicker",
-    "components-forms-and-inputs-date-time-picker--docs"
+    "components-forms-and-inputs-radio-radio-group--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DatePicker/",
     "DatePicker",
     "components-forms-and-inputs-date-picker--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/DateTimePicker/",
+    "DateTimePicker",
+    "components-forms-and-inputs-date-time-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Dropdown/",
@@ -80,7 +60,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.",
     "LabelAndCaption",
-    "components-forms-and-inputs-label-caption--docs"
+    "components-forms-and-inputs-form--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/LinkButton/",
@@ -138,6 +118,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-images-and-icons-avatar--docs"
   ],
   [
+    "design-system/src/components/images-and-icons/AvatarGroup/",
+    "AvatarGroup",
+    "components-images-and-icons-avatar-group--docs"
+  ],
+  [
     "design-system/src/components/images-and-icons/Illustration/",
     "Illustration",
     "components-images-and-icons-illustrations--docs"
@@ -155,12 +140,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/labels/CountTag/",
     "CountTag",
-    "components-labels-status-count-tag-count-tag--docs"
-  ],
-  [
-    "design-system/src/components/labels/StatusTag/",
-    "StatusTag",
-    "components-labels-status-count-tag-status-tag--docs"
+    "components-labels-count-tag--docs"
   ],
   [
     "design-system/src/components/labels/Suggestion/",
@@ -170,12 +150,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/labels/Tag/",
     "Tag",
-    "components-labels-status-count-tag-tag--docs"
+    "components-labels-tag--docs"
   ],
   [
     "design-system/src/components/labels/TagGroup/",
     "TagGroup",
-    "components-labels-status-count-tag-tag-group--docs"
+    "components-labels-tag-group--docs"
   ],
   [
     "design-system/src/components/layout-and-structure/Accordion/",
@@ -183,39 +163,9 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-layout-and-structure-accordion--docs"
   ],
   [
-    "design-system/src/components/layout-and-structure/Card/",
-    "Card",
-    "components-layout-and-structure-card--docs"
-  ],
-  [
     "design-system/src/components/layout-and-structure/Carousel/",
     "Carousel",
     "components-layout-and-structure-carousel--docs"
-  ],
-  [
-    "design-system/src/components/layout-and-structure/Collapse/",
-    "Collapse",
-    "components-layout-and-structure-collapse--docs"
-  ],
-  [
-    "design-system/src/components/layout-and-structure/Divider/",
-    "Divider",
-    "components-layout-and-structure-divider--docs"
-  ],
-  [
-    "design-system/src/components/layout-and-structure/Jumbotron/",
-    "Jumbotron",
-    "components-layout-and-structure-jumbotron--docs"
-  ],
-  [
-    "design-system/src/components/layout-and-structure/ListGroup/",
-    "ListGroup",
-    "components-layout-and-structure-list-group--docs"
-  ],
-  [
-    "design-system/src/components/layout-and-structure/MediaObject/",
-    "MediaObject",
-    "components-layout-and-structure-media-object--docs"
   ],
   [
     "design-system/src/components/layout-and-structure/ScrollBar/",
@@ -230,12 +180,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/loading/Skeleton/",
     "Skeleton",
-    "components-loading-loading-skeleton--docs"
+    "components-loading-skeleton--docs"
   ],
   [
     "design-system/src/components/loading/Spinner/",
     "Spinner",
-    "components-loading-loading-spinner--docs"
+    "components-loading-spinner--docs"
   ],
   [
     "design-system/src/components/messaging/Alert/",
@@ -243,14 +193,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-messaging-section-message--docs"
   ],
   [
-    "design-system/src/components/messaging/Modal/",
-    "Modal",
-    "components-messaging-modal--docs"
+    "design-system/src/components/messaging/Flag/",
+    "Flag",
+    "components-messaging-flag--docs"
   ],
   [
-    "design-system/src/components/messaging/Toast/",
-    "Toast",
-    "components-messaging-flag--docs"
+    "design-system/src/components/messaging/Modal/",
+    "Modal",
+    "components-messaging-modal-dialog--docs"
   ],
   [
     "design-system/src/components/navigation/Breadcrumb/",
@@ -258,24 +208,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-navigation-breadcrumbs--docs"
   ],
   [
-    "design-system/src/components/navigation/NavPills/",
-    "NavPills",
-    "components-navigation-tabs-nav-pills-navbar-nav-pills--docs"
-  ],
-  [
     "design-system/src/components/navigation/NavTabs/",
     "NavTabs",
-    "components-navigation-tabs-nav-pills-navbar-tabs--docs"
+    "components-navigation-tabs--docs"
   ],
   [
     "design-system/src/components/navigation/Pagination/",
     "Pagination",
     "components-navigation-pagination--docs"
-  ],
-  [
-    "design-system/src/components/navigation/Scrollspy/",
-    "Scrollspy",
-    "components-navigation-scrollspy--docs"
   ],
   [
     "design-system/src/components/navigation/SidebarTab/",
@@ -291,6 +231,21 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/overlays-and-layering/Tooltip/",
     "Tooltip",
     "components-overlays-and-layering-tooltip--docs"
+  ],
+  [
+    "design-system/src/components/text-and-data-display/Table/DynamicTable.stories.",
+    "DynamicTable",
+    "components-text-and-data-display-dynamic-table--docs"
+  ],
+  [
+    "design-system/src/components/text-and-data-display/Table/StaticTable.",
+    "StaticTable",
+    "components-text-and-data-display-static-table--docs"
+  ],
+  [
+    "design-system/src/components/text-and-data-display/Table/TreeTable.stories.",
+    "TreeTable",
+    "components-text-and-data-display-tree-table--docs"
   ],
   [
     "design-system/src/specs/Universal/Cards/OverviewCard/",

@@ -338,7 +338,10 @@ describe("only registry components", () => {
     // (+1 net). 70: Heading is a new component with its own figmaMeta (+1).
     // 71: Page header gained its own component and figmaMeta (+1 net).
     // 72: Panel gained its own component and figmaMeta (+1 net).
-    assert.equal(names.length, 72);
+    // 63: Card, Divider, Collapse, Jumbotron, List group, Media object,
+    // Scrollspy, Nav pills and Navbar were retired and their registry rows
+    // went with them (-9 net).
+    assert.equal(names.length, 63);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
