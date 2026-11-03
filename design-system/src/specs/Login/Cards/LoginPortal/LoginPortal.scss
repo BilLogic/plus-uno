@@ -108,7 +108,7 @@
 // Matches Figma: bg = state-layers/on-surface/opacity-0_12, text opacity 0.38
 .login-portal-disabled-button {
     width: 100%;
-    background-color: var(--color-on-surface-state-12);
+    background-color: var(--ds-background-disabled);
     border-radius: var(--size-element-radius-md);
     opacity: var(--color-disabled-opacity);
 }

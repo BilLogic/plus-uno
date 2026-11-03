@@ -55,7 +55,7 @@
         // Interaction States (Whole Group)
         &:hover,
         &.lessons-table__group--hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
 
             // Ensure expanded row highlight doesn't conflict
             .lessons-table__row--expanded {
@@ -64,7 +64,7 @@
         }
 
         &.lessons-table__group--pressed {
-            background-color: var(--color-on-surface-state-16);
+            background-color: var(--ds-background-neutral-subtle-pressed);
 
             .lessons-table__row--expanded {
                 background-color: transparent;
@@ -72,8 +72,7 @@
         }
 
         &.lessons-table__group--focus {
-            background-color: var(--color-on-surface-state-12);
-            outline: 2px solid var(--color-focus-ring) !important;
+            outline: 2px solid var(--ds-border-focused) !important;
             outline-offset: -2px;
             position: relative;
             z-index: 10;
@@ -94,7 +93,7 @@
 
             // Expanded state styling (Title row default highlight)
             &--expanded {
-                background-color: var(--color-on-surface-state-08);
+                background-color: var(--ds-background-selected);
             }
 
             td {
@@ -129,7 +128,7 @@
                         transition: background-color 0.2s ease;
 
                         &:hover {
-                            background-color: var(--color-on-surface-state-08);
+                            background-color: var(--ds-background-neutral-subtle-hovered);
                         }
                     }
 

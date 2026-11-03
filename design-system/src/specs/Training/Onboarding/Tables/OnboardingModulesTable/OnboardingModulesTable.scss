@@ -91,7 +91,7 @@
         }
 
         &--hover:hover {
-            background-color: var(--color-on-surface-state-08, rgba(25, 28, 30, 0.08));
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
     }
 
@@ -132,7 +132,7 @@
     &__thumbnail-bg {
         position: absolute;
         inset: 0;
-        background-color: var(--color-tertiary-state-08, rgba(14, 129, 117, 0.08));
+        background-color: var(--ds-background-accent-teal-subtler);
         border-radius: var(--size-element-radius-sm, 4px);
     }
 
