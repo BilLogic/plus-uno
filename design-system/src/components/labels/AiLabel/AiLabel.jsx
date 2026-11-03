@@ -12,7 +12,7 @@ import './AiLabel.scss';
  *                                       primary blue, HARD-CODED as a literal.
  *                                       So the AI mark is the same color as an
  *                                       ordinary primary action.
- *   AiPromptedQuestionBox (Toolkit)     --color-mastering-content-state-16 — a
+ *   AiPromptedQuestionBox (Toolkit)     --ds-background-smart-mastering-content-pressed — a
  *                                       CURRICULUM DOMAIN color, borrowed for a
  *                                       meaning it does not have.
  *   RecommendedLessons (Home)           its own class, and `title="AI

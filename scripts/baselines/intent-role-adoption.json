@@ -48,10 +48,6 @@
     "design-system/src/components/layout-and-structure/Collapse/Collapse.scss": {
       "mix": 2,
       "why": "Brightness filters on the Collapse trigger's hover and pressed states. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
-    },
-    "design-system/src/components/labels/Badge/Badge.scss": {
-      "mix": 1,
-      "why": "A fallback inside var(--…-state-12, color-mix(…)), which paints only if the state token is undefined. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
     }
   },
   "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where foundations/color.md rule 2 asks for a state layer. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit."

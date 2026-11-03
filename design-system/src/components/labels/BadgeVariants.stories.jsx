@@ -106,9 +106,9 @@ Appearances.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expectParity(canvas, BADGE_APPEARANCES);
     await expect(getComputedStyle(canvas.getByTestId('old-positive')).backgroundColor, 'positive fills as success')
-        .toBe(tokenColor(canvasElement, '--color-success-state-08'));
+        .toBe(tokenColor(canvasElement, '--ds-background-success'));
     await expect(getComputedStyle(canvas.getByTestId('old-warning')).backgroundColor, 'warning fills as warning')
-        .toBe(tokenColor(canvasElement, '--color-warning-state-08'));
+        .toBe(tokenColor(canvasElement, '--ds-background-warning'));
 };
 
 /* ---------------------------------------------------------------- density */

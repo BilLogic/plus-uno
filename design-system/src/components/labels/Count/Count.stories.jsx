@@ -79,11 +79,10 @@ Appearances.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     const subtle = getComputedStyle(pillOf(canvas, '12'));
-    await expect(subtle.backgroundColor, 'subtle neutral is on-surface-variant 08').toBe(
-        tokenColor(canvasElement, '--color-on-surface-variant-state-08'),
+    await expect(subtle.backgroundColor, 'subtle neutral is the neutral background').toBe(
+        tokenColor(canvasElement, '--ds-background-neutral'),
     );
-    await expect(alpha(subtle.backgroundColor), 'subtle is translucent').toBeCloseTo(0.08, 2);
-    await expect(subtle.color).toBe(tokenColor(canvasElement, '--color-on-surface-variant'));
+    await expect(subtle.color).toBe(tokenColor(canvasElement, '--ds-text'));
 
     const bold = getComputedStyle(pillOf(canvas, '13'));
     await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
@@ -235,12 +234,12 @@ Styles.play = async ({ canvasElement }) => {
     // [ground, ink] per style, from the Figma set.
     const expected = {
         subtle: {
-            neutral: ['--color-on-surface-variant-state-08', '--color-on-surface-variant'],
-            success: ['--color-success-state-08', '--color-success-text'],
-            warning: ['--color-warning-state-08', '--color-warning-text'],
-            danger: ['--color-danger-state-08', '--color-danger-text'],
-            info: ['--color-tertiary-state-08', '--color-tertiary-text'],
-            discovery: ['--color-mastering-content-state-08', '--color-mastering-content-text'],
+            neutral: ['--ds-background-neutral', '--ds-text'],
+            success: ['--ds-background-success', '--ds-text-success'],
+            warning: ['--ds-background-warning', '--ds-text-warning'],
+            danger: ['--ds-background-danger', '--ds-text-danger'],
+            info: ['--ds-background-information', '--ds-text-information'],
+            discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content'],
         },
         bold: {
             neutral: ['--color-inverse-surface', '--color-inverse-on-surface'],
