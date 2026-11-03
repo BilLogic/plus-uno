@@ -501,7 +501,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-legacy-color-list.mjs',
     guards:
-      'the list of components still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components (scripts/lib/color/legacy-components.mjs). Interns pick their next component from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
+      'the list of components, specs and prototype files still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components, design-system/src/specs and prototypes (scripts/lib/color/legacy-components.mjs). Interns pick their next row from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
   },
   {
     name: 'check:atlassian-benchmark',

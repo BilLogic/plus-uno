@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 67,
-    "uses": 220,
+    "names": 66,
+    "uses": 219,
     "bare": 5
   },
   "tokens": {
@@ -49,10 +49,6 @@
       "bare": 0
     },
     "--color-on-surface-variant-light": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-progress-ring-fill": {
       "uses": 1,
       "bare": 0
     },

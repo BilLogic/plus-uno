@@ -527,7 +527,7 @@ moves both.
 | `specs/Admin/Session/Sections/SessionOverviewSection/SessionOverviewSection.stories.jsx` | 2 | `--color-surface-container` | take |
 | `specs/Admin/Tutor/Cards/TutorDataCard/TutorDataCard.jsx` | 2 | `--color-primary-container` · `--color-surface-container-highest` | take |
 | `specs/Admin/Tutor/Cards/TutorDataCard/TutorDataCard.stories.jsx` | 2 | `--color-surface-container` | take |
-| `specs/Admin/Tutor/Elements/ProgressRing/ProgressRing.jsx` | 2 | `--color-progress-ring-fill` · `--color-surface-variant` | take |
+| `specs/Admin/Tutor/Elements/ProgressRing/ProgressRing.jsx` | 2 | `--color-surface-variant` · `--color-warning-container` | take |
 | `specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss` | 2 | `--color-primary-text` · `--color-secondary-text` | take |
 | `specs/Home/Cards/MetricsCard/MetricsCard.jsx` | 2 | `--color-primary` · `--color-surface-container` | take |
 | `specs/Login/Cards/LoginPortal/LoginPortal.stories.jsx` | 2 | `--color-surface-variant` | take |
