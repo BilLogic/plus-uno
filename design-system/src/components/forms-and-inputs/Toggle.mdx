@@ -1,0 +1,231 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ToggleStories from './Toggle.stories.jsx';
+import { Toggle } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "form-switch-button",
+      "name": "Form Switch Button",
+      "componentSetNodeId": "82:16570",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={ToggleStories} />
+
+<Title />
+A toggle turns one setting on or off, and the change takes effect at once. [ADS documentation](https://atlassian.design/components/toggle/usage).
+
+<DocsTabs of={ToggleStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+<DocsCanvasShell attachSourceBelow description={<>A track, a thumb and a label in a 24 row.</>}>
+    <Canvas of={ToggleStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>1 Track</td><td>A pill, 32 by 16 or 40 by 20. Off it is the neutral bold fill; on it is the selected bold fill.</td></tr>
+        <tr><td>2 Thumb</td><td>An inverse circle inset 2 from the track. It slides to the end when the toggle is on.</td></tr>
+        <tr><td>3 Label</td><td>14/20 text beside the track. It names the setting and stays the same in both states.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the setting. Without a visible label, pass <code>aria-label</code>.</td></tr>
+        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
+        <tr><td><code>size</code></td><td><code>16</code>, <code>20</code></td><td><code>16</code></td><td>Track height in pixels.</td></tr>
+        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Disabled fill on both positions; the thumb says which.</td></tr>
+        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
+        <tr><td><code>id</code>, <code>name</code>, <code>value</code></td><td>string</td><td>generated id</td><td><code>name</code> is a form key, not an id.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<DocsCanvasShell description={<>16 is the default for pages with many toggles. 20 calls attention to one setting.</>}>
+    <DsCanvasQuiet of={ToggleStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Off, on, and disabled in each position.</>}>
+    <DsCanvasQuiet of={ToggleStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the setting does not change.</>}>
+    <DsCanvasQuiet of={ToggleStories.ReadOnly} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Short and long labels.</>}>
+    <DsCanvasQuiet of={ToggleStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ToggleStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a toggle to let a person turn something on or off instantly, such as making a resource public. If a physical switch would work for the action, a toggle is the right component.
+
+A toggle never waits for a button. For an option that needs a button press to apply, such as a field in a form with a Save button, use a checkbox.
+
+Pick the size by the page. Use 16 where the page has many toggles, such as a settings list. Use 20 to call attention to one setting, such as the single switch in a modal.
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <div><Toggle label="Send reminders" defaultChecked /></div>,
+            doCaption: 'The label names the setting and stays the same whether the toggle is on or off.',
+            dontExample: <div><Toggle label="Reminders are on" defaultChecked /></div>,
+            dontCaption: "A label that changes with the state reads as a status, and a screen reader hears it twice.",
+        },
+    ]}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The change lands at once.
+
+A toggle changes the setting as the person flips it. If the change needs confirming, saving or reviewing first, use a Checkbox in a form.
+
+### Read-only is not disabled.
+
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. Say why next to it.
+
+### The role is a switch.
+
+The native input is a checkbox with `role="switch"`, the markup the W3C switch pattern ships. The platform maps the checked state, so no `aria-checked` is written. A `role` prop on the toggle replaces it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Label every toggle.** A visible `label` is better. Where the name sits elsewhere in the layout, pass `aria-label` so it still reaches assistive technology.
+- **Do not change the label with the state.** The label stays the same whether the toggle is on or off.
+- **Explain a disabled toggle.** Put the reason in text beside it, so a person who cannot reach it knows why.
+- **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
+        <tr><td><code>size</code> (<code>regular</code>, <code>large</code>)</td><td><code>size</code> (<code>16</code>, <code>20</code>)</td><td>PLUS names the sizes by their track height in pixels.</td></tr>
+        <tr><td><code>label</code></td><td><code>label</code></td><td>ADS uses it only as a hidden accessible name beside an external label. PLUS draws it as the visible label; pass <code>aria-label</code> for a hidden name.</td></tr>
+        <tr><td><code>id</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>isLoading</code></td><td>not shipped</td><td>No PLUS setting loads asynchronously yet.</td></tr>
+        <tr><td><code>testId</code></td><td>not shipped</td><td>Test by role and name.</td></tr>
+        <tr><td>none</td><td><code>isReadOnly</code></td><td>PLUS addition for a setting a person may read but not change.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For an option that needs a button press to apply, use Checkbox.
+- To choose one option from a visible set, use Radio.
+- To choose one option from a longer list, use Select.
+- To explain what flipping a toggle does, add a Tooltip.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

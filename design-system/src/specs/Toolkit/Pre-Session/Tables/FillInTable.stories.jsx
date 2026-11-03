@@ -354,11 +354,9 @@ export const FillInModalRow = ({
                   * what distinguish it, so they are the name (#213).
                   */}
                 <Checkbox
-                    checked={isChecked}
+                    isChecked={isChecked}
                     onChange={handleCheckboxChange}
-                    size="small"
-                    aria-label={`Select the fill-in on ${date}, ${timeRange}`}
-                />
+                    aria-label={`Select the fill-in on ${date}, ${timeRange}`}/>
             </div>
 
             {/* Date & Time - spans 2 columns */}

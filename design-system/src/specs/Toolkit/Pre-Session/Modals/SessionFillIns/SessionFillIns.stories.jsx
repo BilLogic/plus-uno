@@ -299,11 +299,9 @@ export const ConsentForm = () => (
                                   * `aria-label` carries the same text (#213).
                                   */}
                                 <Checkbox
-                                    checked={i < 2}
+                                    isChecked={i < 2}
                                     onChange={() => {}}
-                                    size="small"
-                                    aria-label={`I acknowledge ${item.title}`}
-                                />
+                                    aria-label={`I acknowledge ${item.title}`}/>
                             </div>
                             <div className="d-flex flex-column" style={{ gap: 'var(--size-table-cell-gap)', flex: 1, minWidth: 0 }}>
                                 <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-xs)' }}>

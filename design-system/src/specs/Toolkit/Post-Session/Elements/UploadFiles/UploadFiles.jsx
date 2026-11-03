@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 import FileListItem from '@/specs/Toolkit/Post-Session/Elements/FileListItem/FileListItem';
 import NoRecordingReason from '@/specs/Toolkit/Post-Session/Elements/NoRecordingReason/NoRecordingReason';
 
@@ -79,12 +79,11 @@ const UploadFiles = ({
             )}
 
             {!showFiles && (
-                <Switch
+                <Toggle
                     id={switchId}
                     label="I don’t have a session recording"
-                    checked={showReason}
-                    onChange={(event) => onNoRecordingChange?.(event.target.checked)}
-                />
+                    isChecked={showReason}
+                    onChange={(event) => onNoRecordingChange?.(event.target.checked)}/>
             )}
 
             {showReason && (

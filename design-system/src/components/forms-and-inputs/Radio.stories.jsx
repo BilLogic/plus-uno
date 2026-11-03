@@ -12,15 +12,13 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isChecked`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected radio only.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, a dot drawn in `icon.inverse`, the disabled fill, edge and dot, and the focus ring in `border.focused`.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'Keyboard focus is the 2px focus-ring role 2px off the radio, replacing the inverse-primary halo. A checked radio keeps its fill and dot on hover.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'A labeled radio is a 24 row at every size, its label 14/20.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
         ],
         docs: {
             description: {
                 component:
-                    'Radio component for single selection from mutually exclusive options. Must be used in groups with the same name attribute.',
+                    'A radio lets a person choose one option from a set. Radios that share a name form a group; the group is usually a ChoiceGroup.',
             },
         },
     },
@@ -30,7 +28,7 @@ export default {
         style: { table: { disable: true } },
         label: {
             control: 'text',
-            description: 'Label text for the radio',
+            description: 'Label text for the first radio',
             table: { category: 'Content' },
         },
         secondLabel: {
@@ -43,236 +41,123 @@ export default {
             description: 'Label text for the third option',
             table: { category: 'Content' },
         },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant',
-            table: { category: 'Design' },
-        },
-        disabled: {
+        isInvalid: {
             control: 'boolean',
-            description: 'Disable the radio',
+            description: 'Marks the unselected radios as failing validation',
+            table: { category: 'State' },
+        },
+        isDisabled: {
+            control: 'boolean',
+            description: 'Disable the radios',
             table: { category: 'Behavior' },
         },
-        id: {
-            control: false,
-            table: { disable: true, category: 'Development' },
+        isRequired: {
+            control: 'boolean',
+            description: 'Require an answer natively',
+            table: { category: 'Behavior' },
         },
-        name: {
-            table: { disable: true, category: 'Development' },
+        isReadOnly: {
+            control: 'boolean',
+            description: 'Shown and focusable, not changeable',
+            table: { category: 'Behavior' },
         },
-        value: {
-            table: { disable: true, category: 'Development' },
-        },
-        defaultChecked: {
-            table: { disable: true, category: 'Development' },
-        },
-        checked: {
-            table: { disable: true, category: 'Development' },
-        },
-        onChange: {
-            table: { disable: true, category: 'Development' },
-        },
-        className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+        name: { table: { disable: true, category: 'Development' } },
+        value: { table: { disable: true, category: 'Development' } },
+        defaultChecked: { table: { disable: true, category: 'Development' } },
+        isChecked: { table: { disable: true, category: 'Development' } },
+        onChange: { table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
     },
 };
 
-export const Overview = () => {
-    const [value, setValue] = useState('option1');
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' };
 
+/** A controlled group of radios sharing one name. */
+const Group = ({ name, options, initial, ...radioProps }) => {
+    const [value, setValue] = useState(initial);
     return (
-        <div style={{ maxWidth: '600px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Radio
-                id="radio-overview-1"
-                name="radio-overview"
-                label="Option 1"
-                value="option1"
-                checked={value === 'option1'}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            <Radio
-                id="radio-overview-2"
-                name="radio-overview"
-                label="Option 2"
-                value="option2"
-                checked={value === 'option2'}
-                onChange={(e) => setValue(e.target.value)}
-            />
+        <div style={stack}>
+            {options.map(({ value: optionValue, label }) => (
+                <Radio
+                    key={optionValue}
+                    id={`${name}-${optionValue}`}
+                    name={name}
+                    label={label}
+                    value={optionValue}
+                    isChecked={value === optionValue}
+                    onChange={(e) => setValue(e.target.value)}
+                    {...radioProps}
+                />
+            ))}
         </div>
     );
 };
+
+const OPTIONS = [
+    { value: 'option1', label: 'Option 1' },
+    { value: 'option2', label: 'Option 2' },
+    { value: 'option3', label: 'Option 3' },
+];
+
+export const Overview = () => <Group name="radio-overview" options={OPTIONS.slice(0, 2)} initial="option1" />;
 Overview.parameters = {
     docs: {
         source: { language: 'jsx', code: webAppSourceSnippets.formRadio }
     }
 };
 
-export const Content = () => {
-    const [value, setValue] = useState('option1');
+/** Concise labels, listed in a logical order, stacked. */
+export const Content = () => <Group name="radio-content" options={OPTIONS} initial="option1" />;
 
-    return (
-        <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                Option labels and a selected value in a named group.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <Radio
-                    id="radio-c1"
-                    name="radio-content"
-                    label="Option 1"
-                    value="option1"
-                    checked={value === 'option1'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-                <Radio
-                    id="radio-c2"
-                    name="radio-content"
-                    label="Option 2"
-                    value="option2"
-                    checked={value === 'option2'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-                <Radio
-                    id="radio-c3"
-                    name="radio-content"
-                    label="Option 3"
-                    value="option3"
-                    checked={value === 'option3'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-            </div>
-        </div>
-    );
-};
-
-export const Layout = () => {
-    const [value, setValue] = useState('a');
-
-    return (
-        <div style={{ maxWidth: '600px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                Vertical stack is the default layout for a radio group.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <Radio
-                    id="radio-l1"
-                    name="radio-layout"
-                    label="First choice"
-                    value="a"
-                    checked={value === 'a'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-                <Radio
-                    id="radio-l2"
-                    name="radio-layout"
-                    label="Second choice"
-                    value="b"
-                    checked={value === 'b'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-                <Radio
-                    id="radio-l3"
-                    name="radio-layout"
-                    label="Third choice"
-                    value="c"
-                    checked={value === 'c'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-            </div>
-        </div>
-    );
-};
-
-export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
-            <Radio id="radio-small" name="radio-size" label="Option" size="small" defaultChecked />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
-            <Radio id="radio-medium" name="radio-size-m" label="Option" size="medium" defaultChecked />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-            <Radio id="radio-large" name="radio-size-l" label="Option" size="large" defaultChecked />
-        </div>
+/** Selected, unselected and disabled. */
+export const States = () => (
+    <div style={stack}>
+        <Radio id="radio-s1" name="radio-states" label="Selected" value="a" defaultChecked />
+        <Radio id="radio-s2" name="radio-states" label="Unselected" value="b" />
+        <Radio id="radio-s3" name="radio-states-dis" label="Disabled" value="c" isDisabled />
+        <Radio id="radio-s4" name="radio-states-dis-on" label="Disabled and selected" value="d" isDisabled defaultChecked />
     </div>
 );
 
-export const InteractionStates = () => {
-    const [value, setValue] = useState('option1');
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SELECTED</span>
-                <Radio
-                    id="radio-s1"
-                    name="radio-states"
-                    label="Option"
-                    value="option1"
-                    checked={value === 'option1'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">UNSELECTED</span>
-                <Radio
-                    id="radio-s2"
-                    name="radio-states"
-                    label="Option"
-                    value="option2"
-                    checked={value === 'option2'}
-                    onChange={(e) => setValue(e.target.value)}
-                />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Radio id="radio-disabled" name="radio-states-dis" label="Option" value="disabled" disabled />
-            </div>
-        </div>
-    );
+/**
+ * Invalid marks the unselected radios with a danger edge. A selected radio
+ * keeps its Lagoon fill.
+ */
+export const Invalid = () => (
+    <div style={stack}>
+        <Radio id="radio-invalid-1" name="radio-invalid" label="Weekly" value="weekly" isInvalid />
+        <Radio id="radio-invalid-2" name="radio-invalid" label="Monthly" value="monthly" isInvalid defaultChecked />
+    </div>
+);
+Invalid.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const off = canvas.getByRole('radio', { name: 'Weekly' });
+    const on = canvas.getByRole('radio', { name: 'Monthly' });
+    await expect(off.getAttribute('aria-invalid')).toBe('true');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(off).borderTopColor, `${mode}: unselected invalid edge`).toBe(token('--ds-border-danger'));
+        await expect(getComputedStyle(on).borderTopColor, `${mode}: selected keeps its edge`).toBe(token('--ds-border-selected'));
+    });
 };
 
 export const Interactive = (args) => {
     const [value, setValue] = useState('option1');
+    const shared = { name: 'radio-interactive', isInvalid: args.isInvalid, isDisabled: args.isDisabled, isReadOnly: args.isReadOnly, isRequired: args.isRequired };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Radio
-                id="radio-int-1"
-                name="radio-interactive"
-                label={args.label}
-                value="option1"
-                checked={value === 'option1'}
-                size={args.size}
-                disabled={args.disabled}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            <Radio
-                id="radio-int-2"
-                name="radio-interactive"
-                label={args.secondLabel}
-                value="option2"
-                checked={value === 'option2'}
-                size={args.size}
-                disabled={args.disabled}
-                onChange={(e) => setValue(e.target.value)}
-            />
-            <Radio
-                id="radio-int-3"
-                name="radio-interactive"
-                label={args.thirdLabel}
-                value="option3"
-                checked={value === 'option3'}
-                size={args.size}
-                disabled={args.disabled}
-                onChange={(e) => setValue(e.target.value)}
-            />
+        <div style={stack}>
+            {[['option1', args.label], ['option2', args.secondLabel], ['option3', args.thirdLabel]].map(([optionValue, label]) => (
+                <Radio
+                    key={optionValue}
+                    id={`radio-int-${optionValue}`}
+                    label={label}
+                    value={optionValue}
+                    isChecked={value === optionValue}
+                    onChange={(e) => setValue(e.target.value)}
+                    {...shared}
+                />
+            ))}
         </div>
     );
 };
@@ -281,8 +166,10 @@ Interactive.args = {
     label: 'Option 1',
     secondLabel: 'Option 2',
     thirdLabel: 'Option 3',
-    size: 'medium',
-    disabled: false,
+    isInvalid: false,
+    isDisabled: false,
+    isReadOnly: false,
+    isRequired: false,
 };
 
 /**
@@ -292,8 +179,8 @@ Interactive.args = {
  */
 export const ReadOnly = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-        <Radio id="radio-readonly-1" name="radio-readonly" label="In person" value="in-person" defaultChecked readOnly />
-        <Radio id="radio-readonly-2" name="radio-readonly" label="Online" value="online" readOnly />
+        <Radio id="radio-readonly-1" name="radio-readonly" label="In person" value="in-person" defaultChecked isReadOnly/>
+        <Radio id="radio-readonly-2" name="radio-readonly" label="Online" value="online" isReadOnly/>
     </div>
 );
 ReadOnly.play = async ({ canvasElement }) => {
@@ -308,8 +195,8 @@ ReadOnly.play = async ({ canvasElement }) => {
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' }}>
-        <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time." />
-        <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked />
+        <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time."/>
+        <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked/>
     </div>
 );
 DescriptionAndCard.play = async ({ canvasElement }) => {
@@ -326,8 +213,8 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
  */
 export const KeyboardFocus = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-        <Radio id="radio-focus-1" name="radio-focus" label="Morning" value="morning" defaultChecked />
-        <Radio id="radio-focus-2" name="radio-focus" label="Evening" value="evening" />
+        <Radio id="radio-focus-1" name="radio-focus" label="Morning" value="morning" defaultChecked/>
+        <Radio id="radio-focus-2" name="radio-focus" label="Evening" value="evening"/>
     </div>
 );
 KeyboardFocus.parameters = { docs: { disable: true } };
@@ -354,9 +241,9 @@ KeyboardFocus.play = async ({ canvasElement }) => {
  */
 export const HoverStep = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-        <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked />
-        <Radio id="radio-hover-2" name="radio-hover" label="Unchecked" value="unchecked" />
-        <Radio id="radio-hover-3" name="radio-hover-disabled" label="Disabled" value="disabled" defaultChecked disabled />
+        <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked/>
+        <Radio id="radio-hover-2" name="radio-hover" label="Unchecked" value="unchecked"/>
+        <Radio id="radio-hover-3" name="radio-hover-disabled" label="Disabled" value="disabled" defaultChecked isDisabled/>
     </div>
 );
 HoverStep.parameters = { docs: { disable: true } };

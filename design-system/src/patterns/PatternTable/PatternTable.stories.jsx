@@ -245,7 +245,7 @@ export const RowStates = {
             <tbody>
                 {sampleRows.map((row, i) => (
                     <tr key={row.name} aria-selected={i === 1}>
-                        <td><Checkbox aria-label={`Select ${row.name}`} checked={i === 1} readOnly /></td>
+                        <td><Checkbox aria-label={`Select ${row.name}`} isChecked={i === 1} isReadOnly/></td>
                         <td>{row.name}</td>
                         <td>{row.role}</td>
                         <td>{row.status}</td>

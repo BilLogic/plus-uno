@@ -77,8 +77,7 @@ const ReconfirmTutorAvailabilityModalBody = () => (
                     id="reconfirm-availability"
                     name="reconfirm-availability"
                     label="I want tutors to reconfirm their availabilities for this session."
-                    style={{ width: 'auto' }}
-                />
+                    style={{ width: 'auto' }}/>
             </div>
         </div>
 

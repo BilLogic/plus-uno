@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
-import { useDeprecatedLargeSize } from '../../lib/useDeprecatedLargeSize';
 import './Range.scss';
 
 /**
@@ -23,9 +22,8 @@ const Range = ({
     value,
     defaultValue,
     step = 1,
-    size = 'medium',
+    isDisabled = false,
     onChange,
-    onInput,
     className = '',
     style,
     ...props
@@ -33,7 +31,6 @@ const Range = ({
     const rangeRef = useRef(null);
     /** One id for the label and the slider — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
-    useDeprecatedLargeSize('Range', size);
 
     // Logic to update --value-percent CSS variable for track filling
     const updateValuePercent = () => {
@@ -59,31 +56,18 @@ const Range = ({
         updateValuePercent();
     }, [value, defaultValue, min, max]);
 
-    const handleInput = (e) => {
-        // Update CSS variable immediately for smooth visual feedback
-        if (rangeRef.current) {
-            const val = parseFloat(e.target.value);
-            const percent = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
-            rangeRef.current.style.setProperty('--value-percent', `${percent}%`);
-        }
-        if (onInput) onInput(e);
-        // We also trigger onChange for standard Controlled input behavior match if user relies on it
-        if (onChange) onChange(e);
-    };
-
+    /** Reports the new value as a number, then the event it came from. */
     const handleChange = (e) => {
-        // Update CSS variable
         if (rangeRef.current) {
             const val = parseFloat(e.target.value);
             const percent = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
             rangeRef.current.style.setProperty('--value-percent', `${percent}%`);
         }
-        if (onChange) onChange(e);
+        if (onChange) onChange(Number(e.target.value), e);
     };
 
     const rangeClasses = [
         'plus-form-range',
-        `plus-form-range-${size}`,
         className
     ].filter(Boolean).join(' ');
 
@@ -106,8 +90,8 @@ const Range = ({
                 step={step}
                 value={value}
                 defaultValue={defaultValue}
+                disabled={isDisabled}
                 onChange={handleChange}
-                onInput={handleInput}
                 className={rangeClasses}
                 style={style}
                 {...props}
@@ -128,14 +112,9 @@ Range.propTypes = {
     value: PropTypes.number,
     defaultValue: PropTypes.number,
     step: PropTypes.number,
-    /**
-     * Every size draws a 32 control with a 14/20 label; `small` keeps its
-     * thinner track. `large` is deprecated: it draws like `medium` and warns in
-     * development.
-     */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    isDisabled: PropTypes.bool,
+    /** Called with the new value as a number, then the change event. */
     onChange: PropTypes.func,
-    onInput: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object
 };

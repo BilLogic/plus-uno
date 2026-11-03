@@ -12,15 +12,13 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isChecked`, `isIndeterminate`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected box only.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, the disabled fill, edge and mark, and the focus ring in `border.focused`.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'A checked box keeps its fill and check on hover, under the shadow 08 layer. Keyboard focus is the 2px focus ring 2px off the box; a pointer focus draws none.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'A labeled checkbox is a 24 row at every size, its label 14/20.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
         ],
         docs: {
             description: {
                 component:
-                    'Checkbox component allows multiple selections with optional indeterminate state. Supports controlled and uncontrolled modes.',
+                    'A checkbox lets a person select one or more options from a list, or confirm a single setting. It supports controlled and uncontrolled use, and a mixed state for a parent of partly selected children.',
             },
         },
     },
@@ -30,149 +28,45 @@ export default {
         style: { table: { disable: true } },
         label: {
             control: 'text',
-            description: 'Label text for the checkbox',
+            description: 'Text that names the checkbox',
             table: { category: 'Content' },
         },
-        checked: {
-            table: { disable: true, category: 'Development' },
-        },
-        indeterminate: {
+        isChecked: { table: { disable: true, category: 'Development' } },
+        isIndeterminate: {
             control: 'boolean',
-            description: 'Indeterminate visual state',
+            description: 'Mixed state, for a parent of partly selected children',
             table: { category: 'State' },
         },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant',
-            table: { category: 'Design' },
+        isInvalid: {
+            control: 'boolean',
+            description: 'Marks the unselected box as failing validation',
+            table: { category: 'State' },
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the checkbox',
             table: { category: 'Behavior' },
         },
-        required: {
+        isRequired: {
             control: 'boolean',
-            description: 'Show required indicator',
+            description: 'Show the required marker and require it natively',
             table: { category: 'Behavior' },
         },
-        id: {
-            control: false,
-            table: { disable: true, category: 'Development' },
+        isReadOnly: {
+            control: 'boolean',
+            description: 'Shown and announced, not changeable',
+            table: { category: 'Behavior' },
         },
-        name: {
-            table: { disable: true, category: 'Development' },
-        },
-        value: {
-            table: { disable: true, category: 'Development' },
-        },
-        defaultChecked: {
-            table: { disable: true, category: 'Development' },
-        },
-        onChange: {
-            table: { disable: true, category: 'Development' },
-        },
-        className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+        name: { table: { disable: true, category: 'Development' } },
+        value: { table: { disable: true, category: 'Development' } },
+        defaultChecked: { table: { disable: true, category: 'Development' } },
+        onChange: { table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
     },
 };
 
-const pageWrap = { maxWidth: '600px' };
-const contentVariantCard = {
-    padding: '12px',
-    border: '1px solid var(--ds-border)',
-    borderRadius: '12px',
-    background: 'var(--ds-surface-container)',
-};
-
-function CheckboxContentDemos() {
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Long label</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
-                    Longer descriptive copy used in forms and filters.
-                </p>
-                <div style={contentVariantCard}>
-                    <Checkbox id="cb-content-long" name="cb-content-long" label="Longer label text used in forms and filters" />
-                </div>
-            </section>
-            <section>
-                <h6 className="h6" style={{ marginBottom: '8px' }}>Required indicator</h6>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
-                    Adds a required marker next to the label.
-                </p>
-                <div style={contentVariantCard}>
-                    <Checkbox id="cb-content-required" name="cb-content-required" label="Required field" required />
-                </div>
-            </section>
-        </div>
-    );
-}
-
-function CheckboxSizesDemos() {
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
-                <Checkbox id="cb-small" name="cb-small" label="Option" size="small" defaultChecked />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
-                <Checkbox id="cb-medium" name="cb-medium" label="Option" size="medium" defaultChecked />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-                <Checkbox id="cb-large" name="cb-large" label="Option" size="large" defaultChecked />
-            </div>
-        </div>
-    );
-}
-
-function CheckboxInteractionStatesDemos() {
-    const [checked1, setChecked1] = useState(false);
-    const [checked2, setChecked2] = useState(true);
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">UNCHECKED</span>
-                <Checkbox
-                    id="cb-unchecked"
-                    name="cb-unchecked"
-                    label="Label"
-                    checked={checked1}
-                    onChange={(e) => setChecked1(e.target.checked)}
-                />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CHECKED</span>
-                <Checkbox
-                    id="cb-checked"
-                    name="cb-checked"
-                    label="Label"
-                    checked={checked2}
-                    onChange={(e) => setChecked2(e.target.checked)}
-                />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INDETERMINATE</span>
-                <Checkbox id="cb-indeterminate" name="cb-indeterminate" label="Label" indeterminate />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <Checkbox id="cb-disabled" name="cb-disabled" label="Label" disabled />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">REQUIRED</span>
-                <Checkbox id="cb-required" name="cb-required" label="Label" required />
-            </div>
-        </div>
-    );
-}
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' };
 
 export const Overview = () => (
     <div style={{ maxWidth: '600px' }}>
@@ -185,48 +79,111 @@ Overview.parameters = {
     }
 };
 
+/** Unselected, selected, mixed and disabled. */
+export const States = () => (
+    <div style={stack}>
+        <Checkbox id="cb-unchecked" label="Unselected" />
+        <Checkbox id="cb-checked" label="Selected" defaultChecked />
+        <Checkbox id="cb-indeterminate" label="Mixed" isIndeterminate />
+        <Checkbox id="cb-disabled" label="Disabled" isDisabled />
+        <Checkbox id="cb-disabled-on" label="Disabled and selected" isDisabled defaultChecked />
+    </div>
+);
+
+/** A long label wraps inside its row; the required marker follows the label. */
 export const Content = () => (
-    <div style={pageWrap}>
-        <CheckboxContentDemos />
+    <div style={stack}>
+        <Checkbox id="cb-content-long" label="Longer label text used in forms and filters" />
+        <Checkbox id="cb-content-required" label="Required field" isRequired />
     </div>
 );
 
-export const Sizes = () => (
-    <div style={pageWrap}>
-        <CheckboxSizesDemos />
+/**
+ * Invalid marks the unselected box with a danger edge. A selected or mixed box
+ * keeps its Lagoon fill, so the red edge never fights the mark.
+ */
+export const Invalid = () => (
+    <div style={stack}>
+        <Checkbox id="cb-invalid" label="I accept the terms" isInvalid />
+        <Checkbox id="cb-invalid-on" label="Selected stays selected" isInvalid defaultChecked />
     </div>
 );
+Invalid.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const off = canvas.getByRole('checkbox', { name: 'I accept the terms' });
+    const on = canvas.getByRole('checkbox', { name: 'Selected stays selected' });
+    await expect(off.getAttribute('aria-invalid')).toBe('true');
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(off).borderTopColor, `${mode}: unselected invalid edge`).toBe(token('--ds-border-danger'));
+        await expect(getComputedStyle(on).borderTopColor, `${mode}: selected keeps its edge`).toBe(token('--ds-border-selected'));
+        await expect(getComputedStyle(on).backgroundColor, `${mode}: selected keeps its fill`).toBe(token('--ds-background-selected-bold'));
+    });
+};
 
-export const InteractionStates = () => (
-    <div style={pageWrap}>
-        <CheckboxInteractionStatesDemos />
-    </div>
-);
+/** A parent box shows the mixed state while some, not all, children are selected. */
+export const SelectAll = () => {
+    const [picked, setPicked] = useState({ mon: true, tue: false, wed: false });
+    const keys = Object.keys(picked);
+    const count = keys.filter((k) => picked[k]).length;
+    const toggleAll = (event) => setPicked(Object.fromEntries(keys.map((k) => [k, event.target.checked])));
+    return (
+        <div style={stack}>
+            <Checkbox
+                id="cb-all"
+                label="All days"
+                isChecked={count === keys.length}
+                isIndeterminate={count > 0 && count < keys.length}
+                onChange={toggleAll}
+            />
+            {keys.map((k) => (
+                <div key={k} style={{ paddingLeft: 'var(--size-element-gap-lg)' }}>
+                    <Checkbox
+                        id={`cb-${k}`}
+                        label={k}
+                        isChecked={picked[k]}
+                        onChange={(event) => setPicked({ ...picked, [k]: event.target.checked })}
+                    />
+                </div>
+            ))}
+        </div>
+    );
+};
+SelectAll.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const all = canvas.getByRole('checkbox', { name: 'All days' });
+    await expect(all.indeterminate).toBe(true);
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'tue' }));
+    await userEvent.click(canvas.getByRole('checkbox', { name: 'wed' }));
+    await waitFor(() => expect(all.indeterminate).toBe(false));
+    await expect(all.checked).toBe(true);
+};
 
 export const Interactive = (args) => {
-    const [checked, setChecked] = useState(args.checked || false);
+    const [checked, setChecked] = useState(false);
 
     return (
         <Checkbox
             id="checkbox-interactive"
             name="checkbox-interactive"
             label={args.label}
-            checked={checked}
-            indeterminate={args.indeterminate}
-            size={args.size}
-            disabled={args.disabled}
-            required={args.required}
+            isChecked={checked}
+            isIndeterminate={args.isIndeterminate}
+            isInvalid={args.isInvalid}
+            isDisabled={args.isDisabled}
+            isRequired={args.isRequired}
+            isReadOnly={args.isReadOnly}
             onChange={(e) => setChecked(e.target.checked)}
         />
     );
 };
 
 Interactive.args = {
-    label: 'Checkbox Label',
-    indeterminate: false,
-    size: 'medium',
-    disabled: false,
-    required: false,
+    label: 'Checkbox label',
+    isIndeterminate: false,
+    isInvalid: false,
+    isDisabled: false,
+    isRequired: false,
+    isReadOnly: false,
 };
 
 /**
@@ -234,9 +191,9 @@ Interactive.args = {
  * and clicking or pressing Space does not change it.
  */
 export const ReadOnly = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-        <Checkbox id="checkbox-readonly-on" label="Background check complete" defaultChecked readOnly />
-        <Checkbox id="checkbox-readonly-off" label="Training complete" readOnly />
+    <div style={stack}>
+        <Checkbox id="checkbox-readonly-on" label="Background check complete" defaultChecked isReadOnly />
+        <Checkbox id="checkbox-readonly-off" label="Training complete" isReadOnly />
     </div>
 );
 ReadOnly.play = async ({ canvasElement }) => {
@@ -255,7 +212,7 @@ ReadOnly.play = async ({ canvasElement }) => {
 
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' }}>
+    <div style={stack}>
         <Checkbox id="checkbox-desc" label="Email reminders" description="Sent the evening before." />
         <Checkbox id="checkbox-card" label="Text reminders" description="Sent an hour before." appearance="card" defaultChecked />
     </div>
@@ -290,10 +247,10 @@ KeyboardFocus.play = async ({ canvasElement }) => {
  * the brand edge. A disabled checked box takes the disabled fill, edge and mark.
  */
 export const HoverStep = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+    <div style={stack}>
         <Checkbox id="checkbox-hover" label="Checked" defaultChecked />
         <Checkbox id="checkbox-hover-off" label="Unchecked" />
-        <Checkbox id="checkbox-hover-disabled" label="Disabled" defaultChecked disabled />
+        <Checkbox id="checkbox-hover-disabled" label="Disabled" defaultChecked isDisabled />
     </div>
 );
 HoverStep.parameters = { docs: { disable: true } };

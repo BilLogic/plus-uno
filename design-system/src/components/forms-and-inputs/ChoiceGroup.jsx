@@ -40,7 +40,6 @@ const ChoiceGroup = ({
     trailingText,
     other,
     appearance = 'plain',
-    size = 'medium',
     required = false,
     disabled = false,
     readOnly = false,
@@ -105,14 +104,13 @@ const ChoiceGroup = ({
                     label={label}
                     description={description}
                     appearance={appearance}
-                    size={size}
-                    checked={checked}
-                    disabled={disabled || optionDisabled}
-                    readOnly={readOnly}
+                    isChecked={checked}
+                    isDisabled={disabled || optionDisabled}
+                    isReadOnly={readOnly}
                     // Radios: the platform enforces "one of these". Checkboxes:
                     // `required` on each box would demand every box, so the
                     // group says it instead.
-                    required={!isCheckbox && required}
+                    isRequired={!isCheckbox && required}
                     onChange={(event) => choose(optionValue, event.target.checked)}
                 />
                 {reveal && checked && (
@@ -276,7 +274,6 @@ ChoiceGroup.propTypes = {
     }),
     /** Passed to every choice. `card` draws each as a bordered tile. */
     appearance: PropTypes.oneOf(['plain', 'card']),
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
     /** The group needs an answer. Marked on the legend. */
     required: PropTypes.bool,
     disabled: PropTypes.bool,

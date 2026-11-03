@@ -55,16 +55,16 @@ describe('componentIdentity', () => {
     expect(
       componentIdentity({
         title: 'Components/Forms and inputs/Toggle',
-        importPath: './design-system/src/components/forms-and-inputs/Switch.stories.jsx',
+        importPath: './design-system/src/components/forms-and-inputs/Toggle.stories.jsx',
       }),
     ).toEqual({
-      name: 'Switch',
+      name: 'Toggle',
       group: 'forms-and-inputs',
       dir: 'design-system/src/components/forms-and-inputs',
-      source: 'design-system/src/components/forms-and-inputs/Switch.jsx',
-      generatedDoc: 'design-system/src/components/forms-and-inputs/Switch.md',
+      source: 'design-system/src/components/forms-and-inputs/Toggle.jsx',
+      generatedDoc: 'design-system/src/components/forms-and-inputs/Toggle.md',
       groupIndex: 'design-system/src/components/forms-and-inputs/index.md',
-      entryFile: 'design-system/src/components/forms-and-inputs/Switch.stories.jsx',
+      entryFile: 'design-system/src/components/forms-and-inputs/Toggle.stories.jsx',
     });
   });
 

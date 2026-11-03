@@ -18,7 +18,6 @@ const ChoiceGrid = ({
     values = {}, // { rowId: { columnId: boolean } } for checkbox, { rowId: columnId } for radio
     disabled = false,
     readOnly = false,
-    size = 'medium',
     onChange,
     className = '',
     style,
@@ -114,10 +113,9 @@ const ChoiceGrid = ({
                                                 id={inputId}
                                                 name={inputName}
                                                 value={column.id}
-                                                checked={checked}
-                                                disabled={disabled}
-                                                readOnly={readOnly}
-                                                size={size}
+                                                isChecked={checked}
+                                                isDisabled={disabled}
+                                                isReadOnly={readOnly}
                                                 className="plus-choice-grid-control"
                                                 aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
                                                 onChange={(e) => handleChange(
@@ -155,7 +153,6 @@ ChoiceGrid.propTypes = {
     disabled: PropTypes.bool,
     /** Shown and focusable, not changeable. */
     readOnly: PropTypes.bool,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
     onChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object

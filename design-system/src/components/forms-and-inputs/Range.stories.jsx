@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { expect, fireEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Range from './Range';
 
@@ -8,13 +9,12 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'The slider is a 32 control at every size, its label 14/20.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isDisabled`, and `onChange` receives the new value as a number, then the event. One size, a 32 control with a 4 track and a 20 thumb. The fill, thumb and disabled state use the named tokens; focus is the 2px ring on `border.focused`.' },
         ],
         docs: {
             description: {
                 component:
-                    'Range input controls allow users to select a numeric value within a specified range by dragging a slider. The range input provides visual feedback with a filled track indicating the current value position.',
+                    'A range lets a person choose an approximate value on a slider, between a minimum and a maximum. The track fills from the start to the thumb.',
             },
         },
     },
@@ -22,12 +22,6 @@ export default {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Available in 3 sizes: small, medium (default), large.',
-            table: { category: 'Design' },
-        },
         value: {
             control: { type: 'range', min: 0, max: 100, step: 1 },
             description: 'Current slider value',
@@ -48,30 +42,16 @@ export default {
             description: 'Slider increment',
             table: { category: 'Behavior' },
         },
-        id: {
-            control: false,
-            table: { disable: true, category: 'Development' },
+        isDisabled: {
+            control: 'boolean',
+            description: 'Disable the slider',
+            table: { category: 'Behavior' },
         },
-        name: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        defaultValue: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        onChange: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        onInput: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
-        className: {
-            control: false,
-            table: { disable: true, category: 'Development' },
-        },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+        name: { control: false, table: { disable: true, category: 'Development' } },
+        defaultValue: { control: false, table: { disable: true, category: 'Development' } },
+        onChange: { control: false, table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
     },
 };
 
@@ -82,13 +62,11 @@ export const Overview = () => {
         <div style={{ maxWidth: '600px' }}>
             <Range
                 id="range-overview"
-                aria-label="Range value"
+                label="Volume"
                 min={0}
                 max={100}
                 value={value}
-                onChange={(e) => setValue(parseFloat(e.target.value))}
-                size="medium"
-            />
+                onChange={setValue}/>
         </div>
     );
 };
@@ -98,45 +76,32 @@ Overview.parameters = {
     }
 };
 
-export const Sizes = () => {
-    const [value1, setValue1] = useState(50);
-    const [value2, setValue2] = useState(50);
-    const [value3, setValue3] = useState(50);
+/** The label sits directly above the slider, aligned left. A hidden label still names it. */
+export const Labels = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)', maxWidth: '600px' }}>
+        <Range id="range-visible" label="Zoom" defaultValue={30}/>
+        <Range id="range-hidden" label="Brightness" showLabel={false} defaultValue={70}/>
+    </div>
+);
 
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '1200px' }}>
-            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Small, medium (default), and large track and thumb.
-            </p>
-            <Range
-                id="range-small"
-                aria-label="Small range value"
-                min={0}
-                max={100}
-                value={value1}
-                onChange={(e) => setValue1(parseFloat(e.target.value))}
-                size="small"
-            />
-            <Range
-                id="range-medium"
-                aria-label="Medium range value"
-                min={0}
-                max={100}
-                value={value2}
-                onChange={(e) => setValue2(parseFloat(e.target.value))}
-                size="medium"
-            />
-            <Range
-                id="range-large"
-                aria-label="Large range value"
-                min={0}
-                max={100}
-                value={value3}
-                onChange={(e) => setValue3(parseFloat(e.target.value))}
-                size="large"
-            />
-        </div>
-    );
+/** The thumb at the start, the middle and the end of the span. */
+export const Positions = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)', maxWidth: '600px' }}>
+        <Range id="range-start" label="At the start" defaultValue={0}/>
+        <Range id="range-middle" label="In the middle" defaultValue={50}/>
+        <Range id="range-end" label="At the end" defaultValue={100}/>
+    </div>
+);
+
+/** Disabled takes the disabled fill on the track and the thumb. */
+export const Disabled = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Range id="range-disabled" label="Zoom" defaultValue={40} isDisabled/>
+    </div>
+);
+Disabled.play = async ({ canvasElement }) => {
+    const slider = within(canvasElement).getByRole('slider', { name: 'Zoom' });
+    await expect(slider.disabled).toBe(true);
 };
 
 export const Interactive = (args) => {
@@ -150,22 +115,47 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '600px' }}>
             <Range
                 id="range-interactive"
-                aria-label="Range value"
+                label="Range value"
                 value={value}
-                onChange={(e) => setValue(parseFloat(e.target.value))}
-                size={args.size}
+                onChange={setValue}
                 min={args.min}
                 max={args.max}
                 step={args.step}
-            />
+                isDisabled={args.isDisabled}/>
         </div>
     );
 };
 
 Interactive.args = {
-    size: 'medium',
     value: 50,
     min: 0,
     max: 100,
     step: 1,
+    isDisabled: false,
+};
+
+/** `onChange` receives the value as a number, then the event. */
+export const ReportsNumber = () => {
+    const [value, setValue] = useState(50);
+    const [seen, setSeen] = useState('none');
+
+    return (
+        <div style={{ maxWidth: '600px' }}>
+            <Range
+                id="range-number"
+                label="Reported"
+                value={value}
+                onChange={(next, event) => {
+                    setSeen(`${typeof next}:${next}:${event.type}`);
+                    setValue(next);
+                }}/>
+            <p data-testid="range-seen">{seen}</p>
+        </div>
+    );
+};
+ReportsNumber.parameters = { docs: { disable: true } };
+ReportsNumber.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    fireEvent.change(canvas.getByRole('slider', { name: 'Reported' }), { target: { value: '72' } });
+    await waitFor(() => expect(canvas.getByTestId('range-seen').textContent).toBe('number:72:change'));
 };

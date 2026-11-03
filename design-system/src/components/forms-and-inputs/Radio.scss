@@ -135,14 +135,7 @@
     }
 }
 
-// Size variants
-.plus-form-radio-small {
-    .plus-form-radio .form-check-input {
-        width: 10px;
-        height: 10px;
-        min-width: 10px;
-        min-height: 10px;
-    }
+// Invalid marks the unselected radio only; a selected radio keeps its fill.
+.plus-form-radio-invalid .plus-form-radio .form-check-input:not(:checked):not(:disabled) {
+    border-color: var(--ds-border-danger) !important;
 }
-
-// `large` is deprecated and draws like `medium`, so it has no rule of its own.

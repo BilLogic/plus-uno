@@ -9,7 +9,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Sizes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, ReportsNumber
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range.mdx`
 
@@ -26,27 +26,20 @@ A range input carries its value, never its meaning: "49" says nothing about what
 | `value` | number | — | Current slider value |
 | `defaultValue` | number | — | — |
 | `step` | number | `1` | Slider increment |
-| `size` | enum | `'medium'` | Available in 3 sizes: small, medium (default), large. |
-| `onChange` | func | — | — |
-| `onInput` | func | — | — |
+| `isDisabled` | bool | `false` | Disable the slider |
+| `onChange` | func | — | Called with the new value as a number, then the change event. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
-## Variants
-
-**`size`** — `small` · `medium` · `large`
-
-Anything not listed is not a valid value.
-
 ## Tokens touched
 
-`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--ds-background-brand-bold-hovered` · `--ds-background-brand-bold-pressed` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--size-element-stroke-lg` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

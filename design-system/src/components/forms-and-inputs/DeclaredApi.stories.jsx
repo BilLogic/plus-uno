@@ -3,7 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import Dropdown from './Dropdown/Dropdown';
 import Select from './Select';
-import Switch from './Switch';
+import Toggle from './Toggle';
 
 /**
  * Props that were declared and did nothing.
@@ -13,7 +13,7 @@ import Switch from './Switch';
  * `required`, `onFocus` and `onBlur` and referenced none of them. `Dropdown`
  * had no `onToggle` at all, so a caller who passed `isOpen` owned the state
  * and had no way to set it back — the dropdown opened and stayed open.
- * `Switch` rendered a checkbox with no `role`, so what looked like a switch
+ * `Toggle` rendered a checkbox with no `role`, so what looked like a switch
  * announced itself as a checkbox.
  *
  * A dead prop is invisible to every guard the repo already had. `propTypes`
@@ -196,40 +196,38 @@ DropdownUncontrolled.play = async ({ canvasElement }) => {
     await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 };
 
-/* ------------------------------------------------------------------ Switch */
+/* ------------------------------------------------------------------ Toggle */
 
 /**
- * `Switch` presents as a switch.
+ * `Toggle` presents as a switch.
  *
- * The decision and its reasoning are recorded in `Switch.jsx` and in the
- * accessibility section of `Switch.mdx`. What this asserts is only the part a
- * test can hold: the role is there by default, `inputProps` can still take it
+ * The decision and its reasoning are recorded in `Toggle.jsx` and in the
+ * accessibility section of `Toggle.mdx`. What this asserts is only the part a
+ * test can hold: the role is there by default, a `role` prop can still take it
  * away, and the native checkbox underneath is untouched — same `type`, same
  * `checked`, same `name`/`value` in a form.
  */
-export const SwitchRole = () => {
+export const ToggleRole = () => {
     const [checked, setChecked] = useState(false);
 
     return (
         <div style={stack}>
-            <Switch
+            <Toggle
                 id="dapi-wifi"
                 name="wifi"
                 label="Wi-Fi"
-                checked={checked}
-                onChange={(event) => setChecked(event.target.checked)}
-            />
-            <Switch
+                isChecked={checked}
+                onChange={(event) => setChecked(event.target.checked)}/>
+            <Toggle
                 id="dapi-optout"
                 name="optout"
                 label="Announce me as a checkbox"
-                inputProps={{ role: 'checkbox' }}
-            />
+                role="checkbox"/>
         </div>
     );
 };
 
-SwitchRole.play = async ({ canvasElement }) => {
+ToggleRole.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     const wifi = canvas.getByRole('switch', { name: 'Wi-Fi' });
