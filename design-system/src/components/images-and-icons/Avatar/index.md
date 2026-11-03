@@ -46,6 +46,6 @@ From `design-system/src/components/images-and-icons/Avatar/Avatar.scss`. Overrid
 
 ## Related
 
-Same group: `AvatarGroup` · `Illustration` · `Tile`
+Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Tile`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

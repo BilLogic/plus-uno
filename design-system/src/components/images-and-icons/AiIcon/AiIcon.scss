@@ -1,0 +1,8 @@
+// The icon takes the icon color and its own box; a caller recolors it with
+// `color`, since the shapes fill with currentColor.
+.plus-ai-icon {
+    display: inline-block;
+    flex: none;
+    color: var(--ds-icon);
+    vertical-align: middle;
+}
