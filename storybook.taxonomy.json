@@ -59,7 +59,8 @@
     ],
     "Loading": [
       "Progress bar",
-      "Loading"
+      "Loading",
+      "Generative border"
     ],
     "Messaging": [
       "Flag",
@@ -207,7 +208,8 @@
         [
           "Spinner",
           "Skeleton"
-        ]
+        ],
+        "Generative border"
       ],
       "Messaging",
       [

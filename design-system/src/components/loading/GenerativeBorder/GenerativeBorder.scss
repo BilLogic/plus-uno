@@ -1,0 +1,65 @@
+/*
+ * GenerativeBorder: a 2px stroke drawn over the edge of the wrapped content, so
+ * it never moves the layout. Four flat segments with hard stops, lagoon and
+ * purple alternating, run clockwise from the top-left; a conic gradient paints
+ * them and a mask keeps only the ring. Turning is the registered start angle
+ * animating. No blur, no blend, no tint.
+ *
+ * The resting angle is the still frame from the design: lagoon runs from the
+ * left edge through the top-left corner to the top edge, purple takes the rest
+ * of the top and the upper right edge, lagoon the lower right edge, corner and
+ * bottom, purple the rest of the bottom, the bottom-left corner and the lower
+ * left edge. Segment lengths are angles around the center, so they follow the
+ * box's proportions.
+ */
+@property --generative-border-angle {
+    syntax: '<angle>';
+    inherits: false;
+    initial-value: 269deg;
+}
+
+.plus-generative-border {
+    --generative-border-width: var(--size-border-stroke-stroke-200);
+    --generative-border-rest: 269deg;
+
+    position: relative;
+    min-width: 0;
+
+    &__ring {
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        padding: var(--generative-border-width);
+        border-radius: var(--generative-border-radius);
+        pointer-events: none;
+        --generative-border-angle: var(--generative-border-rest);
+        background: conic-gradient(
+            from var(--generative-border-angle),
+            var(--ds-border-brand) 0 120deg,
+            var(--ds-border-discovery) 120deg 191deg,
+            var(--ds-border-brand) 191deg 320deg,
+            var(--ds-border-discovery) 320deg 360deg
+        );
+        // Keep the padding box's complement: the ring, not the middle.
+        -webkit-mask: linear-gradient(currentColor 0 0) content-box, linear-gradient(currentColor 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(currentColor 0 0) content-box, linear-gradient(currentColor 0 0);
+        mask-composite: exclude;
+        animation: plus-generative-border-turn 6s linear infinite;
+    }
+}
+
+@keyframes plus-generative-border-turn {
+    from {
+        --generative-border-angle: 269deg;
+    }
+    to {
+        --generative-border-angle: 629deg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-generative-border__ring {
+        animation: none;
+    }
+}
