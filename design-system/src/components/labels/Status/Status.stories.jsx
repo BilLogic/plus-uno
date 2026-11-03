@@ -50,12 +50,12 @@ const COUNT = { medium: { height: 16, inset: 2 }, large: { height: 20, inset: 6 
 
 /** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
-    neutral: ['--color-surface-container', '--color-on-surface-variant', '--color-on-surface-variant-state-16'],
-    success: ['--color-success-state-08', '--color-success-text', '--color-success-state-16'],
-    warning: ['--color-warning-state-08', '--color-warning-text', '--color-warning-state-16'],
-    danger: ['--color-danger-state-08', '--color-danger-text', '--color-danger-state-16'],
-    info: ['--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-state-16'],
-    discovery: ['--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-state-16'],
+    neutral: ['--color-surface-container', '--color-on-surface-variant', '--ds-background-neutral-pressed'],
+    success: ['--ds-background-success', '--ds-text-success', '--ds-background-success-pressed'],
+    warning: ['--ds-background-warning', '--ds-text-warning', '--ds-background-warning-pressed'],
+    danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
+    info: ['--ds-background-information', '--ds-text-information', '--ds-background-information-pressed'],
+    discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content', '--ds-background-smart-mastering-content-pressed'],
 };
 
 /** [border, text, icon] per date style. A date is outlined: it has no fill. */
@@ -96,7 +96,7 @@ const tokenWeight = (host, token) => {
 
 /* ----------------------------------------------------------------- stories */
 
-/** The six styles at both sizes. Fill is the style's 08 layer, text its (Text), border its 16 layer. */
+/** The six styles at both sizes. Fill is the style's tinted background, text its (Text), border its pressed step. */
 export const Styles = () => (
     <div style={grid}>
         {STATUS_SIZES.map((size) => (
@@ -133,10 +133,9 @@ Styles.play = async ({ canvasElement }) => {
             await expect(box.right - text.right, `${name} right padding`).toBe(PAD[size]);
         }
     }
-
-    // Neutral is a solid surface; the others are translucent state layers.
+    // Every style fills with an opaque background token.
     await expect(alpha(getComputedStyle(canvas.getByTestId('neutral-medium')).backgroundColor)).toBe(1);
-    await expect(alpha(getComputedStyle(canvas.getByTestId('success-medium')).backgroundColor)).toBeCloseTo(0.08, 2);
+    await expect(alpha(getComputedStyle(canvas.getByTestId('success-medium')).backgroundColor)).toBe(1);
 };
 
 /** A date is outlined, with a fixed icon per style: calendar, clock, alert. */
@@ -212,10 +211,10 @@ WithCount.play = async ({ canvasElement }) => {
             await expect(p.top - box.top, `${name} count top inset`).toBe(COUNT[size].inset);
             await expect(box.right - p.right, `${name} count right inset`).toBe(COUNT[size].inset);
 
-            // The count takes the Status style: its subtle 08 layer and (Text).
-            const ground = style === 'neutral' ? '--color-on-surface-variant-state-08' : STATE_COLORS[style][0];
+            // The count takes the Status style: its subtle tinted background and (Text).
+            const ground = style === 'neutral' ? '--ds-background-neutral' : STATE_COLORS[style][0];
             await expect(getComputedStyle(pill).backgroundColor, `${name} count ground`).toBe(token(ground));
-            await expect(getComputedStyle(pill).color, `${name} count text`).toBe(token(ink));
+            await expect(getComputedStyle(pill).color, `${name} count text`).toBe(token(style === 'neutral' ? '--ds-text' : ink));
         }
     }
 
@@ -484,8 +483,8 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
 
         // The unknown type is a filled state, keeping its valid style.
         const unknownType = canvas.getByTestId('unknown-type');
-        await expect(getComputedStyle(unknownType).backgroundColor).toBe(token('--color-success-state-08'));
-        await expect(innerBorder(unknownType)).toBe(token('--color-success-state-16'));
+        await expect(getComputedStyle(unknownType).backgroundColor).toBe(token('--ds-background-success'));
+        await expect(innerBorder(unknownType)).toBe(token('--ds-background-success-pressed'));
         await expect(iconIn(unknownType), 'a state has no date icon').toBeNull();
     } finally {
         warn.mockRestore();

@@ -39,8 +39,8 @@
 /*
  * The color map: [ground, ink] per style and appearance.
  *
- * subtle   the style's 08 state layer, translucent, so a count inside a tinted
- *          label reads as a darker shade of it; ink is the style's (Text).
+ * subtle   the style's tinted background token, so a count inside a tinted
+ *          label reads as a shade of it; ink is the style's (Text).
  * bold     the solid base with its on-color. Warning is the exception: its
  *          base with white ink fails AA, so bold warning uses Warning Container.
  * dot      the solid base, which is the whole mark.
@@ -48,12 +48,12 @@
  * mapping Status and Tag use.
  */
 $count-subtle: (
-    'neutral': (var(--color-on-surface-variant-state-08, rgba(63, 72, 74, 0.08)), var(--color-on-surface-variant, #3f484a)),
-    'success': (var(--color-success-state-08, rgba(62, 105, 26, 0.08)), var(--color-success-text, #2c5609)),
-    'warning': (var(--color-warning-state-08, rgba(159, 130, 5, 0.08)), var(--color-warning-text, #5b4a00)),
-    'danger': (var(--color-danger-state-08, rgba(186, 26, 26, 0.08)), var(--color-danger-text, #9b0606)),
-    'info': (var(--color-info-state-08), var(--color-info-text)),
-    'discovery': (var(--color-mastering-content-state-08, rgba(134, 89, 169, 0.08)), var(--color-mastering-content-text, #673a8b)),
+    'neutral': (var(--ds-background-neutral), var(--ds-text)),
+    'success': (var(--ds-background-success), var(--ds-text-success)),
+    'warning': (var(--ds-background-warning), var(--ds-text-warning)),
+    'danger': (var(--ds-background-danger), var(--ds-text-danger)),
+    'info': (var(--ds-background-information), var(--ds-text-information)),
+    'discovery': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content)),
 );
 
 $count-bold: (
