@@ -11,7 +11,7 @@ export const AI_ICON_ALL_SIZES = [12, 16, 24];
 /**
  * An icon for a PLUS AI action: generate, ask, rewrite, summarize, plan, suggest
  * or stop generating. Each badged icon is a Font Awesome Free glyph with one
- * four-point sparkle in a corner and a clean gap cut around it. Generate is the
+ * four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the
  * sparkle alone, and stop generating has none because stopping is not generative.
  *
  * - **name** picks the icon.
@@ -35,7 +35,7 @@ const AiIcon = ({ name = 'generate', size = 16, label, className = '', style, ..
         }
         drawn = 16;
     }
-    const { viewBox, paths } = bySize[drawn];
+    const { viewBox, paths, fillRule } = bySize[drawn];
     const classes = ['plus-ai-icon', className].filter(Boolean).join(' ');
     // After the spread, so a caller's role or aria-hidden cannot contradict `label`.
     const accessibility = label
@@ -52,10 +52,9 @@ const AiIcon = ({ name = 'generate', size = 16, label, className = '', style, ..
             height={drawn}
             viewBox={viewBox}
             fill="currentColor"
-            overflow="visible"
             xmlns="http://www.w3.org/2000/svg"
         >
-            {paths.map((d) => <path key={d} d={d} />)}
+            {paths.map((d) => <path key={d} d={d} fillRule={fillRule} />)}
         </svg>
     );
 };

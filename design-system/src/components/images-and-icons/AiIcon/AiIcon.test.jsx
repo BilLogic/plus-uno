@@ -28,12 +28,16 @@ describe('AiIcon', () => {
         expect(container.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
     });
 
-    it('fills with currentColor and lets overhanging artwork show', () => {
+    it('fills with currentColor', () => {
         const { container } = render(<AiIcon name="suggest" size={24} />);
         const svg = container.querySelector('svg');
         expect(svg).toHaveAttribute('fill', 'currentColor');
-        expect(svg).toHaveAttribute('overflow', 'visible');
         expect(svg.querySelectorAll('[fill]:not(svg)')).toHaveLength(0);
+    });
+
+    it("cuts plan's calendar with the even-odd rule", () => {
+        const { container } = render(<AiIcon name="plan" />);
+        container.querySelectorAll('path').forEach((path) => expect(path).toHaveAttribute('fill-rule', 'evenodd'));
     });
 
     it('draws every name at every size it has, as a square of that size', () => {
