@@ -117,8 +117,8 @@ export const ReflectionsTableRow = ({
 
     const stateStyles = {
         default: {},
-        hover: { backgroundColor: 'var(--color-on-surface-state-08)' },
-        pressed: { backgroundColor: 'var(--color-on-surface-state-12)' }
+        hover: { backgroundColor: 'var(--ds-background-neutral-subtle-hovered)' },
+        pressed: { backgroundColor: 'var(--ds-background-neutral-subtle-pressed)' }
     };
 
     const handleMouseEnter = interactive && !forcedState ? () => setCurrentState('hover') : undefined;

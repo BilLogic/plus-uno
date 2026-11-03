@@ -36,7 +36,7 @@ const reasonOptions = [
  * Call-off Alert Component
  * Warning bordered card with title, description and close button
  * Uses semantic tokens:
- * - Background: --color-warning-state-16 (warning tonal)
+ * - Background: --ds-background-warning (warning tonal)
  * - Border: --color-warning (warning color)
  * - Radius: --size-modal-radius-md (modal/card radius)
  * - Padding: --size-card-pad-y-sm, --size-card-pad-x-sm (card padding)
@@ -46,7 +46,7 @@ const reasonOptions = [
 const CallOffAlert = ({ onClose }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-warning-state-16)',
+            backgroundColor: 'var(--ds-background-warning)',
             border: '1px solid var(--color-warning-border)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',

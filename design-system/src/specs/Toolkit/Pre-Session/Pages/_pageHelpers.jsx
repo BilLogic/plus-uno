@@ -70,7 +70,7 @@ export const SectionTitle = ({ title, titleAs: Heading = 'h3' }) => (
 export const UpdateAlert = ({ title, description, onClose }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-primary-container-state-16)',
+            backgroundColor: 'var(--ds-background-brand-subtlest)',
             border: '1px solid var(--color-primary)',
             borderRadius: 'var(--size-modal-radius-md)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',

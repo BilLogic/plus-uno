@@ -29,8 +29,8 @@ const getStatusConfig = (status) => {
  * Cell padding: var(--size-table-cell-x), var(--size-table-cell-y)
  * 
  * Interactive states:
- * - Hover: background changes to --color-on-surface-state-08
- * - Active/Pressed: background changes to --color-on-surface-state-12
+ * - Hover: background changes to --ds-background-neutral-subtle-hovered
+ * - Active/Pressed: background changes to --ds-background-neutral-subtle-pressed
  */
 export const TableRow = ({ date, timeRange, school, teacher, status, state: forcedState, interactive = true }) => {
     const [currentState, setCurrentState] = useState('default');
@@ -40,11 +40,10 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
 
     const stateStyles = {
         default: {},
-        hover: { backgroundColor: 'var(--color-on-surface-state-08)' },
-        pressed: { backgroundColor: 'var(--color-on-surface-state-12)' },
+        hover: { backgroundColor: 'var(--ds-background-neutral-subtle-hovered)' },
+        pressed: { backgroundColor: 'var(--ds-background-neutral-subtle-pressed)' },
         focus: {
-            border: 'var(--size-element-stroke-lg) solid var(--color-inverse-primary)',
-            backgroundColor: 'var(--color-on-surface-state-12)'
+            border: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)'
         },
         disabled: { opacity: 0.5, pointerEvents: 'none' }
     };

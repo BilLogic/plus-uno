@@ -27,7 +27,7 @@ All render from the shared **StudentTag** component (warning-tonal Badge + signa
 - **neutral** — no icon (overflow)
 
 ## Design tokens
-- **Surface**: \`--color-warning-state-08\` (tonal warning) · **Text**: \`--color-warning-text\`
+- **Surface**: \`--ds-background-warning\` (tonal warning) · **Text**: \`--color-warning-text\`
 - **Radius**: \`--size-element-radius-full\` (pill) · **Type**: body3 (12px)
                 `
             }

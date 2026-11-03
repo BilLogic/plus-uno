@@ -18,7 +18,7 @@ export const IconButton = ({ icon = 'fa-table-cells-large', ariaLabel = 'View op
         aria-label={ariaLabel}
         className="d-flex align-items-center justify-content-center"
         style={{
-            backgroundColor: 'var(--color-primary-state-08)',
+            backgroundColor: 'var(--ds-background-brand-subtlest)',
             borderRadius: 'var(--size-element-radius-full)',
             padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
             border: 'none',

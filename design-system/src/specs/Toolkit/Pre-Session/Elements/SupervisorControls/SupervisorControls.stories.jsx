@@ -72,9 +72,9 @@ const GearIconButton = ({ state = 'default' }) => {
     const getBackgroundColor = () => {
         switch (state) {
             case 'hover':
-                return 'var(--color-primary-state-08)';
+                return 'var(--ds-background-neutral-subtle-hovered)';
             case 'pressed':
-                return 'var(--color-primary-state-12)';
+                return 'var(--ds-background-neutral-subtle-pressed)';
             default:
                 return 'transparent';
         }
