@@ -192,6 +192,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/033-bot-skills-live-with-the-worker.md`](docs/adr/033-bot-skills-live-with-the-worker.md) | uno-bot's instructions are its own bot skills, kept with the Worker and named for what the bot does, each ending in answer, file or hand off; the six uno skills become IDE-only, and the bot never builds code or draws in Figma (2026-10-14) |
 | [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; it may delete through the delete RPCs, and every row it causes in authoring_changes reads author uno-bot; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
 | [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
+| [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -220,6 +221,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-149 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+150 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
