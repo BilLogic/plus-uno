@@ -29,7 +29,7 @@ An Overlay interrupts the page for one task. It dims everything behind it with o
 
 - Put a **Modal** in an Overlay when one task blocks the page.
 - Put a **Drawer** in an Overlay, at an edge, when the task needs the page in view.
-- Raise a confirm from a modal in a second Overlay above the first.
+- A dialog never opens another Overlay. A follow-up decision inside a modal swaps its content for an inline confirmation in the same Overlay.
 - For a menu, popup, flag or tooltip, use the **Popover family**. These float with no scrim and never take an Overlay.
 - For a floating sidebar, use the **Sidebar**. It takes a shadow and no scrim.
 
@@ -62,7 +62,7 @@ An Overlay interrupts the page for one task. It dims everything behind it with o
 </tbody>
 </DocsTable>
 
-Figma's Overlay has two more properties. **Height** (hug or fill) lives on the Modal inside it, shown in the Heights example on the [Modal page](?path=/docs/foundations-patterns-modal--docs), and **stack** (single or nested confirm) is a second Overlay later in the page.
+Figma's Overlay has one more property. **Height** (hug or fill) lives on the Modal inside it, shown in the Heights example on the [Modal page](?path=/docs/foundations-patterns-modal--docs).
 
 </div>
 
@@ -119,11 +119,12 @@ Figma's Overlay has two more properties. **Height** (hug or fill) lives on the M
 
 <div className="sb-ds-doc-section">
 
-### Two overlays
+### One dialog at a time
 
-<DocsCanvasShell description={<>A confirm raised from a modal sits in a second Overlay. It reuses the scrim and modal layers later in the page and covers the first. The confirm is always width <code>sm</code>.</>}>
-    <DsCanvasQuiet of={OverlayStories.NestedConfirm} />
-</DocsCanvasShell>
+A dialog never opens a second Overlay. When a follow-up decision comes up
+inside a modal — confirming a delete, for example — the modal swaps its
+title, body and footer for an inline confirmation in the same Overlay instead
+of raising another one on top.
 
 </div>
 
@@ -155,7 +156,7 @@ Figma has no z-index, so the order is written here and lives in code.
 
 - Pad 16 at the sides and 64 above and below. This is the closest a modal gets to the screen edge.
 - Use one scrim, `--ds-blanket`, under every modal and drawer.
-- Stack at most **two overlays**: Overlay 1 for a modal, Overlay 2 for a confirm raised from it.
+- A dialog never opens another dialog. A follow-up decision swaps the dialog's content for an inline confirmation in place.
 - Opening a modal closes a floating sidebar, so the two never stack.
 - A floating sidebar gets a shadow and no scrim.
 - Popovers, flags and tooltips never bring a scrim.

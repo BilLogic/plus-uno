@@ -59,6 +59,16 @@ pattern a screen-reader user expects.
 component takes a branch that ignores `trigger`, `delayShow` and `delayHide`
 entirely.
 
+## Dialogs and what layers over them
+
+A dialog (`Modal`) never opens another dialog — one dialog at a time. A
+follow-up decision raised inside one, such as a destructive confirmation,
+replaces the dialog's content in place rather than opening a second dialog.
+
+A `Popover`, a `Menu`, a `Tooltip`, and a field's own dropdown can still float
+above an open dialog, by elevation. A `Flag` always renders on top of
+everything, dialog included. Opening a dialog closes a floating sidebar.
+
 ## Related
 
 - `design-system/src/components/overlays-and-layering/index.md` — generated facts and coverage

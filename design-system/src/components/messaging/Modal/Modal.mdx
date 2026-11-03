@@ -144,10 +144,11 @@ the component renders the `Button` pair for you, aligned right. Pass `footer` fo
 other actions, such as a Delete on the left or a single primary.
 
 Pick a grid `width` for the content rather than a number: `sm` for a confirm, `md` for a
-short form, `lg` for a table or an editor. A confirm raised from a modal is the
-most that stacks — at most two overlays. A third does not open, and development
-builds warn in the console. Opening a modal closes a floating sidebar; a docked
-one stays.
+short form, `lg` for a table or an editor. A dialog never opens another dialog.
+When a follow-up decision comes up inside one — confirming a delete, for
+example — swap its content for an inline confirmation in the same dialog
+rather than opening a second one. Opening a modal closes a floating sidebar; a
+docked one stays.
 
 </div>
 
@@ -186,6 +187,49 @@ one stays.
 </Modal>
 ```
 
+### Inline confirmation
+
+A follow-up decision — confirming a delete, for example — replaces the
+dialog's title, body and footer in place. It does not open a second dialog.
+
+### Confirm a follow-up decision in place, not in a new dialog.
+
+```jsx
+// Incorrect — a second Modal opens on top of the first. Dialogs never stack.
+<Modal title="Session settings" show={open} onClose={close}>
+  {settingsForm}
+  <Modal
+    title="Discard changes?"
+    show={confirmOpen}
+    onClose={closeConfirm}
+    secondaryButton={{ text: 'Back', onClick: closeConfirm }}
+    primaryButton={{ text: 'Discard changes', appearance: 'danger', onClick: discard }}
+  >
+    Your edits to this session are not saved.
+  </Modal>
+</Modal>
+
+// Correct — the same dialog swaps its title, body and footer for the
+// confirmation, and Back returns to the form without losing what was typed.
+<Modal
+  title={confirming ? 'Discard changes?' : 'Session settings'}
+  show={open}
+  onClose={close}
+  secondaryButton={
+    confirming
+      ? { text: 'Back', onClick: () => setConfirming(false) }
+      : { text: 'Cancel', onClick: close }
+  }
+  primaryButton={
+    confirming
+      ? { text: 'Discard changes', appearance: 'danger', onClick: discard }
+      : { text: 'Save', onClick: save }
+  }
+>
+  {confirming ? 'Your edits to this session are not saved.' : settingsForm}
+</Modal>
+```
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -212,6 +256,13 @@ one stays.
   `autoFocus` and `restoreFocus` are forwarded untouched; leave them alone unless
   you have a specific reason, because the defaults are what trap focus inside the
   dialog and return it to the trigger on close.
+- **Dismiss is Close, Escape, a Blanket click, or an optional Cancel.** An
+  inline confirmation of a destructive action turns off the Blanket click, so a
+  stray click outside the dialog cannot destroy something by accident — Close,
+  Escape or the footer's Back still work.
+- **Focus order is Close, then the content, then the secondary action, then
+  the primary action.** Tab follows that order on open, and focus returns to
+  the trigger on close.
 
 ### Do not use the inline render for a live dialog.
 
