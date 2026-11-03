@@ -30,7 +30,7 @@ const TreeCell = ({ depth, expandable, children }) => (
     <TableCell
         emphasis="title"
         leading={expandable ? <i className="fa-solid fa-chevron-down" aria-hidden="true" /> : null}
-        style={{ paddingLeft: `calc(var(--size-table-cell-pad-x, 16px) + ${depth * INDENT_PX}px)` }}
+        style={{ paddingLeft: `calc(var(--size-table-cell-pad-x, 12px) + ${depth * INDENT_PX}px)` }}
     >
         {children}
     </TableCell>
