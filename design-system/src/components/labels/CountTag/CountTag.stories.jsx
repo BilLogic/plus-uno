@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
 
 /**
@@ -66,7 +67,7 @@ export const Appearances = () => (
         <button type="button" className="btn btn-primary">
             Review <CountTag value={14} isInverse />
         </button>
-        <span style={{ background: 'var(--color-inverse-surface)', padding: '8px', borderRadius: '6px' }}>
+        <span style={{ background: 'var(--ds-background-neutral-bold)', padding: '8px', borderRadius: '6px' }}>
             <CountTag value={15} isInverse />
         </span>
         <CountTag isDot appearance="danger" label="New activity" />
@@ -82,18 +83,18 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(subtle.color).toBe(tokenColor(canvasElement, '--ds-text'));
 
     const bold = getComputedStyle(pillOf(canvas, '13'));
-    await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
-    await expect(bold.color).toBe(tokenColor(canvasElement, '--color-on-danger'));
+    await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-danger-bold'));
+    await expect(bold.color).toBe(tokenColor(canvasElement, '--ds-text-inverse'));
 
-    // Inverse is a solid white pill with dark text, on a primary button and on
-    // inverse-surface alike.
+    // Inverse is a solid surface pill with subtle text, on a button and on a
+    // bold neutral fill alike.
     for (const text of ['14', '15']) {
         const inverse = getComputedStyle(pillOf(canvas, text));
-        await expect(inverse.backgroundColor, 'inverse is surface-container-lowest').toBe(
-            tokenColor(canvasElement, '--color-surface-container-lowest'),
+        await expect(inverse.backgroundColor, 'inverse is the surface').toBe(
+            tokenColor(canvasElement, '--ds-surface'),
         );
         await expect(alpha(inverse.backgroundColor), 'inverse is solid').toBe(1);
-        await expect(inverse.color).toBe(tokenColor(canvasElement, '--color-on-surface-variant'));
+        await expect(inverse.color).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
         await expect(contrast(inverse.color, inverse.backgroundColor), 'AA on any fill').toBeGreaterThanOrEqual(4.5);
     }
 
@@ -101,7 +102,7 @@ Appearances.play = async ({ canvasElement }) => {
     const d = getComputedStyle(dot);
     await expect(px(d.height)).toBe(8);
     await expect(px(d.width)).toBe(8);
-    await expect(d.backgroundColor).toBe(tokenColor(canvasElement, '--color-danger'));
+    await expect(d.backgroundColor).toBe(tokenColor(canvasElement, '--ds-icon-danger'));
     await expect(dot).toHaveTextContent('');
 };
 
@@ -183,7 +184,7 @@ export const Ring = () => (
 );
 Ring.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const surface = tokenColor(canvasElement, '--color-surface');
+    const surface = tokenColor(canvasElement, '--ds-surface');
 
     const numeric = canvas.getByText('3').parentElement;
     const dot = canvas.getByRole('img', { name: 'New notifications' });
@@ -226,7 +227,6 @@ export const Styles = () => (
 Styles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const pill = (name) => canvas.getByText(name).parentElement;
-    const token = (name) => tokenColor(canvasElement, name);
 
     // [ground, ink] per style, from the Figma set.
     const expected = {
@@ -239,39 +239,43 @@ Styles.play = async ({ canvasElement }) => {
             discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content'],
         },
         bold: {
-            neutral: ['--color-inverse-surface', '--color-inverse-on-surface'],
-            success: ['--color-success', '--color-on-success'],
-            warning: ['--color-warning-container', '--color-on-warning-container'],
-            danger: ['--color-danger', '--color-on-danger'],
-            info: ['--color-tertiary', '--color-on-tertiary'],
-            discovery: ['--color-mastering-content', '--color-on-mastering-content'],
+            neutral: ['--ds-background-neutral-bold', '--ds-text-inverse'],
+            success: ['--ds-background-success-bold', '--ds-text-inverse'],
+            warning: ['--ds-background-warning-bold', '--ds-text-warning-inverse'],
+            danger: ['--ds-background-danger-bold', '--ds-text-inverse'],
+            info: ['--ds-background-information-bold', '--ds-text-inverse'],
+            discovery: ['--ds-background-smart-mastering-content-bold', '--ds-text-inverse'],
         },
     };
 
-    for (const [appearance, styles] of Object.entries(expected)) {
-        for (const size of COUNT_TAG_SPACINGS) {
-            for (const [style, [ground, ink]] of Object.entries(styles)) {
-                const name = `${appearance} ${style} ${size}`;
-                const s = getComputedStyle(pill(name));
-                await expect(s.backgroundColor, `${name} ground`).toBe(token(ground));
-                await expect(s.color, `${name} ink`).toBe(token(ink));
-                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'compact' ? 16 : 20);
+    // The same mapping holds in dark and at more contrast: every ground and
+    // ink is a themed token, so a legacy light-only color fails here.
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        for (const [appearance, styles] of Object.entries(expected)) {
+            for (const size of COUNT_TAG_SPACINGS) {
+                for (const [style, [ground, ink]] of Object.entries(styles)) {
+                    const name = `${appearance} ${style} ${size}`;
+                    const s = getComputedStyle(pill(name));
+                    await expect(s.backgroundColor, `${mode}: ${name} ground`).toBe(token(ground));
+                    await expect(s.color, `${mode}: ${name} ink`).toBe(token(ink));
+                    await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'compact' ? 16 : 20);
+                }
             }
         }
-    }
 
-    const dots = {
-        neutral: '--color-on-surface-variant',
-        success: '--color-success',
-        warning: '--color-warning',
-        danger: '--color-danger',
-        info: '--color-tertiary',
-        discovery: '--color-mastering-content',
-    };
-    for (const [style, fill] of Object.entries(dots)) {
-        const dot = canvas.getByRole('img', { name: `dot ${style}` });
-        await expect(getComputedStyle(dot).backgroundColor, `dot ${style} fill`).toBe(token(fill));
-    }
+        const dots = {
+            neutral: '--ds-icon-subtle',
+            success: '--ds-icon-success',
+            warning: '--ds-icon-warning',
+            danger: '--ds-icon-danger',
+            info: '--ds-icon-information',
+            discovery: '--ds-icon-smart-mastering-content',
+        };
+        for (const [style, fill] of Object.entries(dots)) {
+            const dot = canvas.getByRole('img', { name: `dot ${style}` });
+            await expect(getComputedStyle(dot).backgroundColor, `${mode}: dot ${style} fill`).toBe(token(fill));
+        }
+    });
 };
 
 /**

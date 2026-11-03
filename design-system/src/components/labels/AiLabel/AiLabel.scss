@@ -15,7 +15,7 @@
  */
 .plus-ai-label {
     /* The one line the brand decision changes. */
-    --plus-ai-accent: var(--color-on-surface-variant);
+    --plus-ai-accent: var(--ds-icon-subtle);
 
     display: inline-flex;
     align-items: baseline;
@@ -30,12 +30,12 @@
      * and never floods a surface, which is also what keeps the mark legible on
      * whatever it is attached to.
      */
-    background-color: var(--color-surface-container-lowest);
-    border: var(--size-element-border) solid var(--color-outline-variant);
+    background-color: var(--ds-surface);
+    border: var(--size-element-border) solid var(--ds-border);
     border-inline-start: var(--size-element-stroke-lg) solid var(--plus-ai-accent);
     border-radius: var(--size-element-radius-md);
 
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-ai-label__mark {
@@ -58,22 +58,19 @@
  * them apart is the caller's words, not a color.
  */
 .plus-ai-label--reviewed {
-    --plus-ai-accent: var(--color-success);
+    --plus-ai-accent: var(--ds-icon-success);
 }
 
 /*
- * Low confidence uses the WARNING container pair, not the warning ground.
- *
- * Deliberate, and measured: `--color-warning` with a white label is 3.70:1 and
- * fails AA (#312), while `--color-warning-container` with
- * `--color-on-warning-container` is 13.27:1. A new component must not be built
- * on the one pair in the system that is known to fail.
+ * Low confidence uses the tinted warning background with warning text, not the
+ * bold ground: a bold fill would flood the surface the mark sits on, and the
+ * tinted pair is the one every other warning label reads.
  */
 .plus-ai-label--low {
-    --plus-ai-accent: var(--color-warning-text);
-    background-color: var(--color-warning-container);
-    color: var(--color-on-warning-container);
-    border-color: var(--color-warning-text);
+    --plus-ai-accent: var(--ds-icon-warning);
+    background-color: var(--ds-background-warning);
+    color: var(--ds-text-warning-bolder);
+    border-color: var(--ds-border-warning);
 }
 
 .plus-ai-label__note {
@@ -108,6 +105,6 @@
 }
 
 .plus-ai-label__explain:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--color-primary);
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
     outline-offset: var(--size-element-gap-xs);
 }

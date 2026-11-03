@@ -1,6 +1,8 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+
 import AiLabel, { AI_ORIGINS } from './AiLabel';
 
 /**
@@ -161,27 +163,33 @@ TheGlyphIsDecoration.play = async ({ canvasElement }) => {
  * moves.
  *
  * This asserts the absence, because the absence is the design: nothing in the
- * component may resolve to `--color-primary`, which is what the surface it
- * replaces hard-codes as `fill="#0472A8"`.
+ * component may resolve to the brand tokens, which is what the surface it
+ * replaces hard-codes as `fill="#0472A8"`. The mark's colors are also held to
+ * the themed tokens in dark and at more contrast.
  */
 export const NoBrandHueIsAssumed = () => (
     <div style={row}>
         <AiLabel origin="generated" />
+        <AiLabel origin="generated" confidence="low" />
     </div>
 );
 
 NoBrandHueIsAssumed.play = async ({ canvasElement }) => {
-    const mark = canvasElement.querySelector('.plus-ai-label');
-    const styles = getComputedStyle(mark);
-    const primary = getComputedStyle(document.documentElement)
-        .getPropertyValue('--color-primary')
-        .trim();
-    const accent = styles.getPropertyValue('--plus-ai-accent').trim();
-    await expect(accent, 'the accent must be a real value').not.toBe('');
-    await expect(
-        accent.toLowerCase(),
-        'the AI mark must not borrow the primary action color',
-    ).not.toBe(primary.toLowerCase());
+    const marks = [...canvasElement.querySelectorAll('.plus-ai-label')];
+    for (const mark of marks) {
+        const accent = getComputedStyle(mark).getPropertyValue('--plus-ai-accent').trim();
+        await expect(accent, 'the accent must be a real value').not.toBe('');
+        await expect(accent, 'the AI mark must not borrow the brand color').not.toMatch(/brand/);
+    }
+
+    const [plain, low] = marks;
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        await expect(getComputedStyle(plain).backgroundColor, `${mode}: ground`).toBe(token('--ds-surface'));
+        await expect(getComputedStyle(plain).color, `${mode}: text`).toBe(token('--ds-text'));
+        await expect(getComputedStyle(plain).borderTopColor, `${mode}: edge`).toBe(token('--ds-border'));
+        await expect(getComputedStyle(low).backgroundColor, `${mode}: low ground`).toBe(token('--ds-background-warning'));
+        await expect(getComputedStyle(low).color, `${mode}: low text`).toBe(token('--ds-text-warning-bolder'));
+    });
 };
 
 /* -------------------------------------------------------------- playground */
