@@ -17,28 +17,12 @@
     --color-on-primary-container: #001e2e;
     --color-inverse-primary: #84cfff;
 
-    /* Primary State Layers */
-    --color-primary-state-08: rgba(4, 114, 168, 0.08);
-    --color-primary-state-12: rgba(4, 114, 168, 0.12);
-    --color-primary-state-16: rgba(4, 114, 168, 0.16);
-    --color-primary-container-state-08: rgba(97, 181, 207, 0.08);
-    --color-primary-container-state-12: rgba(97, 181, 207, 0.12);
-    --color-primary-container-state-16: rgba(97, 181, 207, 0.16);
-
     /* Secondary Colors */
     --color-secondary: #445c6a;
     --color-secondary-text: #3b525f;
     --color-on-secondary: #ffffff;
     --color-secondary-container: #5e849b;
     --color-on-secondary-container: #09171f;
-
-    /* Secondary State Layers */
-    --color-secondary-state-08: rgba(68, 92, 106, 0.08);
-    --color-secondary-state-12: rgba(68, 92, 106, 0.12);
-    --color-secondary-state-16: rgba(68, 92, 106, 0.16);
-    --color-secondary-container-state-08: rgba(94, 132, 155, 0.08);
-    --color-secondary-container-state-12: rgba(94, 132, 155, 0.12);
-    --color-secondary-container-state-16: rgba(94, 132, 155, 0.16);
 
     /* Tertiary Colors */
     --color-tertiary: #0e8175;
@@ -48,14 +32,6 @@
     --color-on-tertiary-container: #005a50;
     --color-tertiary-border-subtle: rgba(14, 129, 117, 0.45);
 
-    /* Tertiary State Layers */
-    --color-tertiary-state-08: rgba(14, 129, 117, 0.08);
-    --color-tertiary-state-12: rgba(14, 129, 117, 0.12);
-    --color-tertiary-state-16: rgba(14, 129, 117, 0.16);
-    --color-tertiary-container-state-08: rgba(133, 236, 213, 0.08);
-    --color-tertiary-container-state-12: rgba(133, 236, 213, 0.12);
-    --color-tertiary-container-state-16: rgba(133, 236, 213, 0.16);
-
     /* Danger Colors */
     --color-danger: #ba1a1a;
     --color-danger-text: #9b0606;
@@ -63,14 +39,6 @@
     --color-danger-container: #ffdad6;
     --color-on-danger-container: #410002;
     --color-danger-border-subtle: rgba(186, 26, 26, 0.45);
-
-    /* Danger State Layers */
-    --color-danger-state-08: rgba(186, 26, 26, 0.08);
-    --color-danger-state-12: rgba(186, 26, 26, 0.12);
-    --color-danger-state-16: rgba(186, 26, 26, 0.16);
-    --color-danger-container-state-08: rgba(255, 218, 214, 0.08);
-    --color-danger-container-state-12: rgba(255, 218, 214, 0.12);
-    --color-danger-container-state-16: rgba(255, 218, 214, 0.16);
 
     /* Success Colors */
     --color-success: #3e691a;
@@ -80,14 +48,6 @@
     --color-on-success-container: #0c2000;
     --color-success-border-subtle: rgba(62, 105, 26, 0.45);
 
-    /* Success State Layers */
-    --color-success-state-08: rgba(62, 105, 26, 0.08);
-    --color-success-state-12: rgba(62, 105, 26, 0.12);
-    --color-success-state-16: rgba(62, 105, 26, 0.16);
-    --color-success-container-state-08: rgba(189, 242, 146, 0.08);
-    --color-success-container-state-12: rgba(189, 242, 146, 0.12);
-    --color-success-container-state-16: rgba(189, 242, 146, 0.16);
-
     /* Warning Colors */
     --color-warning: #9f8205;
     --color-warning-text: #5b4a00;
@@ -95,14 +55,6 @@
     --color-warning-container: #ffe17a;
     --color-on-warning-container: #231b00;
     --color-warning-border-subtle: rgba(159, 130, 5, 0.45);
-
-    /* Warning State Layers */
-    --color-warning-state-08: rgba(159, 130, 5, 0.08);
-    --color-warning-state-12: rgba(159, 130, 5, 0.12);
-    --color-warning-state-16: rgba(159, 130, 5, 0.16);
-    --color-warning-container-state-08: rgba(255, 225, 122, 0.08);
-    --color-warning-container-state-12: rgba(255, 225, 122, 0.12);
-    --color-warning-container-state-16: rgba(255, 225, 122, 0.16);
 
     /* Info Colors */
     /* Info aliases to Tertiary */
@@ -113,15 +65,6 @@
     --color-on-info-container: var(--color-on-tertiary-container);
     --color-info-border-subtle: var(--color-tertiary-border-subtle);
 
-    /* Info State Layers */
-    /* Info aliases to Tertiary */
-    --color-info-state-08: var(--color-tertiary-state-08);
-    --color-info-state-12: var(--color-tertiary-state-12);
-    --color-info-state-16: var(--color-tertiary-state-16);
-    --color-info-container-state-08: var(--color-tertiary-container-state-08);
-    --color-info-container-state-12: var(--color-tertiary-container-state-12);
-    --color-info-container-state-16: var(--color-tertiary-container-state-16);
-
     /* Social-Emotional Colors */
     --color-social-emotional: #8c6600;
     --color-social-emotional-text: #674a00;
@@ -129,14 +72,6 @@
     --color-social-emotional-container: #ffdea0;
     --color-on-social-emotional-container: #5c4300;
     --color-social-emotional-border-subtle: rgba(140, 102, 0, 0.45);
-
-    /* Social-Emotional State Layers */
-    --color-social-emotional-state-08: rgba(140, 102, 0, 0.08);
-    --color-social-emotional-state-12: rgba(140, 102, 0, 0.12);
-    --color-social-emotional-state-16: rgba(140, 102, 0, 0.16);
-    --color-social-emotional-container-state-08: rgba(255, 222, 160, 0.08);
-    --color-social-emotional-container-state-12: rgba(255, 222, 160, 0.12);
-    --color-social-emotional-container-state-16: rgba(255, 222, 160, 0.16);
 
     /* Mastering-Content Colors */
     --color-mastering-content: #8659a9;
@@ -146,14 +81,6 @@
     --color-on-mastering-content-container: #583a6f;
     --color-mastering-content-border-subtle: rgba(134, 89, 169, 0.45);
 
-    /* Mastering-Content State Layers */
-    --color-mastering-content-state-08: rgba(134, 89, 169, 0.08);
-    --color-mastering-content-state-12: rgba(134, 89, 169, 0.12);
-    --color-mastering-content-state-16: rgba(134, 89, 169, 0.16);
-    --color-mastering-content-container-state-08: rgba(242, 218, 255, 0.08);
-    --color-mastering-content-container-state-12: rgba(242, 218, 255, 0.12);
-    --color-mastering-content-container-state-16: rgba(242, 218, 255, 0.16);
-
     /* Advocacy Colors */
     --color-advocacy: #167745;
     --color-advocacy-text: #00572a;
@@ -161,14 +88,6 @@
     --color-advocacy-container: #b3f1bf;
     --color-on-advocacy-container: #16512c;
     --color-advocacy-border-subtle: rgba(22, 119, 69, 0.45);
-
-    /* Advocacy State Layers */
-    --color-advocacy-state-08: rgba(22, 119, 69, 0.08);
-    --color-advocacy-state-12: rgba(22, 119, 69, 0.12);
-    --color-advocacy-state-16: rgba(22, 119, 69, 0.16);
-    --color-advocacy-container-state-08: rgba(179, 241, 191, 0.08);
-    --color-advocacy-container-state-12: rgba(179, 241, 191, 0.12);
-    --color-advocacy-container-state-16: rgba(179, 241, 191, 0.16);
 
     /* Relationship Colors */
     --color-relationship: #c70b77;
@@ -178,14 +97,6 @@
     --color-on-relationship-container: #3f001b;
     --color-relationship-border-subtle: rgba(199, 11, 119, 0.45);
 
-    /* Relationship State Layers */
-    --color-relationship-state-08: rgba(199, 11, 119, 0.08);
-    --color-relationship-state-12: rgba(199, 11, 119, 0.12);
-    --color-relationship-state-16: rgba(199, 11, 119, 0.16);
-    --color-relationship-container-state-08: rgba(255, 217, 228, 0.08);
-    --color-relationship-container-state-12: rgba(255, 217, 228, 0.12);
-    --color-relationship-container-state-16: rgba(255, 217, 228, 0.16);
-
     /* Technology-Tools Colors */
     --color-technology-tools: #005cbd;
     --color-technology-tools-text: #0b469d;
@@ -193,14 +104,6 @@
     --color-technology-tools-container: #d7e2ff;
     --color-on-technology-tools-container: #001a40;
     --color-technology-tools-border-subtle: rgba(0, 92, 189, 0.45);
-
-    /* Technology-Tools State Layers */
-    --color-technology-tools-state-08: rgba(0, 92, 189, 0.08);
-    --color-technology-tools-state-12: rgba(0, 92, 189, 0.12);
-    --color-technology-tools-state-16: rgba(0, 92, 189, 0.16);
-    --color-technology-tools-container-state-08: rgba(215, 226, 255, 0.08);
-    --color-technology-tools-container-state-12: rgba(215, 226, 255, 0.12);
-    --color-technology-tools-container-state-16: rgba(215, 226, 255, 0.16);
 
     /* ============================================
        NEUTRAL COLORS - Material Design 3
@@ -232,83 +135,4 @@
     --color-disabled-opacity: 0.38; // overridden by color/_legacy-aliases.scss
     --color-inverse-surface: #2e3133; // overridden by color/_legacy-aliases.scss
     --color-inverse-on-surface: #f0f1f3; // overridden by color/_legacy-aliases.scss
-
-    /* ============================================
-       NEUTRAL STATE LAYERS
-       ============================================ */
-
-    /* surface */
-    --color-surface-state-08: rgba(249, 249, 252, 0.08);
-    --color-surface-state-12: rgba(249, 249, 252, 0.12);
-    --color-surface-state-16: rgba(249, 249, 252, 0.16);
-
-    /* outline */
-    --color-outline-state-08: rgba(111, 121, 122, 0.08);
-    --color-outline-state-12: rgba(111, 121, 122, 0.12);
-    --color-outline-state-16: rgba(111, 121, 122, 0.16);
-
-    /* surface-variant */
-    --color-surface-variant-state-08: rgba(221, 227, 234, 0.08);
-    --color-surface-variant-state-12: rgba(221, 227, 234, 0.12);
-    --color-surface-variant-state-16: rgba(221, 227, 234, 0.16);
-
-    /* inverse-surface */
-    --color-inverse-surface-state-08: rgba(46, 49, 51, 0.08);
-    --color-inverse-surface-state-12: rgba(46, 49, 51, 0.12);
-    --color-inverse-surface-state-16: rgba(46, 49, 51, 0.16);
-
-    /* shadow */
-    --color-shadow-state-08: rgba(0, 0, 0, 0.08);
-    --color-shadow-state-12: rgba(0, 0, 0, 0.12);
-    --color-shadow-state-16: rgba(0, 0, 0, 0.16);
-
-    /* outline-variant */
-    --color-outline-variant-state-08: rgba(190, 200, 202, 0.08);
-    --color-outline-variant-state-12: rgba(190, 200, 202, 0.12);
-    --color-outline-variant-state-16: rgba(190, 200, 202, 0.16);
-
-    /* surface-container-highest */
-    --color-surface-container-highest-state-08: rgba(226, 226, 229, 0.08);
-    --color-surface-container-highest-state-12: rgba(226, 226, 229, 0.12);
-    --color-surface-container-highest-state-16: rgba(226, 226, 229, 0.16);
-
-    /* surface-container-high */
-    --color-surface-container-high-state-08: rgba(231, 232, 235, 0.08);
-    --color-surface-container-high-state-12: rgba(231, 232, 235, 0.12);
-    --color-surface-container-high-state-16: rgba(231, 232, 235, 0.16);
-
-    /* surface-container */
-    --color-surface-container-state-08: rgba(237, 238, 240, 0.08);
-    --color-surface-container-state-12: rgba(237, 238, 240, 0.12);
-    --color-surface-container-state-16: rgba(237, 238, 240, 0.16);
-
-    /* surface-container-low */
-    --color-surface-container-low-state-08: rgba(243, 243, 246, 0.08);
-    --color-surface-container-low-state-12: rgba(243, 243, 246, 0.12);
-    --color-surface-container-low-state-16: rgba(243, 243, 246, 0.16);
-
-    /* surface-container-lowest */
-    --color-surface-container-lowest-state-08: rgba(255, 255, 255, 0.08);
-    --color-surface-container-lowest-state-12: rgba(255, 255, 255, 0.12);
-    --color-surface-container-lowest-state-16: rgba(255, 255, 255, 0.16);
-
-    /* surface-bright */
-    --color-surface-bright-state-08: rgba(249, 249, 252, 0.08);
-    --color-surface-bright-state-12: rgba(249, 249, 252, 0.12);
-    --color-surface-bright-state-16: rgba(249, 249, 252, 0.16);
-
-    /* surface-dim */
-    --color-surface-dim-state-08: rgba(217, 218, 221, 0.08);
-    --color-surface-dim-state-12: rgba(217, 218, 221, 0.12);
-    --color-surface-dim-state-16: rgba(217, 218, 221, 0.16);
-
-    /* on-surface */
-    --color-on-surface-state-08: rgba(25, 28, 30, 0.08);
-    --color-on-surface-state-12: rgba(25, 28, 30, 0.12);
-    --color-on-surface-state-16: rgba(25, 28, 30, 0.16);
-
-    /* on-surface-variant */
-    --color-on-surface-variant-state-08: rgba(63, 72, 74, 0.08);
-    --color-on-surface-variant-state-12: rgba(63, 72, 74, 0.12);
-    --color-on-surface-variant-state-16: rgba(63, 72, 74, 0.16);
 }

@@ -12,7 +12,8 @@ export default {
     parameters: {
         layout: 'padded',
         changelog: [
-            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s Container 08 state layer (`--color-<style>-container-state-08`) instead of its base-color state layer, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them. The left border reads `--size-element-stroke-xl`, which is now 3px.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'The ground is each style\'s named background token (`--ds-background-success`, `--ds-background-brand-subtlest` for primary, and so on), so it follows light, dark and contrast modes.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s container tint instead of its base-color tint, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them. The left border reads `--size-element-stroke-xl`, which is now 3px.' },
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The border is one 3px line on the left edge, in each style\'s Border color (`--color-<style>-border`), instead of 1px on all four sides in the base color. Warning\'s border moves to its darker Border role, which holds 3:1 on every surface step.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Title and body text are `--color-on-surface` in every style, instead of the style\'s on-container color. Links in the body inherit it.' },
@@ -65,6 +66,15 @@ Six styles, an optional title, and a leading icon that each style picks by defau
             table: { disable: true, category: 'Development' },
         },
     },
+};
+
+const GROUND_TOKEN = {
+    primary: '--ds-background-brand-subtlest',
+    secondary: '--ds-background-neutral',
+    success: '--ds-background-success',
+    danger: '--ds-background-danger',
+    warning: '--ds-background-warning',
+    info: '--ds-background-information',
 };
 
 const alertCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
@@ -391,14 +401,14 @@ BorderAndText.play = async ({ canvasElement }) => {
         await expect(contrastRatio(s.borderLeftColor, ground), `${id}: border holds 3:1 on the darkest surface`)
             .toBeGreaterThanOrEqual(3);
 
-        // 4px corners (--size-modal-radius-sm) and the Container 08 ground.
+        // 4px corners (--size-modal-radius-sm) and the role's named background ground.
         const radius = tokenLength(canvasElement, '--size-modal-radius-sm');
         await expect(radius, 'the radius token is 4px, as Figma draws it').toBe(4);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
             await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the modal-radius-sm token`).toBe(radius);
         }
-        await expect(s.backgroundColor, `${id}: ground is the Container 08 state layer`)
-            .toBe(tokenColor(canvasElement, `--color-${style}-container-state-08`));
+        await expect(s.backgroundColor, `${id}: ground is the role's named background token`)
+            .toBe(tokenColor(canvasElement, GROUND_TOKEN[style]));
         await expect(contrastRatio(s.borderLeftColor, paintedOver(s.backgroundColor, ground)), `${id}: border holds 3:1 on its own ground`)
             .toBeGreaterThanOrEqual(3);
 

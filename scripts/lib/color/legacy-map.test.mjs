@@ -57,11 +57,11 @@ test('a missing target is reported', () => {
   assert.deepEqual(missingTargets(semantics), ['--color-scrim aliases color.blanket, which the generator does not emit']);
 });
 
-test('names that split by property, state layers and the hue families are not aliased', () => {
+test('names that split by property and the hue families are not aliased', () => {
   for (const name of [
     '--color-primary', '--color-on-primary', '--color-outline-variant', '--color-surface', '--color-on-surface',
-    '--color-primary-state-08', '--color-on-surface-state-12', '--color-danger-text', '--color-info',
-    '--color-tertiary-container', '--color-relationship-text', '--color-outline-state-12',
+    '--color-danger-text', '--color-info',
+    '--color-tertiary-container', '--color-relationship-text',
     '--color-primary-text', '--color-secondary-text', '--color-primary-container', '--surface-sunken',
   ]) {
     assert.ok(rowFor(name), `${name} has a row`);
@@ -104,10 +104,10 @@ test('pairs: the repo aliases partners together or not at all, and passes 4.5:1 
   for (const key of ['A', 'B']) assert.deepEqual(pairFailures(legacyCoverage().used.keys(), buildPlan(key).semantics, contrast, composite), [], `Plan ${key}`);
 });
 
-test('pairs: brand text aliased alone, against the legacy primary selection, fails before Storybook does', () => {
-  const failures = pairs(['--color-primary-text', '--color-primary-state-16'], { ...ALIASES, '--color-primary-text': 'color.text.brand' });
+test('pairs: brand text aliased alone, against the legacy primary container, fails before Storybook does', () => {
+  const failures = pairs(['--color-primary-text', '--color-primary-container'], { ...ALIASES, '--color-primary-text': 'color.text.brand' });
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /--color-primary-text aliased but --color-primary-state-16 not/);
+  assert.match(failures[0], /--color-primary-text aliased but --color-primary-container not/);
 });
 
 test('pairs: a fully aliased pair that loses contrast fails', () => {

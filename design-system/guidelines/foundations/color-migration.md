@@ -98,8 +98,8 @@ Two of these rows go past a single map row, and each rests on a source:
   step (neutral 750) so it keeps 4.5:1 on hovered and selected rows, which is
   why it is safe for text.
 
-**State layers map by what the element is, not by step.** `-state-08`, `-12`
-and `-16` were translucent washes. The new set has opaque named steps:
+**Interaction states map by what the element is.** The set has opaque named
+steps:
 
 - A selected element (`aria-selected`, `aria-current`, `.active`, expanded)
   takes `--ds-background-selected`, and `--ds-background-selected-hovered`
@@ -131,12 +131,11 @@ the call site: replace it with the token it meant.
 
 A text color and the background it is drawn on move in the same change. The
 `PAIRS` list in `legacy-map.mjs` names the partners: brand text with the brand
-container and its state layers, secondary text with the secondary container,
+container, secondary text with the secondary container,
 on-surface text with every surface, inverse text with the inverse surface.
 
-Moving one side alone pairs a new color with an old one nobody chose. When
-only the brand text was moved, it sat on the legacy 16% primary selection at
-4.44:1, under the 4.5:1 floor. `check:color-system` refuses an alias sheet
+Moving one side alone pairs a new color with an old one nobody chose, and the
+pair can fall under the 4.5:1 floor. `check:color-system` refuses an alias sheet
 that splits a pair. Inside a component, you hold the rule yourself: if a rule
 sets both `color` and `background-color`, move both lines, and if you move a
 background, move the text and icons on it. `check:text-contrast` measures each

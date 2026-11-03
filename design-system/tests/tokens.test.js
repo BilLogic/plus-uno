@@ -74,7 +74,7 @@ describe('the token grammar', () => {
   it('names a token as `--` plus lowercase letters, digits and hyphens', () => {
     const tail = new RegExp(`^--${TOKEN_NAME_TAIL}$`);
     expect(tail.test('--color-primary')).toBe(true);
-    expect(tail.test('--color-primary-state-08')).toBe(true);
+    expect(tail.test('--color-primary-container')).toBe(true);
     expect(tail.test('--Color-Primary')).toBe(false);
     expect(tail.test('--color_primary')).toBe(false);
     expect(tail.test('--')).toBe(false);

@@ -53,7 +53,7 @@ const VALUES = new Map([
   ['--color-warning', '#9f8205'],
   ['--color-warning-text', '#5b4a00'],
   ['--color-primary', '#0472a8'],
-  ['--color-primary-state-08', 'rgba(4, 114, 168, 0.08)'],
+  ['--tint-primary-08', 'rgba(4, 114, 168, 0.08)'],
 ]);
 
 function fixture(name, content) {
@@ -87,10 +87,10 @@ test('a background in a CHILD rule is not this rule’s ground', () => {
 });
 
 test('a translucent ground is composited over the page, not read as paint', () => {
-  const solid = opaqueGround('--color-primary-state-08', VALUES);
+  const solid = opaqueGround('--tint-primary-08', VALUES);
   // 8% of #0472a8 over #f9f9fc is a near-white wash, nothing like the blue.
   assert.ok(solid.r > 220 && solid.g > 220 && solid.b > 230, JSON.stringify(solid));
-  const measured = ratio('--color-primary', VALUES, '--color-primary-state-08');
+  const measured = ratio('--color-primary', VALUES, '--tint-primary-08');
   assert.ok(measured > 4 && measured < 5, `expected ~4.46, got ${measured}`);
 });
 

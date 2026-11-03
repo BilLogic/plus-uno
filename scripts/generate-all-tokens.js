@@ -48,9 +48,6 @@ const stale = (constant, message) => staleExceptions.push(`${constant}: ${messag
  */
 const slug = (name) => name.trim().toLowerCase().replace(/\s*\/\s*/g, '-').replace(/\s+/g, '-');
 
-/** The state-layer opacities, in the order they are written. */
-const STATE_LEVELS = ['08', '12', '16'];
-
 /**
  * A Figma color ({r, g, b, a} in 0–1) as CSS: `#rrggbb` when opaque, `rgba()`
  * with the alpha at up to three places otherwise (0.08, not 0.080).
@@ -73,15 +70,15 @@ const ACCENT_FAMILIES = [
 /**
  * Info is Tertiary under another name: Figma aliases `Info/*` to `Tertiary/*`,
  * so every Info token is written as a `var()` of its Tertiary twin. That also
- * covers the two Figma leaves as literals or not at all (`Info 08` is a literal
- * of the same value; there is no `Info Border Subtle`), and the generator
- * refuses if any Info variable stops resolving to its Tertiary twin's color.
+ * covers a leaf Figma carries as a literal or not at all (there is no `Info
+ * Border Subtle`), and the generator refuses if any Info variable stops
+ * resolving to its Tertiary twin's color.
  */
 const ALIASED_FAMILIES = { Info: 'Tertiary' };
 
 /**
- * `Primary/Primary (Text)` -> `primary-text`, `Primary/State-layers/Primary
- * Container 08` -> `primary-container-state-08`, and so on, or `null` for a
+ * `Primary/Primary (Text)` -> `primary-text`, `Primary/Primary Container` ->
+ * `primary-container`, and so on, or `null` for a
  * variable this file does not carry: the `-icon`/`-border` roles and focus
  * rings (hand-maintained in `_color_roles.scss`), the `Proposal/*` candidates,
  * and stray leaves such as `Advocacy/on-surface` and the `Content` string.
@@ -91,13 +88,6 @@ function accentToken(name) {
     if (!ACCENT_FAMILIES.includes(family) || rest.length === 0) return null;
     const f = slug(family);
     const leaf = rest.join('/');
-
-    const state = leaf.match(new RegExp(`^State-layers/(.+) (${STATE_LEVELS.join('|')})$`));
-    if (state) {
-        if (state[1] === family) return `${f}-state-${state[2]}`;
-        if (state[1] === `${family} Container`) return `${f}-container-state-${state[2]}`;
-        return null;
-    }
 
     const roles = {
         [family]: f,
@@ -111,22 +101,16 @@ function accentToken(name) {
     return roles[leaf] ?? null;
 }
 
-/** The order a family's tokens are written in, base roles then state layers. */
+/** The order a family's tokens are written in. */
 function familyOrder(f) {
-    return {
-        roles: [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`],
-        states: [...STATE_LEVELS.map((l) => `${f}-state-${l}`), ...STATE_LEVELS.map((l) => `${f}-container-state-${l}`)],
-    };
+    return [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`];
 }
 
 /**
  * `Neutral Colors/Alternative/surface-dim` -> `surface-dim`,
- * `State-layers/on surface/opacity-0_08` -> `on-surface-state-08`, or `null`
- * for the `Surface roles/*` aliases, which are not part of this file.
+ * or `null` for the `Surface roles/*` aliases, which are not part of this file.
  */
 function neutralToken(name) {
-    const state = name.match(new RegExp(`^State-layers/(.+)/opacity-0_(${STATE_LEVELS.join('|')})$`));
-    if (state) return `${slug(state[1])}-state-${state[2]}`;
     const role = name.match(/^Neutral Colors\/(?:Surface container\/|Alternative\/)?([^/]+)$/);
     return role ? slug(role[1]) : null;
 }
@@ -138,13 +122,6 @@ const NEUTRAL_GROUPS = {
     'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
     'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'disabled-opacity', 'inverse-surface', 'inverse-on-surface'],
 };
-
-const NEUTRAL_STATE_BASES = [
-    'surface', 'outline', 'surface-variant', 'inverse-surface', 'shadow', 'outline-variant',
-    'surface-container-highest', 'surface-container-high', 'surface-container',
-    'surface-container-low', 'surface-container-lowest', 'surface-bright', 'surface-dim',
-    'on-surface', 'on-surface-variant',
-];
 
 /**
  * Not a Figma variable: the M3 disabled-content opacity. Figma applies it as
@@ -204,7 +181,7 @@ function generateColorsSCSS() {
 
     for (const family of ACCENT_FAMILIES) {
         const f = slug(family);
-        const { roles, states } = familyOrder(f);
+        const roles = familyOrder(f);
         const target = ALIASED_FAMILIES[family];
         const line = (token) => {
             if (!target) return accentMap[token] === undefined ? '' : `    --color-${token}: ${accentMap[token]};\n`;
@@ -220,7 +197,6 @@ function generateColorsSCSS() {
         };
         const note = target ? `    /* ${family} aliases to ${target} */\n` : '';
         scss += `\n    /* ${family} Colors */\n${note}${roles.map(line).join('')}`;
-        scss += `\n    /* ${family} State Layers */\n${note}${states.map(line).join('')}`;
     }
 
     scss += `
@@ -237,26 +213,13 @@ function generateColorsSCSS() {
         }
     }
 
-    scss += `
-    /* ============================================
-       NEUTRAL STATE LAYERS
-       ============================================ */
-`;
-    for (const base of NEUTRAL_STATE_BASES) {
-        const keys = STATE_LEVELS.map((l) => `${base}-state-${l}`).filter((k) => neutralMap[k] !== undefined);
-        if (!keys.length) continue;
-        scss += `\n    /* ${base} */\n`;
-        for (const key of keys) scss += `    --color-${key}: ${neutralMap[key]};\n`;
-    }
-
     /*
      * Anything the maps produced that no list above placed. Written rather than
      * dropped, so a new Figma role shows up in the diff instead of vanishing.
      */
     const placed = new Set([
-        ...ACCENT_FAMILIES.flatMap((f) => Object.values(familyOrder(slug(f))).flat()),
+        ...ACCENT_FAMILIES.flatMap((f) => familyOrder(slug(f))),
         ...Object.values(NEUTRAL_GROUPS).flat(),
-        ...NEUTRAL_STATE_BASES.flatMap((b) => STATE_LEVELS.map((l) => `${b}-state-${l}`)),
     ]);
     const unplaced = Object.entries({ ...accentMap, ...neutralMap }).filter(([k]) => !placed.has(k));
     if (unplaced.length) {

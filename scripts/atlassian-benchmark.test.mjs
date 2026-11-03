@@ -98,14 +98,12 @@ test('ageInDays counts whole days and rejects nonsense', () => {
 });
 
 test('the seven intents all still carry the same shape', () => {
-  // The finding this benchmark was written on was "every intent names two roles
-  // and uses three": nine tokens each — base, container, -text, six state
-  // overlays — and no -border or -icon. The role layer added those two, so the
-  // shape is eleven now and the ratchet rows sit at 7. What the assertion is
-  // for is unchanged: all seven must move TOGETHER. An intent that grows a role
-  // the others lack is a vocabulary that only some of the system can use.
+  // Every intent names two roles and uses three: five tokens each - base,
+  // container, -text, -border and -icon. What the assertion is for is that all
+  // seven move TOGETHER. An intent that grows a role the others lack is a
+  // vocabulary that only some of the system can use.
   //
-  // One role sits outside the shared eleven on purpose: `-border-subtle`, the
+  // One role sits outside the shared five on purpose: `-border-subtle`, the
   // intent at 45% that an outlined label (Tag, date Status) draws its border
   // with. Labels speak tertiary, danger, success, warning and info, never
   // primary or secondary, and BS4 Foundation has no `Border Subtle` variable for
@@ -118,7 +116,7 @@ test('the seven intents all still carry the same shape', () => {
     const own = tokens.filter(
       (t) => (t.startsWith(`--color-${name}-`) || t === `--color-${name}`) && t !== `--color-${name}-border-subtle`,
     );
-    assert.equal(own.length, 11, `${name} has ${own.length} tokens, not the shared 11`);
+    assert.equal(own.length, 5, `${name} has ${own.length} tokens, not the shared 5`);
     assert.equal(
       tokens.includes(`--color-${name}-border-subtle`),
       labelIntents.has(name),
@@ -137,8 +135,8 @@ test('the roles we DO have are counted under our own names, not Atlassian spelli
   // the literal string. --color-surface* IS the background role; measuring our
   // vocabulary instead of our system produced a finding that was not true.
   const tokens = ourTokens(REPO_ROOT);
-  assert.ok(tokens.filter((t) => t.startsWith('--color-surface')).length > 20);
-  assert.ok(tokens.filter((t) => t.startsWith('--color-outline')).length > 5);
+  assert.ok(tokens.filter((t) => t.startsWith('--color-surface')).length > 10);
+  assert.ok(tokens.filter((t) => t.startsWith('--color-outline')).length >= 2);
 });
 
 test('the type scale is measured from rendered sizes, not from token names', () => {

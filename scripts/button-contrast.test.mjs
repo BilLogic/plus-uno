@@ -76,15 +76,15 @@ $btn-themes: (
 test('themeMap reads the map rather than a copy of it', () => {
   const themes = themeMap(`
 $btn-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--c', '--oc'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--c', '--oc')
+    'primary': ('--color-primary', '--color-on-primary', '--color-primary-hovered', '--color-primary-text', '--c', '--oc'),
+    'danger': ('--color-danger', '--color-on-danger', '--color-danger-hovered', '--color-danger-text', '--c', '--oc')
 );`);
   assert.equal(themes.length, 2);
   assert.deepEqual(themes[0], {
     style: 'primary',
     main: '--color-primary',
     onMain: '--color-on-primary',
-    state: '--color-primary-state-08',
+    state: '--color-primary-hovered',
     text: '--color-primary-text',
   });
 });
