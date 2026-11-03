@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'react-bootstrap';
 import { StatusTag } from '@/components';
-import { Button } from '@/components';
+import { Button, IconButton } from '@/components';
 import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 import OnboardingModuleCard from '@/components/_internal/training/OnboardingModuleCard';
 
@@ -27,8 +27,8 @@ const OnboardingOverviewPage = () => {
                     <div className="d-flex justify-content-between align-items-center">
                         <h4 className="h5 fw-bold m-0">Featured Modules</h4>
                         <div className="d-flex gap-2">
-                            <Button spacing="compact" iconBefore="arrow-left" aria-label="Previous modules" isDisabled />
-                            <Button spacing="compact" iconBefore="arrow-right" aria-label="Next modules" />
+                            <IconButton spacing="compact" icon="arrow-left" label="Previous modules" isDisabled />
+                            <IconButton spacing="compact" icon="arrow-right" label="Next modules" />
                         </div>
                     </div>
                     <div className="d-flex gap-3 overflow-auto pb-2">

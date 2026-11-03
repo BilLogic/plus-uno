@@ -1,7 +1,7 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
-import { Button } from '@/components';
+import { IconButton } from '@/components';
 
 export default {
     title: 'Components/Messaging/Modal',
@@ -333,7 +333,7 @@ function ModalOptionDemos() {
                 renderAs="inline"
                 title="Share report"
                 description="People with the link can view it."
-                headerActions={<Button appearance="subtle" spacing="compact" iconBefore="link" title="Copy link" />}
+                headerActions={<IconButton appearance="subtle" spacing="compact" icon="link" label="Copy link" />}
                 dividers
                 body="Header actions sit before the close button; dividers rule off the header and footer."
                 primaryButton={{ text: 'Done' }}

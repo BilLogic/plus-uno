@@ -112,6 +112,11 @@ $btn-appearances: (
         width: var(--item-height-sm);
     }
 
+    // Icon button `shape="circle"`: a round icon button for top navigation.
+    &.plus-btn--circle.btn {
+        border-radius: 50%;
+    }
+
     // The label is Body/default at the medium weight; icons draw at 16. The
     // `.btn` in the selector beats the typography classes' `.h3 .fa-solid`
     // icon sizing, so a button inside a heading keeps its 16 icon. A label

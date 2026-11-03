@@ -8,7 +8,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components';
 import OnboardingModuleCard from '@/specs/Training/Onboarding/Cards/OnboardingModuleCard/OnboardingModuleCard';
 import OnboardingModulesTable from '@/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable';
 import SortingDropdown from '@/specs/Training/Onboarding/Elements/SortingDropdown/SortingDropdown';
@@ -97,18 +97,18 @@ const OnboardingOverviewPage = ({
                             <h2 className="h4" style={{ margin: 0 }}>Featured Modules</h2>
                         </div>
                         <div className="onboarding-overview-page__controls">
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-left"
-                                aria-label="Scroll to previous modules"
+                                icon="arrow-left"
+                                label="Scroll to previous modules"
                                 onClick={() => scrollCarousel('left')}
                                 isDisabled={!canScrollLeft}
                                 className={!canScrollLeft ? 'onboarding-overview-page__btn-disabled' : ''}
                             />
-                            <Button
+                            <IconButton
                                 spacing="compact"
-                                iconBefore="arrow-right"
-                                aria-label="Scroll to next modules"
+                                icon="arrow-right"
+                                label="Scroll to next modules"
                                 onClick={() => scrollCarousel('right')}
                                 isDisabled={!canScrollRight}
                             />

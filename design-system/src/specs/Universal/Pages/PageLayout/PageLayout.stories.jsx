@@ -325,7 +325,7 @@ const focusedParts = (canvasElement) => {
         banner: canvas.getByRole('banner'),
         main: canvas.getByRole('main'),
         footer: canvas.queryByRole('contentinfo', { name: 'Page actions' }),
-        back: canvas.queryByRole('button', { name: 'Back' }),
+        back: canvas.queryByRole('button', { name: 'Back' }) ?? canvas.queryByRole('link', { name: 'Back' }),
         close: canvas.queryByRole('button', { name: 'Close' }),
         title: canvas.getByRole('heading', { level: 1 }),
         surface: frame.querySelector('.plus-frame__surface'),

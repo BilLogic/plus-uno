@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GaugeChart, HeatmapChart } from '@/dataviz';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button, IconButton } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import NavTabs from '@/components/navigation/NavTabs';
@@ -209,9 +209,9 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             ))}
                         </NavTabs>
                     </div>
-                    <Button
-                        aria-label="Close"
-                        iconBefore={<i className="fas fa-xmark" aria-hidden />}
+                    <IconButton
+                        label="Close"
+                        icon={<i className="fas fa-xmark" aria-hidden />}
                         appearance="subtle"
                         onClick={onClose}
                     />

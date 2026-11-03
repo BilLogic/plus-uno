@@ -2,12 +2,12 @@
 
 # Forms and inputs
 
-23 components. Each row links to the generated facts; the three columns after it are the
+26 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 19 | ✕ | ✕ | ✅ |
+| [Button](Button/index.md) | 17 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
@@ -18,8 +18,11 @@ authored half (#166), counted rather than assumed.
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
+| [IconButton](IconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
+| [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
+| [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
@@ -31,7 +34,7 @@ authored half (#166), counted rather than assumed.
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 21/23 (91%) · Correct/incorrect 11/23 (48%) · Accessibility 22/23 (96%)
+**Authored coverage:** When to use 21/26 (81%) · Correct/incorrect 11/26 (42%) · Accessibility 25/26 (96%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

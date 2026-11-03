@@ -44,6 +44,25 @@ export const webAppSourceSnippets = {
         '  appearance="primary"',
         '/>'
     ]),
+    iconButton: snippet([
+        '<IconButton',
+        '  icon="pen"',
+        '  label="Edit page"',
+        '/>'
+    ]),
+    linkButton: snippet([
+        '<LinkButton',
+        '  href="/sessions"',
+        '  text="View sessions"',
+        '/>'
+    ]),
+    linkIconButton: snippet([
+        '<LinkIconButton',
+        '  href="/help"',
+        '  icon="circle-question"',
+        '  label="Open Help Center"',
+        '/>'
+    ]),
     buttonGroup: snippet([
         '<ButtonGroup',
         '  appearance="default"',

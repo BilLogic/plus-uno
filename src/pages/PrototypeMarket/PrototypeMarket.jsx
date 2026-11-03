@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Select from '@/components/forms-and-inputs/Select';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import StatusTag from '@/components/labels/StatusTag';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button, IconButton } from '@/components';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Divider from '@/components/layout-and-structure/Divider';
 import PrototypeCard from './PrototypeCard';
@@ -414,12 +414,12 @@ const PrototypeMarket = () => {
             aria-label={`${activePrototype.title} details`}
             onClick={(e) => e.stopPropagation()}
           >
-            <Button
+            <IconButton
               className="prototype-market__modal-close"
               appearance="subtle"
-              iconBefore="xmark"
+              icon="xmark"
               onClick={() => setActivePrototype(null)}
-              aria-label="Close details"
+              label="Close details"
             />
 
             <div className="prototype-market__modal-top">
@@ -519,13 +519,13 @@ const PrototypeMarket = () => {
                   }
                 }}
               />
-              <Button
+              <IconButton
                 className="prototype-market__modal-send"
                 appearance="primary"
-                iconBefore="paper-plane"
+                icon="paper-plane"
                 onClick={submitComment}
                 isDisabled={!pendingComment.trim()}
-                aria-label="Send comment"
+                label="Send comment"
               />
             </div>
             <Divider size="1px" style="dark" opacity10={true} />

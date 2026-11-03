@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Tile } from '@/components';
+import { Tile, Button, IconButton } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
@@ -99,8 +99,8 @@ export const PairWithLabels = () => (
         </Do>
         <Dont caption="Icons alone for actions people use rarely. Each one costs the reader a guess.">
             <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
-                <Button iconBefore="calendar-days" title="Reschedule" aria-label="Reschedule" />
-                <Button iconBefore="comment" title="Message" aria-label="Message" />
+                <IconButton icon="calendar-days" label="Reschedule" />
+                <IconButton icon="comment" label="Message" />
             </span>
         </Dont>
     </DoDont>

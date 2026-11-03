@@ -1,19 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import {
-    Breadcrumb,
-    Button,
-    ButtonGroup,
-    Checkbox,
-    CloseButton,
-    NavPills,
-    NavTabs,
-    Radio,
-    Range,
-    Rating,
-    Toggle,
-} from '@/components';
+import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, NavPills, NavTabs, Radio, Range, Rating, Toggle, Button, IconButton } from '@/components';
 
 /**
  * Two control heights: 32 for everything, 24 compact for buttons in table rows
@@ -54,7 +42,7 @@ export const Buttons = () => (
             <div key={spacing} style={row} data-spacing={spacing}>
                 <Button appearance="primary" spacing={spacing} text={`Save ${spacing}`} />
                 <Button spacing={spacing} text={`Add ${spacing}`} iconBefore="plus" />
-                <Button spacing={spacing} appearance="subtle" iconBefore="trash" aria-label={`Delete ${spacing}`} />
+                <IconButton spacing={spacing} appearance="subtle" icon="trash" label={`Delete ${spacing}`} />
             </div>
         ))}
     </div>
@@ -86,7 +74,7 @@ Buttons.play = async ({ canvasElement }) => {
 export const ButtonInHeading = () => (
     <div className="h3" style={row}>
         <span>Heading</span>
-        <Button appearance="subtle" iconBefore="pen" aria-label="Edit" />
+        <IconButton appearance="subtle" icon="pen" label="Edit" />
     </div>
 );
 

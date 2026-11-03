@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from '../Button/Button';
+import IconButton from '../IconButton/IconButton';
 import { FieldLabel } from '../_internal/Field';
 import { SAVE_FAILED } from '../_internal/useInlineEdit';
 import './InlineEdit.scss';
@@ -184,19 +184,19 @@ const InlineEdit = ({
                     {!hideActionButtons && (
                         <div className="plus-inline-edit__anchor">
                             <div className="plus-inline-edit__actions">
-                                <Button
+                                <IconButton
                                     appearance="primary"
                                     spacing={buttonSpacing}
-                                    iconBefore="check"
-                                    aria-label={confirmLabel}
+                                    icon="check"
+                                    label={confirmLabel}
                                     isLoading={busy}
                                     onMouseDown={keepFocus}
                                     onClick={() => confirm(true)}
                                 />
-                                <Button
+                                <IconButton
                                     spacing={buttonSpacing}
-                                    iconBefore="xmark"
-                                    aria-label={cancelLabel}
+                                    icon="xmark"
+                                    label={cancelLabel}
                                     isDisabled={busy}
                                     onMouseDown={keepFocus}
                                     onClick={cancel}

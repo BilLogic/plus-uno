@@ -167,6 +167,7 @@ export function iconOnly(body) {
 /**
  * Nameless icon buttons, as `{file, line, tag, source}`.
  *
+ * `<IconButton>` and `<LinkIconButton>` are included because their `label` is required.
  * `<Button>` is included because the design system's own component produces
  * `plus-btn--icon-only` whenever it is given neither text nor children, and six
  * of the 23 axe findings were exactly that: the system's button, used as
@@ -176,7 +177,7 @@ export function nameless(files, root = REPO_ROOT) {
   const found = [];
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
-    for (const tag of ['button', 'Button']) {
+    for (const tag of ['button', 'Button', 'IconButton', 'LinkIconButton']) {
       const opens = new RegExp(`<${tag}[\\s/>]`, 'g');
       let match = opens.exec(source);
       while (match) {
@@ -186,9 +187,14 @@ export function nameless(files, root = REPO_ROOT) {
         const selfClosing = source[end - 1] === '/';
         // A spread can carry the name. Blind spot 1.
         const spread = /\{\s*\.\.\./.test(attributes);
-        let named = hasName(attributes) || spread;
-        let empty = selfClosing;
-        if (!selfClosing) {
+        // IconButton and LinkIconButton are icon-only by definition, and the one
+        // thing that names them is `label`.
+        const iconComponent = tag === 'IconButton' || tag === 'LinkIconButton';
+        let named = iconComponent
+          ? /(^|\s)label\s*=\s*(?:"[^"]+"|'[^']+'|\{)/.test(attributes) || spread
+          : hasName(attributes) || spread;
+        let empty = selfClosing || iconComponent;
+        if (!selfClosing && !iconComponent) {
           const body = bodyOf(source, tag, end + 1);
           empty = body ? iconOnly(body.body) : false;
         }
