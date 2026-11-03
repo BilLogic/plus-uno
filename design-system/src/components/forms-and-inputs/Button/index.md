@@ -32,7 +32,6 @@
 | `as` | elementType | — | — |
 | `iconBefore` | string or node | — | Font Awesome glyph before the label |
 | `iconAfter` | string or node | — | Font Awesome glyph after the label |
-| `vertical` | bool | `false` | — |
 | `id` | string | — | — |
 
 ## Variants
@@ -45,13 +44,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-text-disabled` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-y-md` · `--element-radius-item-sm` · `--element-radius-md` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--plus-btn-fg` · `--plus-btn-icon` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-stroke-lg` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-text-disabled` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-sm` · `--element-radius-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--plus-btn-fg` · `--plus-btn-icon` · `--size-column-xs` · `--size-element-border` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
+Same group: `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 

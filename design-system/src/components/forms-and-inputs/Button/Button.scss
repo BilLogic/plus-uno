@@ -225,18 +225,17 @@ $btn-appearances: (
     }
 
     // --- VERTICAL LAYOUT ---
+    // Vertical button: one size, 60 by 60, the icon stacked over the label.
     &.plus-btn--vertical.btn {
-        // A vertical button stacks its icon over its label, so it is not a
-        // single-line control and keeps the height its content gives it.
-        height: auto;
-        padding-top: var(--element-pad-y-md);
-        padding-bottom: var(--element-pad-y-md);
+        width: var(--size-column-xs);
+        height: var(--size-column-xs);
+        padding: var(--element-pad-y-sm) var(--element-pad-x-xs);
         flex-direction: column;
-        gap: var(--size-element-gap-md);
+        gap: var(--element-inline-sm);
 
-        .plus-btn-visual--before {
-            margin-bottom: var(--size-element-gap-sm);
-            font-size: var(--icon-lg);
+        .plus-btn-text {
+            font: var(--body-small);
+            font-weight: var(--type-weight-medium);
         }
     }
 }

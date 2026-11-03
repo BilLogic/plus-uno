@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as SplitButtonStories from './SplitButton.stories.jsx';
+
+<Meta of={SplitButtonStories} />
+
+<Title />
+A split button does one action and opens a menu of related actions from its chevron.
+
+<DocsTabs of={SplitButtonStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={SplitButtonStories.Overview} />
+
+<ArgTypes of={SplitButtonStories} />
+
+</DocsTab>
+
+</DocsTabs>
