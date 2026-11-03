@@ -17,6 +17,8 @@
     "storybook": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p 4200 --host 0.0.0.0 --config-dir .storybook",
     "storybook:preview": "NODE_OPTIONS=\"--require ./scripts/storybook-networkinterfaces-fix.cjs\" WATCHPACK_POLLING=true CHOKIDAR_USEPOLLING=true storybook dev -p ${PORT:-4200} --host 0.0.0.0 --config-dir .storybook",
     "build-storybook": "npm run generate:brand-image && storybook build --config-dir .storybook -o storybook-static && mkdir -p dist && rm -rf dist/storybook && mv storybook-static dist/storybook",
+    "build:archive-storybook": "node scripts/build-archive-storybook.mjs",
+    "archive-storybook:smoke": "node scripts/archive-storybook-smoke.mjs",
     "sync:tokens": "node scripts/sync-figma-tokens.js",
     "generate:tokens": "node scripts/generate-all-tokens.js",
     "generate:color-tokens": "node scripts/generate-color-tokens.mjs",
