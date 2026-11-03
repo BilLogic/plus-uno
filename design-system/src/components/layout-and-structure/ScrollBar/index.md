@@ -32,6 +32,6 @@ From `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `VisuallyHidden`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `Panel` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

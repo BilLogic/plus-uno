@@ -1536,6 +1536,30 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505"
       }
     },
+    "Panel": {
+      "code": {
+        "import": "@/components/layout-and-structure",
+        "export": "default",
+        "mdxPath": "design-system/src/components/layout-and-structure/Panel/Panel.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
+        "storybookId": "components-layout-and-structure-panel--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "panel",
+            "name": "Panel",
+            "componentSetNodeId": "20630:52",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-52",
+            "source": "node-chart",
+            "status": "verified",
+            "isComponentSet": false
+          }
+        ]
+      }
+    },
     "Popover": {
       "code": {
         "import": "@/components/overlays-and-layering",

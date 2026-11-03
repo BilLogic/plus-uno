@@ -57,6 +57,6 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Accordion` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
