@@ -3,6 +3,8 @@
 
 # Carousel
 
+Rotates through a set of slides, with controls, indicators, captions, and a pausable autoplay. Hand-rolled: ADS has no equivalent, and there is no Base UI part for it.
+
 **Import:** `import { Carousel } from '@/components';`
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
@@ -16,7 +18,7 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `slides` | arrayOf or shape or string or node or number | `[]` | — |
+| `slides` | arrayOf or shape or string or node | `[]` | — |
 | `activeIndex` | number | — | — |
 | `onSelect` | func | — | — |
 | `controls` | bool | `true` | Show previous/next navigation controls |
@@ -40,7 +42,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-large` · `--color-disabled-opacity` · `--color-on-primary` · `--color-on-surface` · `--color-on-surface-variant` · `--color-primary` · `--color-scrim` · `--color-surface-container-highest` · `--color-surface-container-lowest` · `--heading-medium` · `--icon-lg` · `--size-column-lg` · `--size-column-md` · `--size-column-xs` · `--size-element-gap-sm` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2000` · `--size-spacing-xlarge-space-2500` · `--size-spacing-xlarge-space-5000`
+`--body-large` · `--ds-background-inverse-subtle` · `--ds-background-selected-bold` · `--ds-border` · `--ds-surface` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--heading-medium` · `--icon-lg` · `--size-column-lg` · `--size-column-md` · `--size-column-xs` · `--size-element-gap-sm` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2000` · `--size-spacing-xlarge-space-2500` · `--size-spacing-xlarge-space-5000`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

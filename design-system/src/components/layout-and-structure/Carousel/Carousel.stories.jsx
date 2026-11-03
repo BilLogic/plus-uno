@@ -9,7 +9,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Carousel component for displaying a rotating set of content slides. Supports controls, indicators, and captions. Built on React Bootstrap.'
+                component: 'Carousel component for displaying a rotating set of content slides. Supports controls, indicators, and captions.'
             }
         }
     },

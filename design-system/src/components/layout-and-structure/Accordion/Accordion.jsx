@@ -1,14 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
-import { Accordion as RBAccordion } from 'react-bootstrap';
 import './Accordion.scss';
 
 /**
  * Accordion Component
- * Collapsible content sections built on React Bootstrap Accordion.
+ * Collapsible content sections built on Base UI's Accordion.
  * Supports flush mode, always open, and multiple item expansion.
  */
+
+// Base UI's `value` is always an array of open item keys; the public API
+// here keeps the old single-key-or-array shape, so this is the only place
+// that converts between the two.
+const toValueArray = (key) => {
+    if (key === undefined || key === null) return undefined;
+    return Array.isArray(key) ? key : [key];
+};
+
 const Accordion = ({
     // Content
     items = [],
@@ -50,19 +59,23 @@ const Accordion = ({
         ));
     };
 
+    const handleValueChange = (value) => {
+        if (!onSelect) return;
+        onSelect(alwaysOpen ? value : (value[0] ?? null));
+    };
+
     return (
-        <RBAccordion
+        <BaseAccordion.Root
             id={id}
-            defaultActiveKey={defaultActiveKey}
-            activeKey={activeKey}
-            flush={flush}
-            alwaysOpen={alwaysOpen}
-            onSelect={onSelect}
+            defaultValue={toValueArray(defaultActiveKey)}
+            value={toValueArray(activeKey)}
+            onValueChange={handleValueChange}
+            multiple={alwaysOpen}
             className={accordionClasses}
             {...props}
         >
             {renderItems()}
-        </RBAccordion>
+        </BaseAccordion.Root>
     );
 };
 
@@ -87,39 +100,23 @@ const AccordionItem = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <RBAccordion.Item
-            eventKey={eventKey}
+        <BaseAccordion.Item
+            value={eventKey}
+            disabled={disabled}
             className={itemClasses}
             {...props}
         >
-            {/*
-              * #331. `disabled` reaches the BUTTON, not only a class.
-              *
-              * It used to add `plus-accordion-item--disabled`, whose rule is
-              * `pointer-events: none`. That stops the mouse and nothing else:
-              * measured in chromium, a button under `pointer-events: none` is
-              * still in the tab order and Enter still fires its click handler,
-              * so a disabled section opened for anyone using a keyboard.
-              *
-              * The header is composed by hand rather than using
-              * `Accordion.Header`, and that is not a preference. `AccordionHeader`
-              * spreads its props onto the `h2` WRAPPER and passes its
-              * `AccordionButton` only `onClick`, `aria-controls` and children —
-              * so `disabled` handed to it lands on a heading, where it means
-              * nothing. `AccordionButton` does spread onto the `button`, so
-              * addressing it directly is the only route to the attribute. The
-              * `accordion-header` class is what `AccordionHeader` would have
-              * added, kept so the stylesheet does not know the difference.
-              */}
-            <Heading className="accordion-header plus-accordion-header">
-                <RBAccordion.Button disabled={disabled}>
+            <BaseAccordion.Header
+                render={<Heading className="plus-accordion-header" />}
+            >
+                <BaseAccordion.Trigger className="plus-accordion-trigger">
                     {header}
-                </RBAccordion.Button>
-            </Heading>
-            <RBAccordion.Body className="plus-accordion-body">
+                </BaseAccordion.Trigger>
+            </BaseAccordion.Header>
+            <BaseAccordion.Panel className="plus-accordion-body">
                 {children}
-            </RBAccordion.Body>
-        </RBAccordion.Item>
+            </BaseAccordion.Panel>
+        </BaseAccordion.Item>
     );
 };
 

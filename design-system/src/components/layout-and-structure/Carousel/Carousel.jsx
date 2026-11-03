@@ -1,13 +1,20 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
-import { Carousel as BootstrapCarousel } from 'react-bootstrap';
 import './Carousel.scss';
 
+const normalizeIndex = (index, length) => ((index % length) + length) % length;
+
+/**
+ * Carousel Component
+ * Rotates through a set of slides, with controls, indicators, captions, and
+ * a pausable autoplay. Hand-rolled: ADS has no equivalent, and there is no
+ * Base UI part for it.
+ */
 const Carousel = ({
     id,
     slides = [],
-    activeIndex,
+    activeIndex: activeIndexProp,
     onSelect,
     controls = true,
     indicators = true,
@@ -23,9 +30,33 @@ const Carousel = ({
     prevIcon,
     nextIcon,
     children, // Allow manual composition if preferred
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     ...props
 }) => {
+    // A landmark with no accessible name is worse than no landmark: two
+    // unnamed carousels on one page collide under "landmark-unique". Only
+    // callers who name theirs get the region semantics.
+    const isLandmark = Boolean(ariaLabel || ariaLabelledBy);
     const slide = slideProp !== undefined ? slideProp : true;
+    const slideCount = children ? React.Children.count(children) : slides.length;
+
+    const isControlled = activeIndexProp !== undefined;
+    const [uncontrolledIndex, setUncontrolledIndex] = useState(0);
+    const activeIndex = isControlled ? activeIndexProp : uncontrolledIndex;
+
+    const goTo = useCallback((nextIndex, direction) => {
+        if (slideCount === 0) return;
+        const bounded = wrap
+            ? normalizeIndex(nextIndex, slideCount)
+            : Math.min(Math.max(nextIndex, 0), slideCount - 1);
+        if (bounded === activeIndex) return;
+        if (!isControlled) setUncontrolledIndex(bounded);
+        onSelect?.(bounded, { direction });
+    }, [activeIndex, isControlled, onSelect, slideCount, wrap]);
+
+    const goPrev = useCallback(() => goTo(activeIndex - 1, 'prev'), [activeIndex, goTo]);
+    const goNext = useCallback(() => goTo(activeIndex + 1, 'next'), [activeIndex, goTo]);
 
     /*
      * #333. Autoplay needs a way to stop it.
@@ -41,73 +72,158 @@ const Carousel = ({
      * what the component does.
      */
     const autoplays = typeof interval === 'number' && interval > 0;
-    const [paused, setPaused] = useState(false);
-    const effectiveInterval = autoplays && !paused ? interval : null;
-    // Custom icons matching legacy
-    const defaultPrevIcon = <span aria-hidden="true" className="carousel-control-prev-icon plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
-    const defaultNextIcon = <span aria-hidden="true" className="carousel-control-next-icon plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
+    const [manuallyPaused, setManuallyPaused] = useState(false);
+    const [hovered, setHovered] = useState(false);
+    const effectivelyPaused = manuallyPaused || (pause === 'hover' && hovered);
+
+    useEffect(() => {
+        if (!autoplays || effectivelyPaused || slideCount < 2) return undefined;
+        const timer = setInterval(() => {
+            goTo(activeIndex + 1, 'next');
+        }, interval);
+        return () => clearInterval(timer);
+    }, [autoplays, effectivelyPaused, interval, activeIndex, goTo, slideCount]);
+
+    const handleKeyDown = (event) => {
+        if (!keyboard) return;
+        if (event.key === 'ArrowLeft') {
+            event.preventDefault();
+            goPrev();
+        } else if (event.key === 'ArrowRight') {
+            event.preventDefault();
+            goNext();
+        }
+    };
+
+    // Default icons matching legacy
+    const defaultPrevIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
+    const defaultNextIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
 
     // A slide's title is one level below the section the carousel sits in.
     const SlideTitle = headingTag(useHeadingLevel() + 1);
-    const content = children || slides.map((slide, index) => (
-        <BootstrapCarousel.Item key={index} className="plus-carousel-item" interval={slide.interval}>
-            {/* Handle content: string (img url) or node */}
-            {typeof slide.content === 'string' && slide.content.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i) ? (
+
+    const renderItemContent = (item, index) => {
+        // Handle content: string (img url) or node
+        if (typeof item.content === 'string' && item.content.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i)) {
+            return (
                 <img
-                    className="d-block w-100 plus-carousel-image"
-                    src={slide.content}
-                    alt={slide.alt || `Slide ${index}`}
+                    className="plus-carousel-image"
+                    src={item.content}
+                    alt={item.alt || `Slide ${index}`}
                 />
-            ) : (
-                <div className="plus-carousel-content">
-                    {/*
-                      * #316. A non-element `content` renders as TEXT, never as markup.
-                      * `slides` is a public prop, so anything a caller pipes through it —
-                      * a review body, an API description — used to be written into the DOM
-                      * with `dangerouslySetInnerHTML`, which is an injection. React escapes
-                      * a string child; a caller who genuinely holds trusted HTML can pass
-                      * their own `dangerouslySetInnerHTML` element as `content` and own
-                      * that decision explicitly.
-                      */}
-                    {slide.content}
-                </div>
-            )}
+            );
+        }
+        return (
+            /*
+              * #316. A non-element `content` renders as TEXT, never as markup.
+              * `slides` is a public prop, so anything a caller pipes through it —
+              * a review body, an API description — used to be written into the DOM
+              * with `dangerouslySetInnerHTML`, which is an injection. React escapes
+              * a string child; a caller who genuinely holds trusted HTML can pass
+              * their own `dangerouslySetInnerHTML` element as `content` and own
+              * that decision explicitly.
+              */
+            <div className="plus-carousel-content">
+                {item.content}
+            </div>
+        );
+    };
 
-            {(slide.title || slide.caption) && (
-                <BootstrapCarousel.Caption className="plus-carousel-caption">
-                    {slide.title && <SlideTitle className="plus-carousel-title">{slide.title}</SlideTitle>}
-                    {slide.caption && <p>{slide.caption}</p>}
-                </BootstrapCarousel.Caption>
-            )}
-        </BootstrapCarousel.Item>
-    ));
-
-    const carousel = (
-        <BootstrapCarousel
-            id={id}
-            activeIndex={activeIndex}
-            onSelect={onSelect}
-            controls={controls}
-            indicators={indicators}
-            interval={effectiveInterval}
-            pause={pause}
-            wrap={wrap}
-            keyboard={keyboard}
-            fade={false}
-            slide={slide}
-            className={`plus-carousel ${className}`}
-            style={style}
-            prevIcon={prevIcon || defaultPrevIcon}
-            nextIcon={nextIcon || defaultNextIcon}
-            // Visually-hidden text (react-bootstrap renders it wrapped in a
-            // `.visually-hidden` span) so prev/next controls have an
-            // accessible name — omitting it fails the "link-name" a11y rule.
-            prevLabel="Previous slide"
-            nextLabel="Next slide"
-            {...props}
+    const renderSlide = (content, index, caption) => (
+        <div
+            key={index}
+            className={[
+                'plus-carousel-item',
+                index === activeIndex ? 'plus-carousel-item--active' : ''
+            ].filter(Boolean).join(' ')}
+            aria-hidden={index === activeIndex ? undefined : true}
         >
             {content}
-        </BootstrapCarousel>
+            {caption}
+        </div>
+    );
+
+    const content = children
+        ? React.Children.map(children, (child, index) => renderSlide(child, index))
+        : slides.map((item, index) => renderSlide(
+            renderItemContent(item, index),
+            index,
+            (item.title || item.caption) && (
+                <div className="plus-carousel-caption">
+                    {item.title && <SlideTitle className="plus-carousel-title">{item.title}</SlideTitle>}
+                    {item.caption && <p>{item.caption}</p>}
+                </div>
+            )
+        ));
+
+    const carouselClasses = [
+        'plus-carousel',
+        slide ? 'plus-carousel--slide' : '',
+        className
+    ].filter(Boolean).join(' ');
+
+    const carousel = (
+        <div
+            id={id}
+            className={carouselClasses}
+            style={style}
+            role={isLandmark ? 'region' : undefined}
+            aria-roledescription={isLandmark ? 'carousel' : undefined}
+            aria-label={ariaLabel}
+            aria-labelledby={ariaLabelledBy}
+            onMouseEnter={pause === 'hover' ? () => setHovered(true) : undefined}
+            onMouseLeave={pause === 'hover' ? () => setHovered(false) : undefined}
+            onKeyDown={handleKeyDown}
+            {...props}
+        >
+            <div
+                className="plus-carousel-track"
+                style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            >
+                {content}
+            </div>
+
+            {controls && slideCount > 1 && (
+                <>
+                    <button
+                        type="button"
+                        className="plus-carousel-control plus-carousel-control-prev"
+                        aria-label="Previous slide"
+                        onClick={goPrev}
+                        disabled={!wrap && activeIndex === 0}
+                    >
+                        {prevIcon || defaultPrevIcon}
+                    </button>
+                    <button
+                        type="button"
+                        className="plus-carousel-control plus-carousel-control-next"
+                        aria-label="Next slide"
+                        onClick={goNext}
+                        disabled={!wrap && activeIndex === slideCount - 1}
+                    >
+                        {nextIcon || defaultNextIcon}
+                    </button>
+                </>
+            )}
+
+            {indicators && slideCount > 1 && (
+                <div className="plus-carousel-indicators">
+                    {Array.from({ length: slideCount }, (_, index) => (
+                        <button
+                            key={index}
+                            type="button"
+                            className={[
+                                'plus-carousel-indicator',
+                                index === activeIndex ? 'active' : ''
+                            ].filter(Boolean).join(' ')}
+                            aria-label={`Slide ${index + 1}`}
+                            aria-current={index === activeIndex ? 'true' : undefined}
+                            onClick={() => goTo(index, index > activeIndex ? 'next' : 'prev')}
+                        />
+                    ))}
+                </div>
+            )}
+        </div>
     );
 
     if (!autoplays) return carousel;
@@ -124,10 +240,10 @@ const Carousel = ({
             <button
                 type="button"
                 className="plus-carousel-playpause"
-                aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
-                onClick={() => setPaused((wasPaused) => !wasPaused)}
+                aria-label={manuallyPaused ? 'Play slideshow' : 'Pause slideshow'}
+                onClick={() => setManuallyPaused((wasPaused) => !wasPaused)}
             >
-                <i className={`fas ${paused ? 'fa-play' : 'fa-pause'}`} aria-hidden="true" />
+                <i className={`fas ${manuallyPaused ? 'fa-play' : 'fa-pause'}`} aria-hidden="true" />
             </button>
         </div>
     );
@@ -139,8 +255,7 @@ Carousel.propTypes = {
         content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
         alt: PropTypes.string,
         title: PropTypes.string,
-        caption: PropTypes.string,
-        interval: PropTypes.number
+        caption: PropTypes.string
     })),
     activeIndex: PropTypes.number,
     onSelect: PropTypes.func,
@@ -155,7 +270,10 @@ Carousel.propTypes = {
     style: PropTypes.object,
     prevIcon: PropTypes.node,
     nextIcon: PropTypes.node,
-    children: PropTypes.node
+    children: PropTypes.node,
+    /** Names the carousel as an `aria-roledescription="carousel"` region. */
+    'aria-label': PropTypes.string,
+    'aria-labelledby': PropTypes.string
 };
 
 export default Carousel;
