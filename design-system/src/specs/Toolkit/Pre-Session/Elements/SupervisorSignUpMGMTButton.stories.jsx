@@ -4,7 +4,7 @@ import { IconButton } from '@/components';
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Sign-Up MGMT Button',
-    component: Button,
+    component: IconButton,
     parameters: {
         layout: 'padded',
     },

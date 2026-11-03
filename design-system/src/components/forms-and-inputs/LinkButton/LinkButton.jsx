@@ -10,6 +10,7 @@ import { Button, BUTTON_APPEARANCES } from '../Button/Button';
 export const LinkButton = ({ href, target, rel, children, text, ...props }) => (
     <Button
         href={href}
+        role="link"
         target={target}
         rel={target === '_blank' ? rel ?? 'noopener noreferrer' : rel}
         text={text}

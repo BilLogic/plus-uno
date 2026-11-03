@@ -11,6 +11,7 @@ import { IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '../Icon
 export const LinkIconButton = ({ href, target, rel, ...props }) => (
     <IconButton
         href={href}
+        role="link"
         target={target}
         rel={target === '_blank' ? rel ?? 'noopener noreferrer' : rel}
         {...props}
