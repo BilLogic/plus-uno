@@ -45,10 +45,6 @@
     }
   },
   "mixedStates": {
-    "design-system/src/components/layout-and-structure/Accordion/Accordion.scss": {
-      "mix": 2,
-      "why": "An 8% black mix over the primary state layer on the open header's hover. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."
-    },
     "design-system/src/components/layout-and-structure/Collapse/Collapse.scss": {
       "mix": 2,
       "why": "Brightness filters on the Collapse trigger's hover and pressed states. Outside the 2026-10-24 audit's scope (the patterns, the Popover family, Button, Field and the controls). The fix Button and Dropdown took applies: lay --color-shadow-state-NN over the fill, which composites to the color the mix produced; compare the pixels before lowering this."

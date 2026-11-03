@@ -55,8 +55,8 @@
  * AND A NAME SUFFIX IS NOT A DERIVATION. `familyOf` reads a prefix, and the
  * families below say nothing about how one token's value relates to another's —
  * deliberately, because within the color family the names promise a
- * relationship the values do not always keep. `--color-{role}-state-08/12/16`
- * reads as that role at 8/12/16%. Today 114 of the 117 overlays are exactly
+ * relationship the values do not always keep. A role's state-overlay token
+ * reads as that role at 8, 12 or 16%. Today 114 of the 117 overlays are exactly
  * that, but until 2026-09-29 thirty were washes of a different color than
  * their name pointed at, because the solids were re-picked in Figma and the
  * washes never followed. The one remaining exception, shadow, is pinned in
@@ -88,7 +88,7 @@
  * rounding difference: 315 pairs of color tokens are EQUAL under the old
  * normalizer and UNEQUAL under this key — every one of them a translucent
  * state overlay keyed against a solid of the same channels, such
- * as `--color-secondary-state-08` (`rgba(68, 92, 106, 0.08)`) against
+ * as the secondary 8% overlay (`rgba(68, 92, 106, 0.08)`) against
  * `--color-secondary-border` (`#445c6a`).
  *
  * A caller migrating on to this key therefore has to MEASURE its own output

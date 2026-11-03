@@ -154,9 +154,9 @@ const slideColors = [
     'var(--color-surface-container)',
     'var(--color-surface-container-high)',
     'var(--color-surface-container-highest)',
-    'var(--color-primary-state-08)',
-    'var(--color-secondary-state-08)',
-    'var(--color-tertiary-state-08)'
+    'var(--ds-background-selected)',
+    'var(--ds-background-neutral)',
+    'var(--ds-background-accent-teal-subtler)'
 ];
 
 const slideLabels = ['First Slide', 'Second Slide', 'Third Slide', 'Fourth Slide', 'Fifth Slide', 'Sixth Slide'];

@@ -32,7 +32,7 @@
  * A token name is `--` followed by one or more of: LOWERCASE LETTERS `a-z`,
  * DIGITS `0-9`, and HYPHEN `-`. Nothing else. Uppercase letters, underscores,
  * dots and escapes are rejected, not folded: every token this design system
- * defines is lowercase kebab-case (`--color-primary-state-08`,
+ * defines is lowercase kebab-case (`--color-primary-text`,
  * `--font-size-body-md`), so a grammar that accepted more would be describing
  * tokens that do not exist and would quietly match CSS that is not ours. `--`
  * alone is not a name; a name needs at least one character after the dashes.
