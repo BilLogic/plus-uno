@@ -46,7 +46,7 @@ const MaintenanceAlert = ({
                         {greeting} {intro} <strong>{startTime}</strong> to <strong>{endTime}</strong>. {closing}
                     </span>
                 </div>
-                {dismissable && <CloseButton what="maintenance notice" onClick={handleDismiss} />}
+                {dismissable && <CloseButton label="Dismiss maintenance notice" onClick={handleDismiss} />}
             </div>
         </Banner>
     );

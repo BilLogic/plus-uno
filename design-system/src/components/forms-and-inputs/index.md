@@ -8,12 +8,12 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
-| [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
+| [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
-| [CloseButton](CloseButton/index.md) | 4 | ✅ | ✅ | ✅ |
+| [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
@@ -37,7 +37,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 16/29 (55%) · Correct/incorrect 9/29 (31%) · Accessibility 20/29 (69%)
+**Authored coverage:** When to use 14/29 (48%) · Correct/incorrect 7/29 (24%) · Accessibility 18/29 (62%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

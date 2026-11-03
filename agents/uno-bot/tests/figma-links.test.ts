@@ -322,12 +322,13 @@ describe("only registry components", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
     const names = Object.keys(registry.components);
-    // 67: Select, Cascader and Tree select dropped their figmaMeta when the
-    // family moved to ADS props and a minimal MDX stub; Phase D backfills
-    // Figma from the rebuilt code and the registry entries return. 66: Date
-    // tag and Smart tag split out of Status tag, and Status tag's own entry
-    // folded into the split rather than staying a third registry row.
-    assert.equal(names.length, 66);
+    // 64: Button group and Close button dropped their figmaMeta when they
+    // moved to ADS props and a minimal MDX stub, same as 67: Select, Cascader
+    // and Tree select did for the same reason. 66: Date tag and Smart tag
+    // split out of Status tag, and Status tag's own entry folded into the
+    // split rather than staying a third registry row. Phase D backfills
+    // Figma from the rebuilt code and the registry entries return.
+    assert.equal(names.length, 64);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

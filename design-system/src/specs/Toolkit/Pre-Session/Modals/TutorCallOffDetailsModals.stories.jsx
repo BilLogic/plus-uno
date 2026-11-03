@@ -52,13 +52,10 @@ export const PreReview_TutorRequest = () => (
                 </div>
 
                 {/* Step 2: Tabs using ButtonGroup with tonal fill */}
-                <ButtonGroup
-                    className="w-100"
-                    buttons={[
-                        { text: 'Tutor request', isSelected: true },
-                        { text: 'Supervisor review' }
-                    ]}
-                />
+                <ButtonGroup className="w-100">
+                    <Button text="Tutor request" isSelected shouldFitContainer />
+                    <Button text="Supervisor review" shouldFitContainer />
+                </ButtonGroup>
 
                 {/* Step 3: Body/Roster Container */}
                 <div style={{
@@ -277,13 +274,10 @@ export const PostReview_SupervisorReview = () => (
                 </div>
 
                 {/* Tabs - Supervisor review is active */}
-                <ButtonGroup
-                    className="w-100"
-                    buttons={[
-                        { text: 'Tutor request', style: 'secondary' },
-                        { text: 'Supervisor review', active: true, style: 'primary' }
-                    ]}
-                />
+                <ButtonGroup className="w-100">
+                    <Button text="Tutor request" shouldFitContainer />
+                    <Button text="Supervisor review" isSelected shouldFitContainer />
+                </ButtonGroup>
 
                 {/* Supervisor Review Content */}
                 <div style={{
@@ -357,13 +351,10 @@ export const PostReview_TutorRequest = () => (
                 </div>
 
                 {/* Tabs - Tutor request is active */}
-                <ButtonGroup
-                    className="w-100"
-                    buttons={[
-                        { text: 'Tutor request', isSelected: true },
-                        { text: 'Supervisor review' }
-                    ]}
-                />
+                <ButtonGroup className="w-100">
+                    <Button text="Tutor request" isSelected shouldFitContainer />
+                    <Button text="Supervisor review" shouldFitContainer />
+                </ButtonGroup>
 
                 {/* Tutor Request Content */}
                 <div style={{

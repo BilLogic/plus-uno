@@ -391,26 +391,20 @@ test('NavPills: hovered, pressed, focus a ring with no fill, selected or not', (
 
 /* ─── CloseButton ────────────────────────────────────────────────────────── */
 
-test('CloseButton: named hovered and pressed steps, focus the ring alone, on both tones', () => {
+test('CloseButton: an Icon button, subtle — inverse repaints the named hovered, pressed and focus-ring steps', () => {
   const file = 'components/forms-and-inputs/CloseButton/CloseButton.scss';
-  for (const [btn, hovered, pressed] of [
-    ['.plus-close-btn', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed'],
-    ['.plus-close-btn--inverse', '--ds-interaction-inverse-hovered', '--ds-interaction-inverse-pressed'],
-  ]) {
-    expectRule(file, `${btn}:hover`, { 'background-color': layer(hovered) });
-    expectRule(file, `${btn}:active`, { 'background-color': layer(pressed) });
-    for (const focus of [`${btn}:focus`, `${btn}:focus-visible`]) {
-      const decls = declarations(sheet(file), focus);
-      assert.ok(!decls || !('background-color' in decls), `${focus} fills focus with ${decls?.['background-color']}`);
-    }
+  const base = '.plus-close-btn.plus-close-btn--inverse.btn';
+  expectRule(file, `${base}:hover`, { 'background-color': layer('--ds-interaction-inverse-hovered') });
+  expectRule(file, `${base}:active`, { 'background-color': layer('--ds-interaction-inverse-pressed') });
+  for (const focus of [`${base}:focus`, `${base}:focus-visible`]) {
+    const decls = declarations(sheet(file), focus);
+    assert.ok(!decls || !('background-color' in decls), `${focus} fills focus with ${decls?.['background-color']}`);
   }
-  // The ring itself is drawn on ::after, 2px outside the box.
-  expectRule(file, '.plus-close-btn:focus-visible::after', {
-    border: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
-  });
-  expectRule(file, '.plus-close-btn--inverse:focus-visible::after', {
-    'border-color': layer('--color-focus-ring-inverse'),
-  });
+  // The default tone's hovered, pressed and ring are Icon button's own subtle
+  // appearance and keyboard focus ring (Button: default and subtle take the
+  // neutral subtle steps; Button: keyboard focus is a 2px focus ring), so this
+  // file only overrides what inverse repaints.
+  expectRule(file, `${base}:focus-visible`, { 'outline-color': layer('--ds-border-focused-inverse') });
 });
 
 /* ─── Pagination ─────────────────────────────────────────────────────────── */

@@ -87,8 +87,14 @@ ButtonInHeading.play = async ({ canvasElement }) => {
 /** Button group follows the button. */
 export const Groups = () => (
     <div style={stack}>
-        <ButtonGroup spacing="compact" ariaLabel="Small group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
-        <ButtonGroup ariaLabel="Medium group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
+        <ButtonGroup label="Small group">
+            <Button text="Day" spacing="compact" />
+            <Button text="Week" spacing="compact" />
+        </ButtonGroup>
+        <ButtonGroup label="Medium group">
+            <Button text="Day" />
+            <Button text="Week" />
+        </ButtonGroup>
     </div>
 );
 
@@ -99,7 +105,7 @@ Groups.play = async ({ canvasElement }) => {
 };
 
 /** Close button is a 32 box drawing a 16 ×. */
-export const Close = () => <CloseButton what="panel" />;
+export const Close = () => <CloseButton label="Dismiss panel" />;
 
 Close.play = async ({ canvasElement }) => {
     const button = within(canvasElement).getByRole('button', { name: 'Dismiss panel' });

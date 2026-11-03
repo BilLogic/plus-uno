@@ -32,7 +32,10 @@ const RECORDING = 'design-system/figma/node-types.json';
 /**
  * The floor. A comparison over an empty recording agrees with everything, so
  * the size is asserted rather than assumed. Lower it only when a mapping is
- * genuinely deleted, and say which one in the commit. 88: Date tag and Smart
+ * genuinely deleted, and say which one in the commit. 85: Button group
+ * (34:5212) and Close button's two sets (17827:827, 17827:846) left the
+ * registry when their MDX dropped Figma references, taking their three nodes
+ * out of the recording. Before that, 88: Date tag and Smart
  * tag split out of Status tag with no Figma mapping of their own, taking
  * Status's node 17876:1653 out of the registry. Before that, 89: Select,
  * Cascader and Tree select dropped their Figma mappings when the family moved
@@ -42,7 +45,7 @@ const RECORDING = 'design-system/figma/node-types.json';
  * Number input and Input group left with Text field and Text area, taking their
  * six Figma nodes (`_Field` among them) out of the registry.
  */
-export const MIN_RECORDED = 88;
+export const MIN_RECORDED = 85;
 
 export const REMEDY =
   `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +

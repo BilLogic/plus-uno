@@ -314,24 +314,22 @@ const PrototypeMarket = () => {
             />
           )}
         </div>
-        <ButtonGroup
-          spacing="compact"
-          ariaLabel="View mode"
-          buttons={[
-            {
-              id: 'grid-view',
-              iconBefore: 'grip',
-              isSelected: viewMode === 'grid',
-              onClick: () => setViewMode('grid'),
-            },
-            {
-              id: 'list-view',
-              iconBefore: 'list',
-              isSelected: viewMode === 'list',
-              onClick: () => setViewMode('list'),
-            },
-          ]}
-        />
+        <ButtonGroup label="View mode">
+          <IconButton
+            icon="grip"
+            label="Grid view"
+            spacing="compact"
+            isSelected={viewMode === 'grid'}
+            onClick={() => setViewMode('grid')}
+          />
+          <IconButton
+            icon="list"
+            label="List view"
+            spacing="compact"
+            isSelected={viewMode === 'list'}
+            onClick={() => setViewMode('list')}
+          />
+        </ButtonGroup>
       </div>
 
       {/* Grid or List */}

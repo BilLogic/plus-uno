@@ -218,8 +218,7 @@ const RichTextEditor = ({
 
     const renderFullToolbar = () => (
         <ButtonGroup
-            spacing={toolbarBtnSpacing}
-            ariaLabel="Rich text formatting"
+            label="Rich text formatting"
             className="plus-rich-text-editor-full-group"
         >
             {(toolbarButtons || FULL_DEFAULT_BUTTONS).map((btnKey) => {

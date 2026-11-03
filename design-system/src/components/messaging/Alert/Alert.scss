@@ -67,7 +67,7 @@
  * strut: an invisible character in the first line's text style (the title's
  * with a title, the text's without), so the column is exactly one line tall. The icon and
  * the CloseButton are centered on it, and the CloseButton may overhang a line
- * shorter than its 24px box.
+ * shorter than its 32px box.
  */
 .plus-alert-leading,
 .plus-alert-dismiss {
@@ -131,7 +131,7 @@
 }
 
 .plus-alert-dismiss {
-    width: 24px; /* the CloseButton's fixed box */
+    width: var(--item-height-md); /* the CloseButton's fixed box; also its max-width containing block */
 }
 
 /* Alert Style Variants */

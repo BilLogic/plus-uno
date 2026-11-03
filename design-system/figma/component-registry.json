@@ -236,30 +236,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
       }
     },
-    "ButtonGroup": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/ButtonGroup",
-        "source": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx",
-        "storybookId": "components-forms-and-inputs-button-group--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "button-group",
-            "name": "Button Group",
-            "componentSetNodeId": "34:5212",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-5212",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19489"
-      }
-    },
     "Card": {
       "code": {
         "import": "@/components/layout-and-structure",
@@ -431,40 +407,6 @@
           "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
           "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
         }
-      }
-    },
-    "CloseButton": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/CloseButton",
-        "source": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx",
-        "storybookId": "components-forms-and-inputs-button-close-button--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "close-button",
-            "name": "Close button",
-            "componentSetNodeId": "17827:827",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "remove-button",
-            "name": "Remove button",
-            "componentSetNodeId": "17827:846",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-846",
-            "source": "designer-supplied",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "size × state, 12 variants (small (default) 16, medium 20, large 24; rest, hover, pressed, focus). Not drawn by CloseButton: in code the small size is the × inside a removable or link Tag (behavior=\"removable\", or a link with onRemove), and its states are the browser's own :hover, :active and :focus-visible. Medium and large are not built in code yet."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17827-827"
       }
     },
     "Collapse": {

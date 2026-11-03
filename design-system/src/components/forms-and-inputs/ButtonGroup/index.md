@@ -3,13 +3,13 @@
 
 # ButtonGroup
 
-Groups related buttons together with connected styling. Supports horizontal and vertical layouts with consistent spacing.
+Button group: a visually connected row of related actions. Follows Atlassian's Button group (https://atlassian.design/components/button/button-group) — a plain container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology.
 
 **Import:** `import { ButtonGroup } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Sizes, Layout, Counts, Patterns, Children, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Appearances, Spacing, IconOnly, Selected, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx`
 
@@ -17,27 +17,15 @@ Groups related buttons together with connected styling. Supports horizontal and 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `buttons` | arrayOf or shape or string or func or node or bool or object | `[]` | Array of button configurations |
-| `children` | node | — | Child Button components (alternative to buttons array) |
-| `appearance` | enum | `'default'` | Appearance of every button in the group |
-| `spacing` | enum | `'default'` | Spacing of every button in the group: default 32, compact 24 |
-| `vertical` | bool | `false` | Stack buttons vertically |
-| `block` | bool | `false` | Whether the group takes full width |
-| `className` | string | `''` | Additional CSS classes |
-| `id` | string | — | HTML ID attribute |
-| `ariaLabel` | string | — | Accessible label for the button group |
-
-## Variants
-
-**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery`
-
-**`spacing`** — `default` · `compact`
-
-Anything not listed is not a valid value.
+| `children` | node | — | The buttons to render inside the group. |
+| `label` | string | — | The group's accessible name. Strongly recommended. |
+| `testId` | string | — | A `data-testid` hook for automated tests. |
+| `className` | string | — | Additional CSS classes. |
+| `id` | string | — | HTML ID attribute. |
 
 ## Tokens touched
 
-`--plus-button-group-radius` · `--size-element-radius-md` · `--size-element-radius-sm`
+`--element-radius-item-sm` · `--size-element-border`
 
 From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss`. Override these through the token layer, never with a literal.
 
@@ -45,4 +33,8 @@ From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss
 
 Same group: `Button` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `ButtonGroup` is the right call, only what it accepts.

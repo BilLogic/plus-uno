@@ -105,7 +105,7 @@ const Alert = ({
             {canDismiss && (
                 <div className="plus-alert-dismiss">
                     {strut}
-                    <CloseButton aria-label="Close alert" onClick={handleClose} />
+                    <CloseButton label="Close alert" onClick={handleClose} />
                 </div>
             )}
         </RBAlert>
