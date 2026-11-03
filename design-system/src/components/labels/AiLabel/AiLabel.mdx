@@ -188,11 +188,10 @@ this inside it.
 - **The explain button says what it does.** `How was this made?` is an action,
   not a category. Compare `title="AI recommended"`, which is not a reliable
   accessible name in any screen reader.
-- **Low confidence uses the warning *container* pair, never the warning
-  ground.** Measured: `--color-warning` with a white label is 3.70:1 — the only
-  one of the 65 button combinations below AA — while
-  `--color-warning-container` with `--color-on-warning-container` is 13.27:1. A
-  new component must not be built on the one pair known to fail.
+- **Low confidence uses the tinted warning background with warning text, never
+  the bold ground.** A bold fill would flood the surface the mark sits on, and
+  the tinted pair is the one every other warning label reads, so it holds in
+  light, dark and at more contrast.
 
 </div>
 

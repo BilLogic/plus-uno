@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import StatusTag, {
@@ -52,7 +53,7 @@ const COUNT_SPACINGS = ['default', 'spacious'];
 
 /** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
-    neutral: ['--color-surface-container', '--color-on-surface-variant', '--ds-background-neutral-pressed'],
+    neutral: ['--ds-background-neutral', '--ds-text-subtle', '--ds-background-neutral-pressed'],
     success: ['--ds-background-success', '--ds-text-success', '--ds-background-success-pressed'],
     warning: ['--ds-background-warning', '--ds-text-warning', '--ds-background-warning-pressed'],
     danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
@@ -66,9 +67,9 @@ const STATE_COLORS = {
 
 /** [border, text, icon] per date style. A date is outlined: it has no fill. */
 const DATE_LOOK = {
-    neutral: ['--color-outline-variant', '--color-on-surface-variant', 'fa-calendar'],
-    warning: ['--color-warning-border-subtle', '--color-warning-text', 'fa-clock'],
-    danger: ['--color-danger-border-subtle', '--color-danger-text', 'fa-triangle-exclamation'],
+    neutral: ['--ds-border', '--ds-text-subtle', 'fa-calendar'],
+    warning: ['--ds-border-warning-subtle', '--ds-text-warning', 'fa-clock'],
+    danger: ['--ds-border-danger-subtle', '--ds-text-danger', 'fa-triangle-exclamation'],
 };
 
 /** The 1px inside border is an inset box-shadow, so the height stays exact. */
@@ -120,15 +121,27 @@ Styles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
+    // The mapping holds in dark and at more contrast: every fill, text and
+    // edge is a themed token, so a legacy light-only color fails here.
+    await inEveryColorModeOf(canvasElement, async (mode, themed) => {
+        for (const size of STATUS_TAG_SPACINGS) {
+            for (const [style, [fill, ink, edge]] of Object.entries(STATE_COLORS)) {
+                const el = canvas.getByTestId(`${style}-${size}`);
+                const s = getComputedStyle(el);
+                const name = `${mode}: ${style}-${size}`;
+                await expect(s.backgroundColor, `${name} fill`).toBe(themed(fill));
+                await expect(s.color, `${name} text`).toBe(themed(ink));
+                await expect(innerBorder(el), `${name} 1px inside border`).toBe(themed(edge));
+            }
+        }
+    });
+
     for (const size of STATUS_TAG_SPACINGS) {
-        for (const [style, [fill, ink, edge]] of Object.entries(STATE_COLORS)) {
+        for (const [style] of Object.entries(STATE_COLORS)) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
             const s = getComputedStyle(el);
             await expect(el.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(s.backgroundColor, `${name} fill`).toBe(token(fill));
-            await expect(s.color, `${name} text`).toBe(token(ink));
-            await expect(innerBorder(el), `${name} 1px inside border`).toBe(token(edge));
             await expect(px(s.borderRadius), `${name} radius`).toBe(size === 'spacious' ? 6 : 4);
 
             const label = within(el).getByText(style);
@@ -159,6 +172,17 @@ export const Dates = () => (
 Dates.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
+
+    await inEveryColorModeOf(canvasElement, async (mode, themed) => {
+        for (const size of STATUS_TAG_SPACINGS) {
+            for (const [style, [edge, ink]] of Object.entries(DATE_LOOK)) {
+                const el = canvas.getByTestId(`${style}-${size}`);
+                const name = `${mode}: ${style}-${size}`;
+                await expect(innerBorder(el), `${name} border`).toBe(themed(edge));
+                await expect(getComputedStyle(el).color, `${name} text`).toBe(themed(ink));
+            }
+        }
+    });
 
     for (const size of STATUS_TAG_SPACINGS) {
         for (const [style, [edge, ink, icon]] of Object.entries(DATE_LOOK)) {
@@ -317,7 +341,7 @@ Truncation.play = async ({ canvasElement }) => {
  */
 export const NarrowContainer = () => (
     <div style={grid}>
-        <div data-testid="column" style={{ width: '120px', border: '1px dashed var(--color-outline-variant)' }}>
+        <div data-testid="column" style={{ width: '120px', border: '1px dashed var(--ds-border)' }}>
             <StatusTag appearance="info" data-testid="clamped">Waiting on the district data export</StatusTag>
         </div>
         <div style={{ width: '400px' }}>
@@ -484,7 +508,7 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
         // The unknown style renders exactly as neutral.
         const neutral = canvas.getByTestId('neutral');
         const unknownStyle = canvas.getByTestId('unknown-style');
-        await expect(getComputedStyle(unknownStyle).backgroundColor).toBe(token('--color-surface-container'));
+        await expect(getComputedStyle(unknownStyle).backgroundColor).toBe(token('--ds-background-neutral'));
         await expect(getComputedStyle(unknownStyle).color).toBe(getComputedStyle(neutral).color);
         await expect(innerBorder(unknownStyle)).toBe(innerBorder(neutral));
 
