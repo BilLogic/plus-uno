@@ -3,7 +3,7 @@ import { expect, within } from 'storybook/test';
 
 import ChoiceGroup from './ChoiceGroup';
 import DatePicker from './DatePicker/DatePicker';
-import InputGroup from './InputGroup/InputGroup';
+import TextField from './TextField/TextField';
 import RichTextEditor from './RichTextEditor/RichTextEditor';
 import Select from './Select';
 
@@ -14,10 +14,9 @@ import Select from './Select';
  * that resolves to its control. Three were left out of that fix because they had
  * no control for a label to resolve to, and nothing was put in its place.
  *
- * `InputGroup` was the starkest: it had no `label` prop, `id` was applied to the
- * GROUP, and extra props were spread there too — so no route existed, through
- * any prop, to give the input a name. A caller who wanted one had to stop using
- * the component.
+ * A field with an element before or after its control was the starkest: it had
+ * no `label` prop, `id` was applied to the group, and extra props were spread
+ * there too — so no route existed, through any prop, to give the input a name.
  *
  * `RichTextEditor`'s editable region was a bare `contentEditable` div: no
  * `role`, no name, and `id` on the outer container, so a `label` pointing at it
@@ -53,7 +52,7 @@ export default {
 
 export const EveryFieldCanBeNamed = () => (
     <div style={stack}>
-        <InputGroup id="nf-amount" label="Amount" leadingVisual="£" />
+        <TextField id="nf-amount" label="Amount" elemBefore="£" />
         <RichTextEditor id="nf-notes" label="Session notes" />
         <ChoiceGroup
             name="level"
@@ -89,13 +88,13 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
 /**
  * Naming a field must not change what it looks like.
  *
- * `showLabel={false}` on `InputGroup`, and `ChoiceGroup` with `aria-label`
+ * `isLabelHidden` on a Text field, and `ChoiceGroup` with `aria-label`
  * instead of a legend, are the two ways a caller keeps a question off screen —
  * so both have to keep the name they are hiding.
  */
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
-        <InputGroup id="nf-hidden" label="Search" showLabel={false} trailingVisual="icon" />
+        <TextField id="nf-hidden" label="Search" isLabelHidden elemAfter={<i className="fa-solid fa-plus" aria-hidden="true" />} />
         <ChoiceGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );
@@ -154,35 +153,4 @@ CallerPropsNameTheControl.play = async ({ canvasElement }) => {
 
     const date = canvas.getByRole('combobox', { name: 'Session date' });
     await expect(date.tagName).toBe('INPUT');
-};
-
-/**
- * A dropdown addon's props reach the dropdown, and only the dropdown.
- *
- * Spreading them on the addon wrapper as well put the same `id` on two
- * elements, and wrote props such as `ariaLabel` to a `span` as unknown DOM
- * attributes, where they name nothing.
- */
-export const DropdownAddonTakesItsPropsOnce = () => (
-    <div style={stack}>
-        <InputGroup
-            id="nf-price"
-            label="Price"
-            leadingVisual={{
-                type: 'dropdown',
-                id: 'nf-currency',
-                text: 'GBP',
-                ariaLabel: 'Currency',
-                items: [{ label: 'GBP' }, { label: 'USD' }],
-            }}
-        />
-    </div>
-);
-
-DropdownAddonTakesItsPropsOnce.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvasElement.querySelectorAll('#nf-currency')).toHaveLength(1);
-    await expect(canvasElement.querySelector('[arialabel]')).toBeNull();
-    await expect(canvas.getByRole('button', { name: 'Currency' })).toBeTruthy();
 };

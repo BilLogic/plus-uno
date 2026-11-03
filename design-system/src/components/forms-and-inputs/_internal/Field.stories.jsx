@@ -4,7 +4,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Field from './Field';
 
 /**
- * _Field — the part behind Input, Textarea, Number input and Input group.
+ * _Field — the part behind Text field and Text area.
  *
  * Unpublished in Figma and absent from the barrel: it is never placed on a
  * screen by itself, so it has stories and no docs page. Each story pins down
@@ -18,7 +18,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'The one box behind every text-like input: size, border, fill and state, '
+                    'The one box behind every text-like input: height, border, fill and state, '
                     + 'with Leading, Content and Trailing slots.',
             },
         },
@@ -57,20 +57,21 @@ Anatomy.play = async ({ canvasElement }) => {
     await expect(document.activeElement).toBe(input);
 };
 
-/** One height, 32. `small` and `large` are deprecated and draw like `medium`. */
-export const Sizes = () => (
+/** Two heights: 40 by default and 32 compact, with a radius a quarter of the height. */
+export const Spacings = () => (
     <div style={row}>
-        {['small', 'medium', 'large'].map((size) => (
-            <Field key={size} size={size} data-testid={size}>{control(`${size} field`)}</Field>
+        {['default', 'compact'].map((spacing) => (
+            <Field key={spacing} spacing={spacing} data-testid={spacing}>{control(`${spacing} field`)}</Field>
         ))}
     </div>
 );
 
-Sizes.play = async ({ canvasElement }) => {
-    const height = (size) => px(getComputedStyle(within(canvasElement).getByTestId(size)).height);
-    await expect(height('small')).toBe(32);
-    await expect(height('medium')).toBe(32);
-    await expect(height('large')).toBe(32);
+Spacings.play = async ({ canvasElement }) => {
+    const box = (spacing) => getComputedStyle(within(canvasElement).getByTestId(spacing));
+    await expect(px(box('default').height)).toBe(40);
+    await expect(px(box('compact').height)).toBe(32);
+    await expect(px(box('default').borderTopLeftRadius)).toBe(10);
+    await expect(px(box('compact').borderTopLeftRadius)).toBe(8);
 };
 
 const STATES = [
@@ -80,6 +81,7 @@ const STATES = [
     ['disabled', { disabled: true }],
     ['read-only', { readOnly: true }],
     ['invalid', { invalid: true }],
+    ['warning', { warning: true }],
     ['valid', { valid: true }],
 ];
 
@@ -123,6 +125,7 @@ States.play = async ({ canvasElement }) => {
         await expect(style('focus').outlineColor, `${mode}: ring`).toBe(token('--ds-border-focused'));
         await expect(style('read-only').backgroundColor, `${mode}: read-only fill`).toBe(token('--ds-background-neutral'));
         await expect(style('invalid').borderTopColor, `${mode}: invalid border`).toBe(token('--ds-border-danger'));
+        await expect(style('warning').borderTopColor, `${mode}: warning border`).toBe(token('--ds-border-warning'));
         await expect(style('valid').borderTopColor, `${mode}: valid border`).toBe(token('--ds-border-success'));
     });
 };

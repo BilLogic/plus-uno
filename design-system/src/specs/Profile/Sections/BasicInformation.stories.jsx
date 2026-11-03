@@ -55,7 +55,7 @@
  */
 import React from 'react';
 import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
@@ -142,13 +142,12 @@ export const BasicInformationSection = ({ changed = false }) => {
                     }}
                 >
                     <Label text="First Name" required={false} htmlFor={`${uid}-first-name`} />
-                    <Input
+                    <TextField
                         id={`${uid}-first-name`}
                         placeholder="Value"
                         value="Veronica"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -164,13 +163,12 @@ export const BasicInformationSection = ({ changed = false }) => {
                     }}
                 >
                     <Label text="Last Name" required={false} htmlFor={`${uid}-last-name`} />
-                    <Input
+                    <TextField
                         id={`${uid}-last-name`}
                         placeholder="Value"
                         value="Lodge"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -186,11 +184,10 @@ export const BasicInformationSection = ({ changed = false }) => {
                     }}
                 >
                     <Label text="Preferred Name" required={false} htmlFor={`${uid}-preferred-name`} />
-                    <Input
+                    <TextField
                         id={`${uid}-preferred-name`}
                         placeholder="Enter"
-                        size="medium"
-                        showLabel={false}
+                        isLabelHidden
                     />
                 </div>
 
@@ -226,13 +223,12 @@ export const BasicInformationSection = ({ changed = false }) => {
                     }}
                 >
                     <Label text="PLUS Account Email" required={false} htmlFor={`${uid}-plus-account-email`} />
-                    <Input
+                    <TextField
                         id={`${uid}-plus-account-email`}
                         placeholder="Placeholder"
                         value="pl2-app-demo@gmail.com"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -281,11 +277,10 @@ export const BasicInformationSection = ({ changed = false }) => {
                             </span>
                         </Tooltip>
                     </div>
-                    <Input
+                    <TextField
                         id={`${uid}-additional-email`}
                         placeholder="pl2-app-demo@gmail.com"
-                        size="medium"
-                        showLabel={false}
+                        isLabelHidden
                     />
                 </div>
 
@@ -301,11 +296,10 @@ export const BasicInformationSection = ({ changed = false }) => {
                     }}
                 >
                     <Label text="Slack Email" required={false} htmlFor={`${uid}-slack-email`} />
-                    <Input
+                    <TextField
                         id={`${uid}-slack-email`}
                         placeholder="pl2-app-demo@gmail.com"
-                        size="medium"
-                        showLabel={false}
+                        isLabelHidden
                     />
                 </div>
             </div>

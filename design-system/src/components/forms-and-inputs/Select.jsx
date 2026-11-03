@@ -9,7 +9,6 @@ import useOptionSource from './_internal/useOptionSource';
 import useStagedValue from './_internal/useStagedValue';
 import useFieldId from './useFieldId';
 import './Select.scss';
-import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 export { SEARCH_FIRST_ABOVE };
 
@@ -75,7 +74,6 @@ const Select = ({
     style,
     ...props
 }) => {
-    useDeprecatedFieldSize('Select', size);
     const multi = mode === 'multi';
     // A required single pick cannot be emptied; multi and optional fields can.
     const canClear = clearable ?? (multi || !required);
@@ -425,7 +423,7 @@ const Select = ({
             <div className="plus-select-field" onFocus={handleFocus} onBlur={handleBlur}>
                 <Field
                     ref={fieldRef}
-                    size={size}
+                    spacing={size === 'small' ? 'compact' : 'default'}
                     grow={multi && lineWrap}
                     disabled={isDisabled}
                     readOnly={isReadOnly}

@@ -21,12 +21,10 @@ long the message lives and whether the user can keep working.
 | must be answered before anything else | `Modal` | takes focus, blocks the page behind a backdrop |
 | is about one form field | none of these | the field's own error state |
 
-That last row is the one that matters most. `Input`, `NumberInput`, `FileUpload`
-and `DateAndTimePicker` all take `validation="invalid"` plus `validationMessage`,
+That last row is the one that matters most. `TextField`, `TextArea`, `FileUpload`
+and `DateAndTimePicker` all take `isInvalid` plus `errorMessage`,
 which renders the message directly beneath the control with a matching icon. An
 `Alert` at the top of a form makes the user hunt for which field is wrong.
-`Textarea` is the exception in the other direction: it has a `state="error"`
-style but no message slot, so the caller renders the message.
 
 ## What each one actually does
 

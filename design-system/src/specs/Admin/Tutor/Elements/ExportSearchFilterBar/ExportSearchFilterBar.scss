@@ -27,8 +27,8 @@
         flex: 1;
         min-width: 120px;
         max-width: 400px;
-        // The search is a small InputGroup, whose field box is already the
-        // 28px Figma draws; the icon sits in its Leading slot.
+        // The search is a compact Text field, whose box is already 32 high;
+        // the icon sits in its before slot.
     }
 
     &__filters {

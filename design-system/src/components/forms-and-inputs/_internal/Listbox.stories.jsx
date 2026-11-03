@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from '@/components/messaging/Modal/Modal';
-import Input from '../Input';
+import TextField from '../TextField/TextField';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import '../TagInput.scss';
 import Listbox from './Listbox';
@@ -56,7 +56,7 @@ const ComboboxDemo = ({ label = 'Subject', options = SUBJECTS, mode = 'single', 
     return (
         <div style={fieldStyle}>
             <div ref={anchorRef}>
-                <Input
+                <TextField
                     label={label}
                     inputRef={inputRef}
                     value={filter}
@@ -408,7 +408,7 @@ export const Colors = () => (
             value="a"
             header={(
                 <div className="plus-tag-input__rename">
-                    <Input label="Name" showLabel={false} size="small" defaultValue="Algebra" />
+                    <TextField label="Name" isLabelHidden spacing="compact" defaultValue="Algebra" />
                 </div>
             )}
         />

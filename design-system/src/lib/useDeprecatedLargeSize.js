@@ -18,7 +18,6 @@ function useDeprecatedSizes(component, size, deprecated) {
 }
 
 const LARGE = ['large'];
-const SMALL_AND_LARGE = ['small', 'large'];
 
 /**
  * Controls draw two heights, 32 and 24 compact. `size="large"` is kept so no
@@ -29,15 +28,4 @@ const SMALL_AND_LARGE = ['small', 'large'];
  */
 export function useDeprecatedLargeSize(component, size) {
     useDeprecatedSizes(component, size, LARGE);
-}
-
-/**
- * Fields draw one height, 32. `size="small"` and `size="large"` are kept so
- * no call site breaks, but both draw like `medium`.
- *
- * @param {string} component - The component's display name, for the message.
- * @param {string} size - The size prop the caller passed.
- */
-export function useDeprecatedFieldSize(component, size) {
-    useDeprecatedSizes(component, size, SMALL_AND_LARGE);
 }

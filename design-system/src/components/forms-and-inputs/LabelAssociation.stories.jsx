@@ -4,12 +4,12 @@ import { expect, within } from 'storybook/test';
 import DateAndTimePicker from './DateAndTimePicker';
 import FileUpload from './FileUpload';
 import ChoiceGroup from './ChoiceGroup';
-import Input from './Input';
-import NumberInput from './NumberInput';
+import TextField from './TextField/TextField';
+
 import Radio from './Radio';
 import Rating from './Rating';
 import TagInput from './TagInput';
-import Textarea from './Textarea';
+import TextArea from './TextArea/TextArea';
 
 /**
  * Label association across every form component that renders its own label.
@@ -22,13 +22,13 @@ import Textarea from './Textarea';
  * label could reach, so their labels dangled even when `id` *was* passed.
  *
  * axe's `label` rule only sees half of that: it fires when an `input` ends up
- * with no accessible name, so it catches `Input`, `Textarea` and friends but
+ * with no accessible name, so it catches the Text field, the Text area and friends but
  * says nothing about `Rating` or `TagInput`, which render no input at all. The
  * `play` blocks below cover the other half — every `label[for]` in the story
  * has to resolve, and every field has to be reachable by its visible label.
  *
  * #225 added the hidden-label case, which is the same defect one step earlier:
- * `DateAndTimePicker`'s `showLabel={false}` used to skip rendering the label at
+ * `DateAndTimePicker`'s hidden label used to skip rendering the label at
  * all, so there was no `for` to dangle and no name to check — the field simply
  * had none. Its story asserts names rather than `for` targets, which is the only
  * form of the question that survives a label that is not there.
@@ -39,10 +39,10 @@ import Textarea from './Textarea';
  * group lands on whichever the browser reached first — so a story here has to
  * check that the ids are distinct as well as that they exist.
  *
- * #318 added `NumberInput` to the hidden-label story, which had made #225's
+ * #318 added the number field to the hidden-label story, which had made #225's
  * mistake in its own file: `{showLabel && label && …}` skipped the element
  * entirely rather than clipping it, and nothing replaced the name. The rule
- * this file exists to hold is one rule for the whole group — showLabel moves
+ * this file exists to hold is one rule for the whole group — a hidden label moves
  * pixels — so the assertion that states it is the one that has to grow.
  */
 
@@ -89,9 +89,9 @@ export default {
  */
 export const NameWithoutId = () => (
     <div style={stack}>
-        <Input name="email" label="Email address" placeholder="you@example.com" />
-        <Textarea name="message" label="Message" placeholder="Say something" />
-        <NumberInput name="quantity" label="Quantity" />
+        <TextField name="email" label="Email address" placeholder="you@example.com" />
+        <TextArea name="message" label="Message" placeholder="Say something" />
+        <TextField type="number" name="quantity" label="Quantity" />
         <FileUpload name="transcript" label="Transcript" />
         <DateAndTimePicker name="starts" label="Session start" />
         <ChoiceGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
@@ -165,9 +165,9 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
 };
 
 /**
- * `showLabel={false}` on the two components that offer it. The label is clipped,
- * not dropped: #213 settled that for `Input`, #225 for `DateAndTimePicker`,
- * whose `showLabel` used to feed `hasLabel` and so took the name away along with
+ * `isLabelHidden` on the components that offer it. The label is clipped,
+ * not dropped: #213 settled that for the Text field, #225 for `DateAndTimePicker`,
+ * whose label option used to feed `hasLabel` and so took the name away along with
  * the pixels — leaving two inputs called "Date" and "Time", which does not say
  * which field.
  *
@@ -178,7 +178,7 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
  */
 export const HiddenLabels = () => (
     <div style={stack}>
-        <Input id="hl-email" name="email" label="Email address" showLabel={false} />
+        <TextField id="hl-email" name="email" label="Email address" isLabelHidden />
         <DateAndTimePicker id="hl-starts" name="starts" label="Session start" showLabel={false} />
         <DateAndTimePicker
             id="hl-ends"
@@ -189,7 +189,7 @@ export const HiddenLabels = () => (
             showSectionLabels={false}
         />
         {/* #318. The third component to make this mistake, and the last. */}
-        <NumberInput id="hl-sessions" name="sessions" label="Sessions" showLabel={false} />
+        <TextField type="number" id="hl-sessions" name="sessions" label="Sessions" isLabelHidden />
     </div>
 );
 
@@ -300,9 +300,9 @@ ForwardedProps.play = async ({ canvasElement }) => {
  */
 export const ExplicitIds = () => (
     <div style={stack}>
-        <Input id="la-email" name="email" label="Email address" />
-        <Textarea id="la-message" name="message" label="Message" />
-        <NumberInput id="la-quantity" name="quantity" label="Quantity" />
+        <TextField id="la-email" name="email" label="Email address" />
+        <TextArea id="la-message" name="message" label="Message" />
+        <TextField type="number" id="la-quantity" name="quantity" label="Quantity" />
         <FileUpload id="la-transcript" name="transcript" label="Transcript" />
         <DateAndTimePicker id="la-starts" name="starts" label="Session start" />
         <ChoiceGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />

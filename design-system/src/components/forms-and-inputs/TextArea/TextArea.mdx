@@ -1,0 +1,249 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TextAreaStories from './TextArea.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import TextArea from './TextArea';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": []
+};
+
+<Meta of={TextAreaStories} />
+
+<Title />
+A text area lets users enter long form text which spans over multiple lines.
+
+<DocsTabs of={TextAreaStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TextArea"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A labeled text area, 80 high at least.</>}>
+    <Canvas of={TextAreaStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<p>
+    Adapted from the Atlassian Design System{' '}
+    <a href="https://atlassian.design/components/textarea" target="_blank" rel="noreferrer">Text area</a>.
+    It shares its box, label, caption and states with the Text field.
+</p>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+<DocsTable>
+    <thead>
+        <tr><th scope="col">Part</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Label</td><td>Names the field. A required marker and an info tooltip sit beside it.</td></tr>
+        <tr><td>Field box</td><td>80 high at least, growing with <code>rows</code>. Its corners are 10, or 8 when compact.</td></tr>
+        <tr><td>Control</td><td>The native textarea. It resizes vertically.</td></tr>
+        <tr><td>Caption</td><td>A message on the left and, with <code>maxLength</code>, a count on the right.</td></tr>
+        <tr><td>Save and Cancel</td><td>Shown below a subtle text area while it is edited.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th scope="col">Prop</th><th scope="col">Values</th><th scope="col">Default</th><th scope="col">Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the field. Pass <code>isLabelHidden</code> to clip it out of sight and keep the name.</td></tr>
+        <tr><td><code>rows</code></td><td>number</td><td>3</td><td>Visible lines. The box never goes below 80.</td></tr>
+        <tr><td><code>spacing</code></td><td><code>default</code>, <code>compact</code></td><td><code>default</code></td><td>The same corners as a Text field of that spacing.</td></tr>
+        <tr><td><code>appearance</code></td><td><code>standard</code>, <code>subtle</code></td><td><code>standard</code></td><td><code>subtle</code> shows Save and Cancel while editing.</td></tr>
+        <tr><td><code>isRequired</code>, <code>isDisabled</code>, <code>isReadOnly</code></td><td>boolean</td><td>false</td><td>As on the Text field.</td></tr>
+        <tr><td><code>isInvalid</code></td><td>boolean</td><td>false</td><td>Draws the error border and sets <code>aria-invalid</code>. <code>errorMessage</code> says why.</td></tr>
+        <tr><td><code>warningMessage</code>, <code>successMessage</code></td><td>node</td><td>none</td><td>Draw the warning and confirmation borders.</td></tr>
+        <tr><td><code>caption</code></td><td>node</td><td>none</td><td>Standing help under the field.</td></tr>
+        <tr><td><code>maxLength</code></td><td>number</td><td>none</td><td>Limits the length and shows a count.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Rows and spacing
+
+<DocsCanvasShell description={<>The field is 80 high at least, and <code>rows</code> grows it from there.</>}>
+    <DsCanvasQuiet of={TextAreaStories.Rows} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The corners are 10 by default and 8 compact.</>}>
+    <DsCanvasQuiet of={TextAreaStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Default, filled, success, warning, error, disabled and read-only.</>}>
+    <DsCanvasQuiet of={TextAreaStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focus draws a 2px ring in <code>border.focused</code>, 2px off the box. It changes no fill.</>}>
+    <DsCanvasQuiet of={TextAreaStories.FocusRing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Count
+
+<DocsCanvasShell description={<>With <code>maxLength</code>, a count sits on the right of the caption, beside any error.</>}>
+    <DsCanvasQuiet of={TextAreaStories.Count} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>Plain text until hovered or edited. Save and Cancel show while editing, and the field stays open when focus leaves it.</>}>
+    <DsCanvasQuiet of={TextAreaStories.Subtle} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+    <thead>
+        <tr><th scope="col">ADS Text area</th><th scope="col">PLUS Text area</th><th scope="col">Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>appearance</code> (<code>standard</code>, <code>subtle</code>, <code>none</code>)</td><td><code>appearance</code> (<code>standard</code>, <code>subtle</code>)</td><td><code>none</code> is not used.</td></tr>
+        <tr><td><code>isCompact</code></td><td><code>spacing="compact"</code></td><td></td></tr>
+        <tr><td><code>isDisabled</code>, <code>isInvalid</code>, <code>isReadOnly</code>, <code>isRequired</code></td><td>Same names.</td><td></td></tr>
+        <tr><td><code>resize</code></td><td>vertical</td><td>Fixed.</td></tr>
+        <tr><td><code>minimumRows</code></td><td><code>rows</code></td><td>The box starts at 80.</td></tr>
+        <tr><td><code>maxHeight</code></td><td>not used</td><td></td></tr>
+        <tr><td><code>isMonospaced</code></td><td>not used</td><td></td></tr>
+        <tr><td>Form messages</td><td><code>errorMessage</code>, <code>warningMessage</code>, <code>successMessage</code>, <code>caption</code></td><td>PLUS adds the warning message.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TextAreaStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use a Text area for free text over several lines: session notes, feedback, a
+reason. Use a Text field for one short answer, and a Rich text editor only when
+the text needs formatting.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Put help in the caption.
+
+<DoDontPair
+    doExample={<TextArea label="Session notes" rows={3} caption="What went well, and what to try next time." />}
+    doCaption="Put help in the caption, where it stays after the person types."
+    dontExample={<TextArea label="Session notes" rows={3} placeholder="Write what went well and what to try next time" />}
+    dontCaption="Help in the placeholder disappears when the person starts typing."
+/>
+
+### Rules
+
+- **Match `rows` to the expected answer.** One row is a short note; six rows is a
+  paragraph. The box starts at 80 whatever `rows` says.
+- **A count is for a real limit.** Set `maxLength` when something downstream
+  truncates; do not add a limit just to show a count.
+- **`appearance="subtle"` is for editing in place.** It shows Save and Cancel
+  while editing and does not save when focus leaves the field, so a click
+  elsewhere in the middle of a paragraph does not publish half a thought.
+- **A warning accepts the value.** Use `isInvalid` only when the form cannot
+  go on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The label is associated whether you pass `id` or not**, and `isLabelHidden`
+  clips it out of sight without removing the name.
+- **An error is announced.** `isInvalid` sets `aria-invalid` and renders the
+  message with `role="alert"`; a warning, a success message and standing help are
+  described. A count is part of the description.
+- **Focus is a ring** in `border.focused`, with no change of fill.
+- **Save and Cancel are real buttons**, reached in the tab order after the field.
+  Esc cancels, and Ctrl or Cmd with Enter saves.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For one line of text, see Text field.
+- For formatted text, see Rich text editor.
+- For the label and caption conventions, see Label and caption.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

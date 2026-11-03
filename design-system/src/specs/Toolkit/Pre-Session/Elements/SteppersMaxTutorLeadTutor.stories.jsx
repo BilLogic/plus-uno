@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stepper } from './Steppers.stories';
 import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import InputGroup from '@/components/forms-and-inputs/InputGroup/InputGroup';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Steppers Max Tutor & Lead Tutor',
@@ -47,17 +47,16 @@ const ErrorStepper = ({ label = 'Max # of lead tutors', value = '4' }) => (
     >
         <Label text={label} required={true} />
         <div className="error-stepper-input-wrapper">
-            <InputGroup
+            <TextField
                 placeholder={value}
                 value={value}
-                size="medium"
-                readonly
-                validation="invalid"
+                isReadOnly
+                isInvalid
                 className="error-stepper-input-group"
             />
         </div>
         <style>{`
-            .plus-field.error-stepper-input-group {
+            .error-stepper-input-group .plus-field {
                 background-color: var(--color-surface-container-lowest);
             }
             .error-stepper-input-group .plus-field__control {

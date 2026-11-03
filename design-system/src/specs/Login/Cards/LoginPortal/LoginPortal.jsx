@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Button from '@/components/forms-and-inputs/Button';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import {
     LoginAlertBanner,
@@ -111,11 +111,11 @@ export default function LoginPortal({
                             <div className="login-field__label body1-txt font-weight-semibold">
                                 First Name <span className="login-field__required">*</span>
                             </div>
-                            <Input
+                            <TextField
                                 label="First Name"
-                                required
+                                isRequired
                                 placeholder="First name..."
-                                showLabel={false}
+                                isLabelHidden
                             />
                         </div>
                     </div>
@@ -124,10 +124,10 @@ export default function LoginPortal({
                             <div className="login-field__label body1-txt font-weight-semibold">
                                 Preferred Name
                             </div>
-                            <Input
+                            <TextField
                                 label="Preferred Name"
                                 placeholder="Preferred name..."
-                                showLabel={false}
+                                isLabelHidden
                             />
                         </div>
                     </div>
@@ -137,7 +137,7 @@ export default function LoginPortal({
                     <div className="login-field__label body1-txt font-weight-semibold">
                         Last Name <span className="login-field__required">*</span>
                     </div>
-                    <Input label="Last Name" required placeholder="Last name..." showLabel={false} />
+                    <TextField label="Last Name" isRequired placeholder="Last name..." isLabelHidden />
                 </div>
 
                 <div className="login-portal-terms">
@@ -180,7 +180,7 @@ export default function LoginPortal({
                             <div className="login-field__label body1-txt font-weight-semibold">
                                 First Name <span className="login-field__required">*</span>
                             </div>
-                            <Input label="First Name" required placeholder="First name..." showLabel={false} />
+                            <TextField label="First Name" isRequired placeholder="First name..." isLabelHidden />
                         </div>
                     </div>
                     <div style={{ flex: 1 }}>
@@ -188,7 +188,7 @@ export default function LoginPortal({
                             <div className="login-field__label body1-txt font-weight-semibold">
                                 Preferred Name
                             </div>
-                            <Input label="Preferred Name" placeholder="Preferred name..." showLabel={false} />
+                            <TextField label="Preferred Name" placeholder="Preferred name..." isLabelHidden />
                         </div>
                     </div>
                 </div>
@@ -197,17 +197,17 @@ export default function LoginPortal({
                     <div className="login-field__label body1-txt font-weight-semibold">
                         Last Name <span className="login-field__required">*</span>
                     </div>
-                    <Input label="Last Name" required placeholder="Last name..." showLabel={false} />
+                    <TextField label="Last Name" isRequired placeholder="Last name..." isLabelHidden />
                 </div>
 
                 <div className="login-field">
                     <div className="login-field__label body1-txt font-weight-semibold">
                         Institution Name <span className="login-field__required">*</span>
                     </div>
-                    <Input
+                    <TextField
                         label="Institution Name"
-                        required
-                        showLabel={false}
+                        isRequired
+                        isLabelHidden
                         placeholder="Add your institution name..."
                     />
                     <div className="login-field__caption body3-txt">

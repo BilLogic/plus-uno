@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import Input from './Input';
+import TextField from './TextField/TextField';
 import TagInput from './TagInput';
 
 /**
@@ -330,7 +330,7 @@ const WIDTHS = [160, 200, 240, 280, 360];
 
 export const SmallFitsItsTags = () => (
     <div style={stack}>
-        <Input label="Small input" size="small" />
+        <TextField label="Small input" spacing="compact" />
         {WIDTHS.map((width) => (
             <div key={width} style={{ width }}>
                 <TagInput label={`Topics at ${width}`} size="small" options={TOPICS} defaultTags={MANY} />

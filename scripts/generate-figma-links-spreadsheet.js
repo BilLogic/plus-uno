@@ -34,7 +34,6 @@ function componentNameFromMdx(dsRoot, mdxAbsPath) {
     const rel = path.relative(dsRoot, mdxAbsPath).replace(/\\/g, '/');
     const parts = rel.replace(/\.mdx$/, '').split('/');
     if (parts[0] === 'forms' && parts[1] === 'DatePicker') return 'DatePicker';
-    if (parts[0] === 'forms' && parts[1] === 'InputGroup') return 'InputGroup';
     return parts[parts.length - 1];
 }
 

@@ -5,7 +5,6 @@ import { Dropdown } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
-import { useDeprecatedFieldSize } from '../../../lib/useDeprecatedLargeSize';
 
 const FULL_DEFAULT_BUTTONS = [
     'bold', 'italic', 'underline', 'strikethrough',
@@ -92,7 +91,6 @@ const RichTextEditor = ({
     onBlur,
     ...props
 }) => {
-    useDeprecatedFieldSize('RichTextEditor', size);
     const fieldId = useFieldId(id);
     const editorId = `${fieldId}-editor`;
     const labelId = label ? `${fieldId}-label` : undefined;

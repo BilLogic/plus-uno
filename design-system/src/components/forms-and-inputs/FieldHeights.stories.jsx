@@ -1,28 +1,13 @@
 import React from 'react';
-import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import {
-    Cascader,
-    DateAndTimePicker,
-    DatePicker,
-    Input,
-    InputGroup,
-    NumberInput,
-    RichTextEditor,
-    Select,
-    TagInput,
-    Textarea,
-    TreeSelect,
-} from '@/components';
+import { Button, Cascader, DateAndTimePicker, DatePicker, TextField, RichTextEditor, Select, TagInput, TextArea, TreeSelect } from '@/components';
 
 /**
- * Every single-line field is 32 high, its content centered, side padding 12.
- * A button inside a field is the 24 compact button, centered with 4 around
- * it. Text area (80), Rich text editor (120) and Tag field (32) start at a
- * minimum and grow.
- *
- * Size prop names stay. `medium` draws 32; `small` and `large` are
- * deprecated: they draw like `medium` and warn in development.
+ * Every single-line field is 40 high, or 32 compact, its content centered,
+ * side padding 12. A button inside a field is 32 in the 40 field and 24 in the
+ * 32 field, centered with 4 around it. Text area (80), Rich text editor (120)
+ * and Tag field (40) start at a minimum and grow.
  */
 export default {
     title: 'Components/Forms and inputs/Field heights',
@@ -54,19 +39,19 @@ const TREE = [
     { label: 'Math', value: 'math', children: [{ label: 'Algebra', value: 'algebra' }] },
 ];
 
-/** One of each single-line field, at its default size. */
+/** One of each single-line field, at its default spacing. */
 const SINGLE_LINE = [
-    ['Text field', () => <Input label="Text field" placeholder="Name" />],
+    ['Text field', () => <TextField label="Text field" placeholder="Name" />],
     ['Select', () => <Select label="Select" options={OPTIONS} placeholder="Subject" />],
-    ['Number field', () => <NumberInput label="Number field" defaultValue={3} />],
+    ['Number field', () => <TextField type="number" label="Number field" defaultValue={3} />],
     ['Date picker', () => <DatePicker aria-label="Date picker" placeholder="MM/DD/YYYY" />],
     ['Date time picker', () => <DateAndTimePicker label="Date time picker" />],
     ['Cascader', () => <Cascader options={CASCADE} onChange={() => {}} />],
     ['Tree select', () => <TreeSelect options={TREE} onChange={() => {}} />],
-    ['Text field group', () => <InputGroup label="Text field group" leadingVisual="$" trailingVisual=".00" />],
+    ['Text field with affixes', () => <TextField label="Text field with affixes" elemBefore="$" elemAfter=".00" />],
 ];
 
-/** Each single-line field is 32, its text centered, its side padding 12. */
+/** Each single-line field is 40, its text centered, its side padding 12. */
 export const SingleLine = () => (
     <div style={stack}>
         {SINGLE_LINE.map(([name, render]) => (
@@ -80,7 +65,7 @@ SingleLine.play = async ({ canvasElement }) => {
         const boxes = canvasElement.querySelectorAll(`[data-field="${name}"] .plus-field`);
         await expect(boxes.length, `${name} draws a field`).toBeGreaterThan(0);
         for (const box of boxes) {
-            await expect(heightOf(box), `${name} height`).toBe(32);
+            await expect(heightOf(box), `${name} height`).toBe(40);
 
             const style = getComputedStyle(box);
             const side = parseFloat(style.paddingLeft) + parseFloat(style.borderLeftWidth);
@@ -94,26 +79,48 @@ SingleLine.play = async ({ canvasElement }) => {
     }
 };
 
-/** A 24 compact button inside a field: centered, 4 from the box's edge, and the field stays 32. */
+/** Compact fields are 32 and take a quarter of that for their corners: 8. */
+export const Compact = () => (
+    <div style={stack}>
+        <div data-field="Compact text field"><TextField label="Compact text field" spacing="compact" /></div>
+        <div data-field="Compact number field"><TextField type="number" label="Compact number field" spacing="compact" defaultValue={2} /></div>
+    </div>
+);
+
+Compact.play = async ({ canvasElement }) => {
+    for (const name of ['Compact text field', 'Compact number field']) {
+        const box = fieldIn(canvasElement, name);
+        await expect(heightOf(box), `${name} height`).toBe(32);
+        await expect(Math.round(parseFloat(getComputedStyle(box).borderTopLeftRadius)), `${name} radius`).toBe(8);
+    }
+};
+
+/** A button inside a field: 32 in the 40 field, 24 in the 32 field, centered, 4 from the box's edge. */
 export const ButtonInside = () => (
     <div style={stack}>
         <div data-field="Buttons">
-            <InputGroup
+            <TextField
                 label="Invite by email"
-                trailingVisual={[{ type: 'button', text: 'Copy' }, { type: 'button', text: 'Send' }]}
+                elemAfter={(
+                    <>
+                        <Button appearance="default" spacing="default" text="Copy" />
+                        <Button appearance="default" spacing="default" text="Send" />
+                    </>
+                )}
             />
         </div>
-        <div data-field="Leading button">
-            <InputGroup label="Search tutors" leadingVisual={{ type: 'button', text: 'Filter' }} />
+        <div data-field="Before button">
+            <TextField label="Search tutors" elemBefore={<Button appearance="default" spacing="default" text="Filter" />} />
+        </div>
+        <div data-field="Compact buttons">
+            <TextField
+                label="Invite by email, compact"
+                spacing="compact"
+                elemAfter={<Button appearance="default" spacing="compact" text="Send" />}
+            />
         </div>
         <div data-field="Steppers">
-            <NumberInput label="Sessions" defaultValue={3} />
-        </div>
-        <div data-field="Dropdown">
-            <InputGroup
-                label="Duration"
-                trailingVisual={{ type: 'dropdown', text: 'Minutes', items: [{ text: 'Minutes' }, { text: 'Hours' }] }}
-            />
+            <TextField type="number" label="Sessions" defaultValue={3} />
         </div>
         <div data-field="AM/PM">
             <DateAndTimePicker label="Starts" showDate={false} />
@@ -122,15 +129,16 @@ export const ButtonInside = () => (
 );
 
 ButtonInside.play = async ({ canvasElement }) => {
-    for (const name of ['Buttons', 'Leading button', 'Steppers']) {
+    const heights = { Buttons: [40, 32], 'Before button': [40, 32], 'Compact buttons': [32, 24], Steppers: [40, 32] };
+    for (const [name, [fieldHeight, buttonHeight]] of Object.entries(heights)) {
         const box = fieldIn(canvasElement, name);
-        await expect(heightOf(box), `${name} field height`).toBe(32);
+        await expect(heightOf(box), `${name} field height`).toBe(fieldHeight);
         const outer = rect(box);
         const buttons = [...box.querySelectorAll('.plus-btn')];
         await expect(buttons.length, `${name} buttons`).toBeGreaterThan(0);
         for (const button of buttons) {
             const inner = rect(button);
-            await expect(Math.round(inner.height), `${name} button height`).toBe(24);
+            await expect(Math.round(inner.height), `${name} button height`).toBe(buttonHeight);
             await expect(Math.round(inner.top - outer.top), `${name} button top`).toBe(4);
             await expect(Math.round(outer.bottom - inner.bottom), `${name} button bottom`).toBe(4);
         }
@@ -142,25 +150,16 @@ ButtonInside.play = async ({ canvasElement }) => {
             await expect(Math.round(first.left - outer.left), `${name} button start`).toBe(4);
         }
     }
-    // The Dropdown addon is 24, 4 from the box's edge.
-    const dropdownBox = fieldIn(canvasElement, 'Dropdown');
-    const toggle = rect(dropdownBox.querySelector('.dropdown-toggle'));
-    const outer = rect(dropdownBox);
-    await expect(heightOf(dropdownBox), 'Dropdown field height').toBe(32);
-    await expect(Math.round(toggle.height), 'Dropdown addon height').toBe(24);
-    await expect(Math.round(toggle.top - outer.top), 'Dropdown addon top').toBe(4);
-    await expect(Math.round(outer.right - toggle.right), 'Dropdown addon end').toBe(4);
 
-    // The AM/PM menu is 24, centered, and the time field stays 32.
+    // The AM/PM menu is centered in the time field.
     const timeBox = fieldIn(canvasElement, 'AM/PM');
     const period = rect(timeBox.querySelector('.plus-datetime-am-pm-toggle'));
-    await expect(heightOf(timeBox), 'Time field height').toBe(32);
-    await expect(Math.round(period.height), 'AM/PM height').toBe(24);
-    await expect(Math.round(period.top - rect(timeBox).top), 'AM/PM top').toBe(4);
+    await expect(heightOf(timeBox), 'Time field height').toBe(40);
+    await expect(Math.abs(middle(period) - middle(rect(timeBox))), 'AM/PM centered').toBeLessThanOrEqual(0.5);
 
     // Steppers are square.
     for (const stepper of fieldIn(canvasElement, 'Steppers').querySelectorAll('.plus-field-stepper')) {
-        await expect(Math.round(rect(stepper).width)).toBe(24);
+        await expect(Math.round(rect(stepper).width)).toBe(32);
     }
 };
 
@@ -169,8 +168,8 @@ const MANY_TAGS = ['Algebra', 'Geometry', 'Biology', 'Chemistry', 'Physics', 'Hi
 /** Text area, Rich text editor and Tag field start at their minimums and grow. */
 export const MultiLine = () => (
     <div style={stack}>
-        <div data-field="Text area"><Textarea label="Text area" rows={1} /></div>
-        <div data-field="Long text area"><Textarea label="Long text area" rows={8} /></div>
+        <div data-field="Text area"><TextArea label="Text area" rows={1} /></div>
+        <div data-field="Long text area"><TextArea label="Long text area" rows={8} /></div>
         <div data-field="Rich text editor"><RichTextEditor label="Rich text editor" /></div>
         <div data-field="Tag field"><TagInput label="Tag field" options={MANY_TAGS} /></div>
         <div data-field="Full tag field">
@@ -188,25 +187,13 @@ MultiLine.play = async ({ canvasElement }) => {
     editor.innerHTML = Array.from({ length: 12 }, (_, i) => `<p>Line ${i + 1}</p>`).join('');
     await waitFor(() => expect(heightOf(editor), 'Rich text editor grows').toBeGreaterThan(120));
 
-    await expect(heightOf(fieldIn(canvasElement, 'Tag field')), 'Tag field minimum').toBe(32);
+    await expect(heightOf(fieldIn(canvasElement, 'Tag field')), 'Tag field minimum').toBe(40);
     // At rest a full Tag field is one line; with focus its tags wrap and it grows.
     const full = fieldIn(canvasElement, 'Full tag field');
-    await expect(heightOf(full), 'Full tag field at rest').toBe(32);
+    await expect(heightOf(full), 'Full tag field at rest').toBe(40);
     await userEvent.click(within(full).getByRole('combobox'));
-    await waitFor(() => expect(heightOf(full), 'Tag field grows').toBeGreaterThan(32));
+    await waitFor(() => expect(heightOf(full), 'Tag field grows').toBeGreaterThan(40));
 };
-
-const DEPRECATED = [
-    ['Input', (size) => <Input size={size} label={`Input ${size}`} />],
-    ['Select', (size) => <Select size={size} label={`Select ${size}`} options={OPTIONS} />],
-    ['NumberInput', (size) => <NumberInput size={size} label={`Number ${size}`} defaultValue={1} />],
-    ['DatePicker', (size) => <DatePicker size={size} aria-label={`Date ${size}`} />],
-    ['DateAndTimePicker', (size) => <DateAndTimePicker size={size} label={`Date and time ${size}`} />],
-    ['InputGroup', (size) => <InputGroup size={size} label={`Group ${size}`} leadingVisual="$" />],
-    ['TagInput', (size) => <TagInput size={size} label={`Tags ${size}`} options={MANY_TAGS} />],
-    ['Textarea', (size) => <Textarea size={size} label={`Text area ${size}`} rows={1} />],
-    ['RichTextEditor', (size) => <RichTextEditor size={size} label={`Editor ${size}`} />],
-];
 
 /** The calendar a deprecated-size Date picker opens is the medium one. */
 export const DeprecatedCalendar = () => (
@@ -234,53 +221,4 @@ DeprecatedCalendar.play = async ({ canvasElement }) => {
     const medium = await dayCell('medium');
     await expect(await dayCell('small'), 'small calendar').toEqual(medium);
     await expect(await dayCell('large'), 'large calendar').toEqual(medium);
-};
-
-/** `small` and `large` are deprecated: they draw like `medium` and warn in development. */
-let sizeWarn;
-export const DeprecatedSizes = {
-    beforeEach: () => {
-        sizeWarn = spyOn(console, 'warn').mockImplementation(() => {});
-        return () => sizeWarn.mockRestore();
-    },
-    render: () => (
-        <div style={stack}>
-            {DEPRECATED.map(([name, render]) => ['small', 'medium', 'large'].map((size) => (
-                <div key={`${name}-${size}`} data-field={`${name} ${size}`}>{render(size)}</div>
-            )))}
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const messages = sizeWarn.mock.calls.map((call) => String(call[0]));
-        for (const [name] of DEPRECATED) {
-            for (const size of ['small', 'large']) {
-                await expect(
-                    messages.some((m) => m.startsWith(`[${name}]`) && m.includes(`size="${size}" is deprecated`)),
-                    `${name} warns for ${size}`,
-                ).toBe(true);
-            }
-            await expect(
-                messages.some((m) => m.startsWith(`[${name}]`) && m.includes('size="medium" is deprecated')),
-                `${name} does not warn for medium`,
-            ).toBe(false);
-
-            // The whole host and its box draw like medium: height, padding and type.
-            const medium = canvasElement.querySelector(`[data-field="${name} medium"]`);
-            const drawn = (wrapper) => {
-                const box = wrapper.querySelector('.plus-field, .plus-rich-text-editor-content');
-                const style = getComputedStyle(box);
-                return {
-                    host: heightOf(wrapper),
-                    box: heightOf(box),
-                    padding: style.padding,
-                    fontSize: style.fontSize,
-                    lineHeight: style.lineHeight,
-                };
-            };
-            for (const size of ['small', 'large']) {
-                const other = canvasElement.querySelector(`[data-field="${name} ${size}"]`);
-                await expect(drawn(other), `${name} ${size} draws like medium`).toEqual(drawn(medium));
-            }
-        }
-    },
 };

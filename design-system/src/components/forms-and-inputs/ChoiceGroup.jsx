@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
-import Input from './Input';
+import TextField from './TextField/TextField';
 import useFieldId from './useFieldId';
 import './ChoiceGroup.scss';
 
@@ -138,16 +138,16 @@ const ChoiceGroup = ({
         return (
             <div className="plus-choice-group-other">
                 {renderChoice(otherOption, index)}
-                <Input
+                <TextField
                     id={`${fieldId}-other-text`}
                     label={other.inputLabel ?? `${typeof otherLabel === 'string' ? otherLabel : 'Other'}, please specify`}
-                    showLabel={false}
-                    size="small"
+                    isLabelHidden
+                    spacing="compact"
                     placeholder={other.placeholder}
                     value={other.text}
                     defaultValue={other.text === undefined ? other.defaultText : undefined}
-                    disabled={disabled}
-                    readOnly={readOnly}
+                    isDisabled={disabled}
+                    isReadOnly={readOnly}
                     onChange={typeOther}
                 />
             </div>

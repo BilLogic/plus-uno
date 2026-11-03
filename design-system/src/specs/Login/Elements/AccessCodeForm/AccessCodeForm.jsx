@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import '../shared/login-field.scss';
 
@@ -31,18 +31,19 @@ export function LoginAccessCodeField({
                 Enter Your Access Code {required && <span className="login-field__required">*</span>}
             </div>
 
-            <Input
+            <TextField
                 id={id}
                 name={id}
                 label="Enter Your Access Code"
-                required={required}
-                showLabel={false}
+                isRequired={required}
+                isLabelHidden
                 autoComplete="one-time-code"
                 placeholder="e.g., funny-walrus"
-                trailingVisual="fa-solid fa-circle-info"
+                elemAfter={<i className="fa-solid fa-circle-info" aria-hidden="true" />}
                 value={value}
-                validation={validation}
-                validationMessage={validationMessage}
+                isInvalid={validation === 'invalid'}
+                errorMessage={validationMessage}
+                successMessage={validation === 'success' ? validationMessage : undefined}
             />
 
             {caption && (

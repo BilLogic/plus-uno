@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 
 /**
  * Free-text follow-up when an "Other" option chip is selected
@@ -43,14 +43,13 @@ const OtherTextInput = ({
                 {label}
                 {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
             </label>
-            <Textarea
+            <TextArea
                 id={fieldId}
                 name={fieldId}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
                 rows={1}
-                size="medium"
             />
         </div>
     );

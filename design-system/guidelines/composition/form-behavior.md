@@ -11,9 +11,9 @@ and what a field shows when the person cannot change it. Where the fields sit
 is `forms.md` beside this file; which component to pick is
 `../components/forms-and-inputs.md`.
 
-The components render states; the form decides when to enter them. `Input`,
-`NumberInput`, `FileUpload` and `DateAndTimePicker` take `validation` and
-`validationMessage` and point the control at the message, but none of them
+The components render states; the form decides when to enter them. `TextField`,
+`TextArea`, `FileUpload` and `DateAndTimePicker` take `isInvalid` and
+`errorMessage` and point the control at the message, but none of them
 knows when to check. The caller owns timing, and this page is the timing.
 
 ## When to validate
@@ -28,18 +28,18 @@ writing: a ten-character minimum turns red on the first letter.
 const [error, setError] = useState(null);
 const [submitFailed, setSubmitFailed] = useState(false);
 
-<Input
+<TextField
   id="feedback"
   label="What feels inaccurate?"
-  required
+  isRequired
   value={text}
   onChange={(e) => {
     setText(e.target.value);
     if (submitFailed) setError(check(e.target.value));
   }}
   onBlur={() => setError(check(text))}
-  validation={error ? 'invalid' : 'none'}
-  validationMessage={error}
+  isInvalid={Boolean(error)}
+  errorMessage={error}
 />
 ```
 
@@ -84,9 +84,9 @@ A permission split — an admin edits a profile, a tutor views it — is read-on
 After a submit that fails on permission, the form turns read-only and says
 why in an `Alert`, keeping the values readable.
 
-The prop is spelled per component: `readOnly` on `Input`, `Textarea`,
+The prop is spelled per component: `isReadOnly` on `TextField` and `TextArea`; `readOnly` on
 `Checkbox`, `Radio`, `Switch`, `ChoiceGroup` and `ChoiceGrid`; `readonly` on
-`Select`, `NumberInput`, `InputGroup` and `DateAndTimePicker`. `Select` treats
+`Select` and `DateAndTimePicker`. `Select` treats
 `readonly` as disabled today. A read-only choice keeps its focus and contrast
 and ignores clicks and keys; put radios in a `ChoiceGroup`, since ARIA lets the
 radio group announce read-only and not a lone radio.
@@ -131,8 +131,8 @@ reverts. A textarea shows Save and Cancel and stays open when it loses focus.
 A failed save keeps the field open in its invalid state, with the server's
 message under it. One surface uses one look.
 
-Input, Textarea and NumberInput take a `subtle` prop. Input and Textarea save
-through `onSave`; NumberInput takes the look only, so its caller saves on
+TextField and TextArea take `appearance="subtle"` and save through `onSave`;
+a subtle `type="number"` field takes the look only, so its caller saves on
 blur. Select and the other pickers have no subtle look yet, so a surface that
 needs one of them stays standard throughout.
 

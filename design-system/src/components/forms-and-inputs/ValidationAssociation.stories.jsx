@@ -3,8 +3,8 @@ import { expect, within } from 'storybook/test';
 
 import DateAndTimePicker from './DateAndTimePicker';
 import FileUpload from './FileUpload';
-import Input from './Input';
-import NumberInput from './NumberInput';
+import TextField from './TextField/TextField';
+
 
 /**
  * Pointing a field at the reason it was rejected.
@@ -62,17 +62,17 @@ async function expectDescriptionResolves(canvasElement, control, expectedText) {
 
 export const InvalidFieldsPointAtTheirMessage = () => (
     <div style={stack}>
-        <Input
+        <TextField
             id="va-email"
             label="Email address"
-            validation="invalid"
-            validationMessage="Use the address your school gave you."
+            isInvalid
+            errorMessage="Use the address your school gave you."
         />
-        <NumberInput
+        <TextField type="number"
             id="va-sessions"
             label="Sessions"
-            validation="invalid"
-            validationMessage="Ten sessions is the maximum."
+            isInvalid
+            errorMessage="Ten sessions is the maximum."
         />
         <FileUpload
             id="va-report"
@@ -121,12 +121,11 @@ InvalidFieldsPointAtTheirMessage.play = async ({ canvasElement }) => {
  */
 export const ValidFieldsSayNothing = () => (
     <div style={stack}>
-        <Input id="va-quiet" label="Full name" />
-        <Input
+        <TextField id="va-quiet" label="Full name" />
+        <TextField
             id="va-good"
             label="Postcode"
-            validation="success"
-            validationMessage="That looks right."
+            successMessage="That looks right."
         />
     </div>
 );
@@ -149,12 +148,12 @@ ValidFieldsSayNothing.play = async ({ canvasElement }) => {
  */
 export const CallerDescriptionIsKept = () => (
     <div style={stack}>
-        <Input
+        <TextField
             id="va-phone"
             label="Phone"
             aria-describedby="va-phone-help"
-            validation="invalid"
-            validationMessage="That is not a UK number."
+            isInvalid
+            errorMessage="That is not a UK number."
         />
         <p id="va-phone-help">Include the area code.</p>
     </div>

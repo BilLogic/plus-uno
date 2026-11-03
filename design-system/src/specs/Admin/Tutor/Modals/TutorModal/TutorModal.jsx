@@ -14,7 +14,7 @@ import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import Toggle from '@/components/forms-and-inputs/Toggle';
 import Select from '@/components/forms-and-inputs/Select';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import './TutorModal.scss';
 
@@ -188,24 +188,24 @@ const TutorModal = ({
                         <div className="tutor-modal__info-tab">
                             <Form>
                                 <div className="tutor-modal__form-group">
-                                    <Input
+                                    <TextField
                                         label="Preferred name"
                                         type="text"
                                         placeholder="Amy"
                                         value={formData.preferredName}
                                         onChange={(e) => setFormData({ ...formData, preferredName: e.target.value })}
-                                        size="small"
+                                        spacing="compact"
                                     />
                                 </div>
 
                                 <div className="tutor-modal__form-group">
-                                    <Input
+                                    <TextField
                                         label="Email"
                                         type="email"
                                         placeholder="name@example.com"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        size="small"
+                                        spacing="compact"
                                     />
                                 </div>
 
@@ -287,48 +287,48 @@ const TutorModal = ({
                             <Form>
                                 <div className="tutor-modal__row">
                                     <div className="tutor-modal__form-group tutor-modal__half-width">
-                                        <Input
+                                        <TextField
                                             label="First Name"
-                                            required
+                                            isRequired
                                             type="text"
                                             placeholder="Ex. Jon"
                                             value={formData.firstName}
                                             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                            size="small"
+                                            spacing="compact"
                                         />
                                     </div>
                                     <div className="tutor-modal__form-group tutor-modal__half-width">
-                                        <Input
+                                        <TextField
                                             label="Last Name"
-                                            required
+                                            isRequired
                                             type="text"
                                             placeholder="Ex. Doe"
                                             value={formData.lastName}
                                             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                            size="small"
+                                            spacing="compact"
                                         />
                                     </div>
                                 </div>
 
                                 <div className="tutor-modal__form-group">
-                                    <Input
+                                    <TextField
                                         label="Preferred Name"
                                         type="text"
                                         placeholder="Preferred Name (optional)"
                                         value={formData.preferredName}
                                         onChange={(e) => setFormData({ ...formData, preferredName: e.target.value })}
-                                        size="small"
+                                        spacing="compact"
                                     />
                                 </div>
 
                                 <div className="tutor-modal__form-group">
-                                    <Input
+                                    <TextField
                                         label="Tutor Email"
                                         type="email"
                                         placeholder="Tutor email (optional)"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        size="small"
+                                        spacing="compact"
                                     />
                                 </div>
 

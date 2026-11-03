@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Input, Textarea } from '@/components';
+import { Button, TextField, TextArea } from '@/components';
 import { Frame, PatternCard, PatternSection, Topbar } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
@@ -197,12 +197,12 @@ const NoteForm = () => (
     <>
         <PatternSection title="Session details" description="What the student worked on today.">
             <div style={fieldStack}>
-                <Input label="Topic" placeholder="e.g. Solving two-step equations" />
-                <Textarea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
+                <TextField label="Topic" placeholder="e.g. Solving two-step equations" />
+                <TextArea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
             </div>
         </PatternSection>
         <PatternSection title="Follow-up">
-            <Input label="Next step" placeholder="e.g. Practice set 4" />
+            <TextField label="Next step" placeholder="e.g. Practice set 4" />
         </PatternSection>
     </>
 );

@@ -6,9 +6,8 @@ import './Field.scss';
 /**
  * _Field — the one box behind every text-like input.
  *
- * It owns the size, the border, the fill and the state. A host (Input,
- * Textarea, NumberInput, InputGroup) decides only what goes in its three
- * slots: `leading` (an icon, an affix, an addon), the content (`children`,
+ * It owns the height, the border, the fill and the state. A host (Text field,
+ * Text area) decides only what goes in its three slots: `leading` (an icon, an affix, an addon), the content (`children`,
  * normally the control itself) and `trailing` (an icon, a caret, steppers,
  * "saving…").
  *
@@ -17,15 +16,15 @@ import './Field.scss';
  * them still, for documentation; the Figma set has them as variants.
  *
  * It is a part: not exported from the barrel, never placed on a screen alone.
- * The Figma counterpart is `_Field` on the Input page.
  */
 const Field = ({
-    size = 'medium',
+    spacing = 'default',
     subtle = false,
     disabled = false,
     readOnly = false,
     invalid = false,
     valid = false,
+    warning = false,
     busy = false,
     multiline = false,
     grow = false,
@@ -39,12 +38,13 @@ const Field = ({
 }) => {
     const classes = [
         'plus-field',
-        `plus-field--${size}`,
+        `plus-field--${spacing}`,
         subtle && 'plus-field--subtle',
         disabled && 'plus-field--disabled',
         readOnly && !disabled && 'plus-field--readonly',
         invalid && 'plus-field--invalid',
-        valid && !invalid && 'plus-field--valid',
+        warning && !invalid && 'plus-field--warning',
+        valid && !invalid && !warning && 'plus-field--valid',
         busy && 'plus-field--busy',
         multiline && 'plus-field--multiline',
         grow && !multiline && 'plus-field--grow',
@@ -69,7 +69,7 @@ const Field = ({
         <div
             className={classes}
             style={style}
-            data-size={size}
+            data-spacing={spacing}
             /* Marks the whole box inactive, so its affixes and icons are read
              * as part of a disabled control and not as text on their own. */
             aria-disabled={disabled || undefined}
@@ -84,22 +84,20 @@ const Field = ({
 };
 
 Field.propTypes = {
-    /**
-     * `medium` draws 32 and is the default. `small` and `large` are
-     * deprecated: they draw like `medium`, and the host warns in development.
-     */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    /** `default` draws 40 and `compact` draws 32. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** Borderless at rest, for editing in place. Editing looks the same as the standard field. */
     subtle: PropTypes.bool,
     disabled: PropTypes.bool,
     readOnly: PropTypes.bool,
     invalid: PropTypes.bool,
     valid: PropTypes.bool,
+    warning: PropTypes.bool,
     /** Something is happening in Trailing ("saving…"), so a subtle field keeps it on show. */
     busy: PropTypes.bool,
     /** The content is several lines (Textarea): slots align to the top, and the box starts at 80 and grows. */
     multiline: PropTypes.bool,
-    /** The content wraps (tags in a Tag field): the box starts at 32 and grows with each row. */
+    /** The content wraps (tags in a Tag field): the box starts at its height and grows with each row. */
     grow: PropTypes.bool,
     /** Draws a live state still, for documentation. Live hover and focus need nothing. */
     state: PropTypes.oneOf(['default', 'hover', 'focus']),
@@ -112,15 +110,15 @@ Field.propTypes = {
 
 /**
  * What a caption tone means for the box and the control. One place, so every
- * host maps it the same way: an error marks both, a confirmation marks only
- * the box, and help leaves the field plain.
+ * host maps it the same way: an error marks both, a warning or a confirmation
+ * marks only the box, and help leaves the field plain.
  *
- * @param {'help'|'invalid'|'success'} [tone]
- * @returns {{ field: { invalid: boolean, valid: boolean }, control: { 'aria-invalid'?: true } }}
+ * @param {'help'|'invalid'|'warning'|'success'} [tone]
+ * @returns {{ field: { invalid: boolean, warning: boolean, valid: boolean }, control: { 'aria-invalid'?: true } }}
  */
 export function toneProps(tone) {
     return {
-        field: { invalid: tone === 'invalid', valid: tone === 'success' },
+        field: { invalid: tone === 'invalid', warning: tone === 'warning', valid: tone === 'success' },
         control: { 'aria-invalid': tone === 'invalid' || undefined },
     };
 }
@@ -205,7 +203,8 @@ FieldLabel.propTypes = {
 };
 
 const CAPTION_ICON = {
-    invalid: 'fa-solid fa-triangle-exclamation',
+    invalid: 'fa-solid fa-circle-exclamation',
+    warning: 'fa-solid fa-triangle-exclamation',
     success: 'fa-solid fa-circle-check',
 };
 
@@ -254,8 +253,8 @@ export const FieldCaption = ({
 FieldCaption.propTypes = {
     messageId: PropTypes.string,
     message: PropTypes.node,
-    /** `invalid` is announced; `success` and `help` are described. */
-    tone: PropTypes.oneOf(['help', 'invalid', 'success']),
+    /** `invalid` is announced; `warning`, `success` and `help` are described. */
+    tone: PropTypes.oneOf(['help', 'invalid', 'warning', 'success']),
     countId: PropTypes.string,
     count: PropTypes.number,
     maxLength: PropTypes.number,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Input, Checkbox } from '@/components';
+import { Card, Button, TextField, Checkbox } from '@/components';
 import { Form as BootstrapForm } from 'react-bootstrap';
 
 /**
@@ -27,7 +27,7 @@ const LoginForm = () => {
                 <BootstrapForm onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <BootstrapForm.Label htmlFor="login-email" className="body2-txt">Email Address</BootstrapForm.Label>
-                        <Input
+                        <TextField
                             id="login-email"
                             type="email"
                             autoComplete="email"
@@ -42,7 +42,7 @@ const LoginForm = () => {
                             <BootstrapForm.Label htmlFor="login-password" className="body2-txt mb-0">Password</BootstrapForm.Label>
                             <a href="#" className="body3-txt color-primary">Forgot password?</a>
                         </div>
-                        <Input
+                        <TextField
                             id="login-password"
                             type="password"
                             autoComplete="current-password"
