@@ -389,7 +389,7 @@ export const GroundAndText = () => (
 GroundAndText.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const ground = getComputedStyle(canvas.getByTestId('ground')).backgroundColor;
-    const onSurface = tokenColor(canvasElement, '--color-on-surface');
+    const onSurface = tokenColor(canvasElement, '--ds-text');
 
     for (const appearance of SECTION_MESSAGE_APPEARANCES) {
         const id = `ground-${appearance}`;
