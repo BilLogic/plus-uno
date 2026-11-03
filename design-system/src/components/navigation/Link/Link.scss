@@ -1,0 +1,49 @@
+@use '../../../styles/state' as *;
+
+.plus-link {
+    display: inline;
+    cursor: pointer;
+    border-radius: var(--radius-050);
+
+    &--default {
+        color: var(--ds-link);
+        text-decoration: underline;
+
+        &:visited {
+            color: var(--ds-link-visited);
+        }
+
+        @include plus-state((
+            pressed: (color: var(--ds-link-pressed)),
+        ));
+    }
+
+    &--subtle {
+        color: var(--ds-text);
+        text-decoration: none;
+
+        &:hover,
+        &[data-hovered] {
+            text-decoration: underline;
+        }
+
+        @include plus-state((
+            pressed: (color: var(--ds-link-pressed)),
+        ));
+    }
+
+    &--inverse {
+        color: var(--ds-text-inverse);
+        text-decoration: underline;
+
+        @include plus-state(
+            (),
+            $ring-token: --ds-border-focused-inverse
+        );
+    }
+
+    .plus-link-icon {
+        margin-inline-start: var(--space-050);
+        font-size: var(--icon-sm);
+    }
+}

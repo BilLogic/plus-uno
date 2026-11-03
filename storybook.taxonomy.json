@@ -89,6 +89,7 @@
     ],
     "Navigation": [
       "Breadcrumbs",
+      "Link",
       "Pagination",
       "Scrollspy",
       "Sidebar tab",
@@ -265,6 +266,7 @@
       "Navigation",
       [
         "Breadcrumbs",
+        "Link",
         "Pagination",
         "Scrollspy",
         "Sidebar tab",

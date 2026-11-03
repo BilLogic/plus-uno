@@ -79,6 +79,7 @@ export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/componen
 export { default as Modal, createModal } from '@/components/messaging/Modal';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
+export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
 export { default as Navbar } from '@/components/navigation/Navbar';
 export { default as NavPills } from '@/components/navigation/NavPills';
 export { default as NavTabs } from '@/components/navigation/NavTabs';

@@ -38,7 +38,7 @@ From `design-system/src/components/navigation/Navbar/Navbar.scss`. Override thes
 
 ## Related
 
-Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Pagination` · `Scrollspy` · `Sidebar` · `SidebarTab`
+Same group: `Breadcrumb` · `Link` · `NavPills` · `NavTabs` · `Pagination` · `Scrollspy` · `Sidebar` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
