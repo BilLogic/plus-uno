@@ -1,0 +1,35 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ObjectStories from './Object.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "object",
+      "name": "Object",
+      "componentSetNodeId": "20630:40",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={ObjectStories} />
+
+<Title />
+
+<DocsTabs of={ObjectStories}>
+
+<DocsTab tab="examples">
+
+A small, typed glyph for a kind of thing: a task, a bug, an idea.
+
+<Canvas of={ObjectStories.Kinds} />
+
+<ArgTypes of={ObjectStories} />
+
+</DocsTab>
+
+</DocsTabs>

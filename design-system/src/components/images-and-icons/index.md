@@ -11,7 +11,7 @@ authored half (#166), counted rather than assumed.
 | [Avatar](Avatar/index.md) | 10 | ✅ | ✅ | ✅ |
 | [AvatarGroup](AvatarGroup/index.md) | 7 | ✅ | ✕ | ✅ |
 | [Illustration](Illustration/index.md) | 5 | ✅ | ✅ | ✅ |
-| [Image](Image/index.md) | 7 | ✕ | ✕ | ✕ |
+| [Object](Object/index.md) | 4 | ✕ | ✕ | ✕ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
 | [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 

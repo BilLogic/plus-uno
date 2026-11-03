@@ -45,6 +45,7 @@
     "Images and icons": [
       "Avatar",
       "Logo",
+      "Object",
       "Tile",
       "AI icon",
       "Illustrations",
@@ -213,6 +214,7 @@
       [
         "Avatar",
         "Logo",
+        "Object",
         "Tile",
         "AI icon",
         "Illustrations",
