@@ -318,9 +318,9 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two — the deliberate
   // edit this number is here to force.
   //
-  if (tabbed.length !== 62) {
+  if (tabbed.length !== 65) {
     all.push(
-      `expected 62 tabbed docs pages (61 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 65 tabbed docs pages (64 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

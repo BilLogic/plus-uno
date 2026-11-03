@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import { Dropdown } from 'react-bootstrap';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
 
@@ -199,14 +199,13 @@ const RichTextEditor = ({
         if (!def) return null;
         const icon = iconOverride || def.icon;
         return (
-            <Button
+            <IconButton
                 key={btnKey}
                 type="button"
                 spacing={toolbarBtnSpacing}
                 appearance="subtle"
-                iconBefore={icon}
-                title={def.title}
-                aria-label={def.title}
+                icon={icon}
+                label={def.title}
                 isSelected={Boolean(toolbarState[btnKey])}
                 onClick={(e) => {
                     e.preventDefault();
@@ -227,13 +226,12 @@ const RichTextEditor = ({
                 const def = BUTTON_DEFS[btnKey];
                 if (!def) return null;
                 return (
-                    <Button
+                    <IconButton
                         key={btnKey}
                         type="button"
                         spacing={toolbarBtnSpacing}
-                        iconBefore={def.icon}
-                        title={def.title}
-                        aria-label={def.title}
+                        icon={def.icon}
+                        label={def.title}
                         isSelected={Boolean(toolbarState[btnKey])}
                         onClick={(e) => {
                             e.preventDefault();

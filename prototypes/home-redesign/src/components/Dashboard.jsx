@@ -6,7 +6,7 @@ import ChatSimulationCard from './ChatSimulationCard';
 import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { RecommendedLessons } from '@/specs/Home/Cards';
-import Button from '@/components/forms-and-inputs/Button';
+import { IconButton } from '@/components';
 import DonutChart from '@/dataviz/part-to-whole/DonutChart/DonutChart';
 import { BarChart } from '@/dataviz';
 import Progress from '@/components/loading/Progress/Progress';
@@ -175,19 +175,19 @@ function StudentMomentumCard() {
             <div className="home-redesign-card-header-with-nav">
                 <h4 className="h4 home-redesign-card-title">Student Momentum</h4>
                 <div className="home-redesign-nav-buttons">
-                    <Button
+                    <IconButton
                         spacing="compact"
-                        iconBefore="arrow-left"
+                        icon="arrow-left"
                         onClick={() => setPage((p) => Math.max(0, p - 1))}
                         isDisabled={page === 0}
-                        aria-label="Previous"
+                        label="Previous"
                     />
-                    <Button
+                    <IconButton
                         spacing="compact"
-                        iconBefore="arrow-right"
+                        icon="arrow-right"
                         onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
                         isDisabled={page >= maxPage}
-                        aria-label="Next"
+                        label="Next"
                     />
                 </div>
             </div>
@@ -313,19 +313,19 @@ export const Dashboard = () => {
                             <div className="home-redesign-trainings-header">
                                 <h4 className="h4">Personalized Trainings</h4>
                                 <div className="home-redesign-trainings-controls">
-                                    <Button
+                                    <IconButton
                                         spacing="compact"
-                                        iconBefore="arrow-left"
+                                        icon="arrow-left"
                                         onClick={() => scrollCarousel('left')}
                                         isDisabled={!canScrollLeft}
-                                        aria-label="Scroll left"
+                                        label="Scroll left"
                                     />
-                                    <Button
+                                    <IconButton
                                         spacing="compact"
-                                        iconBefore="arrow-right"
+                                        icon="arrow-right"
                                         onClick={() => scrollCarousel('right')}
                                         isDisabled={!canScrollRight}
-                                        aria-label="Scroll right"
+                                        label="Scroll right"
                                     />
                                 </div>
                             </div>

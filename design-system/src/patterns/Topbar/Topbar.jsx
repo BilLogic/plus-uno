@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Breadcrumb, Button, Skeleton, UserAvatar } from '@/components';
+import { Breadcrumb, Skeleton, UserAvatar, IconButton, LinkIconButton } from '@/components';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import './Topbar.scss';
 
@@ -51,11 +51,11 @@ const Topbar = ({
         <div id={id} className={classes} style={style}>
             <div className="plus-topbar__start">
                 {hasToggle ? (
-                    <Button
+                    <IconButton
                         className="plus-topbar__toggle"
                         appearance="subtle"
-                        iconBefore={open ? 'angles-left' : 'bars'}
-                        aria-label={open && isDocked ? 'Close sidebar' : 'Open sidebar'}
+                        icon={open ? 'angles-left' : 'bars'}
+                        label={open && isDocked ? 'Close sidebar' : 'Open sidebar'}
                         aria-expanded={open}
                         {...toggleProps}
                         {...control?.toggleProps}
@@ -77,17 +77,26 @@ const Topbar = ({
                     <Skeleton shape="circle" width="var(--item-height-md)" />
                 ) : (
                     <>
-                        <Button
-                            className="plus-topbar__help"
-                            appearance="subtle"
-                            iconBefore="circle-question"
-                            aria-label="Help Center"
-                            title="Help Center"
-                            href={helpHref}
-                            target={helpHref ? '_blank' : undefined}
-                            rel={helpHref ? 'noreferrer' : undefined}
-                            onClick={onHelpClick}
-                        />
+                        {helpHref ? (
+                            <LinkIconButton
+                                className="plus-topbar__help"
+                                appearance="subtle"
+                                icon="circle-question"
+                                label="Help Center"
+                                href={helpHref}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={onHelpClick}
+                            />
+                        ) : (
+                            <IconButton
+                                className="plus-topbar__help"
+                                appearance="subtle"
+                                icon="circle-question"
+                                label="Help Center"
+                                onClick={onHelpClick}
+                            />
+                        )}
                         {user ? (
                             <UserAvatar
                                 size="md"

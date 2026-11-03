@@ -77,16 +77,4 @@ describe('Button', () => {
         expect(container.querySelector('.plus-btn-visual--before i')).toHaveClass('fa-solid', 'fa-plus');
         expect(container.querySelector('.plus-btn-visual--after i')).toHaveClass('fa-solid', 'fa-chevron-right');
     });
-
-    it('is square when it has an icon and no label', () => {
-        render(<Button iconBefore="trash" aria-label="Delete" />);
-        expect(screen.getByRole('button', { name: 'Delete' })).toHaveClass('plus-btn--icon-only');
-    });
-
-    it('renders an anchor when given an href', () => {
-        const { container } = render(<Button href="/sessions" text="Sessions" />);
-        const anchor = container.querySelector('a');
-        expect(anchor).toHaveAttribute('href', '/sessions');
-        expect(anchor).toHaveTextContent('Sessions');
-    });
 });

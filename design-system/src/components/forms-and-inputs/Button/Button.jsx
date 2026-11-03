@@ -56,8 +56,6 @@ export const Button = ({
     isDisabled = false,
     isSelected,
     isLoading = false,
-    href,
-    target,
     type = 'button',
     as: Component,
 
@@ -90,8 +88,6 @@ export const Button = ({
             id={id}
             as={Component}
             variant=""
-            href={href}
-            target={target}
             type={type}
             className={btnClasses}
             onClick={!isLoading ? onClick : undefined}
@@ -127,8 +123,6 @@ Button.propTypes = {
     isDisabled: PropTypes.bool,
     isSelected: PropTypes.bool,
     isLoading: PropTypes.bool,
-    href: PropTypes.string,
-    target: PropTypes.string,
     type: PropTypes.string,
     as: PropTypes.elementType,
 

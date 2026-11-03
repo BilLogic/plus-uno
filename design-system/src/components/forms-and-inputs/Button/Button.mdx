@@ -139,7 +139,6 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Prevents interaction. Avoid it; see Usage.</td></tr>
 <tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>Shows a spinner in place of the label and blocks interaction.</td></tr>
 <tr><td><code>shouldFitContainer</code></td><td>boolean</td><td><code>false</code></td><td>Stretches the button to the width of its container.</td></tr>
-<tr><td><code>href</code>, <code>target</code></td><td>string</td><td>none</td><td>Renders an anchor. Use it for navigation.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -268,7 +267,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ## Usage
 
-Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, pass `href` so it renders a link.
+Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
 
 ### One primary action per area.
 
@@ -322,7 +321,7 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 
 - A button performs an action; a link navigates. Use the right element so screen readers announce the right role.
 - Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Use validation and on-screen directions instead, and never attach a tooltip to one.
-- An icon-only button needs a name: pass `aria-label`.
+- A button with no visible label is an Icon button, which requires a `label`.
 - Loading blocks interaction and sets `aria-busy`; the label stays in the tree for assistive technology.
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.

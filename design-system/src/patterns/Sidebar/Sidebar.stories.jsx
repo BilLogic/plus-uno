@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, CountTag, Logo, Sidebar as RoleSidebar, StatusTag } from '@/components';
+import { CountTag, Logo, Sidebar as RoleSidebar, StatusTag, Button, IconButton } from '@/components';
 import PatternSidebar, {
     clearOpenTabs,
     createOpenTabsStore,
@@ -256,7 +256,7 @@ export const ItemSlots = {
                         id: 'actions',
                         text: 'Groups',
                         icon: 'users-rectangle',
-                        actionsOnHover: <Button spacing="compact" appearance="subtle" iconBefore="xmark" aria-label="Close Groups" />,
+                        actionsOnHover: <IconButton spacing="compact" appearance="subtle" icon="xmark" label="Close Groups" />,
                     },
                     { id: 'off', text: 'Reports', icon: 'chart-pie', disabled: true },
                 ]}

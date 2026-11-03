@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Table, Button, StatusTag } from '@/components';
+import { Card, Table, StatusTag, Button, IconButton } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 import PatternSection from '@/patterns/PatternSection';
 import { Select } from '@/components/forms-and-inputs';
@@ -59,8 +59,8 @@ export const OnboardingSpec = () => {
                 <PatternSection title="Featured Modules">
                     <div className="d-flex justify-content-end mb-2">
                         <div className="d-flex gap-2">
-                            <Button iconBefore="arrow-left" spacing="compact" aria-label="Previous modules" isDisabled />
-                            <Button iconBefore="arrow-right" spacing="compact" aria-label="Next modules" />
+                            <IconButton icon="arrow-left" spacing="compact" label="Previous modules" isDisabled />
+                            <IconButton icon="arrow-right" spacing="compact" label="Next modules" />
                         </div>
                     </div>
                     <div className="d-flex gap-3 overflow-auto pb-3" style={{ scrollBehavior: 'smooth' }}>

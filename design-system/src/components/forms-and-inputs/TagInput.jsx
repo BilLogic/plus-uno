@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Tag, { TAG_COLORS } from '@/components/labels/Tag';
 import TagGroup from '@/components/labels/TagGroup';
-import Button from '@/components/forms-and-inputs/Button';
+import IconButton from '@/components/forms-and-inputs/IconButton';
 import TextField from './TextField/TextField';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
@@ -557,12 +557,12 @@ const TagInput = ({
         return (
             <>
                 {canReorder && (
-                    <Button
+                    <IconButton
                         ref={gripRef}
                         appearance="subtle"
                         spacing="compact"
-                        iconBefore="grip-vertical"
-                        aria-label={`Reorder ${text}`}
+                        icon="grip-vertical"
+                        label={`Reorder ${text}`}
                         aria-describedby={`${fieldId}-reorder-keys`}
                         className="plus-tag-input__row-action plus-tag-input__grip"
                         onKeyDown={(event) => handleGripKeyDown(index, event)}
@@ -571,12 +571,12 @@ const TagInput = ({
                     />
                 )}
                 {hasMenu && (
-                    <Button
+                    <IconButton
                         ref={moreRef}
                         appearance="subtle"
                         spacing="compact"
-                        iconBefore="ellipsis"
-                        aria-label={`Options for ${text}`}
+                        icon="ellipsis"
+                        label={`Options for ${text}`}
                         aria-haspopup="listbox"
                         aria-expanded={Boolean(menu)}
                         aria-controls={menu ? menuListId : undefined}

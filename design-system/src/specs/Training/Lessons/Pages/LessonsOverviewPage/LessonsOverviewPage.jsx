@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button, IconButton } from '@/components';
 import TrainingLessonStatusSelect from '@/specs/Training/Lessons/Elements/TrainingLessonStatusSelect/TrainingLessonStatusSelect';
 import SortControl from '@/specs/Training/Lessons/Elements/SortControl/SortControl';
 import LessonsTable from '@/specs/Training/Lessons/Tables/LessonsTable/LessonsTable';
@@ -162,21 +162,19 @@ const LessonsOverviewPage = ({
 
                         {/* View Toggle Buttons */}
                         <div className="lessons-overview-page__view-toggle">
-                            <Button
-                                text=""
+                            <IconButton
                                 appearance="subtle" isSelected={currentView === 'list'}
                                 spacing="compact"
-                                iconBefore="list-ul"
-                                aria-label="List view"
+                                icon="list-ul"
+                                label="List view"
                                 aria-pressed={currentView === 'list'}
                                 onClick={() => onViewToggle && onViewToggle('list')}
                             />
-                            <Button
-                                text=""
+                            <IconButton
                                 appearance="subtle" isSelected={currentView === 'grid'}
                                 spacing="compact"
-                                iconBefore="table-cells-large"
-                                aria-label="Grid view"
+                                icon="table-cells-large"
+                                label="Grid view"
                                 aria-pressed={currentView === 'grid'}
                                 onClick={() => onViewToggle && onViewToggle('grid')}
                             />
