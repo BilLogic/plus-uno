@@ -1,0 +1,36 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PanelStories from './Panel.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "panel",
+      "name": "Panel",
+      "componentSetNodeId": "20630:52",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-52",
+      "source": "node-chart",
+      "status": "verified",
+      "isComponentSet": false
+    }
+  ]
+};
+
+<Meta of={PanelStories} />
+
+<Title />
+
+<DocsTabs of={PanelStories}>
+
+<DocsTab tab="examples">
+
+A docked surface with a header, body and footer, for secondary content beside the page.
+
+<Canvas of={PanelStories.FullComposition} />
+
+<ArgTypes of={PanelStories} />
+
+</DocsTab>
+
+</DocsTabs>
