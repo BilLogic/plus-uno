@@ -26,11 +26,11 @@
     
     // Validation states
     &.plus-file-upload-invalid {
-        box-shadow: 0 0 0 0.2rem var(--color-danger-state-08);
+        box-shadow: 0 0 0 0.2rem var(--ds-background-danger-subtler);
     }
     
     &.plus-file-upload-valid {
-        box-shadow: 0 0 0 0.2rem var(--color-success-state-08);
+        box-shadow: 0 0 0 0.2rem var(--ds-background-success-subtler);
     }
     
     // Disabled state

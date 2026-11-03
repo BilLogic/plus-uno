@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-state-12` · `--color-primary-state-16` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
+`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--ds-background-brand-bold-hovered` · `--ds-background-brand-bold-pressed` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
