@@ -44,12 +44,11 @@ const FileListItem = ({ name, size = '', onRemove }) => (
         <div style={{ marginLeft: 'auto' }}>
             <Button
                 type="button"
-                style="default"
-                fill="ghost"
-                size="small"
+                appearance="subtle"
+                spacing="compact"
                 title={`Remove ${name}`}
                 aria-label={`Remove ${name}`}
-                leadingVisual="close"
+                iconBefore="close"
                 onClick={onRemove}
             />
         </div>

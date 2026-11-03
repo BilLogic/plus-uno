@@ -146,9 +146,7 @@ const LessonsOverviewPage = ({
                         {/* Expand All Button */}
                         <Button
                             text="Expand All"
-                            style="secondary"
-                            fill="outline"
-                            size="small"
+                            spacing="compact"
                             onClick={onExpandAll}
                         />
 
@@ -166,20 +164,18 @@ const LessonsOverviewPage = ({
                         <div className="lessons-overview-page__view-toggle">
                             <Button
                                 text=""
-                                style="primary"
-                                fill={currentView === 'list' ? 'tonal' : 'ghost'}
-                                size="small"
-                                leadingVisual="list-ul"
+                                appearance="subtle" isSelected={currentView === 'list'}
+                                spacing="compact"
+                                iconBefore="list-ul"
                                 aria-label="List view"
                                 aria-pressed={currentView === 'list'}
                                 onClick={() => onViewToggle && onViewToggle('list')}
                             />
                             <Button
                                 text=""
-                                style="primary"
-                                fill={currentView === 'grid' ? 'tonal' : 'ghost'}
-                                size="small"
-                                leadingVisual="table-cells-large"
+                                appearance="subtle" isSelected={currentView === 'grid'}
+                                spacing="compact"
+                                iconBefore="table-cells-large"
                                 aria-label="Grid view"
                                 aria-pressed={currentView === 'grid'}
                                 onClick={() => onViewToggle && onViewToggle('grid')}

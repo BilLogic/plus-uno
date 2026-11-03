@@ -27,12 +27,12 @@ export const FocusRing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the button. The fill is unchanged.</>}>
             <span style={{ display: 'inline-flex', borderRadius: 'var(--element-radius-item-md)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)' }}>
-                <Button text="Save changes" style="primary" fill="filled" />
+                <Button text="Save changes" appearance="primary" />
             </span>
         </Do>
         <Dont caption="Focus shown only by darkening the fill. It reads as hover or press, and it is easy to miss.">
             <span style={{ display: 'inline-flex' }}>
-                <Button text="Save changes" style="primary" fill="filled" className="sb-focus-by-fill" />
+                <Button text="Save changes" appearance="primary" className="sb-focus-by-fill" />
                 <style>{'.sb-focus-by-fill.btn { background-color: var(--ds-background-brand-bold-pressed); }'}</style>
             </span>
         </Dont>

@@ -58,8 +58,8 @@ function ExampleForm() {
         className="d-flex justify-content-end"
         style={{ gap: 'var(--size-element-gap-md)', marginTop: 'var(--size-card-gap-md)' }}
       >
-        <Button text="Cancel" style="secondary" fill="tonal" onClick={onCancel} />
-        <Button text="Save" style="primary" fill="filled" type="submit" onClick={onSave} />
+        <Button text="Cancel" onClick={onCancel} />
+        <Button text="Save" appearance="primary" type="submit" onClick={onSave} />
       </div>
     </Card>
   );
@@ -102,7 +102,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 - Raw `<form><input /></form>` with Bootstrap classes only
 - Mixed hardcoded px gaps and token gaps in the same form
-- `Button variant="primary"` (Bootstrap) instead of PLUS `style` / `fill`
+- `Button variant="primary"` (Bootstrap) instead of PLUS `appearance`
 - Product-specific wizard steps or IA — out of scope for this pattern doc
 
 ## Field-level conventions

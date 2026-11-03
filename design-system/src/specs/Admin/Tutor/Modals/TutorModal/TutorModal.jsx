@@ -215,10 +215,8 @@ const TutorModal = ({
                                         {['Option #1', 'Option #2', 'Option #3'].map((option, index) => (
                                             <Button
                                                 key={index}
-                                                text={option}
-                                                style="secondary"
-                                                fill="filled" // Changing to filled based on screenshot appearance (darker gray on light gray)
-                                                size="small"
+                                                text={option} // Changing to filled based on screenshot appearance (darker gray on light gray)
+                                                spacing="compact"
                                             />
                                         ))}
                                     </div>
@@ -231,9 +229,7 @@ const TutorModal = ({
                                             <Button
                                                 key={index}
                                                 text={option}
-                                                style="secondary"
-                                                fill="filled"
-                                                size="small"
+                                                spacing="compact"
                                             />
                                         ))}
                                     </div>
@@ -397,9 +393,7 @@ const TutorModal = ({
                     {mode === 'edit' && (
                         <Button
                             text="Delete This Tutor"
-                            style="danger"
-                            fill="text"
-                            size="medium"
+                            appearance="subtle"
                             onClick={onDelete}
                         />
                     )}
@@ -408,16 +402,12 @@ const TutorModal = ({
                     <div className="tutor-modal__actions" style={mode === 'add' ? { marginLeft: 'auto' } : {}}>
                         <Button
                             text="Cancel"
-                            style="secondary"
-                            fill="text"
-                            size="medium"
+                            appearance="subtle"
                             onClick={onHide}
                         />
                         <Button
                             text="Save"
-                            style="primary"
-                            fill="filled"
-                            size="medium"
+                            appearance="primary"
                             onClick={onSave}
                         />
                     </div>

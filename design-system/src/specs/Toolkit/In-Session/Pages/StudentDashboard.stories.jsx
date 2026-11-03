@@ -421,10 +421,7 @@ const RegularTutorEmptyState = () => (
             {/* Refresh Button */}
             <Button
                 text="Refresh"
-                style="primary"
-                fill="outline"
-                size="medium"
-                leadingVisual="rotate"
+                iconBefore="rotate"
                 onClick={() => window.location.reload()}
             />
         </div>
@@ -548,10 +545,7 @@ const LeadSupervisorEmptyState = () => (
             {/* Manage Session Button */}
             <Button
                 text="Manage Session"
-                style="primary"
-                fill="outline"
-                size="medium"
-                leadingVisual="pen-to-square"
+                iconBefore="pen-to-square"
             />
         </div>
     </div>

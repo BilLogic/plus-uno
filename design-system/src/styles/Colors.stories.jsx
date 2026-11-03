@@ -247,14 +247,14 @@ export const AccentOnComponents = () => (
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
                 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
-                <span><Button text="Join session" style="primary" fill="filled" /></span>
+                <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Do>
         <Dont caption="Running text in the brand color. Nothing reads as the action any more, and links look like plain text.">
             <div style={sample}>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
                 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
-                <span><Button text="Join session" style="primary" fill="filled" /></span>
+                <span><Button text="Join session" appearance="primary" /></span>
             </div>
         </Dont>
     </DoDont>

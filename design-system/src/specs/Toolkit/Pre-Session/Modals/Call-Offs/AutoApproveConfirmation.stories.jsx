@@ -85,8 +85,8 @@ export const AutoApprove_Confirmation = () => (
 
                 {/* Footer Buttons - using tutor view components */}
                 <div className="d-flex" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    <SeeSessionsSignUpButton block />
-                    <ViewUpdatedScheduleButton block fill="filled" />
+                    <SeeSessionsSignUpButton shouldFitContainer />
+                    <ViewUpdatedScheduleButton shouldFitContainer appearance="primary" />
                 </div>
             </div>
         }

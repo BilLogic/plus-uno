@@ -21,18 +21,15 @@ const CtaButtons = ({
     const stateConfig = {
         'not started': {
             text: 'Get Started',
-            buttonStyle: 'primary',
-            fill: 'filled'
+            appearance: 'primary'
         },
         'in progress': {
             text: 'Continue',
-            buttonStyle: 'primary',
-            fill: 'filled'
+            appearance: 'primary'
         },
         'completed': {
             text: 'Review',
-            buttonStyle: 'success',
-            fill: 'tonal'
+            appearance: 'default'
         }
     };
 
@@ -42,11 +39,10 @@ const CtaButtons = ({
         <div className={`cta-buttons ${className}`} {...props}>
             <Button
                 text={config.text}
-                style={config.buttonStyle}
-                fill={config.fill}
-                size="small"
+                appearance={config.appearance}
+                spacing="compact"
                 onClick={onClick}
-                disabled={disabled}
+                isDisabled={disabled}
             />
         </div>
     );

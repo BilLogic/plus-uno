@@ -256,7 +256,7 @@ export const ItemSlots = {
                         id: 'actions',
                         text: 'Groups',
                         icon: 'users-rectangle',
-                        actionsOnHover: <Button size="small" fill="text" style="secondary" leadingVisual="xmark" aria-label="Close Groups" />,
+                        actionsOnHover: <Button spacing="compact" appearance="subtle" iconBefore="xmark" aria-label="Close Groups" />,
                     },
                     { id: 'off', text: 'Reports', icon: 'chart-pie', disabled: true },
                 ]}
@@ -398,9 +398,7 @@ const OpenTabsSidebar = ({ boxHeight, records = [], label = 'Main' }) => {
                     {records.map(([parent, record]) => (
                         <Button
                             key={`${parent}:${record.id}`}
-                            size="small"
-                            fill="outline"
-                            style="secondary"
+                            spacing="compact"
                             text={`Open ${record.title}`}
                             onClick={() => tabs.open(parent, record)}
                         />
@@ -706,7 +704,7 @@ const PersistenceDemo = () => {
     const [load, setLoad] = useState(0);
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
-            <div><Button size="small" fill="tonal" text="Reload" onClick={() => setLoad((n) => n + 1)} /></div>
+            <div><Button spacing="compact" text="Reload" onClick={() => setLoad((n) => n + 1)} /></div>
             <OpenTabsHarness
                 key={load}
                 storeKey={PERSIST_KEY}

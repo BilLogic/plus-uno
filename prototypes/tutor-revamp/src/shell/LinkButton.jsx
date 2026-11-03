@@ -8,6 +8,6 @@ import { Button } from '@/components';
  * link role, which Button's polymorphic `as` would otherwise turn into a
  * button. Takes Button's props plus `to`.
  */
-const LinkButton = (props) => <Button as={Link} role="link" {...props} />;
+const LinkButton = (props) => <Button appearance="primary" as={Link} role="link" {...props} />;
 
 export default LinkButton;

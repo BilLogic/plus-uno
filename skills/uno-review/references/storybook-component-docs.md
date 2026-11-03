@@ -30,7 +30,7 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
    Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Examples: [`Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx), [`NavPills.mdx`](../../../design-system/src/components/navigation/NavPills/NavPills.mdx).
 
 3. **Single entry, richer composed docs**
-   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), which uses [`button-segmented-demos.jsx`](../../../design-system/src/components/forms-and-inputs/Button/button-segmented-demos.jsx).
+   A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), which sets its sections on the Core Component template and builds its examples from the stories.
 
 4. **Stories-only outlier**
    Some forms still rely on a single story file and have no colocated MDX page yet. As of the 2026-07 Documentation IA migration there are no current examples — the last known outliers (`Rating`, `Input group`, `Scale`) have since gained colocated MDX pages under `Components/Forms and inputs/`.

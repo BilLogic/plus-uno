@@ -18,8 +18,8 @@ const box = { height: 280, width: '100%' };
 
 const noteActions = (
     <>
-        <Button style="secondary" fill="outline" text="Save draft" />
-        <Button style="primary" fill="filled" text="Submit note" />
+        <Button text="Save draft" />
+        <Button appearance="primary" text="Submit note" />
     </>
 );
 
@@ -62,9 +62,9 @@ export const FocusedActionsDont = () => (
             actions={(
                 // An auto end margin moves the group to the start of the end-aligned footer.
                 <div style={{ display: 'flex', gap: 'var(--space-050)', marginRight: 'auto' }}>
-                    <Button style="primary" fill="filled" text="Submit note" />
-                    <Button style="primary" fill="filled" text="Save draft" />
-                    <Button style="primary" fill="filled" text="Discard" />
+                    <Button appearance="primary" text="Submit note" />
+                    <Button appearance="primary" text="Save draft" />
+                    <Button appearance="primary" text="Discard" />
                 </div>
             )}
         >

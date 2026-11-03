@@ -102,7 +102,7 @@ const RichTextEditor = ({
     const [blockFormat, setBlockFormat] = useState('p');
 
     const useFullToolbar = toolbarPreset === 'full' || toolbarButtons != null;
-    const toolbarBtnSize = useFullToolbar ? 'medium' : 'small';
+    const toolbarBtnSpacing = useFullToolbar ? 'default' : 'compact';
 
     const updateToolbarState = useCallback(() => {
         const fmt = normalizeBlockTag(document.queryCommandValue('formatBlock'));
@@ -204,27 +204,24 @@ const RichTextEditor = ({
             <Button
                 key={btnKey}
                 type="button"
-                size={toolbarBtnSize}
-                style="secondary"
-                fill="ghost"
-                leadingVisual={icon}
+                spacing={toolbarBtnSpacing}
+                appearance="subtle"
+                iconBefore={icon}
                 title={def.title}
                 aria-label={def.title}
-                active={Boolean(toolbarState[btnKey])}
+                isSelected={Boolean(toolbarState[btnKey])}
                 onClick={(e) => {
                     e.preventDefault();
                     execCommand(def.command, def.value);
                 }}
-                disabled={disabled || readOnly}
+                isDisabled={disabled || readOnly}
             />
         );
     };
 
     const renderFullToolbar = () => (
         <ButtonGroup
-            size={toolbarBtnSize}
-            style="secondary"
-            fill="outline"
+            spacing={toolbarBtnSpacing}
             ariaLabel="Rich text formatting"
             className="plus-rich-text-editor-full-group"
         >
@@ -235,18 +232,16 @@ const RichTextEditor = ({
                     <Button
                         key={btnKey}
                         type="button"
-                        size={toolbarBtnSize}
-                        style="secondary"
-                        fill="outline"
-                        leadingVisual={def.icon}
+                        spacing={toolbarBtnSpacing}
+                        iconBefore={def.icon}
                         title={def.title}
                         aria-label={def.title}
-                        active={Boolean(toolbarState[btnKey])}
+                        isSelected={Boolean(toolbarState[btnKey])}
                         onClick={(e) => {
                             e.preventDefault();
                             execCommand(def.command, def.value);
                         }}
-                        disabled={disabled || readOnly}
+                        isDisabled={disabled || readOnly}
                     />
                 );
             })}

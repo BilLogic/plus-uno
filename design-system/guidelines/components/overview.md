@@ -162,13 +162,13 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 
 | Use Case | Component | Props |
 |----------|-----------|-------|
-| Main page actions | `Button` | `style="primary" fill="filled"` |
-| Secondary actions | `Button` | `style="secondary" fill="tonal"` |
+| Main page actions | `Button` | `appearance="primary"` |
+| Secondary actions | `Button` | `appearance="default"` or `appearance="subtle"` |
 | Status indicators | `Badge` | `style="success"` or `style="warning"` |
 | User feedback | `Alert` | `style="success"` or `style="danger"` |
 | Navigation breadcrumbs | `Breadcrumb` | — |
 | Collapsible sections | `Accordion` | — |
-| Related action groups | `ButtonGroup` | `style="primary" fill="outline"` |
+| Related action groups | `ButtonGroup` | `appearance="default"` |
 
 ---
 
@@ -250,20 +250,22 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 
 ### Button
 **Purpose**: Trigger actions and submit forms.
-**Styles**: primary, secondary, tertiary, ghost, danger
-**Sizes**: small, medium, large
+**Appearances**: default, primary, subtle, warning, danger, discovery
+**Spacing**: default (32), compact (24)
 **Props**:
 - `text`: Button label
-- `style`: Visual variant
-- `size`: Button size
-- `leadingVisual`: Icon before text
-- `trailingVisual`: Icon after text
-- `disabled`: Disable interaction
-- `loading`: Show loading spinner
+- `appearance`: Visual style
+- `spacing`: Button height and padding
+- `iconBefore`: Icon before text
+- `iconAfter`: Icon after text
+- `isSelected`: Mark the button selected
+- `isDisabled`: Disable interaction
+- `isLoading`: Show loading spinner
+- `shouldFitContainer`: Fill the width of the container
 
 ```jsx
-<Button text="Submit" style="primary" size="medium" />
-<Button text="Cancel" style="ghost" />
+<Button text="Submit" appearance="primary" />
+<Button text="Cancel" />
 ```
 
 ---
@@ -277,9 +279,9 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 
 ```jsx
 <ButtonGroup>
-  <Button text="Left" />
-  <Button text="Middle" />
-  <Button text="Right" />
+  <Button appearance="primary" text="Left" />
+  <Button appearance="primary" text="Middle" />
+  <Button appearance="primary" text="Right" />
 </ButtonGroup>
 ```
 

@@ -694,25 +694,22 @@ export default function MonthlyReportContent() {
                                                             <p className="feedback-prompt">{state === 'reviewed' ? (feedbackSelections[dim.id] === 'helpful' ? 'Marked as helpful' : 'Your feedback:') : 'Was this insight helpful?'}</p>
                                                             <div className="feedback-buttons">
                                                                 <Button
-                                                                    size="small"
-                                                                    style={feedbackSelections[dim.id] === 'helpful' ? 'success' : 'secondary'}
-                                                                    fill={feedbackSelections[dim.id] === 'helpful' ? 'tonal' : 'outline'}
+                                                                    spacing="compact"
+                                                                    isSelected={feedbackSelections[dim.id] === 'helpful'}
                                                                     onClick={(e) => { e.stopPropagation(); handleFeedback(dim.id, 'helpful'); }}
                                                                 >
                                                                     <i className="fa-solid fa-thumbs-up"></i> Helpful
                                                                 </Button>
                                                                 <Button
-                                                                    size="small"
-                                                                    style={feedbackSelections[dim.id] === 'not_helpful' ? 'secondary' : 'secondary'}
-                                                                    fill={feedbackSelections[dim.id] === 'not_helpful' ? 'tonal' : 'outline'}
+                                                                    spacing="compact"
+                                                                    isSelected={feedbackSelections[dim.id] === 'not_helpful'}
                                                                     onClick={(e) => { e.stopPropagation(); handleFeedback(dim.id, 'not_helpful'); }}
                                                                 >
                                                                     <i className="fa-solid fa-thumbs-down"></i> Not Helpful
                                                                 </Button>
                                                                 <Button
-                                                                    size="small"
-                                                                    style={feedbackSelections[dim.id] === 'inaccurate' ? 'warning' : 'warning'}
-                                                                    fill={feedbackSelections[dim.id] === 'inaccurate' ? 'tonal' : 'outline'}
+                                                                    spacing="compact"
+                                                                    isSelected={feedbackSelections[dim.id] === 'inaccurate'}
                                                                     onClick={(e) => { e.stopPropagation(); handleFeedback(dim.id, 'inaccurate'); }}
                                                                 >
                                                                     <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
@@ -737,9 +734,9 @@ export default function MonthlyReportContent() {
                                                             />
                                                             <div style={{ marginTop: 'var(--size-element-gap-sm)', display: 'flex', justifyContent: 'flex-end' }}>
                                                                 <Button
-                                                                    size="small"
-                                                                    style="primary"
-                                                                    disabled={
+                                                                    spacing="compact"
+                                                                    appearance="primary"
+                                                                    isDisabled={
                                                                         !feedbackText[dim.id] ||
                                                                         feedbackText[dim.id].length < 10 ||
                                                                         (state === 'reviewed' && feedbackText[dim.id] === savedFeedbackText[dim.id])
@@ -885,11 +882,9 @@ export default function MonthlyReportContent() {
                     </div>
                     <Button
                         text="Sign up"
-                        style="primary"
-                        fill="filled"
-                        size="medium"
+                        appearance="primary"
                         onClick={() => { }}
-                        trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
+                        iconAfter={<i className="fa-solid fa-arrow-right"></i>}
                     />
                 </div>
             </section>

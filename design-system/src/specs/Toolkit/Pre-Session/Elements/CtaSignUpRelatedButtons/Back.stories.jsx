@@ -14,9 +14,8 @@ export default {
  * Back Button
  * Outlined primary button for going back
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="outline" for outlined style
- * - leadingIcon="arrow-left" for back arrow icon
+ * - appearance="default"
+ * - iconBefore="arrow-left" for back arrow icon
  */
 export const Overview = () => (
     <div
@@ -31,9 +30,7 @@ export const Overview = () => (
             <div style={{ maxWidth: '200px' }}>
                 <Button
                     text="Back"
-                    leadingIcon="arrow-left"
-                    style="primary"
-                    fill="outline"
+                    iconBefore="arrow-left"
                 />
             </div>
         </section>
@@ -47,9 +44,7 @@ export const Overview = () => (
 export const BackButton = ({ ...props }) => (
     <Button
         text="Back"
-        leadingIcon="arrow-left"
-        style="primary"
-        fill="outline"
+        iconBefore="arrow-left"
         {...props}
     />
 );

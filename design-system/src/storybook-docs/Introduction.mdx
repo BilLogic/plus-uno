@@ -125,21 +125,20 @@ import Button from '@/components/forms-and-inputs/Button';
         <p className="sb-plus-intro-mini-copy">Visual treatments for emphasis and semantic intent.</p>
         <div className="sb-plus-intro-mini-canvas">
           <div className="flex flex-wrap items-center gap-2">
-            <Button text="Primary" style="primary" fill="filled" size="small" />
-            <Button text="Secondary" style="secondary" fill="filled" size="small" />
-            <Button text="Danger" style="danger" fill="filled" size="small" />
+            <Button text="Primary" appearance="primary" spacing="compact" />
+            <Button text="Default" spacing="compact" />
+            <Button text="Danger" appearance="danger" spacing="compact" />
           </div>
         </div>
       </div>
 
       <div className="sb-plus-intro-mini-card">
-        <h4 className="sb-plus-intro-mini-title">Sizes</h4>
-        <p className="sb-plus-intro-mini-copy">Scale choices that adapt component prominence to context.</p>
+        <h4 className="sb-plus-intro-mini-title">Spacing</h4>
+        <p className="sb-plus-intro-mini-copy">Default and compact heights that fit a component to its surroundings.</p>
         <div className="sb-plus-intro-mini-canvas">
           <div className="flex flex-wrap items-center gap-2">
-            <Button text="Small" style="primary" fill="outline" size="small" />
-            <Button text="Medium" style="primary" fill="outline" size="medium" />
-            <Button text="Large" style="primary" fill="outline" size="large" />
+            <Button text="Compact" spacing="compact" />
+            <Button text="Default" />
           </div>
         </div>
       </div>
@@ -149,8 +148,8 @@ import Button from '@/components/forms-and-inputs/Button';
         <p className="sb-plus-intro-mini-copy">Disabled, hover, focus, and active behavior for usability.</p>
         <div className="sb-plus-intro-mini-canvas">
           <div className="flex flex-wrap items-center gap-2">
-            <Button text="Disabled" style="secondary" fill="filled" size="small" disabled />
-            <Button text="Loading" style="primary" fill="filled" size="small" loading />
+            <Button text="Disabled" spacing="compact" isDisabled />
+            <Button text="Loading" appearance="primary" spacing="compact" isLoading />
           </div>
         </div>
       </div>

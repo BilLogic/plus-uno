@@ -52,8 +52,8 @@ export const Rules = () => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)', alignItems: 'start' }}>
         <div style={col('var(--element-stack-md)')}>
             <span style={{ display: 'inline-flex', gap: 'var(--element-inline-md)', alignItems: 'center' }}>
-                <Button text="Compact" size="small" style="default" fill="outline" />
-                <Button text="Default" style="default" fill="outline" />
+                <Button text="Compact" spacing="compact" />
+                <Button text="Default" />
             </span>
             <span style={title}>Items: height ÷ 4</span>
             <span style={caption}>Compact 24 at radius 6, default 32 at radius 8.</span>
@@ -82,7 +82,7 @@ export const Rules = () => (
         <div style={col('var(--element-stack-md)')}>
             <span style={{ display: 'inline-flex', padding: 'var(--border-focused)' }}>
                 <span style={{ display: 'inline-flex', borderRadius: 'var(--element-radius-item-md)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)' }}>
-                    <Button text="Save" style="primary" fill="filled" />
+                    <Button text="Save" appearance="primary" />
                 </span>
             </span>
             <span style={title}>The focus ring sits 2 outside</span>

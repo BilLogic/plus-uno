@@ -75,7 +75,7 @@ export default function ReflectionsListPage() {
                     }}
                 >
                     <h3 className="h3 m-0" style={{ color: 'var(--color-on-surface)' }}>Sessions</h3>
-                    <Button size="medium" fill="filled" style="primary" leadingVisual="user-plus" text="Fill in" />
+                    <Button appearance="primary" iconBefore="user-plus" text="Fill in" />
                 </div>
 
                 <div

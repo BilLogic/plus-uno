@@ -65,7 +65,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
-            <Button size="default" fill="filled" style="primary" leadingVisual="calendar-plus" text="Fill in" />
+            <Button appearance="primary" iconBefore="calendar-plus" text="Fill in" />
         </div>
 
         {/* Stat Cards */}
@@ -202,9 +202,8 @@ export const WithModals = (args) => {
                         <Button
                             key={bp}
                             text={`${bp.toUpperCase()} (${width}px)`}
-                            size="small"
-                            style="primary"
-                            fill={breakpoint === bp ? 'filled' : 'outline'}
+                            spacing="compact"
+                            isSelected={breakpoint === bp}
                             onClick={() => setBreakpoint(bp)}
                         />
                     ))}
@@ -219,9 +218,8 @@ export const WithModals = (args) => {
                         <Button
                             key={type.id}
                             text={type.label}
-                            size="small"
-                            style="primary"
-                            fill={sessionType === type.id ? 'filled' : 'ghost'}
+                            spacing="compact"
+                            appearance="subtle" isSelected={sessionType === type.id}
                             onClick={() => setSessionType(type.id)}
                         />
                     ))}
@@ -236,9 +234,8 @@ export const WithModals = (args) => {
                         <Button
                             key={t.id}
                             text={t.label}
-                            size="small"
-                            style="primary"
-                            fill={tab === t.id ? 'filled' : 'ghost'}
+                            spacing="compact"
+                            appearance="subtle" isSelected={tab === t.id}
                             onClick={() => setTab(t.id)}
                         />
                     ))}
@@ -253,9 +250,8 @@ export const WithModals = (args) => {
                         <Button
                             key={status.id}
                             text={status.label}
-                            size="small"
-                            style="primary"
-                            fill={sessionStatus === status.id ? 'filled' : 'ghost'}
+                            spacing="compact"
+                            appearance="subtle" isSelected={sessionStatus === status.id}
                             onClick={() => setSessionStatus(status.id)}
                         />
                     ))}

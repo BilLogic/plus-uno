@@ -58,10 +58,10 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
-                <Button size="default" fill="outline" style="primary" leadingVisual="plus">
+                <Button iconBefore="plus">
                     Create New Sessions
                 </Button>
-                <Button size="default" fill="filled" style="primary" leadingVisual="calendar">
+                <Button appearance="primary" iconBefore="calendar">
                     Fill in
                 </Button>
             </div>
@@ -163,9 +163,8 @@ export const WithModals = (args) => {
                         <Button
                             key={bp}
                             text={`${bp.toUpperCase()} (${width}px)`}
-                            size="small"
-                            style="primary"
-                            fill={breakpoint === bp ? 'filled' : 'outline'}
+                            spacing="compact"
+                            isSelected={breakpoint === bp}
                             onClick={() => setBreakpoint(bp)}
                         />
                     ))}
@@ -180,9 +179,8 @@ export const WithModals = (args) => {
                         <Button
                             key={m.id}
                             text={m.label}
-                            size="small"
-                            style="primary"
-                            fill={modal === m.id ? 'filled' : 'ghost'}
+                            spacing="compact"
+                            appearance="subtle" isSelected={modal === m.id}
                             onClick={() => setModal(m.id)}
                         />
                     ))}

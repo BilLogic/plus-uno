@@ -67,10 +67,9 @@ const ExportSearchFilterBar = ({
             {!hideExport && (
                 <Button
                     text={exportLabel}
-                    style="primary"
-                    fill="filled"
-                    size="small"
-                    leadingVisual="download"
+                    appearance="primary"
+                    spacing="compact"
+                    iconBefore="download"
                     onClick={onExport}
                     className="export-search-filter-bar__export-btn"
                 />

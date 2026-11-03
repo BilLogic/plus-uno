@@ -24,7 +24,7 @@ const LessonWelcomeSection = ({
     title = 'Welcome back, Tutor!',
     description = 'Sign up for your next session to continue your journey.',
     primaryAction = { text: 'Sign up now', leadingVisual: 'square-plus', onClick: () => { } },
-    secondaryAction = { text: 'View schedule', style: 'secondary', fill: 'filled', onClick: () => { } },
+    secondaryAction = { text: 'View schedule', appearance: 'default', onClick: () => { } },
     onTabChange,
     className = '',
     style
@@ -138,20 +138,16 @@ const LessonWelcomeSection = ({
                         {primaryAction && (
                             <Button
                                 text={primaryAction.text}
-                                style="primary"
-                                fill="filled"
-                                size="medium"
-                                leadingVisual={primaryAction.leadingVisual} // Support icon
+                                appearance="primary"
+                                iconBefore={primaryAction.leadingVisual} // Support icon
                                 onClick={primaryAction.onClick}
                             />
                         )}
                         {secondaryAction && (
                             <Button
                                 text={secondaryAction.text}
-                                style={secondaryAction.style || 'secondary'} // Default to secondary logic
-                                fill={secondaryAction.fill || 'filled'} // Assume filled/tonal for secondary
-                                size="medium"
-                                leadingVisual={secondaryAction.leadingVisual}
+                                appearance={secondaryAction.appearance}
+                                iconBefore={secondaryAction.leadingVisual}
                                 onClick={secondaryAction.onClick}
                             />
                         )}

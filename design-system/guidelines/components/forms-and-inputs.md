@@ -180,8 +180,8 @@ action is really navigation — the component forwards it and renders an anchor,
 which keeps middle-click and open-in-new-tab working.
 
 **`ButtonGroup`** for two or more actions that read as one control — a toolbar
-above a table, a vertical stack of related commands. It pushes `size`, `style`
-and `fill` down to its children so those props are declared once. Give it
+above a table, a vertical stack of related commands. It pushes `appearance`
+and `spacing` down to its children so those props are declared once. Give it
 `ariaLabel`: it renders `role="group"`, and an unnamed group adds a boundary a
 screen reader cannot explain.
 
@@ -206,18 +206,10 @@ button config's `props` object when you are inside a `ButtonGroup`.
 
 ### Two things that catch people
 
-**The style lists differ.** `Button` accepts thirteen `style` values, including
-the five SMART curriculum domains (`social-emotional`, `mastering-content`,
-`advocacy`, `relationship`, `technology-tools`) and `default`. `ButtonGroup`
-accepts seven — no `default`, no domains. Its `fill` list is four; `Button`'s is
-five, the extra one being `text`. Set the narrow ones per button.
-
 **Icon-only buttons are small.** With no `text` and no children, `Button`
-renders a square: 28×28 at `small`, 36×36 at `medium`, 48×48 at `large`. Only
-`large` clears the 44×44 minimum in
-`design-system/guidelines/foundations/accessibility.md`, and none of them get an
-accessible name on their own — a string `leadingVisual` renders as an
-`aria-hidden` icon.
+renders a square: 24×24 at `compact` spacing, 32×32 at default. Neither gets an
+accessible name on its own — a string `iconBefore` renders as an `aria-hidden`
+icon, so pass `aria-label`.
 
 ## Related
 

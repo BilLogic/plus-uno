@@ -49,7 +49,7 @@ const DashboardContent = () => (
             level="page"
             title="Sessions"
             description="This week at a glance."
-            actions={<Button text="Add a session" style="primary" fill="filled" size="small" leadingVisual="plus" />}
+            actions={<Button text="Add a session" appearance="primary" spacing="compact" iconBefore="plus" />}
         >
             <div style={cardRow}>
                 {METRICS.map((metric) => <Metric key={metric.title} {...metric} />)}
@@ -209,8 +209,8 @@ const NoteForm = () => (
 
 const NoteActions = () => (
     <>
-        <Button style="secondary" fill="outline" text="Save draft" />
-        <Button style="primary" fill="filled" text="Submit note" />
+        <Button text="Save draft" />
+        <Button appearance="primary" text="Submit note" />
     </>
 );
 
@@ -254,8 +254,8 @@ const PageWithDrawer = () => {
                 onClose: () => setOpen(false),
                 footer: (
                     <>
-                        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => setOpen(false)} />
-                        <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => setOpen(false)} />
+                        <Button text="Cancel" spacing="compact" onClick={() => setOpen(false)} />
+                        <Button text="Save changes" appearance="primary" spacing="compact" onClick={() => setOpen(false)} />
                     </>
                 ),
                 children: (
@@ -267,7 +267,7 @@ const PageWithDrawer = () => {
         >
             <DashboardContent />
             <div>
-                <Button text="Open session details" style="secondary" fill="outline" size="small" onClick={() => setOpen(true)} />
+                <Button text="Open session details" spacing="compact" onClick={() => setOpen(true)} />
             </div>
         </PageLayout>
     );

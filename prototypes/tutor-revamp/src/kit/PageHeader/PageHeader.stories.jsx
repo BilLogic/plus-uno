@@ -31,6 +31,6 @@ export const Detail = {
         title: 'Math 7',
         status: <Status type="date" style="warning">Starts in 25 min</Status>,
         meta: 'Today, 1:00–2:00 pm at Lincoln Middle School with Ms. Rivera',
-        actions: <Button text="Join session" style="primary" fill="filled" disabled />,
+        actions: <Button text="Join session" appearance="primary" isDisabled />,
     },
 };

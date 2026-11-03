@@ -98,15 +98,14 @@ const Jumbotron = ({
 
     let resolvedActions = actions;
     if (resolvedActions == null && (primaryButton || secondaryButton)) {
-        // `size="medium"` is Button's own default and a size its stylesheet
-        // defines. It is spread first, so a caller's `size` still wins.
+        // The defaults are spread first, so a caller's props still win.
         resolvedActions = (
             <>
                 {primaryButton && (
-                    <Button text="Primary Action" style="primary" fill="filled" size="medium" {...primaryButton} />
+                    <Button text="Primary Action" appearance="primary" {...primaryButton} />
                 )}
                 {secondaryButton && (
-                    <Button text="Secondary Action" style="secondary" fill="outline" size="medium" {...secondaryButton} />
+                    <Button text="Secondary Action" {...secondaryButton} />
                 )}
             </>
         );
@@ -181,9 +180,8 @@ const Jumbotron = ({
 const buttonShape = PropTypes.shape({
     text: PropTypes.string,
     onClick: PropTypes.func,
-    style: PropTypes.string,
-    fill: PropTypes.string,
-    size: PropTypes.string,
+    appearance: PropTypes.string,
+    spacing: PropTypes.string,
     icon: PropTypes.string,
     iconPosition: PropTypes.string,
 });

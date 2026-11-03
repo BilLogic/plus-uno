@@ -47,10 +47,8 @@ const RosterPanel = ({ title, addLabel, items }) => (
             </span>
             <Button
                 text={addLabel}
-                size="small"
-                style="primary"
-                fill="outline"
-                leadingVisual="user-plus"
+                spacing="compact"
+                iconBefore="user-plus"
             />
         </div>
 
@@ -105,24 +103,19 @@ const AttendeeEditModalBody = () => (
         {/* Tab Navigation - ButtonGroup (Attendees active) */}
         <div style={{ display: 'flex', width: '100%' }}>
             <ButtonGroup
-                fill="tonal"
                 className="w-100"
             >
                 <Button
                     text="Session info"
-                    style="secondary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
                 <Button
                     text="Attendees"
-                    active={true}
-                    trailingVisual={
+                    isSelected={true}
+                    iconAfter={
                         <Badge text="20" style="secondary" size="b3" />
                     }
-                    style="primary"
-                    fill="tonal"
-                    block
+                    shouldFitContainer
                 />
             </ButtonGroup>
         </div>
@@ -173,10 +166,10 @@ const AttendeeEditModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <CancelButton block />
+                <CancelButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <SaveChangesButton block />
+                <SaveChangesButton shouldFitContainer />
             </div>
         </div>
     </div>

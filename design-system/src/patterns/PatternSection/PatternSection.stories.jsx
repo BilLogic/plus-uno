@@ -10,8 +10,8 @@ const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' 
 
 const Actions = () => (
     <>
-        <Button text="Secondary" style="secondary" fill="outline" size="medium" onClick={() => {}} />
-        <Button text="Primary" style="primary" fill="filled" size="medium" onClick={() => {}} />
+        <Button text="Secondary" onClick={() => {}} />
+        <Button text="Primary" appearance="primary" onClick={() => {}} />
     </>
 );
 
@@ -31,15 +31,15 @@ const DefaultToolbar = () => (
         search={<Input label="Search students" showLabel={false} placeholder="Search students" leadingVisual="magnifying-glass" type="search" />}
         filters={(
             <>
-                <Button text="Status" style="default" fill="ghost" size="medium" trailingVisual="chevron-down" onClick={() => {}} />
-                <Button text="Tutor" style="default" fill="ghost" size="medium" trailingVisual="chevron-down" onClick={() => {}} />
+                <Button text="Status" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />
+                <Button text="Tutor" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />
             </>
         )}
         count="48 students"
         actions={(
             <>
-                <Button text="Export" style="secondary" fill="outline" size="small" leadingVisual="download" onClick={() => {}} />
-                <Button text="Add student" style="primary" fill="filled" size="small" leadingVisual="user-plus" onClick={() => {}} />
+                <Button text="Export" spacing="compact" iconBefore="download" onClick={() => {}} />
+                <Button text="Add student" appearance="primary" spacing="compact" iconBefore="user-plus" onClick={() => {}} />
             </>
         )}
     />
@@ -51,8 +51,8 @@ const SelectedToolbar = () => (
         selection="3 selected"
         bulkActions={(
             <>
-                <Button text="Assign tutor" style="default" fill="ghost" size="small" onClick={() => {}} />
-                <Button text="Message" style="default" fill="ghost" size="small" onClick={() => {}} />
+                <Button text="Assign tutor" appearance="subtle" spacing="compact" onClick={() => {}} />
+                <Button text="Message" appearance="subtle" spacing="compact" onClick={() => {}} />
             </>
         )}
         onClear={() => {}}
@@ -210,7 +210,7 @@ export const Footer = () => (
     <PatternSection
         title="Upcoming sessions"
         description={description}
-        footer={<Button text="View all" style="primary" fill="text" size="medium" onClick={() => {}} />}
+        footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
     >
         {slotContent('Rows')}
     </PatternSection>
@@ -225,7 +225,7 @@ export const Anatomy = () => (
         tabs={<Tabs />}
         layout="split"
         side={slotContent('Side · span 4')}
-        footer={<Button text="View all" style="primary" fill="text" size="medium" onClick={() => {}} />}
+        footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
     >
         {slotContent('Content · span 8')}
     </PatternSection>

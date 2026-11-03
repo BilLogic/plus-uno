@@ -9,30 +9,28 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'Follows Button: a group is 32 at `medium` and 24 at `small`.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="large"` was deprecated: it draws like `medium` and warns in development.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Follows Button: `appearance` and `spacing` (default 32, compact 24) set every button in the group.' },
         ],
         docs: {
             description: {
-                component: 'Button Group component for grouping related buttons together. Supports horizontal and vertical layouts with multiple sizes and styles. Uses tonal fill as the default per the design system specification.'
+                component: 'Button Group component for grouping related buttons together. Supports horizontal and vertical layouts, with the appearance and spacing of Button.'
             }
         }
     },
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
         // DESIGN
-        size: {
+        appearance: {
             control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size of buttons in the group',
+            options: ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'],
+            description: 'Appearance of every button in the group',
             table: { category: 'Design' }
         },
-        fill: {
+        spacing: {
             control: 'select',
-            options: ['filled', 'tonal', 'outline', 'ghost'],
-            description: 'Fill variant for buttons',
+            options: ['default', 'compact'],
+            description: 'Spacing of every button in the group: default 32, compact 24',
             table: { category: 'Design' }
         },
         vertical: {
@@ -72,16 +70,15 @@ function ButtonGroupSizesDemos() {
         <section>
             <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Small</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Compact</span>
                     <ButtonGroup
-                        size="small"
+                        spacing="compact"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Medium (Default)</span>
+                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Default</span>
                     <ButtonGroup
-                        size="medium"
                         buttons={[{ text: 'Left' }, { text: 'Right' }]}
                     />
                 </div>
@@ -144,8 +141,6 @@ function ButtonGroupUseCasesDemos() {
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
-                        style="secondary"
-                        fill="outline"
                         buttons={[
                             { leadingVisual: 'chevron-left', props: { 'aria-label': 'Previous page' } },
                             { text: '1' },
@@ -159,8 +154,7 @@ function ButtonGroupUseCasesDemos() {
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
-                        style="tertiary"
-                        fill="ghost"
+                        appearance="subtle"
                         buttons={[
                             { leadingVisual: 'bold', props: { 'aria-label': 'Bold' } },
                             { leadingVisual: 'italic', props: { 'aria-label': 'Italic' } },
@@ -172,7 +166,6 @@ function ButtonGroupUseCasesDemos() {
 
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
                     <ButtonGroup
-                        style="primary"
                         buttons={[
                             { text: 'Day', active: true },
                             { text: 'Week' },
@@ -189,10 +182,10 @@ function ButtonGroupUseCasesDemos() {
 function ButtonGroupChildrenDemos() {
     return (
         <section>
-            <ButtonGroup style="secondary" fill="tonal">
-                <Button text="Custom" leadingVisual="star" />
-                <Button text="Button" />
-                <Button text="Children" trailingVisual="arrow-right" />
+            <ButtonGroup>
+                <Button appearance="primary" text="Custom" iconBefore="star" />
+                <Button appearance="primary" text="Button" />
+                <Button appearance="primary" text="Children" iconAfter="arrow-right" />
             </ButtonGroup>
         </section>
     );
@@ -243,17 +236,13 @@ function renderButtonGroupPlayground(args) {
 }
 
 const buttonGroupOverviewArgs = {
-    size: 'medium',
-    style: 'primary',
-    fill: 'tonal',
+    appearance: 'default',
     vertical: false,
     buttonCount: 3
 };
 
 const buttonGroupPlaygroundArgs = {
-    size: 'medium',
-    style: 'secondary',
-    fill: 'tonal',
+    appearance: 'default',
     vertical: false,
     buttonCount: 4
 };

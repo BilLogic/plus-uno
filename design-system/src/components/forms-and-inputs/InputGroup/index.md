@@ -111,11 +111,9 @@ Implemented as `InputGroupButton`.
 |------|------|---------|-------------|
 | `children` | node | — | — |
 | `text` | string | — | — |
-| `size` | enum | — | Accepted for older call sites; addon buttons are always small. |
 | `disabled` | bool | — | — |
 | `onClick` | func | — | — |
-| `style` | enum | — | — |
-| `fill` | enum | — | — |
+| `appearance` | enum | — | — |
 | `className` | string | — | — |
 
 ### `InputGroup.Dropdown`

@@ -97,8 +97,8 @@ A form is **dirty** when its values differ from the values it loaded. Typing a
 change and then undoing it leaves the form clean.
 
 When the person leaves a dirty form — navigates away or closes its modal —
-show the unsaved-changes modal: "Exit without saving" as a secondary tonal
-`Button`, "Save & Exit" as the primary filled one. Three specs already draw
+show the unsaved-changes modal: "Exit without saving" as a default
+`Button`, "Save & Exit" as the primary one. Three specs already draw
 it: `Profile/Modals/UnsavedChanges`, and `UnsavedWarning` under
 `Toolkit/Pre-Session/Modals/CreateNewSession` and `.../EditSession`. Reuse
 their wording.

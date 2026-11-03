@@ -41,7 +41,7 @@ Keep controls that create an immediate, obvious change in the inline preview and
 Good fits:
 
 - core content such as `text`, `title`, `label`, `placeholder`
-- major design axes such as `style`, `fill`, `variant`, `size`
+- major design axes such as `appearance`, `spacing`
 - important behavior states such as `disabled`, `loading`, `required`, `selected`
 - simple layout toggles when they materially change the preview
 

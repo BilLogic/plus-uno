@@ -561,10 +561,9 @@ const TagInput = ({
                 {canReorder && (
                     <Button
                         ref={gripRef}
-                        style="default"
-                        fill="ghost"
-                        size="small"
-                        leadingVisual="grip-vertical"
+                        appearance="subtle"
+                        spacing="compact"
+                        iconBefore="grip-vertical"
                         aria-label={`Reorder ${text}`}
                         aria-describedby={`${fieldId}-reorder-keys`}
                         className="plus-tag-input__row-action plus-tag-input__grip"
@@ -576,10 +575,9 @@ const TagInput = ({
                 {hasMenu && (
                     <Button
                         ref={moreRef}
-                        style="default"
-                        fill="ghost"
-                        size="small"
-                        leadingVisual="ellipsis"
+                        appearance="subtle"
+                        spacing="compact"
+                        iconBefore="ellipsis"
                         aria-label={`Options for ${text}`}
                         aria-haspopup="listbox"
                         aria-expanded={Boolean(menu)}

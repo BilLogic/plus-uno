@@ -155,7 +155,7 @@ function AccordionContentDemos() {
             <Accordion defaultActiveKey="custom-1">
                 <Accordion.Item eventKey="custom-1" header="Custom Header One">
                     <p>This is custom content passed as children.</p>
-                    <button className="plus-btn plus-btn--primary plus-btn--filled plus-btn--small" type="button">
+                    <button className="plus-btn plus-btn--primary plus-btn--compact" type="button">
                         Action Button
                     </button>
                 </Accordion.Item>

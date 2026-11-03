@@ -156,8 +156,8 @@ const DrawerOverPage = () => {
                 onClose={() => setOpen(false)}
                 footer={(
                     <>
-                        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => setOpen(false)} />
-                        <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => setOpen(false)} />
+                        <Button text="Cancel" spacing="compact" onClick={() => setOpen(false)} />
+                        <Button text="Save changes" appearance="primary" spacing="compact" onClick={() => setOpen(false)} />
                     </>
                 )}
             >
@@ -296,8 +296,8 @@ const NoteForm = () => (
 
 const NoteActions = () => (
     <>
-        <Button style="secondary" fill="outline" text="Save draft" />
-        <Button style="primary" fill="filled" text="Submit note" />
+        <Button text="Save draft" />
+        <Button appearance="primary" text="Submit note" />
     </>
 );
 

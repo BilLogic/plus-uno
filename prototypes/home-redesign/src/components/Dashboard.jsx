@@ -176,21 +176,17 @@ function StudentMomentumCard() {
                 <h4 className="h4 home-redesign-card-title">Student Momentum</h4>
                 <div className="home-redesign-nav-buttons">
                     <Button
-                        style="primary"
-                        fill="outline"
-                        size="small"
-                        leadingVisual="arrow-left"
+                        spacing="compact"
+                        iconBefore="arrow-left"
                         onClick={() => setPage((p) => Math.max(0, p - 1))}
-                        disabled={page === 0}
+                        isDisabled={page === 0}
                         aria-label="Previous"
                     />
                     <Button
-                        style="primary"
-                        fill="outline"
-                        size="small"
-                        leadingVisual="arrow-right"
+                        spacing="compact"
+                        iconBefore="arrow-right"
                         onClick={() => setPage((p) => Math.min(maxPage, p + 1))}
-                        disabled={page >= maxPage}
+                        isDisabled={page >= maxPage}
                         aria-label="Next"
                     />
                 </div>
@@ -318,21 +314,17 @@ export const Dashboard = () => {
                                 <h4 className="h4">Personalized Trainings</h4>
                                 <div className="home-redesign-trainings-controls">
                                     <Button
-                                        style="primary"
-                                        fill="outline"
-                                        size="small"
-                                        leadingVisual="arrow-left"
+                                        spacing="compact"
+                                        iconBefore="arrow-left"
                                         onClick={() => scrollCarousel('left')}
-                                        disabled={!canScrollLeft}
+                                        isDisabled={!canScrollLeft}
                                         aria-label="Scroll left"
                                     />
                                     <Button
-                                        style="primary"
-                                        fill="outline"
-                                        size="small"
-                                        leadingVisual="arrow-right"
+                                        spacing="compact"
+                                        iconBefore="arrow-right"
                                         onClick={() => scrollCarousel('right')}
-                                        disabled={!canScrollRight}
+                                        isDisabled={!canScrollRight}
                                         aria-label="Scroll right"
                                     />
                                 </div>

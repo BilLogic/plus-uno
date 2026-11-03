@@ -50,17 +50,6 @@ body {
   border-radius: 0 !important;
 }
 
-/* Filled-button label color fix.
-   The DS Button adds a typography class (e.g. .h6 for medium) to its label span.
-   The global `.h6 { color: var(--color-on-surface) }` rule ties in specificity
-   with `.plus-btn-text { color: inherit }` and wins by source order, so filled
-   buttons (primary "Update goals", etc.) render dark text on a colored fill even
-   though the icon stays on-primary. Re-assert that filled-button text inherits
-   the button's on-color (higher specificity → always wins). */
-.plus-btn--filled .plus-btn-text {
-  color: inherit !important;
-}
-
 /* The Admin sidebar section is toggled in/out via the "\" key. Its default
    shell-reveal entrance staggers with delays up to ~2.6s, which feels laggy on
    toggle. Keep the animated disclosure (fade + slide), but make it quick with a

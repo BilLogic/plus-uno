@@ -89,10 +89,8 @@ const StrategyContentPromptModal = ({
             <div className="strategy-content-prompt-modal__footer">
                 <Button
                     text={buttonText}
-                    style="primary"
-                    fill="filled"
-                    size="medium"
-                    leadingVisual="paper-plane"
+                    appearance="primary"
+                    iconBefore="paper-plane"
                     onClick={handleSubmit}
                 />
             </div>

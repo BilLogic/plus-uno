@@ -134,22 +134,18 @@ const TutorHomePageSkillsOverviewDifferentLayout = ({
                         <h4 className="h4">Complete Your Onboarding</h4>
                         <div className="plus-tutor-home-onboarding-controls">
                             <Button
-                                style="primary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-left"
+                                spacing="compact"
+                                iconBefore="arrow-left"
                                 onClick={() => scrollCarousel('left')}
-                                disabled={!canScrollLeft}
+                                isDisabled={!canScrollLeft}
                                 title="Scroll left"
                                 aria-label="Scroll onboarding left"
                             />
                             <Button
-                                style="primary"
-                                fill="outline"
-                                size="small"
-                                leadingVisual="arrow-right"
+                                spacing="compact"
+                                iconBefore="arrow-right"
                                 onClick={() => scrollCarousel('right')}
-                                disabled={!canScrollRight}
+                                isDisabled={!canScrollRight}
                                 title="Scroll right"
                                 aria-label="Scroll onboarding right"
                             />

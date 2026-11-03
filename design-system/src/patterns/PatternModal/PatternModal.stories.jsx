@@ -30,8 +30,8 @@ const longBody = (
 
 const footerActions = (
     <>
-        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
-        <Button text="Move session" style="primary" fill="filled" size="small" onClick={() => {}} />
+        <Button text="Cancel" spacing="compact" onClick={() => {}} />
+        <Button text="Move session" appearance="primary" spacing="compact" onClick={() => {}} />
     </>
 );
 
@@ -199,8 +199,8 @@ const sessionTabs = [
 
 const saveActions = (
     <>
-        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
-        <Button text="Save" style="primary" fill="filled" size="small" onClick={() => {}} />
+        <Button text="Cancel" spacing="compact" onClick={() => {}} />
+        <Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} />
     </>
 );
 
@@ -319,7 +319,7 @@ export const CustomHeader = {
                 header={(
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <strong style={{ font: 'var(--heading-medium)' }}>Reschedule</strong>
-                        <Button text="Help" style="secondary" fill="outline" size="small" onClick={() => {}} />
+                        <Button text="Help" spacing="compact" onClick={() => {}} />
                     </div>
                 )}
                 footer={footerActions}

@@ -264,19 +264,16 @@ const InputGroupButton = ({
     text,
     disabled = false,
     onClick,
-    style = 'primary',
-    fill = 'outline',
+    appearance = 'default',
     className = '',
-    size: _size,
     ...props
 }) => (
     <Button
         text={text || children}
-        size="small"
-        disabled={disabled}
+        spacing="compact"
+        isDisabled={disabled}
         onClick={onClick}
-        style={style}
-        fill={fill}
+        appearance={appearance}
         className={`plus-input-group-addon plus-input-group-button-element ${className}`.trim()}
         {...props}
     />
@@ -285,15 +282,9 @@ const InputGroupButton = ({
 InputGroupButton.propTypes = {
     children: PropTypes.node,
     text: PropTypes.string,
-    /** Accepted for older call sites; addon buttons are always small. */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
     disabled: PropTypes.bool,
     onClick: PropTypes.func,
-    style: PropTypes.oneOf([
-        'primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info', 'default',
-        'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'
-    ]),
-    fill: PropTypes.oneOf(['filled', 'tonal', 'outline', 'ghost']),
+    appearance: PropTypes.oneOf(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery']),
     className: PropTypes.string
 };
 

@@ -157,8 +157,8 @@ const InSessionContent = () => {
                             <div className="page-content-reveal header-reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingTop: '16px', animationDelay: '0ms' }}>
                                 <h1 className="h4" style={{ margin: 0 }}>Your Students</h1>
                                 <div style={{ display: 'flex', gap: '8px' }}>
-                                    <Button text="Copy assignments" style="secondary" fill="outline" size="small" leadingVisual={<i className="fa-solid fa-copy" />} />
-                                    <Button text="Manage Session" style="primary" fill="outline" size="small" leadingVisual={<i className="fa-solid fa-gear" />} onClick={() => setIsManageAssignmentOpen(true)} />
+                                    <Button text="Copy assignments" spacing="compact" iconBefore={<i className="fa-solid fa-copy" />} />
+                                    <Button text="Manage Session" spacing="compact" iconBefore={<i className="fa-solid fa-gear" />} onClick={() => setIsManageAssignmentOpen(true)} />
                                 </div>
                             </div>
 
@@ -221,9 +221,7 @@ const InSessionContent = () => {
                                                 <td style={{ padding: '12px 16px', textAlign: 'right', borderTopRightRadius: '8px', borderBottomRightRadius: '8px' }}>
                                                     <Button
                                                         text="See Details"
-                                                        style="secondary"
-                                                        fill="outline"
-                                                        size="small"
+                                                        spacing="compact"
                                                         onClick={() => openStudentInsights({
                                                             student: s,
                                                             allStudents: yourStudents

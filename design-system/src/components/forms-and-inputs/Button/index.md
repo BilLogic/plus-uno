@@ -3,13 +3,13 @@
 
 # Button
 
-Universal interactive element slightly favoring Figma spec over Bootstrap defaults.
+(https://atlassian.design/components/button).
 
 **Import:** `import { Button } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, SizesFilledRow, Interactive, StateSteps, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -20,56 +20,41 @@ Universal interactive element slightly favoring Figma spec over Bootstrap defaul
 | `text` | string | — | Button label text |
 | `children` | node | — | — |
 | `title` | string | — | — |
-| `style` | enum | `'primary'` | — |
-| `fill` | enum | `'filled'` | — |
-| `size` | enum | `'medium'` | `medium` 32 (default) · `small` 24 compact, for table rows and inline toolbars only · `large` deprecated, draws like `medium` |
-| `block` | bool | `false` | Full width button |
+| `appearance` | enum | `'default'` | — |
+| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24, for tables and tight toolbars. |
+| `shouldFitContainer` | bool | `false` | Stretch to the width of the container |
 | `className` | string | — | — |
 | `onClick` | func | — | — |
-| `disabled` | bool | `false` | — |
-| `active` | bool | `false` | — |
-| `loading` | bool | `false` | Show loading spinner |
+| `isDisabled` | bool | `false` | — |
+| `isSelected` | bool | — | — |
+| `isLoading` | bool | `false` | Show a spinner in place of the label and block interaction |
 | `href` | string | — | — |
 | `target` | string | — | — |
 | `type` | string | `'button'` | — |
 | `as` | elementType | — | — |
-| `leadingVisual` | string or node | — | Icon at start of button |
-| `trailingVisual` | string or node | — | Icon at end of button |
+| `iconBefore` | string or node | — | Font Awesome glyph before the label |
+| `iconAfter` | string or node | — | Font Awesome glyph after the label |
 | `vertical` | bool | `false` | — |
 | `id` | string | — | — |
 
 ## Variants
 
-**`style`** — `primary` · `secondary` · `tertiary` · `success` · `warning` · `danger` · `info` · `default` · `social-emotional` · `mastering-content` · `advocacy` · `relationship` · `technology-tools`
+**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery`
 
-**`fill`** — `filled` · `tonal` · `outline` · `ghost` · `text`
-
-**`size`** — `small` · `medium` · `large`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--element-pad-y-md` · `--icon-lg` · `--icon-md` · `--plus-btn-state-layer` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--type-weight-medium`
+`--body-default` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-text-disabled` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-y-md` · `--element-radius-item-sm` · `--element-radius-md` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--plus-btn-fg` · `--plus-btn-icon` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
-
-## Sub-components
-
-### `Button.Content`
-
-Implemented as `ButtonContent`.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | node | — | — |
-| `text` | string | — | — |
-| `leadingVisual` | string or node | — | — |
-| `trailingVisual` | string or node | — | — |
-| `vertical` | bool | — | — |
 
 ## Related
 
 Same group: `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
+
+> Authored guidance is partial — missing: when to use, correct/incorrect (#166).

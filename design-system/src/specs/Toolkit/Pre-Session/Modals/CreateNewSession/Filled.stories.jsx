@@ -184,10 +184,10 @@ const FilledModalBody = () => (
             }}
         >
             <div style={{ flex: 1 }}>
-                <CancelButton block />
+                <CancelButton shouldFitContainer />
             </div>
             <div style={{ flex: 1 }}>
-                <CreateSessionButton block />
+                <CreateSessionButton shouldFitContainer />
             </div>
         </div>
     </div>

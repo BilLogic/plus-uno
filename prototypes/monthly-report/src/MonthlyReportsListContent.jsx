@@ -204,10 +204,8 @@ export default function MonthlyReportsListContent() {
                                 <td>
                                     <Button
                                         text="View"
-                                        style="secondary"
-                                        fill="outline"
-                                        size="small"
-                                        trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
+                                        spacing="compact"
+                                        iconAfter={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleViewReport(report.month, report.dateRange);

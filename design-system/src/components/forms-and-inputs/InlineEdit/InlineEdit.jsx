@@ -157,7 +157,7 @@ const InlineEdit = ({
         className,
     ].filter(Boolean).join(' ');
 
-    const buttonSize = compact ? 'small' : 'medium';
+    const buttonSpacing = compact ? 'compact' : 'default';
 
     return (
         <div
@@ -185,22 +185,19 @@ const InlineEdit = ({
                         <div className="plus-inline-edit__anchor">
                             <div className="plus-inline-edit__actions">
                                 <Button
-                                    style="primary"
-                                    fill="filled"
-                                    size={buttonSize}
-                                    leadingVisual="check"
+                                    appearance="primary"
+                                    spacing={buttonSpacing}
+                                    iconBefore="check"
                                     aria-label={confirmLabel}
-                                    loading={busy}
+                                    isLoading={busy}
                                     onMouseDown={keepFocus}
                                     onClick={() => confirm(true)}
                                 />
                                 <Button
-                                    style="secondary"
-                                    fill="outline"
-                                    size={buttonSize}
-                                    leadingVisual="xmark"
+                                    spacing={buttonSpacing}
+                                    iconBefore="xmark"
                                     aria-label={cancelLabel}
-                                    disabled={busy}
+                                    isDisabled={busy}
                                     onMouseDown={keepFocus}
                                     onClick={cancel}
                                 />

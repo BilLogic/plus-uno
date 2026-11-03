@@ -14,9 +14,8 @@ export default {
  * Confirm Fill-In Button
  * Filled primary button for confirming fill-in
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="filled" for filled background
- * - leadingIcon="square-plus" for plus icon
+ * - appearance="primary"
+ * - iconBefore="square-plus" for plus icon
  * - width: 194px (fixed width)
  */
 export const Overview = () => (
@@ -32,10 +31,9 @@ export const Overview = () => (
             <div style={{ width: '194px' }}>
                 <Button
                     text="Confirm fill-in"
-                    leadingIcon="square-plus"
-                    style="primary"
-                    fill="filled"
-                    block
+                    iconBefore="square-plus"
+                    appearance="primary"
+                    shouldFitContainer
                 />
             </div>
         </section>
@@ -49,10 +47,9 @@ export const Overview = () => (
 export const ConfirmFillInButton = ({ ...props }) => (
     <Button
         text="Confirm fill-in"
-        leadingIcon="square-plus"
-        style="primary"
-        fill="filled"
-        block
+        iconBefore="square-plus"
+        appearance="primary"
+        shouldFitContainer
         {...props}
     />
 );

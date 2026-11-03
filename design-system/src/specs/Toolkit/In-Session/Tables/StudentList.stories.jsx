@@ -291,9 +291,7 @@ export const TableRow = ({
             >
                 <Button
                     text="Set Goals"
-                    style="primary"
-                    fill="outline"
-                    size="small"
+                    spacing="compact"
                 />
             </div>
         </div>

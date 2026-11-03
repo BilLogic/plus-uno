@@ -284,22 +284,20 @@ const Modal = ({
                                     {secondaryButton && (
                                         <Button
                                             text={secondaryButton.text || 'Cancel'}
-                                            style={secondaryButton.style || 'secondary'}
-                                            fill={secondaryButton.fill || 'tonal'}
-                                            size={secondaryButton.size || 'medium'}
+                                            appearance={secondaryButton.appearance || 'default'}
+                                            spacing={secondaryButton.spacing}
                                             onClick={secondaryButton.onClick}
-                                            leadingVisual={secondaryButton.icon}
+                                            iconBefore={secondaryButton.icon}
                                             className="plus-modal-button plus-modal-button-secondary"
                                         />
                                     )}
                                     {primaryButton && (
                                         <Button
                                             text={primaryButton.text || 'Confirm'}
-                                            style={primaryButton.style || 'primary'}
-                                            fill={primaryButton.fill || 'filled'}
-                                            size={primaryButton.size || 'medium'}
+                                            appearance={primaryButton.appearance || 'primary'}
+                                            spacing={primaryButton.spacing}
                                             onClick={primaryButton.onClick}
-                                            leadingVisual={primaryButton.icon}
+                                            iconBefore={primaryButton.icon}
                                             className="plus-modal-button plus-modal-button-primary"
                                         />
                                     )}
@@ -347,9 +345,8 @@ const Modal = ({
 const buttonShape = PropTypes.shape({
     text: PropTypes.string,
     onClick: PropTypes.func,
-    style: PropTypes.string,
-    fill: PropTypes.string,
-    size: PropTypes.string,
+    appearance: PropTypes.string,
+    spacing: PropTypes.string,
     icon: PropTypes.string,
     iconPosition: PropTypes.string,
 });

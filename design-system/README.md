@@ -35,7 +35,7 @@ import { Button, Alert, Badge, Accordion, Breadcrumb } from '@/components';
 function App() {
   return (
     <div style={{ padding: 'var(--size-section-pad-x-lg)' }}>
-      <Button style="primary">Click me</Button>
+      <Button appearance="primary">Click me</Button>
       <Alert style="success" title="Success!">Operation completed.</Alert>
       <Badge style="info">New</Badge>
       

@@ -44,17 +44,15 @@ const ModalHeader = () => (
 );
 
 const TabButtonGroup = () => (
-    <ButtonGroup fill="tonal" className="w-100">
+    <ButtonGroup className="w-100">
         <Button
             text="Attendance"
-            active={true}
-            style="primary"
-            fill="tonal"
-            block
-            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
+            isSelected={true}
+            shouldFitContainer
+            iconAfter={<Badge text="20" style="secondary" size="b3" />}
         />
-        <Button text="Assignment" style="secondary" fill="tonal" block />
-        <Button text="Session Info" style="secondary" fill="tonal" block />
+        <Button text="Assignment" shouldFitContainer />
+        <Button text="Session Info" shouldFitContainer />
     </ButtonGroup>
 );
 
@@ -141,7 +139,7 @@ export const AttendanceLoadingLead = () => (
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Tutor Roster</span>
-                                <Button text="Add tutor" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
                             </div>
                         </div>
 
@@ -158,7 +156,7 @@ export const AttendanceLoadingLead = () => (
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Student Roster</span>
-                                <Button text="Add Student" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
                             </div>
                         </div>
 
@@ -173,8 +171,8 @@ export const AttendanceLoadingLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)', borderBottom: 'var(--size-element-border) solid var(--color-surface-container-highest)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Update Attendance" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Update Attendance" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -241,7 +239,7 @@ export const AttendanceInitialLead = () => (
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Tutor Roster
                                 </span>
-                                <Button text="Add tutor" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
                             </div>
                             <div className="d-flex flex-column" style={{ flex: '1 0 0', minHeight: 0 }}>
                                 <AttendeeRow name="Savannah Nguyen" />
@@ -268,7 +266,7 @@ export const AttendanceInitialLead = () => (
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Student Roster
                                 </span>
-                                <Button text="Add Student" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
                             </div>
                             <div className="d-flex flex-column" style={{ flex: '1 0 0', minHeight: 0 }}>
                                 <AttendeeRow name="Lila Chen" />
@@ -285,8 +283,8 @@ export const AttendanceInitialLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Continue" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Continue" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -352,7 +350,7 @@ export const AttendanceLoadedLead = () => (
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Tutor Roster
                                 </span>
-                                <Button text="Add tutor" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
                             </div>
                             <div className="d-flex flex-column" style={{ flex: '1 0 0', minHeight: 0 }}>
                                 <AttendeeRow name="Savannah Nguyen" initialStatus="present" />
@@ -379,7 +377,7 @@ export const AttendanceLoadedLead = () => (
                                 <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
                                     Student Roster
                                 </span>
-                                <Button text="Add Student" style="primary" fill="outline" size="small" leadingVisual="user-plus" />
+                                <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
                             </div>
                             <div className="d-flex flex-column" style={{ flex: '1 0 0', minHeight: 0 }}>
                                 <AttendeeRow name="Lila Chen" initialStatus="present" />
@@ -396,8 +394,8 @@ export const AttendanceLoadedLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Continue" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Continue" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -430,16 +428,14 @@ const AssignmentModalHeader = () => (
 );
 
 const AssignmentTabButtonGroup = () => (
-    <ButtonGroup fill="tonal" className="w-100">
+    <ButtonGroup className="w-100">
         <Button
             text="Attendance"
-            style="secondary"
-            fill="tonal"
-            block
-            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
+            shouldFitContainer
+            iconAfter={<Badge text="20" style="secondary" size="b3" />}
         />
-        <Button text="Assignment" active={true} style="primary" fill="tonal" block />
-        <Button text="Session Info" style="secondary" fill="tonal" block />
+        <Button text="Assignment" isSelected={true} shouldFitContainer />
+        <Button text="Session Info" shouldFitContainer />
     </ButtonGroup>
 );
 
@@ -522,8 +518,8 @@ export const AssignmentLoadingLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Update Assignments" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Update Assignments" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -661,8 +657,8 @@ export const AssignmentLoadedLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Edit assignment" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Looks good" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Edit assignment" onClick={() => {}} />
+                    <Button text="Looks good" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -687,16 +683,14 @@ const SessionInfoModalHeader = () => (
 );
 
 const SessionInfoTabButtonGroup = () => (
-    <ButtonGroup fill="tonal" className="w-100">
+    <ButtonGroup className="w-100">
         <Button
             text="Attendance"
-            style="secondary"
-            fill="tonal"
-            block
-            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
+            shouldFitContainer
+            iconAfter={<Badge text="20" style="secondary" size="b3" />}
         />
-        <Button text="Assignment" style="secondary" fill="tonal" block />
-        <Button text="Session Info" active={true} style="primary" fill="tonal" block />
+        <Button text="Assignment" shouldFitContainer />
+        <Button text="Session Info" isSelected={true} shouldFitContainer />
     </ButtonGroup>
 );
 
@@ -758,8 +752,8 @@ export const SessionInfoLoadingLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Continue" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Continue" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -848,8 +842,8 @@ export const SessionInfoLoadedLead = () => (
 
                 {/* Footer */}
                 <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)' }}>
-                    <Button text="Close" style="primary" fill="outline" size="medium" onClick={() => {}} />
-                    <Button text="Close" style="primary" fill="filled" size="medium" onClick={() => {}} />
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Close" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
         }
@@ -864,14 +858,12 @@ export const SessionInfoLoadedLead = () => (
  * Displays session details in a 2-column grid using SessionInfoCard components.
  */
 const RegularTabButtonGroup = () => (
-    <ButtonGroup fill="tonal" className="w-100">
-        <Button text="Session info" active={true} style="primary" fill="tonal" block />
+    <ButtonGroup className="w-100">
+        <Button text="Session info" isSelected={true} shouldFitContainer />
         <Button
             text="Attendees"
-            style="secondary"
-            fill="tonal"
-            block
-            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
+            shouldFitContainer
+            iconAfter={<Badge text="20" style="secondary" size="b3" />}
         />
     </ButtonGroup>
 );
@@ -962,15 +954,13 @@ export const SessionInfoLoadedRegular = () => (
  * Lead tutors are indicated with a "Lead" badge.
  */
 const RegularAttendeeTabButtonGroup = () => (
-    <ButtonGroup fill="tonal" className="w-100">
-        <Button text="Session info" style="secondary" fill="tonal" block />
+    <ButtonGroup className="w-100">
+        <Button text="Session info" shouldFitContainer />
         <Button
             text="Attendees"
-            active={true}
-            style="primary"
-            fill="tonal"
-            block
-            trailingVisual={<Badge text="20" style="secondary" size="b3" />}
+            isSelected={true}
+            shouldFitContainer
+            iconAfter={<Badge text="20" style="secondary" size="b3" />}
         />
     </ButtonGroup>
 );

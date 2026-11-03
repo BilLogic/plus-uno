@@ -81,10 +81,8 @@ const FocusedFrame = ({
             {hasBack ? (
                 <Button
                     className="plus-page-focused__back"
-                    style="secondary"
-                    fill="text"
-                    size="medium"
-                    leadingVisual="arrow-left"
+                    appearance="subtle"
+                    iconBefore="arrow-left"
                     text={backLabel}
                     href={backHref}
                     onClick={onBack}

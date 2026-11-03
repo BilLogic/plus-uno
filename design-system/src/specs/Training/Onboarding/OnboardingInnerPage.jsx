@@ -42,7 +42,7 @@ const OnboardingInnerPage = () => {
                             <Form.Control as="textarea" rows={3} placeholder="Type your answer here..." />
                         </Form.Group>
                         <div className="d-flex justify-content-end">
-                            <Button style="primary" fill="filled" text="Submit" />
+                            <Button appearance="primary" text="Submit" />
                         </div>
                     </Card.Body>
                 </Card>

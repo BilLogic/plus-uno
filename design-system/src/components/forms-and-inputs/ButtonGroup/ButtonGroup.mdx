@@ -78,9 +78,9 @@ Buttons can be grouped together as individual segments of related actions.
 
 <div className="sb-ds-doc-section">
 
-## Sizes
+## Spacing
 
-<DocsCanvasShell description={<>Medium (32, the default) and small (24 compact, for table rows and inline toolbars). Large is deprecated and draws like medium.</>}>
+<DocsCanvasShell description={<>Default (32) and compact (24, for table rows and inline toolbars).</>}>
     <DsCanvasQuiet of={ButtonGroupStories.Sizes} />
 </DocsCanvasShell>
 
@@ -126,7 +126,7 @@ Buttons can be grouped together as individual segments of related actions.
 
 Use `ButtonGroup` when two or more actions belong together and should read as one
 control — a toolbar above a table, a pair of view switches, a vertical stack of
-related commands. It applies `size`, `style` and `fill` down to its children so
+related commands. It applies `appearance` and `spacing` down to its children so
 the group stays visually consistent without repeating those props on every
 button.
 
@@ -141,35 +141,14 @@ children. Children win when both are given.
 
 ### A group of buttons is not a selection.
 
-```jsx
-// Incorrect — looks like a segmented control, announces as three buttons in a
-// group with no selected state.
-<ButtonGroup ariaLabel="Date range" buttons={[
-  { text: 'Week', active: range === 'week', onClick: () => setRange('week') },
-  { text: 'Month', active: range === 'month', onClick: () => setRange('month') },
-]} />
-
-// Correct — `props` on a button config is spread onto the Button, and Button
-// spreads unknown props onto the element, so the state can be declared.
-<ButtonGroup ariaLabel="Date range" buttons={[
-  { text: 'Week', active: range === 'week', onClick: () => setRange('week'),
-    props: { 'aria-pressed': range === 'week' } },
-  { text: 'Month', active: range === 'month', onClick: () => setRange('month'),
-    props: { 'aria-pressed': range === 'month' } },
-]} />
-```
-
-### Group-level style is a narrower set than Button's.
+A group of buttons reads as a set of actions, not as a segmented picker. Where
+one button stands for the current choice, set `isSelected` on it: Button marks it
+with `aria-pressed`, so the state is announced as well as drawn.
 
 ```jsx
-// Incorrect — `social-emotional` is a valid Button style but not a valid
-// ButtonGroup style, so this trips a propTypes warning.
-<ButtonGroup style="social-emotional" buttons={actions} />
-
-// Correct — keep the group on a semantic style and override per button.
-<ButtonGroup style="secondary" buttons={[
-  { text: 'Social-emotional', style: 'social-emotional' },
-  { text: 'Advocacy', style: 'advocacy' },
+<ButtonGroup ariaLabel="Date range" buttons={[
+  { text: 'Week', isSelected: range === 'week', onClick: () => setRange('week') },
+  { text: 'Month', isSelected: range === 'month', onClick: () => setRange('month') },
 ]} />
 ```
 
@@ -185,11 +164,10 @@ children. Children win when both are given.
 - **`role="group"` does not imply arrow keys.** Tab moves between the buttons,
   one stop each. That is correct for a toolbar of actions and wrong for a
   segmented picker — which is the reason a picker belongs elsewhere.
-- **`active` is presentational.** It adds the `active` class and nothing else.
-  Toggle state has to be declared with `aria-pressed`, passed through a button
-  config's `props` object.
-- **Children are cloned, not validated.** Any element child has `size`, `style`
-  and `fill` injected unless it already sets them. Non-`Button` children still
+- **`isSelected` is announced.** It draws the selected fill and sets
+  `aria-pressed` on the button.
+- **Children are cloned, not validated.** Any element child has `appearance`
+  and `spacing` injected unless it already sets them. Non-`Button` children still
   get those props, which React will warn about if they reach a DOM element.
 - **The buttons keep their own rules.** Sizing, icon-only naming and the
   disabled behavior described on the `Button` page all still apply inside a

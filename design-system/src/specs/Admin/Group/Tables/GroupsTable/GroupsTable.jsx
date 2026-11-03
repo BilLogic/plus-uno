@@ -137,9 +137,8 @@ const GroupsTable = ({
                                 <div className="groups-table__action-buttons">
                                     <Button
                                         text="Edit"
-                                        style="default"
-                                        fill="ghost"
-                                        size="small"
+                                        appearance="subtle"
+                                        spacing="compact"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onEditClick && onEditClick(group);
@@ -147,9 +146,8 @@ const GroupsTable = ({
                                     />
                                     <Button
                                         text="View Progress"
-                                        style="default"
-                                        fill="ghost"
-                                        size="small"
+                                        appearance="subtle"
+                                        spacing="compact"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onViewProgressClick && onViewProgressClick(group);

@@ -101,10 +101,8 @@ const GroupInfoPage = ({
                     </h2>
                     <Button
                         text="Add Group"
-                        style="primary"
-                        fill="filled"
-                        size="medium"
-                        leadingVisual="user-plus"
+                        appearance="primary"
+                        iconBefore="user-plus"
                         onClick={onAddGroup}
                     />
                 </div>

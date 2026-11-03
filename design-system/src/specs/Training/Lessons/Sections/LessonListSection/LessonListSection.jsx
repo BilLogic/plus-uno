@@ -43,9 +43,8 @@ const LessonListSection = ({
                     {onViewAll && (
                         <Button
                             text="View All"
-                            style="primary"
-                            fill="text"
-                            size="small"
+                            appearance="subtle"
+                            spacing="compact"
                             onClick={onViewAll}
                             className="lesson-list-section__view-all"
                         />

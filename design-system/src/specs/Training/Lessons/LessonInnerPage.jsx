@@ -65,7 +65,7 @@ const LessonInnerPage = () => {
 
                     {/* Navigation */}
                     <div className="d-flex justify-content-end mt-4">
-                        <Button style="primary" fill="filled" text="Next" onClick={() => setPage(p => p + 1)} />
+                        <Button appearance="primary" text="Next" onClick={() => setPage(p => p + 1)} />
                     </div>
                 </div>
 

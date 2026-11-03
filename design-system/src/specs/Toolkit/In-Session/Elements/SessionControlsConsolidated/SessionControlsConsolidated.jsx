@@ -99,10 +99,9 @@ const SessionControlsConsolidated = ({
                 />
                 <Button
                     text="Manage session"
-                    style="primary"
-                    fill="filled"
-                    size="small"
-                    leadingVisual="gear"
+                    appearance="primary"
+                    spacing="compact"
+                    iconBefore="gear"
                     onClick={onManageSession}
                 />
                 <Dropdown
@@ -113,10 +112,8 @@ const SessionControlsConsolidated = ({
                     size="small"
                     toggle={
                         <Button
-                            style="primary"
-                            fill="outline"
-                            size="small"
-                            leadingVisual="ellipsis"
+                            spacing="compact"
+                            iconBefore="ellipsis"
                             aria-label="More session actions"
                         />
                     }

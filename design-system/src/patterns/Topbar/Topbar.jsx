@@ -53,10 +53,8 @@ const Topbar = ({
                 {hasToggle ? (
                     <Button
                         className="plus-topbar__toggle"
-                        style="primary"
-                        fill="tonal"
-                        size="medium"
-                        leadingVisual={open ? 'angles-left' : 'bars'}
+                        appearance="subtle"
+                        iconBefore={open ? 'angles-left' : 'bars'}
                         aria-label={open && isDocked ? 'Close sidebar' : 'Open sidebar'}
                         aria-expanded={open}
                         {...toggleProps}
@@ -81,10 +79,8 @@ const Topbar = ({
                     <>
                         <Button
                             className="plus-topbar__help"
-                            style="secondary"
-                            fill="text"
-                            size="medium"
-                            leadingVisual="circle-question"
+                            appearance="subtle"
+                            iconBefore="circle-question"
                             aria-label="Help Center"
                             title="Help Center"
                             href={helpHref}

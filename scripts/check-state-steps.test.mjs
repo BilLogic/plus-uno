@@ -160,45 +160,41 @@ test('Sidebar: an open-tab parent hovers on the neutral subtle hovered step', ()
 /* ─── Button ─────────────────────────────────────────────────────────────── */
 
 const BUTTON = 'components/forms-and-inputs/Button/Button.scss';
-const INTENTS = ['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger', 'info'];
+const BOLD = {
+  primary: 'brand-bold',
+  warning: 'warning-bold',
+  danger: 'danger-bold',
+  discovery: 'discovery-bold',
+};
 
-test('Button: filled and tonal lay their role steps on hover and when pressed', () => {
-  const steps = {
-    primary: ['brand-bold', 'brand-subtlest'],
-    secondary: ['neutral-bold', 'neutral'],
-    tertiary: ['accent-teal-bolder', 'accent-teal-subtler'],
-    success: ['success-bold', 'success-subtler'],
-    warning: ['warning-bold', 'warning-subtler'],
-    danger: ['danger-bold', 'danger-subtler'],
-    info: ['information-bold', 'information-subtler'],
-  };
-  for (const intent of INTENTS) {
-    const [bold, subtle] = steps[intent];
-    for (const [fill, role] of [['filled', bold], ['tonal', subtle]]) {
-      const base = `.plus-btn--${intent}.plus-btn--${fill}`;
-      expectRule(BUTTON, `${base}:hover`, { '--plus-btn-state-layer': layer(`--ds-background-${role}-hovered`) });
-      for (const pressed of [':active', '.active']) {
-        expectRule(BUTTON, `${base}${pressed}`, { '--plus-btn-state-layer': layer(`--ds-background-${role}-pressed`) });
-      }
-    }
+test('Button: each bold appearance takes its own hovered and pressed steps', () => {
+  for (const [appearance, role] of Object.entries(BOLD)) {
+    const base = `.plus-btn.plus-btn--${appearance}`;
+    expectRule(BUTTON, `${base}:hover`, { 'background-color': layer(`--ds-background-${role}-hovered`) });
+    expectRule(BUTTON, `${base}:active`, { 'background-color': layer(`--ds-background-${role}-pressed`) });
   }
 });
 
-test('Button: outline and ghost take the neutral subtle steps on hover and when pressed', () => {
-  for (const intent of INTENTS) {
-    for (const fill of ['outline', 'ghost', 'text']) {
-      const base = `.plus-btn--${intent}.plus-btn--${fill}`;
-      expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-      for (const pressed of [':active', '.active']) {
-        expectRule(BUTTON, `${base}${pressed}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-      }
-    }
+test('Button: default and subtle take the neutral subtle steps on hover and when pressed', () => {
+  for (const appearance of ['default', 'subtle']) {
+    const base = `.plus-btn.plus-btn--${appearance}`;
+    expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+    expectRule(BUTTON, `${base}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
+  }
+});
+
+test('Button: selected takes the selected role with its own steps', () => {
+  for (const appearance of ['default', 'subtle']) {
+    const base = `.plus-btn.plus-btn--selected.plus-btn--${appearance}`;
+    expectRule(BUTTON, base, { 'background-color': layer('--ds-background-selected') });
+    expectRule(BUTTON, `${base}:hover`, { 'background-color': layer('--ds-background-selected-hovered') });
+    expectRule(BUTTON, `${base}:active`, { 'background-color': layer('--ds-background-selected-pressed') });
   }
 });
 
 test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill', () => {
   expectRule(BUTTON, '.plus-btn.btn:focus-visible', {
-    outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
+    outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
     'outline-offset': 'var(--size-element-stroke-lg)',
   });
   expectNoFill(BUTTON, '.plus-btn.btn:focus-visible');

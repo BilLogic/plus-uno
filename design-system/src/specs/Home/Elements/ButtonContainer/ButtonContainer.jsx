@@ -36,13 +36,10 @@ export const ButtonContainer = ({
         >
             <div className="plus-button-container-group">
                 <Button
-                    style="primary"
-                    fill="outline"
-                    size="medium"
                     text={buttonText}
-                    leadingVisual={enabled ? 'arrow-up-right-from-square' : undefined}
+                    iconBefore={enabled ? 'arrow-up-right-from-square' : undefined}
                     onClick={onButtonClick}
-                    disabled={!enabled}
+                    isDisabled={!enabled}
                     className="plus-button-container-button"
                 />
                 <Select

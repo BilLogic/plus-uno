@@ -204,12 +204,8 @@ export default function MonthlyReportsListPage() {
                                 <td>
                                     <Button
                                         text="View"
-                                        style="secondary" // or primary? InSessionPage uses secondary outline
-                                        fill="outline"
-                                        size="small"
-                                        // InSessionPage used Button component. My design used a link.
-                                        // Let's use a text button with arrow.
-                                        trailingVisual={<i className="fa-solid fa-arrow-right"></i>}
+                                        spacing="compact"
+                                        iconAfter={<i className="fa-solid fa-arrow-right"></i>}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleViewReport(report.id);

@@ -110,9 +110,8 @@ const RecommendedLessons = ({
                 <div className="plus-recommended-lessons-bottom">
                     <Button
                         text={actionLabel}
-                        style="primary"
-                        fill="filled"
-                        size="small"
+                        appearance="primary"
+                        spacing="compact"
                         onClick={onReviewClick}
                     />
                     <div className="plus-recommended-lessons-indicators">

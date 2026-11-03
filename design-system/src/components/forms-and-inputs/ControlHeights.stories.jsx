@@ -20,8 +20,9 @@ import {
  * and inline toolbars and for choice rows. Every control label is 14/20 and
  * every icon draws at 16, whatever the size prop says.
  *
- * Size prop names stay. `medium` draws 32, `small` draws 24, and `large` is
- * deprecated: it draws like `medium` and warns in development.
+ * Button takes `spacing`: default draws 32 and compact draws 24. The other
+ * controls keep their `size` prop: `medium` draws 32, `small` draws 24, and
+ * `large` is deprecated: it draws like `medium` and warns in development.
  *
  * Checkbox, Radio and Switch rows are 24 at every size. Range, Rating,
  * Breadcrumb and Close button are 32. Button group, Nav pills and Nav tabs
@@ -46,16 +47,16 @@ const expectLabel = async (element, name, weight) => {
     if (weight) await expect(style.fontWeight, `${name} font weight`).toBe(weight);
 };
 
-const BUTTON_HEIGHTS = { small: 24, medium: 32, large: 32 };
+const BUTTON_HEIGHTS = { compact: 24, default: 32 };
 
 /** Text, icon and icon-only buttons at each size. */
 export const Buttons = () => (
     <div style={stack}>
-        {Object.keys(BUTTON_HEIGHTS).map((size) => (
-            <div key={size} style={row} data-size={size}>
-                <Button size={size} text={`Save ${size}`} />
-                <Button size={size} fill="outline" text={`Add ${size}`} leadingVisual="plus" />
-                <Button size={size} fill="ghost" leadingVisual="trash" aria-label={`Delete ${size}`} />
+        {Object.keys(BUTTON_HEIGHTS).map((spacing) => (
+            <div key={spacing} style={row} data-spacing={spacing}>
+                <Button appearance="primary" spacing={spacing} text={`Save ${spacing}`} />
+                <Button spacing={spacing} text={`Add ${spacing}`} iconBefore="plus" />
+                <Button spacing={spacing} appearance="subtle" iconBefore="trash" aria-label={`Delete ${spacing}`} />
             </div>
         ))}
     </div>
@@ -63,22 +64,22 @@ export const Buttons = () => (
 
 Buttons.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const [size, height] of Object.entries(BUTTON_HEIGHTS)) {
-        const text = canvas.getByRole('button', { name: `Save ${size}` });
-        const withIcon = canvas.getByRole('button', { name: `Add ${size}` });
-        const iconOnly = canvas.getByRole('button', { name: `Delete ${size}` });
+    for (const [spacing, height] of Object.entries(BUTTON_HEIGHTS)) {
+        const text = canvas.getByRole('button', { name: `Save ${spacing}` });
+        const withIcon = canvas.getByRole('button', { name: `Add ${spacing}` });
+        const iconOnly = canvas.getByRole('button', { name: `Delete ${spacing}` });
 
         for (const button of [text, withIcon, iconOnly]) {
-            const name = `${size} ${button.getAttribute('aria-label') || button.textContent}`;
+            const name = `${spacing} ${button.getAttribute('aria-label') || button.textContent}`;
             await expect(heightOf(button), `${name} height`).toBe(height);
         }
         // An icon-only button is square.
-        await expect(Math.round(box(iconOnly).width), `${size} icon-only width`).toBe(height);
+        await expect(Math.round(box(iconOnly).width), `${spacing} icon-only width`).toBe(height);
 
-        await expectLabel(text.querySelector('.plus-btn-text'), `${size} label`, '500');
+        await expectLabel(text.querySelector('.plus-btn-text'), `${spacing} label`, '500');
         for (const button of [withIcon, iconOnly]) {
             const icon = button.querySelector('.plus-btn-visual i');
-            await expect(getComputedStyle(icon).fontSize, `${size} icon`).toBe('16px');
+            await expect(getComputedStyle(icon).fontSize, `${spacing} icon`).toBe('16px');
         }
     }
 };
@@ -87,7 +88,7 @@ Buttons.play = async ({ canvasElement }) => {
 export const ButtonInHeading = () => (
     <div className="h3" style={row}>
         <span>Heading</span>
-        <Button size="medium" fill="ghost" leadingVisual="pen" aria-label="Edit" />
+        <Button appearance="subtle" iconBefore="pen" aria-label="Edit" />
     </div>
 );
 
@@ -97,7 +98,7 @@ ButtonInHeading.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(button.querySelector('i')).fontSize).toBe('16px');
 };
 
-/** `size="large"` is deprecated: it draws like `medium` and warns in development. */
+/** `size="large"` is deprecated on these controls: it draws like `medium` and warns in development. */
 let largeWarn;
 export const LargeWarns = {
     beforeEach: () => {
@@ -106,36 +107,28 @@ export const LargeWarns = {
     },
     render: () => (
         <div style={stack}>
-            <div style={row}>
-                <Button size="large" text="Large" />
-                <Button size="medium" text="Medium" />
-            </div>
-            <ButtonGroup size="large" ariaLabel="Large group" buttons={[{ text: 'One' }]} />
             <Checkbox size="large" label="Large checkbox" />
             <Radio size="large" name="large" label="Large radio" />
             <Switch size="large" label="Large switch" />
             <Range size="large" label="Large range" value={40} onChange={() => {}} />
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async () => {
         const messages = largeWarn.mock.calls.map((call) => String(call[0]));
-        for (const component of ['Button', 'Checkbox', 'Radio', 'Switch', 'Range']) {
+        for (const component of ['Checkbox', 'Radio', 'Switch', 'Range']) {
             await expect(
                 messages.some((m) => m.startsWith(`[${component}]`) && m.includes('size="large" is deprecated')),
                 `${component} warns`,
             ).toBe(true);
         }
-        const canvas = within(canvasElement);
-        await expect(heightOf(canvas.getByRole('button', { name: 'Large' })))
-            .toBe(heightOf(canvas.getByRole('button', { name: 'Medium' })));
     },
 };
 
 /** Button group follows the button. */
 export const Groups = () => (
     <div style={stack}>
-        <ButtonGroup size="small" ariaLabel="Small group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
-        <ButtonGroup size="medium" ariaLabel="Medium group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
+        <ButtonGroup spacing="compact" ariaLabel="Small group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
+        <ButtonGroup ariaLabel="Medium group" buttons={[{ text: 'Day' }, { text: 'Week' }]} />
     </div>
 );
 

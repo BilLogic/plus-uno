@@ -7,10 +7,24 @@ import { createPageLayout } from '../Universal/Pages/PageLayout.js';
 import { createSection } from '@/components/_internal/Section/index.js';
 import { createCard } from '@/components/layout-and-structure/Card/index.js';
 import { createTable } from '@/components/_internal/Table/index.js';
-import { createButton } from '@/components/forms-and-inputs/Button/index.js';
 
 // Export Home Cards
 export * from './Cards';
+
+/** A plain DOM button for the sections this module builds without React. */
+const createButton = ({ btnText = 'Button', icon } = {}) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn';
+    if (icon) {
+        const glyph = document.createElement('i');
+        glyph.className = `fa-solid fa-${icon}`;
+        glyph.setAttribute('aria-hidden', 'true');
+        button.appendChild(glyph);
+    }
+    button.append(btnText);
+    return button;
+};
 
 /**
  * Creates the Home page
@@ -71,9 +85,7 @@ export function createHome() {
             },
             skill.status,
             createButton({
-                btnText: 'View',
-                btnSize: 'sm',
-                btnStyle: 'secondary'
+                btnText: 'View'
             })
         ]),
         hover: true,
@@ -94,8 +106,7 @@ export function createHome() {
 
     const addSkillBtn = createButton({
         btnText: 'Add Skill',
-        icon: 'plus',
-        btnStyle: 'primary'
+        icon: 'plus'
     });
     sectionHeader.appendChild(addSkillBtn);
 

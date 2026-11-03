@@ -14,9 +14,8 @@ export default {
  * Cancel Button
  * Outlined primary button for canceling action
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="outline" for outlined style
- * - leadingIcon="times" for X icon
+ * - appearance="default"
+ * - iconBefore="times" for X icon
  */
 export const Overview = () => (
     <div
@@ -31,9 +30,7 @@ export const Overview = () => (
             <div style={{ maxWidth: '200px' }}>
                 <Button
                     text="Cancel"
-                    leadingIcon="times"
-                    style="primary"
-                    fill="outline"
+                    iconBefore="times"
                 />
             </div>
         </section>
@@ -47,9 +44,7 @@ export const Overview = () => (
 export const CancelButton = ({ ...props }) => (
     <Button
         text="Cancel"
-        leadingIcon="times"
-        style="primary"
-        fill="outline"
+        iconBefore="times"
         {...props}
     />
 );

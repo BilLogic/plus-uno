@@ -7,8 +7,8 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 20 | ✅ | ✅ | ✅ |
-| [ButtonGroup](ButtonGroup/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Button](Button/index.md) | 19 | ✕ | ✕ | ✅ |
+| [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
@@ -33,7 +33,7 @@ authored half (#166), counted rather than assumed.
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 24/25 (96%) · Correct/incorrect 16/25 (64%) · Accessibility 24/25 (96%)
+**Authored coverage:** When to use 23/25 (92%) · Correct/incorrect 15/25 (60%) · Accessibility 24/25 (96%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

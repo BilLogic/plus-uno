@@ -34,8 +34,8 @@ const longBody = (
 
 const footerActions = (
     <>
-        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => {}} />
-        <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => {}} />
+        <Button text="Cancel" spacing="compact" onClick={() => {}} />
+        <Button text="Save changes" appearance="primary" spacing="compact" onClick={() => {}} />
     </>
 );
 
@@ -199,15 +199,15 @@ const WithTrigger = (args) => {
     const [open, setOpen] = React.useState(false);
     return (
         <>
-            <Button text="Open session details" style="primary" fill="filled" size="small" onClick={() => setOpen(true)} />
+            <Button text="Open session details" appearance="primary" spacing="compact" onClick={() => setOpen(true)} />
             <PatternDrawer
                 {...args}
                 open={open}
                 onClose={() => setOpen(false)}
                 footer={(
                     <>
-                        <Button text="Cancel" style="secondary" fill="outline" size="small" onClick={() => setOpen(false)} />
-                        <Button text="Save changes" style="primary" fill="filled" size="small" onClick={() => setOpen(false)} />
+                        <Button text="Cancel" spacing="compact" onClick={() => setOpen(false)} />
+                        <Button text="Save changes" appearance="primary" spacing="compact" onClick={() => setOpen(false)} />
                     </>
                 )}
             >

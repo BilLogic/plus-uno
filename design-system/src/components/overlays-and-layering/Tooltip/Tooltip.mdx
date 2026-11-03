@@ -117,12 +117,12 @@ tooltip; the prop is kept so no call site breaks.
 // entirely. `trigger`, `delayShow` and `delayHide` are all dead, and the
 // tooltip is exactly as visible as the boolean says.
 <Tooltip text="Saved" show={justSaved} trigger="hover" delayHide={2000}>
-  <Button text="Save" />
+  <Button appearance="primary" text="Save" />
 </Tooltip>
 
 // Correct — let the component drive itself for hover, and use Toast for a
 // transient confirmation.
-<Tooltip text="Save this draft"><Button text="Save" /></Tooltip>
+<Tooltip text="Save this draft"><Button appearance="primary" text="Save" /></Tooltip>
 ```
 
 </div>
@@ -153,12 +153,12 @@ tooltip; the prop is kept so no call site breaks.
 // Incorrect — the icon-only button has no accessible name of its own, so it is
 // announced as "button" with a description hanging off it.
 <Tooltip text="Archive session">
-  <Button leadingVisual="box-archive" size="large" />
+  <Button appearance="primary" iconBefore="box-archive" />
 </Tooltip>
 
 // Correct — name the control, then describe it.
 <Tooltip text="Moves this session out of the active list">
-  <Button leadingVisual="box-archive" size="large" aria-label="Archive session" />
+  <Button appearance="primary" iconBefore="box-archive" aria-label="Archive session" />
 </Tooltip>
 ```
 
@@ -168,12 +168,11 @@ tooltip; the prop is kept so no call site breaks.
 // Incorrect — the link cannot be clicked. Moving the pointer toward it leaves
 // the trigger, and the tooltip hides.
 <Tooltip text={<a href="/help">Read the guide</a>}>
-  <Button leadingVisual="circle-question" size="large" aria-label="Help" />
+  <Button appearance="primary" iconBefore="circle-question" aria-label="Help" />
 </Tooltip>
 
 // Correct — a Popover is the overlay that holds content you can interact with.
-<Popover title="Scheduling" trigger={<Button leadingVisual="circle-question"
-         size="large" aria-label="Help" />}>
+<Popover title="Scheduling" trigger={<Button appearance="primary" iconBefore="circle-question" aria-label="Help" />}>
   <a href="/help">Read the guide</a>
 </Popover>
 ```

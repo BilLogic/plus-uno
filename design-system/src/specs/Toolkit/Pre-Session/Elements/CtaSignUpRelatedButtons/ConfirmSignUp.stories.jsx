@@ -14,9 +14,8 @@ export default {
  * Confirm Sign-Up Button
  * Filled primary button for confirming sign-up
  * Uses design system Button component with:
- * - style="primary" for primary color
- * - fill="filled" for filled background
- * - leadingIcon="square-plus" for plus icon
+ * - appearance="primary"
+ * - iconBefore="square-plus" for plus icon
  * - width: 194px (fixed width)
  */
 export const Overview = () => (
@@ -32,10 +31,9 @@ export const Overview = () => (
             <div style={{ width: '194px' }}>
                 <Button
                     text="Confirm sign-up"
-                    leadingIcon="square-plus"
-                    style="primary"
-                    fill="filled"
-                    block
+                    iconBefore="square-plus"
+                    appearance="primary"
+                    shouldFitContainer
                 />
             </div>
         </section>
@@ -45,11 +43,10 @@ export const Overview = () => (
             <div style={{ width: '194px' }}>
                 <Button
                     text="Confirm sign-up"
-                    leadingIcon="square-plus"
-                    style="primary"
-                    fill="filled"
-                    disabled
-                    block
+                    iconBefore="square-plus"
+                    appearance="primary"
+                    isDisabled
+                    shouldFitContainer
                 />
             </div>
         </section>
@@ -63,11 +60,10 @@ export const Overview = () => (
 export const ConfirmSignUpButton = ({ disabled = false, ...props }) => (
     <Button
         text="Confirm sign-up"
-        leadingIcon="square-plus"
-        style="primary"
-        fill="filled"
-        disabled={disabled}
-        block
+        iconBefore="square-plus"
+        appearance="primary"
+        isDisabled={disabled}
+        shouldFitContainer
         {...props}
     />
 );

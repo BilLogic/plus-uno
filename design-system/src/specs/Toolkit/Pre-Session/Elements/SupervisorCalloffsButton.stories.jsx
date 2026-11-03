@@ -21,12 +21,12 @@ export const SupervisorCalloffsButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Approve / Reject</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Approve: Success style (Green), Check icon */}
-                <Button text="Approve" leadingVisual="circle-check" style="success" />
-                <Button text="Approve" leadingVisual="circle-check" style="success" disabled />
+                <Button text="Approve" iconBefore="circle-check" appearance="primary" />
+                <Button text="Approve" iconBefore="circle-check" appearance="primary" isDisabled />
 
                 {/* Reject: Danger style (Red), X/Cross icon (using circle-xmark or xmark if available) */}
-                <Button text="Reject" leadingVisual="circle-xmark" style="danger" />
-                <Button text="Reject" leadingVisual="circle-xmark" style="danger" disabled />
+                <Button text="Reject" iconBefore="circle-xmark" appearance="danger" />
+                <Button text="Reject" iconBefore="circle-xmark" appearance="danger" isDisabled />
             </div>
         </section>
 
@@ -34,12 +34,12 @@ export const SupervisorCalloffsButton = () => (
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Excused / Not Excused</h6>
             <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)', alignItems: 'center' }}>
                 {/* Excused: Success style (Green), Check icon */}
-                <Button text="Excused" leadingVisual="circle-check" style="success" />
-                <Button text="Excused" leadingVisual="circle-check" style="success" disabled />
+                <Button text="Excused" iconBefore="circle-check" appearance="primary" />
+                <Button text="Excused" iconBefore="circle-check" appearance="primary" isDisabled />
 
                 {/* Not Excused: Danger style (Red), X/Cross icon */}
-                <Button text="Not Excused" leadingVisual="circle-xmark" style="danger" />
-                <Button text="Not Excused" leadingVisual="circle-xmark" style="danger" disabled />
+                <Button text="Not Excused" iconBefore="circle-xmark" appearance="danger" />
+                <Button text="Not Excused" iconBefore="circle-xmark" appearance="danger" isDisabled />
             </div>
         </section>
     </div>

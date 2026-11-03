@@ -312,7 +312,7 @@ export const WithActionsOnHover = {
                 icon="calendar-alt"
                 onClick={onRowClick}
                 elemAfter={<Count value={3} label="3 upcoming" />}
-                actionsOnHover={<Button style="default" fill="ghost" size="small" leadingVisual="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
+                actionsOnHover={<Button appearance="subtle" spacing="compact" iconBefore="ellipsis" aria-label="More actions for Sessions" onClick={onMore} />}
             />
         </div>
     ),

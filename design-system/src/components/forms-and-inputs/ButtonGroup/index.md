@@ -3,7 +3,7 @@
 
 # ButtonGroup
 
-Groups related buttons together with connected styling. Supports horizontal and vertical layouts with consistent sizing.
+Groups related buttons together with connected styling. Supports horizontal and vertical layouts with consistent spacing.
 
 **Import:** `import { ButtonGroup } from '@/components';`
 
@@ -19,9 +19,8 @@ Groups related buttons together with connected styling. Supports horizontal and 
 |------|------|---------|-------------|
 | `buttons` | arrayOf or shape or string or func or node or bool or object | `[]` | Array of button configurations |
 | `children` | node | — | Child Button components (alternative to buttons array) |
-| `size` | enum | `'medium'` | Size of buttons in the group |
-| `style` | enum | `'primary'` | Color style theme |
-| `fill` | enum | `'tonal'` | Fill variant for buttons |
+| `appearance` | enum | `'default'` | Appearance of every button in the group |
+| `spacing` | enum | `'default'` | Spacing of every button in the group: default 32, compact 24 |
 | `vertical` | bool | `false` | Stack buttons vertically |
 | `block` | bool | `false` | Whether the group takes full width |
 | `className` | string | `''` | Additional CSS classes |
@@ -30,11 +29,9 @@ Groups related buttons together with connected styling. Supports horizontal and 
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
+**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery`
 
-**`style`** — `primary` · `secondary` · `tertiary` · `success` · `warning` · `danger` · `info`
-
-**`fill`** — `filled` · `tonal` · `outline` · `ghost`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 

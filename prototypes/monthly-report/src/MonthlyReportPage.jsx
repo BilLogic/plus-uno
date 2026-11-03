@@ -362,7 +362,7 @@ export default function MonthlyReportPage() {
                                             {dim.session && (
                                                 <div className="session-row">
                                                     <span className="session-info">{dim.session}</span>
-                                                    <Button size="small" fill="outline">
+                                                    <Button spacing="compact">
                                                         <i className="fa-solid fa-play-circle"></i>
                                                         View Recording
                                                     </Button>
@@ -373,13 +373,13 @@ export default function MonthlyReportPage() {
                                                 <div className="feedback-row">
                                                     <p className="feedback-prompt">Was this insight helpful?</p>
                                                     <div className="feedback-buttons">
-                                                        <Button size="small" fill="outline" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                        <Button spacing="compact" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
                                                             <i className="fa-solid fa-thumbs-up"></i> Helpful
                                                         </Button>
-                                                        <Button size="small" fill="outline" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                        <Button spacing="compact" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
                                                             <i className="fa-solid fa-thumbs-down"></i> Not Helpful
                                                         </Button>
-                                                        <Button size="small" fill="outline" style="danger" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
+                                                        <Button spacing="compact" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
                                                             <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
                                                         </Button>
                                                     </div>

@@ -103,10 +103,10 @@ export const OneStepPerLevel = () => (
 export const LabelStyle = () => (
     <DoDont>
         <Do caption="Body/default with the medium weight on a button label, as every Button draws it.">
-            <span><Button text="Save changes" style="primary" fill="filled" /></span>
+            <span><Button text="Save changes" appearance="primary" /></span>
         </Do>
         <Dont caption="A heading style on a button label. It changes the Item’s height and reads as a title.">
-            <span><Button style="primary" fill="filled"><span style={{ font: 'var(--heading-medium)' }}>Save changes</span></Button></span>
+            <span><Button appearance="primary"><span style={{ font: 'var(--heading-medium)' }}>Save changes</span></Button></span>
         </Dont>
     </DoDont>
 );
