@@ -37,7 +37,7 @@ export const FoundationHero = ({ title, summary, adsHref, adsLabel = 'ADS docume
     >
         <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>Foundation</span>
         <h1 style={{ margin: 0, font: 'var(--heading-xlarge)', color: 'var(--ds-text)' }}>{title}</h1>
-        <p style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</p>
+        <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
         {adsHref && (
             <div>
                 <FoundationLink href={adsHref}>{adsLabel}</FoundationLink>

@@ -154,7 +154,7 @@ Code prefixes keep the names they were generated with, so the Frame is `--surfac
 
 Bind the token and nothing else. A token never takes a fallback, and the layer comes from what the thing is.
 
-- A token is used bare: `var(--ds-text)`, never `var(--ds-text, #172b4d)`. A fallback hides a missing token and drifts from the theme.
+- A token is used bare: `var(--ds-text)`, never with a second value after a comma. That fallback is a fifth, unthemed color: it hides a missing token and drifts from every mode.
 - Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-md`); a filter chip takes the element layer (`--element-pad-x-md`).
 - Spell tokens and copy in American English: gray, color, behavior.
 
@@ -162,7 +162,7 @@ Bind the token and nothing else. A token never takes a fallback, and the layer c
 
 <DoDont>
 <Do caption="The token alone. A missing token fails loudly in review."><C>color: var(--ds-text-subtle);</C></Do>
-<Dont caption="The hex fallback keeps working when the token is missing, so the drift is never noticed."><C>color: var(--ds-text-subtle, #626f86);</C></Dont>
+<Dont caption="A hex written in place of the token keeps working in one mode only, so the drift is never noticed."><C>color: #626f86;</C></Dont>
 </DoDont>
 
 <FoundationSubsection title="Using tokens in design">
