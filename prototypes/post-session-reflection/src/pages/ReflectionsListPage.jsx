@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { Button } from '@/components';
 import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { StatCard } from '@/specs/Toolkit/Pre-Session/Cards/OverviewCard.stories';
@@ -74,7 +74,7 @@ export default function ReflectionsListPage() {
                         gap: 'var(--size-element-gap-md)',
                     }}
                 >
-                    <h3 className="h3 m-0" style={{ color: 'var(--color-on-surface)' }}>Sessions</h3>
+                    <h3 className="h3 m-0" style={{ color: 'var(--ds-text)' }}>Sessions</h3>
                     <Button appearance="primary" iconBefore="user-plus" text="Fill in" />
                 </div>
 
@@ -108,7 +108,7 @@ export default function ReflectionsListPage() {
                             gap: 'var(--size-element-gap-sm)',
                         }}
                     >
-                        <h5 className="h5 m-0" style={{ color: 'var(--color-on-surface)' }}>Your reflections</h5>
+                        <h5 className="h5 m-0" style={{ color: 'var(--ds-text)' }}>Your reflections</h5>
                         <FilterSelect
                             aria-label="Completion"
                             clearable={false}
