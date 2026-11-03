@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as TypographyStories from './Typography.stories.jsx';
 
@@ -21,14 +20,13 @@ export const Sample = ({ font, weight, children = 'Tutors plan the week from her
 <FoundationHero
     title="Typography"
     summary="Heading, Body, Metric and Code are the text styles for all work."
-    adsHref="https://atlassian.design/foundations/typography"
 />
 
 <FoundationContents />
 
 <FoundationSection title="Overview">
 
-Atlassian's structure, with Noto Serif (weight 500) for headings 32 to 20, Noto Sans for headings 16 to 12, metrics and body text, and a monospace face for code: seven Heading sizes, three Body sizes in regular, medium and bold, and three Metric sizes, each a text style bound to the typography variables. Pick a style by where the text sits on the page, not by how big it should look.
+Noto Serif (weight 500) for headings 32 to 20, Noto Sans for headings 16 to 12, metrics and body text, and a monospace face for code: seven Heading sizes, three Body sizes in regular, medium and bold, and three Metric sizes, each a text style bound to the typography variables. Pick a style by where the text sits on the page, not by how big it should look.
 
 ```css
 font: var(--heading-medium);
@@ -44,8 +42,8 @@ Figma holds the text styles Heading/*, Body/*, Metric/* and Code/default, bound 
 
 Typography is the system of fonts and text styles. It carries communication, reinforces the product's voice and guides how people feel using it. Follow three principles, together with the color and spacing tokens.
 
-<FoundationBanner title="PLUS differences from ADS">
-Headings 32 to 20 are Noto Serif at weight 500, where ADS headings are all bold; headings 16 to 12 and metrics are Noto Sans at 600. Code/default is 12/16, where ADS font.code is 12/20. As in ADS, there is no separate button style: labels use Body/default/medium.
+<FoundationBanner title="Type choices">
+Headings 32 to 20 are Noto Serif at weight 500; headings 16 to 12 and metrics are Noto Sans at 600. Code/default is 12/16. There is no separate button style: labels use Body/default/medium.
 </FoundationBanner>
 
 <FoundationSubsection title="Optimize for readability">
@@ -75,7 +73,7 @@ In the app, headings 32 to 20 are Noto Serif at weight 500, and headings 16 to 1
 
 <FoundationSection title="Type scale">
 
-Heading/*, Body/* and Metric/* are the text styles for all new work. Every property of each style is bound to a variable in the typography collection. The sizes follow Atlassian, and the tokens are the contract: a later change edits a variable, never a component. Sizes are in rem, where 1rem is 16px, so people can scale text in their browser.
+Heading/*, Body/* and Metric/* are the text styles for all new work. Every property of each style is bound to a variable in the typography collection. The tokens are the contract: a later change edits a variable, never a component. Sizes are in rem, where 1rem is 16px, so people can scale text in their browser.
 
 <Canvas of={TypographyStories.TypeScale} sourceState="none" />
 
@@ -129,7 +127,7 @@ Headings introduce a new section of content. They are sized to contrast with the
 
 <FoundationSection title="Labels">
 
-A label uses Body/default/medium (Noto Sans 500). There is no separate button style, as in Atlassian: use the medium style for button, tab and menu labels and apply it directly, with no variables bound inline. In code it is `font: var(--body-default)` with `font-weight: var(--type-weight-medium)`.
+A label uses Body/default/medium (Noto Sans 500). There is no separate button style: use the medium style for button, tab and menu labels and apply it directly, with no variables bound inline. In code it is `font: var(--body-default)` with `font-weight: var(--type-weight-medium)`.
 
 <DoDont>
 <Do caption="Body/default/medium on a button or tab label.">
@@ -328,20 +326,6 @@ Use Metric to emphasize a number; a serif heading style makes the figure read as
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Heading family', 'One sans family, all bold', 'Noto Serif at 500 for 32 to 20; Noto Sans at 600 for 16 to 12', 'The serif gives PLUS its voice at the sizes people read as titles.'],
-        ['Code', 'font.code 12/20', 'Code/default 12/16', 'Denser code samples in the docs.'],
-        ['Button style', 'None; labels use the medium body style', 'The same: Body/default/medium', 'Matches ADS.'],
-        ['Paragraph spacing', 'Figma styles give 16, 12 and 8', 'Section and stack tokens', 'Spacing is one system, so text blocks use it too.'],
-        ['Units', 'rem in tokens', 'rem in tokens', 'Matches ADS, so people can scale text.'],
-    ]}
-/>
 
 </FoundationSection>
 

@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as IconsStories from './Icons.stories.jsx';
 
@@ -21,7 +20,6 @@ export const Glyph = ({ name, size = '--icon-md', family = 'fa-solid' }) => (
 <FoundationHero
     title="Iconography"
     summary="Icons are small symbols that help people find their way and act faster."
-    adsHref="https://atlassian.design/foundations/iconography"
 />
 
 <FoundationContents />
@@ -66,8 +64,8 @@ Before adding an icon, ask whether a label does the job better. Leave out icons 
 
 Icons come in three sizes, bound to the Size/Icon tokens. The box is exactly the size, so an icon never adds height to the line it sits in.
 
-<FoundationBanner title="PLUS differences from ADS">
-ADS has 16 and 12 only and sends anything larger to a tile; PLUS also has a 24 size. 12 is for chevrons, which are always 12, field validation icons, compact text, small contained elements such as tags, badges and statuses, and secondary actions. PLUS draws icons from Font Awesome Free, so ADS's stroke, corner and end-cap rules do not apply.
+<FoundationBanner title="Sizes and source">
+Icons come in 12, 16 and 24. 12 is for chevrons, which are always 12, field validation icons, compact text, small contained elements such as tags, badges and statuses, and secondary actions. PLUS draws icons from Font Awesome Free, so stroke, corner and end-cap rules do not apply.
 </FoundationBanner>
 
 <Canvas of={IconsStories.Sizes} sourceState="none" />
@@ -186,20 +184,6 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Sizes', '16 and 12; larger goes in a tile', '12, 16 and 24; larger goes in a Tile', 'Empty states and section headers need a 24 mark without a Tile.'],
-        ['Glyph set', 'Atlassian icon set with stroke and corner rules', 'Font Awesome Free only', 'A licensed, widely recognized set; the stroke rules do not apply.'],
-        ['Color', 'Icon color tokens', 'Icon color tokens', 'Matches ADS.'],
-        ['Labels', 'Pair with text where possible', 'The same', 'Matches ADS.'],
-        ['New icons', 'A contribution process', 'Four checks, then design lead approval', 'A small team needs a short path.'],
-    ]}
-/>
 
 </FoundationSection>
 

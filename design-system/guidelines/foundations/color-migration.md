@@ -93,8 +93,8 @@ Two of these rows go past a single map row, and each rests on a source:
   `color.link`, and the proposal's Links spec sets every link to `color.link`
   (lagoon.800, the same step as `color.text.brand`). The `--color-primary-text`
   row only lists `color.text.brand` because it describes brand text in general.
-- **Meta text takes `--ds-text-subtlest`.** Atlassian describes that token as
-  "tertiary text, such as meta-data, breadcrumbs". PLUS darkened it a half
+- **Meta text takes `--ds-text-subtlest`.** That token is
+  tertiary text, such as meta-data and breadcrumbs. PLUS darkened it a half
   step (neutral 750) so it keeps 4.5:1 on hovered and selected rows, which is
   why it is safe for text.
 
@@ -251,7 +251,7 @@ good first component.
 | the story's separator `<span>` | `--color-on-surface-variant` | `color` of the separator |
 
 **Map.** The separator and the current page are breadcrumb meta text, so both
-take `--ds-text-subtlest`, the token Atlassian names for breadcrumbs (§ Reading
+take `--ds-text-subtlest`, the token for breadcrumbs (§ Reading
 the map). The two link rules are `color` on an `<a>`, so they take `--ds-link`
 by the link row, which rests on the map's `--color-primary (border / text)`
 row and the Links spec. `--ds-link` has no hovered step, so the hover rule

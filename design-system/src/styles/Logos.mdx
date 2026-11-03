@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 
 import { Logo } from '@/components';
@@ -27,7 +26,6 @@ export const Ground = ({ token, children, caption }) => (
 <FoundationHero
     title="Logos"
     summary="A logo is the visual representation of PLUS. It is one mark, shown with or without the wordmark."
-    adsHref="https://atlassian.design/foundations/logos"
 />
 
 <FoundationContents />
@@ -85,7 +83,7 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 
 <FoundationSection title="Color options">
 
-Logos are available in three color options to suit different grounds, where ADS offers brand, neutral and inverse. Choose by the ground the logo sits on.
+Logos are available in three color options to suit different grounds. Choose by the ground the logo sits on.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
     <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size="M" text /></Ground>
@@ -118,7 +116,7 @@ Surround the logo with clear space free of type, graphics and other elements tha
     ]}
 />
 
-ADS measures clearance from the wordmark. Every PLUS logo has the logomark, so PLUS measures from the logomark. Align a logo to its neighbors by the logomark's edge and center it on the same line as the text beside it.
+Every PLUS logo has the logomark, so clearance is measured from the logomark. Align a logo to its neighbors by the logomark's edge and center it on the same line as the text beside it.
 
 </FoundationSection>
 
@@ -186,20 +184,6 @@ Do not add effects to the logo.
 - Do not place a colored or filled logo on a complex background, and do not edit the artwork. Use the outlined option on photos and busy grounds.
 - Do not rebuild the logomark from shapes or type; use the Logo component.
 - One Logo per view. Partner and tool logos go in a Tile, never in the Logo set.
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Color options', 'Brand, neutral and inverse', 'Colored, filled and outlined', 'The filled and outlined marks are white; the names say what the mark looks like.'],
-        ['Clearance', 'Measured from the wordmark', 'Half the logomark height, measured from the logomark', 'Every PLUS logo has the logomark.'],
-        ['Sizes', 'Per logo type', 'Fixed steps: 60, 96, 132, 192, 224', 'Never scaled by hand.'],
-        ['Partner logos', 'Shown as their own marks', 'In a Tile, never in the Logo set', 'The Logo set is for PLUS itself.'],
-        ['Alt text', 'Write the name', 'The same, by case', 'Matches ADS.'],
-    ]}
-/>
 
 </FoundationSection>
 

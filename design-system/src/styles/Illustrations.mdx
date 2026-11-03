@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 
 import { Illustration, Tile } from '@/components';
@@ -29,7 +28,6 @@ export const Captioned = ({ caption, children }) => (
 <FoundationHero
     title="Illustrations"
     summary="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
-    adsHref="https://atlassian.design/foundations/illustrations"
 />
 
 <FoundationContents />
@@ -255,19 +253,6 @@ A single character carries the mood; a crowd competes with the message.
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Types', 'Spot, low-fidelity UI and ambient pattern', 'Characters are spot illustrations; a low-fidelity UI uses basic shapes in mostly gray and never a real screenshot', 'PLUS draws one set of hand-made characters for tutoring.'],
-        ['Color', 'Illustration palette', 'Body from SMART or accent tokens, line work from the icon token', 'Characters follow Light and Dark through tokens.'],
-        ['Sizes', 'Per illustration type', 'Four sizes: 48, 96, 160, 240', 'Below 48 the line work breaks up; above 240 the texture turns coarse.'],
-        ['Other visual aids', 'Avatar, icon, logo, image', 'The same set', 'Matches ADS.'],
-    ]}
-/>
 
 </FoundationSection>
 

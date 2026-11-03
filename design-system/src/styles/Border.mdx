@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const field = (extra = {}) => ({
@@ -32,7 +31,6 @@ export const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle
 <FoundationHero
     title="Border"
     summary="A border is a width token paired with a color token."
-    adsHref="https://atlassian.design/foundations/border"
 />
 
 <FoundationContents />
@@ -49,7 +47,7 @@ border-width: var(--border-focused);
 
 Figma holds Border/default, Border/selected and Border/focused in `spacing / foundations`, built on Stroke/stroke-1 and stroke-2 in `spacing / primitives`. Pair them with `color/border/*` in `color / foundations`.
 
-<FoundationBanner title="PLUS differences from ADS">
+<FoundationBanner title="Border rules">
 A card has no border: its edge comes from elevation. The focus ring rounds to the control's radius plus 2, and buttons ring at 8 (6 compact). A border never draws a colored side stripe: meaning comes from the fill, the icon and the full outline.
 </FoundationBanner>
 
@@ -249,20 +247,6 @@ The sidebar ends in a 1 divider in `color/border/default`. The topbar has no bor
 <div style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', boxShadow: 'inset 0 0 0 var(--border-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Algebra 1</div>
 </Dont>
 </DoDont>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Width tokens', 'border.width, border.width.selected, border.width.focused', 'Border/default, Border/selected, Border/focused', 'Same three jobs; PLUS names them as the Border group.'],
-        ['Cards', 'Flat cards take a border', 'Cards have no border; the edge comes from elevation', 'One rule for every card.'],
-        ['Focus ring', 'A ring around the control', 'The same 2 ring, radius plus 2, buttons 8 and 6', 'The ring follows each control’s own radius.'],
-        ['Side stripes', 'Allowed on some messages', 'None', 'Meaning comes from fill, icon and the full outline.'],
-        ['Dividers', 'A border token', 'The same: no Divider component', 'Matches ADS.'],
-    ]}
-/>
 
 </FoundationSection>
 

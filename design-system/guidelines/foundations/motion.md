@@ -6,7 +6,7 @@ summary: Duration, easing, patterns and reduced motion
 
 # Motion
 
-Motion builds on Atlassian's: duration, easing and property, adjusted for a calm tutoring product.
+Motion has three attributes, duration, easing and property, tuned for a calm tutoring product.
 
 ## Rules
 
@@ -21,4 +21,3 @@ Motion builds on Atlassian's: duration, easing and property, adjusted for a calm
 - Accordion and Progress animate size and are documented exceptions.
 - Prefer transform and opacity to width, height and top.
 - **Reduced motion:** motion is off and instant. Set every duration and stagger to 0 ms under `prefers-reduced-motion`; a Spinner becomes a static icon with the word Loading; charts draw their final state; characters rest. Nothing is communicated by motion alone.
-- Recheck Atlassian's Early Access values before the tokens ship.

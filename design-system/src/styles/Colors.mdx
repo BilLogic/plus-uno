@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as ColorsStories from './Colors.stories.jsx';
@@ -18,7 +17,6 @@ import * as ColorsStories from './Colors.stories.jsx';
 <FoundationHero
     title="Color"
     summary="Every color is a --ds token named for its job."
-    adsHref="https://atlassian.design/foundations/color"
 />
 
 <FoundationContents />
@@ -48,7 +46,7 @@ Saturated colors carry meaning, highlight UI or tie related UI together. Neutral
 
 <FoundationSection title="How the tokens are built">
 
-Two layers. Primitives are the raw ramps and stay hidden; never bind one. Semantic tokens point at a primitive and name a job, and they are the only color tokens you bind. Names follow Atlassian's, so an Atlassian guideline usually applies word for word.
+Two layers. Primitives are the raw ramps and stay hidden; never bind one. Semantic tokens point at a primitive and name a job, and they are the only color tokens you bind.
 
 A name reads from the general to the specific: property, role, emphasis, state. In Figma the parts join with slashes, so `color/background/danger/bold/hovered`. In CSS, drop the leading `color` and join the parts with dashes behind `--ds-`, so `--ds-background-danger-bold-hovered`. That is the fill of a bold danger surface under the pointer.
 
@@ -497,20 +495,6 @@ Selection uses the selected tokens and another cue such as a check mark. The foc
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Token names', 'One dotted name in design and code', 'Slashes in Figma, dashes behind --ds- in code', 'Figma variable groups read as paths; CSS needs a flat custom property.'],
-        ['Selected', 'Trialing a neutral selection behind a feature flag', 'Stays blue with a second cue', 'Blue reads as chosen to tutors and students; a neutral selection is not specified.'],
-        ['AI', 'A purple for AI', 'PLUS AI uses the discovery purple', 'One purple for new and proposed things keeps the palette small.'],
-        ['Roles and emphasis', 'Neutral, brand, status, accent, inverse, input', 'The same, plus five SMART subject roles', 'The five SMART areas of tutoring need a color of their own.'],
-        ['Focus', 'A ring on the focused border token', 'The same 2px ring, never a fill', 'Matches ADS; stated here because a filled field reads as selected.'],
-    ]}
-/>
 
 </FoundationSection>
 

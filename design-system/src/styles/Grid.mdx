@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as GridStories from './Grid.stories.jsx';
@@ -19,7 +18,6 @@ import * as GridStories from './Grid.stories.jsx';
 <FoundationHero
     title="Layout & Grid"
     summary="Two 12-column grids with a 16 gutter at every width; page content caps at 1232."
-    adsHref="https://atlassian.design/foundations/grid"
 />
 
 <FoundationContents />
@@ -28,8 +26,8 @@ import * as GridStories from './Grid.stories.jsx';
 
 PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Blanket layer: modals and drawers size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
 
-<FoundationBanner title="PLUS differences from ADS">
-PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width, where ADS uses 12 below 1024. The page margin is 16 below 1440 and 24 from 1440, where ADS uses 16 and 32. ADS counts its 1296 fixed-wide maximum with margins; PLUS counts 1232 as content only. Layers over the page sit outside the grid in ADS; in PLUS only the Modal and Drawer take their width from the screen grid.
+<FoundationBanner title="How the PLUS grid differs from a standard one">
+PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 16 below 1440 and 24 from 1440. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal and Drawer take their width from the screen grid.
 </FoundationBanner>
 
 <Canvas of={GridStories.GridAnatomy} sourceState="none" />
@@ -414,7 +412,7 @@ Every box either hugs its content or fills the space it is given. The container 
 
 <FoundationSection title="Do and don't">
 
-Align containers to the grid, keep the grid on the page, and build with auto layout. Atlassian's Grid page frames the same rules.
+Align containers to the grid, keep the grid on the page, and build with auto layout.
 
 **Align containers, not small elements.** Cards, tables, forms and text blocks sit on columns. Buttons and icons do not; their size and spacing come from tokens.
 
@@ -423,22 +421,6 @@ Align containers to the grid, keep the grid on the page, and build with auto lay
 **Keep the grid on the page.** The content grid sits inside the Page. It does not run under the sidebar or the topbar: twelve columns start where the Page starts, after the sidebar.
 
 **Build with auto layout.** The grid guides alignment; auto layout holds the layout together as the breakpoint changes. An auto layout row with a 16 gap keeps cards on the columns when the mode changes; cards dragged into place by hand drift off the columns and do not adapt to the next mode.
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ["Breakpoints", "Several tiers down to mobile", "Three modes: 768, 1024, 1440", "PLUS is desktop only."],
-        ["Columns", "12, with 2 and 6 column tiers", "12 at every width", "No small-screen tier to serve."],
-        ["Gutter", "12 below 1024, 16 above", "16 at every width", "One rhythm for cards and columns."],
-        ["Page margin", "16, 32 from 1440", "16, 24 from 1440", "The sidebar already takes width; a smaller margin keeps the content wide."],
-        ["Maximum width", "1296, margins included", "1232, content only", "The cap counts what is read."],
-        ["Layers over the page", "Sit outside the grid", "Modal and Drawer take their width from the screen grid", "Modals line up with the page whenever the sidebar is closed."],
-        ["Nested grids", "Allowed", "None; containers have no inner grid", "Inside a container, spacing tokens take over."],
-    ]}
-/>
 
 </FoundationSection>
 

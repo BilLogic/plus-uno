@@ -8,8 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
-    FoundationLink,
 } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="Foundations/Tokens" tags={['!dev']} />
@@ -17,7 +15,6 @@ import {
 <FoundationHero
     title="Design tokens"
     summary="Design tokens are a single source of truth to name and store design decisions for the PLUS apps."
-    adsHref="https://atlassian.design/foundations/tokens/design-tokens"
 />
 
 <FoundationContents />
@@ -26,8 +23,8 @@ import {
 
 Tokens are how the tutor and student apps apply color, type, spacing, radius, borders and elevation. A token has a name that says how to use it and a value that can change by theme, so one choice is made once and every screen follows.
 
-<FoundationBanner title="A PLUS difference from ADS: two name notations">
-PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code, where ADS uses one dotted name in both. This is deliberate. To start by task: use tokens in code (Using tokens in code), or choose a token in design (Choose a layer).
+<FoundationBanner title="Two name notations">
+PLUS writes a token with slashes in Figma (`color/text/subtle`) and as `--ds-text-subtle` in code. To start by task: use tokens in code (Using tokens in code), or choose a token in design (Choose a layer).
 </FoundationBanner>
 
 Code reads `--ds-*` for color and elevation, `--element-*`, `--card-*`, `--table-*`, `--modal-*` and the other pattern prefixes for spacing and patterns, and `--space-*`, `--radius-*` for primitives. Figma reads local variables grouped into the collections below.
@@ -220,20 +217,6 @@ Features bind semantic tokens. A primitive is a building block that only defines
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Name notation', 'One dotted name in design and code', 'Slashes in Figma, dashes behind --ds- in code', 'Figma groups read as paths; CSS needs a flat custom property.'],
-        ['Themes', 'Light, dark, spacing, typography, shape', 'Light, Dark, Light IC, Dark IC, and three breakpoint modes', 'Increased contrast is a first-class theme.'],
-        ['Layers', 'Base and semantic', 'Primitives (hidden) and semantic', 'Features only ever bind the semantic layer.'],
-        ['Fallbacks', 'Allowed in code', 'Never; tokens are used bare', 'A fallback hides a missing token.'],
-        ['Pattern tokens', 'Component-level tokens', 'One collection per pattern', 'A value is read from where it sits.'],
-    ]}
-/>
 
 </FoundationSection>
 

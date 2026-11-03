@@ -104,5 +104,5 @@ For page sections and large containers:
 - The kind of box sets its pad: an Item by its height, a Container by its size, a Wrapper has none.
 - Controls: buttons and tabs are 32 (24 compact), fields and menu rows are 40 (32 compact). Buttons round 6 (4 compact); every other control rounds to its height ÷ 4.
 - Group first, then space; never hand-space; space never speaks alone.
-- The scale is named rem × 100: `--space-100` is 16, where ADS's `space.100` is 8.
+- The scale is named rem × 100: `--space-100` is 16.
 

@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const CURVES = [
@@ -46,14 +45,13 @@ export const Label = ({ children }) => (
 <FoundationHero
     title="Motion"
     summary="Motion shows what changed, where it came from and what to do next, and stays out of the way of a tutor's work."
-    adsHref="https://atlassian.design/foundations/motion"
 />
 
 <FoundationContents />
 
 <FoundationSection title="Overview">
 
-Motion in PLUS builds on the Atlassian system: the same three attributes (duration, easing and property), the same curves and the same four principles, adjusted for a calm tutoring product. Interactions are near-instant, entrances orient people and exits get out of the way. Playful motion is kept for moments that are not part of a task.
+Motion in PLUS has three attributes (duration, easing and property) and four principles, tuned for a calm tutoring product. Interactions are near-instant, entrances orient people and exits get out of the way. Playful motion is kept for moments that are not part of a task.
 
 Motion is defined by numeric tokens: `Motion/duration-150` for a duration and `Motion/easing-out-practical` for a curve. Bundles that package a duration, an easing and a property exist only for Modal, Blanket, Drawer, Popup, Flag, Tooltip, Tab and Button. Bootstrap's own motion variables are overridden by these tokens, so react-bootstrap keeps its focus and transition lifecycle.
 
@@ -61,7 +59,7 @@ Motion is defined by numeric tokens: `Motion/duration-150` for a duration and `M
 
 <FoundationSection title="Principles">
 
-Four principles from Atlassian guide every motion, worded for PLUS.
+Four principles guide every motion.
 
 <FoundationSubsection title="Human">
 Movement should feel like a supportive teammate nudging, not a machine snapping. Warmth comes from soft landings and restraint, not from extra movement.
@@ -83,21 +81,21 @@ A tutor in a live session is looking at something else. Frequent things (hover, 
 
 <FoundationSection title="Duration">
 
-Every motion is defined by duration, easing and property. Interactions run 50 to 150 ms; transitions run 150 to 400 ms, and larger elements take longer. Frequent things stay under 150 ms. PLUS changes from Atlassian are marked in the last column.
+Every motion is defined by duration, easing and property. Interactions run 50 to 150 ms; transitions run 150 to 400 ms, and larger elements take longer. Frequent things stay under 150 ms.
 
 <RefTable
-    head={['Token', 'Duration', 'Use', 'Against Atlassian']}
+    head={['Token', 'Duration', 'Use']}
     rows={[
-        [<C>Motion/duration-0</C>, '0 ms', 'Focus ring, selected state and the reduced-motion fallback.', 'Same (instant).'],
-        [<C>Motion/duration-50</C>, '50 ms', 'Table row and list item hover, tooltip exit.', 'Same (xxshort).'],
-        [<C>Motion/duration-100</C>, '100 ms', 'Button hover and press, list item press, popup exit, tooltip hide delay.', 'PLUS change: buttons move from 150 to 100, because people press them constantly in a session.'],
-        [<C>Motion/duration-150</C>, '150 ms', 'Popup enter, input and field states, tab, checkbox, skeleton-to-content fade, and the exit of a modal, drawer or flag.', 'PLUS change: exits shorten from 200 to 150.'],
-        [<C>Motion/duration-200</C>, '200 ms', 'Flag enter, accordion panel and chevron, state changes inside a card.', 'PLUS change: flag enter shortens from 250 to 200.'],
-        [<C>Motion/duration-250</C>, '250 ms', 'Modal and Blanket enter, drawer enter, progress fill.', 'Same (long).'],
-        [<C>Motion/duration-400</C>, '400 ms', 'Page or route transitions, and the first-load reveal.', 'Same.'],
-        [<C>Motion/duration-600</C>, '600 ms', 'Onboarding steps, chart and card intros. The ceiling for anything a tutor meets mid-task, and only once per view.', 'Same value. PLUS limits it to non-task or once-per-view moments.'],
-        [<C>Motion/duration-1000</C>, '1000 ms', 'Character moments only: empty state, completion, onboarding and error. Never inside a task flow. Also the one Spinner period.', 'PLUS addition. Atlassian has no value this long.'],
-        [<C>Motion/stagger-40</C>, '40 ms', 'Delay between siblings entering, up to 6 steps (240 ms), first item immediate.', 'PLUS addition.'],
+        [<C>Motion/duration-0</C>, '0 ms', 'Focus ring, selected state and the reduced-motion fallback.'],
+        [<C>Motion/duration-50</C>, '50 ms', 'Table row and list item hover, tooltip exit.'],
+        [<C>Motion/duration-100</C>, '100 ms', 'Button hover and press, list item press, popup exit, tooltip hide delay.'],
+        [<C>Motion/duration-150</C>, '150 ms', 'Popup enter, input and field states, tab, checkbox, skeleton-to-content fade, and the exit of a modal, drawer or flag.'],
+        [<C>Motion/duration-200</C>, '200 ms', 'Flag enter, accordion panel and chevron, state changes inside a card.'],
+        [<C>Motion/duration-250</C>, '250 ms', 'Modal and Blanket enter, drawer enter, progress fill.'],
+        [<C>Motion/duration-400</C>, '400 ms', 'Page or route transitions, and the first-load reveal.'],
+        [<C>Motion/duration-600</C>, '600 ms', 'Onboarding steps, chart and card intros. The ceiling for anything a tutor meets mid-task, and only once per view.'],
+        [<C>Motion/duration-1000</C>, '1000 ms', 'Character moments only: empty state, completion, onboarding and error. Never inside a task flow. Also the one Spinner period.'],
+        [<C>Motion/stagger-40</C>, '40 ms', 'Delay between siblings entering, up to 6 steps (240 ms), first item immediate.'],
     ]}
 />
 
@@ -113,14 +111,14 @@ Every motion is defined by duration, easing and property. Interactions run 50 to
 Entering elements ease out, exiting elements ease in, and elements that scale or reposition in place ease in and out. Use the practical curves for everyday interactions and the bold curves for larger movement. Curve names are written `Motion/easing-name`.
 
 <RefTable
-    head={['Token', 'cubic-bezier', 'Use', 'Against Atlassian']}
+    head={['Token', 'cubic-bezier', 'Use']}
     rows={[
-        [<C>Motion/easing-out-bold</C>, '0, 0.4, 0, 1', 'Drawer and flag enter, panel enter. A fast start and a controlled landing.', 'Same (out.bold).'],
-        [<C>Motion/easing-inout-bold</C>, '0.4, 0, 0, 1', 'Modal and Blanket scale-in, repositioning, a progress fill changing.', 'Same (inout.bold).'],
-        [<C>Motion/easing-in-practical</C>, '0.6, 0, 0.8, 0.6', 'Every exit, drawer exit included. Starts slowly and accelerates away.', 'Same curve. PLUS also uses it for the drawer exit, where Atlassian uses out.bold.'],
-        [<C>Motion/easing-out-practical</C>, '0.4, 1, 0.6, 1', 'Hover and press color, popup and tooltip enter, tabs, form fields, content swaps.', 'Same (out.practical).'],
-        [<C>Motion/easing-out-expressive</C>, '0.22, 1, 0.36, 1', 'Non-task moments only: character moments, first-load reveals, chart and card intros. Everywhere else, use out-bold.', 'PLUS addition, fenced to non-task moments.'],
-        [<C>Motion/easing-linear</C>, '0, 0, 1, 1', 'Rotation and time-based loops only.', 'Standard exception.'],
+        [<C>Motion/easing-out-bold</C>, '0, 0.4, 0, 1', 'Drawer and flag enter, panel enter. A fast start and a controlled landing.'],
+        [<C>Motion/easing-inout-bold</C>, '0.4, 0, 0, 1', 'Modal and Blanket scale-in, repositioning, a progress fill changing.'],
+        [<C>Motion/easing-in-practical</C>, '0.6, 0, 0.8, 0.6', 'Every exit, drawer exit included. Starts slowly and accelerates away.'],
+        [<C>Motion/easing-out-practical</C>, '0.4, 1, 0.6, 1', 'Hover and press color, popup and tooltip enter, tabs, form fields, content swaps.'],
+        [<C>Motion/easing-out-expressive</C>, '0.22, 1, 0.36, 1', 'Non-task moments only: character moments, first-load reveals, chart and card intros. Everywhere else, use out-bold.'],
+        [<C>Motion/easing-linear</C>, '0, 0, 1, 1', 'Rotation and time-based loops only.'],
     ]}
 />
 
@@ -191,25 +189,9 @@ Characters move in empty states, completion, onboarding and error screens, and n
 
 </FoundationSection>
 
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Attributes', 'Duration, easing, property', 'The same three', 'Matches ADS.'],
-        ['Button hover and press', '150 ms', '100 ms', 'Tutors press buttons constantly in a session.'],
-        ['Exits', '200 ms', '150 ms for modal, drawer and flag', 'Exits get out of the way.'],
-        ['Flag enter', '250 ms and half its width of travel', '200 ms and 8 px of travel', 'A 400-wide flag would sweep 200 px.'],
-        ['Expressive curve and 1000 ms', 'None', 'Non-task moments and character moments only', 'Warmth for the moments that are not a task.'],
-        ['Token structure', 'motion.<component>.<enter|exit> bundles for every component', 'Numeric tokens, with bundles for Modal, Blanket, Drawer, Popup, Flag, Tooltip, Tab and Button', 'Fewer names to learn; bundles where a component needs a recipe.'],
-        ['Values', 'Early Access, behind a feature flag', 'Recheck the live Atlassian values before the tokens ship', 'The values may move while Motion is in Early Access.'],
-    ]}
-/>
-
-</FoundationSection>
-
 <FoundationSection title="Accessibility">
 
-When a person asks for reduced motion, product motion is off and instant, as in Atlassian's guidance. Set it once at the token layer so every component complies without an extra rule.
+When a person asks for reduced motion, product motion is off and instant. Set it once at the token layer so every component complies without an extra rule.
 
 - Set every duration and stagger token to 0 ms under `prefers-reduced-motion`, and jump to the final state, so nothing is left half-transparent.
 - Never flash, oscillate rapidly or sweep large areas of the screen, whether or not reduced motion is on.

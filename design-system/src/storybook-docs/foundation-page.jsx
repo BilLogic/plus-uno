@@ -1,32 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
  * The Foundation docs scaffold: the chrome every Foundations page shares, so a
  * page file holds only its content. A page is, in order, a hero, a contents
- * list, its sections (Overview first, Related last), an ADS parity table and
- * Accessibility. Every block styles itself with `--ds-*` and pattern tokens,
- * so a page follows the toolbar's Color mode and Contrast switches.
+ * list, its sections (Overview first, Related last) and Accessibility.
+ * Every block styles itself with `--ds-*` and pattern tokens, so a page follows the toolbar's Color mode and Contrast switches.
  */
 
 const SECTION_ATTR = 'data-foundation-section';
 
 const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' };
 
-/** A text link that opens in a new tab, for pages outside Storybook. */
-export const FoundationLink = ({ href, children }) => (
-    <a href={href} target="_blank" rel="noreferrer" style={linkStyle}>
-        {children}
-        <i className="fa-solid fa-arrow-up-right-from-square" aria-hidden="true" style={{ marginInlineStart: 'var(--element-inline-sm)', fontSize: 'var(--icon-sm)' }} />
-    </a>
-);
-
 /**
- * Kind label, title, one-line summary, and the link to the matching page on
- * atlassian.design. The title is the page's one `h1`, so a page does not also
- * render `<Title />`.
+ * Kind label, title and one-line summary. The title is the page's one `h1`,
+ * so a page does not also render `<Title />`.
  */
-export const FoundationHero = ({ title, summary, adsHref, adsLabel = 'ADS documentation' }) => (
+export const FoundationHero = ({ title, summary }) => (
     <header
         style={{
             display: 'flex',
@@ -38,11 +27,6 @@ export const FoundationHero = ({ title, summary, adsHref, adsLabel = 'ADS docume
         <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>Foundation</span>
         <h1 style={{ margin: 0, font: 'var(--heading-xlarge)', color: 'var(--ds-text)' }}>{title}</h1>
         <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
-        {adsHref && (
-            <div>
-                <FoundationLink href={adsHref}>{adsLabel}</FoundationLink>
-            </div>
-        )}
     </header>
 );
 
@@ -135,11 +119,6 @@ export const FoundationBanner = ({ title, appearance = 'information', children }
         </aside>
     );
 };
-
-/** The ADS parity table: where PLUS follows Atlassian and where it differs. */
-export const AdsParity = ({ rows }) => (
-    <RefTable head={['Topic', 'ADS', 'PLUS', 'Why it differs']} rows={rows} />
-);
 
 /** Related pages, last on the page. Each item is `{ title, description, href }`. */
 export const FoundationRelated = ({ items }) => (

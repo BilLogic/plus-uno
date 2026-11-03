@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const Control = ({ height, radius, children, ring }) => (
@@ -42,14 +41,13 @@ export const Menu = ({ rowRadius }) => (
 <FoundationHero
     title="Radius"
     summary="A control rounds at a quarter of its height; buttons round 6 and 4; containers own their tokens."
-    adsHref="https://atlassian.design/foundations/radius"
 />
 
 <FoundationContents />
 
 <FoundationSection title="Overview">
 
-Radius tokens keep corners consistent across the tutor and student apps. A control's radius is a quarter of its height, so a 24 high control takes 6, a 32 high one takes 8 and a 40 high one takes 10. Buttons are the exception and match ADS: 6 default and 4 compact. Containers take the step their pattern names, and pair every radius with a focus ring that is 2 larger.
+Radius tokens keep corners consistent across the tutor and student apps. A control's radius is a quarter of its height, so a 24 high control takes 6, a 32 high one takes 8 and a 40 high one takes 10. Buttons are the exception: 6 default and 4 compact. Containers take the step their pattern names, and pair every radius with a focus ring that is 2 larger.
 
 Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--element-radius-*`, `--card-radius`, `--modal-radius`, `--popover-radius-*`, `--tile-radius-*` and `--surface-radius` as semantic tokens. Figma holds the primitives in `spacing / primitives`, and the semantic tokens in `spacing / foundations`, `spacing / layout` (Page/radius) and `spacing / patterns`.
 
@@ -65,8 +63,8 @@ Radius tokens standardize how round a corner is, so a session card, a menu and a
 
 Use the token for the role, not the one that matches a pixel value. Values are read from the page.
 
-<FoundationBanner title="PLUS differences from ADS">
-Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10, where ADS inputs use 6. Buttons are the exception and match ADS at 6 and 4. Cards and the Page round at 16, where ADS uses 8 and 12, because containers own their tokens: Table 8, Modal and Popup 12, Menu 10, 12 or 14, Tooltip 6.
+<FoundationBanner title="How PLUS rounds">
+Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10. Buttons are the exception at 6 and 4. Cards and the Page round at 16, because containers own their tokens: Table 8, Modal and Popup 12, Menu 10, 12 or 14, Tooltip 6.
 </FoundationBanner>
 
 <FoundationSubsection title="Controls and elements">
@@ -86,7 +84,7 @@ Controls round at a quarter of their height, so a 32 high field takes 8 and a 40
 
 <FoundationSubsection title="Buttons">
 
-Every button rounds the same way: 6 at the default height of 32 and 4 compact at 24. Their focus rings draw at 8 and 6. This is the ADS value, and it is not the height ÷ 4 rule. Element/radius-lg (8) is for fields, tabs and navigation, not for buttons.
+Every button rounds the same way: 6 at the default height of 32 and 4 compact at 24. Their focus rings draw at 8 and 6. This is not the height ÷ 4 rule. Element/radius-lg (8) is for fields, tabs and navigation, not for buttons.
 
 </FoundationSubsection>
 
@@ -114,7 +112,7 @@ Every button rounds the same way: 6 at the default height of 32 and 4 compact at
 
 <FoundationSection title="Radius examples and usage">
 
-Every control except a button takes a radius of its height ÷ 4. The same quarter keeps a 24, 32 and 40 control looking like one family, and it matches how Atlassian derives its tile radius (25%).
+Every control except a button takes a radius of its height ÷ 4. The same quarter keeps a 24, 32 and 40 control looking like one family.
 
 <FoundationExample caption="Each control takes the radius of its height divided by four. Buttons are the exception: 6 default, 4 compact.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)' }}>
@@ -240,7 +238,7 @@ A Tile rounds at 25% of its size. Every part keeps the radius of its own compone
 
 <FoundationSection title="Button radius">
 
-Every control except a button takes a radius of its height ÷ 4: a 24 chip rounds at 6, a 32 field at 8 and a 40 field at 10. Buttons are the named exception and match ADS: 6 default and 4 compact, with focus rings at 8 and 6. This covers Button, Icon button, Link button, Split button, Filter button, Close button and Vertical button. Containers keep their own tokens: Card 16, Modal 12.
+Every control except a button takes a radius of its height ÷ 4: a 24 chip rounds at 6, a 32 field at 8 and a 40 field at 10. Buttons are the named exception: 6 default and 4 compact, with focus rings at 8 and 6. This covers Button, Icon button, Link button, Split button, Filter button, Close button and Vertical button. Containers keep their own tokens: Card 16, Modal 12.
 
 </FoundationSection>
 
@@ -275,21 +273,6 @@ Take the radius from the height of the control, not from the nearest look.
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Inputs and fields', 'Radius 6', 'Height ÷ 4: 10 at 40, 8 at 32', 'The quarter rule keeps every control one family at any height.'],
-        ['Buttons', '6 default, 4 compact', 'The same, rings at 8 and 6', 'Matches ADS.'],
-        ['Cards and the Page', '8 and 12', '16', 'Containers own their tokens.'],
-        ['Table, Modal, Popup, Menu, Tooltip', 'Per component', 'Table 8, Modal and Popup 12, Menu 10 to 14, Tooltip 6', 'Each container names its own step.'],
-        ['Tile', '25% of the size', '25% of the size', 'Matches ADS.'],
-        ['Focus ring', 'Component radius plus the offset', 'Component radius + 2', 'Matches ADS.'],
-    ]}
-/>
 
 </FoundationSection>
 

@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import { ModeCompare } from '@/storybook-docs/foundation-blocks.jsx';
@@ -46,7 +45,6 @@ export const Kard = ({ children = 'Sessions this week', value = '24', style }) =
 <FoundationHero
     title="Elevation"
     summary="A surface lifts by its shadow, never by a darker fill."
-    adsHref="https://atlassian.design/foundations/elevation"
 />
 
 <FoundationContents />
@@ -305,20 +303,6 @@ How to lift a surface, and what not to do.
 </DoDont>
 
 **Limit overlays.** When controls must sit over other UI, group related actions in one floating toolbar rather than several overlay buttons. One overlay toolbar holds the related actions; separate floating buttons side by side pile up shadows.
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ["Cards", "Flat cards take a border; the raised level is for cards that can move", "Every card rests on the raised pair with no border", "The lift is the edge, and one rule for every card is simpler to apply."],
-        ["Levels", "Sunken, default, raised, overlay, plus overflow", "The same five", "Matches ADS."],
-        ["Tooltip", "Inverse fill", "Dark neutral fill with inverse text", "Matches ADS."],
-        ["Dark mode", "Higher is lighter; shadows stay on raised and overlay", "The same", "Matches ADS."],
-        ["Z-index", "Layer tokens", "Layer tokens, code-only", "Stacking has no Figma variable."],
-    ]}
-/>
 
 </FoundationSection>
 

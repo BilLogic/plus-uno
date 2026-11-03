@@ -747,8 +747,8 @@ BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
  * five, and `--color-primary` fails on the two darkest. Every `--color-*-text`
  * token clears 4.5:1 on all five.
  *
- * WHAT ATLASSIAN DOES, read live on 2026-08-29: `color.text` 49 tokens,
- * `color.icon` 23, `color.border` 39 — three namespaces, because an icon and a
+ * THE ROLE LAYER: `color.text` 49 tokens, `color.icon` 23 and
+ * `color.border` 39 — three namespaces, because an icon and a
  * border are held to 3:1 under WCAG 1.4.11 where text is held to 4.5:1. Naming
  * the role is what lets a value be chosen against the right bar.
  *

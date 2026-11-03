@@ -8,8 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
-    FoundationLink,
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
@@ -19,14 +17,13 @@ export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id
 <FoundationHero
     title="Foundations overview"
     summary="Foundations create consistent experiences across the tutor and student apps."
-    adsHref="https://atlassian.design/foundations"
 />
 
 <FoundationContents />
 
 <FoundationSection title="Overview">
 
-Foundations are the tokens, guidelines and visual styles that every pattern and component builds on: color, spacing, typography and more. This page lists all fourteen, grouped as Atlassian groups its own: tokens, guidelines, then styles.
+Foundations are the tokens, guidelines and visual styles that every pattern and component builds on: color, spacing, typography and more. This page lists all fourteen, grouped as tokens, guidelines, then styles.
 
 - Repo: `design-system/guidelines/foundations/` holds the written guidance for each foundation.
 - Figma: one page per foundation under Foundations, in this order.
@@ -36,25 +33,25 @@ Foundations are the tokens, guidelines and visual styles that every pattern and 
 
 <FoundationSection title="The fourteen foundations">
 
-Each foundation has a one-line definition and a link to the matching page on atlassian.design.
+Each foundation has a one-line definition.
 
 <RefTable
-    head={['Group', 'Foundation', 'What it is', 'ADS']}
+    head={['Group', 'Foundation', 'What it is']}
     rows={[
-        ['Design tokens', <Page id="tokens">Tokens</Page>, 'Named values that store a design decision once, for every theme.', <FoundationLink href="https://atlassian.design/foundations/tokens/design-tokens">Design tokens</FoundationLink>],
-        ['Guidelines', <Page id="accessibility">Accessibility</Page>, 'What makes the apps usable by everyone, and how each foundation supports it.', <FoundationLink href="https://atlassian.design/foundations/accessibility">Accessibility</FoundationLink>],
-        ['Guidelines', 'Content', 'How the words inside the apps are written. The guidance lives in the repo.', <FoundationLink href="https://atlassian.design/foundations/content">Content</FoundationLink>],
-        ['Guidelines', <Page id="spacing">Spacing</Page>, 'The space inside and between boxes, named by the job it does.', <FoundationLink href="https://atlassian.design/foundations/spacing">Spacing</FoundationLink>],
-        ['Guidelines', <Page id="layout-grid">Layout & grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.', <FoundationLink href="https://atlassian.design/foundations/grid">Grid</FoundationLink>],
-        ['Styles', <Page id="color">Color</Page>, 'Every color as a token named for its job.', <FoundationLink href="https://atlassian.design/foundations/color">Color</FoundationLink>],
-        ['Styles', <Page id="typography">Typography</Page>, 'Heading, Body, Metric and Code text styles.', <FoundationLink href="https://atlassian.design/foundations/typography">Typography</FoundationLink>],
-        ['Styles', <Page id="motion">Motion</Page>, 'Duration, easing and what is allowed to move.', <FoundationLink href="https://atlassian.design/foundations/motion">Motion</FoundationLink>],
-        ['Styles', <Page id="iconography">Iconography</Page>, 'Font Awesome Free icons at three sizes.', <FoundationLink href="https://atlassian.design/foundations/iconography">Iconography</FoundationLink>],
-        ['Styles', <Page id="illustrations">Illustrations</Page>, 'The hand-drawn characters for moments with room to breathe.', <FoundationLink href="https://atlassian.design/foundations/illustrations">Illustrations</FoundationLink>],
-        ['Styles', <Page id="logos">Logos</Page>, 'The PLUS mark, with or without the wordmark.', <FoundationLink href="https://atlassian.design/foundations/logos">Logos</FoundationLink>],
-        ['Styles', <Page id="elevation">Elevation</Page>, 'Surface and shadow pairs that lift a layer.', <FoundationLink href="https://atlassian.design/foundations/elevation">Elevation</FoundationLink>],
-        ['Styles', <Page id="border">Border</Page>, 'A width token paired with a color token.', <FoundationLink href="https://atlassian.design/foundations/border">Border</FoundationLink>],
-        ['Styles', <Page id="radius">Radius</Page>, 'Corner roundness: height ÷ 4, with buttons at 6 and 4.', <FoundationLink href="https://atlassian.design/foundations/radius">Radius</FoundationLink>],
+        ['Design tokens', <Page id="tokens">Tokens</Page>, 'Named values that store a design decision once, for every theme.'],
+        ['Guidelines', <Page id="accessibility">Accessibility</Page>, 'What makes the apps usable by everyone, and how each foundation supports it.'],
+        ['Guidelines', 'Content', 'How the words inside the apps are written. The guidance lives in the repo.'],
+        ['Guidelines', <Page id="spacing">Spacing</Page>, 'The space inside and between boxes, named by the job it does.'],
+        ['Guidelines', <Page id="layout-grid">Layout & grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.'],
+        ['Styles', <Page id="color">Color</Page>, 'Every color as a token named for its job.'],
+        ['Styles', <Page id="typography">Typography</Page>, 'Heading, Body, Metric and Code text styles.'],
+        ['Styles', <Page id="motion">Motion</Page>, 'Duration, easing and what is allowed to move.'],
+        ['Styles', <Page id="iconography">Iconography</Page>, 'Font Awesome Free icons at three sizes.'],
+        ['Styles', <Page id="illustrations">Illustrations</Page>, 'The hand-drawn characters for moments with room to breathe.'],
+        ['Styles', <Page id="logos">Logos</Page>, 'The PLUS mark, with or without the wordmark.'],
+        ['Styles', <Page id="elevation">Elevation</Page>, 'Surface and shadow pairs that lift a layer.'],
+        ['Styles', <Page id="border">Border</Page>, 'A width token paired with a color token.'],
+        ['Styles', <Page id="radius">Radius</Page>, 'Corner roundness: height ÷ 4, with buttons at 6 and 4.'],
     ]}
 />
 
@@ -64,24 +61,10 @@ Each foundation has a one-line definition and a link to the matching page on atl
 
 Every foundation page follows the same shape, so you can find the same thing in the same place.
 
-- A hero names the foundation, says what it is in one line and links to the matching Atlassian page.
+- A hero names the foundation, says what it is in one line.
 - Contents lists every section, Overview and Related included.
-- The foundation's own sections come next, then an ADS parity table that says where PLUS follows Atlassian and where it differs, then Accessibility, then Related last.
+- The foundation's own sections come next, then Accessibility, then Related last.
 - Examples are drawn from live tokens, so they follow the toolbar's Color mode and Contrast switches.
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ['Grouping', 'Design tokens, guidelines, styles', 'The same three groups', 'Matches ADS.'],
-        ['Token names', 'One dotted name in design and code', 'Slashes in Figma, dashes in code', 'Figma variable groups read as paths; CSS needs a flat custom property.'],
-        ['Cards', 'Border on flat cards', 'No border; the edge comes from elevation', 'One rule for every card.'],
-        ['Spacing scale', 'space.100 is 8px', 'space-100 is 16px', 'PLUS names its scale by rem.'],
-        ['Screen sizes', 'Mobile through desktop', 'Desktop only, from 768 up', 'The apps are used on laptops and desktops.'],
-    ]}
-/>
 
 </FoundationSection>
 
@@ -99,7 +82,6 @@ Every foundation page follows the same shape, so you can find the same thing in 
     items={[
         { title: 'Tokens', description: 'The names every other foundation points back to.', href: '?path=/docs/foundations-tokens--docs' },
         { title: 'Patterns', description: 'Where foundations are composed into layouts.', href: '?path=/docs/foundations-patterns-introduction--docs' },
-        { title: 'Atlassian foundations', description: 'The benchmark for how each foundation is documented.', href: 'https://atlassian.design/foundations' },
     ]}
 />
 

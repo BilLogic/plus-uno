@@ -8,7 +8,6 @@ import {
     FoundationBanner,
     FoundationRelated,
     FoundationExample,
-    AdsParity,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
 import * as SpacingStories from './Spacing.stories.jsx';
@@ -19,7 +18,6 @@ import * as SpacingStories from './Spacing.stories.jsx';
 <FoundationHero
     title="Spacing"
     summary="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
-    adsHref="https://atlassian.design/foundations/spacing"
 />
 
 <FoundationContents />
@@ -464,20 +462,6 @@ Group by proximity, match the token to the container you are in, and take every 
 <Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-md)</C></Do>
 <Dont caption="A literal 13 matches no step on the scale and will not follow a token change."><C>padding: 13px</C></Dont>
 </DoDont>
-
-</FoundationSection>
-
-<FoundationSection title="ADS parity">
-
-<AdsParity
-    rows={[
-        ["Scale names", "space.100 is 8px (percent of an 8px base)", "space-100 is 16px (rem \u00d7 100)", "PLUS names its scale by rem, so a token reads as the unit it is. Convert ADS spacing guidance to pixels before reuse."],
-        ["Token layers", "Space tokens by value", "Space by job: pad, stack, inline per pattern", "Tutors and students meet the same patterns everywhere, so the pattern names the gap."],
-        ["Negative spacing", "space.negative tokens", "None; use the layout to bleed a child", "Nothing in the product needs one."],
-        ["Gutter", "Per breakpoint", "16 at every breakpoint", "One gutter keeps cards and columns aligned."],
-        ["Control heights", "Buttons and fields 32 and 24", "Buttons 32 and 24; fields 40 and 32", "Fields are larger touch targets for students."],
-    ]}
-/>
 
 </FoundationSection>
 

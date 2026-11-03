@@ -138,9 +138,7 @@ ring.
 ## Data-viz color
 
 Charts take the `--ds-chart-*` tokens, generated with the rest of the `--ds-`
-set (ADR-035), and follow Atlassian's
-[data-visualization color guidance](https://atlassian.design/foundations/color/data-visualization-color)
-where PLUS does not say otherwise below. In code, never name a chart color by
+set (ADR-035). In code, never name a chart color by
 hand: `design-system/src/dataviz/palette.js` (exported as `chartPalette` from
 `@/components`) says which token does which job, and the Highcharts theme in
 `chartTheme.js` applies it. Every color does one job.
@@ -161,7 +159,7 @@ legends `--ds-text`, tick labels `--ds-text-subtle`, grid lines and axes
 ### Categorical order
 
 Assign series in this order, never skipping a slot. Past six, fold the
-smallest into "Other" (Atlassian's limit is five or six); 7 and 8 exist for
+smallest into "Other" (five or six is the limit); 7 and 8 exist for
 overflow only, as darker reprises of 1 and 4. The theme wraps back to slot 1
 after 8, which repeats a color: group the series before it gets there.
 
@@ -180,13 +178,12 @@ Neighbors stay apart under protan and deutan simulation (deltaE ≥ 8) and for
 full color vision (deltaE ≥ 15), in both plans, light and dark. The order
 leaves out red, which reads as danger, green, which reads as success, and teal,
 which reads as the brand. Slot 2 is the same yellow as `--ds-chart-warning`,
-as Atlassian's slot 4 is its warning orange: a chart uses either categorical or
+so a chart uses either categorical or
 status colors, never both.
 
 ### Sequential and diverging ramps
 
-Atlassian publishes no sequential or diverging guidance, so PLUS builds both
-from its chart tokens.
+Both ramps are built from the chart tokens.
 
 - **Sequential** runs `--ds-background-accent-<hue>-subtler`, then
   `--ds-chart-<hue>-bold`, `-bolder` and `-boldest`. Each step sits further
@@ -206,8 +203,8 @@ from its chart tokens.
 
 Use the status tokens only when a value means a status. The `-bold` step is the
 more extreme level of the same status: highest priority on
-`--ds-chart-danger-bold`, high on `--ds-chart-danger`. PLUS success is green and
-warning is yellow, where Atlassian's are lime and orange, so they match the
+`--ds-chart-danger-bold`, high on `--ds-chart-danger`. Success is green and
+warning is yellow, so they match the
 `--ds-*-success` and `-warning` roles. Status colors are hard to tell apart with
 a color-vision deficiency, so a status always carries an icon, a label or a
 signed value too.
