@@ -145,7 +145,7 @@ const SessionInfoForm = ({
                         type="checkbox"
                         required
                         legend={(
-                            <span className="body1-txt font-weight-semibold">
+                            <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                 Select one or more reasons why the session did not happen.
                             </span>
                         )}

@@ -111,7 +111,7 @@ const SelfReflectionForm = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <LinearScale
                     name="self-reflection-rating"
-                    legend={<span className="body1-txt font-weight-semibold">How did this session go for you?</span>}
+                    legend={<span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>How did this session go for you?</span>}
                     required
                     value={rating}
                     onChange={setRating}
