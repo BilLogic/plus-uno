@@ -1,0 +1,22 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as ProgressIndicatorStories from './ProgressIndicator.stories.jsx';
+
+<Meta of={ProgressIndicatorStories} />
+
+<Title />
+
+Shows the user where they are along the steps of a journey.
+
+<DocsTabs of={ProgressIndicatorStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={ProgressIndicatorStories.Default} />
+
+<ArgTypes />
+
+</DocsTab>
+
+</DocsTabs>
