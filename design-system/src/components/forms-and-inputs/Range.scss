@@ -120,15 +120,21 @@
         z-index: 2;
     }
 
-    &:hover:not(:disabled) {
-        &::-webkit-slider-thumb { background: var(--ds-background-selected-bold-hovered); }
-        &::-moz-range-thumb { background: var(--ds-background-selected-bold-hovered); }
-    }
+    // Hovered and pressed read on the thumb, not on the track the mixin's
+    // selectors default to, so each state is its own call with the compound
+    // vendor-prefixed selector in place of the default. The declarations
+    // still flow through the one named-token map.
+    @include plus-state(
+        $states: (hovered: (background: var(--ds-background-selected-bold-hovered))),
+        $ring: false,
+        $hovered-selector: '&:hover:not(:disabled)::-webkit-slider-thumb, &:hover:not(:disabled)::-moz-range-thumb'
+    );
 
-    &:active:not(:disabled) {
-        &::-webkit-slider-thumb { background: var(--ds-background-selected-bold-pressed); }
-        &::-moz-range-thumb { background: var(--ds-background-selected-bold-pressed); }
-    }
+    @include plus-state(
+        $states: (pressed: (background: var(--ds-background-selected-bold-pressed))),
+        $ring: false,
+        $pressed-selector: '&:active:not(:disabled)::-webkit-slider-thumb, &:active:not(:disabled)::-moz-range-thumb'
+    );
 
     // Keyboard focus is the 2px ring on `border.focused`, 2px off the thumb.
     // A pointer focus draws none.
@@ -146,28 +152,24 @@
         }
     }
 
-    // Disabled takes the disabled fill on the whole slider, thumb included.
-    &:disabled {
-        cursor: not-allowed;
+    // Disabled takes the disabled fill on the whole slider, thumb included —
+    // the track and the thumb each read a different disabled role, so each is
+    // its own call.
+    @include plus-state(
+        $states: (disabled: (cursor: not-allowed)),
+        $ring: false,
+        $disabled-selector: '&:disabled'
+    );
 
-        &::-webkit-slider-runnable-track {
-            background: var(--ds-background-disabled);
-        }
+    @include plus-state(
+        $states: (disabled: (background: var(--ds-background-disabled))),
+        $ring: false,
+        $disabled-selector: '&:disabled::-webkit-slider-runnable-track, &:disabled::-moz-range-track'
+    );
 
-        &::-moz-range-track {
-            background: var(--ds-background-disabled);
-        }
-
-        &::-webkit-slider-thumb {
-            background: var(--ds-icon-disabled);
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-
-        &::-moz-range-thumb {
-            background: var(--ds-icon-disabled);
-            box-shadow: none;
-            cursor: not-allowed;
-        }
-    }
+    @include plus-state(
+        $states: (disabled: (background: var(--ds-icon-disabled), box-shadow: none, cursor: not-allowed)),
+        $ring: false,
+        $disabled-selector: '&:disabled::-webkit-slider-thumb, &:disabled::-moz-range-thumb'
+    );
 }

@@ -41,13 +41,15 @@ $btn-appearances: (
     border-color: #{btn-read(list.nth($config, 6))};
     color: var(--plus-btn-fg);
 
-    &:hover {
-        background-color: #{btn-read(list.nth($config, 4))};
-    }
-
-    &:active {
-        background-color: #{btn-read(list.nth($config, 5))};
-    }
+    // The ring is drawn once, on `.plus-btn.btn`; each appearance only adds
+    // its own hovered/pressed fill, so the ring is not redrawn per appearance.
+    @include plus-state(
+        $states: (
+            hovered: (background-color: #{btn-read(list.nth($config, 4))}),
+            pressed: (background-color: #{btn-read(list.nth($config, 5))}),
+        ),
+        $ring: false
+    );
 }
 
 .plus-btn {
