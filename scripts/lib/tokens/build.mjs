@@ -1,0 +1,151 @@
+/**
+ * Renders `scripts/lib/tokens/plan.mjs` into the files
+ * `scripts/generate-design-tokens.mjs` writes — SCSS and a Figma variables
+ * payload, the same split `scripts/lib/color/build.mjs` writes for ADR-035.
+ * Pure: takes the plan, returns `{file: content}`; writing and checking live
+ * in the generator script.
+ */
+
+import { CONTAINER_PAD_ROLES, ELEMENT_ROLES, LEGACY_ALIASES, MOTION_DURATIONS, MOTION_EASINGS } from './plan.mjs';
+
+const DENSITIES = ['default', 'compact', 'spacious'];
+
+/** `{container:'section', axis:'x'}` -> `section-pad-x`; axis `null` -> `card-pad`. */
+function roleName(container, axis) {
+  return axis ? `${container}-pad-${axis}` : `${container}-pad`;
+}
+
+/** @returns {string} `_roles.scss` */
+export function rolesScss() {
+  let scss = `/**
+ * Role Tokens (ADR-038)
+ * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
+ * Container roles keyed to density (default / compact / spacious); element
+ * roles keyed to density (default / compact). Every value is a reference to
+ * the --space-* and --radius-* primitive ladder in _scales.scss.
+ */
+
+:root {
+    /* Container roles */
+`;
+  for (const { container, axis, steps } of CONTAINER_PAD_ROLES) {
+    const name = roleName(container, axis);
+    for (const density of DENSITIES) {
+      scss += `    --${name}-${density}: var(${steps[density]});\n`;
+    }
+  }
+  scss += `
+    /* Element roles */
+`;
+  for (const { kind, steps } of ELEMENT_ROLES) {
+    scss += `    --element-${kind}-default: var(${steps.default});\n`;
+    scss += `    --element-${kind}-compact: var(${steps.compact});\n`;
+  }
+  scss += `}\n`;
+  return scss;
+}
+
+/** @returns {string} `_motion.scss` */
+export function motionScss() {
+  const durations = Object.entries(MOTION_DURATIONS)
+    .map(([name, value]) => `    --motion-duration-${name}: ${value};\n`)
+    .join('');
+  const easings = Object.entries(MOTION_EASINGS)
+    .map(([name, value]) => `    --motion-easing-${name}: ${value};\n`)
+    .join('');
+  const zeroed = Object.keys(MOTION_DURATIONS)
+    .map((name) => `        --motion-duration-${name}: 0ms;\n`)
+    .join('');
+  return `/**
+ * Motion Tokens (ADR-038)
+ * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
+ * Duration and easing roles for Base UI's data-starting-style/data-ending-
+ * style transitions. Reduced motion is handled once, here: every duration
+ * collapses to 0ms under prefers-reduced-motion, so a component that reads
+ * --motion-duration-* needs no reduced-motion branch of its own.
+ */
+
+:root {
+${durations}${easings}}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+${zeroed}    }
+}
+`;
+}
+
+/** @returns {string} `_legacy-size-aliases.scss` */
+export function legacyAliasesScss() {
+  const lines = LEGACY_ALIASES.map(({ old, role }) => `    ${old}: var(${role}); /* ADR-038, one cycle */\n`).join('');
+  return `/**
+ * Legacy Size Aliases (ADR-038)
+ * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
+ * Old names this generator's role tokens make redundant, pointed at their
+ * replacement for one cycle so an unmigrated caller still resolves. Loads
+ * after _spacing_semantics.scss and _frame_layers.scss, so it wins; every
+ * value here is identical to what those files already declare for the same
+ * name (see plan.mjs's LEGACY_ALIASES comment), so this changes no pixel.
+ * A family PR deletes both the original declaration and its row here in the
+ * same PR, once its callers read the role token instead.
+ */
+
+:root {
+${lines}}
+`;
+}
+
+/** `--card-pad-default` -> `Card/pad-default` (Figma variable name, folder/leaf). */
+function figmaName(token) {
+  return token
+    .replace(/^--/, '')
+    .split('-')
+    .map((part, i) => (i === 0 ? part[0].toUpperCase() + part.slice(1) : part))
+    .join('-')
+    .replace(/^([A-Za-z]+)-/, '$1/');
+}
+
+/** @returns {object} the Figma variables payload (write-only; no push in this run) */
+export function figmaSpec() {
+  const variables = [];
+  for (const { container, axis, steps } of CONTAINER_PAD_ROLES) {
+    const name = roleName(container, axis);
+    for (const density of DENSITIES) {
+      const token = `--${name}-${density}`;
+      variables.push({ name: figmaName(token), resolvedType: 'FLOAT', codeSyntax: { WEB: `var(${token})` } });
+    }
+  }
+  for (const { kind, steps } of ELEMENT_ROLES) {
+    for (const density of ['default', 'compact']) {
+      const token = `--element-${kind}-${density}`;
+      variables.push({ name: figmaName(token), resolvedType: 'FLOAT', codeSyntax: { WEB: `var(${token})` } });
+    }
+  }
+  for (const name of Object.keys(MOTION_DURATIONS)) {
+    const token = `--motion-duration-${name}`;
+    variables.push({ name: figmaName(token), resolvedType: 'FLOAT', codeSyntax: { WEB: `var(${token})` } });
+  }
+  for (const name of Object.keys(MOTION_EASINGS)) {
+    const token = `--motion-easing-${name}`;
+    variables.push({ name: figmaName(token), resolvedType: 'STRING', codeSyntax: { WEB: `var(${token})` } });
+  }
+  return {
+    note:
+      'Generated by scripts/generate-design-tokens.mjs (ADR-038) from scripts/lib/tokens/plan.mjs. ' +
+      'This is the export step only — nothing here has been pushed to Figma. Direction is code -> ' +
+      'Figma, the reverse of the size/type/layout collections generate-all-tokens.js still reads FROM Figma.',
+    collections: [
+      { name: 'Deep foundations / roles and motion', variables },
+    ],
+  };
+}
+
+/** @returns {{[file: string]: string}} every file this generator writes, repo-relative under TOKEN_DIR. */
+export function artifacts() {
+  return {
+    'deep/_roles.scss': rolesScss(),
+    'deep/_motion.scss': motionScss(),
+    'deep/_legacy-size-aliases.scss': legacyAliasesScss(),
+    'deep/figma-spec.json': `${JSON.stringify(figmaSpec(), null, 2)}\n`,
+  };
+}

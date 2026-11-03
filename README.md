@@ -140,7 +140,7 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | Icons | Font Awesome Free 7.2 (no Pro icons — enforced) |
 | Deployment | Netlify |
 | Slack bot runtime | Cloudflare Worker (`agents/uno-bot/`) |
-| Figma Sync | Custom scripts (`scripts/sync-figma-tokens.js`, `scripts/poll-figma-library.js`) |
+| Figma Sync | `scripts/poll-figma-library.js` (component registry); deep-foundation tokens generate code -> Figma (ADR-038), no pull script |
 
 ## Commands
 
@@ -155,7 +155,6 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | `npm run build:all` | Build app + Storybook |
 | `npm run build-storybook` | Build Storybook static site only |
 | `npm run test` | Run component tests |
-| `npm run sync:tokens` | Sync tokens from Figma |
 | `npm run generate:tokens` | Generate SCSS from token source |
 | `npm run generate:agent` | Regenerate agent-views + Figma registries + audit |
 | `npm run generate:figma-links` | Regenerate the component ↔ Figma links spreadsheet |

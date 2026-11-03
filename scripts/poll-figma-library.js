@@ -454,7 +454,7 @@ function buildIssueBody(componentDiff, newVersions) {
   parts.push(`### Action Items`);
   parts.push(`- [ ] Review Figma changes`);
   parts.push(`- [ ] Update component code if needed`);
-  parts.push(`- [ ] Run \`npm run sync:tokens && npm run generate:tokens\` for token changes`);
+  parts.push(`- [ ] Re-export the Figma JSON under tokens/source/ and run \`npm run generate:tokens\` for token changes`);
   parts.push(`- [ ] Verify in Storybook`);
   parts.push('');
   parts.push(`---`);

@@ -102,11 +102,10 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 ## Token workflow
 
 ```
-Figma → npm run sync:tokens → npm run generate:tokens → commit SCSS
+Figma export (manual) → npm run generate:tokens → commit SCSS; deep-foundation tokens (ADR-038) generate code → Figma instead, via npm run generate:design-tokens
 ```
 
 - Never edit generated token files (`_colors.scss`, `_spacing.scss`, etc.) directly
-- Always run `generate:tokens` after `sync:tokens`
 - Token source is Figma, not the SCSS files — for every family except the
   Atlassian-shaped color set below
 
