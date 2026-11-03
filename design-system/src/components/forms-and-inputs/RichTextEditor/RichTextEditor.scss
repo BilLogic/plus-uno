@@ -61,11 +61,11 @@
     border-radius: var(--size-element-radius-md);
 
     &:hover:not(:disabled) {
-        background-color: var(--color-on-surface-state-08);
+        background-color: var(--ds-background-neutral-subtle-hovered);
     }
 
     &:active:not(:disabled) {
-        background-color: var(--color-on-surface-state-12);
+        background-color: var(--ds-background-neutral-subtle-pressed);
     }
 
     &:disabled {
@@ -102,15 +102,15 @@
         // The steps of a secondary ghost button, whose icons these are: the
         // transparent rest above would otherwise drop Button's own.
         &:hover:not(:disabled):not(.active) {
-            background-color: var(--color-secondary-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         &:active:not(:disabled):not(.active) {
-            background-color: var(--color-secondary-state-12);
+            background-color: var(--ds-background-neutral-subtle-pressed);
         }
 
         &.active {
-            background-color: var(--color-primary-state-16);
+            background-color: var(--ds-background-selected);
             color: var(--color-primary-text);
         }
 
@@ -157,17 +157,17 @@
         color: var(--color-on-surface);
 
         &:hover {
-            background-color: var(--color-on-surface-state-08);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         &:active {
-            background-color: var(--color-on-surface-state-12);
+            background-color: var(--ds-background-neutral-subtle-pressed);
         }
 
         // A menu is a dense list, so the current block is primary 08 (color.md).
         // It holds the 08 under hover and press, as Dropdown's selected item does.
         &.active {
-            background-color: var(--color-primary-state-08);
+            background-color: var(--ds-background-selected);
             color: var(--color-primary-text);
         }
 
