@@ -109,7 +109,6 @@ const FormingModalBody = () => (
                     <Select
                         options={schoolOptions}
                         placeholder="Select a school"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -117,7 +116,6 @@ const FormingModalBody = () => (
                     <Select
                         options={teacherOptions}
                         placeholder="Select a teacher"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -125,7 +123,6 @@ const FormingModalBody = () => (
                     <Select
                         options={dayOptions}
                         placeholder="Select a day"
-                        mode="single"
                     />
                 </FieldWrapper>
             </div>

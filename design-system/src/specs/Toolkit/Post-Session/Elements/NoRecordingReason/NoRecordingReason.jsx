@@ -51,8 +51,7 @@ const NoRecordingReason = ({
             <Select
                 id={id}
                 label="Why is there no recording?"
-                required={isRequired}
-                mode="single"
+                isRequired={isRequired}
                 options={options}
                 value={value}
                 onChange={onChange}

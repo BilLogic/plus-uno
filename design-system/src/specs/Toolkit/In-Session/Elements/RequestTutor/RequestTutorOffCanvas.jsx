@@ -193,7 +193,7 @@ export const RequestTutorOffCanvas = ({
                             aria-label="Other closing time"
                             clearable={false}
                             placeholder="Other"
-                            size="small"
+                            spacing="compact"
                             options={OTHER_CLOSING_TIMES.map((t) => ({ value: t, label: `${t}pm` }))}
                             value={OTHER_CLOSING_TIMES.includes(closesAt) ? closesAt : ''}
                             onChange={setClosesAt}

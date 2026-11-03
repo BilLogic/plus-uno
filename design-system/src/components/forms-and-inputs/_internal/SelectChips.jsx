@@ -4,8 +4,8 @@ import TagGroup from '@/components/labels/TagGroup';
 
 /**
  * A multi Select's picked values inside the field: Tags in a TagGroup
- * (`displayMode="tags"`), which collapse into "+n" when `collapsed`. Any other
- * mode draws nothing.
+ * (`displayMode="tags"`), which collapse into "+n" when `collapsed`. The
+ * `text` display mode draws nothing here; Select renders it inline instead.
  *
  * `live` false makes every chip read-only.
  */

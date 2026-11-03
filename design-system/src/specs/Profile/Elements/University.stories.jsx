@@ -44,13 +44,11 @@ export const University = ({ id = 'university', value, onChange, defaultValue, r
             <Label text="University" required={required} />
             <Select
                 id={id}
-                mode="single"
                 options={universityOptions}
                 value={value}
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select University"
-                size="medium"
                 style={{ width: '100%' }}
                 {...props}
             />

@@ -114,10 +114,9 @@ const ReasonDropdown = ({ value, onChange }) => (
         <Select
             options={reasonOptions}
             placeholder="Select a reason"
-            mode="single"
             value={value}
             onChange={onChange}
-            required
+            isRequired
         />
     </div>
 );

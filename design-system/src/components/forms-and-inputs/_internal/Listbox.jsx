@@ -104,6 +104,7 @@ const Listbox = ({
     error,
     emptyMessage = 'No results',
     embedded = false,
+    spacing = 'default',
     onActiveChange,
     className = '',
     style,
@@ -322,6 +323,7 @@ const Listbox = ({
                 dropIndicator={option.dropIndicator}
                 leading={leading.length ? leading : undefined}
                 trailing={option.trailing}
+                spacing={spacing}
                 onSelect={() => choose(option)}
                 onMouseMove={() => { if (!option.disabled && rowId !== resolvedActive) setActiveId(rowId); }}
                 {...extra}
@@ -426,6 +428,7 @@ const Listbox = ({
                             id={createId}
                             label={createLabel ? createLabel(filter.trim()) : filter.trim()}
                             highlighted={createId === resolvedActive}
+                            spacing={spacing}
                             onSelect={create}
                             onMouseMove={() => { if (createId !== resolvedActive) setActiveId(createId); }}
                         />
@@ -538,6 +541,8 @@ Listbox.propTypes = {
     emptyMessage: PropTypes.node,
     /** Draws no surface of its own, for a list inside another menu. */
     embedded: PropTypes.bool,
+    /** `default` draws 40 rows and `compact` draws 32, matching the field it opens from. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** `(id)` of the highlighted row, for the field's `aria-activedescendant`. */
     onActiveChange: PropTypes.func,
     className: PropTypes.string,

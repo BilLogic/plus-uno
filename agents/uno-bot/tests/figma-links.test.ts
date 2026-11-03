@@ -322,7 +322,10 @@ describe("only registry components", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
     const names = Object.keys(registry.components);
-    assert.equal(names.length, 70);
+    // 67: Select, Cascader and Tree select dropped their figmaMeta when the
+    // family moved to ADS props and a minimal MDX stub; Phase D backfills
+    // Figma from the rebuilt code and the registry entries return.
+    assert.equal(names.length, 67);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

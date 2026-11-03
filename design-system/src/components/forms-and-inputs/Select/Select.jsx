@@ -1,16 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
-import Listbox from './_internal/Listbox';
-import SelectChips from './_internal/SelectChips';
-import { SEARCH_FIRST_ABOVE, selectList } from './_internal/selectList';
-import useOpenState from './_internal/useOpenState';
-import useOptionSource from './_internal/useOptionSource';
-import useStagedValue from './_internal/useStagedValue';
-import useFieldId from './useFieldId';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import Listbox from '../_internal/Listbox';
+import SelectChips from '../_internal/SelectChips';
+import { SEARCH_FIRST_ABOVE, selectList } from '../_internal/selectList';
+import useOpenState from '../_internal/useOpenState';
+import useOptionSource from '../_internal/useOptionSource';
+import useStagedValue from '../_internal/useStagedValue';
+import useFieldId from '../useFieldId';
 import './Select.scss';
 
 export { SEARCH_FIRST_ABOVE };
+
+export const SELECT_SPACINGS = ['default', 'compact'];
 
 const isEmpty = (value) => value === undefined || value === null || value === ''
     || (Array.isArray(value) && value.length === 0);
@@ -23,8 +25,8 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  *   its `aria-activedescendant`. A searchable field is a text input: typing in
  *   it filters the list. A plain one is a select-only combobox.
  * - **Values are ids; options are objects.** `value` is an option's `value` (an
- *   array in multi mode), controlled or not.
- * - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which
+ *   array with `isMulti`), controlled or not.
+ * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which
  *   collapse into "+n" without focus.
  * - **Trailing** holds the clear × (not a tab stop; Delete does the same) and
  *   the caret.
@@ -34,7 +36,7 @@ const Select = ({
     name,
     label,
     caption,
-    mode = 'single',
+    isMulti = false,
     options = [],
     value,
     defaultValue,
@@ -49,15 +51,15 @@ const Select = ({
     displayMode = 'tags',
     lineWrap = true,
     truncate = false,
-    size = 'medium',
-    disabled = false,
-    readonly = false,
-    readOnly,
-    required = false,
+    spacing = 'default',
+    isDisabled = false,
+    isReadOnly = false,
+    isRequired = false,
     info,
-    validation = 'none',
-    validationMessage,
-    invalid = false,
+    isInvalid = false,
+    errorMessage,
+    isValid = false,
+    successMessage,
     commitOnClose = false,
     clearable,
     selectAll = false,
@@ -74,18 +76,17 @@ const Select = ({
     style,
     ...props
 }) => {
-    const multi = mode === 'multi';
+    const multi = isMulti;
     // A required single pick cannot be emptied; multi and optional fields can.
-    const canClear = clearable ?? (multi || !required);
+    const canClear = clearable ?? (multi || !isRequired);
     const fieldId = useFieldId(id);
     const listId = `${fieldId}-listbox`;
     const labelId = label ? `${fieldId}-label` : undefined;
-    const isReadOnly = readOnly !== undefined ? Boolean(readOnly) : Boolean(readonly);
 
     /* ---------- dependent field ---------- */
     const waiting = Boolean(dependsOn) && isEmpty(dependsOn.value);
-    const isDisabled = disabled || waiting;
-    const live = !isDisabled && !isReadOnly;
+    const disabled = isDisabled || waiting;
+    const live = !disabled && !isReadOnly;
 
     /* ---------- value, staged for `commitOnClose` ---------- */
     const picked = useStagedValue({ multi, value, defaultValue, onChange, staged: multi && commitOnClose });
@@ -195,7 +196,7 @@ const Select = ({
 
     const handleKeyDown = (event) => {
         if (props.onKeyDown) props.onKeyDown(event);
-        if (event.defaultPrevented || isDisabled) return;
+        if (event.defaultPrevented || disabled) return;
         const typing = typeable && filter;
         if (!isOpen) {
             if (!live) return;
@@ -260,11 +261,9 @@ const Select = ({
     };
 
     /* ---------- the caption ---------- */
-    // `invalid` is the older spelling of `validation="invalid"`; both still work.
-    const result = validation !== 'none' ? validation : (invalid ? 'invalid' : 'none');
-    const tone = result === 'invalid' ? 'invalid' : (result === 'success' ? 'success' : 'help');
+    const tone = isInvalid ? 'invalid' : (isValid ? 'success' : 'help');
     const tones = toneProps(tone);
-    let message = (result !== 'none' && validationMessage) || caption;
+    let message = (isInvalid && errorMessage) || (isValid && successMessage) || caption;
     if (waiting) message = `Choose ${dependsOn.label || 'the field above'} first`;
     else if (atLimit && !caption) message = `You can pick up to ${maxSelections}`;
     const { messageId, describedBy } = fieldDescription({
@@ -288,7 +287,7 @@ const Select = ({
         'aria-activedescendant': shown ? activeId : undefined,
         'aria-labelledby': props['aria-labelledby'] || labelId,
         'aria-label': props['aria-label'] || comboName,
-        'aria-required': required || undefined,
+        'aria-required': isRequired || undefined,
         ...tones.control,
         'aria-readonly': isReadOnly || undefined,
         'aria-describedby': describedBy,
@@ -305,8 +304,8 @@ const Select = ({
                 className="plus-field__control plus-select-input"
                 autoComplete="off"
                 aria-autocomplete="list"
-                disabled={isDisabled}
-                aria-disabled={isDisabled || undefined}
+                disabled={disabled}
+                aria-disabled={disabled || undefined}
                 readOnly={isReadOnly}
                 value={multi ? filter : (typed ? query : singleText)}
                 placeholder={multi ? (hasValue ? '' : placeholder) : (singleText || placeholder)}
@@ -322,8 +321,8 @@ const Select = ({
             <div
                 {...comboProps}
                 className="plus-select-combobox"
-                tabIndex={isDisabled ? undefined : 0}
-                aria-disabled={isDisabled || undefined}
+                tabIndex={disabled ? undefined : 0}
+                aria-disabled={disabled || undefined}
             >
                 {!multi || displayMode === 'text' ? (
                     <span className={`plus-select-text${hasValue ? '' : ' plus-select-placeholder'}`}>
@@ -343,7 +342,7 @@ const Select = ({
             textFor={textFor}
             onRemove={removeValue}
             live={live}
-            disabled={isDisabled}
+            disabled={disabled}
             label={typeof label === 'string' ? label : props['aria-label']}
             collapsed={!(focused || shown)}
             onOverflowClick={() => { openList(); controlRef.current?.focus(); }}
@@ -401,10 +400,9 @@ const Select = ({
 
     const wrapperClasses = [
         'plus-select-wrapper',
-        `plus-select-${size === 'small' ? 'sm' : size === 'large' ? 'lg' : 'md'}`,
         multi ? 'plus-select-multi' : 'plus-select-single',
         typeable ? 'plus-select-typeable' : '',
-        isDisabled ? 'plus-select-disabled' : '',
+        disabled ? 'plus-select-disabled' : '',
         isReadOnly ? 'plus-select-readonly' : '',
         shown ? 'plus-select-open' : '',
         lineWrap ? '' : 'plus-select-nowrap',
@@ -414,18 +412,18 @@ const Select = ({
 
     // A field waiting on its parent fades only its box: the caption saying why stays readable.
     return (
-        <FieldStack disabled={disabled} className={wrapperClasses} style={style}>
+        <FieldStack disabled={isDisabled} className={wrapperClasses} style={style}>
             {label && (
-                <FieldLabel htmlFor={typeable ? fieldId : undefined} required={required} info={info} name={typeof label === 'string' ? label : undefined}>
+                <FieldLabel htmlFor={typeable ? fieldId : undefined} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     <span id={labelId}>{label}</span>
                 </FieldLabel>
             )}
             <div className="plus-select-field" onFocus={handleFocus} onBlur={handleBlur}>
                 <Field
                     ref={fieldRef}
-                    spacing={size === 'small' ? 'compact' : 'default'}
+                    spacing={spacing}
                     grow={multi && lineWrap}
-                    disabled={isDisabled}
+                    disabled={disabled}
                     readOnly={isReadOnly}
                     {...tones.field}
                     trailing={trailing}
@@ -441,6 +439,7 @@ const Select = ({
                     open={shown}
                     anchorRef={fieldRef}
                     mode={multi ? 'multi' : 'single'}
+                    spacing={spacing}
                     options={listOptions}
                     value={multi ? current : (hasValue ? current : null)}
                     onChange={(next) => choose(next)}
@@ -459,7 +458,7 @@ const Select = ({
                 />
             </div>
             {name && (multi ? committedList : (isEmpty(committedList) ? [] : [committedList])).map((v) => (
-                <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
+                <input key={v} type="hidden" name={name} value={v} disabled={disabled} />
             ))}
             <FieldCaption messageId={messageId} message={message} tone={tone} />
         </FieldStack>
@@ -475,9 +474,10 @@ Select.propTypes = {
     name: PropTypes.string,
     /** The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. */
     label: PropTypes.node,
-    /** Help under the field. With `invalid`, it is the error and is announced. */
+    /** Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. */
     caption: PropTypes.node,
-    mode: PropTypes.oneOf(['single', 'multi']),
+    /** Several values, shown as Tags in the field and checkboxes in the list. */
+    isMulti: PropTypes.bool,
     /** Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. */
     options: PropTypes.arrayOf(PropTypes.shape({
         value: valueType.isRequired,
@@ -487,7 +487,7 @@ Select.propTypes = {
         disabled: PropTypes.bool,
         group: PropTypes.string,
     })),
-    /** The picked id, or ids in multi mode. Pass it to control the field. */
+    /** The picked id, or ids with `isMulti`. Pass it to control the field. */
     value: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     defaultValue: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     placeholder: PropTypes.string,
@@ -507,39 +507,38 @@ Select.propTypes = {
     /** `(open)`: the list asks to open or close. */
     onOpenChange: PropTypes.func,
     defaultSearchTerm: PropTypes.string,
-    /** Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). */
+    /** With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). */
     displayMode: PropTypes.oneOf(['tags', 'text']),
-    /** Badges only: wrap onto more lines. */
+    /** `text` display mode only: wrap onto more lines. */
     lineWrap: PropTypes.bool,
-    /** Badges only: clip the row with a fade. */
+    /** `text` display mode only: clip the row with a fade. */
     truncate: PropTypes.bool,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
+    /** `default` draws 40 and `compact` draws 32. */
+    spacing: PropTypes.oneOf(SELECT_SPACINGS),
+    isDisabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
-    readOnly: PropTypes.bool,
-    /** @deprecated Prefer readOnly */
-    readonly: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     /** Shows an asterisk on the label and sets `aria-required`. */
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     /** Text for the info tooltip beside the label. */
     info: PropTypes.node,
-    /** The field's validation tone, as on Input: an error, a confirmation, or neither. */
-    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
-    /** Shown under the field in place of `caption` while `validation` is set; an error is announced. */
-    validationMessage: PropTypes.node,
-    /** Same as `validation="invalid"`: draws the error border, and `caption` becomes the announced error. */
-    invalid: PropTypes.bool,
-    /** Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. */
+    /** Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. */
+    isInvalid: PropTypes.bool,
+    errorMessage: PropTypes.node,
+    /** Draws the confirmation border; `successMessage` takes the caption's place. */
+    isValid: PropTypes.bool,
+    successMessage: PropTypes.node,
+    /** With `isMulti`: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. */
     commitOnClose: PropTypes.bool,
     /**
      * Shows the clear × (Figma `_Field Clear`), and lets Delete empty the field.
-     * Defaults to true in multi mode and to `!required` in single mode; a sort
+     * Defaults to true with `isMulti` and to `!isRequired` otherwise; a sort
      * passes `false`.
      */
     clearable: PropTypes.bool,
-    /** Multi mode: a "Select all" button over the list, hidden past 50 matches. */
+    /** With `isMulti`: a "Select all" button over the list, hidden past 50 matches. */
     selectAll: PropTypes.bool,
-    /** Multi mode: the most values; past it the other rows are disabled and the list says why. */
+    /** With `isMulti`: the most values; past it the other rows are disabled and the list says why. */
     maxSelections: PropTypes.number,
     /**
      * The field this one depends on: `{ value, label }`. Until `value` is set
@@ -561,7 +560,7 @@ Select.propTypes = {
     recent: PropTypes.arrayOf(valueType),
     /** Ids shown under "Suggested" before typing, in a list of more than 50. */
     suggested: PropTypes.arrayOf(valueType),
-    /** `(next)`: an id, or an array of ids in multi mode. */
+    /** `(next)`: an id, or an array of ids with `isMulti`. */
     onChange: PropTypes.func,
     /** Focus entering the field from outside it. */
     onFocus: PropTypes.func,

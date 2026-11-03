@@ -50,7 +50,7 @@ export const SingleCommitClosesTheMenu = () => {
     return (
         <div style={stack}>
             <Select id="scommit-school" label="School" options={schools} placeholder="Select a school" value={value} onChange={setValue} />
-            <Select id="scommit-locked" label="District" options={schools} placeholder="Select a district" disabled />
+            <Select id="scommit-locked" label="District" options={schools} placeholder="Select a district" isDisabled />
             <p data-testid="chosen">{value}</p>
         </div>
     );
@@ -199,7 +199,7 @@ export const MultiAccumulatesAndRemoves = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={stack}>
-            <Select id="scommit-multi" label="Schools" mode="multi" options={schools} value={value} onChange={setValue} />
+            <Select id="scommit-multi" label="Schools" isMulti options={schools} value={value} onChange={setValue} />
             <p data-testid="chosen">{value.join(',')}</p>
         </div>
     );
@@ -239,7 +239,7 @@ export const CommitOnClose = () => {
             <Select
                 id="scommit-close"
                 label="Schools"
-                mode="multi"
+                isMulti
                 options={schools}
                 commitOnClose
                 onChange={(next) => setLog((prev) => [...prev, next.join('+')])}
@@ -276,7 +276,7 @@ export const SelectAllHiddenPast50 = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={stack}>
-            <Select id="scommit-all" label="Tutors" mode="multi" searchable selectAll options={manyOptions} value={value} onChange={setValue} />
+            <Select id="scommit-all" label="Tutors" isMulti searchable selectAll options={manyOptions} value={value} onChange={setValue} />
             <p data-testid="count">{value.length}</p>
         </div>
     );
@@ -301,7 +301,7 @@ SelectAllHiddenPast50.play = async ({ canvasElement }) => {
 /** With a pick limit, the rest of the rows are disabled and the list says why. */
 export const PickLimitDisablesRows = () => (
     <div style={stack}>
-        <Select id="scommit-limit" label="Schools" mode="multi" maxSelections={2} options={schools} />
+        <Select id="scommit-limit" label="Schools" isMulti maxSelections={2} options={schools} />
     </div>
 );
 
@@ -328,7 +328,7 @@ export const CollapsedTagsShowPlusN = () => (
         <Select
             id="scommit-collapse"
             label="Subjects"
-            mode="multi"
+            isMulti
             options={[
                 { value: 'alg', label: 'Algebra' },
                 { value: 'bio', label: 'Biology' },
@@ -391,8 +391,8 @@ ClearButton.play = async ({ canvasElement }) => {
 /** Read-only shows the value and stays focusable, but never opens or clears. */
 export const ReadonlyIsNotDisabled = () => (
     <div style={stack}>
-        <Select id="scommit-ro" label="School" options={schools} defaultValue="north" readonly />
-        <Select id="scommit-off" label="District" options={schools} defaultValue="north" disabled />
+        <Select id="scommit-ro" label="School" options={schools} defaultValue="north" isReadOnly />
+        <Select id="scommit-off" label="District" options={schools} defaultValue="north" isDisabled />
     </div>
 );
 
@@ -419,10 +419,10 @@ ReadonlyIsNotDisabled.play = async ({ canvasElement }) => {
     await expect(disabled).not.toHaveFocus();
 };
 
-/** `invalid` draws the error border and points the field at its message. */
+/** `isInvalid` draws the error border and points the field at its message. */
 export const InvalidState = () => (
     <div style={stack}>
-        <Select id="scommit-invalid" label="School" options={schools} invalid caption="Choose a school" />
+        <Select id="scommit-invalid" label="School" options={schools} isInvalid caption="Choose a school" />
     </div>
 );
 
@@ -553,15 +553,15 @@ LoadOptionsPages.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------- clearable */
 
 /**
- * `clearable` decides whether the clear × shows. Multi defaults to true; a
- * single field defaults to `!required`, so a required pick cannot be emptied;
+ * `clearable` decides whether the clear × shows. `isMulti` defaults to true; a
+ * single field defaults to `!isRequired`, so a required pick cannot be emptied;
  * a sort passes `clearable={false}`.
  */
 export const ClearableDefaults = () => (
     <div style={stack}>
-        <Select id="sclear-multi" label="Subjects" mode="multi" options={schools} defaultValue={['north']} />
+        <Select id="sclear-multi" label="Subjects" isMulti options={schools} defaultValue={['north']} />
         <Select id="sclear-single" label="School" options={schools} defaultValue="north" />
-        <Select id="sclear-required" label="Home school" options={schools} defaultValue="north" required />
+        <Select id="sclear-required" label="Home school" options={schools} defaultValue="north" isRequired />
         <Select id="sclear-sort" label="Sort" options={schools} defaultValue="north" clearable={false} />
     </div>
 );
@@ -619,7 +619,7 @@ export const ControlledOpenAsksTheParent = {
  */
 export const ListFollowsWrappingChips = () => (
     <div style={{ ...stack, maxWidth: '220px' }}>
-        <Select id="sopen-wrap" label="Schools" mode="multi" options={schools} />
+        <Select id="sopen-wrap" label="Schools" isMulti options={schools} />
     </div>
 );
 
@@ -650,15 +650,14 @@ ListFollowsWrappingChips.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------- validation */
 
 /**
- * Select takes the text fields' validation: `validation` and
- * `validationMessage` set the tone, `invalid` still means an error, and
- * `info` puts the tooltip button beside the label.
+ * Select takes the text fields' validation: `isInvalid`/`errorMessage` and
+ * `isValid`/`successMessage` set the tone, and `info` puts the tooltip button
+ * beside the label.
  */
 export const ValidationTones = () => (
     <div style={stack}>
-        <Select id="stone-success" label="School" options={schools} defaultValue="north" validation="success" validationMessage="School saved" caption="Pick the school you tutor at" />
-        <Select id="stone-invalid" label="District" options={schools} validation="invalid" validationMessage="Pick a district" caption="Districts near you" />
-        <Select id="stone-legacy" label="Region" options={schools} invalid caption="Pick a region" />
+        <Select id="stone-success" label="School" options={schools} defaultValue="north" isValid successMessage="School saved" caption="Pick the school you tutor at" />
+        <Select id="stone-invalid" label="District" options={schools} isInvalid errorMessage="Pick a district" caption="Districts near you" />
         <Select id="stone-info" label="Teacher" options={schools} info="The teacher whose class you join" />
     </div>
 );
@@ -676,11 +675,6 @@ ValidationTones.play = async ({ canvasElement }) => {
     await expect(boxOf('District')).toHaveClass('plus-field--invalid');
     await expect(district).toHaveAttribute('aria-invalid', 'true');
     await expect(district).toHaveAccessibleDescription('Pick a district');
-
-    const region = canvas.getByRole('combobox', { name: 'Region' });
-    await expect(boxOf('Region')).toHaveClass('plus-field--invalid');
-    await expect(region).toHaveAttribute('aria-invalid', 'true');
-    await expect(region).toHaveAccessibleDescription('Pick a region');
 
     await expect(canvas.getByRole('button', { name: 'About Teacher' })).toBeInTheDocument();
 };

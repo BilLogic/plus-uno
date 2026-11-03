@@ -23,7 +23,7 @@ const FilterField = ({ label, value, options, onChange, className }) => (
     <Select
         aria-label={label}
         clearable={false}
-        size="small"
+        spacing="compact"
         options={toOptions(options)}
         value={onChange ? value : undefined}
         defaultValue={value}

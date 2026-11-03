@@ -106,7 +106,6 @@ export const AddTutor = () => (
                             options={tutorOptions}
                             placeholder="Enter tutor name"
                             searchable
-                            size="medium"
                         />
                     </div>
                 </div>
@@ -202,7 +201,6 @@ export const AddStudent = () => (
                             placeholder="Enter student name"
                             searchable
                             creatable
-                            size="medium"
                         />
                     </div>
                 </div>

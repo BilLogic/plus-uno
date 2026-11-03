@@ -115,9 +115,8 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -133,9 +132,8 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -148,10 +146,9 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    mode="single"
                     searchable
                     defaultValue="school-a"
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -164,10 +161,9 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    mode="single"
                     searchable
-                    required
-                    invalid
+                    isRequired
+                    isInvalid
                     caption="School is required"
                 />
             </FieldWrapper>
@@ -207,16 +203,15 @@ export const Interactive = () => {
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                     value={selectedSchool}
                     onChange={(val) => {
                         setSelectedSchool(val);
                         setTouched(true);
                     }}
                     onBlur={() => setTouched(true)}
-                    invalid={hasError}
+                    isInvalid={hasError}
                     caption={hasError ? 'School is required' : undefined}
                 />
             </FieldWrapper>

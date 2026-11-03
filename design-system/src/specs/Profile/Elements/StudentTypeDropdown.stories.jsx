@@ -46,13 +46,11 @@ export const StudentTypeDropdown = ({ id = 'student-type', value, onChange, defa
             <Label text="Student Type" required={required} />
             <Select
                 id={id}
-                mode="single"
                 options={studentTypeOptions}
                 value={value}
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select Student Type"
-                size="medium"
                 style={{ width: '100%' }}
                 {...props}
             />

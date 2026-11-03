@@ -17,8 +17,8 @@ import './FilterSelect.scss';
  */
 export const FilterSelect = ({ mode = 'single', className = '', ...props }) => (
     <Select
-        size="small"
-        mode={mode}
+        spacing="compact"
+        isMulti={mode === 'multi'}
         commitOnClose={mode === 'multi'}
         className={`filter-select ${className}`.trim()}
         {...props}

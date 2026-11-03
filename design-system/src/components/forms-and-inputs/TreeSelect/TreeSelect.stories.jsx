@@ -7,12 +7,13 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'ADS props: `isMulti` replaces `multiple`, `isDisabled`, `isRequired`, `isInvalid`/`errorMessage`, `spacing` (default 40, compact 32); gained `label` and `caption` on the shared `_Field` base.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
         ],
         docs: {
             description: {
                 component:
-                    'TreeSelect component allows selection from hierarchical data. The trigger input opens a panel of expandable tree nodes; in single mode clicking a node selects it, while in multiple mode checkboxes cascade through the branch with indeterminate parent states.',
+                    'Tree select allows selection from hierarchical data. The trigger input opens a panel of expandable tree nodes; in single mode clicking a node selects it, while with `isMulti` checkboxes cascade through the branch with indeterminate parent states.',
             },
         },
     },
@@ -32,14 +33,26 @@ export default {
         value: {
             table: { disable: true, category: 'Development' },
         },
-        multiple: {
+        label: {
+            control: 'text',
+            table: { category: 'Content' },
+        },
+        isMulti: {
             control: 'boolean',
             description: 'Allow selecting multiple nodes with checkboxes',
+            table: { category: 'Design' },
+        },
+        spacing: {
+            control: { type: 'inline-radio' },
+            options: ['default', 'compact'],
+            table: { category: 'Design' },
+        },
+        isDisabled: {
+            control: 'boolean',
             table: { category: 'Behavior' },
         },
-        disabled: {
+        isInvalid: {
             control: 'boolean',
-            description: 'Disable the tree select component',
             table: { category: 'Behavior' },
         },
         onChange: {
@@ -100,10 +113,11 @@ export const Overview = () => {
         <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 320 }}>
             <TreeSelect
                 id="tree-select-overview"
+                aria-label="Topic"
                 value={value}
                 options={sampleOptions}
                 onChange={setValue}
-                multiple
+                isMulti
                 placeholder="Please select"
             />
         </div>
@@ -116,63 +130,39 @@ export const Content = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SINGLE SELECT</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                    Clicking any node selects it and closes the panel.
-                </p>
-                <TreeSelect id="tree-select-single" value={single} options={sampleOptions} onChange={setSingle} />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MULTIPLE WITH PRE-SELECTED BRANCH</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                    Checking a parent cascades to its children; partially checked branches show an indeterminate state.
-                </p>
-                <TreeSelect id="tree-select-multi" value={multi} options={sampleOptions} onChange={setMulti} multiple />
-            </div>
+            <TreeSelect id="tree-select-single" label="Single select" caption="Clicking any node selects it and closes the panel." value={single} options={sampleOptions} onChange={setSingle} />
+            <TreeSelect id="tree-select-multi" label="Multiple, pre-selected branch" caption="Checking a parent cascades to its children; partially checked branches show an indeterminate state." value={multi} options={sampleOptions} onChange={setMulti} isMulti />
         </div>
     );
 };
 
-export const Layout = () => {
-    const [value, setValue] = useState([]);
-
-    return (
-        <div style={{ maxWidth: '800px' }}>
-            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                Each hierarchy level is indented beneath its parent; carets expand and collapse branches in place.
-            </p>
-            <TreeSelect id="tree-select-layout" value={value} options={sampleOptions} onChange={setValue} multiple />
-        </div>
-    );
-};
+export const Spacing = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
+        <TreeSelect id="tree-select-default" label="Default" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
+        <TreeSelect id="tree-select-compact" label="Compact" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
+    </div>
+);
 
 export const InteractionStates = () => (
-    <div style={{ maxWidth: '800px' }}>
-        <TreeSelect
-            id="tree-select-disabled"
-            value={[]}
-            options={sampleOptions}
-            onChange={() => {}}
-            multiple
-            disabled
-        />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
+        <TreeSelect id="tree-select-disabled" label="Disabled" value={[]} options={sampleOptions} onChange={() => {}} isMulti isDisabled />
+        <TreeSelect id="tree-select-invalid" label="Invalid" value={[]} options={sampleOptions} onChange={() => {}} isInvalid errorMessage="Pick a topic" />
     </div>
 );
 
 export const Interactive = (args) => {
     const presetValue = args.contentPreset === 'preselected'
-        ? (args.multiple ? ['triangles', 'circles', 'geometry'] : 'triangles')
-        : (args.multiple ? [] : '');
+        ? (args.isMulti ? ['triangles', 'circles', 'geometry'] : 'triangles')
+        : (args.isMulti ? [] : '');
     const [value, setValue] = useState(presetValue);
 
     useEffect(() => {
         setValue(args.contentPreset === 'preselected'
-            ? (args.multiple ? ['triangles', 'circles', 'geometry'] : 'triangles')
-            : (args.multiple ? [] : ''));
-    }, [args.contentPreset, args.multiple]);
+            ? (args.isMulti ? ['triangles', 'circles', 'geometry'] : 'triangles')
+            : (args.isMulti ? [] : ''));
+    }, [args.contentPreset, args.isMulti]);
 
-    const selectionSummary = args.multiple
+    const selectionSummary = args.isMulti
         ? (Array.isArray(value) && value.length > 0 ? value.join(', ') : '')
         : (value || '');
 
@@ -180,11 +170,12 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '600px' }}>
             <TreeSelect
                 id="tree-select-interactive"
+                label={args.label}
                 value={value}
                 options={sampleOptions}
                 onChange={setValue}
-                multiple={args.multiple}
-                disabled={args.disabled}
+                isMulti={args.isMulti}
+                isDisabled={args.isDisabled}
                 placeholder={args.placeholder}
             />
             {selectionSummary && (
@@ -198,7 +189,8 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     contentPreset: 'empty',
-    multiple: true,
-    disabled: false,
+    label: 'Topic',
+    isMulti: true,
+    isDisabled: false,
     placeholder: 'Please select',
 };

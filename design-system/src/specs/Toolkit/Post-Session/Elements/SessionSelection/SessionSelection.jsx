@@ -42,8 +42,7 @@ const SessionSelection = ({
         <Select
             id={id}
             label={label}
-            required={isRequired}
-            mode="single"
+            isRequired={isRequired}
             options={options}
             value={value}
             onChange={onChange}

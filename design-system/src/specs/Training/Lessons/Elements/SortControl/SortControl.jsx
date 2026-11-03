@@ -54,7 +54,7 @@ const SortControl = ({
             <Select
                 aria-label="Sort by"
                 clearable={false}
-                size="small"
+                spacing="compact"
                 options={sortOptions}
                 value={sortBy}
                 onChange={(next) => onChange && onChange({ sortBy: next, sortOrder: SORTS[next].orders[0].value })}
@@ -63,7 +63,7 @@ const SortControl = ({
             <Select
                 aria-label="Order"
                 clearable={false}
-                size="small"
+                spacing="compact"
                 options={orders}
                 value={sortOrder}
                 onChange={(next) => onChange && onChange({ sortBy, sortOrder: next })}

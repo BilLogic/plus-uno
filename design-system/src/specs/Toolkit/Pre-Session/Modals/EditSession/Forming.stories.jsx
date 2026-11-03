@@ -132,7 +132,6 @@ const FormingModalBody = () => (
                     <Select
                         options={schoolOptions}
                         defaultValue="hogwarts"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -140,7 +139,6 @@ const FormingModalBody = () => (
                     <Select
                         options={teacherOptions}
                         defaultValue="dumbledore"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -148,7 +146,6 @@ const FormingModalBody = () => (
                     <Select
                         options={dayOptions}
                         defaultValue="mondays"
-                        mode="single"
                     />
                 </FieldWrapper>
             </div>

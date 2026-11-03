@@ -3,15 +3,15 @@
 
 # Select
 
-internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array in multi mode), controlled or not. - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
 
 **Import:** `import { Select } from '@/components';`
 
-**Source:** `design-system/src/components/forms-and-inputs/Select.jsx`
+**Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select.stories.jsx` — Content, Modes, Sizes, InteractionStates, DependentFields, LongList, Overview, Interactive, Colors
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Content, Modes, Spacing, InteractionStates, DependentFields, LongList, Overview, Interactive, Colors
 
-**Storybook page:** `design-system/src/components/forms-and-inputs/Select.mdx`
+**Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
 ## Props
 
@@ -20,10 +20,10 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `id` | string | — | — |
 | `name` | string | — | Submitted with a form through hidden inputs, one per value. |
 | `label` | node | — | The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. |
-| `caption` | node | — | Help under the field. With `invalid`, it is the error and is announced. |
-| `mode` | enum | `'single'` | — |
+| `caption` | node | — | Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. |
+| `isMulti` | bool | `false` | Several values, shown as Tags in the field and checkboxes in the list. |
 | `options` | arrayOf (required) | `[]` | Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. |
-| `value` | arrayOf | — | The picked id, or ids in multi mode. Pass it to control the field. |
+| `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
 | `defaultValue` | arrayOf | — | — |
 | `placeholder` | string | `'Select...'` | — |
 | `searchable` | bool | `false` | Typing in the field filters the list. |
@@ -33,28 +33,28 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `defaultOpen` | bool | `false` | — |
 | `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
 | `defaultSearchTerm` | string | `''` | — |
-| `displayMode` | enum | `'tags'` | Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). |
-| `lineWrap` | bool | `true` | Badges only: wrap onto more lines. |
-| `truncate` | bool | `false` | Badges only: clip the row with a fade. |
-| `size` | enum | `'medium'` | — |
-| `disabled` | bool | `false` | — |
-| `readOnly` | bool | — | Shows the value, stays focusable, and cannot be changed. |
-| `readonly` | bool | `false` | @deprecated Prefer readOnly |
-| `required` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
+| `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). |
+| `lineWrap` | bool | `true` | `text` display mode only: wrap onto more lines. |
+| `truncate` | bool | `false` | `text` display mode only: clip the row with a fade. |
+| `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
+| `isDisabled` | bool | `false` | — |
+| `isReadOnly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
+| `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `info` | node | — | Text for the info tooltip beside the label. |
-| `validation` | enum | `'none'` | The field's validation tone, as on Input: an error, a confirmation, or neither. |
-| `validationMessage` | node | — | Shown under the field in place of `caption` while `validation` is set; an error is announced. |
-| `invalid` | bool | `false` | Same as `validation="invalid"`: draws the error border, and `caption` becomes the announced error. |
-| `commitOnClose` | bool | `false` | Multi mode: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
-| `clearable` | bool | — | Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode. |
-| `selectAll` | bool | `false` | Multi mode: a "Select all" button over the list, hidden past 50 matches. |
-| `maxSelections` | number | — | Multi mode: the most values; past it the other rows are disabled and the list says why. |
+| `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
+| `errorMessage` | node | — | — |
+| `isValid` | bool | `false` | Draws the confirmation border; `successMessage` takes the caption's place. |
+| `successMessage` | node | — | — |
+| `commitOnClose` | bool | `false` | With `isMulti`: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
+| `clearable` | bool | — | Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise. |
+| `selectAll` | bool | `false` | With `isMulti`: a "Select all" button over the list, hidden past 50 matches. |
+| `maxSelections` | number | — | With `isMulti`: the most values; past it the other rows are disabled and the list says why. |
 | `dependsOn` | shape or arrayOf or string | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
 | `loading` | bool | `false` | The options are on their way: the list shows a loading row. |
 | `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
 | `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |
 | `suggested` | arrayOf | — | Ids shown under "Suggested" before typing, in a list of more than 50. |
-| `onChange` | func | — | `(next)`: an id, or an array of ids in multi mode. |
+| `onChange` | func | — | `(next)`: an id, or an array of ids with `isMulti`. |
 | `onFocus` | func | — | Focus entering the field from outside it. |
 | `onBlur` | func | — | Focus leaving the field and its list. |
 | `className` | string | `''` | — |
@@ -62,13 +62,9 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 ## Variants
 
-**`mode`** — `single` · `multi`
-
 **`displayMode`** — `tags` · `text`
 
-**`size`** — `small` · `medium` · `large`
-
-**`validation`** — `none` · `invalid` · `success`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 
@@ -76,10 +72,14 @@ Anything not listed is not a valid value.
 
 `--body-default` · `--body-small` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--font-size-body2` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--icon-sm` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-y-md` · `--size-element-pad-y-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
-From `design-system/src/components/forms-and-inputs/Select.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
 Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `Select` is the right call, only what it accepts.

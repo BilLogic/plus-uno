@@ -114,8 +114,8 @@ const CallOffFormOrganism = ({
                                     { value: '2', label: 'Supervisor B' }
                                 ]}
                                 placeholder="Select a supervisor"
-                                disabled={!isInteractive}
-                                required
+                                isDisabled={!isInteractive}
+                                isRequired
                             />
                         </div>
                     </Form.Group>

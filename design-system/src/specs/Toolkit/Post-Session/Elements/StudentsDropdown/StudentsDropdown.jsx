@@ -35,9 +35,9 @@ const StudentsDropdown = ({
             <Select
                 id="students-dropdown"
                 label={label}
-                required={isRequired}
+                isRequired={isRequired}
                 caption={helper}
-                mode="multi"
+                isMulti
                 searchable
                 options={options}
                 value={selectedIds}

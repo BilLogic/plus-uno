@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import useFieldId from './useFieldId';
+import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
-import Field from './_internal/Field';
-import OptionRow from './_internal/OptionRow';
-import { useAnchoredPopup } from './_internal/anchorPlacement';
-import './_internal/Listbox.scss';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import OptionRow from '../_internal/OptionRow';
+import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import '../_internal/Listbox.scss';
 import './TreeSelect.scss';
 
 // ---------------------------------------------------------------------------
@@ -43,7 +43,7 @@ const findOptionByValue = (options, value) => {
 };
 
 /**
- * The nodes a user can currently see, in the order they appear (#323).
+ * The nodes a user can currently see, in the order they appear.
  *
  * Up and Down move through THIS list and not through `options`: a collapsed
  * branch's children are in the tree and not on the screen, and a key that moves
@@ -121,14 +121,24 @@ const orderValues = (options, valueSet) => {
     return ordered;
 };
 
+export const TREE_SELECT_SPACINGS = ['default', 'compact'];
+
 const TreeSelect = ({
     id,
+    name,
+    label,
+    caption,
+    info,
     value,
     options = [],
     onChange,
-    multiple = false,
+    isMulti = false,
     placeholder = 'Please select',
-    disabled = false,
+    spacing = 'default',
+    isDisabled = false,
+    isRequired = false,
+    isInvalid = false,
+    errorMessage,
     className = '',
     style,
     ...props
@@ -141,7 +151,7 @@ const TreeSelect = ({
     const close = useCallback(() => setIsOpen(false), []);
     const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
-     * #323. Focus moves between real elements rather than through
+     * Focus moves between real elements rather than through
      * `aria-activedescendant`: every treeitem is in the DOM already, so a
      * roving `tabIndex` costs nothing and gives the browser's own focus ring,
      * scroll-into-view and screen-reader cursor for free.
@@ -150,11 +160,12 @@ const TreeSelect = ({
     const [activeValue, setActiveValue] = useState(null);
     const fieldId = useFieldId(id);
     const treeId = `${fieldId}-tree`;
+    const labelId = label ? `${fieldId}-label` : undefined;
 
     const selectedValues = useMemo(() => {
-        if (multiple) return Array.isArray(value) ? value : [];
+        if (isMulti) return Array.isArray(value) ? value : [];
         return value === undefined || value === null || value === '' ? [] : [value];
-    }, [value, multiple]);
+    }, [value, isMulti]);
 
     const selectedSet = useMemo(() => new Set(selectedValues), [selectedValues]);
 
@@ -178,12 +189,12 @@ const TreeSelect = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen]);
 
-    // Trigger text: single shows the node label; multiple shows the top-most
+    // Trigger text: single shows the node label; isMulti shows the top-most
     // checked nodes (a fully-checked parent stands in for its children).
     const displayText = useMemo(() => {
         if (selectedValues.length === 0) return '';
 
-        if (!multiple) {
+        if (!isMulti) {
             const option = findOptionByValue(options, selectedValues[0]);
             return option ? getOptionLabel(option) : String(selectedValues[0]);
         }
@@ -200,18 +211,18 @@ const TreeSelect = ({
         };
         walk(options);
         return labels.join(', ');
-    }, [options, selectedValues, selectedSet, multiple]);
+    }, [options, selectedValues, selectedSet, isMulti]);
 
     const handleInputClick = () => {
-        if (disabled) return;
+        if (isDisabled) return;
         setIsOpen((open) => !open);
     };
 
     /**
-     * On open, put the cursor somewhere sensible and move focus into the tree
-     * (#323). The selected node if there is one — the reason the open effect
-     * above expands its ancestors — otherwise the first row. Without this the
-     * panel opened with focus still on the trigger, and Down went nowhere.
+     * On open, put the cursor somewhere sensible and move focus into the tree.
+     * The selected node if there is one — the reason the open effect above
+     * expands its ancestors — otherwise the first row. Without this the panel
+     * opened with focus still on the trigger, and Down went nowhere.
      */
     useEffect(() => {
         if (!isOpen) {
@@ -223,8 +234,7 @@ const TreeSelect = ({
          * carry it. The effect above expands the selection's ancestors in the
          * same commit, so at this moment the selected node is still collapsed
          * out of `visibleNodes` — reading from that list put the cursor on the
-         * first root instead. Measured: `CollapsesAndEscapes` failed with
-         * "Mathematics" where it wanted "Algebra".
+         * first root instead.
          */
         const selected = selectedValues.find((candidate) => findOptionByValue(options, candidate));
         const preferred = selected !== undefined ? selected : visibleNodes[0]?.value;
@@ -253,15 +263,15 @@ const TreeSelect = ({
     }, []);
 
     /**
-     * The tree keyboard contract (#323). Up and Down walk the visible rows;
-     * Right opens a branch and then steps into it; Left closes one and then
-     * steps out of it; Enter and Space choose. Escape closes and hands focus
-     * back, which is what stops the panel being a trap.
+     * The tree keyboard contract. Up and Down walk the visible rows; Right
+     * opens a branch and then steps into it; Left closes one and then steps
+     * out of it; Enter and Space choose. Escape closes and hands focus back,
+     * which is what stops the panel being a trap.
      *
      * @param {React.KeyboardEvent} event
      */
     const handleTreeKeyDown = (event) => {
-        if (disabled || visibleNodes.length === 0) return;
+        if (isDisabled || visibleNodes.length === 0) return;
 
         const index = visibleNodes.findIndex((node) => node.value === activeValue);
         const current = index >= 0 ? visibleNodes[index] : visibleNodes[0];
@@ -306,7 +316,7 @@ const TreeSelect = ({
             case 'Enter':
             case ' ':
                 event.preventDefault();
-                if (multiple) {
+                if (isMulti) {
                     handleMultipleToggle(current.option);
                 } else {
                     handleSingleSelect(current.option);
@@ -329,7 +339,7 @@ const TreeSelect = ({
      * @param {React.KeyboardEvent} event
      */
     const handleTriggerKeyDown = (event) => {
-        if (disabled) return;
+        if (isDisabled) return;
         if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             setIsOpen(true);
@@ -352,13 +362,13 @@ const TreeSelect = ({
     };
 
     const handleSingleSelect = (option) => {
-        if (disabled || isOptionDisabled(option)) return;
+        if (isDisabled || isOptionDisabled(option)) return;
         setIsOpen(false);
         if (onChange) onChange(getOptionValue(option));
     };
 
     const handleMultipleToggle = useCallback((option) => {
-        if (disabled || isOptionDisabled(option)) return;
+        if (isDisabled || isOptionDisabled(option)) return;
         const subtreeValues = collectSubtreeValues(option);
         const next = new Set(selectedSet);
         const isChecked = next.has(getOptionValue(option));
@@ -371,7 +381,7 @@ const TreeSelect = ({
         });
         syncAncestorStates(options, next);
         if (onChange) onChange(orderValues(options, next));
-    }, [disabled, selectedSet, options, onChange]);
+    }, [isDisabled, selectedSet, options, onChange]);
 
     /** Checked / indeterminate visual state for a branch node. */
     const getNodeCheckState = (option) => {
@@ -386,26 +396,26 @@ const TreeSelect = ({
 
     /**
      * One tree row: an OptionRow in the `treeitem` role. Its Leading slot holds
-     * the indent (depth × the `Tree/indent` step), then the toggle, then, in
-     * `multiple` mode, a checkbox that is partly checked on a parent with some
-     * of its subtree picked. The rows are a flat run, as Figma draws them;
+     * the indent (depth × the `Tree/indent` step), then the toggle, then, with
+     * `isMulti`, a checkbox that is partly checked on a parent with some of its
+     * subtree picked. The rows are a flat run, as Figma draws them;
      * `aria-level` carries the depth for assistive technology.
      *
      * @param {{value: any, option: any, depth: number, hasChildren: boolean, isExpanded: boolean}} node
      * @returns {JSX.Element}
      */
     const renderRow = ({ value: optionValue, option, depth, hasChildren, isExpanded }) => {
-        const nodeDisabled = disabled || isOptionDisabled(option);
+        const nodeDisabled = isDisabled || isOptionDisabled(option);
         const { checked, indeterminate } = getNodeCheckState(option);
         const leading = [
             <OptionRow.Indent key="indent" level={depth} />,
             <OptionRow.Toggle
                 key="toggle"
                 state={hasChildren ? (isExpanded ? 'expanded' : 'collapsed') : 'leaf'}
-                onToggle={disabled ? undefined : () => toggleExpanded(optionValue)}
+                onToggle={isDisabled ? undefined : () => toggleExpanded(optionValue)}
             />,
         ];
-        if (multiple) {
+        if (isMulti) {
             leading.push(<OptionRow.Checkbox key="check" checked={checked} indeterminate={indeterminate} />);
         }
 
@@ -416,10 +426,11 @@ const TreeSelect = ({
                 role="treeitem"
                 value={optionValue}
                 label={getOptionLabel(option)}
-                selected={multiple ? checked : selectedSet.has(optionValue)}
+                selected={isMulti ? checked : selectedSet.has(optionValue)}
                 disabled={nodeDisabled}
-                check={!multiple}
+                check={!isMulti}
                 leading={leading}
+                spacing={spacing}
                 aria-expanded={hasChildren ? isExpanded : undefined}
                 aria-level={depth + 1}
                 /*
@@ -435,66 +446,92 @@ const TreeSelect = ({
                 // The tree's keys, handled before the row's own Enter and Space.
                 onKeyDown={handleTreeKeyDown}
                 onSelect={() => {
-                    if (multiple) handleMultipleToggle(option);
+                    if (isMulti) handleMultipleToggle(option);
                     else handleSingleSelect(option);
                 }}
             />
         );
     };
 
+    const tone = isInvalid ? 'invalid' : 'help';
+    const tones = toneProps(tone);
+    const message = (isInvalid && errorMessage) || caption;
+    const { messageId, describedBy } = fieldDescription({
+        fieldId,
+        message,
+        describedBy: props['aria-describedby'],
+    });
+
     /*
      * `id` names the input, which is the element that takes focus, so a
      * `label` pointing at it names the combobox.
      */
     return (
-        <div className={`plus-tree-select-wrapper ${className}`} style={style} ref={wrapperRef}>
-            <Field
-                disabled={disabled}
-                state={isOpen ? 'focus' : undefined}
-                className="plus-tree-select-field"
-                onClick={handleInputClick}
-                trailing={(
-                    <i className={`fa-solid fa-caret-down plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} aria-hidden="true" />
-                )}
-            >
-                <input
-                    ref={inputRef}
-                    id={fieldId}
-                    type="text"
-                    readOnly
-                    value={displayText}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className="plus-field__control plus-tree-select-input"
-                    onKeyDown={handleTriggerKeyDown}
-                    role="combobox"
-                    aria-haspopup="tree"
-                    aria-expanded={isOpen}
-                    aria-controls={isOpen ? treeId : undefined}
-                    {...props}
-                />
-            </Field>
-
-            {isOpen && (
-                <div
-                    ref={menuRef}
-                    className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
-                    data-placement={place?.placement}
-                    data-side={place?.side}
+        <FieldStack disabled={isDisabled} className={className} style={style}>
+            {label && (
+                <FieldLabel htmlFor={fieldId} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
+                    <span id={labelId}>{label}</span>
+                </FieldLabel>
+            )}
+            <div ref={wrapperRef} className="plus-tree-select-wrapper">
+                <Field
+                    spacing={spacing}
+                    disabled={isDisabled}
+                    state={isOpen ? 'focus' : undefined}
+                    className="plus-tree-select-field"
+                    {...tones.field}
+                    onClick={handleInputClick}
+                    trailing={(
+                        <i className={`fa-solid fa-caret-down plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} aria-hidden="true" />
+                    )}
                 >
-                    <div className="plus-listbox-body">
-                        <div
-                            className="plus-listbox-options"
-                            role="tree"
-                            id={treeId}
-                            aria-multiselectable={multiple || undefined}
-                        >
-                            {visibleNodes.map(renderRow)}
+                    <input
+                        ref={inputRef}
+                        id={fieldId}
+                        type="text"
+                        readOnly
+                        value={displayText}
+                        placeholder={placeholder}
+                        disabled={isDisabled}
+                        className="plus-field__control plus-tree-select-input"
+                        onKeyDown={handleTriggerKeyDown}
+                        role="combobox"
+                        aria-haspopup="tree"
+                        aria-expanded={isOpen}
+                        aria-controls={isOpen ? treeId : undefined}
+                        aria-labelledby={props['aria-labelledby'] || labelId}
+                        aria-required={isRequired || undefined}
+                        aria-describedby={describedBy}
+                        {...tones.control}
+                        {...props}
+                    />
+                </Field>
+
+                {isOpen && (
+                    <div
+                        ref={menuRef}
+                        className="plus-listbox plus-listbox--anchored plus-tree-select-menu"
+                        data-placement={place?.placement}
+                        data-side={place?.side}
+                    >
+                        <div className="plus-listbox-body">
+                            <div
+                                className="plus-listbox-options"
+                                role="tree"
+                                id={treeId}
+                                aria-multiselectable={isMulti || undefined}
+                            >
+                                {visibleNodes.map(renderRow)}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
+            {name && selectedValues.map((v) => (
+                <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
+            ))}
+            <FieldCaption messageId={messageId} message={message} tone={tone} />
+        </FieldStack>
     );
 };
 
@@ -511,6 +548,14 @@ const optionShape = PropTypes.oneOfType([
 
 TreeSelect.propTypes = {
     id: PropTypes.string,
+    /** Submitted with a form through hidden inputs, one per value. */
+    name: PropTypes.string,
+    /** The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. */
+    label: PropTypes.node,
+    /** Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. */
+    caption: PropTypes.node,
+    /** Text for the info tooltip beside the label. */
+    info: PropTypes.node,
     value: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,
@@ -518,9 +563,17 @@ TreeSelect.propTypes = {
     ]),
     options: PropTypes.arrayOf(optionShape),
     onChange: PropTypes.func,
-    multiple: PropTypes.bool,
+    /** Several values, shown as checkboxes beside the toggle. */
+    isMulti: PropTypes.bool,
     placeholder: PropTypes.string,
-    disabled: PropTypes.bool,
+    /** `default` draws 40 and `compact` draws 32. */
+    spacing: PropTypes.oneOf(TREE_SELECT_SPACINGS),
+    isDisabled: PropTypes.bool,
+    /** Shows an asterisk on the label and sets `aria-required`. */
+    isRequired: PropTypes.bool,
+    /** Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. */
+    isInvalid: PropTypes.bool,
+    errorMessage: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object
 };

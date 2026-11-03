@@ -16,13 +16,10 @@ const SUBJECTS = [
     { label: 'Science', value: 'science' },
 ];
 
-const Harness = ({ initial, multiple = false }) => {
+const Harness = ({ initial, isMulti = false }) => {
     const [value, setValue] = useState(initial);
     return (
-        <>
-            <label htmlFor="ts">Subject</label>
-            <TreeSelect id="ts" options={SUBJECTS} value={value} onChange={setValue} multiple={multiple} />
-        </>
+        <TreeSelect id="ts" label="Subject" options={SUBJECTS} value={value} onChange={setValue} isMulti={isMulti} />
     );
 };
 
@@ -80,7 +77,7 @@ describe('TreeSelect', () => {
 
     it('draws a checkbox after the toggle, partly checked on a parent with some children picked', async () => {
         const user = userEvent.setup();
-        render(<Harness initial={['algebra']} multiple />);
+        render(<Harness initial={['algebra']} isMulti />);
         const tree = await open(user);
         const [maths, algebra] = within(tree).getAllByRole('treeitem');
 
@@ -102,5 +99,21 @@ describe('TreeSelect', () => {
         expect(maths).toHaveAttribute('aria-expanded', 'true');
         expect(within(tree).getAllByRole('treeitem')).toHaveLength(4);
         expect(screen.getByRole('combobox', { name: 'Subject' })).toHaveValue('');
+    });
+
+    it('draws the error border and announces errorMessage when isInvalid', () => {
+        render(
+            <TreeSelect id="ts2" label="Subject" options={SUBJECTS} isInvalid errorMessage="Pick a subject" />
+        );
+        const trigger = screen.getByRole('combobox', { name: 'Subject' });
+        expect(trigger.closest('.plus-field')).toHaveClass('plus-field--invalid');
+        expect(screen.getByRole('alert')).toHaveTextContent('Pick a subject');
+    });
+
+    it('draws rows at 32 with spacing="compact"', async () => {
+        const user = userEvent.setup();
+        render(<TreeSelect id="ts3" label="Subject" options={SUBJECTS} spacing="compact" />);
+        const tree = await open(user);
+        expect(within(tree).getAllByRole('treeitem')[0]).toHaveClass('plus-option-row--compact');
     });
 });
