@@ -20,7 +20,7 @@
     display: flex;
     flex: 1 0 0;
     flex-direction: column;
-    gap: var(--size-element-gap-sm);
+    gap: var(--element-gap-default);
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
@@ -54,7 +54,7 @@
 .plus-section-message-actions {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--element-gap-default);
 }
 
 .plus-section-message-action {
