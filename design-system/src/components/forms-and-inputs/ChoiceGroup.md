@@ -9,7 +9,7 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGroup.stories.jsx` — Overview, Types, Orientation, ScaleEnds, Descriptions, Other, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGroup.stories.jsx` — Overview, Types, Orientation, Size, ScaleEnds, Descriptions, Other, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGroup.mdx`
 
@@ -20,7 +20,7 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 | `id` | string | — | Base for every id in the group. Generated when omitted. |
 | `name` | string | — | The form key the choices submit under. Defaults to the group's id. |
 | `legend` | node | — | The question. Names the group. |
-| `type` | enum | `'radio'` | radio: pick one. checkbox: pick any. |
+| `type` | enum | `"checkbox"`. */` | radio: pick one. checkbox: pick any. |
 | `orientation` | enum | `'stacked'` | — |
 | `options` | arrayOf or shape or node or bool or string | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, `disabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
 | `value` | arrayOf | — | Radio: one value or `null`. Checkbox: an array of values. |
@@ -30,6 +30,7 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
 | `other` | shape | — | Adds an "Other" answer with a text box after the options. `value` is the answer it adds (default `'other'`); `text` and `onTextChange` hold what was typed. Typing chooses it. |
 | `appearance` | enum | `'plain'` | Passed to every choice. `card` draws each as a bordered tile. |
+| `size` | enum | — | Radio control (dot) width in px. Unset keeps today\'s rendering. No effect on type="checkbox". |
 | `required` | bool | `false` | The group needs an answer. Marked on the legend. |
 | `disabled` | bool | `false` | — |
 | `readOnly` | bool | `false` | Shown and focusable, not changeable. |
@@ -45,6 +46,8 @@ A `fieldset` whose `legend` is the question, holding Radios (`type="radio"`, pic
 
 **`appearance`** — `plain` · `card`
 
+**`size`** — `10` · `12` · `14`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
@@ -55,7 +58,7 @@ From `design-system/src/components/forms-and-inputs/ChoiceGroup.scss`. Override 
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

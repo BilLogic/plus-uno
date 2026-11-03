@@ -15,6 +15,14 @@
     border: 0;
 }
 
+// `size`: the radio control (dot) width, in px. Unset keeps today's rendering.
+// Only `type="radio"` carries `data-size`; checkbox is unaffected.
+.plus-choice-group-radio {
+    &[data-size="10"] { --layout-control-radio: 10px; }
+    &[data-size="12"] { --layout-control-radio: 12px; }
+    &[data-size="14"] { --layout-control-radio: 14px; }
+}
+
 .plus-choice-group-legend {
     font: var(--body-default);
     float: none;
