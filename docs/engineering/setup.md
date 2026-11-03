@@ -12,7 +12,7 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 
 - React + React-Bootstrap on Bootstrap, built with Vite, documented in Storybook.
 - SCSS with design tokens from `design-system/src/tokens/`.
-- AI components use Base UI (`@base-ui/react`, headless) for behavior, styled on `--ds-*` tokens — ADR-036.
+- Every interactive component's behavior is built on Base UI (`@base-ui/react`, headless), styled on `--ds-*` tokens — ADR-037, widening the AI-only scope ADR-036 set. Bootstrap stays the framework for non-interactive product UI.
 - Versions live in `package.json` and nowhere else — read them there rather than from a doc that goes stale on the next bump.
 
 ## Import Aliases
@@ -93,7 +93,7 @@ When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` �
 
 ## Bootstrap & Providers
 
-- Use PLUS components (Bootstrap-based) — not raw Bootstrap markup for DS surfaces
+- Use PLUS components first — not raw Bootstrap markup for DS surfaces. An interactive PLUS component's behavior comes from Base UI, not Bootstrap (ADR-037); Bootstrap markup covers non-interactive layout.
 - Load `main.scss` for token variables
 - Prototype Vite configs must set `@` alias or imports fail
 
