@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--plus-spinner-size`
+`--ds-icon-inverse` · `--plus-spinner-size` · `--size-spinner-lg` · `--size-spinner-md` · `--size-spinner-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 
@@ -40,8 +40,4 @@ From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these
 
 Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Spinner` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -13,7 +13,7 @@
  */
 
 .plus-spinner {
-    --plus-spinner-size: 24px;
+    --plus-spinner-size: var(--size-spinner-md);
 
     display: inline-block;
     width: var(--plus-spinner-size);
@@ -23,6 +23,14 @@
     border-right-color: transparent;
     color: inherit;
     animation: plus-spinner-rotate 0.75s linear infinite;
+}
+
+.plus-spinner[data-size='16'] {
+    --plus-spinner-size: var(--size-spinner-sm);
+}
+
+.plus-spinner[data-size='48'] {
+    --plus-spinner-size: var(--size-spinner-lg);
 }
 
 .plus-spinner--invert {

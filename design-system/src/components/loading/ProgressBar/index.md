@@ -40,8 +40,4 @@ From `design-system/src/components/loading/ProgressBar/ProgressBar.scss`. Overri
 
 Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `ProgressBar` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1413,7 +1413,7 @@
         "import": "@/components/loading",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/ProgressBar/ProgressBar.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressBar",
         "source": "design-system/src/components/loading/ProgressBar/ProgressBar.jsx",
         "storybookId": "components-loading-progress-bar--docs"
       },
@@ -1428,7 +1428,8 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872"
       }
     },
     "Radio": {
@@ -1649,7 +1650,7 @@
         "import": "@/components/loading",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/Skeleton/Skeleton.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Skeleton",
         "source": "design-system/src/components/loading/Skeleton/Skeleton.jsx",
         "storybookId": "components-loading-loading-skeleton--docs",
         "props": {
@@ -1694,7 +1695,8 @@
             "isComponentSet": true,
             "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code takes all ten values as preset, and rect, circle and text are also shape, which resize freely either way. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
       }
     },
     "SmartBadges": {
@@ -1750,7 +1752,7 @@
         "import": "@/components/loading",
         "export": "default",
         "mdxPath": "design-system/src/components/loading/Spinner/Spinner.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Spinner",
         "source": "design-system/src/components/loading/Spinner/Spinner.jsx",
         "storybookId": "components-loading-loading-spinner--docs"
       },
@@ -1789,7 +1791,8 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ]
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872"
       }
     },
     "Suggestion": {

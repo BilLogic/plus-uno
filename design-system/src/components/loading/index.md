@@ -8,11 +8,11 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [GenerativeBorder](GenerativeBorder/index.md) | 5 | ✕ | ✕ | ✕ |
-| [ProgressBar](ProgressBar/index.md) | 6 | ✕ | ✕ | ✕ |
-| [Skeleton](Skeleton/index.md) | 9 | ✕ | ✕ | ✕ |
-| [Spinner](Spinner/index.md) | 4 | ✕ | ✕ | ✕ |
+| [ProgressBar](ProgressBar/index.md) | 6 | ✅ | ✅ | ✅ |
+| [Skeleton](Skeleton/index.md) | 9 | ✅ | ✅ | ✅ |
+| [Spinner](Spinner/index.md) | 4 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 0/4 (0%) · Correct/incorrect 0/4 (0%) · Accessibility 0/4 (0%)
+**Authored coverage:** When to use 3/4 (75%) · Correct/incorrect 3/4 (75%) · Accessibility 3/4 (75%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

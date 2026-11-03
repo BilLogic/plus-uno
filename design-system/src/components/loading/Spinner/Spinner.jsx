@@ -19,7 +19,7 @@ const Spinner = ({
 }) => (
     <div
         className={['plus-spinner', `plus-spinner--${appearance}`, className].filter(Boolean).join(' ')}
-        style={{ '--plus-spinner-size': `${size}px` }}
+        data-size={size}
         role="status"
     >
         <span className="visually-hidden">{label}</span>

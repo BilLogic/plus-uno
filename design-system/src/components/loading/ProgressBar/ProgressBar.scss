@@ -19,14 +19,15 @@
     background-color: var(--ds-background-neutral);
     border-radius: var(--size-element-radius-full);
     overflow: hidden;
+    /* Component-scoped override: a caller drawing several same-appearance
+     * bars in different hues (a breakdown chart's per-segment color, for
+     * example) can redeclare this on an ancestor. */
+    --plus-progressbar-fill-color: var(--ds-background-brand-bold);
 }
 
 .plus-progressbar-fill {
     height: 100%;
-    /* `--plus-progressbar-fill-color`, set on an ancestor, overrides the fill
-     * for a caller drawing several same-appearance bars in different hues
-     * (a breakdown chart's per-segment color, for example). */
-    background-color: var(--plus-progressbar-fill-color, var(--ds-background-brand-bold));
+    background-color: var(--plus-progressbar-fill-color);
     border-radius: var(--size-element-radius-full);
     transition: width 0.3s ease;
 }

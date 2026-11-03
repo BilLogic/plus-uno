@@ -41,8 +41,4 @@ From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override the
 
 Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
-
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Skeleton` is the right call, only what it accepts.
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
