@@ -180,11 +180,11 @@
 
 // A button at the box's edge sits 4 from it, as it does from the top and the
 // bottom: it takes back the rest of the side padding.
-.plus-field .plus-field__leading > .plus-btn:first-child {
+.plus-field .plus-field__leading:has(> .plus-btn:first-child) {
     margin-inline-start: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
 }
 
-.plus-field .plus-field__trailing > .plus-btn:last-child {
+.plus-field .plus-field__trailing:has(> .plus-btn:last-child) {
     margin-inline-end: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
 }
 
