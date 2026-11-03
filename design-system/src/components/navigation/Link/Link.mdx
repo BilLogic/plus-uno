@@ -1,0 +1,35 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as LinkStories from './Link.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "link",
+      "name": "Link",
+      "componentSetNodeId": "20624:87",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20624-87",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={LinkStories} />
+
+<Title />
+
+<DocsTabs of={LinkStories}>
+
+<DocsTab tab="examples">
+
+An inline navigation anchor.
+
+<Canvas of={LinkStories.Appearances} />
+
+<ArgTypes of={LinkStories} />
+
+</DocsTab>
+
+</DocsTabs>

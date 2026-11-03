@@ -984,6 +984,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
+    "Link": {
+      "code": {
+        "import": "@/components/navigation",
+        "export": "default",
+        "mdxPath": "design-system/src/components/navigation/Link/Link.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/navigation/Link/Link.jsx",
+        "storybookId": "components-navigation-link--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "link",
+            "name": "Link",
+            "componentSetNodeId": "20624:87",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20624-87",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ]
+      }
+    },
     "LinkButton": {
       "code": {
         "import": "@/components/forms-and-inputs",

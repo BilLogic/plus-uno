@@ -33,7 +33,7 @@ From `design-system/src/components/navigation/Scrollspy/Scrollspy.scss`. Overrid
 
 ## Related
 
-Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Sidebar` · `SidebarTab`
+Same group: `Breadcrumb` · `Link` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Sidebar` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
