@@ -1,18 +1,18 @@
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import Field from './Field';
+import FieldBox from './FieldBox';
 
 /**
- * _Field — the part behind Text field and Text area.
+ * _FieldBox — the part behind Text field and Text area.
  *
  * Unpublished in Figma and absent from the barrel: it is never placed on a
  * screen by itself, so it has stories and no docs page. Each story pins down
  * one thing the hosts inherit, so a change here shows up here first.
  */
 export default {
-    title: 'Components/Forms and inputs/_Field',
-    component: Field,
+    title: 'Components/Forms and inputs/_FieldBox',
+    component: FieldBox,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
@@ -37,12 +37,12 @@ const px = (value) => Math.round(parseFloat(value));
 /** Leading, Content and Trailing, in that order. */
 export const Anatomy = () => (
     <div style={row}>
-        <Field
+        <FieldBox
             leading={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
             trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
         >
             {control('Search tutors')}
-        </Field>
+        </FieldBox>
     </div>
 );
 
@@ -61,7 +61,7 @@ Anatomy.play = async ({ canvasElement }) => {
 export const Spacings = () => (
     <div style={row}>
         {['default', 'compact'].map((spacing) => (
-            <Field key={spacing} spacing={spacing} data-testid={spacing}>{control(`${spacing} field`)}</Field>
+            <FieldBox key={spacing} spacing={spacing} data-testid={spacing}>{control(`${spacing} field`)}</FieldBox>
         ))}
     </div>
 );
@@ -91,9 +91,9 @@ export const States = () => (
         {STATES.map(([name, props]) => (
             <div key={name}>
                 <span className="body3-txt" style={caption}>{name}</span>
-                <Field {...props} data-testid={name}>
+                <FieldBox {...props} data-testid={name}>
                     {control(`${name} field`, { disabled: props.disabled, readOnly: props.readOnly, defaultValue: 'Bill Guo' })}
-                </Field>
+                </FieldBox>
             </div>
         ))}
     </div>
@@ -133,7 +133,7 @@ States.play = async ({ canvasElement }) => {
 /** Focus within the box draws the ring; nothing in the host tracks it. */
 export const LiveFocus = () => (
     <div style={row}>
-        <Field data-testid="live">{control('Your name')}</Field>
+        <FieldBox data-testid="live">{control('Your name')}</FieldBox>
     </div>
 );
 
@@ -151,14 +151,14 @@ export const Subtle = () => (
         {[['rest', {}], ['hover', { state: 'hover' }], ['focus', { state: 'focus' }]].map(([name, props]) => (
             <div key={name}>
                 <span className="body3-txt" style={caption}>{name}</span>
-                <Field
+                <FieldBox
                     subtle
                     {...props}
                     data-testid={name}
                     trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 >
                     {control(`Grade level, ${name}`, { defaultValue: '8th grade' })}
-                </Field>
+                </FieldBox>
             </div>
         ))}
     </div>

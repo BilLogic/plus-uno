@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
 import { useAnchoredPopup } from '../_internal/anchorPlacement';
 import '../_internal/Listbox.scss';
@@ -467,14 +468,14 @@ const TreeSelect = ({
      * `label` pointing at it names the combobox.
      */
     return (
-        <FieldStack disabled={isDisabled} className={className} style={style}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={className} style={style}>
             {label && (
                 <FieldLabel htmlFor={fieldId} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     <span id={labelId}>{label}</span>
                 </FieldLabel>
             )}
             <div ref={wrapperRef} className="plus-tree-select-wrapper">
-                <Field
+                <FieldBox
                     spacing={spacing}
                     disabled={isDisabled}
                     state={isOpen ? 'focus' : undefined}
@@ -505,7 +506,7 @@ const TreeSelect = ({
                         {...tones.control}
                         {...props}
                     />
-                </Field>
+                </FieldBox>
 
                 {isOpen && (
                     <div
@@ -531,7 +532,7 @@ const TreeSelect = ({
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
             ))}
             <FieldCaption messageId={messageId} message={message} tone={tone} />
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

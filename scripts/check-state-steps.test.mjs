@@ -342,8 +342,8 @@ test('PatternModal: the close button takes the neutral hovered and pressed steps
 
 /* ─── Field ──────────────────────────────────────────────────────────────── */
 
-test('Field: hover turns the border border.focused, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
-  const file = 'components/forms-and-inputs/_internal/Field.scss';
+test('FieldBox: hover turns the border border.focused, subtle hover the neutral subtle step, focus a ring 2px off the box', () => {
+  const file = 'components/forms-and-inputs/_internal/FieldBox.scss';
   expectRule(file, '.plus-field--hover', { 'border-color': layer('--ds-border-focused') });
   expectRule(file, '.plus-field--subtle.plus-field--hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(file, '.plus-field--focus', DS_RING_OUTSIDE);

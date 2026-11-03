@@ -86,6 +86,7 @@
     "prop:size design-system/src/components/forms-and-inputs/Dropdown/Dropdown.stories.jsx": 7,
     "prop:size design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx": 1,
     "prop:size design-system/src/components/forms-and-inputs/TagInput.stories.jsx": 2,
+    "prop:size design-system/src/components/forms-and-inputs/_internal/FieldFrame.jsx": 1,
     "prop:size design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx": 2,
     "prop:size design-system/src/components/layout-and-structure/Divider/Divider.stories.jsx": 6,
     "prop:size design-system/src/components/navigation/Pagination/Pagination.stories.jsx": 4,

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import DatePicker from '../DatePicker/DatePicker';
 import TimePicker from '../TimePicker/TimePicker';
 import useFieldId from '../useFieldId';
-import { FieldCaption } from '../_internal/Field';
+import { FieldCaption } from '../_internal/FieldFrame';
 import { formatIso, parseDate } from '../_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from '../_internal/timeZones';
 import './DateTimePicker.scss';
