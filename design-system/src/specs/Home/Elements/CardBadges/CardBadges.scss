@@ -11,8 +11,8 @@
     &-inner {
         display: flex;
         align-items: center;
-        padding-left: var(--size-element-pad-x-sm);
-        padding-right: var(--size-element-pad-x-sm);
+        padding-left: var(--element-pad-compact);
+        padding-right: var(--element-pad-compact);
         padding-top: 0;
         padding-bottom: 0;
         position: relative;

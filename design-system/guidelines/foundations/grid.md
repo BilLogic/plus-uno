@@ -87,9 +87,9 @@ above, instead of reading `--layout-width-column`.
 ## Modal widths
 
 A modal spans **6 · 8 · 10 screen-grid columns**, plus the gutters between them,
-plus its own pad of 16 (`--modal-pad`) on each side:
+plus its own pad of 16 (`--modal-pad-x-default`) on each side:
 
-`width = n × --layout-width-column-screen + (n − 1) × --layout-gutter + 2 × --modal-pad`
+`width = n × --layout-width-column-screen + (n − 1) × --layout-gutter + 2 × --modal-pad-x-default`
 
 | Width | Columns | Medium | Large | X-Large | Token |
 |:---|---:|---:|---:|---:|:---|

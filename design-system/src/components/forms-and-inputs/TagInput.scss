@@ -96,7 +96,7 @@
 
 /* The name field in the header, and Delete set off from the colors. */
 .plus-tag-input__rename {
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
 }
 
 .plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
@@ -104,7 +104,7 @@
 }
 
 .plus-tag-input__hint {
-    padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-md);
+    padding: var(--size-element-pad-y-sm) var(--element-pad-default);
     color: var(--ds-text-subtle);
     font: var(--body-small);
 }

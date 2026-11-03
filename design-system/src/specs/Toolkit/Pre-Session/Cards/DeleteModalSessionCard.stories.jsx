@@ -16,7 +16,7 @@ const ColumnHeader = ({ label, showSort = true }) => (
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--size-element-gap-sm)',
-            padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-md)',
+            padding: 'var(--size-element-pad-y-lg) var(--element-pad-default)',
         }}
     >
         <span

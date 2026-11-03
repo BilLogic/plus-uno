@@ -99,7 +99,7 @@ export function FloatingChatBubble({
           display: 'flex',
           alignItems: 'flex-end',
           gap: 'var(--size-element-gap-sm, 8px)',
-          padding: 'var(--size-element-pad-y-sm, 4px) var(--size-element-pad-x-md, 10px)',
+          padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-default, 10px)',
           background: 'var(--chat-surface, #e5e7eb)',
           border: '1px solid var(--chat-outline, #d1d5db)',
           borderRadius: 'var(--size-border-radius-radius-300, 12px)',

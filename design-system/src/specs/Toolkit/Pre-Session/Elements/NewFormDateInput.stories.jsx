@@ -51,7 +51,7 @@ const DateInput = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                 width: '100%',
                 borderRadius: 'var(--size-element-radius-sm)',
                 border: `1px solid ${validation === 'invalid' ? 'var(--color-danger)' : 'var(--color-outline-variant)'}`,

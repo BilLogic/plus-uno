@@ -21,7 +21,7 @@
  *
  * @param $pad the layer's own pad, added on each side of the columns
  */
-@mixin screen-grid-width($pad: var(--modal-pad)) {
+@mixin screen-grid-width($pad: var(--modal-pad-x-default)) {
     --plus-overlay-screen-pad: var(--space-150);
     --plus-overlay-grid: clamp(
         var(--layout-min-width-content),

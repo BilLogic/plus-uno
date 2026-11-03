@@ -89,7 +89,7 @@
 
         &.plus-list-group-item--b2 {
             font: var(--body-default);
-            padding: var(--size-element-pad-y-md) var(--size-element-pad-x-md);
+            padding: var(--size-element-pad-y-md) var(--element-pad-default);
             gap: var(--size-element-gap-md);
 
             .plus-list-group-item-content {
@@ -99,7 +99,7 @@
 
         &.plus-list-group-item--b3 {
             font: var(--body-small);
-            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
             gap: var(--size-element-gap-sm);
 
             .plus-list-group-item-content {

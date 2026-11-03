@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, spyOn } from 'storybook/test';
+import { expect } from 'storybook/test';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Divider from '@/components/layout-and-structure/Divider';
@@ -174,33 +174,6 @@ Sizes.play = async ({ canvasElement }) => {
         await expect(drawn, `${size}: line is the stroke-${size} token`)
             .toBe(tokenLength(canvasElement, `--size-element-stroke-${size}`));
     }
-};
-
-/**
- * The old `size="2.5px"` alias keeps working and draws `xl` (3px), but its name
- * no longer says what it draws, so development says to use `size="xl"`.
- * Production stays quiet.
- */
-export const DeprecatedSize = {
-    render: () => (
-        <div style={dividerCol}>
-            <Divider size="2.5px" id="divider-deprecated" />
-        </div>
-    ),
-    // The spy goes in before the story renders, so the render's warning is caught.
-    beforeEach: () => {
-        const warn = spyOn(console, 'warn').mockImplementation(() => {});
-        return () => warn.mockRestore();
-    },
-    play: async ({ canvasElement }) => {
-        const line = canvasElement.querySelector('#divider-deprecated .plus-divider-line');
-        const drawn = px(getComputedStyle(line).height);
-        await expect(drawn, '2.5px draws 3px').toBe(3);
-        await expect(drawn, '2.5px draws the stroke-xl token')
-            .toBe(tokenLength(canvasElement, '--size-element-stroke-xl'));
-        await expect(console.warn, 'development names the replacement')
-            .toHaveBeenCalledWith(expect.stringContaining('size="2.5px" is deprecated; use size="xl"'));
-    },
 };
 
 export const Styles = () => (

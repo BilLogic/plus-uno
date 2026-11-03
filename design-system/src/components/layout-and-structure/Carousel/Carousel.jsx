@@ -22,8 +22,6 @@ const Carousel = ({
     pause = 'hover',
     wrap = true,
     keyboard = true,
-    /** @deprecated Fade transition is not supported; value is ignored. */
-    fade: _fadeIgnored,
     slide: slideProp,
     className = '',
     style,

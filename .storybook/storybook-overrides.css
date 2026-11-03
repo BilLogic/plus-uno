@@ -598,7 +598,7 @@ a.sbdocs-a {
 
 .sbdocs .sb-ds-doc-table th,
 .sbdocs .sb-ds-doc-table td {
-  padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-md);
+  padding: var(--size-element-pad-y-lg) var(--element-pad-default);
   border-bottom: 1px solid var(--color-border, #e5e7eb);
   text-align: left;
   vertical-align: top;
@@ -831,7 +831,7 @@ a.sbdocs-a {
     gap: var(--size-element-gap-xs) !important;
     width: 100% !important;
     margin: 0 !important;
-    padding: var(--size-element-pad-y-md) var(--size-element-pad-x-sm) !important;
+    padding: var(--size-element-pad-y-md) var(--element-pad-compact) !important;
     background: var(--color-surface, #fffbfe) !important;
     border: none !important;
     border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 50%, transparent) !important;

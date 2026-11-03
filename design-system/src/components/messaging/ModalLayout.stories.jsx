@@ -475,7 +475,7 @@ HeaderOptions.play = async ({ canvasElement }) => {
     // Footer actions align right.
     const done = within(full).getByRole('button', { name: 'Done' }).getBoundingClientRect();
     const box = full.getBoundingClientRect();
-    await expect(Math.round(box.right - done.right)).toBe(Math.round(lengthOf(canvasElement.ownerDocument, '--modal-pad')));
+    await expect(Math.round(box.right - done.right)).toBe(Math.round(lengthOf(canvasElement.ownerDocument, '--modal-pad-x-default')));
 
     const noClose = canvas.getByTestId('no-close');
     await expect(within(noClose).queryByRole('button', { name: 'Close modal' })).toBeNull();

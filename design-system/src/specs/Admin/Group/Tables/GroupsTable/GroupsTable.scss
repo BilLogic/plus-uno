@@ -59,7 +59,7 @@
             display: flex;
             gap: var(--size-element-gap-sm);
             align-items: center;
-            padding: var(--size-element-pad-y-sm) var(--size-element-pad-x-sm);
+            padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
             border: none;
             background: transparent;
             cursor: pointer;
@@ -76,7 +76,7 @@
         .groups-table__size-badge {
             &.plus-badge--info {
                 background-color: var(--ds-background-information-subtler);
-                padding: 0 var(--size-element-pad-x-sm);
+                padding: 0 var(--element-pad-compact);
                 border-radius: var(--size-element-radius-full);
                 min-width: unset;
             }

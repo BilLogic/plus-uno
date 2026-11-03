@@ -6,15 +6,11 @@
  * Its fill is color.background.neutral.bold with color.text.inverse, so it
  * flips with the mode. No arrow: it sits Popover/offset 4 from its trigger,
  * lifted by elevation.shadow.overlay like every floating layer without a scrim.
- *
- * Every size draws the one tooltip; `size` is kept so no call site breaks.
  */
 
 .tooltip {
 
-    &.plus-tooltip-default,
-    &.plus-tooltip-small,
-    &.plus-tooltip-large {
+    &.plus-tooltip {
         // Bootstrap tooltip variables
         --bs-tooltip-bg: var(--ds-background-neutral-bold);
         --bs-tooltip-color: var(--ds-text-inverse);

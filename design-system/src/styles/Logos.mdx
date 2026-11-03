@@ -15,7 +15,7 @@ export const Mark = ({ color = 'colored', size = 'M', text = false }) => <Logo s
 
 export const Ground = ({ token, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad-lg)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
         {caption && <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
 );
@@ -153,7 +153,7 @@ Pick a size step. Do not stretch, crop or rotate the logomark.
 
 <DoDont>
 <Do caption="A size step, wordmark included."><Mark color="colored" size="M" text /></Do>
-<Dont caption="A stretched logomark."><span style={{ display: 'inline-block', transform: 'scaleX(1.8)', transformOrigin: 'left center', marginInlineEnd: 'var(--card-pad-lg)' }}><Mark color="colored" size="M" /></span></Dont>
+<Dont caption="A stretched logomark."><span style={{ display: 'inline-block', transform: 'scaleX(1.8)', transformOrigin: 'left center', marginInlineEnd: 'var(--card-pad-spacious)' }}><Mark color="colored" size="M" /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>

@@ -54,8 +54,8 @@
       "Date tag",
       "Status tag",
       "Tag",
-      "Tag group",
       "Smart tag",
+      "Tag group",
       "AI label",
       "Suggestion"
     ],
@@ -218,11 +218,11 @@
         "Date tag",
         "Status tag",
         "Tag",
-        "Tag group",
         [
-          "Tag group",
+          "Tag",
           "Smart tag"
         ],
+        "Tag group",
         "AI label",
         [
           "AI label",

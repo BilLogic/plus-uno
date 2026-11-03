@@ -161,7 +161,7 @@
       "Card padding": "var(--size-card-pad-{x|y}-{sm|md|lg})",
       "Card gap": "var(--size-card-gap-{sm|md|lg})",
       "Card radius": "var(--size-card-radius-{sm|md|full})",
-      "Element padding": "var(--size-element-pad-{x|y}-{sm|md|lg})",
+      "Element padding": "var(--size-element-pad-y-{sm|md|lg})",
       "Element gap": "var(--size-element-gap-{xs|sm|md|lg})",
       "Element radius": "var(--size-element-radius-{sm|md|lg|full})",
       "Modal padding": "var(--size-modal-pad-{x|y}-{sm|md|lg})",
@@ -365,8 +365,6 @@
       "Element/gap-sm": "var(--size-element-gap-sm)",
       "Element/gap-xs": "var(--size-element-gap-xs)",
       "Element/pad-x-lg": "var(--size-element-pad-x-lg)",
-      "Element/pad-x-md": "var(--size-element-pad-x-md)",
-      "Element/pad-x-sm": "var(--size-element-pad-x-sm)",
       "Element/pad-x-xs": "var(--size-element-pad-x-xs)",
       "Element/pad-y-lg": "var(--size-element-pad-y-lg)",
       "Element/pad-y-md": "var(--size-element-pad-y-md)",
@@ -602,9 +600,6 @@
       "Card/min-width-lg": "var(--card-min-width-lg)",
       "Card/min-width-md": "var(--card-min-width-md)",
       "Card/min-width-sm": "var(--card-min-width-sm)",
-      "Card/pad-lg": "var(--card-pad-lg)",
-      "Card/pad-md": "var(--card-pad-md)",
-      "Card/pad-sm": "var(--card-pad-sm)",
       "Card/radius": "var(--card-radius)",
       "Card/radius-sm": "var(--card-radius-sm)",
       "Card/stack-lg": "var(--card-stack-lg)",
@@ -613,7 +608,6 @@
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
       "Modal/inline-sm": "var(--modal-inline-sm)",
-      "Modal/pad": "var(--modal-pad)",
       "Modal/radius": "var(--modal-radius)",
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
@@ -1194,11 +1188,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1436,
+    "scssTokenCount": 1430,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1016,
-      "resolved": 987,
+      "resolved": 981,
       "percent": 97,
       "unresolved": [
         {
@@ -1385,6 +1379,22 @@
         },
         {
           "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-md",
+          "tried": [
+            "--size-element-pad-x-md",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-sm",
+          "tried": [
+            "--size-element-pad-x-sm",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
           "figmaVariable": "Surface Container/border",
           "tried": [
             "--size-surface-container-border"
@@ -1438,6 +1448,34 @@
           "figmaVariable": "Sidebar/sidebar-docked",
           "tried": [
             "--layout-sidebar-docked"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-lg",
+          "tried": [
+            "--card-pad-lg"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-md",
+          "tried": [
+            "--card-pad-md"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-sm",
+          "tried": [
+            "--card-pad-sm"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Modal/pad",
+          "tried": [
+            "--modal-pad"
           ]
         }
       ]

@@ -1,6 +1,6 @@
 import { render, screen, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import PatternSection, { SectionToolbar, resetPatternSectionWarnings } from './PatternSection';
+import { describe, expect, it, vi } from 'vitest';
+import PatternSection, { SectionToolbar } from './PatternSection';
 
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
@@ -12,43 +12,11 @@ import PatternSection, { SectionToolbar, resetPatternSectionWarnings } from './P
 const section = (container) => container.querySelector('section');
 
 describe('PatternSection', () => {
-    let warn;
-    beforeEach(() => {
-        resetPatternSectionWarnings();
-        warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    });
-    afterEach(() => warn.mockRestore());
-
     it('has no fill and no pad by default', () => {
         const { container } = render(<PatternSection title="Sessions">Body</PatternSection>);
         const cls = section(container).className;
         expect(cls).not.toMatch(/plus-pattern-section-pad-/);
         expect(cls).not.toMatch(/plus-pattern-section-bg-/);
-        expect(warn).not.toHaveBeenCalled();
-    });
-
-    describe('deprecated props', () => {
-        it('keeps `padding` and `background` working', () => {
-            const { container } = render(
-                <PatternSection title="Sessions" padding="sm" background="container">Body</PatternSection>,
-            );
-            const cls = section(container).className;
-            expect(cls).toContain('plus-pattern-section-pad-sm');
-            expect(cls).toContain('plus-pattern-section-bg-container');
-        });
-
-        it('warns once per prop, however many sections pass it', () => {
-            render(
-                <>
-                    <PatternSection padding="sm">One</PatternSection>
-                    <PatternSection padding="md">Two</PatternSection>
-                    <PatternSection background="container">Three</PatternSection>
-                </>,
-            );
-            const messages = warn.mock.calls.map(([m]) => m);
-            expect(messages.filter((m) => m.includes('`padding`'))).toHaveLength(1);
-            expect(messages.filter((m) => m.includes('`background`'))).toHaveLength(1);
-        });
     });
 
     describe('header types', () => {

@@ -63,7 +63,6 @@ test('the older table cell tokens follow the new ones: 10 moves to 12, cell-y st
 
 test('nothing else in the size family changes value', () => {
   const unchanged = {
-    '--size-element-pad-x-sm': '8px',
     '--size-card-pad-x-md': '20px',
     '--size-modal-pad-x-md': '16px',
     '--size-table-radius-md': '8px',

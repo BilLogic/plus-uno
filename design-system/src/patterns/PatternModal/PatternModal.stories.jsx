@@ -70,9 +70,6 @@ export default {
             description: 'Hug the content to the screen less 128, or fill to it',
             table: { category: 'Design' },
         },
-        maxHeight: { table: { disable: true } },
-        padding: { table: { disable: true } },
-        gap: { table: { disable: true } },
         id: {
             control: false,
             table: { disable: true, category: 'Development' },
@@ -97,7 +94,7 @@ export const Overview = {
         const overlay = canvasElement.querySelector('.plus-pattern-overlay');
         const [modal] = dialogs(canvasElement);
         const style = getComputedStyle(modal);
-        await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad')}px`);
+        await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         await expect(style.borderTopLeftRadius, 'Modal/radius').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         const overlayStyle = getComputedStyle(overlay);

@@ -27,7 +27,7 @@ summary: Tokens — Overview & Decision Tree
 | Floating layer with no Blanket (menu, popup, tooltip, flag) | **Popup** | `--popover-*` |
 | A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |
 
-The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-pad-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
+The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-stack-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
 
 ## Token References
 

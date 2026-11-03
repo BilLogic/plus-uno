@@ -49,7 +49,7 @@ Six styles, an optional title, and a leading icon that each style picks by defau
             description: "The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it",
             table: { category: 'Content', defaultValue: { summary: 'true' } },
         },
-        dismissable: {
+        dismissible: {
             control: 'boolean',
             description: 'Whether the alert can be dismissed',
             table: { category: 'Behavior' },
@@ -91,7 +91,7 @@ function AlertVariantsDemos() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL STYLES (WITH TITLE, DISMISSIBLE)</span>
             {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(style => (
-                <Alert key={style} style={style} title="Title" dismissable>
+                <Alert key={style} style={style} title="Title" dismissible>
                     You have a message here — come check it out!
                 </Alert>
             ))}
@@ -108,7 +108,7 @@ function AlertContentDemos() {
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use when the message benefits from a short heading.
                 </p>
-                <Alert style="primary" title="With Title" dismissable>
+                <Alert style="primary" title="With Title" dismissible>
                     Alert with title and message text.
                 </Alert>
             </section>
@@ -117,7 +117,7 @@ function AlertContentDemos() {
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use when concise copy does not require a heading.
                 </p>
-                <Alert style="primary" dismissable>
+                <Alert style="primary" dismissible>
                     Alert without title — message only. The dismiss button centers on the first body line.
                 </Alert>
             </section>
@@ -126,7 +126,7 @@ function AlertContentDemos() {
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
                     Use for critical information that must remain visible.
                 </p>
-                <Alert style="primary" title="Non-dismissible Alert" dismissable={false}>
+                <Alert style="primary" title="Non-dismissible Alert" dismissible={false}>
                     This alert cannot be dismissed.
                 </Alert>
             </section>
@@ -157,7 +157,7 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <Alert style="primary" title="With Title" dismissable>
+    <Alert style="primary" title="With Title" dismissible>
         Alert with title and message text.
     </Alert>
 );
@@ -180,7 +180,7 @@ Interactive.args = {
     title: 'Interactive Alert',
     style: 'info',
     leadingVisual: true,
-    dismissable: true,
+    dismissible: true,
 };
 
 

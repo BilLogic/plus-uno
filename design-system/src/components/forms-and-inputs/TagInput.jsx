@@ -9,21 +9,8 @@ import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProp
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
 
-/**
- * The status names the chips used to take, kept as deprecated aliases for the
- * Tag color nearest their hue: a tag is a category, and its color never
- * carries a meaning.
- */
-const TAG_INPUT_COLOR_ALIASES = {
-    default: 'gray',
-    success: 'green',
-    danger: 'magenta',
-    warning: 'yellow',
-    info: 'teal',
-};
-
-/** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
-const ACCEPTED_COLORS = [...TAG_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
+/** Every name a tag's `color` accepts. */
+const ACCEPTED_COLORS = TAG_COLORS;
 
 /** Tag's ten colors as the option menu names them. */
 const COLOR_NAMES = {
@@ -57,16 +44,11 @@ const warn = (message) => {
 };
 
 /**
- * The color to hand Tag. A Tag name goes through as given.
- * TagInput's aliases resolve here, and anything
- * else falls back to gray, each with a development warning.
+ * The color to hand Tag. A Tag name goes through as given, and anything else
+ * falls back to gray with a development warning.
  */
 const tagColorOf = (color) => {
     if (color === undefined || color === null || color === '') return 'gray';
-    if (Object.hasOwn(TAG_INPUT_COLOR_ALIASES, color)) {
-        warn(`color "${color}" is deprecated; use "${TAG_INPUT_COLOR_ALIASES[color]}".`);
-        return TAG_INPUT_COLOR_ALIASES[color];
-    }
     if (TAG_COLORS.includes(color)) return color;
     warn(`color "${color}" is not a Tag color; it falls back to gray.`);
     return 'gray';

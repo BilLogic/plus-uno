@@ -18,12 +18,6 @@ export default {
             description: 'Tooltip placement',
             table: { category: 'Design' },
         },
-        size: {
-            control: 'select',
-            options: ['small', 'default', 'large'],
-            description: 'Tooltip size',
-            table: { category: 'Design' },
-        },
         id: {
             control: false,
             table: { disable: true, category: 'Development' }
@@ -88,40 +82,9 @@ function TooltipVariantsDemos() {
     );
 }
 
-function TooltipSizesDemos() {
-    return (
-        <div style={containerStyle}>
-            <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">SMALL</span>
-                <Tooltip text="Small tooltip" size="small" placement="top" show={true}>
-                    <Button appearance="primary" text="Small" />
-                </Tooltip>
-            </div>
-            <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">DEFAULT</span>
-                <Tooltip text="Default tooltip" size="default" placement="top" show={true}>
-                    <Button appearance="primary" text="Default" />
-                </Tooltip>
-            </div>
-            <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LARGE</span>
-                <Tooltip text="Large tooltip" size="large" placement="top" show={true}>
-                    <Button appearance="primary" text="Large" />
-                </Tooltip>
-            </div>
-        </div>
-    );
-}
-
 export const Placements = () => (
     <div style={{ marginBottom: '60px' }}>
         <TooltipVariantsDemos />
-    </div>
-);
-
-export const Sizes = () => (
-    <div style={{ marginBottom: '60px' }}>
-        <TooltipSizesDemos />
     </div>
 );
 
@@ -137,7 +100,6 @@ export const Interactive = {
     args: {
         text: 'Tooltip text',
         placement: 'top',
-        size: 'default',
     },
     parameters: {
         controls: { exclude: ['show'] },
@@ -155,7 +117,6 @@ export const Overview = {
     args: {
         text: 'Tooltip text',
         placement: 'top',
-        size: 'default',
         show: true,
     },
     render: (args) => (

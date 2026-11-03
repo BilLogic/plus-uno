@@ -38,14 +38,14 @@ export const Overview = () => (
     >
         <section>
             <h6 className="h6 mb-3">One-Time Session</h6>
-            <Alert style="warning" dismissable={false}>
+            <Alert style="warning" dismissible={false}>
                 Please re-confirm your availability for this session.
             </Alert>
         </section>
 
         <section>
             <h6 className="h6 mb-3">Recurring Session</h6>
-            <Alert style="warning" dismissable={false}>
+            <Alert style="warning" dismissible={false}>
                 Please re-confirm your availability for this recurring session.
             </Alert>
         </section>
@@ -58,7 +58,7 @@ export const Overview = () => (
  */
 export const One_Time_Session = () => (
     <div style={{ maxWidth: '672px' }}>
-        <Alert style="warning" dismissable={false}>
+        <Alert style="warning" dismissible={false}>
             Please re-confirm your availability for this session.
         </Alert>
     </div>
@@ -70,7 +70,7 @@ export const One_Time_Session = () => (
  */
 export const Recurring_Session = () => (
     <div style={{ maxWidth: '672px' }}>
-        <Alert style="warning" dismissable={false}>
+        <Alert style="warning" dismissible={false}>
             Please re-confirm your availability for this recurring session.
         </Alert>
     </div>

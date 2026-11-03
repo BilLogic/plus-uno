@@ -237,7 +237,7 @@ export default function MonthlyReportPage() {
                 </div>
 
                 {/* Key Insight using Alert component */}
-                <Alert style="warning" leadingVisual="trophy" dismissable={false} className="insight-alert">
+                <Alert style="warning" leadingVisual="trophy" dismissible={false} className="insight-alert">
                     {REPORT_DATA.keyInsight}
                 </Alert>
             </section>

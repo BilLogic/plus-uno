@@ -53,7 +53,7 @@
     --plus-status-height: #{label.$status-height-spacious};
     --plus-status-icon-box: 22px;
 
-    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--size-element-pad-x-md, 12px);
+    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--element-pad-default, 12px);
     gap: 0;
     border-radius: var(--size-border-radius-radius-150, 6px);
 

@@ -88,7 +88,7 @@ const GearIconButton = ({ state = 'default' }) => {
                 justifyContent: 'center',
                 minWidth: 'var(--size-button-min-width-md)',
                 minHeight: 'var(--size-button-min-height-md)',
-                padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                 borderRadius: 'var(--size-element-radius-md)',
                 backgroundColor: getBackgroundColor(),
                 cursor: 'pointer',
@@ -209,7 +209,7 @@ export const Overview = () => (
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
@@ -221,7 +221,7 @@ export const Overview = () => (
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-pen-to-square" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
@@ -233,7 +233,7 @@ export const Overview = () => (
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-users" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
@@ -245,7 +245,7 @@ export const Overview = () => (
                     display: 'flex',
                     alignItems: 'center',
                     gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-md)',
+                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-trash" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-danger)' }} />
