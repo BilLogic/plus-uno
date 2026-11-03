@@ -114,7 +114,7 @@
         }
 
         &:focus-visible {
-            // @grounds: --ds-surface --ds-surface-raised
+            // @grounds: --color-surface --ds-surface-container
             outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
             outline-offset: var(--size-element-stroke-lg);
             box-shadow: none;
