@@ -5,7 +5,7 @@ import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResp
 import MultiSelectQuestion from '@/specs/Toolkit/Post-Session/Sections/MultiSelectQuestion/MultiSelectQuestion';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import SessionNotes from '@/specs/Toolkit/Post-Session/Sections/SessionNotes/SessionNotes';
-import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import {
     EFFORT_OPTIONS,
     ENGAGEMENT_OPTIONS,
@@ -123,21 +123,7 @@ const StudentReflectionForm = ({
     const canSave = goalProgress.length > 0 || effort.length > 0 || engagement.length > 0;
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-md)',
-                flex: '1 0 0',
-                minWidth: 0,
-            }}
-        >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    Student Reflection
-                </h2>
-                <LastUpdated text={lastUpdated} />
-            </div>
+        <ReflectionStep title="Student Reflection" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
@@ -205,7 +191,7 @@ const StudentReflectionForm = ({
                     <FreeResponseQuestion
                         id="student-followup-description"
                         label="Please describe the concern."
-                        required
+                        isRequired
                         value={followUpDescription}
                         onChange={(event) => setFollowUpDescription(event.target.value)}
                         showEscalate
@@ -225,7 +211,7 @@ const StudentReflectionForm = ({
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
-        </div>
+        </ReflectionStep>
     );
 };
 

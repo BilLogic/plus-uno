@@ -8,7 +8,6 @@ import SelfReflectionForm from '@/specs/Toolkit/Post-Session/Sections/SelfReflec
 import FormFeedbackForm from '@/specs/Toolkit/Post-Session/Sections/FormFeedbackForm/FormFeedbackForm';
 import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 import {
-    ReflectionContentRow,
     ReflectionExitModals,
     ReflectionPageLayout,
 } from '@/specs/Toolkit/Post-Session/Pages/pageShell';
@@ -430,26 +429,25 @@ const ReflectionFlow = ({
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <ReflectionPageLayout id="post-session-reflection-flow">
-                <ReflectionContentRow
-                    sideNav={(
-                        <SideNavBar
-                            students={students}
-                            activeTab={activeTab}
-                            completedSections={{
-                                ...completedSections,
-                                'student-reflection': studentReflectionDone,
-                            }}
-                            canSubmit={canSubmit}
-                            showSelfReflection={showSelfReflection}
-                            showFormFeedback={showFormFeedback}
-                            onTabClick={handleTabClick}
-                            onSubmit={() => handleSubmit()}
-                        />
-                    )}
-                >
-                    {renderStep()}
-                </ReflectionContentRow>
+            <ReflectionPageLayout
+                id="post-session-reflection-flow"
+                stepMenu={(
+                    <SideNavBar
+                        students={students}
+                        activeTab={activeTab}
+                        completedSections={{
+                            ...completedSections,
+                            'student-reflection': studentReflectionDone,
+                        }}
+                        canSubmit={canSubmit}
+                        showSelfReflection={showSelfReflection}
+                        showFormFeedback={showFormFeedback}
+                        onTabClick={handleTabClick}
+                        onSubmit={() => handleSubmit()}
+                    />
+                )}
+            >
+                {renderStep()}
             </ReflectionPageLayout>
 
             <ReflectionExitModals

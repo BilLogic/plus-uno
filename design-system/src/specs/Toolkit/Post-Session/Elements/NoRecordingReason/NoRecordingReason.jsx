@@ -1,7 +1,6 @@
 import React, { useId, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Select from '@/components/forms-and-inputs/Select';
-import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
+import { Select, TextArea } from '@/components';
 
 const DEFAULT_REASONS = [
     'Forgot to record',
@@ -10,8 +9,8 @@ const DEFAULT_REASONS = [
 ];
 
 /**
- * Why is there no recording? (Figma Elements · No Recording Reason `10925:11334`).
- * Other reveals a short Foundations Textarea (keeps Element → Foundations; no Section import).
+ * Reason for a missing recording (Figma Elements · No recording reason).
+ * A Select of reasons; “Other” adds a text area for the detail.
  *
  * @param {object} props
  * @param {string} [props.id='no-recording-reason']
@@ -19,8 +18,8 @@ const DEFAULT_REASONS = [
  * @param {(value: string) => void} [props.onChange]
  * @param {string} [props.otherDetail='']
  * @param {(event: React.ChangeEvent) => void} [props.onOtherDetailChange]
- * @param {string[]} [props.reasons=DEFAULT_REASONS]
- * @param {boolean} [props.required=true]
+ * @param {string[]} [props.reasons]
+ * @param {boolean} [props.isRequired=true]
  */
 const NoRecordingReason = ({
     id = 'no-recording-reason',
@@ -29,7 +28,7 @@ const NoRecordingReason = ({
     otherDetail = '',
     onOtherDetailChange,
     reasons = DEFAULT_REASONS,
-    required = true,
+    isRequired = true,
 }) => {
     const otherAutoId = useId();
     const otherId = `${id}-other-${otherAutoId}`;
@@ -44,46 +43,28 @@ const NoRecordingReason = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-xs)',
+                gap: 'var(--section-stack-sm)',
                 width: '100%',
                 maxWidth: 'var(--col-9)',
             }}
         >
-            <label htmlFor={id} className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                Why is there no recording?
-                {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-            </label>
-            <div className="w-100" style={{ width: '100%' }}>
-                <Select
-                    id={id}
-                    mode="single"
-                    options={options}
-                    value={value}
-                    onChange={onChange}
-                    placeholder="Select a reason"
-                />
-            </div>
+            <Select
+                id={id}
+                label="Why is there no recording?"
+                required={isRequired}
+                mode="single"
+                options={options}
+                value={value}
+                onChange={onChange}
+                placeholder="Select a reason"
+            />
             {showOther && (
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 'var(--size-element-gap-xs)',
-                        width: '100%',
-                        maxWidth: 'var(--col-7)',
-                    }}
-                >
-                    <label
-                        htmlFor={otherId}
-                        className="body3-txt font-weight-semibold m-0"
-                        style={{ color: 'var(--color-on-surface)' }}
-                    >
-                        Other (please specify)
-                        <span style={{ color: 'var(--color-danger)' }}> *</span>
-                    </label>
+                <div style={{ width: '100%', maxWidth: 'var(--col-7)' }}>
                     <TextArea
                         id={otherId}
                         name={otherId}
+                        label="Other (please specify)"
+                        isRequired
                         value={otherDetail}
                         onChange={onOtherDetailChange}
                         placeholder="Briefly describe why there’s no recording"
@@ -102,7 +83,7 @@ NoRecordingReason.propTypes = {
     otherDetail: PropTypes.string,
     onOtherDetailChange: PropTypes.func,
     reasons: PropTypes.arrayOf(PropTypes.string),
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
 };
 
 export default NoRecordingReason;

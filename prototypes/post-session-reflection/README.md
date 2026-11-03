@@ -32,4 +32,4 @@ Open **http://localhost:3009/**.
 
 ## Storybook
 
-Specs live under **Specs → Toolkit → Post-Session** (Overview, Session Reflection states, Reflection Flow, Option Chip, AI Generating Placeholder, Save And Exit modal).
+Specs live under **Specs → Toolkit → Post-Session** (Overview, Session Reflection states, Reflection Flow, AI Generating Placeholder, Save And Exit modal).

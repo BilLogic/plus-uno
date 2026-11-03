@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import FormRating from '@/specs/Toolkit/Post-Session/Elements/FormRating/FormRating';
 import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
-import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import { QuestionLabel } from '@/specs/Toolkit/Post-Session/QuestionText';
+import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import { PRIVACY_WARNING, isReflectionDraftDirty } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**
@@ -49,26 +50,13 @@ const FormFeedbackForm = ({
     }, [rating, experience, comments]);
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-md)',
-                flex: '1 0 0',
-                minWidth: 0,
-            }}
-        >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Form Feedback</h2>
-                <LastUpdated text={typeof lastUpdated === 'string' ? lastUpdated : undefined} />
-            </div>
+        <ReflectionStep title="Form Feedback" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    <QuestionLabel rank="question" isRequired>
                         On a scale from 1–5, how intuitive did you find the reflection form?
-                        <span style={{ color: 'var(--color-danger)' }}> *</span>
-                    </p>
+                    </QuestionLabel>
                     <FormRating
                         id="form-feedback-rating"
                         value={rating}
@@ -106,7 +94,7 @@ const FormFeedbackForm = ({
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onSubmit={() => onSubmit?.(snapshot())}
             />
-        </div>
+        </ReflectionStep>
     );
 };
 

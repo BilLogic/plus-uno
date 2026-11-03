@@ -12,7 +12,7 @@ const galleryLabel = {
     fontSize: 12,
     letterSpacing: '0.04em',
     textTransform: 'uppercase',
-    color: 'var(--color-on-surface-variant)',
+    color: 'var(--ds-text-subtle)',
     fontWeight: 600,
     display: 'block',
     marginBottom: 'var(--size-element-gap-sm)',

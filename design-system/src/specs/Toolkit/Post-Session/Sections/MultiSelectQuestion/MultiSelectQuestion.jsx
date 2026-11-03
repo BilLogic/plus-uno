@@ -1,13 +1,18 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import { OptionChipGroup } from '@/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip';
+import { Tag, Tooltip } from '@/components';
+import { QuestionCaption, QuestionLabel } from '@/specs/Toolkit/Post-Session/QuestionText';
 import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput/OtherTextInput';
+
+/** Hover delay matching the Figma Multi-Select annotation (2 seconds or more). */
+export const ANSWER_TOOLTIP_DELAY_MS = 2000;
 
 /**
  * Multi-select question block
  * (Figma Sections · Multi-Select Question `10791:8694`).
- * Selected chips = filled · unselected = tonal. Tooltips on hover ≥2s via OptionChip.
- * Pair with Other Text Input when Other is selected.
+ * The answers are selectable Tags: pressed means picked. A tag with a `tooltip`
+ * explains itself on hover after 2 seconds. Pair with Other Text Input when
+ * Other is selected.
  *
  * @param {object} props
  * @param {string} [props.id] - Stable prefix for the Other field id
@@ -19,7 +24,7 @@ import OtherTextInput from '@/specs/Toolkit/Post-Session/Sections/OtherTextInput
  * @param {string} [props.otherId='other']
  * @param {string} [props.otherValue]
  * @param {(event: React.ChangeEvent) => void} [props.onOtherChange]
- * @param {boolean} [props.required=true]
+ * @param {boolean} [props.isRequired=true]
  */
 const MultiSelectQuestion = ({
     id,
@@ -35,9 +40,10 @@ const MultiSelectQuestion = ({
     otherId = 'other',
     otherValue = '',
     onOtherChange,
-    required = true,
+    isRequired = true,
 }) => {
     const autoId = useId();
+    const labelId = `${id || autoId}-question`;
     const showOther = Boolean(otherId) && selectedIds.includes(otherId);
     const otherFieldId = `${id || autoId}-${otherId || 'other'}`;
 
@@ -46,24 +52,47 @@ const MultiSelectQuestion = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-section-gap-sm)',
+                gap: 'var(--section-stack-sm)',
                 width: '100%',
                 maxWidth: 'var(--col-8)',
             }}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    {question}
-                    {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-                </p>
-                {caption && (
-                    <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                        {caption}
-                    </p>
-                )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                <div id={labelId}>
+                    <QuestionLabel rank="question" isRequired={isRequired}>{question}</QuestionLabel>
+                </div>
+                {caption && <QuestionCaption>{caption}</QuestionCaption>}
             </div>
 
-            <OptionChipGroup options={options} selectedIds={selectedIds} onToggle={onToggle} />
+            <div
+                role="group"
+                aria-labelledby={labelId}
+                style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--element-inline-md)' }}
+            >
+                {options.map((option) => {
+                    const tag = (
+                        <Tag
+                            color="blue"
+                            maxWidth="100%"
+                            isSelected={selectedIds.includes(option.id)}
+                            onClick={() => onToggle?.(option.id)}
+                        >
+                            {option.label}
+                        </Tag>
+                    );
+                    return option.tooltip ? (
+                        <Tooltip
+                            key={option.id}
+                            text={option.tooltip}
+                            delayShow={ANSWER_TOOLTIP_DELAY_MS}
+                            delayHide={200}
+                            placement="top"
+                        >
+                            <span style={{ display: 'inline-flex', maxWidth: '100%' }}>{tag}</span>
+                        </Tooltip>
+                    ) : React.cloneElement(tag, { key: option.id });
+                })}
+            </div>
 
             {showOther && (
                 <OtherTextInput id={otherFieldId} value={otherValue} onChange={onOtherChange} />
@@ -86,7 +115,7 @@ MultiSelectQuestion.propTypes = {
     otherId: PropTypes.string, // empty string suppresses OtherTextInput pairing
     otherValue: PropTypes.string,
     onOtherChange: PropTypes.func,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
 };
 
 export default MultiSelectQuestion;

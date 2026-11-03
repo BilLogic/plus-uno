@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
-import Toggle from '@/components/forms-and-inputs/Toggle';
+import { TextArea, Toggle } from '@/components';
+import { QuestionCaption } from '@/specs/Toolkit/Post-Session/QuestionText';
 
 /**
  * Free-text question block (Figma Sections · Free Response Question `791:137860`).
- * Separate caption (neutral) and warning (danger) slots — they cannot share one text property.
+ * The question is the text area's label; the neutral caption, the example and
+ * the danger warning (the privacy note) sit under it in the field's caption.
  *
  * @param {object} props
  * @param {string} props.label - Question text
- * @param {boolean} [props.required=false]
- * @param {string} [props.caption] - Neutral helper — Body/B3 (on-surface-variant)
- * @param {string} [props.warning] - Privacy / danger helper — Body/B3 (danger-text)
- * @param {string} [props.example] - Optional “E.g. …” line — Body/B3
+ * @param {boolean} [props.isRequired=false]
+ * @param {string} [props.caption] - Neutral helper
+ * @param {string} [props.warning] - Privacy helper, in the danger text color
+ * @param {string} [props.example] - Optional “E.g. …” line
  * @param {string} [props.value='']
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {string} [props.placeholder='Type your answer here…']
@@ -26,7 +27,7 @@ import Toggle from '@/components/forms-and-inputs/Toggle';
  */
 const FreeResponseQuestion = ({
     label,
-    required = false,
+    isRequired = false,
     caption,
     warning,
     example,
@@ -40,61 +41,52 @@ const FreeResponseQuestion = ({
     onEscalateChange,
     escalateLabel = 'Escalate this request to tutor supervisors for immediate attention.',
     className = '',
-}) => (
-    <div
-        className={className}
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--size-section-gap-sm)',
-            width: '100%',
-            maxWidth: 'var(--col-8)',
-        }}
-    >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)', width: '100%' }}>
-            <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                {label}
-                {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-            </p>
-            {caption ? (
-                <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    {caption}
-                </p>
-            ) : null}
-            {warning ? (
-                <p className="body3-txt m-0" style={{ color: 'var(--color-danger-text, var(--color-danger))' }}>
-                    {warning}
-                </p>
-            ) : null}
-            {example ? (
-                <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    {example}
-                </p>
+}) => {
+    const hasNotes = Boolean(caption || warning || example);
+    return (
+        <div
+            className={className}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--section-stack-sm)',
+                width: '100%',
+                maxWidth: 'var(--col-8)',
+            }}
+        >
+            <TextArea
+                id={id}
+                name={id}
+                label={label}
+                isRequired={isRequired}
+                caption={hasNotes ? (
+                    <>
+                        {caption ? <QuestionCaption>{caption}</QuestionCaption> : null}
+                        {warning ? <QuestionCaption tone="danger">{warning}</QuestionCaption> : null}
+                        {example ? <QuestionCaption>{example}</QuestionCaption> : null}
+                    </>
+                ) : undefined}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                rows={rows}
+            />
+
+            {showEscalate ? (
+                <Toggle
+                    id={`${id}-escalate`}
+                    label={escalateLabel}
+                    isChecked={escalate}
+                    onChange={(event) => onEscalateChange?.(event.target.checked)}
+                />
             ) : null}
         </div>
-
-        <TextArea
-            id={id}
-            name={id}
-            value={value}
-            onChange={onChange}
-            placeholder={placeholder}
-            rows={rows}
-        />
-
-        {showEscalate ? (
-            <Toggle
-                id={`${id}-escalate`}
-                label={escalateLabel}
-                isChecked={escalate}
-                onChange={(event) => onEscalateChange?.(event.target.checked)}/>
-        ) : null}
-    </div>
-);
+    );
+};
 
 FreeResponseQuestion.propTypes = {
     label: PropTypes.string.isRequired,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     caption: PropTypes.string,
     warning: PropTypes.string,
     example: PropTypes.string,

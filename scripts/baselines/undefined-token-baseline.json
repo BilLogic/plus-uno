@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 69,
-    "uses": 222,
+    "names": 67,
+    "uses": 220,
     "bare": 5
   },
   "tokens": {
@@ -84,10 +84,6 @@
       "uses": 5,
       "bare": 0
     },
-    "--font-size-caption": {
-      "uses": 1,
-      "bare": 0
-    },
     "--font-size-fa-b3-solid": {
       "uses": 2,
       "bare": 0
@@ -134,10 +130,6 @@
     },
     "--shadow-small": {
       "uses": 2,
-      "bare": 0
-    },
-    "--size-border-radius-4-5": {
-      "uses": 1,
       "bare": 0
     },
     "--size-border-radius-large": {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Rating from '@/components/forms-and-inputs/Rating';
+import { Rating } from '@/components';
 import { FORM_RATING_COMMENTS } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 
 /**

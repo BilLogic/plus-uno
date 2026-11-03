@@ -89,3 +89,27 @@ export const Cancellation = {
         selectedStudentIds: [],
     }),
 };
+
+/**
+ * No recording — no files uploaded; the Toggle is on and a reason is asked.
+ */
+export const NoRecording = {
+    name: 'No recording',
+    render: () => {
+        const [selectedStudentIds, setSelectedStudentIds] = useState(
+            SAMPLE_STUDENTS.map((student) => student.id),
+        );
+        return renderShell({
+            initialData: {
+                date: '2025-07-29',
+                sessionOption: 'session-1',
+                files: [],
+                noRecording: true,
+                noRecordingReason: 'Other',
+            },
+            availableStudents: SAMPLE_STUDENTS,
+            selectedStudentIds,
+            onStudentSelectionChange: setSelectedStudentIds,
+        });
+    },
+};

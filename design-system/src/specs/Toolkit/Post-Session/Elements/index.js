@@ -4,7 +4,6 @@ export { default as StudentsDropdown } from './StudentsDropdown/StudentsDropdown
 export { default as UploadFiles } from './UploadFiles/UploadFiles';
 export { default as FileListItem } from './FileListItem/FileListItem';
 export { default as NoRecordingReason } from './NoRecordingReason/NoRecordingReason';
-export { default as OptionChip, OptionChipGroup } from './OptionChip/OptionChip';
 export { default as LastUpdated } from './LastUpdated/LastUpdated';
 export { default as NavigationButtons } from './NavigationButtons/NavigationButtons';
 export { default as ReflectionFormActions } from './ReflectionFormActions/ReflectionFormActions';

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
+import { ReflectionChromeContext } from '@/specs/Toolkit/Post-Session/reflectionChrome';
 import SideNavBar from '@/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar';
 import ConfirmationPopUp from '@/specs/Toolkit/Post-Session/Modals/ConfirmationPopUp/ConfirmationPopUp';
 
@@ -37,70 +38,51 @@ BreakpointPreview.propTypes = {
 };
 
 /**
- * Shared PageLayout chrome for Post-Session page stories and ReflectionFlow.
+ * The focused Page template for a reflection step: Back, the title and Close in
+ * the topbar, the step in the reading column, and the step's actions in the
+ * footer. Back and Close leave the way the step's Cancel does.
  *
  * @param {object} props
  * @param {React.ReactNode} props.children
+ * @param {React.ReactNode} [props.stepMenu] - The step menu, beside the step's Section.
  * @param {string} [props.id]
  * @param {string} [props.title] - Page name; becomes the page's `<h1>` (see PageLayout).
  * @returns {React.ReactElement}
  */
-export function ReflectionPageLayout({ children, id = 'post-session-page', title = 'Reflection Form' }) {
+export function ReflectionPageLayout({ children, stepMenu = null, id = 'post-session-page', title = 'Reflection Form' }) {
+    const [footerEl, setFooterEl] = useState(null);
+    const cancelRef = useRef(null);
+    const registerCancel = useCallback((handler) => {
+        cancelRef.current = handler;
+    }, []);
+    const leave = useCallback(() => cancelRef.current?.(), []);
+    const chrome = useMemo(
+        () => ({ stepMenu, footerEl, registerCancel }),
+        [stepMenu, footerEl, registerCancel],
+    );
+
     return (
-        <PageLayout
-            title={title}
-            topBarConfig={{
-                breadcrumbs: [
-                    { text: 'Toolkit', href: '#' },
-                    { text: 'Sessions', href: '#' },
-                    { text: 'Reflection Form' },
-                ],
-                user: { name: 'John Doe', role: 'Lead' },
-            }}
-            sidebarConfig={{ user: 'tutor', activeTab: 'sessions' }}
-            id={id}
-            style={{ width: '100%', height: '100%' }}
-        >
-            {children}
-        </PageLayout>
+        <ReflectionChromeContext.Provider value={chrome}>
+            <PageLayout
+                frame="focused"
+                title={title}
+                onBack={leave}
+                onClose={leave}
+                actions={<div ref={setFooterEl} style={{ display: 'contents' }} />}
+                id={id}
+                style={{ width: '100%', height: '100%' }}
+            >
+                {children}
+            </PageLayout>
+        </ReflectionChromeContext.Provider>
     );
 }
 
 ReflectionPageLayout.propTypes = {
     children: PropTypes.node,
+    stepMenu: PropTypes.node,
     id: PropTypes.string,
     title: PropTypes.string,
-};
-
-/**
- * Flex row wrapping SideNav + main step body.
- *
- * @param {object} props
- * @param {React.ReactNode} props.sideNav
- * @param {React.ReactNode} props.children
- */
-export function ReflectionContentRow({ sideNav, children }) {
-    return (
-        <div
-            style={{
-                display: 'flex',
-                gap: 'var(--size-surface-gap-md)',
-                width: '100%',
-                minHeight: '100%',
-                alignItems: 'stretch',
-            }}
-        >
-            {sideNav}
-            <div style={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
-                {children}
-            </div>
-        </div>
-    );
-}
-
-ReflectionContentRow.propTypes = {
-    sideNav: PropTypes.node,
-    children: PropTypes.node,
 };
 
 /**
@@ -215,23 +197,22 @@ export function ReflectionPageShell({
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
-            <ReflectionPageLayout id={id}>
-                <ReflectionContentRow
-                    sideNav={(
-                        <SideNavBar
-                            students={students}
-                            activeTab={tab}
-                            completedSections={completedSections}
-                            showSelfReflection={showSelfReflection}
-                            showFormFeedback={showFormFeedback}
-                            onTabClick={setTab}
-                        />
-                    )}
-                >
-                    {typeof children === 'function'
-                        ? children({ openDiscard, openSaved })
-                        : children}
-                </ReflectionContentRow>
+            <ReflectionPageLayout
+                id={id}
+                stepMenu={(
+                    <SideNavBar
+                        students={students}
+                        activeTab={tab}
+                        completedSections={completedSections}
+                        showSelfReflection={showSelfReflection}
+                        showFormFeedback={showFormFeedback}
+                        onTabClick={setTab}
+                    />
+                )}
+            >
+                {typeof children === 'function'
+                    ? children({ openDiscard, openSaved })
+                    : children}
             </ReflectionPageLayout>
             <ReflectionExitModals
                 exitModal={exitModal}
