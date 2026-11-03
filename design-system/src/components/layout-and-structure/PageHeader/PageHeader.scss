@@ -1,0 +1,33 @@
+.plus-page-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-100);
+}
+
+.plus-page-header-breadcrumbs {
+    font: var(--body-small);
+}
+
+.plus-page-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-150);
+}
+
+.plus-page-header-title {
+    min-width: 0;
+    margin: 0;
+}
+
+.plus-page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-075);
+    flex: none;
+}
+
+.plus-page-header-bottom-bar {
+    display: flex;
+    align-items: center;
+}

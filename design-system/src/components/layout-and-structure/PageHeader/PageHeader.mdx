@@ -1,0 +1,36 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as PageHeaderStories from './PageHeader.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "page-header",
+      "name": "Page header",
+      "componentSetNodeId": "20622:81",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20622-81",
+      "source": "node-chart",
+      "status": "verified",
+      "isComponentSet": false
+    }
+  ]
+};
+
+<Meta of={PageHeaderStories} />
+
+<Title />
+
+<DocsTabs of={PageHeaderStories}>
+
+<DocsTab tab="examples">
+
+A page's title row, with an optional breadcrumb trail, actions and bottom bar.
+
+<Canvas of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} />
+
+<ArgTypes of={PageHeaderStories} />
+
+</DocsTab>
+
+</DocsTabs>
