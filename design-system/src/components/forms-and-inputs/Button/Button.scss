@@ -8,8 +8,8 @@
  * extensive Style x Variant matrix.
  */
 
-// The hover and pressed STATE LAYER (foundations/color.md rule 2): a shadow
-// state token laid over the fill as a gradient. A registered color property,
+// The hover and pressed STATE LAYER: a named hovered or pressed token laid
+// over the fill as a gradient. A registered color property,
 // so the layer fades in over the same 0.2s the fill used to.
 @property --plus-btn-state-layer {
     syntax: '<color>';
@@ -54,7 +54,7 @@
     // Button.jsx sets `disabled={disabled || loading}` so a loading button is
     // genuinely :disabled — it cannot be clicked and it announces as disabled,
     // which is right. But inheriting the disabled LOOK repainted the ground to
-    // --color-on-surface-state-12 (near-white) and dimmed everything to 0.38,
+    // --ds-background-disabled (near-white) and dimmed everything to 0.38,
     // while the spinner below kept the variant's on-main color: white on
     // near-white at 38%, i.e. an empty gray box. Measured on the docs States
     // demo before this change.
@@ -193,20 +193,38 @@
 
 // --- COLOR THEMES CONFIGURATION ---
 // Using EXPLICIT STRINGS to avoid Sass interpretation issues
-// Index: 1:Main, 2:OnMain, 3:StateLayer, 4:TextSafe, 5:Container, 6:OnContainer, 7:Border
+// Index: 1:Main, 2:OnMain, 3:TonalFill, 4:TextSafe, 5:Container, 6:OnContainer, 7:Border
 // An outline takes the intent's `-border` role (`_color_roles.scss`), not its
 // base. Warning's border role is #715c00 rather than its base, so a warning
 // outline is the one whose edge differs from its fill.
 // `default` and the five category styles have no border role and keep the base.
+// Named hover and pressed steps per intent: opaque, from the color migration map.
+// Index: 1:FilledHovered, 2:FilledPressed, 3:TonalHovered, 4:TonalPressed
+$btn-states: (
+    'primary': ('--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', '--ds-background-brand-subtlest-hovered', '--ds-background-brand-subtlest-pressed'),
+    'secondary': ('--ds-background-neutral-bold-hovered', '--ds-background-neutral-bold-pressed', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed'),
+    'tertiary': ('--ds-background-accent-teal-bolder-hovered', '--ds-background-accent-teal-bolder-pressed', '--ds-background-accent-teal-subtler-hovered', '--ds-background-accent-teal-subtler-pressed'),
+    'success': ('--ds-background-success-bold-hovered', '--ds-background-success-bold-pressed', '--ds-background-success-subtler-hovered', '--ds-background-success-subtler-pressed'),
+    'warning': ('--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed', '--ds-background-warning-subtler-hovered', '--ds-background-warning-subtler-pressed'),
+    'danger': ('--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', '--ds-background-danger-subtler-hovered', '--ds-background-danger-subtler-pressed'),
+    'info': ('--ds-background-information-bold-hovered', '--ds-background-information-bold-pressed', '--ds-background-information-subtler-hovered', '--ds-background-information-subtler-pressed'),
+    'default': ('--ds-background-neutral-hovered', '--ds-background-neutral-pressed', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed'),
+    'social-emotional': ('--ds-background-smart-social-emotional-bold-hovered', '--ds-background-smart-social-emotional-bold-pressed', '--ds-background-smart-social-emotional-hovered', '--ds-background-smart-social-emotional-pressed'),
+    'mastering-content': ('--ds-background-smart-mastering-content-bold-hovered', '--ds-background-smart-mastering-content-bold-pressed', '--ds-background-smart-mastering-content-hovered', '--ds-background-smart-mastering-content-pressed'),
+    'advocacy': ('--ds-background-smart-advocacy-bold-hovered', '--ds-background-smart-advocacy-bold-pressed', '--ds-background-smart-advocacy-hovered', '--ds-background-smart-advocacy-pressed'),
+    'relationship': ('--ds-background-smart-relationship-bold-hovered', '--ds-background-smart-relationship-bold-pressed', '--ds-background-smart-relationship-hovered', '--ds-background-smart-relationship-pressed'),
+    'technology-tools': ('--ds-background-smart-technology-tools-bold-hovered', '--ds-background-smart-technology-tools-bold-pressed', '--ds-background-smart-technology-tools-hovered', '--ds-background-smart-technology-tools-pressed')
+);
+
 $btn-themes: (
-    'primary': ('--color-primary', '--color-on-primary', '--color-primary-state-08', '--color-primary-text', '--color-primary-container', '--color-on-primary-container', '--color-primary-border'),
-    'secondary': ('--color-secondary', '--color-on-secondary', '--color-secondary-state-08', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container', '--color-secondary-border'),
-    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--color-tertiary-state-08', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container', '--color-tertiary-border'),
-    'success': ('--color-success', '--color-on-success', '--color-success-state-08', '--color-success-text', '--color-success-container', '--color-on-success-container', '--color-success-border'),
-    'warning': ('--color-warning', '--color-on-warning', '--color-warning-state-08', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning-border'),
-    'danger': ('--color-danger', '--color-on-danger', '--color-danger-state-08', '--color-danger-text', '--color-danger-container', '--color-on-danger-container', '--color-danger-border'),
-    'info': ('--color-info', '--color-on-info', '--color-info-state-08', '--color-info-text', '--color-info-container', '--color-on-info-container', '--color-info-border'),
-    'default': ('--color-surface-container-high', '--color-on-surface', '--color-surface-container-state-08', '--color-on-surface', '--color-surface-container', '--color-on-surface', '--color-surface-container-high'),
+    'primary': ('--color-primary', '--color-on-primary', '--ds-background-brand-subtlest', '--color-primary-text', '--color-primary-container', '--color-on-primary-container', '--color-primary-border'),
+    'secondary': ('--color-secondary', '--color-on-secondary', '--ds-background-neutral', '--color-secondary-text', '--color-secondary-container', '--color-on-secondary-container', '--color-secondary-border'),
+    'tertiary': ('--color-tertiary', '--color-on-tertiary', '--ds-background-accent-teal-subtler', '--color-tertiary-text', '--color-tertiary-container', '--color-on-tertiary-container', '--color-tertiary-border'),
+    'success': ('--color-success', '--color-on-success', '--ds-background-success-subtler', '--color-success-text', '--color-success-container', '--color-on-success-container', '--color-success-border'),
+    'warning': ('--color-warning', '--color-on-warning', '--ds-background-warning-subtler', '--color-warning-text', '--color-warning-container', '--color-on-warning-container', '--color-warning-border'),
+    'danger': ('--color-danger', '--color-on-danger', '--ds-background-danger-subtler', '--color-danger-text', '--color-danger-container', '--color-on-danger-container', '--color-danger-border'),
+    'info': ('--color-info', '--color-on-info', '--ds-background-information-subtler', '--color-info-text', '--color-info-container', '--color-on-info-container', '--color-info-border'),
+    'default': ('--color-surface-container-high', '--color-on-surface', '--ds-background-neutral', '--color-on-surface', '--color-surface-container', '--color-on-surface', '--color-surface-container-high'),
 
     // The five category styles (#304). `Button.jsx` has advertised all thirteen
     // in its `oneOf` since it was written, while this map implemented eight — so
@@ -221,11 +239,11 @@ $btn-themes: (
     // thing. Badge is also the working precedent that these tokens render.
     //
     // No new tokens: every one of the thirty slots below already existed.
-    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--color-social-emotional-state-08', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container', '--color-social-emotional'),
-    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--color-mastering-content-state-08', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container', '--color-mastering-content'),
-    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--color-advocacy-state-08', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container', '--color-advocacy'),
-    'relationship': ('--color-relationship', '--color-on-relationship', '--color-relationship-state-08', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container', '--color-relationship'),
-    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--color-technology-tools-state-08', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container', '--color-technology-tools')
+    'social-emotional': ('--color-social-emotional', '--color-on-social-emotional', '--ds-background-smart-social-emotional', '--color-social-emotional-text', '--color-social-emotional-container', '--color-on-social-emotional-container', '--color-social-emotional'),
+    'mastering-content': ('--color-mastering-content', '--color-on-mastering-content', '--ds-background-smart-mastering-content', '--color-mastering-content-text', '--color-mastering-content-container', '--color-on-mastering-content-container', '--color-mastering-content'),
+    'advocacy': ('--color-advocacy', '--color-on-advocacy', '--ds-background-smart-advocacy', '--color-advocacy-text', '--color-advocacy-container', '--color-on-advocacy-container', '--color-advocacy'),
+    'relationship': ('--color-relationship', '--color-on-relationship', '--ds-background-smart-relationship', '--color-relationship-text', '--color-relationship-container', '--color-on-relationship-container', '--color-relationship'),
+    'technology-tools': ('--color-technology-tools', '--color-on-technology-tools', '--ds-background-smart-technology-tools', '--color-technology-tools-text', '--color-technology-tools-container', '--color-on-technology-tools-container', '--color-technology-tools')
 );
 
 // --- VARIANTS (Fill Types) ---
@@ -239,8 +257,11 @@ $btn-themes: (
     $col-container: string.unquote(list.nth($config, 5));
     $col-on-container: string.unquote(list.nth($config, 6));
     $col-border: string.unquote(list.nth($config, 7));
-    // The pressed step of the same layer: `--color-x-state-08` → `-state-12`.
-    $col-state-pressed: string.unquote(string.slice($col-state, 1, -3) + '12');
+    $steps: map.get($btn-states, $theme);
+    $col-bold-hovered: string.unquote(list.nth($steps, 1));
+    $col-bold-pressed: string.unquote(string.unquote(list.nth($steps, 2)));
+    $col-tonal-hovered: string.unquote(list.nth($steps, 3));
+    $col-tonal-pressed: string.unquote(list.nth($steps, 4));
 
     &--#{$theme} {
 
@@ -249,15 +270,15 @@ $btn-themes: (
             background-color: var($col-main);
             color: var($col-on-main);
 
-            // The shadow state layer over the fill, hover 08 and pressed 12,
+            // The role's bold hovered and pressed steps, laid over the fill
             // without dimming the label, the icon or the focus ring with it.
             &:hover {
-                --plus-btn-state-layer: var(--color-shadow-state-08);
+                --plus-btn-state-layer: var(#{$col-bold-hovered});
             }
 
             &.active,
             &:active {
-                --plus-btn-state-layer: var(--color-shadow-state-12);
+                --plus-btn-state-layer: var(#{$col-bold-pressed});
             }
 
             &.plus-btn--loading::after {
@@ -267,28 +288,27 @@ $btn-themes: (
             // Disabled: neutral bg at 12%, secondary text color, NO border
             &:disabled:not(.plus-btn--loading),
             &.disabled:not(.plus-btn--loading) {
-                background-color: var(--color-on-surface-state-12);
+                background-color: var(--ds-background-disabled);
                 border-color: transparent;
                 color: var(--color-secondary-text);
                 --plus-btn-state-layer: transparent;
             }
         }
 
-        // 2. TONAL (state-layer bg at 8%, text-safe color). The resting 08 is
-        // the documented tonal exception in foundations/color.md.
+        // 2. TONAL (subtle role fill, text-safe color).
         &.plus-btn--tonal {
             background-color: var($col-state);
             border-color: transparent;
             color: var($col-text);
 
-            // The shadow state layer over the tonal fill, hover 08 and pressed 12.
+            // The role's subtle hovered and pressed steps over the tonal fill.
             &:hover {
-                --plus-btn-state-layer: var(--color-shadow-state-08);
+                --plus-btn-state-layer: var(#{$col-tonal-hovered});
             }
 
             &.active,
             &:active {
-                --plus-btn-state-layer: var(--color-shadow-state-12);
+                --plus-btn-state-layer: var(#{$col-tonal-pressed});
             }
 
             &.plus-btn--loading::after {
@@ -298,7 +318,7 @@ $btn-themes: (
             // Disabled: neutral bg at 12%, on-surface-variant text
             &:disabled:not(.plus-btn--loading),
             &.disabled:not(.plus-btn--loading) {
-                background-color: var(--color-on-surface-state-12);
+                background-color: var(--ds-background-disabled);
                 --plus-btn-state-layer: transparent;
                 color: var(--color-on-surface-variant);
             }
@@ -311,12 +331,12 @@ $btn-themes: (
             color: var($col-text);
 
             &:hover {
-                background-color: var($col-state);
+                background-color: var(--ds-background-neutral-subtle-hovered);
             }
 
             &.active,
             &:active {
-                background-color: var($col-state-pressed);
+                background-color: var(--ds-background-neutral-subtle-pressed);
             }
 
             &.plus-btn--loading::after {
@@ -340,12 +360,12 @@ $btn-themes: (
             color: var($col-text);
 
             &:hover {
-                background-color: var($col-state);
+                background-color: var(--ds-background-neutral-subtle-hovered);
             }
 
             &.active,
             &:active {
-                background-color: var($col-state-pressed);
+                background-color: var(--ds-background-neutral-subtle-pressed);
             }
 
             &.plus-btn--loading::after {

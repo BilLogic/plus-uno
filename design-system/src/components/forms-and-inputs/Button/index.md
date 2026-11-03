@@ -50,7 +50,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-12` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--color-shadow-state-08` · `--color-shadow-state-12` · `--element-pad-y-md` · `--icon-lg` · `--icon-md` · `--plus-btn-state-layer` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--type-weight-medium`
+`--body-default` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-outline` · `--color-secondary-text` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--element-pad-y-md` · `--icon-lg` · `--icon-md` · `--plus-btn-state-layer` · `--size-element-border` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 
