@@ -316,12 +316,13 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // Alert's dismiss control became a shared component, and TagInput added one
   // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
   // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two,
-  // and Banner and InlineMessage added one each — the deliberate
+  // Banner and InlineMessage added one each (69), and Progress indicator and
+  // Progress tracker added one each — the deliberate
   // edit this number is here to force.
   //
-  if (tabbed.length !== 69) {
+  if (tabbed.length !== 71) {
     all.push(
-      `expected 69 tabbed docs pages (69 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 71 tabbed docs pages (71 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

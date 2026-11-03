@@ -302,6 +302,11 @@ const preview = {
               "Popup",
               "Tooltip"
             ],
+            "Status indicators",
+            [
+              "Progress indicator",
+              "Progress tracker"
+            ],
             "Text and data display",
             [
               "Code",

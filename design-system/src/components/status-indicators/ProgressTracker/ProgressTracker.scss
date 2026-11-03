@@ -1,0 +1,134 @@
+/**
+ * ProgressTracker styles. Horizontal lays items in a row connected by a rule;
+ * vertical stacks them as a side-nav-style list (no connecting rule — the
+ * list order alone carries the sequence). `spacing` sets the gap between
+ * items in either orientation.
+ */
+
+.plus-progress-tracker__list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.plus-progress-tracker--horizontal .plus-progress-tracker__list {
+    flex-direction: row;
+    align-items: center;
+}
+
+.plus-progress-tracker--vertical .plus-progress-tracker__list {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.plus-progress-tracker--comfortable .plus-progress-tracker__list {
+    gap: var(--element-stack-lg);
+}
+
+.plus-progress-tracker--cozy .plus-progress-tracker__list {
+    gap: var(--element-stack-md);
+}
+
+.plus-progress-tracker--compact .plus-progress-tracker__list {
+    gap: var(--element-stack-sm);
+}
+
+.plus-progress-tracker__item-wrap {
+    display: flex;
+    min-width: 0;
+}
+
+.plus-progress-tracker--horizontal .plus-progress-tracker__item-wrap:not(:last-child)::after {
+    content: '';
+    align-self: center;
+    width: var(--space-150);
+    height: var(--size-element-stroke-sm);
+    background-color: var(--ds-border);
+    margin-inline: var(--element-inline-sm);
+}
+
+.plus-progress-tracker__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--element-inline-sm);
+    min-width: 0;
+    height: var(--item-height-md);
+    padding: 0 var(--element-pad-x-md);
+    border-radius: var(--element-radius-item-md);
+    background-color: transparent;
+    border: none;
+    color: var(--ds-text-subtle);
+    text-decoration: none;
+    cursor: default;
+    transition: background-color 0.15s ease;
+}
+
+a.plus-progress-tracker__item,
+button.plus-progress-tracker__item {
+    cursor: pointer;
+}
+
+a.plus-progress-tracker__item:hover,
+button.plus-progress-tracker__item:hover {
+    background-color: var(--ds-background-neutral-subtle-hovered);
+    color: var(--ds-text-subtle);
+    text-decoration: none;
+}
+
+a.plus-progress-tracker__item:active,
+button.plus-progress-tracker__item:active {
+    background-color: var(--ds-background-neutral-subtle-pressed);
+}
+
+a.plus-progress-tracker__item:focus-visible,
+button.plus-progress-tracker__item:focus-visible {
+    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline-offset: calc(-1 * var(--size-element-stroke-lg));
+}
+
+.plus-progress-tracker__dot {
+    flex-shrink: 0;
+    width: var(--space-050);
+    height: var(--space-050);
+    border-radius: 50%;
+    border: var(--size-element-stroke-md) solid var(--ds-icon-subtle);
+}
+
+.plus-progress-tracker__icon {
+    flex-shrink: 0;
+    font-size: var(--icon-sm);
+}
+
+.plus-progress-tracker__icon--visited {
+    color: var(--ds-icon-success);
+}
+
+.plus-progress-tracker__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: var(--body-default);
+}
+
+.plus-progress-tracker__item--current {
+    color: var(--ds-text-selected);
+    background-color: var(--ds-background-selected);
+}
+
+.plus-progress-tracker__item--current .plus-progress-tracker__dot {
+    background-color: var(--ds-background-brand-bold);
+    border-color: var(--ds-border-brand);
+}
+
+.plus-progress-tracker__item--current .plus-progress-tracker__label {
+    font-weight: var(--type-weight-medium);
+}
+
+.plus-progress-tracker__item--disabled {
+    color: var(--ds-text-disabled);
+}
+
+.plus-progress-tracker__item--disabled .plus-progress-tracker__dot {
+    border-color: var(--ds-icon-disabled);
+}
