@@ -36,6 +36,6 @@ From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these
 
 ## Related
 
-Same group: `Progress` · `Skeleton`
+Same group: `GenerativeBorder` · `Progress` · `Skeleton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

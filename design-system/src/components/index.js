@@ -46,6 +46,7 @@ export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
 export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner } from '@/components/loading/Spinner';
+export { default as GenerativeBorder } from '@/components/loading/GenerativeBorder';
 export { default as Status } from '@/components/labels/Status';
 export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 

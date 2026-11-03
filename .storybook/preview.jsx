@@ -272,7 +272,8 @@ const preview = {
               [
                 "Spinner",
                 "Skeleton"
-              ]
+              ],
+              "Generative border"
             ],
             "Messaging",
             [

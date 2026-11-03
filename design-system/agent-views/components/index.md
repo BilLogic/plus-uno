@@ -38,6 +38,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
 - [Footer](../../src/components/_internal/Footer/index.md)
+- [GenerativeBorder](../../src/components/loading/GenerativeBorder/index.md)
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)
