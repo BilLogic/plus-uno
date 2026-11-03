@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **102,958 chars from 9 files**, against an assembled budget of 175,500 (72,542 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 82,574 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **102,960 chars from 9 files**, against an assembled budget of 175,500 (72,540 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 82,576 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -24,13 +24,13 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 46,911 | 22,048 (persona) |
 | 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 48,557 | — |
 | 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,805 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,642 (−203 ide-only) | 55,498 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 67,284 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 87,104 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 90,572 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 97,130 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 102,103 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 802 | 102,958 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 55,499 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 67,285 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 87,105 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 90,573 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 97,131 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 102,104 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 102,960 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,14 +42,14 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 137,351 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **18 reference(s), 137,439 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
 | `blueprint-upkeep` | [`agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md`](../../agents/uno-bot/scheduled-actions/blueprint-upkeep/ACTION.md) | 4,291 |
 | `critique-a-design` | [`agents/uno-bot/skills/critique-a-design/SKILL.md`](../../agents/uno-bot/skills/critique-a-design/SKILL.md) | 3,635 |
 | `dm-watch` | [`agents/uno-bot/scheduled-actions/dm-watch/ACTION.md`](../../agents/uno-bot/scheduled-actions/dm-watch/ACTION.md) | 2,820 |
-| `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,486 |
+| `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,439 |
@@ -663,7 +663,7 @@ Each limit in a reply carries its cause and the next route: what could not be do
 
 ## Canvas vs comments
 
-- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it. Writing or classifying an annotation: the six category labels are [`annotations.md`](annotations.md).
+- **Canvas text + Dev Mode annotations = agent-readable context.** Anything the agent (or a future reader) needs to do the job goes on the canvas; a comment points at it. Writing or classifying an annotation: the five category labels are [`annotations.md`](annotations.md).
 - **Comment pins = human dialogue.** uno-bot reads them with a pasted frame (#899) and for decisions (#900), and replies in one only when a comment asks it with @uno (#903).
 
 ## Teams and stage folders
@@ -1146,7 +1146,7 @@ Drafting follows the same routing, not just answering: `skills/uno-synthesize` q
 
 <!-- connectors — read_reference by name -->
 
-**docs/connectors/figma/annotations** — writing, classifying or auditing a Figma annotation — the six category labels and what each holds, the Logic / data vs Development test, and where status and construction notes go instead; read before labeling one or judging a label.
+**docs/connectors/figma/annotations** — writing, classifying or auditing a Figma annotation — the five category labels and what each holds, the Logic / data vs Development test, and where status and construction notes go instead; read before labeling one or judging a label.
 **docs/connectors/notion/page-writing** — writing or correcting a Notion page body, a PRD, a decision page or a project hub — the Markdown that becomes blocks, the attribution line, the hub's golden sections, comments and the API's quirks; read before drafting a body for notion_create or notion_update.
 **docs/connectors/slack/shapes** — the share-out post, a result table, a chart, answer cards, a ⚠️ line, the Sources box, how a reply renders and falls back — read before composing any of them or explaining how one rendered.
 
@@ -1252,20 +1252,19 @@ A `dm_commitments` row holds the permalink, when it is due, its state and the co
 
 # Figma annotation category labels
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · moved out of the overview 2026-10-14, read on demand. -->
+<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · Tooltip folded into Content 2026-11-03 · moved out of the overview 2026-10-14, read on demand. -->
 
-Every annotation carries exactly one category label. There are six:
+Every annotation carries exactly one category label. There are five:
 
 | Label | Color | What it holds |
 |---|---|---|
 | `Development` | green | API, field names, implementation and component-construction constraints |
 | `Interaction` | blue | click, hover, focus, tap; when a thing shows, hides, enables or disables |
-| `Content` | orange | copy, labels, empty states, string templates |
+| `Content` | orange | copy, labels, empty states, string templates, tooltip and help text |
 | `Logic / data` | violet | conditions, what is counted, what is derived, where a number comes from, what is recorded |
-| `Tooltip` | teal | hover and help text |
 | `Accessibility` | pink | focus order, keyboard, labels, contrast |
 
-The first four are Figma's presets, kept at their preset colors; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+The first four are Figma's presets, kept at their preset colors; `Logic / data` is the file's own. Tooltip text is copy, so it is `Content`; when a tooltip shows is `Interaction`. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
 
 **`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
 
