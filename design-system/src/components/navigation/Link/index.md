@@ -39,7 +39,7 @@ From `design-system/src/components/navigation/Link/Link.scss`. Override these th
 
 ## Related
 
-Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Scrollspy` · `Sidebar` · `SidebarTab`
+Same group: `Breadcrumb` · `NavTabs` · `Pagination` · `Sidebar` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

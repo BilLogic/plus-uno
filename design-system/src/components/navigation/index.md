@@ -2,22 +2,19 @@
 
 # Navigation
 
-9 components. Each row links to the generated facts; the three columns after it are the
+6 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Breadcrumb](Breadcrumb/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✕ | ✕ | ✕ |
-| [NavPills](NavPills/index.md) | 7 | ✅ | ✅ | ✅ |
 | [NavTabs](NavTabs/index.md) | 7 | ✅ | ✅ | ✅ |
-| [Navbar](Navbar/index.md) | 6 | ✕ | ✕ | ✕ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
-| [Scrollspy](Scrollspy/index.md) | 9 | ✅ | ✕ | ✅ |
 | [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |
 | [SidebarTab](SidebarTab/index.md) | 14 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/9 (67%) · Correct/incorrect 5/9 (56%) · Accessibility 6/9 (67%)
+**Authored coverage:** When to use 4/6 (67%) · Correct/incorrect 4/6 (67%) · Accessibility 4/6 (67%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

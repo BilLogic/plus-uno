@@ -53,14 +53,8 @@ export { default as Tag, AVATAR_TAG_TYPES, resolveTagKind, TAG_COLOR_OF_CURRICUL
 export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '@/components/labels/TagGroup';
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
-export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
-export { default as Collapse } from '@/components/layout-and-structure/Collapse';
-export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Footer } from '@/components/layout-and-structure/Footer';
-export { default as Jumbotron, resetJumbotronDeprecationWarnings } from '@/components/layout-and-structure/Jumbotron';
-export { default as ListGroup, ListGroupItem } from '@/components/layout-and-structure/ListGroup';
-export { default as MediaObject } from '@/components/layout-and-structure/MediaObject';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
 export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
@@ -80,11 +74,8 @@ export { default as Modal, createModal } from '@/components/messaging/Modal';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
-export { default as Navbar } from '@/components/navigation/Navbar';
-export { default as NavPills } from '@/components/navigation/NavPills';
 export { default as NavTabs } from '@/components/navigation/NavTabs';
 export { default as Pagination, createPagination } from '@/components/navigation/Pagination';
-export { default as Scrollspy, ScrollspyContent } from '@/components/navigation/Scrollspy';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
