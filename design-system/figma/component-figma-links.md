@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 81 style/variant entries across 73 components.
+56 docs-page links + 82 style/variant entries across 74 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
