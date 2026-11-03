@@ -202,7 +202,7 @@
 
 /* Hover state */
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:hover {
-    background-color: var(--color-secondary-state-08);
+    background-color: var(--ds-background-neutral-subtle-hovered);
     /* rgba(68,92,106,0.08) */
     color: var(--color-secondary-text) !important;
     z-index: 2;
@@ -210,7 +210,7 @@
 
 /* Pressed state */
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:active {
-    background-color: var(--color-secondary-state-12);
+    background-color: var(--ds-background-neutral-subtle-pressed);
     color: var(--color-secondary-text) !important;
     z-index: 2;
 }
@@ -234,7 +234,7 @@
 
 /* Current page: selected, so the 16 step. */
 .plus-pagination .page-item.active .page-link {
-    background-color: var(--color-secondary-state-16);
+    background-color: var(--ds-background-selected);
     color: var(--color-secondary-text) !important;
     /* #3b525f */
     cursor: default;

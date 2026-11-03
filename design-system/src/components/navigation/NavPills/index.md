@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-state-08` · `--color-on-surface-state-12` · `--color-primary-border` · `--color-primary-state-08` · `--color-primary-state-12` · `--color-primary-text` · `--item-height-md` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--type-weight-medium`
+`--body-default` · `--color-focus-ring` · `--color-on-surface` · `--color-primary-border` · `--color-primary-text` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--item-height-md` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-pad-x-lg` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/NavPills/NavPills.scss`. Override these through the token layer, never with a literal.
 

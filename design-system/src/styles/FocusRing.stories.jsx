@@ -21,8 +21,7 @@ import { composite, contrast as contrastOf, parseColor, toHex } from '../lib/tok
  *   --color-inverse-primary      1.62:1   14 rules — a tint meant for DARK grounds
  *   --color-outline-variant      1.62:1    6 rules — the same gray the field wears at rest
  *   --color-primary-container    2.22:1    4 rules
- *   --color-*-state-08           1.13:1    4 rules — an 8% tint, used alone
- *   --color-on-surface-state-12  1.28:1    1 rule
+ *   the 8% and 12% state washes  1.13:1    5 rules — a tint, used alone
  *
  * `.plus-input:focus` is the one to look at: `outline: none; border-color:
  * var(--color-inverse-primary); box-shadow: none`. Focus a text input, and the
@@ -76,10 +75,9 @@ const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
 /**
  * Read a token as it renders, compositing translucency over the page.
  *
- * The compositing is the point for half these tokens: `--color-primary-state-08`
- * is `rgba(4, 114, 168, 0.08)`, and its raw channels are primary's own. Read
- * without the ground it looks like a strong blue; drawn on the page it is a
- * whisper.
+ * The compositing is the point for any translucent token: its raw channels are
+ * the role's own. Read without the ground it looks like a strong color; drawn
+ * on the page it is a whisper.
  */
 const PAGE = '--color-surface';
 
@@ -107,10 +105,10 @@ const BEFORE = [
     ['--color-inverse-primary', 14, 'a light tint meant for dark grounds'],
     ['--color-outline-variant', 6, 'the resting border of a readonly field'],
     ['--color-primary-container', 4, 'the container fill, on four textarea states'],
-    ['--color-primary-state-08', 2, 'an 8% tint, used with nothing beside it'],
-    ['--color-danger-state-08', 1, 'the same, on the invalid AM/PM toggle'],
-    ['--color-success-state-08', 1, 'the same, on the valid one'],
-    ['--color-on-surface-state-12', 1, 'a 12% ink tint on a lesson tab'],
+    ['--ds-background-selected', 2, 'a selected-row tint, used with nothing beside it'],
+    ['--ds-background-danger-subtler', 1, 'the same, on the invalid AM/PM toggle'],
+    ['--ds-background-success-subtler', 1, 'the same, on the valid one'],
+    ['--ds-background-neutral-subtle-pressed', 1, 'a pressed-row tint on a lesson tab'],
 ];
 
 /* ---------------------------------------------------------------- drawing */
