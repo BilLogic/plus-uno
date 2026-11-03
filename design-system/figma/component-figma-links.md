@@ -39,7 +39,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | NavTabs | `3497:19503` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
 | Components | Popover | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
-| Components | Progress | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
+| Components | ProgressBar | `49:6872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872) |
 | Components | Radio | `14876:12005` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005) |
 | Components | Range | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
 | Components | Rating | `13266:7763` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763) |
@@ -48,7 +48,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Scrollspy | `72:16516` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516) |
 | Components | SidebarTab | `17118:120` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17118-120) |
 | Components | Skeleton | `17885:47731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731) |
-| Components | Spinner | `3497:19485` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485) |
+| Components | Spinner | `44:4872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872) |
 | Components | Suggestion | `17885:57` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57) |
 | Components | Table | `17156:122` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122) |
 | Components | Tag | `17884:2099` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099) |
@@ -118,7 +118,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | NavTabs | Nav Tabs | `69:16779` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779) | verified |
 | Components | Pagination | Pagination | `53:19822` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822) | verified |
 | Components | Popover | Popover | `49:19534` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534) | verified |
-| Components | Progress | Progress Bar | `49:6872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872) | verified |
+| Components | ProgressBar | Progress Bar | `49:6872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872) | verified |
 | Components | Radio | Form Radio Button | `42:5858` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858) | verified |
 | Components | Range | Form Range Input | `42:5756` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756) | verified |
 | Components | Rating | Rating System (disclosure) | `13526:17774` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17774) | verified |
