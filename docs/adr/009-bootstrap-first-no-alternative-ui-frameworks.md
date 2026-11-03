@@ -1,11 +1,18 @@
 ---
 embodiment: ide
-summary: Bootstrap-first, no alternative UI frameworks
-status: contradicted
-verified: 2026-08-24 (#171)
+summary: Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half
+status: superseded
+verified: 2026-11-03
 ---
 
 # ADR-009: Bootstrap-first, no alternative UI frameworks
+
+> **Superseded by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md), 2026-11-03.**
+>
+> React-Bootstrap is no longer the fallback source of behavior for an
+> interactive component with no PLUS equivalent — Base UI is. The
+> no-other-frameworks half of this decision (no Material UI, no Ant Design,
+> FA Free only) stands; only the Bootstrap-fallback half is replaced.
 
 > **Verified against code 2026-08-24 (#171) — the ban on Tailwind is contradicted by the code.**
 >
