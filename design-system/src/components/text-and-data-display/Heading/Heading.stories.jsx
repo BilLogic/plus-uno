@@ -36,7 +36,7 @@ export default {
 
 /* ------------------------------------------------------------------ default */
 
-export const Overview = () => <Heading size="large">Student progress</Heading>;
+export const Overview = () => <Heading size={'large'}>Student progress</Heading>;
 
 /** At the top level (no provider above it) a heading opens at h1. */
 Overview.play = async ({ canvasElement }) => {
@@ -86,7 +86,7 @@ export const NestedContext = () => (
     <HeadingContextProvider value={2}>
         <Heading size="xxlarge">Page section</Heading>
         <HeadingContextProvider>
-            <Heading size="medium">Subsection</Heading>
+            <Heading size={'medium'}>Subsection</Heading>
         </HeadingContextProvider>
     </HeadingContextProvider>
 );
@@ -102,7 +102,7 @@ NestedContext.play = async ({ canvasElement }) => {
 
 export const InverseColor = () => (
     <div style={{ background: 'var(--ds-text)', padding: 16 }}>
-        <Heading as="div" size="medium" color="color.text.inverse">On a dark ground</Heading>
+        <Heading as="div" size={'medium'} color="color.text.inverse">On a dark ground</Heading>
     </div>
 );
 
