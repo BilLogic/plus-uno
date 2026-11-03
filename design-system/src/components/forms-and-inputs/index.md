@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-29 components. Each row links to the generated facts; the three columns after it are the
+30 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -11,7 +11,7 @@ authored half (#166), counted rather than assumed.
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
-| [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
+| [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
@@ -25,7 +25,7 @@ authored half (#166), counted rather than assumed.
 | [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
-| [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
+| [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 42 | ✕ | ✕ | ✕ |
@@ -33,11 +33,12 @@ authored half (#166), counted rather than assumed.
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
+| [TimePicker](TimePicker/index.md) | 14 | ✕ | ✕ | ✕ |
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 14/29 (48%) · Correct/incorrect 7/29 (24%) · Accessibility 18/29 (62%)
+**Authored coverage:** When to use 14/30 (47%) · Correct/incorrect 7/30 (23%) · Accessibility 18/30 (60%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

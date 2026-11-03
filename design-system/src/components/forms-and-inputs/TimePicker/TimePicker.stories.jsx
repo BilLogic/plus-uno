@@ -1,0 +1,164 @@
+import React, { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
+import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import TimePicker from './TimePicker';
+
+export default {
+    title: 'Components/Forms and inputs/Date time picker/Time picker',
+    component: TimePicker,
+    tags: ['!dev', '!autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                component:
+                    'A time field with an AM/PM toggle. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid.',
+            },
+        },
+    },
+    argTypes: {
+        style: { table: { disable: true } },
+        spacing: {
+            control: 'select',
+            options: ['default', 'compact'],
+            description: 'Field height: 40 default, 32 compact',
+            table: { category: 'Design', defaultValue: { summary: 'default' } },
+        },
+        placeholder: {
+            control: 'text',
+            description: 'Placeholder text',
+            table: { category: 'Content' },
+        },
+        isDisabled: {
+            control: 'boolean',
+            description: 'Disable the picker',
+            table: { category: 'Behavior' },
+        },
+        isReadOnly: {
+            control: 'boolean',
+            description: 'Make read-only',
+            table: { category: 'Behavior' },
+        },
+        isInvalid: {
+            control: 'boolean',
+            description: 'Draw the field invalid',
+            table: { category: 'Validation' },
+        },
+        isValid: {
+            control: 'boolean',
+            description: 'Draw the field valid',
+            table: { category: 'Validation' },
+        },
+    },
+};
+
+export const Overview = () => (
+    <div style={{ maxWidth: '200px' }}>
+        <TimePicker placeholder="__ : __" aria-label="Time" />
+    </div>
+);
+
+export const Spacing = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '200px' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <TimePicker spacing="compact" aria-label="Time" placeholder="Compact" />
+        </div>
+    </div>
+);
+Spacing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const [defaultField, compactField] = canvas.getAllByRole('textbox');
+    await inEveryColorModeOf(canvasElement, async (mode) => {
+        await expect(defaultField.closest('.plus-field'), `${mode}: default field`).toHaveAttribute('data-spacing', 'default');
+        await expect(compactField.closest('.plus-field'), `${mode}: compact field`).toHaveAttribute('data-spacing', 'compact');
+    });
+};
+
+export const InteractionStates = () => (
+    <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <TimePicker aria-label="Time" placeholder="Default" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH VALUE</span>
+            <TimePicker aria-label="Time" value="02:30 PM" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <TimePicker aria-label="Time" isDisabled placeholder="Disabled" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+            <TimePicker aria-label="Time" isReadOnly value="02:30 PM" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <TimePicker aria-label="Time" isInvalid placeholder="Invalid" />
+        </div>
+    </div>
+);
+InteractionStates.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const withValue = canvas.getAllByRole('textbox')[1];
+    await expect(withValue).toHaveValue('02:30');
+    const toggle = withValue.closest('.plus-field').querySelector('.plus-time-picker__period-toggle');
+    await expect(toggle.textContent.trim()).toBe('PM');
+};
+
+export const PickTime = () => {
+    const [value, setValue] = useState('');
+
+    return (
+        <div style={{ maxWidth: '200px' }}>
+            <h6 style={{ marginBottom: '16px' }}>Set a Time</h6>
+            <TimePicker aria-label="Time" value={value} onChange={setValue} />
+            {value && (
+                <div
+                    style={{
+                        marginTop: '16px',
+                        padding: '12px',
+                        backgroundColor: 'var(--ds-surface-container)',
+                        borderRadius: '4px',
+                    }}
+                >
+                    <p style={{ margin: 0, fontSize: '14px' }}>
+                        <strong>Time:</strong> {value}
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+};
+PickTime.storyName = 'Pick Time';
+PickTime.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+    await userEvent.type(input, '0930');
+    await userEvent.tab();
+    await expect(input).toHaveValue('09:30');
+    await expect(canvas.getByText('Time:')).toBeVisible();
+};
+
+export const TwentyFourHourValueIsSplit = () => (
+    <TimePicker aria-label="Time" value="14:30" />
+);
+TwentyFourHourValueIsSplit.storyName = '24-hour value is split';
+TwentyFourHourValueIsSplit.parameters = {
+    docs: {
+        description: {
+            story: 'A 24-hour value is split into the hour this control can show and the period that says which half of the day it is.',
+        },
+    },
+};
+TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox');
+    await expect(input).toHaveValue('02:30');
+    const toggle = canvasElement.querySelector('.plus-time-picker__period-toggle');
+    await expect(toggle.textContent.trim()).toBe('PM');
+};

@@ -331,7 +331,10 @@ describe("only registry components", () => {
     // AvatarGroup gained its own story + figmaMeta (+1), and Table split
     // into Static table, Dynamic table and Tree table, one Figma page each
     // (+2 net, replacing the single Table row).
-    assert.equal(names.length, 67);
+    // 68: TimePicker became its own public component, carrying forward the
+    // `_Time Field` node id that used to live on DateTimePicker's own entry
+    // (+1 net).
+    assert.equal(names.length, 68);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

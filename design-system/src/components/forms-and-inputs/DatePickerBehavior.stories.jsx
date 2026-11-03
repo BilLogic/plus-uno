@@ -11,7 +11,7 @@ import DatePicker from './DatePicker/DatePicker';
  * there rather than inside the story's canvas.
  */
 export default {
-    title: 'Components/Forms and inputs/Date picker behavior',
+    title: 'Components/Forms and inputs/Date time picker/Date picker/Behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

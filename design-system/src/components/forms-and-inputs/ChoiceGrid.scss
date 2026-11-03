@@ -6,6 +6,23 @@
 .plus-choice-grid-wrapper {
     display: block;
     width: 100%;
+
+    // `size`: option-label font and the control width that goes with it.
+    // Unset keeps the default rendering (the control's own size, body-default text).
+    &[data-size="12"] {
+        --plus-choice-grid-label-font: var(--body-small);
+        --plus-choice-grid-control-size: 10px;
+    }
+
+    &[data-size="14"] {
+        --plus-choice-grid-label-font: var(--body-default);
+        --plus-choice-grid-control-size: 12px;
+    }
+
+    &[data-size="16"] {
+        --plus-choice-grid-label-font: var(--body-large);
+        --plus-choice-grid-control-size: 12px;
+    }
 }
 
 // Visually hidden but accessible to screen readers (labels the corner
@@ -36,7 +53,7 @@
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     text-align: center;
     color: var(--color-on-surface);
-    font: var(--body-default);
+    font: var(--plus-choice-grid-label-font, var(--body-default));
     background-color: var(--color-surface-container-low);
 }
 
@@ -45,7 +62,7 @@
     padding: var(--size-element-pad-y-md, 12px) var(--size-element-pad-x-md, 16px);
     text-align: left;
     color: var(--color-on-surface);
-    font: var(--body-default);
+    font: var(--plus-choice-grid-label-font, var(--body-default));
     background-color: var(--color-surface-container-low);
     white-space: nowrap;
 }
@@ -70,6 +87,14 @@
 
     .form-check-input {
         margin-right: 0;
+
+        &[type="checkbox"],
+        &[type="radio"] {
+            width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+            height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+            min-width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+            min-height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+        }
     }
 }
 

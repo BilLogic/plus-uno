@@ -9,6 +9,23 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+
+    // `size`: the dot and bar in px, the track between them a step behind.
+    // Unset keeps the pre-`size` rendering (20 dot, 4 track).
+    &[data-size="8"] {
+        --plus-range-dot-size: 8px;
+        --plus-range-track-height: 4px;
+    }
+
+    &[data-size="12"] {
+        --plus-range-dot-size: 12px;
+        --plus-range-track-height: 6px;
+    }
+
+    &[data-size="16"] {
+        --plus-range-dot-size: 16px;
+        --plus-range-track-height: 8px;
+    }
 }
 
 .plus-form-range-label {
@@ -48,7 +65,7 @@
     // the component as the value changes.
     &::-webkit-slider-runnable-track {
         width: 100%;
-        height: 4px;
+        height: var(--plus-range-track-height, 4px);
         background: linear-gradient(
             to right,
             var(--ds-background-selected-bold) 0%,
@@ -62,7 +79,7 @@
 
     &::-moz-range-track {
         width: 100%;
-        height: 4px;
+        height: var(--plus-range-track-height, 4px);
         background: linear-gradient(
             to right,
             var(--ds-background-selected-bold) 0%,
@@ -74,25 +91,26 @@
         border: none;
     }
 
-    // The thumb, 20 across, centered on the 4 track.
+    // The thumb, 20 across by default (`size` scales dot and track together),
+    // centered on the track.
     &::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 20px;
-        height: 20px;
+        width: var(--plus-range-dot-size, 20px);
+        height: var(--plus-range-dot-size, 20px);
         background: var(--ds-background-selected-bold);
         border-radius: var(--size-element-radius-full, 50%);
         border: none;
         cursor: pointer;
-        margin-top: -8px;
+        margin-top: calc((var(--plus-range-track-height, 4px) - var(--plus-range-dot-size, 20px)) / 2);
         box-shadow: var(--ds-shadow-raised);
         position: relative;
         z-index: 2;
     }
 
     &::-moz-range-thumb {
-        width: 20px;
-        height: 20px;
+        width: var(--plus-range-dot-size, 20px);
+        height: var(--plus-range-dot-size, 20px);
         background: var(--ds-background-selected-bold);
         border-radius: var(--size-element-radius-full, 50%);
         border: none;

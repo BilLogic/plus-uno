@@ -1,0 +1,37 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as TimePickerStories from './TimePicker.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "time-picker",
+      "name": "Time picker",
+      "componentSetNodeId": "16560:4508",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "Hours, minutes and an AM/PM menu that opens 4px (`gap-xs`) below: state × filled? × spacing. Same field anatomy as DatePicker. In code it is `TimePicker.jsx`."
+    }
+  ]
+};
+
+<Meta of={TimePickerStories} />
+
+<Title />
+Use a time picker when a user needs to set a time of day.
+
+<DocsTabs of={TimePickerStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={TimePickerStories.Overview} />
+
+<ArgTypes of={TimePickerStories} />
+
+</DocsTab>
+
+</DocsTabs>

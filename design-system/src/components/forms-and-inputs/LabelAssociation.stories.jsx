@@ -199,18 +199,19 @@ HiddenLabels.play = async ({ canvasElement }) => {
 
     // Every text control in the story, and the one name each must answer to.
     // `getByRole` throws on a second match, so this fails both when a name is
-    // missing and when two controls share one.
+    // missing and when two controls share one. The date half is a combobox,
+    // like DatePicker's own; the rest are plain text boxes.
     const named = [
-        'Email address',
-        'Session start Date',
-        'Session start Time',
-        'Session end',
-        'Sessions',
-    ].map((name) => canvas.getByRole('textbox', { name }));
+        ['textbox', 'Email address'],
+        ['combobox', 'Session start Date'],
+        ['textbox', 'Session start Time'],
+        ['textbox', 'Session end'],
+        ['textbox', 'Sessions'],
+    ].map(([role, name]) => canvas.getByRole(role, { name }));
 
     await expect(new Set(named).size).toBe(named.length);
     // No control left over with some other name — "Date", say, or nothing.
-    await expect(canvas.getAllByRole('textbox')).toHaveLength(named.length);
+    await expect([...canvas.getAllByRole('textbox'), ...canvas.getAllByRole('combobox')]).toHaveLength(named.length);
 
     // And none of those names is on screen: `showLabel` moves pixels only, so
     // all three field labels are rendered and all three are clipped to nothing.
@@ -279,8 +280,9 @@ ForwardedProps.play = async ({ canvasElement }) => {
     await expect(doc.querySelectorAll('[data-testid="session-start-field"]')).toHaveLength(1);
 
     // Not copied onto the two inputs — "spread onto both and hope" is the thing
-    // the rule exists to rule out.
-    const inputs = within(group).getAllByRole('textbox');
+    // the rule exists to rule out. The date half is a combobox, like
+    // DatePicker's own; the time half is a plain text box.
+    const inputs = [...within(group).getAllByRole('textbox'), ...within(group).getAllByRole('combobox')];
     await expect(inputs).toHaveLength(2);
     for (const input of inputs) {
         await expect(input.hasAttribute('aria-describedby')).toBe(false);
@@ -290,7 +292,7 @@ ForwardedProps.play = async ({ canvasElement }) => {
     // The spread goes last, but the caller passed no `aria-labelledby`, so the
     // generated one still names the group and both inputs still resolve.
     await expectNoDanglingLabels(canvasElement);
-    await expect(within(group).getByRole('textbox', { name: 'Session start Date' })).toBeTruthy();
+    await expect(within(group).getByRole('combobox', { name: 'Session start Date' })).toBeTruthy();
     await expect(within(group).getByRole('textbox', { name: 'Session start Time' })).toBeTruthy();
 };
 
