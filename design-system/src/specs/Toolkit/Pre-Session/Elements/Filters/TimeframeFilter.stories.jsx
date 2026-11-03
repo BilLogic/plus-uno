@@ -46,9 +46,9 @@ export const TimeframeFilter = ({ value, defaultValue = 'this_week', onChange, o
             />
             {isCustom && (
                 <>
-                    <DatePicker size="small" aria-label="From date" />
+                    <DatePicker spacing="compact" aria-label="From date" />
                     <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
-                    <DatePicker size="small" aria-label="To date" />
+                    <DatePicker spacing="compact" aria-label="To date" />
                 </>
             )}
         </div>

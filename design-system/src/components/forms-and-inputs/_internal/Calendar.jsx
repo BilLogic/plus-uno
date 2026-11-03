@@ -7,7 +7,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /**
  * Calendar — the month grid (Figma `_Calendar`), the one calendar DatePicker
- * and DateAndTimePicker both open. It is a part: not exported from the barrel.
+ * and DateTimePicker both open. It is a part: not exported from the barrel.
  *
  * - **Grid:** always six weeks, 42 cells, so the panel never changes height.
  *   Days of the months either side are drawn and can't be picked.

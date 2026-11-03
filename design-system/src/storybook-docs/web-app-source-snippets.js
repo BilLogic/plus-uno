@@ -404,14 +404,13 @@ export const webAppSourceSnippets = {
     formDatePicker: snippet([
         '<DatePicker',
         '  placeholder="Select a date"',
-        '  size="medium"',
         '/>'
     ]),
     formDateTime: snippet([
-        '<DateAndTimePicker',
+        '<DateTimePicker',
         '  id="datetime-overview"',
         '  label="Month"',
-        '  required',
+        '  isRequired',
         '  showSectionLabels={false}',
         '/>'
     ]),

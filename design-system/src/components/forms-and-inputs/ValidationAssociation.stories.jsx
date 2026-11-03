@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import DateAndTimePicker from './DateAndTimePicker';
+import DateTimePicker from './DateTimePicker/DateTimePicker';
 import FileUpload from './FileUpload';
 import TextField from './TextField/TextField';
 
@@ -81,12 +81,12 @@ export const InvalidFieldsPointAtTheirMessage = () => (
             validation="invalid"
             validationMessage="That file was larger than 10 MB."
         />
-        <DateAndTimePicker
+        <DateTimePicker
             id="va-starts"
             name="starts"
             label="Session start"
-            validation="invalid"
-            validationMessage="Start time must be in the future."
+            isInvalid
+            errorMessage="Start time must be in the future."
         />
     </div>
 );

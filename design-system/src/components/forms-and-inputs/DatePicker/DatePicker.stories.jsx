@@ -10,10 +10,6 @@ export default {
     component: DatePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
-        ],
         docs: {
             description: {
                 component:
@@ -25,11 +21,11 @@ export default {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
-        size: {
+        spacing: {
             control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant',
-            table: { category: 'Design', defaultValue: { summary: 'medium' } },
+            options: ['default', 'compact'],
+            description: 'Field height: 40 default, 32 compact',
+            table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         placeholder: {
             control: 'text',
@@ -42,12 +38,12 @@ export default {
             description: 'Calendar dropdown alignment',
             table: { category: 'Layout' },
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the picker',
             table: { category: 'Behavior' },
         },
-        readOnly: {
+        isReadOnly: {
             control: 'boolean',
             description: 'Make read-only',
             table: { category: 'Behavior' },
@@ -57,12 +53,12 @@ export default {
             description: 'Pick a first and a last day',
             table: { category: 'Behavior', defaultValue: { summary: 'false' } },
         },
-        invalid: {
+        isInvalid: {
             control: 'boolean',
             description: 'Draw the field invalid',
             table: { category: 'Validation' },
         },
-        valid: {
+        isValid: {
             control: 'boolean',
             description: 'Draw the field valid',
             table: { category: 'Validation' },
@@ -82,7 +78,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
-        <DatePicker placeholder="MM/DD/YYYY" size="medium" />
+        <DatePicker placeholder="MM/DD/YYYY" />
     </div>
 );
 Overview.parameters = {
@@ -91,24 +87,15 @@ Overview.parameters = {
     }
 };
 
-export const Sizes = () => (
+export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
-        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
-            Small, medium, and large trigger and calendar.
-        </p>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
-                <DatePicker size="small" placeholder="Small" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
-                <DatePicker size="medium" placeholder="Medium" />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-                <DatePicker size="large" placeholder="Large" />
-            </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <DatePicker spacing="default" placeholder="Default" />
+        </div>
+        <div>
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <DatePicker spacing="compact" placeholder="Compact" />
         </div>
     </div>
 );
@@ -129,11 +116,11 @@ export const InteractionStates = () => (
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-                <DatePicker disabled placeholder="Disabled" />
+                <DatePicker isDisabled placeholder="Disabled" />
             </div>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-                <DatePicker readOnly value="2023-10-25" placeholder="Read Only" />
+                <DatePicker isReadOnly value="2023-10-25" placeholder="Read Only" />
             </div>
         </div>
     </div>
@@ -248,9 +235,9 @@ export const Interactive = (args) => {
 };
 Interactive.args = {
     placeholder: 'Select a date',
-    size: 'medium',
-    disabled: false,
-    readOnly: false,
+    spacing: 'default',
+    isDisabled: false,
+    isReadOnly: false,
 };
 
 /**

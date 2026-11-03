@@ -164,7 +164,7 @@ users and your own validation is what enforces it.
   one. `ChoiceGroup` uses a `fieldset` named by its `legend`, and `Rating` a
   `span` with an id and `aria-labelledby` — those are the patterns to copy.
 - **Validation messages are attached to their fields.** `TextField`, `TextArea`,
-  `FileUpload` and `DateAndTimePicker` give the message an id and point the
+  `FileUpload` and `DateTimePicker` give the message an id and point the
   control at it, and mark an invalid field `aria-invalid`. Your own
   `aria-describedby` is composed with theirs, not replaced by it.
 - **Standing help is described, not announced.** A `caption` is attached to the

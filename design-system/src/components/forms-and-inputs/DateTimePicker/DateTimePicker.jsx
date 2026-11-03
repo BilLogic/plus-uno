@@ -1,38 +1,40 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Dropdown from './Dropdown/Dropdown';
-import useFieldId from './useFieldId';
-import Calendar from './_internal/Calendar';
-import Field, { FieldCaption, toneProps } from './_internal/Field';
-import { popupLayerOf, useAnchoredPopup } from './_internal/anchorPlacement';
-import { formatIso } from './_internal/dates';
-import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
-import './_internal/Listbox.scss';
-import './DateAndTimePicker.scss';
+import Dropdown from '../Dropdown/Dropdown';
+import useFieldId from '../useFieldId';
+import Calendar from '../_internal/Calendar';
+import Field, { FieldCaption, toneProps } from '../_internal/Field';
+import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
+import { formatIso } from '../_internal/dates';
+import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from '../_internal/timeZones';
+import '../_internal/Listbox.scss';
+import './DateTimePicker.scss';
 
-const DateAndTimePicker = ({
+const DateTimePicker = ({
     id,
     name,
     label,
-    required = false,
+    isRequired = false,
     /**
      * Hide the field label visually. It is still rendered, still carries
      * `htmlFor`, and still names the `group` — see the accessibility section in
-     * `DateAndTimePicker.mdx` (#225) for why it cannot take the name away.
+     * `DateTimePicker.mdx` for why it cannot take the name away.
      */
-    showLabel = true,
+    isLabelHidden = false,
     showSectionLabels = true,
     showDate = true,
     datePlaceholder = 'MM/DD/YY',
     timePlaceholder = '__ : __',
     dateValue,
     timeValue,
-    size = 'medium',
-    disabled = false,
-    readonly = false,
-    validation = 'none', // 'none', 'invalid', 'success'
-    validationMessage,
+    spacing = 'default',
+    isDisabled = false,
+    isReadOnly = false,
+    isInvalid = false,
+    isValid = false,
+    errorMessage,
+    successMessage,
     minDate,
     maxDate,
     calendarAlign = 'left',
@@ -50,10 +52,9 @@ const DateAndTimePicker = ({
     onFocus,
     onBlur,
     /**
-     * Everything not named above, forwarded to the wrapper — see *Forwarded
-     * props* in `DateAndTimePicker.mdx` (#230) for why that is the one target
-     * and not the two inputs. Collected but never spread until #230, so
-     * `aria-describedby` and friends were silently dropped.
+     * Everything not named above, forwarded to the wrapper — the one target
+     * for both halves of the component, since `aria-describedby` wants the
+     * field (this element), not either input.
      */
     ...props
 }) => {
@@ -64,7 +65,7 @@ const DateAndTimePicker = ({
     const [timeMinutes, setTimeMinutes] = useState('');
     const [amPm, setAmPm] = useState('AM');
     const [isAmPmOpen, setIsAmPmOpen] = useState(false);
-    
+
     const dateFieldRef = useRef(null);
     const dateInputRef = useRef(null);
     const timeInputRef = useRef(null);
@@ -75,7 +76,7 @@ const DateAndTimePicker = ({
     const showCaption = showTimeZone && (!timeZone || zone === timeZone);
 
     /**
-     * Ids for a field that renders two controls (#206).
+     * Ids for a field that renders two controls.
      *
      * `label` names the field, not either input, so it labels a `group` and
      * each input is named `<field> Date` / `<field> Time` off the section
@@ -84,17 +85,17 @@ const DateAndTimePicker = ({
      * `id`; what changes is that they are now always present, so the label's
      * `htmlFor` reaches one of them instead of reaching nothing.
      *
-     * `showLabel` is no part of that (#225). It decides whether the label is
+     * `isLabelHidden` is no part of that. It decides whether the label is
      * *seen*, not whether there is one: a field with a `label` names its group
      * and both inputs whether or not the text is on screen, which is the
-     * contract `Input` has carried since #213.
+     * contract `TextField` carries.
      */
     const fieldId = useFieldId(id);
     const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
-    /* #327 — see `Input.jsx`. Here the description belongs to the GROUP, which
-     * is the wrapper, not to either of the two inputs inside it. */
-    const validationId = validation !== 'none' && validationMessage
+    const tone = isInvalid ? 'invalid' : (isValid ? 'success' : 'help');
+    const message = isInvalid ? errorMessage : (isValid ? successMessage : undefined);
+    const validationId = tone !== 'help' && message
         ? `${fieldId}-validation`
         : undefined;
     const timeZoneId = showCaption ? `${fieldId}-time-zone` : undefined;
@@ -155,19 +156,11 @@ const DateAndTimePicker = ({
 
                 /*
                  * THE HOUR SHOWN IS A 12-HOUR HOUR, because an AM/PM control
-                 * sits beside it. This used to convert a 12-hour value UP to
-                 * 24-hour — `if (period === 'PM' && hours !== 12) hours += 12`
-                 * — and then render the result next to the period it came from,
-                 * so `timeValue="02:30 PM"` displayed as `14:30` with `PM`
-                 * beside it and `onChange` reported `"14:30 PM"`. A value could
-                 * not survive a round trip through its own component.
-                 *
-                 * With a period, the hour is already in the form the control
-                 * shows and needs no conversion. Without one the value is
-                 * 24-hour, so it is split into the hour this control can show
-                 * and the period that says which half of the day it is —
-                 * midnight and noon are the two that do not follow the modulo,
-                 * and both read as 12.
+                 * sits beside it. Without a period the value is 24-hour, so it
+                 * is split into the hour this control can show and the period
+                 * that says which half of the day it is — midnight and noon
+                 * are the two that do not follow the modulo, and both read as
+                 * 12.
                  */
                 if (period) {
                     setAmPm(period);
@@ -231,7 +224,7 @@ const DateAndTimePicker = ({
     };
 
     const handleCalendarToggle = (nextShow) => {
-        if (disabled || readonly) return;
+        if (isDisabled || isReadOnly) return;
         setIsCalendarOpen(nextShow);
         if (nextShow) {
             setViewDate(selectedDate || new Date());
@@ -239,24 +232,24 @@ const DateAndTimePicker = ({
     };
 
     const handleDayClick = (date) => {
-        if (disabled) return;
+        if (isDisabled) return;
 
         // Validate constraints
-        let isValid = true;
+        let isValidDate = true;
         if (minDate) {
             const min = parseDate(minDate);
             if (min && date < new Date(min.getFullYear(), min.getMonth(), min.getDate()).setHours(0, 0, 0, 0)) {
-                isValid = false;
+                isValidDate = false;
             }
         }
         if (maxDate) {
             const max = parseDate(maxDate);
             if (max && date > new Date(max.getFullYear(), max.getMonth(), max.getDate()).setHours(23, 59, 59, 999)) {
-                isValid = false;
+                isValidDate = false;
             }
         }
 
-        if (isValid) {
+        if (isValidDate) {
             setSelectedDate(date);
             report(date, timeHours, timeMinutes, amPm);
             setIsCalendarOpen(false);
@@ -264,8 +257,8 @@ const DateAndTimePicker = ({
     };
 
     const handleTimeChange = (type, value) => {
-        if (disabled || readonly) return;
-        
+        if (isDisabled || isReadOnly) return;
+
         // Validate and format
         if (type === 'hours') {
             const num = parseInt(value) || 0;
@@ -289,33 +282,30 @@ const DateAndTimePicker = ({
                 setTimeMinutes('');
             }
         }
-        
+
         // Trigger onChange with current values
         const currentHours = type === 'hours' ? (value ? String(parseInt(value) || 0).padStart(2, '0') : '') : timeHours;
         const currentMinutes = type === 'minutes' ? (value ? String(parseInt(value) || 0).padStart(2, '0') : '') : timeMinutes;
-        
+
         report(selectedDate, currentHours, currentMinutes, amPm);
     };
 
     const handleAmPmChange = (newAmPm) => {
-        if (disabled || readonly) return;
+        if (isDisabled || isReadOnly) return;
         setAmPm(newAmPm);
         setIsAmPmOpen(false);
-        
+
         /*
-         * Reported whether or not a date has been chosen. This used to be
-         * `if (onChange && selectedDate)`, so switching AM to PM on a form
-         * where the time is filled and the date is not told the caller
-         * nothing — and the two sibling handlers, `handleTimeChange` and the
-         * date handler, both report with whatever half they have. A control
-         * that is silent about a change the reader can see is worse than one
-         * that reports a half-complete value.
+         * Reported whether or not a date has been chosen: the two sibling
+         * handlers, `handleTimeChange` and the date handler, both report with
+         * whatever half they have, and a control that is silent about a
+         * change the reader can see is worse than one that reports a
+         * half-complete value.
          */
         report(selectedDate, timeHours, timeMinutes, newAmPm);
     };
 
-    const interactive = !disabled && !readonly;
-    const tone = validation === 'invalid' ? 'invalid' : (validation === 'success' ? 'success' : 'help');
+    const interactive = !isDisabled && !isReadOnly;
     const tones = toneProps(tone);
 
     /* The shared calendar, placed by the popup rule: 4px under the date
@@ -347,7 +337,7 @@ const DateAndTimePicker = ({
             aria-expanded={interactive ? isAmPmOpen : undefined}
         >
             {amPm}
-            {!readonly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
+            {!isReadOnly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
         </button>
     );
     const period = interactive ? (
@@ -365,12 +355,12 @@ const DateAndTimePicker = ({
     ) : periodToggle;
 
     /*
-     * `{...props}` lands on the wrapper, which is also the `group` (#206), so
-     * one target serves both halves of what callers pass: `data-testid` wants
-     * the outermost element, and `aria-describedby` wants the thing the
+     * `{...props}` lands on the wrapper, which is also the `group`, so one
+     * target serves both halves of what callers pass: `data-testid` wants the
+     * outermost element, and `aria-describedby` wants the thing the
      * description is about — the field, which is this element, not either
      * input. It goes last so a caller's `aria-labelledby` overrides the
-     * generated one, the same precedence `Input.jsx` gives its spread (#230).
+     * generated one.
      */
     return (
         <div
@@ -379,11 +369,9 @@ const DateAndTimePicker = ({
             role={hasLabel ? 'group' : undefined}
             aria-labelledby={labelId}
             {...props}
-            /* #327. After the spread, and composed with what the caller passed,
-             * so pointing at your own help text does not drop the error and the
-             * error does not drop your help text. #230 left the caller's value
-             * to win outright, which was right when there was nothing of ours to
-             * lose. */
+            /* After the spread, and composed with what the caller passed, so
+             * pointing at your own help text does not drop the error and the
+             * error does not drop your help text. */
             aria-describedby={[props['aria-describedby'], timeZoneId, validationId]
                 .filter(Boolean).join(' ') || undefined}
         >
@@ -391,10 +379,10 @@ const DateAndTimePicker = ({
                 <label
                     id={labelId}
                     htmlFor={showDate ? dateInputId : timeInputId}
-                    className={`plus-datetime-label${showLabel ? '' : ' plus-datetime-label-hidden'}`}
+                    className={`plus-datetime-label${isLabelHidden ? ' plus-datetime-label-hidden' : ''}`}
                 >
                     {label}
-                    {required && (
+                    {isRequired && (
                         <span className="plus-datetime-required" aria-label="required">*</span>
                     )}
                 </label>
@@ -405,9 +393,9 @@ const DateAndTimePicker = ({
                 {showSectionLabels && <div id={dateSectionLabelId} className="plus-datetime-section-label">Date</div>}
                 <Field
                     ref={dateFieldRef}
-                    spacing={size === 'small' ? 'compact' : 'default'}
-                    disabled={disabled}
-                    readOnly={readonly}
+                    spacing={spacing}
+                    disabled={isDisabled}
+                    readOnly={isReadOnly}
                     {...tones.field}
                     className="plus-datetime-date-field"
                     trailing={(
@@ -434,8 +422,8 @@ const DateAndTimePicker = ({
                         aria-label={dateLabelledBy ? undefined : 'Date'}
                         placeholder={datePlaceholder}
                         value={selectedDate ? formatDateForInput(selectedDate) : ''}
-                        disabled={disabled}
-                        readOnly={readonly}
+                        disabled={isDisabled}
+                        readOnly={isReadOnly}
                         className="plus-field__control plus-datetime-date-input"
                         {...tones.control}
                         onFocus={handleFocus}
@@ -465,7 +453,6 @@ const DateAndTimePicker = ({
                             selected={selectedDate}
                             minDate={minDate}
                             maxDate={maxDate}
-                            size="medium"
                             onPick={handleDayClick}
                         />
                     </div>,
@@ -477,9 +464,9 @@ const DateAndTimePicker = ({
             <div className="plus-datetime-section">
                 {showSectionLabels && <div id={timeSectionLabelId} className="plus-datetime-section-label">Time</div>}
                 <Field
-                    spacing={size === 'small' ? 'compact' : 'default'}
-                    disabled={disabled}
-                    readOnly={readonly}
+                    spacing={spacing}
+                    disabled={isDisabled}
+                    readOnly={isReadOnly}
                     {...tones.field}
                     className="plus-datetime-time-field"
                     trailing={period}
@@ -493,8 +480,8 @@ const DateAndTimePicker = ({
                         aria-label={timeLabelledBy ? undefined : 'Time'}
                         placeholder={timePlaceholder}
                         value={timeHours && timeMinutes ? `${timeHours}:${timeMinutes}` : (timeHours ? `${timeHours}:` : '')}
-                        disabled={disabled}
-                        readOnly={readonly}
+                        disabled={isDisabled}
+                        readOnly={isReadOnly}
                         className="plus-field__control plus-datetime-time-input"
                         {...tones.control}
                         onFocus={handleFocus}
@@ -523,30 +510,33 @@ const DateAndTimePicker = ({
                 )}
             </div>
 
-            {validation !== 'none' && validationMessage && (
-                <FieldCaption messageId={validationId} message={validationMessage} tone={tone} />
+            {message && (
+                <FieldCaption messageId={validationId} message={message} tone={tone} />
             )}
         </div>
     );
 };
 
-DateAndTimePicker.propTypes = {
+DateTimePicker.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
-    required: PropTypes.bool,
-    showLabel: PropTypes.bool,
+    isRequired: PropTypes.bool,
+    isLabelHidden: PropTypes.bool,
     showSectionLabels: PropTypes.bool,
     showDate: PropTypes.bool,
     datePlaceholder: PropTypes.string,
     timePlaceholder: PropTypes.string,
     dateValue: PropTypes.string,
     timeValue: PropTypes.string,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
-    readonly: PropTypes.bool,
-    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
-    validationMessage: PropTypes.string,
+    /** `default` is 40; `compact` is 32. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
+    isDisabled: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
+    isInvalid: PropTypes.bool,
+    isValid: PropTypes.bool,
+    errorMessage: PropTypes.string,
+    successMessage: PropTypes.string,
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     calendarAlign: PropTypes.oneOf(['left', 'center', 'right']),
@@ -565,5 +555,4 @@ DateAndTimePicker.propTypes = {
     onBlur: PropTypes.func
 };
 
-export default DateAndTimePicker;
-
+export default DateTimePicker;

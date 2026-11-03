@@ -42,7 +42,7 @@ const fromValue = (value, range) => {
  *
  * Built from the shared parts: the field is `_Field` with the calendar icon in
  * Trailing, and the calendar is the shared `Calendar` on the `_Listbox`
- * surface, which DateAndTimePicker opens too.
+ * surface, which DateTimePicker opens too.
  *
  * - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates
  *   joined by a dash). It is checked when you press Enter or leave the field:
@@ -67,11 +67,11 @@ const DatePicker = ({
     placeholder,
     value,
     range = false,
-    size = 'medium',
-    disabled = false,
-    readOnly = false,
-    invalid = false,
-    valid = false,
+    spacing = 'default',
+    isDisabled = false,
+    isReadOnly = false,
+    isInvalid = false,
+    isValid = false,
     minDate,
     maxDate,
     calendarAlign = 'left',
@@ -110,7 +110,7 @@ const DatePicker = ({
     const close = useCallback(() => setOpen(false), []);
     const place = useAnchoredPopup({ open, anchorRef: fieldRef, popupRef, align: calendarAlign, onClose: close });
 
-    const interactive = !disabled && !readOnly;
+    const interactive = !isDisabled && !isReadOnly;
 
     const openCalendar = () => {
         if (!interactive || open) return;
@@ -189,18 +189,18 @@ const DatePicker = ({
         onBlur?.(event);
     };
 
-    const isInvalid = invalid || typedInvalid;
+    const invalid = isInvalid || typedInvalid;
     const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
 
     return (
         <>
             <Field
                 ref={fieldRef}
-                spacing={size === 'small' ? 'compact' : 'default'}
-                disabled={disabled}
-                readOnly={readOnly}
-                invalid={isInvalid}
-                valid={valid}
+                spacing={spacing}
+                disabled={isDisabled}
+                readOnly={isReadOnly}
+                invalid={invalid}
+                valid={isValid}
                 className={['plus-date-picker', open && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
                 style={style}
                 trailing={(
@@ -230,11 +230,11 @@ const DatePicker = ({
                     aria-haspopup="dialog"
                     aria-expanded={open}
                     aria-controls={open ? popupId : undefined}
-                    aria-invalid={isInvalid || undefined}
+                    aria-invalid={invalid || undefined}
                     placeholder={placeholder ?? (range ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
                     value={text}
-                    disabled={disabled}
-                    readOnly={readOnly}
+                    disabled={isDisabled}
+                    readOnly={isReadOnly}
                     onClick={openCalendar}
                     onChange={(event) => {
                         setText(event.target.value);
@@ -270,7 +270,6 @@ const DatePicker = ({
                         rangeEnd={rangeEnd}
                         minDate={minDate}
                         maxDate={maxDate}
-                        size="medium"
                         onPick={pick}
                     />
                 </div>,
@@ -289,13 +288,14 @@ DatePicker.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
     /** Pick a first and a last day. */
     range: PropTypes.bool,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
+    /** `default` is 40; `compact` is 32. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
+    isDisabled: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     /** Draws the field invalid; a typed date outside the allowed span does too. */
-    invalid: PropTypes.bool,
+    isInvalid: PropTypes.bool,
     /** Draws the field valid, as a form does once a date is accepted. */
-    valid: PropTypes.bool,
+    isValid: PropTypes.bool,
     /** The earliest day that can be picked or typed. */
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     /** The latest day that can be picked or typed. */

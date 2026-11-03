@@ -26,7 +26,7 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 | Pick one | `Select`, `Radio` | `@/components` |
 | Pick many | `Checkbox`, `Select mode="multi"` | `@/components` |
 | Toggle | `Switch` | `@/components` |
-| Date/time | `DatePicker`, `DateAndTimePicker` | `@/components` |
+| Date/time | `DatePicker`, `DateTimePicker` | `@/components` |
 | Submit / cancel | `Button` | `@/components` |
 | Section container | `Card` | `@/components` |
 

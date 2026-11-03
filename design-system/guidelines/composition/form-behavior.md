@@ -12,7 +12,7 @@ is `forms.md` beside this file; which component to pick is
 `../components/forms-and-inputs.md`.
 
 The components render states; the form decides when to enter them. `TextField`,
-`TextArea`, `FileUpload` and `DateAndTimePicker` take `isInvalid` and
+`TextArea`, `FileUpload` and `DateTimePicker` take `isInvalid` and
 `errorMessage` and point the control at the message, but none of them
 knows when to check. The caller owns timing, and this page is the timing.
 
@@ -86,7 +86,7 @@ why in an `Alert`, keeping the values readable.
 
 The prop is spelled per component: `isReadOnly` on `TextField` and `TextArea`; `readOnly` on
 `Checkbox`, `Radio`, `Switch`, `ChoiceGroup` and `ChoiceGrid`; `readonly` on
-`Select` and `DateAndTimePicker`. `Select` treats
+`Select` and `DateTimePicker`. `Select` treats
 `readonly` as disabled today. A read-only choice keeps its focus and contrast
 and ignores clicks and keys; put radios in a `ChoiceGroup`, since ARIA lets the
 radio group announce read-only and not a lone radio.
