@@ -42,7 +42,7 @@ From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. 
 
 ## Related
 
-Same group: `Alert` · `Banner` · `EmptyState` · `Modal` · `Toast`
+Same group: `Alert` · `Banner` · `EmptyState` · `Flag` · `Modal`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

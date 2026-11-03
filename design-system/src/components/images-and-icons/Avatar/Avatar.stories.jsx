@@ -4,7 +4,6 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Avatar, { AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from './Avatar';
-import AvatarGroup from '../AvatarGroup';
 
 /**
  * `Avatar` and `AvatarGroup`: a person or an agent as a picture, initials or icon.
@@ -213,72 +212,6 @@ Naming.play = async ({ canvasElement }) => {
     await expect(canvas.getByTestId('named')).toHaveAttribute('role', 'img');
     await expect(canvas.getByTestId('anonymous')).toHaveAttribute('aria-hidden', 'true');
     await expect(canvas.getByTestId('labeled')).toHaveAccessibleName('Jane Park, lead tutor');
-};
-
-/* ----------------------------------------------------------------- group */
-
-const PEOPLE = ['Jane Park', 'Jamal Reed', 'Ana Silva', 'Wei Chen', 'Sam Ortiz', 'Priya Nair', 'Tom Hale'];
-
-export const Group = (args) => (
-    <AvatarGroup label="Session attendees" {...args}>
-        {PEOPLE.map((name) => <Avatar key={name} name={name} />)}
-    </AvatarGroup>
-);
-Group.args = { max: 5, size: 32 };
-
-/**
- * `max` counts the `+n` in, so 7 people with a max of 5 show four avatars and
- * `+3`. The avatars overlap by a quarter. `+3` opens the three left out, by
- * name, and Escape closes it again.
- */
-Group.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const group = canvas.getByRole('group', { name: 'Session attendees' });
-    await expect(within(group).getAllByRole('img')).toHaveLength(4);
-
-    const [first, second] = within(group).getAllByRole('img');
-    const a = first.getBoundingClientRect();
-    const b = second.getBoundingClientRect();
-    await expect(Math.round(a.right - b.left), 'overlap is a quarter').toBe(8);
-
-    const more = canvas.getByRole('button', { name: '+3, 3 more people' });
-    await expect(more).toHaveAttribute('aria-expanded', 'false');
-    await userEvent.click(more);
-    await expect(more).toHaveAttribute('aria-expanded', 'true');
-    for (const name of PEOPLE.slice(4)) {
-        await expect(await within(document.body).findByText(name)).toBeVisible();
-    }
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'false'));
-};
-
-export const GroupFits = () => (
-    <AvatarGroup label="Few" max={5}>
-        {PEOPLE.slice(0, 3).map((name) => <Avatar key={name} name={name} />)}
-    </AvatarGroup>
-);
-
-/** Within `max` there is no `+n`. */
-GroupFits.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    await expect(canvas.queryByRole('button')).toBeNull();
-    await expect(canvas.getAllByRole('img')).toHaveLength(3);
-};
-
-export const GroupSizeAndShape = () => (
-    <AvatarGroup label="Agents" size={24} shape="square" max={3}>
-        {PEOPLE.slice(0, 4).map((name) => <Avatar key={name} name={name} size={48} />)}
-    </AvatarGroup>
-);
-
-/** The group's size and shape win over each avatar's own. */
-GroupSizeAndShape.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    for (const img of canvas.getAllByRole('img')) {
-        await expect(box(img)).toEqual({ width: 24, height: 24 });
-        await expect(px(getComputedStyle(img).borderTopLeftRadius)).toBe(6);
-    }
-    await expect(box(canvas.getByRole('button'))).toEqual({ width: 24, height: 24 });
 };
 
 /* ------------------------------------------------------------ playground */

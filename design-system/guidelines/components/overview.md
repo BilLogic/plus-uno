@@ -23,7 +23,7 @@ Groups follow Atlassian's component categories, in Atlassian's order, and
 - [Labels](labels.md) — `StatusTag`, `CountTag`, `Tag`, `TagGroup`, `Suggestion` and `AiLabel`
 - [Layout and structure](layout-and-structure.md) — nine containers
 - [Loading](loading.md) — `Progress`, `Skeleton`, `Spinner`
-- [Messaging](messaging.md) — `Alert`, `Toast`, `Modal`, `Banner`, `InlineMessage`
+- [Messaging](messaging.md) — `Alert`, `Flag`, `Modal`, `Banner`, `InlineMessage`
 - [Navigation](navigation.md) — six, sorted by what the user moves between
 - [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popover`
 
@@ -133,6 +133,7 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 | **DatePicker** | Modals | `design-system/src/components/DatePicker` |
 | **Divider** | Elements | `design-system/src/components/Divider` |
 | **Dropdown** | Elements | `design-system/src/components/Dropdown` |
+| **Flag** | Modals | `design-system/src/components/messaging/Flag` |
 | **Form** | Elements | `design-system/src/components/Form` |
 | **TextField** | Elements | `design-system/src/components/forms-and-inputs/TextField` |
 | **TextArea** | Elements | `design-system/src/components/forms-and-inputs/TextArea` |
@@ -155,7 +156,6 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 | **SuperCompPill** | Elements | `design-system/src/components/SuperCompPill` |
 | **Switch** | Elements | `design-system/src/components/Switch` |
 | **Table** | Tables | `design-system/src/components/Table` |
-| **Toast** | Modals | `design-system/src/components/Toast` |
 | **Tooltip** | Modals | `design-system/src/components/Tooltip` |
 | **UserAvatar** | Elements | `design-system/src/components/UserAvatar` |
 
@@ -436,7 +436,7 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 
 ---
 
-### Toast
+### Flag
 **Purpose**: Brief, auto-dismissing notifications.
 **When to Use**: Success confirmations, Background updates.
 **Props**:

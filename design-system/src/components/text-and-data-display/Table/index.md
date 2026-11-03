@@ -9,29 +9,25 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 
 **Source:** `design-system/src/components/text-and-data-display/Table/Table.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/Table/Table.stories.jsx` — Overview, Striped, Bordered, Empty, Sizes, FramedAndLines, Cells, RowStates, Summary, Footer, Static, HeadCells, SortableHeadCells
-
-**Storybook page:** `design-system/src/components/text-and-data-display/Table/Table.mdx`
-
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `headers` | arrayOf or string or shape or node or object | `[]` | Column headers — a string, or { text, width, align } for control over layout; align is text, number or icon |
-| `rows` | enum | `[]` | Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className } |
-| `striped` | bool | `false` | Alternate row background |
-| `hover` | bool | `true` | Highlight the row under the cursor |
-| `bordered` | bool | `false` | Frame the table and draw vertical lines |
-| `verticalLines` | bool | `false` | Vertical hairlines between columns |
-| `frame` | enum | `'plain'` | Plain spans its section with no outer frame; framed draws its own edge |
-| `size` | enum | — | Row height: sm 32, md 40, lg 48, from the Row size tokens |
-| `density` | enum | — | The older name for size |
-| `titleColumn` | number | — | Index of the one column that names the record, set in semibold |
-| `rowStates` | enum | — | One state per row: rest, highlighted, selected or disabled |
-| `summary` | arrayOf | — | One calculation per column, in a muted row that closes the table |
-| `emptyState` | node | — | Shown as a message row spanning every column when there are no rows |
-| `footer` | node | — | A TableFooter under the rows |
+| `headers` | arrayOf or string or shape or node or object | `[]` | — |
+| `rows` | enum | `[]` | — |
+| `striped` | bool | `false` | — |
+| `hover` | bool | `true` | — |
+| `bordered` | bool | `false` | — |
+| `verticalLines` | bool | `false` | — |
+| `frame` | enum | `'plain'` | — |
+| `size` | enum | — | — |
+| `density` | enum | — | — |
+| `titleColumn` | number | — | — |
+| `rowStates` | enum | — | — |
+| `summary` | arrayOf | — | — |
+| `emptyState` | node | — | — |
+| `footer` | node | — | — |
 | `onRowClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |

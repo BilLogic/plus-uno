@@ -1,0 +1,131 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as DynamicTableStories from './DynamicTable.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. No code component carries the whole set yet — `PatternTable` carries part of it (the sticky header and column, paging and the empty state), and a sortable `HeadCell` plus `TableFooter` on the shared `Table` carry the rest. Listed here as a docs page, not a set to write back to.",
+  "sets": [
+    {
+      "id": "dynamic-table-page",
+      "name": "Dynamic table (page)",
+      "componentSetNodeId": "19685:27042",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
+      "source": "manual",
+      "status": "docs-page",
+      "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
+    }
+  ]
+};
+
+<Meta of={DynamicTableStories} />
+
+<Title />
+
+A table people sort, filter, select, page or act on. Built from the same `Table` the Static table uses, plus a sortable `HeadCell` and `TableFooter`.
+
+<DocsTabs of={DynamicTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Sortable head cells
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A press asks for ascending, then descending, then no sort; the page owns the sort. The arrow shows on hover and focus, and a sorted column keeps it.</>}
+>
+
+<Canvas of={DynamicTableStories.SortableHeadCells} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Footer
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>The footer states the range, and its inset matches the cells. A Static table never pages, so the footer belongs here.</>}
+>
+
+<Canvas of={DynamicTableStories.Footer} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Empty state
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>With no rows — a cleared filter, a new account — the header stays and `emptyState` takes the body as one message row.</>}
+>
+
+<Canvas of={DynamicTableStories.Empty} />
+
+</DocsCanvasShell>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use the Dynamic table where people act on the data: sort a column, filter the
+rows, select some for a bulk action, or page through a long result. Use
+`StaticTable` instead for a grid people only read.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+- **Sorting is not built into `Table`.** A sortable column is a `HeadCell` with `isSortable`, `sort` and `onSort`; the consuming page holds the sort state and passes already-ordered `rows`.
+- **No single component yet.** Selection with bulk actions, a frozen column and expanding rows are documented in Figma but have no code component of their own. `PatternTable` carries the sticky header and column, paging and the empty state.
+- **The footer states the range** — `1–3 of 3` — and sits only on tables that page.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a grid people only read, use the Static table.
+- For records that nest, use the Tree table.
+- For splitting a long result set across pages, use `Pagination`.
+- For a row-select control, use `Checkbox` with an `aria-label` — the column heading does not name it.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

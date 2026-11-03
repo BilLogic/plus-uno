@@ -1,15 +1,15 @@
 ---
-summary: Alert, Toast or Modal — choosing by how long the message lives and whether it blocks
+summary: Alert, Flag or Modal — choosing by how long the message lives and whether it blocks
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the messaging group -->
 
 # Messaging — which component to reach for
 
-Five components: `Alert`, `Toast`, `Modal`, `Banner`, `InlineMessage`. Storybook
-titles the first two with Atlassian's names, Section message and Flag. Generated
+Five components: `Alert`, `Flag`, `Modal`, `Banner`, `InlineMessage`. Storybook
+titles `Alert` with Atlassian's name, Section message. Generated
 facts are in `design-system/src/components/messaging/index.md`. The choice
-between `Alert`, `Toast` and `Modal` is not about severity — all three carry the
+between `Alert`, `Flag` and `Modal` is not about severity — all three carry the
 same semantic palette — it is about how long the message lives and whether the
 user can keep working.
 
@@ -19,7 +19,7 @@ user can keep working.
 |---|---|---|
 | is a prominent notice at the top of the whole page | `Banner` | full width, no dismiss, three appearances (warning, danger, announcement) |
 | belongs to the page and stays until resolved | `Alert` | renders in the flow, dismissible by default |
-| confirms something and should fade | `Toast` | auto-hides after 5000ms by default |
+| confirms something and should fade | `Flag` | auto-hides after 5000ms by default |
 | must be answered before anything else | `Modal` | takes focus, blocks the page behind a backdrop |
 | is extra detail behind an icon, not shown by default | `InlineMessage` | opens a Popup on demand, so it never pushes layout |
 | is about one form field | none of these | the field's own error state |
@@ -37,9 +37,9 @@ the component's own state and the render returns `null` on it, so a dismissed
 alert stays dismissed until it is remounted. Six `style` values: `primary`,
 `secondary`, `success`, `danger`, `warning`, `info`.
 
-**`Toast`** is fully controlled through `show` and `onClose`. `delay` is 5000ms
+**`Flag`** is fully controlled through `show` and `onClose`. `delay` is 5000ms
 and `autohide` is on, and autohide only applies while `delay` is above zero.
-`title` and `children` are both required. `ToastContainer` positions a stack;
+`title` and `children` are both required. `FlagContainer` positions a stack;
 it maps the legacy `top-right`-style positions onto the current ones.
 
 **`Modal`** is the only one that interrupts. `keyboard` and `backdrop` both
@@ -52,9 +52,9 @@ pages, never for a live dialog.
 
 ## Announcement, and why it is easy to overdo
 
-`Alert` renders `role="alert"`. A `danger` or `warning` `Toast` renders
+`Alert` renders `role="alert"`. A `danger` or `warning` `Flag` renders
 `role="alert"` with `aria-live="assertive"` and `aria-atomic="true"`; every other
-`Toast` style is `role="status"` with `aria-live="polite"` and waits its turn.
+`Flag` style is `role="status"` with `aria-live="polite"` and waits its turn.
 Interrupting is right for something that just went wrong and heavy-handed for
 ambient information — a count, a timestamp, a "3 sessions this week" line is
 better as
@@ -65,11 +65,11 @@ announced at all, so anything rendered on mount has to read correctly as plain
 content too.
 
 Every close control in the group has a hard-coded label: `Close alert` on
-`Alert`, `Close` on `Toast`, `Close modal` on `Modal`. None of them can be
+`Alert`, `Close` on `Flag`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
-`Alert` and `Toast` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
-its established label instead, and `Toast` keeps the default "Close".
+`Alert` and `Flag` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
+its established label instead, and `Flag` keeps the default "Close".
 
 ## Related
 

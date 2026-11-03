@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
-import './Toast.scss';
+import './Flag.scss';
 
 /**
  * How long a success or info flag stays before it closes itself. Warning and
@@ -24,12 +24,11 @@ const FLAG_STYLES = {
 };
 
 /**
- * The Popover family's Flag (Figma Pattern/Flag; the code name is still
- * Toast). One surface, 400 wide, padded 16: a 16 icon in the style's icon
- * color on the title's first line, the title and its message, and the close
- * button.
+ * The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide,
+ * padded 16: a 16 icon in the style's icon color on the title's first line,
+ * the title and its message, and the close button.
  */
-export const Toast = ({
+export const Flag = ({
     id,
     style = 'secondary', // 'secondary' (default), 'success', 'danger', 'warning', 'info', 'primary'
     title,
@@ -73,7 +72,7 @@ export const Toast = ({
      * `role="alert"` this component used to pass was never doing anything
      * either; it only looked like the source of the behavior. Setting them on
      * the node we are handed is the one place the value can actually change.
-     * Measured: the assertion in `ToastPoliteness.stories.jsx` fails without it.
+     * Measured: the assertion in `FlagPoliteness.stories.jsx` fails without it.
      */
     const toastRef = useRef(null);
 
@@ -94,7 +93,7 @@ export const Toast = ({
         <BootstrapToast
             ref={toastRef}
             id={id}
-            className={`plus-toast ${toastStyle} ${className}`}
+            className={`plus-flag ${toastStyle} ${className}`}
             show={show}
             onClose={onClose}
             delay={delay}
@@ -105,7 +104,7 @@ export const Toast = ({
               * The icon sits on the title's first line: a box one title line
               * tall, so a wrapping title keeps it on line 1.
               */}
-            <div className="plus-toast-icon">
+            <div className="plus-flag-icon">
                 {/*
                   * #325. Decorative, and marked so — every other icon in
                   * these components is `aria-hidden`. The title beside it
@@ -113,12 +112,12 @@ export const Toast = ({
                   */}
                 <i className={`fas ${iconClass}`} aria-hidden="true"></i>
             </div>
-            <div className="plus-toast-content">
-                <div className={`plus-toast-header ${headerClass}`}>
-                    <strong className="plus-toast-title">{title}</strong>
-                    {timestamp && <small className="plus-toast-timestamp">{timestamp}</small>}
+            <div className="plus-flag-content">
+                <div className={`plus-flag-header ${headerClass}`}>
+                    <strong className="plus-flag-title">{title}</strong>
+                    {timestamp && <small className="plus-flag-timestamp">{timestamp}</small>}
                 </div>
-                <div className={`plus-toast-body ${bodyClass}`}>
+                <div className={`plus-flag-body ${bodyClass}`}>
                     {children}
                 </div>
             </div>
@@ -129,7 +128,7 @@ export const Toast = ({
     );
 };
 
-Toast.propTypes = {
+Flag.propTypes = {
     id: PropTypes.string,
     style: PropTypes.oneOf(['secondary', 'success', 'danger', 'warning', 'info', 'primary']),
     title: PropTypes.node.isRequired,
@@ -151,7 +150,7 @@ Toast.propTypes = {
  * Where flags sit: bottom-left by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
  */
-export const ToastContainer = ({
+export const FlagContainer = ({
     position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
@@ -171,7 +170,7 @@ export const ToastContainer = ({
         <BootstrapToastContainer
             position={mapPosition(position)}
             containerPosition={containerPosition}
-            className={`plus-toast-container ${className}`}
+            className={`plus-flag-container ${className}`}
             {...props}
         >
             {children}
@@ -179,7 +178,7 @@ export const ToastContainer = ({
     );
 };
 
-ToastContainer.propTypes = {
+FlagContainer.propTypes = {
     position: PropTypes.string,
     /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
     containerPosition: PropTypes.string,
@@ -187,4 +186,4 @@ ToastContainer.propTypes = {
     children: PropTypes.node
 };
 
-export default Toast;
+export default Flag;

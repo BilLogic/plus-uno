@@ -2,17 +2,17 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import Table, { StaticTable, TableFooter, HeadCell } from '@/components/text-and-data-display/Table';
+import Table, { StaticTable, HeadCell } from '@/components/text-and-data-display/Table';
 
 export default {
-    title: 'Components/Text and data display/Table',
+    title: 'Components/Text and data display/Static table',
     component: Table,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
                 component:
-                    'Data table for tabular content. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }), so a cell can hold any node — a Badge, a Button used as a sort trigger, formatted currency. Sorting is NOT built in: the consuming page owns the sort state and passes already-ordered rows.'
+                    'A fixed grid people read. Headers and rows accept either plain values or per-cell objects ({ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }), so a cell can hold any node — a Badge, formatted currency. Rows rest or are highlighted; nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.'
             }
         }
     },
@@ -127,18 +127,6 @@ export const Striped = {
 
 export const Bordered = {
     args: { headers, rows, bordered: true, size: 'sm' }
-};
-
-export const Empty = {
-    args: { headers, rows: [], emptyState: 'No sessions yet' },
-    parameters: {
-        docs: { description: { story: 'With no rows the header stays and `emptyState` takes the body as one message row spanning every column.' } }
-    },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(canvas.getByText('No sessions yet').closest('td').colSpan).toBe(4);
-        await expect(canvas.getByRole('columnheader', { name: 'Session date' })).toBeVisible();
-    }
 };
 
 export const Sizes = {
@@ -257,11 +245,6 @@ export const Summary = {
     }
 };
 
-export const Footer = {
-    args: { headers, rows, footer: <TableFooter range="1–3 of 3" /> },
-    parameters: { docs: { description: { story: 'The footer states the range, and its inset matches the cells. A Static table never pages, so the footer belongs to the Dynamic table.' } } }
-};
-
 export const Static = {
     render: (args) => <StaticTable {...args} />,
     args: { headers, rows, titleColumn: 1, rowStates: [undefined, 'highlighted'] },
@@ -301,70 +284,5 @@ export const HeadCells = {
         await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');
         await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
-    }
-};
-
-const SortableHeads = () => {
-    const [sorted, setSorted] = React.useState({ key: null, sort: 'none' });
-    const head = (key, label, extra = {}) => (
-        <HeadCell
-            key={key}
-            label={label}
-            isSortable
-            sort={sorted.key === key ? sorted.sort : 'none'}
-            onSort={(sort) => setSorted({ key, sort })}
-            {...extra}
-        />
-    );
-    return (
-        <HeadRow>
-            {head('student', 'Student', { width: '200px' })}
-            {head('sessions', 'Sessions', { width: '140px', align: 'number' })}
-        </HeadRow>
-    );
-};
-
-export const SortableHeadCells = {
-    render: () => <SortableHeads />,
-    parameters: { docs: { description: { story: 'A sortable column puts `aria-sort` on the header and a real button inside it. A press asks for ascending, then descending, then no sort; the page owns the sort. The unsorted arrow shows on hover and focus and a sorted column keeps its arrow, always 12 tall. Focus is a ring inset in the cell, never a fill.' } } },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const th = canvas.getByRole('columnheader', { name: /Student/ });
-        const button = within(th).getByRole('button');
-        const arrow = th.querySelector('.plus-table-head-cell-sort');
-        await expect(th).toHaveAttribute('aria-sort', 'none');
-        // The suite's real pointer persists between stories and may rest on the button
-        // when this one starts; hover is the other thing that shows the arrow.
-        await expect(getComputedStyle(arrow).opacity, 'unsorted arrow is hidden at rest').toBe(button.matches(':hover') ? '1' : '0');
-        await userEvent.tab();
-        await expect(button, 'the button takes focus from the keyboard').toHaveFocus();
-        await expect(getComputedStyle(arrow).opacity, 'and the arrow shows on focus').toBe('1');
-        await expect(px(getComputedStyle(arrow).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
-        button.blur();
-
-        await userEvent.click(button);
-        await expect(th).toHaveAttribute('aria-sort', 'ascending');
-        await expect(arrow).toHaveClass('fa-sort-up');
-        await userEvent.unhover(button);
-        await expect(getComputedStyle(arrow).opacity, 'a sorted arrow stays').toBe('1');
-        await userEvent.click(button);
-        await expect(th).toHaveAttribute('aria-sort', 'descending');
-        await expect(arrow).toHaveClass('fa-sort-down');
-        await userEvent.click(button);
-        await expect(th).toHaveAttribute('aria-sort', 'none');
-
-        await inEveryColorMode(async (mode) => {
-            button.blur();
-            await userEvent.tab();
-            await expect(button, `${mode}: keyboard focus`).toHaveFocus();
-            const style = getComputedStyle(button);
-            await expect(style.outlineStyle, `${mode}: focus is a ring`).toBe('solid');
-            await expect(style.outlineColor, `${mode}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
-            // The real pointer may still rest on the button after the clicks above; its
-            // hover fill is the only fill the cell may carry. Focus adds none.
-            const fill = button.matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)';
-            await expect(style.backgroundColor, `${mode}: focus is not a fill`).toBe(fill);
-            button.blur();
-        });
     }
 };
