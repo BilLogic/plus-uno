@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect } from 'storybook/test';
-import { Button, Input, NavTabs } from '@/components';
+import { Button, TextField, NavTabs } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -28,7 +28,7 @@ const Tabs = ({ label = 'Views' }) => {
 
 const DefaultToolbar = () => (
     <PatternSection.Toolbar
-        search={<Input label="Search students" showLabel={false} placeholder="Search students" leadingVisual="magnifying-glass" type="search" />}
+        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBefore={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} type="search" />}
         filters={(
             <>
                 <Button text="Status" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />

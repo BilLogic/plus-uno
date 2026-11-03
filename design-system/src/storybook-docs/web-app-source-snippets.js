@@ -229,20 +229,19 @@ export const webAppSourceSnippets = {
         '  <Button appearance="primary" text="Hover me" />',
         '</Tooltip>'
     ]),
-    formInput: snippet([
-        '<Input',
-        '  id="input-overview"',
-        '  showLabel',
+    formTextField: snippet([
+        '<TextField',
+        '  id="text-field-overview"',
         '  label="Label"',
         '  placeholder="Placeholder"',
         '  value=""',
-        '  required',
-        '  trailingVisual="fa-solid fa-icons"',
+        '  isRequired',
+        '  elemAfter={<i className="fa-solid fa-icons" aria-hidden="true" />}',
         '/>'
     ]),
-    formTextarea: snippet([
-        '<Textarea',
-        '  id="textarea-overview"',
+    formTextArea: snippet([
+        '<TextArea',
+        '  id="text-area-overview"',
         '  label="Label"',
         '  placeholder="Enter text..."',
         '  rows={3}',
@@ -284,9 +283,10 @@ export const webAppSourceSnippets = {
         '  buttonText="Choose a file"',
         '/>'
     ]),
-    formNumber: snippet([
-        '<NumberInput',
-        '  id="number-input-overview"',
+    formNumberField: snippet([
+        '<TextField',
+        '  id="number-field-overview"',
+        '  type="number"',
         '  label="Number of sessions"',
         '  placeholder="Number"',
         '/>'
@@ -378,14 +378,15 @@ export const webAppSourceSnippets = {
         '  showSectionLabels={false}',
         '/>'
     ]),
-    formInputGroup: snippet([
+    formTextFieldAffix: snippet([
         'const [value, setValue] = useState("");',
         '',
-        '<InputGroup',
-        '  id="input-group-overview"',
+        '<TextField',
+        '  id="text-field-affix-overview"',
+        '  label="Website"',
         '  placeholder="Placeholder"',
-        '  leadingVisual={{ type: "text", children: "https://" }}',
-        '  trailingVisual="icon"',
+        '  elemBefore="https://"',
+        '  elemAfter={<i className="fa-solid fa-link" aria-hidden="true" />}',
         '  value={value}',
         '  onChange={(e) => setValue(e.target.value)}',
         '/>'

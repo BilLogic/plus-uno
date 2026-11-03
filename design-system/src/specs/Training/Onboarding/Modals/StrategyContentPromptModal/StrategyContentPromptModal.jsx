@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import './StrategyContentPromptModal.scss';
 
 const StrategyContentPromptModal = ({
@@ -73,9 +73,9 @@ const StrategyContentPromptModal = ({
                     </p>
                 </div>
 
-                {/* Textarea */}
+                {/* Text area */}
                 <div className="strategy-content-prompt-modal__textarea-wrapper">
-                    <Textarea
+                    <TextArea
                         value={localValue}
                         onChange={handleChange}
                         placeholder={placeholder}
@@ -107,7 +107,7 @@ StrategyContentPromptModal.propTypes = {
     questionLabel: PropTypes.string,
     /** Question text */
     questionText: PropTypes.string,
-    /** Textarea placeholder */
+    /** Text area placeholder */
     placeholder: PropTypes.string,
     /** Submit button text */
     buttonText: PropTypes.string,

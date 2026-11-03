@@ -162,16 +162,16 @@ icon and the ground, not by the text. Every style has 4px corners.
 // Incorrect — the error is a hundred pixels away from the input it is about,
 // and nothing connects the two.
 <Alert style="danger">Email address is not valid.</Alert>
-<Input id="email" label="Email" value={email} onChange={onEmail} />
+<TextField id="email" label="Email" value={email} onChange={onEmail} />
 
 // Correct — the field owns its own error state and message.
-<Input
+<TextField
   id="email"
   label="Email"
   value={email}
   onChange={onEmail}
-  validation="invalid"
-  validationMessage="Enter an email address in the form name@example.com."
+  isInvalid
+  errorMessage="Enter an email address in the form name@example.com."
   aria-invalid={true}
 />
 ```

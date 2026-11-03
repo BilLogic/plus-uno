@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Select from '@/components/forms-and-inputs/Select';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
@@ -211,15 +211,14 @@ const PrototypeMarket = () => {
         </p>
       </header>
 
-      {/* Search — using DS Input component */}
-      <Input
+      {/* Search — using the DS Text field */}
+      <TextField
         id="market-search"
         placeholder="Search prototypes..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        leadingVisual="fa-solid fa-magnifying-glass"
-        size="large"
-        showLabel={false}
+        elemBefore={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
+        isLabelHidden
         label="Search prototypes"
       />
 
@@ -505,13 +504,12 @@ const PrototypeMarket = () => {
               ))}
             </div>
             <div className="prototype-market__modal-feedback-row">
-              <Input
+              <TextField
                 id="prototype-comment-input"
                 className="prototype-market__modal-feedback-input"
                 placeholder="Share your feedback"
-                showLabel={false}
+                isLabelHidden
                 label="Share your feedback"
-                size="medium"
                 value={pendingComment}
                 onChange={(e) => setPendingComment(e.target.value)}
                 onKeyDown={(e) => {

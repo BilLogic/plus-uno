@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-65 docs-page links + 92 style/variant entries across 70 components.
+63 docs-page links + 86 style/variant entries across 68 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -35,8 +35,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Dropdown | `37:4513` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513) |
 | Components | FileUpload | `13337:2288` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288) |
 | Components | Illustration | `19785:489` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489) |
-| Components | Input | `13611:6957` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957) |
-| Components | InputGroup | `3497:19496` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496) |
 | Components | Jumbotron | `3497:19500` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19500) |
 | Components | LabelAndCaption | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
 | Components | ListGroup | `3497:19501` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19501) |
@@ -44,7 +42,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Modal | `3497:19502` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502) |
 | Components | NavPills | `3497:19503` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503) |
 | Components | NavTabs | `3497:19503` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503) |
-| Components | NumberInput | `13265:5812` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
 | Components | Popover | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
 | Components | Progress | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
@@ -63,7 +60,8 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Table | `17156:122` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122) |
 | Components | Tag | `17884:2099` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099) |
 | Components | TagInput | `18233:48345` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345) |
-| Components | Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) |
+| Components | TextArea |  | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/) |
+| Components | TextField |  | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/) |
 | Components | Tile | `18314:53755` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755) |
 | Components | Toast | `3548:245993` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993) |
 | Components | Toggle | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
@@ -113,10 +111,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Dropdown | Dropdown List | `9109:14766` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766) | verified |
 | Components | FileUpload | File Upload | `13696:8299` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299) | verified |
 | Components | Illustration | Character | `19786:47743` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743) | verified |
-| Components | Input | _Field Text | `18265:4067` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-4067) | unpublished |
-| Components | Input | Form | `14841:25919` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919) | unpublished |
-| Components | Input | Input | `39:4802` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802) | verified |
-| Components | InputGroup | Input Group | `13671:3218` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218) | verified |
 | Components | Jumbotron | Jumbotron | `19627:113213` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-113213) | verified |
 | Components | LabelAndCaption | _Form Caption | `13726:9599` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599) | verified |
 | Components | LabelAndCaption | Label | `14851:17069` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069) | verified |
@@ -135,7 +129,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | NavTabs | _Tab Dropdown | `4209:29375` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-29375) | verified |
 | Components | NavTabs | _Tab Item | `4209:20411` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-20411) | verified |
 | Components | NavTabs | Nav Tabs | `69:16779` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779) | verified |
-| Components | NumberInput | Number Input Group Button | `13644:11268` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268) | verified |
 | Components | Pagination | Pagination | `53:19822` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822) | verified |
 | Components | Popover | Popover | `49:19534` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534) | verified |
 | Components | Progress | Progress Bar | `49:6872` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872) | verified |
@@ -159,7 +152,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | TagGroup | TagGroup | `17878:1713` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713) | verified |
 | Components | TagInput | _Option menu | `19150:44293` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293) | unpublished |
 | Components | TagInput | TagInput | `18233:48345` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345) | unpublished |
-| Components | Textarea | Textarea | `13541:10731` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731) | verified |
 | Components | Tile | Tile | `17878:1928` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928) | verified |
 | Components | Toast | Toast | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
 | Components | Toggle | Form Switch Button | `82:16570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570) | verified |

@@ -18,7 +18,7 @@ import PageLayout from './PageLayout';
 import Card from '@/components/layout-and-structure/Card/Card';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import { Button, Input, Textarea } from '@/components';
+import { Button, TextField, TextArea } from '@/components';
 import { PatternDrawer, PatternSection } from '@/patterns';
 import { SURFACE_EDGE } from '@/patterns/Surface';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -285,11 +285,11 @@ const FOCUSED_HEIGHT = 900;
 const NoteForm = () => (
     <>
         <PatternSection title="Session details" description="What the student worked on today.">
-            <Input label="Topic" placeholder="e.g. Solving two-step equations" />
-            <Textarea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
+            <TextField label="Topic" placeholder="e.g. Solving two-step equations" />
+            <TextArea label="Notes" placeholder="What went well, and what to try next time" rows={6} />
         </PatternSection>
         <PatternSection title="Follow-up">
-            <Input label="Next step" placeholder="e.g. Practice set 4" />
+            <TextField label="Next step" placeholder="e.g. Practice set 4" />
         </PatternSection>
     </>
 );

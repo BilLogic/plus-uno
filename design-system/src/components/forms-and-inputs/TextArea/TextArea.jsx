@@ -1,51 +1,42 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Button from './Button/Button';
-import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
-import useInlineEdit from './_internal/useInlineEdit';
-import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
+import Button from '../Button/Button';
+import useFieldId from '../useFieldId';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import useInlineEdit from '../_internal/useInlineEdit';
 
-/** Older `state` names, kept for existing call sites. */
-const LEGACY_STATE = {
-    error: 'invalid',
-    invalid: 'invalid',
-    success: 'success',
-    valid: 'success',
-    readonly: 'readonly',
-    'read-only': 'readonly',
-    readOnly: 'readonly',
-};
+export const TEXT_AREA_APPEARANCES = ['standard', 'subtle'];
+export const TEXT_AREA_SPACINGS = ['default', 'compact'];
 
 /**
- * Textarea — free text over several lines, on `_Field`.
+ * Text area — free text over several lines, on `_Field`.
  *
  * The field is 80 high at least, and `rows` grows it from there. With
- * `maxLength`, the caption counts characters on the right. With `subtle`, it
- * reads as plain text until hovered or edited, shows Save and Cancel while
- * editing, and stays open when it loses focus.
+ * `maxLength`, the caption counts characters on the right. With
+ * `appearance="subtle"`, it reads as plain text until hovered or edited, shows
+ * Save and Cancel while editing, and stays open when it loses focus.
  */
-const Textarea = ({
+const TextArea = ({
     id,
     name,
     label,
-    required = false,
-    showLabel = true,
+    isRequired = false,
+    isLabelHidden = false,
     info,
     caption,
     value,
     defaultValue,
     placeholder,
     rows = 3,
-    size = 'medium',
-    validation = 'none',
-    validationMessage,
-    /** Draws a state still (`focus` for documentation), or an older name for one. */
-    state = 'default',
-    disabled = false,
-    readOnly = false,
+    spacing = 'default',
+    appearance = 'standard',
+    isDisabled = false,
+    isReadOnly = false,
+    isInvalid = false,
+    errorMessage,
+    warningMessage,
+    successMessage,
     maxLength,
-    subtle = false,
     onSave,
     onChange,
     onFocus,
@@ -55,15 +46,12 @@ const Textarea = ({
     style,
     ...props
 }) => {
-    useDeprecatedFieldSize('Textarea', size);
     /** One id for the label and the control — see `useFieldId`. */
     const fieldId = useFieldId(id);
-    const legacy = LEGACY_STATE[state];
-    const isReadOnly = readOnly || legacy === 'readonly';
-    const isDisabled = disabled || state === 'disabled';
+    const isSubtle = appearance === 'subtle';
 
     const edit = useInlineEdit({
-        enabled: subtle && !isDisabled && !isReadOnly,
+        enabled: isSubtle && !isDisabled && !isReadOnly,
         multiline: true,
         value,
         defaultValue,
@@ -77,9 +65,21 @@ const Textarea = ({
         : typedLength;
 
     const failed = edit.enabled && edit.error;
-    const result = validation !== 'none' ? validation : (legacy === 'invalid' || legacy === 'success' ? legacy : 'none');
-    const tone = failed || result === 'invalid' ? 'invalid' : (result === 'success' ? 'success' : 'help');
-    const message = failed ? edit.error : (result !== 'none' && validationMessage) || caption;
+    let tone = 'help';
+    let message = caption;
+    if (failed) {
+        tone = 'invalid';
+        message = edit.error;
+    } else if (isInvalid) {
+        tone = 'invalid';
+        message = errorMessage || caption;
+    } else if (warningMessage) {
+        tone = 'warning';
+        message = warningMessage;
+    } else if (successMessage) {
+        tone = 'success';
+        message = successMessage;
+    }
     const { messageId, countId, describedBy } = fieldDescription({
         fieldId,
         message,
@@ -109,19 +109,18 @@ const Textarea = ({
     const showActions = edit.enabled && edit.editing;
 
     return (
-        <FieldStack disabled={isDisabled} className={`plus-textarea ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} required={required} info={info} hidden={!showLabel}>
+        <FieldStack disabled={isDisabled} className={`plus-text-area ${className}`.trim()} style={style}>
+            <FieldLabel htmlFor={fieldId} required={isRequired} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
             <Field
-                size={size}
+                spacing={spacing}
                 multiline
-                subtle={subtle}
+                subtle={isSubtle}
                 disabled={isDisabled}
                 readOnly={isReadOnly}
                 {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
-                state={state === 'focus' ? 'focus' : undefined}
                 trailing={edit.enabled && edit.saving
                     ? <span className="plus-field-saving" role="status">saving…</span>
                     : null}
@@ -136,12 +135,12 @@ const Textarea = ({
                     disabled={isDisabled}
                     readOnly={isReadOnly}
                     maxLength={maxLength}
-                    className="plus-field__control plus-textarea__control"
+                    className="plus-field__control plus-text-area__control"
                     onChange={handleChange}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
-                    aria-required={required || undefined}
+                    aria-required={isRequired || undefined}
                     {...props}
                     aria-describedby={describedBy}
                     {...toneProps(tone).control}
@@ -176,34 +175,38 @@ const Textarea = ({
     );
 };
 
-Textarea.propTypes = {
+TextArea.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
     /** Shows an asterisk and sets `aria-required`. */
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     /** Hides the label without removing it. */
-    showLabel: PropTypes.bool,
+    isLabelHidden: PropTypes.bool,
     /** Text for an info tooltip beside the label. */
     info: PropTypes.node,
-    /** Standing help under the field. A validation message takes its place. */
+    /** Standing help under the field. A message takes its place. */
     caption: PropTypes.node,
     value: PropTypes.string,
     defaultValue: PropTypes.string,
     placeholder: PropTypes.string,
     /** Visible lines of text. One row is the short textarea. */
     rows: PropTypes.number,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
-    validation: PropTypes.oneOf(['none', 'invalid', 'success']),
-    validationMessage: PropTypes.node,
-    /** `focus` draws focus still, for documentation. The other values are older names for `validation`, `readOnly` and `disabled`. */
-    state: PropTypes.oneOf(['default', 'focus', 'error', 'success', 'readonly', 'disabled', 'valid', 'read-only', 'invalid']),
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
+    /** `default` starts at 80 high with 10 corners; `compact` has 8 corners, to sit beside a 32 field. */
+    spacing: PropTypes.oneOf(TEXT_AREA_SPACINGS),
+    /** `subtle` is borderless until hovered or edited, with Save and Cancel while editing. */
+    appearance: PropTypes.oneOf(TEXT_AREA_APPEARANCES),
+    isDisabled: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
+    /** Draws the error border and sets `aria-invalid`; `errorMessage` says why. */
+    isInvalid: PropTypes.bool,
+    errorMessage: PropTypes.node,
+    /** Draws the warning border. Does not set `aria-invalid`: the value is accepted. */
+    warningMessage: PropTypes.node,
+    /** Draws the confirmation border. */
+    successMessage: PropTypes.node,
     /** Limits the length and shows a count on the right of the caption. */
     maxLength: PropTypes.number,
-    /** Borderless until hovered or edited, with Save and Cancel while editing. */
-    subtle: PropTypes.bool,
     /** Subtle only: called by Save (or Ctrl/⌘+Enter). Throw or reject to keep the field open in `invalid`. */
     onSave: PropTypes.func,
     onChange: PropTypes.func,
@@ -214,4 +217,4 @@ Textarea.propTypes = {
     style: PropTypes.object
 };
 
-export default Textarea;
+export default TextArea;

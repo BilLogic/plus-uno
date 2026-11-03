@@ -143,7 +143,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
   different component, which keeps the time half's parsing and its AM/PM
   behavior rather than reimplementing them beside it.
 - **Not for a duration.** This picks a point, not a length. Two of these, or a
-  `NumberInput` of minutes, says what a single one cannot.
+  number field of minutes, says what a single one cannot.
 
 </div>
 
@@ -199,7 +199,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
   rendered either way and always carries `htmlFor`; `showLabel={false}` only
   clips it out of sight with `.plus-datetime-label-hidden`, so the group and
   both inputs keep their names and the layout does not move. This matches
-  `Input` — see *Why `showLabel` cannot take the name away* in the Input docs.
+  `TextField` — see *Accessibility* in the Text field docs.
 - **A field with no `label` still has no name.** `showLabel` decides whether the
   label is *seen*; passing no `label` is what leaves the field unnamed. Then
   there is no group either, and the two inputs are called just "Date" and
@@ -234,7 +234,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
   means by "this field", and it is what `aria-describedby` is about — a
   description of the field describes the field, not its date half. The spread is
   last, so a caller's `aria-labelledby` wins over the generated one, matching
-  `Input`. One dependency worth knowing: the wrapper is only a `group` when the
+  `TextField`. One dependency worth knowing: the wrapper is only a `group` when the
   field has a `label`, per the third bullet above, so a description forwarded to
   an unlabeled picker lands on a plain `<div>` and is announced by nothing.
   Pass a `label` — with `showLabel={false}` if it should not be seen.
@@ -252,7 +252,7 @@ Date and time pickers let people select a date or range of dates and/or a time f
 ## Related
 
 - For a date with no time alongside it, use `DatePicker`.
-- For a value the user types rather than picks, use `Input`.
+- For a value the user types rather than picks, use `TextField`.
 - For how the label and caption pair is written, see *Label & caption*.
 
 </div>

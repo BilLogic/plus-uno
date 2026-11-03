@@ -64,7 +64,7 @@ component by the number of files under `design-system/src/specs/` and
 `prototypes/` that import it from the design system and render it, the leaders
 are: `Button` (139 files), `Badge` (60), `Modal` (29), `Select` (24),
 `Dropdown` (17), `ButtonGroup` (17), `Card` (14), `Pagination` (14),
-`NavTabs` (11), `Alert` (11), `Input` (10), `Textarea` (9), `Checkbox` (9),
+`NavTabs` (11), `Alert` (11), `TextField` (10), `TextArea` (9), `Checkbox` (9),
 `Tooltip` (8), `Switch` (7). Those fifteen were written first, in #166. Twenty
 of the 48 public components are rendered nowhere in either corpus.
 
@@ -130,8 +130,8 @@ Each component belongs to a Pattern Pack that groups it by interaction role.
 | **Divider** | Elements | `design-system/src/components/Divider` |
 | **Dropdown** | Elements | `design-system/src/components/Dropdown` |
 | **Form** | Elements | `design-system/src/components/Form` |
-| **Input** | Elements | `design-system/src/components/Input` |
-| **InputGroup** | Elements | `design-system/src/components/InputGroup` |
+| **TextField** | Elements | `design-system/src/components/forms-and-inputs/TextField` |
+| **TextArea** | Elements | `design-system/src/components/forms-and-inputs/TextArea` |
 | **Jumbotron** | Sections | `design-system/src/components/Jumbotron` |
 | **ListGroup** | Sections | `design-system/src/components/ListGroup` |
 | **LoadingGif** | Modals | `design-system/src/components/LoadingGif` |
@@ -460,10 +460,10 @@ Purpose: Boolean selection. Use for multiple independent options.
 ### Radio
 Purpose: Single selection from a group. Use when only one option is valid.
 
-### Input
-Purpose: Single-line text entry. Supports validation states.
+### TextField
+Purpose: Single-line text entry, and numbers with `type="number"`. Supports validation states, and elements before and after the control.
 
-### Textarea
+### TextArea
 Purpose: Multi-line text entry.
 
 ### Select

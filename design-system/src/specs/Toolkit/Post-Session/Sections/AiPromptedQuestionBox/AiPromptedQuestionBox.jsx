@@ -1,6 +1,6 @@
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import Spinner from '@/components/loading/Spinner';
 import { PRIVACY_WARNING } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 import SparkleIcon from './SparkleIcon';
@@ -84,7 +84,7 @@ const AiPromptedQuestionBox = ({
                         <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{helper}</p>
                     ) : null}
                 </div>
-                <Textarea
+                <TextArea
                     id={fieldId}
                     value={value}
                     onChange={onChange}

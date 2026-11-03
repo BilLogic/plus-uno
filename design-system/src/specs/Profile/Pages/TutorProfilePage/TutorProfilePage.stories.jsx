@@ -10,7 +10,7 @@ import TutorProfilePage from './TutorProfilePage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { PageLayout } from '../../../Universal/Pages';
 import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { Pronouns } from '../../Elements/Pronouns.stories';
@@ -190,12 +190,11 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             }}
                         >
                             <Label text="First Name" required={false} htmlFor={fieldId('bi-first-name')} />
-                            <Input
+                            <TextField
                                 id={fieldId('bi-first-name')}
                                 value="Veronica"
-                                readonly={true}
-                                size="medium"
-                                showLabel={false}
+                                isReadOnly={true}
+                                isLabelHidden
                             />
                         </div>
                         <div
@@ -209,7 +208,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             }}
                         >
                             <Label text="Last Name" required={false} htmlFor={fieldId('bi-last-name')} />
-                            <Input id={fieldId('bi-last-name')} value="Lodge" readonly={true} size="medium" showLabel={false} />
+                            <TextField id={fieldId('bi-last-name')} value="Lodge" isReadOnly={true} isLabelHidden />
                         </div>
                         <div
                             style={{
@@ -222,13 +221,12 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             }}
                         >
                             <Label text="Preferred Name" required={false} htmlFor={fieldId('bi-preferred-name')} />
-                            <Input
+                            <TextField
                                 id={fieldId('bi-preferred-name')}
                                 placeholder="Enter"
                                 value={preferredName}
                                 onChange={(e) => setPreferredName(e.target.value)}
-                                size="medium"
-                                showLabel={false}
+                                isLabelHidden
                             />
                         </div>
                         <div style={{ flex: '1 0 0', maxWidth: '285px' }}>
@@ -248,12 +246,11 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             }}
                         >
                             <Label text="PLUS Account Email" required={false} htmlFor={fieldId('bi-plus-email')} />
-                            <Input
+                            <TextField
                                 id={fieldId('bi-plus-email')}
                                 value="pl2-app-demo@gmail.com"
-                                readonly={true}
-                                size="medium"
-                                showLabel={false}
+                                isReadOnly={true}
+                                isLabelHidden
                             />
                         </div>
                         <div
@@ -297,13 +294,12 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                     </span>
                                 </Tooltip>
                             </div>
-                            <Input
+                            <TextField
                                 id={fieldId('bi-additional-email')}
                                 placeholder="pl2-app-demo@gmail.com"
                                 value={additionalEmail}
                                 onChange={(e) => setAdditionalEmail(e.target.value)}
-                                size="medium"
-                                showLabel={false}
+                                isLabelHidden
                             />
                         </div>
                         <div
@@ -317,13 +313,12 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             }}
                         >
                             <Label text="Slack Email" required={false} htmlFor={fieldId('bi-slack-email')} />
-                            <Input
+                            <TextField
                                 id={fieldId('bi-slack-email')}
                                 placeholder="pl2-app-demo@gmail.com"
                                 value={slackEmail}
                                 onChange={(e) => setSlackEmail(e.target.value)}
-                                size="medium"
-                                showLabel={false}
+                                isLabelHidden
                             />
                         </div>
                     </div>
@@ -393,7 +388,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 }}
                             >
                                 <Label text={field.label} required={false} htmlFor={fieldId(`status-${field.label}`)} />
-                                <Input id={fieldId(`status-${field.label}`)} value={field.value} readonly={true} size="medium" showLabel={false} />
+                                <TextField id={fieldId(`status-${field.label}`)} value={field.value} isReadOnly={true} isLabelHidden />
                             </div>
                         ))}
                     </div>

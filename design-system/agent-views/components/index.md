@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (70)
+## UI components (68)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -40,8 +40,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)
-- [Input](../../src/components/forms-and-inputs/Input.md)
-- [InputGroup](../../src/components/forms-and-inputs/InputGroup/index.md)
 - [Jumbotron](../../src/components/layout-and-structure/Jumbotron/index.md)
 - [ListGroup](../../src/components/layout-and-structure/ListGroup/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
@@ -50,7 +48,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [NavPills](../../src/components/navigation/NavPills/index.md)
 - [NavTabs](../../src/components/navigation/NavTabs/index.md)
 - [Navbar](../../src/components/_internal/Navbar/index.md)
-- [NumberInput](../../src/components/forms-and-inputs/NumberInput.md)
 - [Pagination](../../src/components/navigation/Pagination/index.md)
 - [Popover](../../src/components/overlays-and-layering/Popover/index.md)
 - [Progress](../../src/components/loading/Progress/index.md)
@@ -72,7 +69,8 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Tag](../../src/components/labels/Tag/index.md)
 - [TagGroup](../../src/components/labels/TagGroup/index.md)
 - [TagInput](../../src/components/forms-and-inputs/TagInput.md)
-- [Textarea](../../src/components/forms-and-inputs/Textarea.md)
+- [TextArea](../../src/components/forms-and-inputs/TextArea/index.md)
+- [TextField](../../src/components/forms-and-inputs/TextField/index.md)
 - [Tile](../../src/components/images-and-icons/Tile/index.md)
 - [Toast](../../src/components/messaging/Toast/index.md)
 - [Toggle](../../src/components/forms-and-inputs/Toggle.md)

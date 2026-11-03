@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import Toggle from '@/components/forms-and-inputs/Toggle';
 
 /**
@@ -73,7 +73,7 @@ const FreeResponseQuestion = ({
             ) : null}
         </div>
 
-        <Textarea
+        <TextArea
             id={id}
             name={id}
             value={value}

@@ -52,7 +52,7 @@
  */
 import React from 'react';
 import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';
 import { ClearanceStatus } from '../Elements/ClearanceStatus.stories';
@@ -199,12 +199,11 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     }}
                 >
                     <Label text="Tutor Status" required={false} htmlFor={`${uid}-tutor-status`} />
-                    <Input
+                    <TextField
                         id={`${uid}-tutor-status`}
                         value="Lead Tutor"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -220,12 +219,11 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     }}
                 >
                     <Label text="Onboarding Status:" required={false} htmlFor={`${uid}-onboarding-status`} />
-                    <Input
+                    <TextField
                         id={`${uid}-onboarding-status`}
                         value="Complete"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -241,12 +239,11 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     }}
                 >
                     <Label text="Tutoring with PLUS since:" required={false} htmlFor={`${uid}-tutoring-since`} />
-                    <Input
+                    <TextField
                         id={`${uid}-tutoring-since`}
                         value="01/29/2026"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
 
@@ -262,12 +259,11 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     }}
                 >
                     <Label text="Assigned Supervisor:" required={false} htmlFor={`${uid}-assigned-supervisor`} />
-                    <Input
+                    <TextField
                         id={`${uid}-assigned-supervisor`}
                         value="Albus Dumbledore"
-                        readonly={true}
-                        size="medium"
-                        showLabel={false}
+                        isReadOnly={true}
+                        isLabelHidden
                     />
                 </div>
             </div>

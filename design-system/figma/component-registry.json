@@ -832,74 +832,6 @@
         "sets": []
       }
     },
-    "Input": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Input.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Input.jsx",
-        "storybookId": "components-forms-and-inputs-text-field--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "input",
-            "name": "Input",
-            "componentSetNodeId": "39:4802",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-4802",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "field",
-            "name": "Form",
-            "componentSetNodeId": "14841:25919",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14841-25919",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The part this component is built on, still named Form in the Figma file: one box with Leading, Content and Trailing slots, 3 sizes × 7 states (21 variants). In code it is `_internal/Field.jsx`, which is not exported from the barrel, so `unpublished` is its settled state: a part to build on, not a component to place."
-          },
-          {
-            "id": "field-text",
-            "name": "_Field Text",
-            "componentSetNodeId": "18265:4067",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-4067",
-            "source": "designer-supplied",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The text in Form's Content slot, by kind (2 variants): placeholder or value. No component of its own in code: Input renders it as the native input's placeholder and value, so like Form it is a part to build on, not a component to place."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6957"
-      }
-    },
-    "InputGroup": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InputGroup",
-        "source": "design-system/src/components/forms-and-inputs/InputGroup/InputGroup.jsx",
-        "storybookId": "components-forms-and-inputs-input-group--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "input-group",
-            "name": "Input Group",
-            "componentSetNodeId": "13671:3218",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13671-3218",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19496"
-      }
-    },
     "Jumbotron": {
       "code": {
         "import": "@/components/layout-and-structure",
@@ -1284,30 +1216,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
-      }
-    },
-    "NumberInput": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/NumberInput.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/NumberInput.jsx",
-        "storybookId": "components-forms-and-inputs-number-input--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "number-input-group-button",
-            "name": "Number Input Group Button",
-            "componentSetNodeId": "13644:11268",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13644-11268",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5812"
       }
     },
     "OptionChip": {
@@ -2206,62 +2114,40 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
             "source": "manual",
             "status": "unpublished",
-            "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `Input size=\"small\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
+            "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `TextField spacing=\"compact\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
       }
     },
-    "Textarea": {
+    "TextArea": {
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Textarea.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Textarea.jsx",
-        "storybookId": "components-forms-and-inputs-text-area--docs",
-        "props": {
-          "size": {
-            "type": "enum",
-            "values": [
-              "small",
-              "medium",
-              "large"
-            ]
-          },
-          "state": {
-            "type": "enum",
-            "values": [
-              "default",
-              "focus",
-              "error",
-              "success",
-              "readonly",
-              "disabled"
-            ]
-          }
-        }
+        "mdxPath": "design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TextArea",
+        "source": "design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx",
+        "storybookId": "components-forms-and-inputs-text-area--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "textarea",
-            "name": "Textarea",
-            "componentSetNodeId": "13541:10731",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731",
-            "variantValueMap": {
-              "validation": {
-                "invalid": "error",
-                "valid": "success"
-              }
-            },
-            "status": "verified",
-            "verifiedAt": "2026-10-15",
-            "notes": "One set. Form Short Textarea was merged into it and deleted from the library; a text area is 80 high at least and grows from there. `rows` is code-only: Figma sets the height by resizing the instance."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-10731"
+        "sets": [],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
+      }
+    },
+    "TextField": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/TextField/TextField.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TextField",
+        "source": "design-system/src/components/forms-and-inputs/TextField/TextField.jsx",
+        "storybookId": "components-forms-and-inputs-text-field--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
       }
     },
     "Tile": {

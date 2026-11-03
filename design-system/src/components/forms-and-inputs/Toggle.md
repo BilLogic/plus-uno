@@ -47,7 +47,7 @@ From `design-system/src/components/forms-and-inputs/Toggle.scss`. Override these
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

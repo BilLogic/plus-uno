@@ -30,14 +30,13 @@ const REGISTRY = 'design-system/figma/component-registry.json';
 const RECORDING = 'design-system/figma/node-types.json';
 
 /**
- * The floor, measured over 100 recorded ids. The recording has since grown to
- * 104 ids across 107 mappings: `14841:25919` (`_Field`) is claimed by `Input`,
- * `InputGroup`, `NumberInput` and `Textarea`, the parts they share. A
- * comparison over an empty recording agrees with everything, so the size is
- * asserted rather than assumed. Lower it only when a mapping is genuinely
- * deleted, and say which one in the commit.
+ * The floor. A comparison over an empty recording agrees with everything, so
+ * the size is asserted rather than assumed. Lower it only when a mapping is
+ * genuinely deleted, and say which one in the commit. 95: Input, Textarea,
+ * Number input and Input group left with Text field and Text area, taking their
+ * six Figma nodes (`_Field` among them) out of the registry.
  */
-export const MIN_RECORDED = 100;
+export const MIN_RECORDED = 95;
 
 export const REMEDY =
   `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +

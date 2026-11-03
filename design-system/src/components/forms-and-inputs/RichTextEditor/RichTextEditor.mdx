@@ -75,7 +75,7 @@ export const figmaMeta = {
 
 Use `RichTextEditor` where the formatting is part of the meaning — session notes
 with a list, feedback with emphasis, a description that needs a link. Where it is
-not, a `Textarea` is the smaller, sturdier control.
+not, a `TextArea` is the smaller, sturdier control.
 
 `toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the
 buttons by name and implies the full toolbar. `value` and `onChange` are HTML
@@ -145,9 +145,9 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Related
 
-- For plain multi-line text, use `Textarea` — smaller, labeled, and with none
+- For plain multi-line text, use `TextArea` — smaller, labeled, and with none
   of the above.
-- For one line, use `Input`.
+- For one line, use `TextField`.
 - For displaying formatted content the user cannot edit, render the HTML
   yourself after sanitizing it.
 

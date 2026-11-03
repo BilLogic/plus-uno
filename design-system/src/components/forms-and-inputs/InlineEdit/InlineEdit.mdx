@@ -14,7 +14,7 @@ export const figmaMeta = {
 
 <Title />
 Text that reads as text and becomes a field when it is pressed. `InlineEdit` holds
-any edit view; `InlineEditableTextfield` is the one built on `Input`.
+any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <DocsTabs of={InlineEditStories}>
 
@@ -134,9 +134,9 @@ Use `InlineEdit` for a value that is read far more often than it is changed and
 that can be saved on its own: a title, a name or a short note on a record or a
 profile page.
 
-Use `Input` inside a form, where a Save button submits every field together. An
+Use `TextField` inside a form, where a Save button submits every field together. An
 inline edit saves when it is confirmed and has no say in the form's submit, so
-placing one in a form leaves two ways to save. Use a subtle `Input` where
+placing one in a form leaves two ways to save. Use a subtle `TextField` where
 leaving the field should save with no buttons at all.
 
 </div>
@@ -197,9 +197,9 @@ thought, and keep the buttons so there is a clear way out.
 
 ## Related
 
-- For a field in a form, use `Input`.
-- For editing in place with no buttons, use `Input` with `subtle`.
-- For several lines edited in place, use `Textarea` with `subtle`.
+- For a field in a form, use `TextField`.
+- For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
+- For several lines edited in place, use `TextArea` with `appearance="subtle"`.
 
 </div>
 

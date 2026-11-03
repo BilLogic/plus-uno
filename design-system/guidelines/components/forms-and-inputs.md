@@ -13,7 +13,7 @@ file is about picking one.
 
 The group follows Atlassian's Forms and inputs category, so it holds the
 buttons too. Storybook titles components with Atlassian's display names,
-while the code export keeps its own: `Input` is Text field, `Textarea`
+while the code export keeps its own: `TextField` is Text field, `TextArea`
 is Text area, `Switch` is Toggle, `Dropdown` is Dropdown menu, and
 `DateAndTimePicker` is Date time picker.
 
@@ -24,8 +24,8 @@ importable from `@/components` today.
 
 | The answer is | Reach for |
 |---|---|
-| free text, one line | `Input` |
-| free text, several lines | `Textarea`, sized with `rows` |
+| free text, one line | `TextField` |
+| free text, several lines | `TextArea`, sized with `rows` |
 | one pick, fewer than 5 options | `ChoiceGroup` (`type="radio"`, the default) |
 | one pick, 5–15 options | `Select` |
 | one pick, more than 15 options | `Select searchable` |
@@ -37,9 +37,9 @@ importable from `@/components` today.
 | the same choice for several questions | `ChoiceGrid` |
 | an action run from a button | `Dropdown` — a button, not a field |
 
-The rest of the group answers narrower shapes: `NumberInput` for a number with
-steppers, `RichTextEditor` for formatted prose, `InputGroup` for a field with
-text, an icon or a button welded to it, `Range` for a number in a continuous
+The rest of the group answers narrower shapes: `TextField type="number"` for a number with
+steppers, `RichTextEditor` for formatted prose, `elemBefore` and `elemAfter` on a
+`TextField` for text, an icon or a button inside the field, `Range` for a number in a continuous
 range, `Switch` for a setting that applies immediately, `Checkbox` for one
 independent yes/no saved with the form, `DateAndTimePicker` for a date or time,
 `FileUpload` for a file.
@@ -113,17 +113,14 @@ something else on the page must reference the control; leave it off and the
 label still names the field. `Select` and `DatePicker` render no label, so this
 rule does not reach them.
 
-**Validation is wired on five fields.** `validation="invalid"` with
-`validationMessage` — on `Input`, `NumberInput`, `FileUpload`,
+**Validation is wired on five fields.** `isInvalid` with
+`errorMessage` — on `TextField`, `TextArea`, `FileUpload`,
 `DateAndTimePicker` and `TagInput` — sets `aria-invalid` and points `aria-describedby` at the
-message, appending to any `aria-describedby` the caller passed. `Textarea` has
-no message slot: its `state="error"` is styling, so the caller renders the
-message and passes `aria-invalid` and `aria-describedby`, which reach the
-`textarea` through its rest props. Either way the error belongs on the field,
+message, appending to any `aria-describedby` the caller passed. The error belongs on the field,
 not in an `Alert` at the top of the form — see
 `design-system/guidelines/components/messaging.md`.
 
-**`required` means three different things.** On `Input`, `NumberInput`,
+**`required` means three different things.** On `TextField`, `TextArea`,
 `FileUpload`, `DateAndTimePicker`, `Rating` and `TagInput` it draws an
 asterisk marked `aria-label="required"` and stops there, so enforce it yourself.
 `Checkbox` forwards it to the native input. `ChoiceGroup` marks its legend and,
@@ -174,8 +171,8 @@ radio or checkbox.
 click handler, and it is what the rest of the system composes when it
 needs an action: `Modal` builds its footer from `primaryButton` /
 `secondaryButton`, `Jumbotron` takes Buttons in its `actions` slot, `Card` builds
-from `actionButton`, `InputGroup`
-from `InputGroup.Button`. Pass `href` when the
+from `actionButton`, and `TextField`
+from a Button in `elemBefore` or `elemAfter`. Pass `href` when the
 action is really navigation — the component forwards it and renders an anchor,
 which keeps middle-click and open-in-new-tab working.
 

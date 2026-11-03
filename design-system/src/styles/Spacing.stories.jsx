@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Input, Tag, Suggestion } from '@/components';
+import { Button, TextField, Tag, Suggestion } from '@/components';
 import { PatternCard } from '@/patterns';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 
@@ -24,9 +24,9 @@ const col = (gap) => ({ display: 'flex', flexDirection: 'column', gap });
 const row = (gap) => ({ display: 'flex', alignItems: 'center', gap, flexWrap: 'wrap' });
 const tag = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 
-const School = ({ id }) => <Input id={`${id}-school`} label="School" placeholder="Select a school" />;
-const Teacher = ({ id }) => <Input id={`${id}-teacher`} label="Teacher" placeholder="Select a teacher" />;
-const SessionDate = ({ id }) => <Input id={`${id}-date`} label="Session date" defaultValue="Tuesday, June 3" />;
+const School = ({ id }) => <TextField id={`${id}-school`} label="School" placeholder="Select a school" />;
+const Teacher = ({ id }) => <TextField id={`${id}-teacher`} label="Teacher" placeholder="Select a teacher" />;
+const SessionDate = ({ id }) => <TextField id={`${id}-date`} label="Session date" defaultValue="Tuesday, June 3" />;
 
 /** Item, Container and Wrapper: the kind of box decides its pad. */
 export const ThreeKinds = () => (
@@ -146,7 +146,7 @@ export const Hierarchy = () => (
                     <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Shown to your students.</span>
                 </div>
                 <div style={{ height: 'var(--section-stack-md)' }} />
-                <Input id="hie-do-name" label="Display name" defaultValue="Maya Chen" />
+                <TextField id="hie-do-name" label="Display name" defaultValue="Maya Chen" />
                 <div style={{ height: 'var(--section-stack-lg)' }} />
                 <span><Button text="Save changes" appearance="primary" /></span>
             </div>
@@ -155,7 +155,7 @@ export const Hierarchy = () => (
             <div style={col('var(--space-050)')}>
                 <span style={{ font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>Profile</span>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Shown to your students.</span>
-                <Input id="hie-dont-name" label="Display name" defaultValue="Maya Chen" />
+                <TextField id="hie-dont-name" label="Display name" defaultValue="Maya Chen" />
                 <span><Button text="Save changes" appearance="primary" /></span>
             </div>
         </Dont>
