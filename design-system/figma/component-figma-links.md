@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-63 docs-page links + 86 style/variant entries across 71 components.
+62 docs-page links + 85 style/variant entries across 70 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -69,7 +69,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | TreeSelect |  | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-) |
 | Other | Footer | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) |
 | Other | MaintenanceAlert | `2370:194322` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322) |
-| Other | OptionChip | `10661:10292` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10661-10292) |
 | Other | OverviewCard | `83:125838` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838) |
 | Other | PageLayout | `112:597` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597) |
 | Other | Sidebar | `111:227891` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891) |
@@ -162,7 +161,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Other | Footer | Footnote | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) | verified |
 | Other | Logo | Logo | `1133:12915` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1133-12915) | verified |
 | Other | MaintenanceAlert | Maintenance Alert | `2370:194322` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322) | verified |
-| Other | OptionChip | Option Chip | `10661:10292` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=10661-10292) |  |
 | Other | OverviewCard | Overview Card | `83:125838` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838) | verified |
 | Other | PageLayout | Page Layout | `111:241933` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-241933) | verified |
 | Other | Sidebar | Sidebar | `111:227891` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891) | verified |
