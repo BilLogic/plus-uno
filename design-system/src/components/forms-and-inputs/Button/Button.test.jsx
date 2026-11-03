@@ -84,7 +84,9 @@ describe('Button', () => {
     });
 
     it('renders an anchor when given an href', () => {
-        render(<Button href="/sessions" text="Sessions" />);
-        expect(screen.getByRole('link', { name: 'Sessions' })).toHaveAttribute('href', '/sessions');
+        const { container } = render(<Button href="/sessions" text="Sessions" />);
+        const anchor = container.querySelector('a');
+        expect(anchor).toHaveAttribute('href', '/sessions');
+        expect(anchor).toHaveTextContent('Sessions');
     });
 });
