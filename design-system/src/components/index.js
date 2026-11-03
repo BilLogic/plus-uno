@@ -62,6 +62,7 @@ export { default as Jumbotron, resetJumbotronDeprecationWarnings } from '@/compo
 export { default as ListGroup, ListGroupItem } from '@/components/layout-and-structure/ListGroup';
 export { default as MediaObject } from '@/components/layout-and-structure/MediaObject';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
+export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 export { default as VisuallyHidden } from '@/components/layout-and-structure/VisuallyHidden';
 

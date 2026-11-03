@@ -2,7 +2,7 @@
 
 # Layout and structure
 
-12 components. Each row links to the generated facts; the three columns after it are the
+13 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -17,10 +17,11 @@ authored half (#166), counted rather than assumed.
 | [ListGroup](ListGroup/index.md) | 5 | ✅ | ✕ | ✅ |
 | [MediaObject](MediaObject/index.md) | 8 | ✅ | ✅ | ✅ |
 | [PageHeader](PageHeader/index.md) | 7 | ✕ | ✕ | ✕ |
+| [Panel](Panel/index.md) | 3 | ✕ | ✕ | ✕ |
 | [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
 | [VisuallyHidden](VisuallyHidden/index.md) | 3 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 10/12 (83%) · Correct/incorrect 9/12 (75%) · Accessibility 10/12 (83%)
+**Authored coverage:** When to use 10/13 (77%) · Correct/incorrect 9/13 (69%) · Accessibility 10/13 (77%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
