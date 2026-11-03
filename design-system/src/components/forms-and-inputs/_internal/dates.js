@@ -1,5 +1,5 @@
 /**
- * Date helpers shared by DatePicker, DateAndTimePicker and the Calendar part.
+ * Date helpers shared by DatePicker, DateTimePicker and the Calendar part.
  * Dates are local calendar days; ISO strings are `YYYY-MM-DD`.
  */
 

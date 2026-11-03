@@ -14,8 +14,8 @@ authored half (#166), counted rather than assumed.
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 4 | ✅ | ✅ | ✅ |
-| [DateAndTimePicker](DateAndTimePicker.md) | 28 | ✅ | ✕ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
+| [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
+| [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
@@ -37,7 +37,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 18/29 (62%) · Correct/incorrect 10/29 (34%) · Accessibility 22/29 (76%)
+**Authored coverage:** When to use 16/29 (55%) · Correct/incorrect 9/29 (31%) · Accessibility 20/29 (69%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Cascader, DateAndTimePicker, DatePicker, TextField, RichTextEditor, Select, TagInput, TextArea, TreeSelect } from '@/components';
+import { Button, Cascader, DateTimePicker, DatePicker, TextField, RichTextEditor, Select, TagInput, TextArea, TreeSelect } from '@/components';
 
 /**
  * Every single-line field is 40 high, or 32 compact, its content centered,
@@ -45,7 +45,7 @@ const SINGLE_LINE = [
     ['Select', () => <Select label="Select" options={OPTIONS} placeholder="Subject" />],
     ['Number field', () => <TextField type="number" label="Number field" defaultValue={3} />],
     ['Date picker', () => <DatePicker aria-label="Date picker" placeholder="MM/DD/YYYY" />],
-    ['Date time picker', () => <DateAndTimePicker label="Date time picker" />],
+    ['Date time picker', () => <DateTimePicker label="Date time picker" />],
     ['Cascader', () => <Cascader options={CASCADE} onChange={() => {}} />],
     ['Tree select', () => <TreeSelect options={TREE} onChange={() => {}} />],
     ['Text field with affixes', () => <TextField label="Text field with affixes" elemBefore="$" elemAfter=".00" />],
@@ -123,7 +123,7 @@ export const ButtonInside = () => (
             <TextField type="number" label="Sessions" defaultValue={3} />
         </div>
         <div data-field="AM/PM">
-            <DateAndTimePicker label="Starts" showDate={false} />
+            <DateTimePicker label="Starts" showDate={false} />
         </div>
     </div>
 );
@@ -193,32 +193,4 @@ MultiLine.play = async ({ canvasElement }) => {
     await expect(heightOf(full), 'Full tag field at rest').toBe(40);
     await userEvent.click(within(full).getByRole('combobox'));
     await waitFor(() => expect(heightOf(full), 'Tag field grows').toBeGreaterThan(40));
-};
-
-/** The calendar a deprecated-size Date picker opens is the medium one. */
-export const DeprecatedCalendar = () => (
-    <div style={stack}>
-        {['small', 'medium', 'large'].map((size) => (
-            <div key={size} data-field={`Calendar ${size}`}>
-                <DatePicker size={size} aria-label={`Calendar ${size}`} placeholder="MM/DD/YYYY" />
-            </div>
-        ))}
-    </div>
-);
-
-DeprecatedCalendar.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const dayCell = async (size) => {
-        await userEvent.click(canvas.getByRole('combobox', { name: `Calendar ${size}` }));
-        await waitFor(() => expect(document.body.querySelector('.plus-date-popup .plus-calendar')).not.toBeNull());
-        const calendar = document.body.querySelector('.plus-date-popup .plus-calendar');
-        const day = calendar.querySelector('button.plus-calendar-day');
-        const drawn = { medium: calendar.classList.contains('plus-calendar--medium'), w: Math.round(rect(day).width), h: Math.round(rect(day).height) };
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(document.body.querySelector('.plus-date-popup .plus-calendar')).toBeNull());
-        return drawn;
-    };
-    const medium = await dayCell('medium');
-    await expect(await dayCell('small'), 'small calendar').toEqual(medium);
-    await expect(await dayCell('large'), 'large calendar').toEqual(medium);
 };

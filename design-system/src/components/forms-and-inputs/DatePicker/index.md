@@ -3,13 +3,13 @@
 
 # DatePicker
 
-Built from the shared parts: the field is `_Field` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateAndTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--size-element-gap-xs`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
+Built from the shared parts: the field is `_Field` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--size-element-gap-xs`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
 
 **Import:** `import { DatePicker } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Sizes, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -22,11 +22,11 @@ Built from the shared parts: the field is `_Field` with the calendar icon in Tra
 | `placeholder` | string | — | Placeholder text |
 | `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be null. |
 | `range` | bool | `false` | Pick a first and a last day |
-| `size` | enum | `'medium'` | Size variant |
-| `disabled` | bool | `false` | Disable the picker |
-| `readOnly` | bool | `false` | Make read-only |
-| `invalid` | bool | `false` | Draw the field invalid |
-| `valid` | bool | `false` | Draw the field valid |
+| `spacing` | enum | `'default'` | Field height: 40 default, 32 compact |
+| `isDisabled` | bool | `false` | Disable the picker |
+| `isReadOnly` | bool | `false` | Make read-only |
+| `isInvalid` | bool | `false` | Draw the field invalid |
+| `isValid` | bool | `false` | Draw the field valid |
 | `minDate` | string or instanceOf | — | Optional minimum allowed date |
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
 | `calendarAlign` | enum | `'left'` | Calendar dropdown alignment |
@@ -38,7 +38,7 @@ Built from the shared parts: the field is `_Field` with the calendar icon in Tra
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
+**`spacing`** — `default` · `compact`
 
 **`calendarAlign`** — `left` · `center` · `right`
 
@@ -52,6 +52,10 @@ From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `DatePicker` is the right call, only what it accepts.

@@ -15,7 +15,7 @@ The group follows Atlassian's Forms and inputs category, so it holds the
 buttons too. Storybook titles components with Atlassian's display names,
 while the code export keeps its own: `TextField` is Text field, `TextArea`
 is Text area, `Switch` is Toggle, `Dropdown` is Dropdown menu, and
-`DateAndTimePicker` is Date time picker.
+`DateTimePicker` is Date time picker.
 
 ## Which input to use
 
@@ -41,7 +41,7 @@ The rest of the group answers narrower shapes: `TextField type="number"` for a n
 steppers, `RichTextEditor` for formatted prose, `elemBefore` and `elemAfter` on a
 `TextField` for text, an icon or a button inside the field, `Range` for a number in a continuous
 range, `Switch` for a setting that applies immediately, `Checkbox` for one
-independent yes/no saved with the form, `DateAndTimePicker` for a date or time,
+independent yes/no saved with the form, `DateTimePicker` for a date or time,
 `FileUpload` for a file.
 
 ### A default, or every option in view
@@ -98,10 +98,10 @@ and its column.
   Notion's multi-select: typing filters its options, and a Create row adds a
   new value with a random Tag color, reported through `onCreate`. Its
   `options` are required and owned by the caller.
-- `DatePicker` is a bare date control with no `label`, no `required`, no
-  `validation`, and no rest props, so nothing can name it. Reach for
-  `DateAndTimePicker`, which has `label`, `required`, `validation` with
-  `validationMessage`, `minDate` / `maxDate`, and `showDate={false}` when only a
+- `DatePicker` is a bare date control with no `label`, no `isRequired`, no
+  `isInvalid`, and no rest props, so nothing can name it. Reach for
+  `DateTimePicker`, which has `label`, `isRequired`, `isInvalid` with
+  `errorMessage`, `minDate` / `maxDate`, and `showDate={false}` when only a
   time is wanted.
 
 ## Rules that apply across the group
@@ -115,13 +115,13 @@ rule does not reach them.
 
 **Validation is wired on five fields.** `isInvalid` with
 `errorMessage` — on `TextField`, `TextArea`, `FileUpload`,
-`DateAndTimePicker` and `TagInput` — sets `aria-invalid` and points `aria-describedby` at the
+`DateTimePicker` and `TagInput` — sets `aria-invalid` and points `aria-describedby` at the
 message, appending to any `aria-describedby` the caller passed. The error belongs on the field,
 not in an `Alert` at the top of the form — see
 `design-system/guidelines/components/messaging.md`.
 
-**`required` means three different things.** On `TextField`, `TextArea`,
-`FileUpload`, `DateAndTimePicker`, `Rating` and `TagInput` it draws an
+**`isRequired` means three different things.** On `TextField`, `TextArea`,
+`FileUpload`, `DateTimePicker`, `Rating` and `TagInput` it draws an
 asterisk marked `aria-label="required"` and stops there, so enforce it yourself.
 `Checkbox` forwards it to the native input. `ChoiceGroup` marks its legend and,
 for radios, sets `aria-required` on the group and `required` on every radio; a
@@ -130,7 +130,7 @@ announces it through a visually hidden "Required" description on the trigger.
 
 **Popup placement.** Every popup that opens from a field or button follows one
 rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
-`DateAndTimePicker` and the `Dropdown` menu.
+`DateTimePicker` and the `Dropdown` menu.
 
 - **Gap:** `--size-element-gap-xs` (4px) between the trigger's edge and the
   popup surface, as a token, with Bootstrap's spacer margin reset to zero.

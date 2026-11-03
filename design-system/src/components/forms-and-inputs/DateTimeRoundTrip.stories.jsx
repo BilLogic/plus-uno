@@ -1,12 +1,12 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import DateAndTimePicker from './DateAndTimePicker';
+import DateTimePicker from './DateTimePicker/DateTimePicker';
 
 /**
  * A time surviving a round trip through the control that shows it.
  *
- * WHY THIS FILE EXISTS. `DateAndTimePicker` renders an hour, a minute and an
+ * WHY THIS FILE EXISTS. `DateTimePicker` renders an hour, a minute and an
  * AM/PM control. Its `timeValue` parser converted a 12-hour value UP to
  * 24-hour — `if (period === 'PM' && hours !== 12) hours += 12` — and then the
  * component rendered that number beside the period it had just been derived
@@ -33,7 +33,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Behavior cover for the time half of DateAndTimePicker: a 12-hour value renders '
+                    'Behavior cover for the time half of DateTimePicker: a 12-hour value renders '
                     + 'as it was given, a 24-hour value is split into an hour and a period, the hour '
                     + 'field refuses a number the control cannot show, and an AM/PM change is '
                     + 'reported with or without a date.',
@@ -56,7 +56,7 @@ const period = (root) => root.querySelector('.plus-datetime-am-pm-toggle').textC
 
 export const TwelveHourValueSurvives = {
     render: () => (
-        <DateAndTimePicker label="Session start" timeValue="02:30 PM" dateValue="03/14/26" />
+        <DateTimePicker label="Session start" timeValue="02:30 PM" dateValue="03/14/26" />
     ),
 };
 
@@ -70,7 +70,7 @@ TwelveHourValueSurvives.play = async ({ canvasElement }) => {
 };
 
 export const TwentyFourHourValueIsSplit = {
-    render: () => <DateAndTimePicker label="Session start" timeValue="14:30" />,
+    render: () => <DateTimePicker label="Session start" timeValue="14:30" />,
 };
 
 TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
@@ -84,8 +84,8 @@ TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
 export const MidnightAndNoonReadAsTwelve = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <DateAndTimePicker label="Midnight" timeValue="00:15" />
-            <DateAndTimePicker label="Noon" timeValue="12:45" />
+            <DateTimePicker label="Midnight" timeValue="00:15" />
+            <DateTimePicker label="Noon" timeValue="12:45" />
         </div>
     ),
 };
@@ -103,7 +103,7 @@ MidnightAndNoonReadAsTwelve.play = async ({ canvasElement }) => {
 };
 
 export const HourFieldRefusesWhatItCannotShow = {
-    render: () => <DateAndTimePicker label="Session start" />,
+    render: () => <DateTimePicker label="Session start" />,
 };
 
 HourFieldRefusesWhatItCannotShow.play = async ({ canvasElement }) => {
@@ -130,7 +130,7 @@ HourFieldRefusesWhatItCannotShow.play = async ({ canvasElement }) => {
 export const PeriodChangeIsReportedWithoutADate = {
     args: { onChange: fn() },
     render: (args) => (
-        <DateAndTimePicker label="Session start" timeValue="09:15 AM" onChange={args.onChange} />
+        <DateTimePicker label="Session start" timeValue="09:15 AM" onChange={args.onChange} />
     ),
 };
 

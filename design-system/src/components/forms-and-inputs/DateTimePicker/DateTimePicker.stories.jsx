@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import DateAndTimePicker from './DateAndTimePicker';
+import DateTimePicker from './DateTimePicker';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker',
-    component: DateAndTimePicker,
+    component: DateTimePicker,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-10-23', kind: 'changed', summary: 'Both fields became 32, their text centered and their side padding 12, with a 24 AM/PM menu.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
-        ],
         docs: {
             description: {
                 component:
@@ -27,7 +23,7 @@ export default {
             description: 'Label text for the date and time picker field',
             table: { category: 'Content' },
         },
-        required: {
+        isRequired: {
             control: 'boolean',
             description: 'Whether the field is required (shows red asterisk)',
             table: { category: 'Content' },
@@ -42,31 +38,40 @@ export default {
             description: 'Placeholder text for the time input',
             table: { category: 'Content' },
         },
-        size: {
+        spacing: {
             control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant of the component',
+            options: ['default', 'compact'],
+            description: 'Field height: 40 default, 32 compact',
             table: { category: 'Design' },
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the date and time picker component',
             table: { category: 'Behavior' },
         },
-        readonly: {
+        isReadOnly: {
             control: 'boolean',
             description: 'Make the component read-only',
             table: { category: 'Behavior' },
         },
-        validation: {
-            control: 'select',
-            options: ['none', 'invalid', 'success'],
-            description: 'Validation state of the component',
+        isInvalid: {
+            control: 'boolean',
+            description: 'Draw the field invalid',
             table: { category: 'Validation' },
         },
-        validationMessage: {
+        isValid: {
+            control: 'boolean',
+            description: 'Draw the field valid',
+            table: { category: 'Validation' },
+        },
+        errorMessage: {
             control: 'text',
-            description: 'Message displayed for validation states',
+            description: 'Message shown when `isInvalid`',
+            table: { category: 'Validation' },
+        },
+        successMessage: {
+            control: 'text',
+            description: 'Message shown when `isValid`',
             table: { category: 'Validation' },
         },
         id: {
@@ -85,16 +90,9 @@ export default {
     },
 };
 
-const contentVariantCard = {
-    padding: '12px',
-    border: '1px solid var(--ds-border)',
-    borderRadius: '12px',
-    background: 'var(--ds-surface-container)',
-};
-
 export const Overview = () => (
     <div style={{ maxWidth: '600px' }}>
-        <DateAndTimePicker id="datetime-overview" label="Month" required showSectionLabels={false} />
+        <DateTimePicker id="datetime-overview" label="Month" isRequired showSectionLabels={false} />
     </div>
 );
 Overview.parameters = {
@@ -103,67 +101,40 @@ Overview.parameters = {
     }
 };
 
-export const Content = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
-        <section>
-            <h6 className="h6 mb-2">Without section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)', marginBottom: '12px' }}>
-                Compact row: date and time only.
-            </p>
-            <div style={contentVariantCard}>
-                <DateAndTimePicker id="datetime-content-nolabel" label="Month" required showSectionLabels={false} />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-2">With section labels</h6>
-            <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)', marginBottom: '12px' }}>
-                “Date” and “Time” captions above each control.
-            </p>
-            <div style={contentVariantCard}>
-                <DateAndTimePicker id="datetime-content-labels" label="Month" required showSectionLabels />
-            </div>
-        </section>
-    </div>
-);
-
-export const Sizes = () => (
+export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SMALL</span>
-            <DateAndTimePicker id="dt-small" label="Month" required size="small" showSectionLabels={false} />
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <DateTimePicker id="dt-default" label="Month" isRequired spacing="default" showSectionLabels={false} />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MEDIUM (DEFAULT)</span>
-            <DateAndTimePicker id="dt-medium" label="Month" required size="medium" showSectionLabels={false} />
-        </div>
-        <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LARGE</span>
-            <DateAndTimePicker id="dt-large" label="Month" required size="large" showSectionLabels={false} />
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <DateTimePicker id="dt-compact" label="Month" isRequired spacing="compact" showSectionLabels={false} />
         </div>
     </div>
 );
 
-export const Styles = () => (
+export const Validation = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
-            <DateAndTimePicker
+            <DateTimePicker
                 id="datetime-error"
                 label="Month"
-                required
-                validation="invalid"
-                validationMessage="Validation message"
+                isRequired
+                isInvalid
+                errorMessage="Validation message"
                 showSectionLabels={false}
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SUCCESS</span>
-            <DateAndTimePicker
+            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
+            <DateTimePicker
                 id="datetime-success"
                 label="Month"
-                required
-                validation="success"
-                validationMessage="Validation message"
+                isRequired
+                isValid
+                successMessage="Validation message"
                 showSectionLabels={false}
             />
         </div>
@@ -174,29 +145,29 @@ export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
-            <DateAndTimePicker id="datetime-default" label="Month" required showSectionLabels={false} />
+            <DateTimePicker id="datetime-default" label="Month" isRequired showSectionLabels={false} />
         </div>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-            <DateAndTimePicker id="datetime-disabled" label="Month" required disabled showSectionLabels={false} />
+            <DateTimePicker id="datetime-disabled" label="Month" isRequired isDisabled showSectionLabels={false} />
         </div>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
-            <DateAndTimePicker id="datetime-readonly" label="Month" required readonly showSectionLabels={false} />
+            <DateTimePicker id="datetime-readonly" label="Month" isRequired isReadOnly showSectionLabels={false} />
         </div>
     </div>
 );
 
 export const TimeZones = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '600px', paddingBottom: '300px' }}>
-        <DateAndTimePicker
+        <DateTimePicker
             id="datetime-tz-same"
             label="Session start"
             timeZone="America/New_York"
             dateValue="2026-10-21"
             timeValue="04:00 PM"
         />
-        <DateAndTimePicker
+        <DateTimePicker
             id="datetime-tz-other"
             label="Session start"
             timeZone="America/Los_Angeles"
@@ -221,7 +192,7 @@ export const Interactive = (args) => {
 
     return (
         <div style={{ maxWidth: '600px' }}>
-            <DateAndTimePicker
+            <DateTimePicker
                 {...args}
                 onChange={(data) => {
                     setValue(data);
@@ -248,13 +219,13 @@ export const Interactive = (args) => {
 Interactive.args = {
     id: 'datetime-interactive',
     label: 'Month',
-    required: true,
+    isRequired: true,
     datePlaceholder: 'MM/DD/YY',
     timePlaceholder: '__ : __',
-    size: 'medium',
-    disabled: false,
-    readonly: false,
-    validation: 'none',
-    validationMessage: '',
+    spacing: 'default',
+    isDisabled: false,
+    isReadOnly: false,
+    isInvalid: false,
+    isValid: false,
     showSectionLabels: false,
 };
