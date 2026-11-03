@@ -1,7 +1,7 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
-import Toggle from '@/components/forms-and-inputs/Toggle';
+import { Button, Toggle } from '@/components';
+import { QuestionCaption, QuestionLabel } from '@/specs/Toolkit/Post-Session/QuestionText';
 import FileListItem from '@/specs/Toolkit/Post-Session/Elements/FileListItem/FileListItem';
 import NoRecordingReason from '@/specs/Toolkit/Post-Session/Elements/NoRecordingReason/NoRecordingReason';
 
@@ -42,14 +42,11 @@ const UploadFiles = ({
                 maxWidth: 'var(--col-9)',
             }}
         >
-            <label className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                Upload session recording
-                <span style={{ color: 'var(--color-danger)' }}> *</span>
-            </label>
+            <QuestionLabel isRequired>Upload session recording</QuestionLabel>
 
-            <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <QuestionCaption>
                 Upload this session’s Zoom recording folder — video, audio, and student chat come in together. Single files and .zip work too.
-            </p>
+            </QuestionCaption>
 
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 <Button

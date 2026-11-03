@@ -1,7 +1,7 @@
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
-import Spinner from '@/components/loading/Spinner';
+import { TextArea } from '@/components';
+import { Spinner } from '@/components';
 import { PRIVACY_WARNING } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 import SparkleIcon from './SparkleIcon';
 
@@ -55,7 +55,7 @@ const AiPromptedQuestionBox = ({
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '84%' }} />
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '60%' }} />
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '36%' }} />
-                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Preparing your question…
                     </span>
                 </div>
@@ -67,7 +67,7 @@ const AiPromptedQuestionBox = ({
         return (
             <div className={className} style={shellStyle}>
                 <SparkleIcon size={24} />
-                <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)', flex: 1 }}>
+                <p className="body3-txt m-0" style={{ color: 'var(--ds-text-subtle)', flex: 1 }}>
                     No more questions for now — you’ve got it covered. Let’s move on to the next section!
                 </p>
             </div>
@@ -79,9 +79,9 @@ const AiPromptedQuestionBox = ({
             <SparkleIcon size={24} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-sm, 10px)', flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <p className="h6 m-0" style={{ color: 'var(--color-on-surface)' }}>{question}</p>
+                    <p className="h6 m-0" style={{ color: 'var(--ds-text)' }}>{question}</p>
                     {helper ? (
-                        <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{helper}</p>
+                        <p className="body3-txt m-0" style={{ color: 'var(--ds-text-subtle)' }}>{helper}</p>
                     ) : null}
                 </div>
                 <TextArea
@@ -92,7 +92,7 @@ const AiPromptedQuestionBox = ({
                     rows={3}
                 />
                 {showPrivacyWarning ? (
-                    <p className="body3-txt m-0" style={{ color: 'var(--color-danger-text, var(--color-danger))' }}>
+                    <p className="body3-txt m-0" style={{ color: 'var(--ds-text-danger)' }}>
                         {PRIVACY_WARNING}
                     </p>
                 ) : null}

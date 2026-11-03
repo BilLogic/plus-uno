@@ -1,78 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
-import './SideNavBar.scss';
-
-/**
- * Single side-nav tab row for the reflection flow.
- * Selected state paints the primary-16 pill — only for section tabs, not student names.
- *
- * @param {object} props
- * @param {string} props.text
- * @param {'enabled'|'selected'|'disabled'|'active-text'} [props.state='enabled']
- * @param {'section'|'student'} [props.variant='section']
- * @param {React.ReactNode} [props.trailingIcon]
- * @param {() => void} [props.onClick]
- */
-const SideBarTab = ({
-    text = 'Tab Title',
-    state = 'enabled',
-    variant = 'section',
-    trailingIcon = null,
-    onClick,
-}) => {
-    const isSelected = state === 'selected';
-    const isDisabled = state === 'disabled';
-    const isActiveText = state === 'active-text';
-
-    const className = [
-        'post-session-side-nav-tab',
-        variant === 'student' ? 'post-session-side-nav-tab--student' : '',
-        isSelected ? 'post-session-side-nav-tab--selected' : '',
-        isDisabled ? 'post-session-side-nav-tab--disabled' : '',
-        isActiveText ? 'post-session-side-nav-tab--active-text' : '',
-    ].filter(Boolean).join(' ');
-
-    return (
-        <div
-            role="button"
-            tabIndex={isDisabled ? -1 : 0}
-            aria-disabled={isDisabled || undefined}
-            aria-current={isSelected || isActiveText ? 'step' : undefined}
-            className={className}
-            onClick={!isDisabled ? onClick : undefined}
-            onKeyDown={(event) => {
-                if (isDisabled) return;
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onClick?.();
-                }
-            }}
-        >
-            <span
-                className={[
-                    'post-session-side-nav-tab__label',
-                    isSelected || isActiveText ? 'body2-txt font-weight-semibold' : 'body2-txt',
-                ].join(' ')}
-            >
-                {text}
-            </span>
-            {trailingIcon && (
-                <span className="post-session-side-nav-tab__icon" aria-hidden="true">
-                    {trailingIcon}
-                </span>
-            )}
-        </div>
-    );
-};
-
-SideBarTab.propTypes = {
-    text: PropTypes.string,
-    state: PropTypes.oneOf(['enabled', 'selected', 'disabled', 'active-text']),
-    variant: PropTypes.oneOf(['section', 'student']),
-    trailingIcon: PropTypes.node,
-    onClick: PropTypes.func,
-};
+import { Button, SidebarTab } from '@/components';
 
 /**
  * @param {boolean} complete
@@ -80,18 +8,26 @@ SideBarTab.propTypes = {
  */
 const completeIcon = (complete) =>
     complete ? (
-        <i className="fa-solid fa-circle-check" aria-hidden="true" />
+        <i
+            className="fa-solid fa-circle-check"
+            style={{ color: 'var(--ds-icon-success)' }}
+            role="img"
+            aria-label="Complete"
+        />
     ) : null;
 
 /**
- * Reflection flow side navigation (Figma Side Nav Bar — `20:24229`).
+ * Step menu for the reflection flow: the list of steps, with Submit under it.
+ * It sits in the side column of the step's Section.
  *
- * Student name rows never get the selected pill background — only primary text
- * when that student is active (Figma students-confirmed).
+ * A step is selected while it is open. While a student is open, Student
+ * Reflection stays selected and that student's row is selected under it.
  *
  * @param {object} props
+ * @param {string} [props.label='Reflection steps'] - The menu's accessible name; say which when a page holds more than one.
  */
 const SideNavBar = ({
+    label = 'Reflection steps',
     state = 'pre-student-add',
     students = [],
     activeTab,
@@ -119,87 +55,87 @@ const SideNavBar = ({
     };
 
     return (
-        <div className="post-session-side-nav">
-            <div className="post-session-side-nav__tabs">
-                <SideBarTab
+        <nav
+            aria-label={label}
+            style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', minWidth: 0 }}
+        >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                <SidebarTab
                     text="Session Information"
+                    leadingVisual={false}
                     state={sectionState(activeTab === 'session-information')}
-                    trailingIcon={completeIcon(sessionInfoDone && activeTab !== 'session-information')}
+                    elemAfter={completeIcon(sessionInfoDone && activeTab !== 'session-information')}
                     onClick={() => onTabClick?.('session-information')}
                 />
 
-                <div className="post-session-side-nav__student-stack">
-                    <SideBarTab
-                        text="Student Reflection"
-                        state={sectionState(
-                            onStudentStep || activeTab === 'student-reflection',
-                            !sessionInfoDone,
-                        )}
-                        trailingIcon={completeIcon(studentDone && !onStudentStep)}
-                        onClick={() => onTabClick?.(students.length ? 'student-0' : 'student-reflection')}
+                <SidebarTab
+                    text="Student Reflection"
+                    leadingVisual={false}
+                    state={sectionState(onStudentStep, !sessionInfoDone)}
+                    elemAfter={completeIcon(studentDone && !onStudentStep)}
+                    onClick={() => onTabClick?.(students.length ? 'student-0' : 'student-reflection')}
+                />
+
+                {students.length > 0 && onStudentStep && students.map((student, index) => (
+                    <SidebarTab
+                        key={student.id || student.name || index}
+                        text={student.name}
+                        leadingVisual={false}
+                        state={activeTab === `student-${index}` ? 'selected' : 'enabled'}
+                        style={{ marginInlineStart: 'var(--space-100)' }}
+                        onClick={() => onTabClick?.(`student-${index}`)}
                     />
+                ))}
 
-                    {students.length > 0 && onStudentStep && students.map((student, index) => {
-                        const isActive = activeTab === `student-${index}`;
-                        return (
-                            <SideBarTab
-                                key={student.id || student.name || index}
-                                text={student.name}
-                                variant="student"
-                                state={isActive ? 'active-text' : 'enabled'}
-                                onClick={() => onTabClick?.(`student-${index}`)}
-                            />
-                        );
-                    })}
-                </div>
-
-                <SideBarTab
+                <SidebarTab
                     text="Session Reflection"
+                    leadingVisual={false}
                     state={sectionState(
                         activeTab === 'session-reflection',
                         !sessionInfoDone || !studentDone,
                     )}
-                    trailingIcon={completeIcon(sessionDone)}
+                    elemAfter={completeIcon(sessionDone)}
                     onClick={() => onTabClick?.('session-reflection')}
                 />
                 {showSelfReflection && (
-                    <SideBarTab
+                    <SidebarTab
                         text="Self Reflection"
+                        leadingVisual={false}
                         state={sectionState(
                             activeTab === 'self-reflection',
                             !sessionDone,
                         )}
-                        trailingIcon={completeIcon(selfDone)}
+                        elemAfter={completeIcon(selfDone)}
                         onClick={() => onTabClick?.('self-reflection')}
                     />
                 )}
                 {showFormFeedback && (
-                    <SideBarTab
+                    <SidebarTab
                         text="Form Feedback"
+                        leadingVisual={false}
                         state={sectionState(
                             activeTab === 'form-feedback',
                             !sessionDone || (showSelfReflection && !selfDone),
                         )}
-                        trailingIcon={completeIcon(Boolean(completedSections['form-feedback']))}
+                        elemAfter={completeIcon(Boolean(completedSections['form-feedback']))}
                         onClick={() => onTabClick?.('form-feedback')}
                     />
                 )}
             </div>
 
-            <div className="post-session-side-nav__submit">
-                <Button
-                    text="Submit"
-                    appearance={canSubmit ? 'primary' : 'default'}
-                    isDisabled={!canSubmit}
-                    shouldFitContainer
-                    onClick={() => onSubmit?.()}
-                />
-            </div>
-        </div>
+            <Button
+                text="Submit"
+                appearance={canSubmit ? 'primary' : 'default'}
+                isDisabled={!canSubmit}
+                shouldFitContainer
+                onClick={() => onSubmit?.()}
+            />
+        </nav>
     );
 };
 
 SideNavBar.propTypes = {
+    label: PropTypes.string,
     state: PropTypes.string,
     students: PropTypes.array,
     activeTab: PropTypes.string,

@@ -16,7 +16,8 @@ export default {
 const tokenNames = (declaration) => declaration.match(/--[\w-]+/g) ?? [];
 
 /**
- * Default · Loading · Empty on one canvas (matches Figma set — no subpages).
+ * Proposal, not shipped. Default · Loading · Empty on one canvas (matches the
+ * Figma set, no subpages).
  */
 export const Overview = {
     render: () => (

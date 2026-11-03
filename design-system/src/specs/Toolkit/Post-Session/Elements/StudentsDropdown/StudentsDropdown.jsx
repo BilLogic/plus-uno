@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Select from '@/components/forms-and-inputs/Select';
+import { Select } from '@/components';
 
 /**
- * Students multi-select (Figma Elements · Students Dropdown `20:24325`).
- * B3 label + helper; field shows secondary Badges (no border); menu = Search + checkboxes.
+ * Students dropdown (Figma Elements · Students dropdown).
+ * A multi-select Select labeled with the question, and the helper as its caption.
  *
  * @param {object} props
- * @param {{ id?: string, name: string }[]} [props.students=[]]
- * @param {string[]} [props.selectedIds=[]]
+ * @param {{ id?: string, name: string }[]} [props.students]
+ * @param {string[]} [props.selectedIds]
  * @param {(ids: string[]) => void} [props.onChange]
- * @param {string} [props.label='Select the students you tutored']
+ * @param {string} [props.label]
  * @param {string} [props.helper]
- * @param {boolean} [props.required=true]
+ * @param {boolean} [props.isRequired=true]
  */
 const StudentsDropdown = ({
     students = [],
@@ -20,7 +20,7 @@ const StudentsDropdown = ({
     onChange,
     label = 'Select the students you tutored',
     helper = 'Pre-filled based on the session attendance you marked. Add or remove as needed.',
-    required = true,
+    isRequired = true,
 }) => {
     const options = useMemo(
         () => students.map((student) => ({
@@ -31,26 +31,12 @@ const StudentsDropdown = ({
     );
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-xs)',
-                width: '100%',
-                maxWidth: 'var(--col-9)',
-            }}
-        >
-            <label className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                {label}
-                {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-            </label>
-            {helper && (
-                <p className="body3-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
-                    {helper}
-                </p>
-            )}
+        <div style={{ width: '100%', maxWidth: 'var(--col-9)' }}>
             <Select
                 id="students-dropdown"
+                label={label}
+                required={isRequired}
+                caption={helper}
                 mode="multi"
                 searchable
                 options={options}
@@ -68,7 +54,7 @@ StudentsDropdown.propTypes = {
     onChange: PropTypes.func,
     label: PropTypes.string,
     helper: PropTypes.string,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
 };
 
 export default StudentsDropdown;

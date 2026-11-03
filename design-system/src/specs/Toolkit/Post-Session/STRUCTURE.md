@@ -19,7 +19,6 @@ Audited against Figma `1721:118446` (2026-07-30). Every non-obsolete organism be
 | Last Updated | `10750:475179` | Elements / Last Updated |
 | Navigation Button | `6327:243019` | Elements / Navigation Buttons |
 | No Recording Reason | `10925:11334` | Elements / No Recording Reason |
-| Option Chip | `10661:10292` | Elements / Option Chip |
 | Reflection Form Actions | `5951:312403` | Elements / Reflection Form Actions |
 | Session date | `10882:170725` | Elements / Session Date |
 | Session Rating | `10661:10584` | Elements / Session Rating |
@@ -107,7 +106,7 @@ These are **not** in the current Figma Components strip and must not ship as liv
 
 | Was | Reason |
 |---|---|
-| Student Rating / Self Rating | Superseded by Option Chips + Linear Scale |
+| Student Rating / Self Rating | Superseded by answer Tags + Linear Scale |
 | AI Generating Placeholder | Loading is a state of Dynamic AI Prompted Question Box |
 | Session Info (Element) | Session Info is a **Page** |
 | Save And Exit (separate modal) | Confirmation Pop-up `type=exit without saving` |
@@ -119,5 +118,5 @@ These are **not** in the current Figma Components strip and must not ship as liv
 ## Docs conventions
 
 - Every leaf: `*.stories.jsx` + sibling `*.mdx` with `<Title/>` → intro → `<ResourcesBlock/>` (deep `node-id`) → Overview.
-- Prefer PLUS primitives (`Badge`, `Button`, `Modal`, `Rating`, `Textarea`, `DatePicker`, `Dropdown`) — local organisms compose them.
+- Prefer PLUS primitives (`StatusTag`, `Tag`, `Button`, `Modal`, `Rating`, `TextArea`, `DatePicker`, `Select`) — local organisms compose them.
 - Do not invent organisms that are not in the Figma strip.

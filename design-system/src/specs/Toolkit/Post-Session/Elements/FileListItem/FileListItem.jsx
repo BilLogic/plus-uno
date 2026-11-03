@@ -26,18 +26,18 @@ const FileListItem = ({ name, size = '', onRemove }) => (
         <i
             className="fa-solid fa-file-circle-check"
             style={{
-                color: 'var(--color-on-surface-variant)',
+                color: 'var(--ds-text-subtle)',
                 fontSize: 'var(--font-size-fa-body2-solid)',
                 lineHeight: 'var(--font-line-height-fa-body2-solid)',
                 flexShrink: 0,
             }}
             aria-hidden="true"
         />
-        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             {name}
         </span>
         {size && (
-            <span className="body2-txt" style={{ color: 'var(--color-outline-variant)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text-subtlest)' }}>
                 {size}
             </span>
         )}

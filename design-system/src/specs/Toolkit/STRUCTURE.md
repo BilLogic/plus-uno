@@ -16,7 +16,7 @@ design-system/src/specs/Toolkit/
 ├── Post-Session/
 │   ├── Overview.mdx
 │   ├── reflectionCopy.js          # shared rating copy + chip option banks
-│   ├── Elements/                  # Ratings, OptionChip, Session date/selection, Upload, …
+│   ├── Elements/                  # Ratings, Session date/selection, Upload, …
 │   ├── Modals/ConfirmationPopUp/  # exit · exit without saving · reflection submitted
 │   ├── Sections/                  # SideNavBar, FreeResponse, MultiSelect, AI box, LinearScale,
 │   │                              # *Form / *FormV2 (composition helpers, not Figma strip leaves)
@@ -159,7 +159,7 @@ design-system/src/specs/Toolkit/
 - **SessionReflection** (`Session Reflection`): Empty · In progress (AI generating) · Filled · Worst case · Save & Exit confirmation
 - **ReflectionFlow** (`Reflection Flow`): End-to-end in-memory orchestrator (Entry → Submit)
 - **StudentReflection** (`Student Reflection`): Student reflection pages (part=1-3; AI states in V2 form)
-- **OptionChip / Dynamic AI Prompted Question Box / Confirmation Pop-up**: Post-Session organisms aligned to Figma `3400:286833` / `1721:118446`
+- **Dynamic AI Prompted Question Box / Confirmation Pop-up**: Post-Session organisms aligned to Figma `3400:286833` / `1721:118446`
 
 ## Storybook organization
 

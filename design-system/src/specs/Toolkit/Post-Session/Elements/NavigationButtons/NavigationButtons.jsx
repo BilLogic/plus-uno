@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button } from '@/components';
+import { useReflectionChrome } from '@/specs/Toolkit/Post-Session/reflectionChrome';
 
 /**
- * Form footer navigation for reflection steps
- * (Figma Navigation Button + spaced Button Group layout — not connected ButtonGroup chrome).
+ * A step's actions: Previous, Cancel, Save & Exit and Next (or Submit).
+ *
+ * On a reflection page they go into the page footer, end-aligned with the
+ * primary last, and the step's Cancel is what Back and Close in the topbar run.
+ * On their own they sit in a row.
  *
  * @param {object} props
  * @param {boolean} [props.canSave=false] - Enables Save & Exit
@@ -27,34 +32,51 @@ const NavigationButtons = ({
     onSaveAndExit,
     onNext,
     onSubmit,
-}) => (
-    <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
-        {showPrevious && (
-            <Button text="Previous" onClick={onPrevious} />
-        )}
-        <Button text="Cancel" onClick={onCancel} />
-        <Button
-            text="Save & Exit"
-            isDisabled={!canSave}
-            onClick={onSaveAndExit}
-        />
-        {showSubmit ? (
+}) => {
+    const { footerEl, registerCancel } = useReflectionChrome();
+
+    useEffect(() => {
+        registerCancel(onCancel);
+        return () => registerCancel(null);
+    }, [registerCancel, onCancel]);
+
+    const actions = (
+        <>
+            {showPrevious && (
+                <Button text="Previous" onClick={onPrevious} />
+            )}
+            <Button text="Cancel" onClick={onCancel} />
             <Button
-                text="Submit"
-                appearance="primary"
-                isDisabled={!canNext}
-                onClick={onSubmit}
+                text="Save & Exit"
+                isDisabled={!canSave}
+                onClick={onSaveAndExit}
             />
-        ) : (
-            <Button
-                text="Next"
-                appearance="primary"
-                isDisabled={!canNext}
-                onClick={onNext}
-            />
-        )}
-    </div>
-);
+            {showSubmit ? (
+                <Button
+                    text="Submit"
+                    appearance="primary"
+                    isDisabled={!canNext}
+                    onClick={onSubmit}
+                />
+            ) : (
+                <Button
+                    text="Next"
+                    appearance="primary"
+                    isDisabled={!canNext}
+                    onClick={onNext}
+                />
+            )}
+        </>
+    );
+
+    if (footerEl) return createPortal(actions, footerEl);
+
+    return (
+        <div style={{ display: 'flex', gap: 'var(--element-inline-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
+            {actions}
+        </div>
+    );
+};
 
 NavigationButtons.propTypes = {
     canSave: PropTypes.bool,

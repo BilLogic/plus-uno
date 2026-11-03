@@ -5,7 +5,7 @@ import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResp
 import LinearScale from '@/specs/Toolkit/Post-Session/Sections/LinearScale/LinearScale';
 import MultiSelectQuestion from '@/specs/Toolkit/Post-Session/Sections/MultiSelectQuestion/MultiSelectQuestion';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
-import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import {
     SELF_EFFECTIVE_OPTIONS,
     SELF_IMPROVE_OPTIONS,
@@ -106,19 +106,7 @@ const SelfReflectionForm = ({
     }), []);
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-md)',
-                flex: '1 0 0',
-                minWidth: 0,
-            }}
-        >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>Self Reflection</h2>
-                <LastUpdated text={typeof lastUpdated === 'string' ? lastUpdated : undefined} />
-            </div>
+        <ReflectionStep title="Self Reflection" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <LinearScale
@@ -138,7 +126,7 @@ const SelfReflectionForm = ({
                     ))}
                     otherValue={otherEffective}
                     onOtherChange={(event) => setOtherEffective(event.target.value)}
-                    required={positiveRequired}
+                    isRequired={positiveRequired}
                 />
 
                 <MultiSelectQuestion
@@ -150,7 +138,7 @@ const SelfReflectionForm = ({
                     ))}
                     otherValue={otherImprove}
                     onOtherChange={(event) => setOtherImprove(event.target.value)}
-                    required={improveRequired}
+                    isRequired={improveRequired}
                 />
 
                 {aiState === 'generating' && <AiPromptedQuestionBox state="loading" />}
@@ -188,7 +176,7 @@ const SelfReflectionForm = ({
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
-        </div>
+        </ReflectionStep>
     );
 };
 

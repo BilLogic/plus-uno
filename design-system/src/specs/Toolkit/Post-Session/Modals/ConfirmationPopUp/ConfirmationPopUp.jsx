@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Modal from '@/components/messaging/Modal';
-import './ConfirmationPopUp.scss';
+import { Modal } from '@/components';
 
 const COPY = {
     'exit-without-saving': {
@@ -27,7 +26,7 @@ const COPY = {
 /**
  * Confirmation pop-up (Figma Modals · Confirmation Pop-up `6327:241454`).
  * Types: exit (Saved) · exit without saving · reflection submitted.
- * Shell: 340px · surface-container-high · modal radius-md (6px) · small tonal/filled buttons.
+ * A Modal on the Blanket: the title, one line, and two buttons.
  *
  * @param {object} props
  * @param {boolean} props.show
@@ -52,22 +51,19 @@ const ConfirmationPopUp = ({
             onClose={onClose}
             title={copy.title}
             body={(
-                <p className="body1-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <p className="body1-txt m-0" style={{ color: 'var(--ds-text)' }}>
                     {copy.body}
                 </p>
             )}
             renderAs={renderAs}
-            className="plus-modal--confirmation-popup"
             primaryButton={{
                 text: copy.primary,
                 appearance: 'primary',
-                spacing: 'compact',
                 onClick: onPrimary || onClose,
             }}
             secondaryButton={{
                 text: copy.secondary,
                 appearance: 'default',
-                spacing: 'compact',
                 onClick: onSecondary || onClose,
             }}
         />
