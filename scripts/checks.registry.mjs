@@ -279,6 +279,16 @@ export const CHECKS = [
       'components staying on the themed `--ds-*` color tokens: the legacy `--color-*` tokens and hex fallbacks inside `var()` are light-only and stay light in dark mode, so their uses are counted per rule and per file in design-system/src/components, design-system/src/ai and prototypes. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:legacy-colors -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
+    name: 'check:react-bootstrap-imports',
+    script: 'node scripts/check-react-bootstrap-imports.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-react-bootstrap-imports.mjs',
+    baseline: 'scripts/baselines/react-bootstrap-imports.json',
+    guards:
+      'react-bootstrap leaving the tree and not coming back while every component family moves its behavior onto Base UI (#1687): import statements naming `react-bootstrap` or one of its subpaths, counted per file in design-system/src, prototypes and src. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:react-bootstrap-imports -- --update`, which refuses to write a rise, and never by hand. At a baseline of zero the final sweep removes the dependency and this becomes a hard ban. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
     name: 'check:retired-spelling',
     script: 'node scripts/check-retired-spelling.mjs',
     pkg: 'root',
