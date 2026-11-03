@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (44)
+## UI components (45)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiLabel](../../src/components/labels/AiLabel/index.md)
@@ -38,6 +38,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [NavPills](../../src/components/navigation/NavPills/index.md)
 - [NavTabs](../../src/components/navigation/NavTabs/index.md)
 - [Navbar](../../src/components/navigation/Navbar/index.md)
+- [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [Radio](../../src/components/forms-and-inputs/Radio.md)
 - [Range](../../src/components/forms-and-inputs/Range.md)
 - [Rating](../../src/components/forms-and-inputs/Rating.md)
