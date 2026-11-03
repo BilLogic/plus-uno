@@ -23,7 +23,7 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 ## Related
 
-Same group: `Avatar` · `Illustration` · `Tile`
+Same group: `AiIcon` · `Avatar` · `Illustration` · `Tile`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

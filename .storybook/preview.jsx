@@ -233,7 +233,8 @@ const preview = {
             [
               "Logo",
               "Tile",
-              "Illustrations"
+              "Illustrations",
+              "AI icon"
             ],
             "Labels",
             [
