@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
-import { Status } from '@/components';
+import { StatusTag } from '@/components';
 import Agenda from './Agenda';
 import { AGENDA } from '../../data/mock';
 import { DARK_WITH_LEGACY, LIGHT, onSurface } from '../storyModes';
@@ -12,7 +12,7 @@ export default {
     decorators: [(Story) => <div style={{ width: 340 }}><Story /></div>, onSurface],
     args: {
         label: 'Today',
-        items: AGENDA.map((a) => ({ ...a, href: `#${a.id}`, status: a.status ? <Status style="info">{a.status}</Status> : undefined })),
+        items: AGENDA.map((a) => ({ ...a, href: `#${a.id}`, status: a.status ? <StatusTag appearance="info">{a.status}</StatusTag> : undefined })),
     },
 };
 

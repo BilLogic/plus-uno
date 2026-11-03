@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 const STATUS_CONFIG = {
     'not-started': {
         text: 'Not started',
-        style: 'primary',
+        style: 'info',
         iconClass: 'fa-regular fa-circle',
         title: 'Start your reflection after the session',
     },
@@ -34,12 +34,7 @@ const ReflectionStatusBadge = ({ status = 'not-started', className = '' }) => {
     const config = STATUS_CONFIG[status] || STATUS_CONFIG['not-started'];
     return (
         <span title={config.title} className={className}>
-            <Badge
-                text={config.text}
-                style={config.style}
-                size="b3"
-                leadingVisual={<i className={config.iconClass} aria-hidden="true" />}
-            />
+            <StatusTag appearance={config.style} leadingVisual={<i className={config.iconClass} aria-hidden="true" />}>{config.text}</StatusTag>
         </span>
     );
 };

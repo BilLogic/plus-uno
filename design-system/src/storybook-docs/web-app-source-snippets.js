@@ -26,7 +26,7 @@ export const webAppSourceSnippets = {
         '</Alert>'
     ]),
     badge: snippet([
-        '<Badge text="Primary" style="primary" size="b2" />'
+        '<StatusTag appearance="info">Primary</StatusTag>'
     ]),
     breadcrumb: snippet([
         '<Breadcrumb',

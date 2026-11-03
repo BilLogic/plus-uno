@@ -9,7 +9,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './TutorsPerformanceTable.scss';
 
 /**
@@ -19,7 +19,7 @@ import './TutorsPerformanceTable.scss';
  * <50% → danger (red)
  */
 const getAttendanceStyle = (value) => {
-    if (!value || value === 'Null') return 'secondary';
+    if (!value || value === 'Null') return 'neutral';
     const numValue = parseInt(value);
     if (numValue >= 80) return 'success';
     if (numValue >= 50) return 'warning';
@@ -106,41 +106,38 @@ const TutorsPerformanceTable = ({
                                 <div className="tutors-performance-table__tutor-cell">
                                     <span className="body3-txt">{tutor.tutorName}</span>
                                     {tutor.badge && (
-                                        <Badge style="info" size="b3">
+                                        <StatusTag appearance="info">
                                             {tutor.badge}
-                                        </Badge>
+                                        </StatusTag>
                                     )}
                                 </div>
                             </td>
                             <td>
-                                <Badge
-                                    style={tutor.signedUp === 'Yes' ? 'info' : 'secondary'}
-                                    size="b3"
-                                >
+                                <StatusTag appearance={tutor.signedUp === 'Yes' ? 'info' : 'neutral'}>
                                     {tutor.signedUp}
-                                </Badge>
+                                </StatusTag>
                             </td>
                             <td>
                                 {tutor.attendance !== null ? (
-                                    <Badge style={getAttendanceStyle(tutor.attendance)} size="b3">
+                                    <StatusTag appearance={getAttendanceStyle(tutor.attendance)}>
                                         {tutor.attendance}%
-                                    </Badge>
+                                    </StatusTag>
                                 ) : (
-                                    <Badge style="secondary" size="b3">Null</Badge>
+                                    <StatusTag appearance="neutral">Null</StatusTag>
                                 )}
                             </td>
                             <td>
                                 {tutor.sessions !== null ? (
-                                    <Badge style="secondary" size="b3">{tutor.sessions}</Badge>
+                                    <StatusTag appearance="neutral">{tutor.sessions}</StatusTag>
                                 ) : (
-                                    <Badge style="secondary" size="b3">Null</Badge>
+                                    <StatusTag appearance="neutral">Null</StatusTag>
                                 )}
                             </td>
                             <td>
                                 {tutor.students !== null ? (
-                                    <Badge style="secondary" size="b3">{tutor.students}</Badge>
+                                    <StatusTag appearance="neutral">{tutor.students}</StatusTag>
                                 ) : (
-                                    <Badge style="secondary" size="b3">Null</Badge>
+                                    <StatusTag appearance="neutral">Null</StatusTag>
                                 )}
                             </td>
                         </tr>

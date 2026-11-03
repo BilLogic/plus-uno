@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -13,8 +13,8 @@ export default {
 // Status configuration for badge styling
 const getStatusConfig = (status) => {
     const configs = {
-        'Scheduled': { style: 'primary', icon: 'circle-check' },
-        'Live': { style: 'primary', icon: 'circle-check' },
+        'Scheduled': { style: 'info', icon: 'circle-check' },
+        'Live': { style: 'info', icon: 'circle-check' },
         'In progress': { style: 'info', icon: 'play' },
         'Starting soon': { style: 'warning', icon: 'clock' },
         'Canceled': { style: 'danger', icon: 'circle-xmark' }
@@ -120,12 +120,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <Badge
-                    text={status}
-                    style={getStatusConfig(status).style}
-                    size="b2"
-                    leadingVisual={<i className={`fa-solid fa-${getStatusConfig(status).icon}`} />}
-                />
+                <StatusTag appearance={getStatusConfig(status).style} leadingVisual={<i className={`fa-solid fa-${getStatusConfig(status).icon}`} />}>{status}</StatusTag>
             </div>
 
             {/* Actions Cell - column 7 */}

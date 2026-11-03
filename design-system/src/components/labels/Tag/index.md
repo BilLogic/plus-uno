@@ -22,7 +22,7 @@
 | `color` | enum | `'gray'` | A category color: an accent family, on the border and swatch. Never a status. `grey` is a deprecated alias for `gray`. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
 | `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
-| `count` | number or string | — | `selectable` only: a small neutral Count, such as a filter's result count. Ignored with a warning elsewhere. |
+| `count` | number or string | — | `selectable` only: a compact neutral Count tag, such as a filter's result count. Ignored with a warning elsewhere. |
 | `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
 | `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
 | `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
@@ -56,6 +56,6 @@ From `design-system/src/components/labels/Tag/Tag.scss`. Override these through 
 
 ## Related
 
-Same group: `AiLabel` · `Badge` · `BadgeVariants` · `Count` · `Status` · `Suggestion` · `TagGroup`
+Same group: `AiLabel` · `CountTag` · `StatusTag` · `Suggestion` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

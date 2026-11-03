@@ -2,7 +2,8 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 import Alert from '@/components/messaging/Alert';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
@@ -80,7 +81,7 @@ export const SessionInfo_PostSignUp = () => (
                         <Button
                             text="Attendees"
                             iconAfter={
-                                <Badge text="20" style="secondary" size="b3" />
+                                <CountTag value={20} />
                             }
                             shouldFitContainer
                         />
@@ -190,7 +191,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             text="Attendees"
                             isSelected={true}
                             iconAfter={
-                                <Badge text="20" style="secondary" size="b3" />
+                                <CountTag value={20} />
                             }
                             shouldFitContainer
                         />
@@ -217,7 +218,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             padding: 'var(--size-modal-pad-y-md) var(--size-modal-pad-x-md)',
                         }}>
                             <span className="h6 m-0">Tutor Roster</span>
-                            <Badge text="4" style="info" size="b3" leadingVisual={<i className="fa-solid fa-users" />} />
+                            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
                         </div>
                         {/* Panel Body - Content + Scrollbar */}
                         <div className="d-flex" style={{ flex: 1, overflow: 'hidden' }}>
@@ -229,7 +230,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                                     gap: 'var(--size-element-gap-sm)',
                                 }}>
                                     <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>Ben Green</span>
-                                    <Badge text="Lead" style="info" size="b3" />
+                                    <StatusTag appearance="info">Lead</StatusTag>
                                 </div>
                                 {/* Other Tutors */}
                                 {[1, 2, 3].map((i) => (
@@ -263,7 +264,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             padding: 'var(--size-modal-pad-y-md) var(--size-modal-pad-x-md)',
                         }}>
                             <span className="h6 m-0">Student Roster</span>
-                            <Badge text="4" style="info" size="b3" leadingVisual={<i className="fa-solid fa-users" />} />
+                            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
                         </div>
                         {/* Panel Body - Content + Scrollbar */}
                         <div className="d-flex" style={{ flex: 1, overflow: 'hidden' }}>
@@ -345,7 +346,7 @@ export const OneTimeSession_PreFillIn = () => (
                         <Button
                             text="Attendees"
                             iconAfter={
-                                <Badge text="20" style="secondary" size="b3" />
+                                <CountTag value={20} />
                             }
                             shouldFitContainer
                         />
@@ -489,11 +490,7 @@ export const FillIn_ReviewChoices = () => {
                     {tutorCount} (Leads: {leadCount})
                 </span>
                 {hasNoLead && (
-                    <Badge
-                        text="No lead"
-                        style="warning"
-                        size="b3"
-                    />
+                    <StatusTag appearance="warning">No lead</StatusTag>
                 )}
             </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -198,11 +198,7 @@ export const ReflectionsTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <Badge
-                    text={getBadgeText()}
-                    style={getBadgeStyle()}
-                    size="b2"
-                />
+                <StatusTag appearance={getBadgeStyle()}>{getBadgeText()}</StatusTag>
             </div>
 
             {/* Actions - spans 1 column */}

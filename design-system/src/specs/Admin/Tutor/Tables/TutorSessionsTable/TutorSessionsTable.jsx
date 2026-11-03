@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './TutorSessionsTable.scss';
 
 const TutorSessionsTable = ({
@@ -86,7 +86,7 @@ const TutorSessionsTable = ({
                                 <span className="body3-txt">{session.shift}</span>
                             </td>
                             <td>
-                                <Badge style="secondary" size="b3">{session.school}</Badge>
+                                <StatusTag appearance="neutral">{session.school}</StatusTag>
                             </td>
                         </tr>
                     ))}

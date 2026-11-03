@@ -26,7 +26,7 @@ Then open **http://localhost:3020/** in your browser.
 All design system components are available via the `@` alias:
 
 ```jsx
-import { Button, Modal, Badge, Alert } from '@/components';
+import { Button, Modal, StatusTag, Alert } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 ```
 

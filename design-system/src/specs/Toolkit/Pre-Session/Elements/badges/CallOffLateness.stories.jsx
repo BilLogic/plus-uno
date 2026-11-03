@@ -1,9 +1,9 @@
 import React from 'react';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Badges/Call-Off Lateness',
-    component: Badge,
+    component: StatusTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
@@ -17,11 +17,7 @@ const LatenessBadge = ({ isLate = true }) => {
 
     return (
         <div title="This call-off request was submitted late (within 12 hours of the session start)." style={{ display: 'inline-block' }}>
-            <Badge
-                text="Late"
-                style="danger"
-                size="b2"
-            />
+            <StatusTag appearance="danger">Late</StatusTag>
         </div>
     );
 };

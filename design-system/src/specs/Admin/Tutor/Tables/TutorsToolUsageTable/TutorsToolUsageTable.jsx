@@ -8,7 +8,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './TutorsToolUsageTable.scss';
 
 const TutorsToolUsageTable = ({
@@ -57,10 +57,10 @@ const TutorsToolUsageTable = ({
 
     const renderBadge = (value) => {
         if (value === null || value === undefined || value === 'Null' || value === 'null') {
-            return <Badge style="secondary" size="b3">Null</Badge>;
+            return <StatusTag appearance="neutral">Null</StatusTag>;
         }
         const displayVal = typeof value === 'number' ? `${value}%` : value;
-        return <Badge style="secondary" size="b3">{displayVal}</Badge>;
+        return <StatusTag appearance="neutral">{displayVal}</StatusTag>;
     };
 
     return (

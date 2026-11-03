@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Table, Form } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import Switch from '@/components/forms-and-inputs/Switch';
 import './StudentModal.scss';
@@ -114,9 +114,9 @@ const StudentModal = ({
                         onClick={() => setActiveTab('sessions')}
                     >
                         <span className="h6">Sessions</span>
-                        <Badge style="default" size="b3" className="student-modal__tab-badge">
+                        <StatusTag appearance="neutral" className="student-modal__tab-badge">
                             {totalSessions}
-                        </Badge>
+                        </StatusTag>
                     </button>
                 </div>
 
@@ -245,9 +245,9 @@ const StudentModal = ({
                                                 <span className="body3-txt" style={{ fontWeight: 300 }}>{session.shift}</span>
                                             </td>
                                             <td>
-                                                <Badge style="secondary" size="b3">
+                                                <StatusTag appearance="neutral">
                                                     {session.school}
-                                                </Badge>
+                                                </StatusTag>
                                             </td>
                                         </tr>
                                     ))}

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { GaugeChart, HeatmapChart } from '@/dataviz';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import NavTabs from '@/components/navigation/NavTabs';
 import Accordion from '@/components/layout-and-structure/Accordion';
@@ -105,7 +105,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
     }, []);
 
     const keyObservations = [
-        { title: 'Persistence Score', subtitle: 'Attempts before giving up', value: '4.2', badge: 'avg', comparison: 'vs. 3.8 last week', badgeStyle: 'primary' },
+        { title: 'Persistence Score', subtitle: 'Attempts before giving up', value: '4.2', badge: 'avg', comparison: 'vs. 3.8 last week', badgeStyle: 'info' },
         { title: 'Struggling Concept', subtitle: 'Fractions with unlike denominators', value: '3', badge: 'attempts', comparison: 'vs. last session', badgeStyle: 'danger' },
         { title: 'Strong Momentum', subtitle: 'Integer operations', value: '95%', badge: 'accuracy', comparison: 'vs. last session', badgeStyle: 'success' }
     ];
@@ -117,7 +117,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
     ];
 
     const statusTags = [
-        { text: 'Needs content help', style: 'secondary', fill: 'tonal' },
+        { text: 'Needs content help', style: 'neutral' },
         { text: 'Eligible for reward', style: 'success', fill: 'tonal', leadingVisual: <i className="fa-solid fa-gift" aria-hidden /> },
         { text: 'Check-in pending', style: 'warning', fill: 'tonal', leadingVisual: <i className="fa-solid fa-clock" aria-hidden /> }
     ];
@@ -227,12 +227,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                             {statusTags.map((tag, i) => (
                                 <div key={i} className="animate-enter" style={{ animationDelay: `${150 + i * 50}ms` }}>
-                                    <Badge
-                                        text={tag.text}
-                                        style={tag.style}
-                                        size="b2"
-                                        leadingVisual={tag.leadingVisual}
-                                    />
+                                    <StatusTag appearance={tag.style} leadingVisual={tag.leadingVisual}>{tag.text}</StatusTag>
                                 </div>
                             ))}
                         </div>
@@ -399,7 +394,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                         <div className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>{obs.subtitle}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
                                             <span className="body1-txt" style={{ fontWeight: 600 }}>{obs.value}</span>
-                                            <Badge text={obs.badge} style={obs.badgeStyle} size="b3" fill="tonal" />
+                                            <StatusTag appearance={obs.badgeStyle}>{obs.badge}</StatusTag>
                                             <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>{obs.comparison}</span>
                                         </div>
                                     </div>
@@ -451,7 +446,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                                         <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{goal.title}</span>
-                                        <Badge text={goal.due} style="secondary" size="b3" fill="tonal" />
+                                        <StatusTag appearance="neutral">{goal.due}</StatusTag>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
                                         <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--color-outline-variant)', overflow: 'hidden' }}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -37,7 +37,7 @@ export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
             <div style={nameStyle}>
                 <span className="body2-txt">{name}</span>
                 {isLead && (
-                    <Badge text="Lead" style="info" size="b3" />
+                    <StatusTag appearance="info">Lead</StatusTag>
                 )}
             </div>
 

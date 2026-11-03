@@ -26,8 +26,7 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  * - **Values are ids; options are objects.** `value` is an option's `value` (an
  *   array in multi mode), controlled or not.
  * - **Multi mode** shows Tags in a TagGroup (`displayMode="tags"`), which
- *   collapse into "+n" without focus. `displayMode="badges"` keeps the Badge
- *   chips for screens that still draw them.
+ *   collapse into "+n" without focus.
  * - **Trailing** holds the clear × (not a tab stop; Delete does the same) and
  *   the caret.
  */
@@ -511,7 +510,7 @@ Select.propTypes = {
     onOpenChange: PropTypes.func,
     defaultSearchTerm: PropTypes.string,
     /** Multi mode: `tags` (Tag chips), `badges` (the older Badge chips) or `text` (comma-separated). */
-    displayMode: PropTypes.oneOf(['tags', 'badges', 'text']),
+    displayMode: PropTypes.oneOf(['tags', 'text']),
     /** Badges only: wrap onto more lines. */
     lineWrap: PropTypes.bool,
     /** Badges only: clip the row with a fade. */

@@ -9,7 +9,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageLayout } from '@/specs/Universal/Pages';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import Progress from '@/components/loading/Progress/Progress';
@@ -99,7 +99,7 @@ export default function MonthlyReportsListPage() {
     const getProgressColor = (done, total) => {
         const pct = (done / total) * 100;
         if (pct >= 100) return 'success';
-        if (pct >= 60) return 'primary';
+        if (pct >= 60) return 'info';
         return 'warning';
     };
 
@@ -176,12 +176,7 @@ export default function MonthlyReportsListPage() {
                                 <td className="body2-txt">{report.month}</td>
                                 <td className="body2-txt">{report.dateRange}</td>
                                 <td>
-                                    <Badge
-                                        text={report.status}
-                                        style={getStatusBadgeStyle(report.status)}
-                                        size="b3"
-                                        fill="tonal"
-                                    />
+                                    <StatusTag appearance={getStatusBadgeStyle(report.status)}>{report.status}</StatusTag>
                                 </td>
                                 <td>
                                     <div className="completion-cell">

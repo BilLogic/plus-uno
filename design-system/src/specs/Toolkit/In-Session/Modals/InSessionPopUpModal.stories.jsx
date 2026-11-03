@@ -2,7 +2,8 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
+import CountTag from '@/components/labels/CountTag';
 import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
 import { AttendanceDropdown } from '../Elements/AttendanceDropdown';
 import { SessionInfoCard } from '../Cards/SessionInfoCard.stories';
@@ -49,7 +50,7 @@ const TabButtonGroup = () => (
             text="Attendance"
             isSelected={true}
             shouldFitContainer
-            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+            iconAfter={<CountTag value={20} />}
         />
         <Button text="Assignment" shouldFitContainer />
         <Button text="Session Info" shouldFitContainer />
@@ -432,7 +433,7 @@ const AssignmentTabButtonGroup = () => (
         <Button
             text="Attendance"
             shouldFitContainer
-            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+            iconAfter={<CountTag value={20} />}
         />
         <Button text="Assignment" isSelected={true} shouldFitContainer />
         <Button text="Session Info" shouldFitContainer />
@@ -541,7 +542,7 @@ const AssignmentStudentRow = ({ name }) => (
         >
             {name}
         </span>
-        <Badge text="Joined" style="success" size="b3" trailingVisual={<i className="fa-solid fa-caret-down" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-success-text)' }} />} />
+        <StatusTag appearance="success">Joined</StatusTag>
     </div>
 );
 
@@ -571,12 +572,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
             >
                 {tutorName}
             </span>
-            <Badge
-                style="info"
-                size="b3"
-                leadingVisual={<i className="fa-solid fa-user-group" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-secondary-text)' }} />}
-                text={String(studentCount)}
-            />
+            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-group" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-secondary-text)' }} />}>{String(studentCount)}</StatusTag>
         </div>
         {/* Student List */}
         {students.map((name) => (
@@ -687,7 +683,7 @@ const SessionInfoTabButtonGroup = () => (
         <Button
             text="Attendance"
             shouldFitContainer
-            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+            iconAfter={<CountTag value={20} />}
         />
         <Button text="Assignment" shouldFitContainer />
         <Button text="Session Info" isSelected={true} shouldFitContainer />
@@ -863,7 +859,7 @@ const RegularTabButtonGroup = () => (
         <Button
             text="Attendees"
             shouldFitContainer
-            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+            iconAfter={<CountTag value={20} />}
         />
     </ButtonGroup>
 );
@@ -960,7 +956,7 @@ const RegularAttendeeTabButtonGroup = () => (
             text="Attendees"
             isSelected={true}
             shouldFitContainer
-            iconAfter={<Badge text="20" style="secondary" size="b3" />}
+            iconAfter={<CountTag value={20} />}
         />
     </ButtonGroup>
 );

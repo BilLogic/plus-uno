@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 export default {
@@ -193,11 +193,7 @@ export const FillInTableRow = ({
                     {tutorCount}
                 </span>
                 {needLead && (
-                    <Badge
-                        text="Need Lead"
-                        style="warning"
-                        size="b3"
-                    />
+                    <StatusTag appearance="warning">Need Lead</StatusTag>
                 )}
             </div>
 
@@ -421,11 +417,7 @@ export const FillInModalRow = ({
                     {tutorCount}
                 </span>
                 {needLead && (
-                    <Badge
-                        text="Need Lead"
-                        style="warning"
-                        size="b3"
-                    />
+                    <StatusTag appearance="warning">Need Lead</StatusTag>
                 )}
             </div>
         </div>

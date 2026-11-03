@@ -8,7 +8,7 @@
 import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import './LessonWelcomeSection.scss';
 
 const defaultTabs = [
@@ -100,13 +100,9 @@ const LessonWelcomeSection = ({
                                     {tab.label}
                                 </span>
                                 {tab.count !== undefined && (
-                                    <Badge
-                                        size="b3"
-                                        style="primary"
-                                        className="lesson-welcome-section__tab-badge"
-                                    >
+                                    <StatusTag appearance="info" className="lesson-welcome-section__tab-badge">
                                         {tab.count}
-                                    </Badge>
+                                    </StatusTag>
                                 )}
                                 {selectedTab === tab.id && (
                                     <div className="lesson-welcome-section__tab-indicator" />

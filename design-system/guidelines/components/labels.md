@@ -1,40 +1,35 @@
 ---
-summary: The label family — Status, Count, Tag, TagGroup, Suggestion and AI label — and the deprecated Badge it replaces
+summary: The label family — Status tag, Count tag, Tag, TagGroup, Suggestion and AI label — and how to choose between them
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the labels group -->
 
 # Labels — which component to reach for
 
-The label family: `Status`, `Count`, `Tag`, `TagGroup`, `Suggestion` and
-`AiLabel`. They keep their own names in Storybook rather than Atlassian's. Generated facts are in `design-system/src/components/labels/index.md`;
+The label family: `StatusTag`, `CountTag`, `Tag`, `TagGroup`, `Suggestion` and
+`AiLabel`. Generated facts are in `design-system/src/components/labels/index.md`;
 when to use each is on its own docs page.
 
-`Badge` and `BadgeVariants` are deprecated in favor of `Status`, `Count` and
-`Tag`. They still render, and warn in development with the replacement for
-their props. The rest of this file describes `Badge` for the calls that have not
-moved yet.
+Three questions choose between the first three:
 
-## Badge, while it lasts
+- **Is it a number?** `CountTag`.
+- **Is it the condition something is in, and can that condition change?**
+  `StatusTag`, whether the system calculated it or a person set it.
+- **Otherwise** (a subject, a person, a category): `Tag`.
 
-`Badge` is the second most used component in the repo after `Button`, almost
-always as a status chip in a table row or a card header. It is read-only by
-design: no `onClick`, and no button semantics on the badge itself, because the
-only interactive part is the X that `dismissible` adds — nesting one control
-inside another is invalid ARIA, and the source says so.
+`StatusTag` takes `appearance` (neutral, success, warning, danger, info,
+discovery, and the five SMART subjects) and `spacing` (default 20, compact 16,
+spacious 32). `CountTag` takes `appearance`, `spacing` (default 20, compact 16)
+and the `isBold`, `isInverse`, `isDot` and `hasRing` booleans.
 
-**`Badge`'s `size` is a type scale, not a physical size.** It selects `h1`–`h6`
-or `b1`–`b3` (default `b2`), so `size="h1"` is a badge with heading-sized text,
-not a bigger pill. And its `style` list has eleven values — no `default`, unlike
-`Button` — five of which are SMART curriculum domains that carry no severity
-meaning.
+Both are read-only: no `onClick`, and no button semantics, because a label sits
+inside buttons, tabs and rows and nesting one control inside another is invalid
+ARIA. A number that changes while the page is open is not announced by either;
+if a change genuinely needs to interrupt, that is `Flag` — see
+`design-system/guidelines/components/messaging.md`.
 
-`Badge`'s `counter` is a plain span with no live region, so a number that changes
-while the page is open is not announced. If a change genuinely needs to
-interrupt, that is `Toast` — see `design-system/guidelines/components/messaging.md`.
-
-Color is never the whole message: `Badge`'s style only changes the palette, so
-the text has to say what the badge means, per
+Color is never the whole message: an appearance only changes the palette, so the
+text has to say what the label means, per
 `design-system/guidelines/foundations/accessibility.md`.
 
 ## Related

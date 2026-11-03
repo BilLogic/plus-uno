@@ -53,7 +53,6 @@ const StudentsDropdown = ({
                 id="students-dropdown"
                 mode="multi"
                 searchable
-                displayMode="badges"
                 options={options}
                 value={selectedIds}
                 onChange={onChange}

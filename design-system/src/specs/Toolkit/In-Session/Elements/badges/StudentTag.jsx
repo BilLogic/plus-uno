@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Badge from '@/components/labels/Badge/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 
 /**
  * StudentTag — a "PLUS Tag": a tonal pill labeling a student on one dimension
@@ -10,7 +10,7 @@ import Badge from '@/components/labels/Badge/Badge';
  *   - negative → red triangle-exclamation (needs attention)
  *   - neutral  → no icon (e.g. the overflow "…")
  *
- * Consolidates what used to be repeated inline <Badge> markup across the specs so
+ * Consolidates what used to be repeated inline label markup across the specs so
  * every student tag renders from one place.
  */
 const SIGNAL_ICON = {
@@ -20,13 +20,13 @@ const SIGNAL_ICON = {
 };
 
 export const StudentTag = ({ label, signal = 'neutral', className = '' }) => (
-    <Badge
-        text={label}
-        style="warning"
-        size="b3"
-        leadingVisual={SIGNAL_ICON[signal] || null}
-        className={`fw-normal ${className}`.trim()}
-    />
+    <StatusTag
+        appearance="warning"
+        leadingVisual={SIGNAL_ICON[signal] || undefined}
+        className={className}
+    >
+        {label}
+    </StatusTag>
 );
 
 StudentTag.propTypes = {

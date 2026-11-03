@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button';
 import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
 import './PrototypeCard.scss';
@@ -58,12 +58,12 @@ const PrototypeCard = ({
         <div className="prototype-card__head-main">
           {/* Badges row */}
           <div className="prototype-card__badges">
-            <Badge style={stageMeta.badgeStyle} size="b3">
+            <StatusTag appearance={stageMeta.badgeStyle}>
               {stageMeta.label}
-            </Badge>
-            <Badge style={pillarMeta.badgeStyle} size="b3">
+            </StatusTag>
+            <StatusTag appearance={pillarMeta.badgeStyle}>
               {pillarMeta.label}
-            </Badge>
+            </StatusTag>
           </div>
 
           {/* Title */}

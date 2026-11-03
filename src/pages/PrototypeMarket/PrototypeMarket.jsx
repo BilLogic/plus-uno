@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import Select from '@/components/forms-and-inputs/Select';
 import Input from '@/components/forms-and-inputs/Input';
-import Badge from '@/components/labels/Badge';
+import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Divider from '@/components/layout-and-structure/Divider';
@@ -384,10 +384,10 @@ const PrototypeMarket = () => {
                     <span className="prototype-market__list-desc">{proto.description}</span>
                   </span>
                   <span className="prototype-market__list-col--pillar">
-                    <Badge style={pillarMeta.badgeStyle} size="b3">{pillarMeta.label}</Badge>
+                    <StatusTag appearance={pillarMeta.badgeStyle}>{pillarMeta.label}</StatusTag>
                   </span>
                   <span className="prototype-market__list-col--stage">
-                    <Badge style={stageMeta.badgeStyle} size="b3">{stageMeta.label}</Badge>
+                    <StatusTag appearance={stageMeta.badgeStyle}>{stageMeta.label}</StatusTag>
                   </span>
                   <span className="prototype-market__list-col--creator">{proto.creators?.join(', ')}</span>
                   <span className="prototype-market__list-col--date">{proto.lastUpdated}</span>
@@ -426,12 +426,12 @@ const PrototypeMarket = () => {
             <div className="prototype-market__modal-top">
               <div className="prototype-market__modal-header-main">
                 <div className="prototype-market__modal-badges">
-                  <Badge style={(STAGE_META[activePrototype.stage] || STAGE_META.low).badgeStyle} size="b3">
+                  <StatusTag appearance={(STAGE_META[activePrototype.stage] || STAGE_META.low).badgeStyle}>
                     {(STAGE_META[activePrototype.stage] || STAGE_META.low).label}
-                  </Badge>
-                  <Badge style={(PILLAR_META[activePrototype.productPillar] || PILLAR_META.universal).badgeStyle} size="b3">
+                  </StatusTag>
+                  <StatusTag appearance={(PILLAR_META[activePrototype.productPillar] || PILLAR_META.universal).badgeStyle}>
                     {(PILLAR_META[activePrototype.productPillar] || PILLAR_META.universal).label}
-                  </Badge>
+                  </StatusTag>
                 </div>
                 <h3 className="prototype-market__modal-title h3">{activePrototype.title}</h3>
               </div>

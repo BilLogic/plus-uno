@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { Alert, Button, Count, NavTabs, Select, StaticBadgeSmart, Status, Tag } from '@/components';
+import { Alert, Button, CountTag, NavTabs, Select, StaticBadgeSmart, StatusTag, Tag } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -241,7 +241,7 @@ const TutorHomePageNewLayout = ({
                     <NavTabs mode="tabs" activeKey={sessionTab} onSelect={setSessionTab} aria-label="Next session">
                         <NavTabs.Item eventKey="sign-up">Sign up / Edit</NavTabs.Item>
                         <NavTabs.Item eventKey="session">
-                            <TabLabel after={<Count value={sessionLinks.length} size="small" />}>Session links</TabLabel>
+                            <TabLabel after={<CountTag value={sessionLinks.length} spacing="compact" />}>Session links</TabLabel>
                         </NavTabs.Item>
                         <NavTabs.Item eventKey="reflection">Reflection</NavTabs.Item>
                     </NavTabs>
@@ -299,7 +299,7 @@ const TutorHomePageNewLayout = ({
                             <li key={stat.label} className="plus-home-new__stat">
                                 <p className="plus-home-new__stat-value">{stat.value}</p>
                                 <p className="plus-home-new__secondary">{stat.label}</p>
-                                {stat.change && <Status style="success" leadingVisual="arrow-up">+{'{#}'}% since last week</Status>}
+                                {stat.change && <StatusTag appearance="success" leadingVisual="arrow-up">+{'{#}'}% since last week</StatusTag>}
                             </li>
                         ))}
                     </ul>
@@ -380,8 +380,8 @@ const TutorHomePageNewLayout = ({
                                         ? <StaticBadgeSmart type={CATEGORY_AREA[lesson.category]} />
                                         : lesson.category && <Tag color="gray">{lesson.category}</Tag>}
                                     {lesson.duration && <span className="plus-home-new__caption">{lesson.duration}</span>}
-                                    {lesson.inProgress && <Status style="warning" leadingVisual="spinner">In progress</Status>}
-                                    {lesson.aiRecommended && <Status style="discovery" leadingVisual="wand-magic-sparkles">AI recommended</Status>}
+                                    {lesson.inProgress && <StatusTag appearance="warning" leadingVisual="spinner">In progress</StatusTag>}
+                                    {lesson.aiRecommended && <StatusTag appearance="discovery" leadingVisual="wand-magic-sparkles">AI recommended</StatusTag>}
                                 </div>
                             </PatternCard>
                         </li>

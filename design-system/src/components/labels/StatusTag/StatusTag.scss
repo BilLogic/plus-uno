@@ -1,16 +1,16 @@
 /*
- * Status — the condition something is in.
+ * Status tag — the condition something is in.
  *
- * THE BOX. Medium is 20 tall (B3 12, icon 12, radius 4); large is 32 (B2 14
- * semibold, icon 16, radius 6). The two heights have no semantic token yet
+ * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); compact is 16 (same
+ * type, tighter); spacious is 32 (B2 14, icon 16, radius 6). The two heights have no semantic token yet
  * (label heights 16/20/22/32 are a token follow-up), so they are local custom
  * properties set from `_label-heights.scss`, which Skeleton reads too.
  *
  * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
  * (`__content`) whose right padding, added to the outer right padding, makes
- * the label's right inset equal its left one: 4 in medium, 12 in large. A
+ * the label's right inset equal its left one: 4 in default, 12 in spacious. A
  * nested count is the outer box's last child, so it sits at the outer right
- * padding — 2 in medium, 6 in large — which, centered in the height, is the
+ * padding — 2 in default, 6 in spacious — which, centered in the height, is the
  * same inset from the top. The 2 and 6 have no Element token, so they take the
  * spacing primitives Figma binds; the 6 radius is the radius-150 primitive for
  * the same reason.
@@ -49,8 +49,17 @@
     gap: var(--size-element-gap-xs, 4px);
 }
 
-.plus-status--large {
-    --plus-status-height: #{label.$status-height-large};
+.plus-status--compact {
+    --plus-status-height: #{label.$status-height-compact};
+    --plus-status-icon-box: 16px;
+
+    .plus-status__label {
+        line-height: var(--plus-status-height);
+    }
+}
+
+.plus-status--spacious {
+    --plus-status-height: #{label.$status-height-spacious};
     --plus-status-icon-box: 22px;
 
     padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--size-element-pad-x-md, 12px);
@@ -80,13 +89,13 @@
     }
 }
 
-.plus-status--large .plus-status__visual > i {
+.plus-status--spacious .plus-status__visual > i {
     font-size: var(--icon-md);
 }
 
 /*
  * Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip.
- * The label is body.small 12/16, and body.default 14/20 on a large status. The
+ * The label is body.small 12/16, and body.default 14/20 on a spacious one. The
  * style sets the weight too, so a Status inside a `th` or a heading does not
  * inherit bold.
  */
@@ -105,7 +114,7 @@
  * text    the style's (Text) color; neutral is on-surface-variant.
  * border  the style's pressed background token.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
- * mapping Count and Tag use.
+ * mapping Count tag and Tag use. The five SMART subjects read their own tokens.
  */
 $status-state: (
     'neutral': (var(--color-surface-container, #edeef0), var(--color-on-surface-variant, #3f484a), var(--ds-background-neutral-pressed)),
@@ -114,6 +123,11 @@ $status-state: (
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
     'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed)),
     'discovery': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content), var(--ds-background-smart-mastering-content-pressed)),
+    'social-emotional': (var(--ds-background-smart-social-emotional), var(--ds-text-smart-social-emotional), var(--ds-background-smart-social-emotional-pressed)),
+    'mastering-content': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content), var(--ds-background-smart-mastering-content-pressed)),
+    'advocacy': (var(--ds-background-smart-advocacy), var(--ds-text-smart-advocacy), var(--ds-background-smart-advocacy-pressed)),
+    'relationship': (var(--ds-background-smart-relationship), var(--ds-text-smart-relationship), var(--ds-background-smart-relationship-pressed)),
+    'technology-tools': (var(--ds-background-smart-technology-tools), var(--ds-text-smart-technology-tools), var(--ds-background-smart-technology-tools-pressed)),
 );
 
 /*

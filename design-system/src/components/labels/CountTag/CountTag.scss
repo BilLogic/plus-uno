@@ -1,5 +1,5 @@
 /*
- * Count — a number on its own, as a pill.
+ * Count tag — a number on its own, as a pill.
  *
  * EVERY COUNT IS A PILL: 20 on its own, 16 for use inside a label, with the
  * minimum width equal to the height so a single digit is a circle and 9 → 10
@@ -31,8 +31,8 @@
     font-variant-numeric: tabular-nums;
 }
 
-.plus-count--small {
-    --plus-count-size: #{label.$count-height-small};
+.plus-count--compact {
+    --plus-count-size: #{label.$count-height-compact};
     --plus-count-min: var(--size-spacing-medium-space-300, 16px);
 }
 
@@ -45,7 +45,7 @@
  *          base with white ink fails AA, so bold warning uses Warning Container.
  * dot      the solid base, which is the whole mark.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
- * mapping Status and Tag use.
+ * mapping Status tag and Tag use.
  */
 $count-subtle: (
     'neutral': (var(--ds-background-neutral), var(--ds-text)),
@@ -123,7 +123,7 @@ $count-dot: (
 }
 
 /*
- * The small pill is 16 tall and the B3 line is 20; the flex box centers the
+ * The compact pill is 16 tall and the B3 line is 20; the flex box centers the
  * line, and a line height of the pill keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
