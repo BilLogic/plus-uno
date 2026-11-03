@@ -18,9 +18,9 @@
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
 | `type` | enum | `'state'` | `state` for a condition; `date` for a due or event date, outlined with a fixed icon. |
 | `appearance` | oneOf | `'neutral'` | The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. The five SMART subjects draw their own `smart` tokens. |
-| `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `compact` (16) in dense tables; `spacious` (32) beside a heading. |
+| `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
 | `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. |
-| `count` | number or string | — | A number nested inside the label as a Count tag of the same appearance: compact (16) in default, default (20) in spacious. Hidden at 0, and not shown at `compact`. |
+| `count` | number or string | — | A number nested inside the label as a Count tag of the same appearance: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
@@ -29,7 +29,7 @@
 
 **`type`** — `state` · `date`
 
-**`spacing`** — `default` · `compact` · `spacious`
+**`spacing`** — `default` · `spacious`
 
 Anything not listed is not a valid value.
 

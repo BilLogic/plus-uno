@@ -41,7 +41,7 @@ export const STATUS_TAG_STATUS_APPEARANCES = ['neutral', 'success', 'warning', '
 export const STATUS_TAG_SMART_APPEARANCES = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
 export const STATUS_TAG_APPEARANCES = [...STATUS_TAG_STATUS_APPEARANCES, ...STATUS_TAG_SMART_APPEARANCES];
 export const STATUS_TAG_DATE_APPEARANCES = ['neutral', 'warning', 'danger'];
-export const STATUS_TAG_SPACINGS = ['default', 'compact', 'spacious'];
+export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
 /** The fixed icon of each date appearance: calendar, clock, alert. */
 export const STATUS_TAG_DATE_ICONS = {
@@ -108,9 +108,7 @@ export const StatusTag = ({
     }
 
     const visual = isDate ? STATUS_TAG_DATE_ICONS[effectiveAppearance] : leadingVisual;
-    /* A compact tag is 16 tall, the height of a compact count: there is no room to nest one. */
-    const hasCount = count !== undefined && count !== null && formatCount(count) !== null
-        && effectiveSpacing !== 'compact';
+    const hasCount = count !== undefined && count !== null && formatCount(count) !== null;
 
     /*
      * A node visual is a new object every render; keying the measurement on it
@@ -178,11 +176,11 @@ StatusTag.propTypes = {
     type: PropTypes.oneOf(STATUS_TAG_TYPES),
     /** The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. The five SMART subjects draw their own `smart` tokens. */
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
-    /** `default` (20) in rows, lists and sentences; `compact` (16) in dense tables; `spacious` (32) beside a heading. */
+    /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
     /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. */
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** A number nested inside the label as a Count tag of the same appearance: compact (16) in default, default (20) in spacious. Hidden at 0, and not shown at `compact`. */
+    /** A number nested inside the label as a Count tag of the same appearance: compact (16) in default, default (20) in spacious. Hidden at 0. */
     count: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

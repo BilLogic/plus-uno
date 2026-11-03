@@ -9,7 +9,7 @@ export const figmaMeta = {
   "props": {
     "type": { "type": "enum", "values": ["state", "date"] },
     "appearance": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery", "social-emotional", "mastering-content", "advocacy", "relationship", "technology-tools"] },
-    "spacing": { "type": "enum", "values": ["default", "compact", "spacious"] },
+    "spacing": { "type": "enum", "values": ["default", "spacious"] },
     "leadingVisual": { "type": "boolean" },
     "count": { "type": "boolean" }
   },
@@ -93,7 +93,7 @@ something is in, whether the system calculated it or a person set it.
     <DsCanvasQuiet of={StatusTagStories.LeadingVisual} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>count</code> nests a Count tag of the same appearance: compact (16) in default, default (20) in spacious, inset equally from the top and the right. A count of 0 is hidden, and a compact tag takes none.</>}>
+<DocsCanvasShell description={<><code>count</code> nests a Count tag of the same appearance: compact (16) in default, default (20) in spacious, inset equally from the top and the right. A count of 0 is hidden.</>}>
     <DsCanvasQuiet of={StatusTagStories.WithCount} />
 </DocsCanvasShell>
 
@@ -135,7 +135,7 @@ Benchmarked against the [ADS documentation](https://atlassian.design/components/
         <tr><td><code>appearance</code> (default, inprogress, moved, new, removed, success)</td><td><code>appearance</code> (neutral, success, warning, danger, info, discovery, and the five SMART subjects)</td><td>PLUS names the meaning. SMART subjects keep their own colors.</td></tr>
         <tr><td><code>isBold</code></td><td>None</td><td>Status tags are filled with a tinted background; a bold fill is not part of the PLUS set.</td></tr>
         <tr><td><code>maxWidth</code></td><td><code>maxWidth</code></td><td>Same; the full text is a tooltip, reachable by keyboard.</td></tr>
-        <tr><td>None</td><td><code>spacing</code> (default 20, compact 16, spacious 32)</td><td>Compact is for dense tables; spacious sits beside a heading.</td></tr>
+        <tr><td>None</td><td><code>spacing</code> (default 20, spacious 32)</td><td>Spacious sits beside a heading.</td></tr>
         <tr><td>None</td><td><code>type</code> (state, date), <code>leadingVisual</code>, <code>count</code></td><td>A date is outlined with a fixed icon; a count nests a Count tag.</td></tr>
     </tbody>
 </DocsTable>
@@ -162,8 +162,8 @@ same component whether the system calculated the state or a person set it.
 - **Is it the condition something is in, and can that condition change?** Status tag.
 - **Otherwise** (a subject, a person, a category): Tag.
 
-Use `spacing="default"` (20) in rows, lists and sentences, `spacing="compact"`
-(16) in dense tables, and `spacing="spacious"` (32) beside a heading.
+Use `spacing="default"` (20) in rows, lists, tables and sentences, and
+`spacing="spacious"` (32) beside a heading.
 
 </div>
 

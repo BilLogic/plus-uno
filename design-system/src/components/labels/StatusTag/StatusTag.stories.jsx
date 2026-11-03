@@ -43,13 +43,11 @@ const grid = { display: 'grid', gap: '12px' };
 
 /* ------------------------------------------------------------------ helpers */
 
-const SIZE = { compact: 16, default: 20, spacious: 32 };
+const SIZE = { default: 20, spacious: 32 };
 /** Left and right padding when there is no count: Element xs (4) and md (12). */
-const PAD = { compact: 4, default: 4, spacious: 12 };
+const PAD = { default: 4, spacious: 12 };
 /** The nested count's height, and its inset from the top and right edges. */
 const COUNT = { default: { height: 16, inset: 2 }, spacious: { height: 20, inset: 6 } };
-/** Spacings that can nest a count: a compact tag is as tall as a compact count. */
-const COUNT_SPACINGS = ['default', 'spacious'];
 
 /** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
@@ -206,12 +204,11 @@ Dates.play = async ({ canvasElement }) => {
 
 /**
  * `count` nests a Count tag of the same appearance: compact (16) in default,
- * default (20) in spacious, inset equally from the top and the right. A compact
- * tag is as tall as a compact count, so it takes none.
+ * default (20) in spacious, inset equally from the top and the right.
  */
 export const WithCount = () => (
     <div style={grid}>
-        {COUNT_SPACINGS.map((size) => (
+        {STATUS_TAG_SPACINGS.map((size) => (
             <div key={size} style={row}>
                 {STATUS_TAG_STATUS_APPEARANCES.map((appearance) => (
                     <StatusTag key={appearance} appearance={appearance} spacing={size} count={38} data-testid={`${appearance}-${size}`}>
@@ -229,7 +226,7 @@ WithCount.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
-    for (const size of COUNT_SPACINGS) {
+    for (const size of STATUS_TAG_SPACINGS) {
         for (const [style, [, ink]] of Object.entries(STATE_COLORS).filter(([name]) => STATUS_TAG_STATUS_APPEARANCES.includes(name))) {
             const name = `${style}-${size}`;
             const el = canvas.getByTestId(name);
