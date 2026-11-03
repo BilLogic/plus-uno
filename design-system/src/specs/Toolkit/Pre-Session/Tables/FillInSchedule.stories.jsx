@@ -20,8 +20,8 @@ export default {
  * - Row radius: var(--size-table-radius-md)
  * 
  * Interactive states:
- * - Hover: background changes to --color-on-surface-state-08
- * - Active/Pressed: background changes to --color-on-surface-state-12
+ * - Hover: background changes to --ds-background-neutral-subtle-hovered
+ * - Active/Pressed: background changes to --ds-background-neutral-subtle-pressed
  */
 export const TableRow = ({
     date,
@@ -44,11 +44,10 @@ export const TableRow = ({
 
     const stateStyles = {
         default: {},
-        hover: { backgroundColor: 'var(--color-on-surface-state-08)' },
-        pressed: { backgroundColor: 'var(--color-on-surface-state-12)' },
+        hover: { backgroundColor: 'var(--ds-background-neutral-subtle-hovered)' },
+        pressed: { backgroundColor: 'var(--ds-background-neutral-subtle-pressed)' },
         focus: {
-            border: 'var(--size-element-stroke-lg) solid var(--color-inverse-primary)',
-            backgroundColor: 'var(--color-on-surface-state-12)'
+            border: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)'
         },
         disabled: { opacity: 0.5, pointerEvents: 'none' }
     };
@@ -262,7 +261,7 @@ export const TableHeaderRow = () => (
  * - --size-table-cell-gap (internal cell gap)
  * - --size-table-radius-md (row border radius)
  * - --color-on-surface, --color-secondary-text (text colors)
- * - --color-on-surface-state-08/12 (interactive states)
+ * - --ds-background-neutral-subtle-hovered/-pressed (interactive states)
  */
 export const Overview = () => (
     <div style={{

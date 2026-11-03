@@ -14,16 +14,16 @@ import PropTypes from 'prop-types';
  * adds a small warning indicator, matching the Figma "room # (out of range)" variant.
  *
  * Tokens (from Figma variable defs):
- *  - default: bg --color-secondary-state-08 (#445c6a14), text --color-secondary-text (#3b525f)
- *  - out of range: bg --color-danger-state-08, text --color-danger-text
+ *  - default: bg --ds-background-neutral, text --color-secondary-text (#3b525f)
+ *  - out of range: bg --ds-background-danger, text --color-danger-text
  *  - radius --size-element-radius-md (4px), pad-x --size-element-pad-x-sm (8px), height 20px, gap 4px
  */
 export const RoomBadge = ({ number, outOfRange = false }) => {
     if (number === null || number === undefined || number === '') return null;
 
     const tone = outOfRange
-        ? { bg: 'var(--color-danger-state-08)', fg: 'var(--color-danger-text)' }
-        : { bg: 'var(--color-secondary-state-08)', fg: 'var(--color-secondary-text)' };
+        ? { bg: 'var(--ds-background-danger)', fg: 'var(--color-danger-text)' }
+        : { bg: 'var(--ds-background-neutral)', fg: 'var(--color-secondary-text)' };
 
     return (
         <span

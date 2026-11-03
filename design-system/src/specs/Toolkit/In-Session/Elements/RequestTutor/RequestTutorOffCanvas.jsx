@@ -74,7 +74,7 @@ const Chip = ({ selected, children, onClick }) => (
             padding: 'var(--size-element-pad-y-sm) var(--size-element-pad-x-md)',
             borderRadius: 'var(--size-element-radius-full, 999px)',
             border: `var(--size-element-stroke-sm) solid ${selected ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`,
-            background: selected ? 'var(--color-primary)' : 'var(--color-secondary-state-08)',
+            background: selected ? 'var(--color-primary)' : 'var(--ds-background-neutral)',
             color: selected ? 'var(--color-on-primary)' : 'var(--color-on-surface)',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
