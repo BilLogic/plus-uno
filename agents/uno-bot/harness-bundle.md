@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **102,960 chars from 9 files**, against an assembled budget of 175,500 (72,540 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 82,576 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **104,894 chars from 9 files**, against an assembled budget of 175,500 (70,606 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 84,510 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,113 (−7,715 ide-only) | 10,113 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 15,301 | 25,443 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 46,911 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 48,557 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 49,805 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 55,499 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 67,285 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 87,105 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 90,573 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 97,131 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 102,104 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 102,960 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,235 | 27,377 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 48,845 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 50,491 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 51,739 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 57,433 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,219 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 89,039 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 92,507 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 99,065 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 104,038 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 104,894 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -271,6 +271,56 @@ _Avoid_: "data table", "interactive table"
 **Tree table**:
 A table whose rows nest under parent rows. Planned in code as `TreeTable`.
 _Avoid_: "table tree", "nested table"
+
+**Frame**:
+The pattern for the app's outer shell: the topbar and sidebar that stay put while the **Page** inside changes.
+
+**Page**:
+The pattern for the main content area inside a **Frame**: it carries the page title and a body. Distinct from **Page** the Context Level.
+
+**Blanket**:
+The pattern for the layer over the UI that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
+
+**Modal**:
+The pattern for content that takes over the screen until it is closed. Built from a **Blanket** and a layer; **ModalDialog** is the component built on it.
+_Avoid_: bare "modal" for the component
+
+**ModalDialog**:
+The component built on the **Modal** pattern, with a title, body and actions.
+_Avoid_: "popup" for a blocking dialog
+
+**Drawer**:
+A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
+_Avoid_: "side panel", "slide-over"
+
+**Status tag**:
+A label that shows the state of one thing, with a color for its meaning.
+_Avoid_: "pill"
+
+**Count tag**:
+A label that shows a number.
+_Avoid_: "counter"
+
+**Tag**:
+A label a person can attach, filter by or remove: it names a category rather than a state.
+_Avoid_: "chip"
+
+**Tag group**:
+A set of **Tag**s laid out together.
+_Avoid_: "tag list"
+
+**Suggestion**:
+A label that offers something PLUS AI proposes, which a person accepts or dismisses.
+_Avoid_: "AI chip"
+
+**appearance**:
+The prop that picks how a component looks within its role, such as `default`, `subtle` or `primary`.
+
+**spacing**:
+The prop that sets a component's density in words: `default`, `compact` or `spacious`. Pixel values belong to `size`.
+
+**Named state token**:
+A color token that names the state it paints, such as `--ds-background-brand-bold-hovered` or `--ds-background-selected`, so a hover, press or selection reads from its name. The mapping is `design-system/guidelines/foundations/color-migration.md`.
 
 ### Estates
 

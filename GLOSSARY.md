@@ -116,6 +116,56 @@ _Avoid_: "data table", "interactive table"
 A table whose rows nest under parent rows. Planned in code as `TreeTable`.
 _Avoid_: "table tree", "nested table"
 
+**Frame**:
+The pattern for the app's outer shell: the topbar and sidebar that stay put while the **Page** inside changes.
+
+**Page**:
+The pattern for the main content area inside a **Frame**: it carries the page title and a body. Distinct from **Page** the Context Level.
+
+**Blanket**:
+The pattern for the layer over the UI that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
+
+**Modal**:
+The pattern for content that takes over the screen until it is closed. Built from a **Blanket** and a layer; **ModalDialog** is the component built on it.
+_Avoid_: bare "modal" for the component
+
+**ModalDialog**:
+The component built on the **Modal** pattern, with a title, body and actions.
+_Avoid_: "popup" for a blocking dialog
+
+**Drawer**:
+A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
+_Avoid_: "side panel", "slide-over"
+
+**Status tag**:
+A label that shows the state of one thing, with a color for its meaning.
+_Avoid_: "pill"
+
+**Count tag**:
+A label that shows a number.
+_Avoid_: "counter"
+
+**Tag**:
+A label a person can attach, filter by or remove: it names a category rather than a state.
+_Avoid_: "chip"
+
+**Tag group**:
+A set of **Tag**s laid out together.
+_Avoid_: "tag list"
+
+**Suggestion**:
+A label that offers something PLUS AI proposes, which a person accepts or dismisses.
+_Avoid_: "AI chip"
+
+**appearance**:
+The prop that picks how a component looks within its role, such as `default`, `subtle` or `primary`.
+
+**spacing**:
+The prop that sets a component's density in words: `default`, `compact` or `spacious`. Pixel values belong to `size`.
+
+**Named state token**:
+A color token that names the state it paints, such as `--ds-background-brand-bold-hovered` or `--ds-background-selected`, so a hover, press or selection reads from its name. The mapping is `design-system/guidelines/foundations/color-migration.md`.
+
 ### Estates
 
 **uno-blueprint**:
