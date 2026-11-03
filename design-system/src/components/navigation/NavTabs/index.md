@@ -79,6 +79,6 @@ Implemented as `NavTabsDropdown`.
 
 ## Related
 
-Same group: `Breadcrumb` · `NavPills` · `Pagination` · `Scrollspy` · `SidebarTab`
+Same group: `Breadcrumb` · `NavPills` · `Navbar` · `Pagination` · `Scrollspy` · `Sidebar` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
-import Table from '@/components/_internal/Table';
+import Table from '@/components/text-and-data-display/Table';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import './StudentsOverviewSection.scss';

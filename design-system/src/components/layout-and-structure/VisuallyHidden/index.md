@@ -23,6 +23,6 @@ Text that assistive technology reads and nobody sees: a one-pixel, clipped span 
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

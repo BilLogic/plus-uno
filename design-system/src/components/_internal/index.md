@@ -2,21 +2,16 @@
 
 # Internal
 
-8 components. Each row links to the generated facts; the three columns after it are the
+3 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Footer](Footer/index.md) | 6 | ✕ | ✕ | ✕ |
 | [LoadingGif](LoadingGif/index.md) | 5 | ✕ | ✕ | ✕ |
-| [Navbar](Navbar/index.md) | 6 | ✕ | ✕ | ✕ |
 | [SessionAvailabilitySnackbar](SessionAvailabilitySnackbar/index.md) | 5 | ✕ | ✕ | ✕ |
 | [SessionManagementSnackbar](SessionManagementSnackbar/index.md) | 4 | ✕ | ✕ | ✕ |
-| [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |
-| [Table](Table/index.md) | 18 | ✕ | ✕ | ✕ |
-| [UserAvatar](UserAvatar/index.md) | 10 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 0/8 (0%) · Correct/incorrect 0/8 (0%) · Accessibility 0/8 (0%)
+**Authored coverage:** When to use 0/3 (0%) · Correct/incorrect 0/3 (0%) · Accessibility 0/3 (0%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

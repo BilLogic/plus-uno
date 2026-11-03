@@ -8,7 +8,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import Table from '@/components/_internal/Table/Table';
+import Table from '@/components/text-and-data-display/Table/Table';
 import { BadgeClaimedPill, ProgressRing } from '@/specs/Admin/Tutor/Elements';
 
 import './TutorsTrainingProgressTable.scss';

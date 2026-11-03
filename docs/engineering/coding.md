@@ -15,6 +15,27 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 - **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
 - **Prompt-specs**: same folder, same date prefix, `-spec` suffix (`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
+## Folder shape
+
+Every component is one folder, under a group, with this shape (not every file is
+required — a component with no tests or no docs page just has fewer of them):
+
+```
+<group>/Name/Name.jsx|.scss|.stories.jsx|.test.jsx|.mdx|index.js
+```
+
+`index.js` is the component's own curated public surface (its default export,
+and any named export it chooses to carry alongside it); `design-system/src/components/index.js`
+is generated from the folder tree by `npm run generate:component-barrel`
+(`npm run check:component-barrel` in CI) — a source for regeneration, same as
+`_colors.scss` and the other generated files above. A group folder that owns
+its own `index.js` (today, only `forms-and-inputs`) is re-exported wholesale;
+every other group's component folders are picked up by name. `_internal/` sits
+outside the scan entirely, so the public barrel only ever surfaces a component
+that lives in a group folder. A flat file still converging toward this shape
+stays that way until its own family PR touches it, rather than as a side
+effect of a neighboring line (#1702).
+
 ## Imports
 
 **Alias resolution:**

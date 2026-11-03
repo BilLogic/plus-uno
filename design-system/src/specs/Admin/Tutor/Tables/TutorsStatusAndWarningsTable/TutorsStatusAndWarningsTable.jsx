@@ -8,10 +8,10 @@
 
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Table from '@/components/_internal/Table/Table';
+import Table from '@/components/text-and-data-display/Table/Table';
 import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
 import StatusTag from '@/components/labels/StatusTag';
-import UserAvatar from '@/components/_internal/UserAvatar/UserAvatar';
+import UserAvatar from '@/components/images-and-icons/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
 
 /**
