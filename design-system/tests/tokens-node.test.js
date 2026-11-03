@@ -613,7 +613,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // fallbacks went with the legacy names.
     // 481: the Foundations docs moved onto the --ds- tokens, and the old Grid
     // stories' five color fallbacks went with them.
-    expect(comparable).toBe(481);
+    // 477: Range's thumb took the brand bold steps, and its four washes went.
+    expect(comparable).toBe(477);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
