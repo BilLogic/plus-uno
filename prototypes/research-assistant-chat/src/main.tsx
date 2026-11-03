@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from 'react-bootstrap';
 import { ErrorBoundary } from './ErrorBoundary';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@plus-ds/styles/bootstrap-layer.css';
 import '@plus-ds/styles/main.scss';
 import App from './App';
 import './styles/plus-tokens.scss';
