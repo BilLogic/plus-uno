@@ -11,14 +11,13 @@
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .html .mdx` file under
  * `design-system/src`, `prototypes` and `src` (`.mjs` counts as js), by `git ls-files` (a filesystem
- * walk finds a second copy of the tree under `.claude/worktrees/`). The state
- * step definitions in `design-system/src/tokens/` are out of scope until the
- * token sweep deletes them. `docs/knowledge/archive/`, `docs/adr/` and
+ * walk finds a second copy of the tree under `.claude/worktrees/`), the token
+ * files included. `docs/knowledge/archive/`, `docs/adr/` and
  * `_Avoid_:` glossary lines are allowlisted: they record the old words on
  * purpose, as history or as what not to say.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
- *   state-step       lines naming a `--*-state-08|12|16` custom property.
+ *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
  *   component:<Name> JSX tags `<Name` plus import statements binding `Name`,
  *                    for the legacy names. `Overlay` and `Surface` count only
  *                    where they are the pattern, not React-Bootstrap's Overlay.
@@ -27,6 +26,9 @@
  *                    `size="small|medium|large|sm|md|lg"`.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
+ *
+ * ONE RULE IS NOT A RATCHET. `state-step` allows zero: any hit is a finding,
+ * the baseline never holds it, and `--update` never records it.
  *
  * THE RATCHET. The count of a (rule, file) pair may fall and never rise, and a
  * pair the baseline does not hold is a finding. A pair that reaches zero leaves
@@ -58,8 +60,6 @@ export const BASELINE = 'scripts/baselines/ads-language.json';
 
 export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
-/** The state step definitions live here until the token sweep deletes them. */
-const OUT_OF_SCOPE = /^design-system\/src\/tokens\//;
 /** Files that record the old words on purpose: history, decisions. */
 const ALLOWED_PATHS = [/^docs\/knowledge\/archive\//, /^docs\/adr\//];
 /** A glossary line saying what not to say. */
@@ -121,7 +121,6 @@ export function measure(sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
-      if (rule === 'state-step' && OUT_OF_SCOPE.test(file)) continue;
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
@@ -148,9 +147,18 @@ export function sourcesOf(repoRoot) {
     .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
 }
 
-/** The ratchet's side of a measurement: a plain `key -> count` object in key order. */
+/** Rules that allow none: a hit is a finding, whatever the baseline says. */
+const HARD_RULES = ['state-step'];
+const isHard = (key) => HARD_RULES.includes(key.split(' ')[0]);
+
+/** The ratchet's side of a measurement: a plain `key -> count` object in key order, hard rules left out. */
 const asRecord = (found) =>
-  Object.fromEntries([...found.entries()].sort(([a], [b]) => (a < b ? -1 : 1)).map(([k, v]) => [k, v.count]));
+  Object.fromEntries(
+    [...found.entries()]
+      .filter(([k]) => !isHard(k))
+      .sort(([a], [b]) => (a < b ? -1 : 1))
+      .map(([k, v]) => [k, v.count]),
+  );
 
 /** Opened fresh on every call: `--update` writes the record and the gate then reads it back. */
 const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
@@ -175,6 +183,15 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
           : `old language rose: ${failure.count} x ${rule} against a baseline of ${failure.recorded}`,
     };
   });
+  for (const [key, { count, line }] of found) {
+    if (!isHard(key)) continue;
+    const [rule, ...rest] = key.split(' ');
+    findings.push({
+      file: rest.join(' '),
+      line,
+      message: `old language: ${count} x ${rule}; the 08 / 12 / 16 state steps are gone, so zero allowed (use the named hovered, pressed and selected tokens)`,
+    });
+  }
   if (!ratchet.absent) {
     for (const entry of ratchet.stale(asRecord(found))) {
       const [rule, ...rest] = entry.key.split(' ');

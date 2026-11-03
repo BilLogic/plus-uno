@@ -52,14 +52,14 @@ test('the line number is the line the usage is on', () => {
 });
 
 test('a whole rgba() fallback is captured, commas and alpha included', () => {
-  // Every state-layer wash is written this way, so a capture that stopped at
+  // Every translucent wash is written this way, so a capture that stopped at
   // the first comma would miss exactly the fallbacks a re-mixed base leaves
   // stale.
   const uses = fallbackUsages([
-    { path: 'a.scss', text: 'background: var(--color-primary-state-08, rgba(4, 114, 168, 0.08));' },
+    { path: 'a.scss', text: 'background: var(--color-primary-tint, rgba(4, 114, 168, 0.08));' },
   ]);
   assert.deepEqual(uses, [
-    { path: 'a.scss', line: 1, token: '--color-primary-state-08', literal: 'rgba(4, 114, 168, 0.08)' },
+    { path: 'a.scss', line: 1, token: '--color-primary-tint', literal: 'rgba(4, 114, 168, 0.08)' },
   ]);
 });
 
@@ -158,11 +158,11 @@ test('an rgba() fallback is compared with its alpha, so a stale wash is reported
   // The alpha is part of the color: a wash at 0.5 over a token at 0.32 paints
   // a different scrim, and so does the right alpha over the wrong base.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-tertiary-state-08', 'rgba(14, 129, 117, 0.08)']]),
+    tokens: new Map([['--color-tertiary-tint', 'rgba(14, 129, 117, 0.08)']]),
     usages: [
-      { path: 'a.scss', line: 1, token: '--color-tertiary-state-08', literal: 'rgba(14, 129, 117, 0.08)' },
-      { path: 'b.scss', line: 2, token: '--color-tertiary-state-08', literal: 'rgba(0, 82, 221, 0.08)' },
-      { path: 'c.scss', line: 3, token: '--color-tertiary-state-08', literal: 'rgba(14, 129, 117, 0.5)' },
+      { path: 'a.scss', line: 1, token: '--color-tertiary-tint', literal: 'rgba(14, 129, 117, 0.08)' },
+      { path: 'b.scss', line: 2, token: '--color-tertiary-tint', literal: 'rgba(0, 82, 221, 0.08)' },
+      { path: 'c.scss', line: 3, token: '--color-tertiary-tint', literal: 'rgba(14, 129, 117, 0.5)' },
     ],
   });
   assert.equal(audit.comparable, 3);

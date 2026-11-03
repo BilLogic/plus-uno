@@ -8,6 +8,8 @@ import path from 'node:path';
 import { BASELINE, measure, run } from './check-ads-language.mjs';
 
 const src = (file, text) => ({ path: file, text });
+/** A state-step custom property, assembled so this file does not itself carry the old name. */
+const step = (role, n) => `--color-${role}-state-${n}`;
 const countOf = (sources, key) => measure(sources).get(key)?.count;
 
 /** A scratch repo root holding a baseline record of `counts`. */
@@ -18,11 +20,11 @@ function scratch(counts) {
   return root;
 }
 
-test('a state step custom property is counted per line, and the token definitions are out of scope', () => {
-  const css = '.a { color: var(--color-primary-state-08); background: var(--color-danger-state-12); }\n.b { x: var(--color-primary-state-16) }\n';
+test('a state step custom property is counted per line, in the token files too', () => {
+  const css = `.a { color: var(${step('primary', '08')}); background: var(${step('danger', '12')}); }\n.b { x: var(${step('primary', '16')}) }\n`;
   assert.equal(countOf([src('design-system/src/components/A/A.scss', css)], 'state-step design-system/src/components/A/A.scss'), 2);
-  assert.equal(measure([src('design-system/src/tokens/_colors.scss', '--color-primary-state-08: #000;')]).size, 0);
-  assert.equal(measure([src('a.scss', 'var(--color-primary-state-082)')]).size, 0, 'only the 08 / 12 / 16 steps');
+  assert.equal(countOf([src('design-system/src/tokens/_colors.scss', `${step('primary', '08')}: #000;`)], 'state-step design-system/src/tokens/_colors.scss'), 1);
+  assert.equal(measure([src('a.scss', `var(${step('primary', '08')}2)`)]).size, 0, 'only the 08 / 12 / 16 steps');
 });
 
 test('legacy components count as tags and imports, and a longer name is not its prefix', () => {
@@ -60,9 +62,15 @@ test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on pu
   assert.equal(measure([src('design-system/src/G.mdx', '_Avoid_: "scrim", "Rovo"\n')]).size, 0);
 });
 
-test('a fixture with a new -state-08 fails against the baseline', () => {
+test('a state step fails with zero allowed, and a recorded baseline does not excuse it', () => {
+  const root = scratch({ 'state-step design-system/src/A.scss': 1 });
+  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', `.a { c: var(${step('info', '08')}) }`)] });
+  assert.ok(findings.some((f) => /state-step/.test(f.message) && /zero allowed/.test(f.message) && f.line === 1));
+});
+
+test('a fixture with a new state step fails against the baseline', () => {
   const root = scratch({});
-  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', '.a { c: var(--color-info-state-08) }')] });
+  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', `.a { c: var(${step('info', '08')}) }`)] });
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /state-step/);
   assert.equal(findings[0].file, 'design-system/src/A.scss');
@@ -70,16 +78,16 @@ test('a fixture with a new -state-08 fails against the baseline', () => {
 });
 
 test('a count that rises fails, and one that falls passes', () => {
-  const key = 'state-step design-system/src/A.scss';
-  const two = '.a { c: var(--color-info-state-08) }\n.b { c: var(--color-info-state-12) }\n';
-  const one = '.a { c: var(--color-info-state-08) }\n';
-  const three = `${two}.c { c: var(--color-info-state-16) }\n`;
+  const key = 'word:scrim design-system/src/A.scss';
+  const two = '.a { /* scrim */ }\n.b { /* scrim */ }\n';
+  const one = '.a { /* scrim */ }\n';
+  const three = `${two}.c { /* scrim */ }\n`;
   const root = scratch({ [key]: 2 });
   assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', two)] }), []);
   assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', one)] }), [], 'lowering a count passes');
   const rose = run({ repoRoot: root, sources: [src('design-system/src/A.scss', three)] });
   assert.equal(rose.length, 1);
-  assert.match(rose[0].message, /rose: 3 x state-step against a baseline of 2/);
+  assert.match(rose[0].message, /rose: 3 x word:scrim against a baseline of 2/);
 });
 
 test('a pair that reaches zero is stale until the baseline is regenerated', () => {

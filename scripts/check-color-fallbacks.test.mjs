@@ -46,9 +46,9 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
   const { root, done } = policyTree(
     {
       'design-system/src/tokens/_colors.scss':
-        ':root { --color-tertiary-state-08: rgba(14, 129, 117, 0.08); }\n',
+        ':root { --color-tertiary-tint: rgba(14, 129, 117, 0.08); }\n',
       'design-system/src/a.scss':
-        '.a { background: var(--color-tertiary-state-08, rgba(0, 82, 221, 0.08)); }\n',
+        '.a { background: var(--color-tertiary-tint, rgba(0, 82, 221, 0.08)); }\n',
       'scripts/baselines/color-fallback-baseline.json': BASELINE,
     },
     { git: true },
@@ -56,7 +56,7 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /--color-tertiary-state-08/.test(message) && /a\.scss:1/.test(message)),
+      found.some((message) => /--color-tertiary-tint/.test(message) && /a\.scss:1/.test(message)),
       `expected a disagreement finding for the stale wash, got:\n${found.join('\n')}`,
     );
   } finally {

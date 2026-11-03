@@ -141,9 +141,9 @@ export function edgeUses(files, root = REPO_ROOT) {
  *
  * `color-mix(in srgb, var(--color-primary), black 8%)` and
  * `filter: brightness(0.92)` are both a hover color computed at the call site.
- * The system already names that darkening: `--color-shadow-state-08/12/16`
- * are the black washes at 8, 12 and 16%, and laid over the fill as a
- * `background-image` they composite to the same color the mix produced. A
+ * The system already names that darkening: the role's own `.hovered` and
+ * `.pressed` tokens, and `--ds-interaction-hovered` / `-pressed` where the
+ * base fill cannot change. A
  * mix with `transparent` is an alpha, not a darkening, and is not counted.
  * Comments are stripped first, so a sentence about the old mix is not a use.
  */
@@ -188,7 +188,7 @@ export function mixFailures(uses, { failures: verdicts = [], stale = [], unrevie
       const lines = uses.filter((u) => u.file === verdict.key).map((u) => u.line);
       found.push(
         `${verdict.key} mixes a state color by hand and is not in the baseline: line ${lines.join(', ')}. ` +
-          'Lay `--color-shadow-state-08/12/16` (or the role\'s own `-state-NN`) over the fill instead.',
+          'Use the role\'s named hovered and pressed tokens (or `--ds-interaction-hovered` / `-pressed`) instead.',
       );
       continue;
     }

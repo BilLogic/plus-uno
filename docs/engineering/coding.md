@@ -61,7 +61,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 **Real token examples:**
 
 - Spacing: `--size-element-pad-x-lg`, `--size-card-pad-x-md`, `--size-section-gap-lg`, `--size-modal-radius-lg`, `--size-surface-pad-x`
-- Color: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-surface-container`, `--color-danger`, `--color-primary-state-08`
+- Color: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-surface-container`, `--color-danger`
 - Typography: `--font-family-header`, `--font-family-body`, `--font-size-h1`, `--font-weight-semibold-1`, `--font-line-height-body2`
 - Elevation: `--elevation-light-1` through `--elevation-light-5`
 - Breakpoints: `--breakpoint-md-min`, `--breakpoint-lg-min`, `--breakpoint-xl-min`
