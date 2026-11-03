@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Tag, { TAG_COLOR_OF_CURRICULUM } from '../Tag/Tag';
+import './SmartTag.scss';
 
 /**
  * `SmartTag` — a SMART competency area.
@@ -58,7 +59,7 @@ export const SmartTag = ({ subject, children, text, ...rest }) => {
         <Tag
             {...rest}
             color={TAG_COLOR_OF_CURRICULUM[effectiveSubject]}
-            elemBefore={<i className={`fa-solid fa-${SUBJECT_ICONS[effectiveSubject]}`} aria-hidden="true" />}
+            elemBefore={<i className={`plus-smart-tag__icon fa-solid fa-${SUBJECT_ICONS[effectiveSubject]}`} aria-hidden="true" />}
         >
             {label}
         </Tag>

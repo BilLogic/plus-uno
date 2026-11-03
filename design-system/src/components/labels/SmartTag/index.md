@@ -25,6 +25,12 @@
 
 Anything not listed is not a valid value.
 
+## Tokens touched
+
+`--icon-sm`
+
+From `design-system/src/components/labels/SmartTag/SmartTag.scss`. Override these through the token layer, never with a literal.
+
 ## Related
 
 Same group: `AiLabel` · `CountTag` · `DateTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
