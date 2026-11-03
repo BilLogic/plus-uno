@@ -86,28 +86,6 @@ A radio lets a person choose one option from a set. [ADS documentation](https://
 
 <div className="sb-ds-doc-section">
 
-## ADS parity
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
-        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
-        <tr><td><code>isInvalid</code></td><td><code>isInvalid</code></td><td>Same. Marks the unselected radio only.</td></tr>
-        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
-        <tr><td><code>isRequired</code></td><td><code>isRequired</code></td><td>Same.</td></tr>
-        <tr><td><code>label</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
-        <tr><td><code>xcss</code>, <code>testId</code></td><td>not shipped</td><td>Style through tokens; test by role and name.</td></tr>
-        <tr><td>none</td><td><code>isReadOnly</code>, <code>description</code>, <code>appearance</code></td><td>PLUS additions.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## States
 
 <DocsCanvasShell description={<>Selected, unselected and disabled.</>}>
@@ -210,6 +188,28 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 - **Include an error message for a required or invalid group**, for example "Select an option".
 - **Do not disable an option that must stay reachable.** Use validation, so a screen reader user hears why it cannot be chosen.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>isInvalid</code></td><td><code>isInvalid</code></td><td>Same. Marks the unselected radio only.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
+        <tr><td><code>isRequired</code></td><td><code>isRequired</code></td><td>Same.</td></tr>
+        <tr><td><code>label</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>xcss</code>, <code>testId</code></td><td>not shipped</td><td>Style through tokens; test by role and name.</td></tr>
+        <tr><td>none</td><td><code>isReadOnly</code>, <code>description</code>, <code>appearance</code></td><td>PLUS additions.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 

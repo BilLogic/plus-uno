@@ -82,26 +82,6 @@ A range lets a person choose an approximate value on a slider. [ADS documentatio
 
 <div className="sb-ds-doc-section">
 
-## ADS parity
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>value</code>, <code>defaultValue</code>, <code>min</code>, <code>max</code>, <code>step</code></td><td>same</td><td>Same.</td></tr>
-        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
-        <tr><td><code>onChange</code></td><td><code>onChange</code></td><td>Same: the first argument is the number. PLUS passes the event second.</td></tr>
-        <tr><td><code>id</code>, <code>name</code></td><td>same</td><td>Same.</td></tr>
-        <tr><td><code>testId</code></td><td>not shipped</td><td>Test by role and name.</td></tr>
-        <tr><td>none</td><td><code>label</code>, <code>showLabel</code></td><td>PLUS additions: ADS pairs the range with an external label.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Labels
 
 <DocsCanvasShell description={<>The label sits above the slider. A hidden label still names it.</>}>
@@ -202,6 +182,26 @@ If the slider needs explaining, put one line of helper text under it rather than
 - **Arrow keys step the value by `step`; Home and End jump to `min` and `max`.**
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the handle.** A pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>value</code>, <code>defaultValue</code>, <code>min</code>, <code>max</code>, <code>step</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
+        <tr><td><code>onChange</code></td><td><code>onChange</code></td><td>Same: the first argument is the number. PLUS passes the event second.</td></tr>
+        <tr><td><code>id</code>, <code>name</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>testId</code></td><td>not shipped</td><td>Test by role and name.</td></tr>
+        <tr><td>none</td><td><code>label</code>, <code>showLabel</code></td><td>PLUS additions: ADS pairs the range with an external label.</td></tr>
+    </tbody>
+</DocsTable>
 
 </div>
 
