@@ -3,7 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Cascader from './Cascader';
 
 export default {
-    title: 'Components/Forms and inputs/Cascader',
+    title: 'Components/Forms and inputs/Select/Cascader',
     component: Cascader,
     tags: ['!dev', '!autodocs'],
     parameters: {

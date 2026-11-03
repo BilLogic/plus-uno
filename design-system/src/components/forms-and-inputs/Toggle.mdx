@@ -22,7 +22,7 @@ export const figmaMeta = {
 <Meta of={ToggleStories} />
 
 <Title />
-A toggle turns one setting on or off, and the change takes effect at once. [ADS documentation](https://atlassian.design/components/toggle/usage).
+A toggle turns one setting on or off, and the change takes effect at once.
 
 <DocsTabs of={ToggleStories}>
 
@@ -187,29 +187,6 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 - **Do not change the label with the state.** The label stays the same whether the toggle is on or off.
 - **Explain a disabled toggle.** Put the reason in text beside it, so a person who cannot reach it knows why.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## ADS parity
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
-        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
-        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
-        <tr><td><code>size</code> (<code>regular</code>, <code>large</code>)</td><td><code>size</code> (<code>16</code>, <code>20</code>)</td><td>PLUS names the sizes by their track height in pixels.</td></tr>
-        <tr><td><code>label</code></td><td><code>label</code></td><td>ADS uses it only as a hidden accessible name beside an external label. PLUS draws it as the visible label; pass <code>aria-label</code> for a hidden name.</td></tr>
-        <tr><td><code>id</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
-        <tr><td><code>isLoading</code></td><td>not shipped</td><td>No PLUS setting loads asynchronously yet.</td></tr>
-        <tr><td><code>testId</code></td><td>not shipped</td><td>Test by role and name.</td></tr>
-        <tr><td>none</td><td><code>isReadOnly</code></td><td>PLUS addition for a setting a person may read but not change.</td></tr>
-    </tbody>
-</DocsTable>
 
 </div>
 

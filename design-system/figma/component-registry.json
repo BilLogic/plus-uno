@@ -325,7 +325,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
-        "storybookId": "components-forms-and-inputs-choice-grid--docs",
+        "storybookId": "components-forms-and-inputs-radio-choice-grid--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -360,7 +360,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/ChoiceGroup.jsx",
-        "storybookId": "components-forms-and-inputs-choice-group--docs",
+        "storybookId": "components-forms-and-inputs-radio-radio-group--docs",
         "props": {
           "type": {
             "type": "enum",
@@ -440,7 +440,7 @@
         "mdxPath": "design-system/src/components/labels/CountTag/CountTag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/CountTag",
         "source": "design-system/src/components/labels/CountTag/CountTag.jsx",
-        "storybookId": "components-labels-status-count-tag-count-tag--docs",
+        "storybookId": "components-labels-count-tag--docs",
         "props": {
           "appearance": {
             "type": "enum",
@@ -1114,7 +1114,7 @@
         "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal",
         "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-        "storybookId": "components-messaging-modal--docs"
+        "storybookId": "components-messaging-modal-dialog--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1138,7 +1138,7 @@
         "mdxPath": "design-system/src/components/navigation/Navbar/Navbar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Navbar",
         "source": "design-system/src/components/navigation/Navbar/Navbar.jsx",
-        "storybookId": "components-navigation-tabs-nav-pills-navbar-navbar--docs",
+        "storybookId": "components-navigation-navbar--docs",
         "props": {
           "backgroundColor": {
             "type": "enum",
@@ -1212,7 +1212,7 @@
         "mdxPath": "design-system/src/components/navigation/NavPills/NavPills.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavPills",
         "source": "design-system/src/components/navigation/NavPills/NavPills.jsx",
-        "storybookId": "components-navigation-tabs-nav-pills-navbar-nav-pills--docs"
+        "storybookId": "components-navigation-nav-pills--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1254,7 +1254,7 @@
         "mdxPath": "design-system/src/components/navigation/NavTabs/NavTabs.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/NavTabs",
         "source": "design-system/src/components/navigation/NavTabs/NavTabs.jsx",
-        "storybookId": "components-navigation-tabs-nav-pills-navbar-tabs--docs"
+        "storybookId": "components-navigation-tabs--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1652,7 +1652,7 @@
         "mdxPath": "design-system/src/components/loading/Skeleton/Skeleton.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Skeleton",
         "source": "design-system/src/components/loading/Skeleton/Skeleton.jsx",
-        "storybookId": "components-loading-loading-skeleton--docs",
+        "storybookId": "components-loading-skeleton--docs",
         "props": {
           "shape": {
             "type": "enum",
@@ -1754,7 +1754,7 @@
         "mdxPath": "design-system/src/components/loading/Spinner/Spinner.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Spinner",
         "source": "design-system/src/components/loading/Spinner/Spinner.jsx",
-        "storybookId": "components-loading-loading-spinner--docs"
+        "storybookId": "components-loading-spinner--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1920,7 +1920,7 @@
         "mdxPath": "design-system/src/components/labels/Tag/Tag.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Tag",
         "source": "design-system/src/components/labels/Tag/Tag.jsx",
-        "storybookId": "components-labels-status-count-tag-tag--docs",
+        "storybookId": "components-labels-tag--docs",
         "props": {
           "color": {
             "type": "enum",
@@ -1986,7 +1986,7 @@
         "mdxPath": "design-system/src/components/labels/TagGroup/TagGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/TagGroup",
         "source": "design-system/src/components/labels/TagGroup/TagGroup.jsx",
-        "storybookId": "components-labels-status-count-tag-tag-group--docs",
+        "storybookId": "components-labels-tag-group--docs",
         "props": {
           "overflow": {
             "type": "enum",

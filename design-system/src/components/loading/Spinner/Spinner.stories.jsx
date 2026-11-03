@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import Spinner, { SPINNER_APPEARANCES, SPINNER_SIZES } from './Spinner';
 
 export default {
-    title: 'Components/Loading/Loading/Spinner',
+    title: 'Components/Loading/Spinner',
     component: Spinner,
     tags: ['!dev', '!autodocs'],
     argTypes: {

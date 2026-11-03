@@ -156,8 +156,9 @@ writing it.
 
 ## The Docs frame
 
-Its content adapts the matching atlassian.design page and cites it; the benchmark
-rule and the Figma-then-Storybook order are `documentation-ia.md` § The benchmark.
+Its content adapts the matching atlassian.design page, read silently, without
+citing it; the benchmark rule and the Figma-then-Storybook order are
+`documentation-ia.md` § The benchmark.
 
 Name it `Docs / <Component>`, using the Storybook display name, and name its
 Section `<Component>`. One per family.

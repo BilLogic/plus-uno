@@ -37,21 +37,21 @@ Where PLUS names a thing differently from atlassian.design, the row says why.
 Confirmed rows only; the terms are defined in `GLOSSARY.md`. Atlassian is the
 benchmark for every page, so a name that matches it needs no row.
 
-| Our name | ADS name | Why different | ADS link |
-| :--- | :--- | :--- | :--- |
-| Frame (pattern) | none | The app's outer shell is a PLUS pattern; ADS ships its own layout primitives instead | none |
-| Page (pattern) | none | The content area inside the Frame, with the page title; PLUS composes it, ADS leaves it to the product | none |
-| Blanket (pattern) | Blanket | Same name; here it also sets the width of what sits on it, in screen-grid columns | [atlassian.design/components/blanket](https://atlassian.design/components/blanket) |
-| Modal (pattern) | none | The pattern is the blanket plus a layer; ADS has only the dialog component | [atlassian.design/components/modal-dialog](https://atlassian.design/components/modal-dialog) |
-| ModalDialog (component) | Modal dialog | Built on the Modal pattern | [atlassian.design/components/modal-dialog](https://atlassian.design/components/modal-dialog) |
-| Status tag | Lozenge | Named for what it shows, a state, in the label family | [atlassian.design/components/lozenge](https://atlassian.design/components/lozenge) |
-| Count tag | Badge | Named for what it shows, a number, in the label family | [atlassian.design/components/badge](https://atlassian.design/components/badge) |
-| Tag | Tag | Same name and role | [atlassian.design/components/tag](https://atlassian.design/components/tag) |
-| Tag group | Tag group | Same name and role | [atlassian.design/components/tag-group](https://atlassian.design/components/tag-group) |
-| Suggestion | none | Offers what PLUS AI proposes, accepted or dismissed | none |
-| Drawer (pattern) | Drawer | Kept as a PLUS pattern; its docs say it is a PLUS addition | [atlassian.design/components/drawer](https://atlassian.design/components/drawer) |
-| `appearance` | `appearance` | Same prop; values carry meaning (`default`, `subtle`, `primary`) | [atlassian.design/components/button](https://atlassian.design/components/button) |
-| `spacing` | `spacing` | Density in words: `default`, `compact`, `spacious`; pixel values stay on `size` | [atlassian.design/components/button](https://atlassian.design/components/button) |
+| Our name | ADS name | Why different |
+| :--- | :--- | :--- |
+| Frame (pattern) | none | The app's outer shell is a PLUS pattern; ADS ships its own layout primitives instead |
+| Page (pattern) | none | The content area inside the Frame, with the page title; PLUS composes it, ADS leaves it to the product |
+| Blanket (pattern) | Blanket | Same name; here it also sets the width of what sits on it, in screen-grid columns |
+| Modal (pattern) | none | The pattern is the blanket plus a layer; ADS has only the dialog component |
+| ModalDialog (component) | Modal dialog | Built on the Modal pattern |
+| Status tag | Lozenge | Named for what it shows, a state, in the label family |
+| Count tag | Badge | Named for what it shows, a number, in the label family |
+| Tag | Tag | Same name and role |
+| Tag group | Tag group | Same name and role |
+| Suggestion | none | Offers what PLUS AI proposes, accepted or dismissed |
+| Drawer (pattern) | Drawer | Kept as a PLUS pattern; its docs say it is a PLUS addition |
+| `appearance` | `appearance` | Same prop; values carry meaning (`default`, `subtle`, `primary`) |
+| `spacing` | `spacing` | Density in words: `default`, `compact`, `spacious`; pixel values stay on `size` |
 
 Facts about a single component — props, variants, defaults, tokens touched,
 related components — are generated from source into each component's own

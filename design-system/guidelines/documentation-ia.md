@@ -28,8 +28,9 @@ and regenerate rather than touching the literal.
 
 atlassian.design is the benchmark for every Figma and Storybook docs page. Take
 Atlassian's structure, guidance, do and don'ts and wording, then adapt them to
-PLUS: the tutoring context, PLUS component names, our tokens. The page cites the
-atlassian.design page it adapts.
+PLUS: the tutoring context, PLUS component names, our tokens. Read the
+benchmark silently — the page never cites atlassian.design, links to it, or
+names it.
 
 - **Order:** code and Storybook first. The component and its Storybook MDX are
   built to Atlassian best practice on the Core docs-parts template structure

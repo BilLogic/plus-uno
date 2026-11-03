@@ -19,7 +19,7 @@ import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag'
  */
 
 export default {
-    title: 'Components/Labels/Status, count & tag/Count tag',
+    title: 'Components/Labels/Count tag',
     component: CountTag,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -209,81 +209,94 @@ const preview = {
               "Button",
               [
                 "Button",
-                "Close button"
+                "Icon button",
+                "Link button",
+                "Link icon button",
+                "Split button",
+                "Filter button",
+                "Button group",
+                "Close button",
+                "Vertical button"
               ],
-              "Button group",
-              "Cascader",
               "Checkbox",
-              "Choice grid",
-              "Choice group",
-              "Date picker",
               "Date time picker",
+              "Date picker",
               "Dropdown menu",
               "File upload",
-              "Input group",
               "Label & caption",
-              "Number input",
               "Radio",
+              [
+                "Radio",
+                "Radio group",
+                "Choice grid"
+              ],
               "Range",
               "Rating",
               "Rich text editor",
               "Select",
+              [
+                "Select",
+                "Cascader",
+                "Tree select"
+              ],
               "Tag input",
               "Text area",
               "Text field",
               "Toggle",
-              "Tree select"
+              "Inline edit"
             ],
             "Images and icons",
             [
+              "Avatar",
               "Logo",
               "Tile",
-              "Illustrations",
-              "AI icon"
+              "AI icon",
+              "Illustrations"
             ],
             "Labels",
             [
-              "Status, count & tag",
+              "Count tag",
+              "Date tag",
+              "Status tag",
+              "Tag",
+              "Tag group",
               [
-                "Status",
-                "Count",
-                "Tag",
-                "Tag group"
+                "Tag group",
+                "Smart tag"
               ],
               "AI label",
               [
                 "AI label",
                 "Suggestion"
-              ],
-              "Deprecated"
+              ]
             ],
             "Layout and structure",
             [
               "Accordion",
-              "Card",
               "Carousel",
+              "Scrollbar",
+              "Visually hidden",
+              "Card",
               "Collapse",
               "Divider",
               "Jumbotron",
               "List group",
-              "Media object",
-              "Scrollbar",
-              "Visually hidden"
+              "Media object"
             ],
             "Loading",
             [
               "Progress bar",
-              "Loading",
-              [
-                "Spinner",
-                "Skeleton"
-              ],
+              "Skeleton",
+              "Spinner",
               "Generative border"
             ],
             "Messaging",
             [
+              "Banner",
+              "Empty state",
               "Flag",
-              "Modal",
+              "Inline message",
+              "Modal dialog",
               "Section message"
             ],
             "Navigation",
@@ -292,12 +305,9 @@ const preview = {
               "Pagination",
               "Scrollspy",
               "Sidebar tab",
-              "Tabs, nav pills & navbar",
-              [
-                "Tabs",
-                "Nav pills",
-                "Navbar"
-              ]
+              "Tabs",
+              "Nav pills",
+              "Navbar"
             ],
             "Overlays and layering",
             [
@@ -312,7 +322,10 @@ const preview = {
             "Text and data display",
             [
               "Code",
-              "Code block",
+              [
+                "Code",
+                "Code block"
+              ],
               "Table"
             ]
           ],

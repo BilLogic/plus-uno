@@ -205,34 +205,6 @@ category.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-## ADS documentation
-
-Benchmarked against the [ADS documentation](https://atlassian.design/components/tag) for this component. The parity table lists each ADS prop and what Tag does with it.
-
-<DocsTable>
-    <thead>
-        <tr><th>ADS: Tag</th><th>Tag</th><th>Note</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>text</code></td><td><code>text</code> or <code>children</code></td><td>Same.</td></tr>
-        <tr><td><code>color</code></td><td><code>color</code></td><td>Ten accent families; no red, since a tag is never a status.</td></tr>
-        <tr><td><code>isRemovable</code> (default true)</td><td><code>isRemovable</code> (default false)</td><td>A tag in PLUS is read-only unless it says otherwise.</td></tr>
-        <tr><td><code>onAfterRemoveAction</code>, <code>onBeforeRemoveAction</code></td><td><code>onAfterRemoveAction</code></td><td>Called with the text and the event; the caller removes the tag.</td></tr>
-        <tr><td><code>removeButtonLabel</code></td><td><code>removeButtonLabel</code></td><td>Defaults to Remove plus the label.</td></tr>
-        <tr><td><code>href</code>, <code>linkComponent</code>, <code>onClick</code></td><td>Same</td><td>A link with <code>isRemovable</code> has a separate ×.</td></tr>
-        <tr><td><code>elemBefore</code>, <code>swatchBefore</code></td><td>Same</td><td>PLUS draws a 10 swatch by default.</td></tr>
-        <tr><td><code>maxWidth</code></td><td><code>maxWidth</code></td><td>Default 180; the full text is a tooltip.</td></tr>
-        <tr><td><code>trailingMetric</code></td><td><code>trailingMetric</code></td><td>A compact Count tag, on selectable tags.</td></tr>
-        <tr><td>AvatarTag</td><td><code>type</code> (person, agent, team), <code>avatar</code></td><td>One component; the avatar sits in the swatch's place.</td></tr>
-        <tr><td><code>appearance</code> (rounded)</td><td>None</td><td>A person tag is round; every other tag keeps the 4 radius.</td></tr>
-        <tr><td>None</td><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code>, <code>isElevated</code></td><td>Answer chips, a disabled tag, saving, and a tag on an image.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>
