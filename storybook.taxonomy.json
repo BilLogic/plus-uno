@@ -105,6 +105,7 @@
     "Text and data display": [
       "Code",
       "Code block",
+      "Heading",
       "Table"
     ]
   },
@@ -285,6 +286,7 @@
           "Code",
           "Code block"
         ],
+        "Heading",
         "Table"
       ]
     ],

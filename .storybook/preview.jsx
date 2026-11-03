@@ -326,6 +326,7 @@ const preview = {
                 "Code",
                 "Code block"
               ],
+              "Heading",
               "Table"
             ]
           ],

@@ -1,0 +1,39 @@
+.plus-heading {
+    margin: 0;
+    color: var(--ds-text);
+
+    &--xxlarge {
+        font: var(--heading-xxlarge);
+        letter-spacing: var(--heading-xxlarge-tracking);
+    }
+
+    &--xlarge {
+        font: var(--heading-xlarge);
+        letter-spacing: var(--heading-xlarge-tracking);
+    }
+
+    &--large {
+        font: var(--heading-large);
+        letter-spacing: var(--heading-large-tracking);
+    }
+
+    &--medium {
+        font: var(--heading-medium);
+    }
+
+    &--small {
+        font: var(--heading-small);
+    }
+
+    &--xsmall {
+        font: var(--heading-xsmall);
+    }
+
+    &--xxsmall {
+        font: var(--heading-xxsmall);
+    }
+
+    &--inverse {
+        color: var(--ds-text-inverse);
+    }
+}

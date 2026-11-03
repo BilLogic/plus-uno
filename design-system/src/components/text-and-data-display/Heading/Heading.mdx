@@ -1,0 +1,35 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as HeadingStories from './Heading.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "heading",
+      "name": "Heading",
+      "componentSetNodeId": "20626:95",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={HeadingStories} />
+
+<Title />
+
+<DocsTabs of={HeadingStories}>
+
+<DocsTab tab="examples">
+
+A piece of text at a type-scale size, its semantic tag chosen independently.
+
+<Canvas of={HeadingStories.Sizes} />
+
+<ArgTypes of={HeadingStories} />
+
+</DocsTab>
+
+</DocsTabs>
