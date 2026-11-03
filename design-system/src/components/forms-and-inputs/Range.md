@@ -9,7 +9,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, States, Interactive, ReportsNumber
+**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, ReportsNumber
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range.mdx`
 

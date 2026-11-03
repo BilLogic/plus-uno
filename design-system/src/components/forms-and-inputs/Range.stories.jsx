@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, fireEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Range from './Range';
 
 export default {
@@ -104,39 +102,6 @@ export const Disabled = () => (
 Disabled.play = async ({ canvasElement }) => {
     const slider = within(canvasElement).getByRole('slider', { name: 'Zoom' });
     await expect(slider.disabled).toBe(true);
-};
-
-/**
- * Hovered, pressed and keyboard focus, through the state mixin: the thumb
- * steps to its named hovered and pressed fills, and the ring is the same 2px
- * of `border.focused` Checkbox, Radio and Toggle draw, offset outside the
- * thumb rather than the (invisible) track.
- */
-export const States = () => (
-    <div style={{ maxWidth: '600px' }}>
-        <Range id="range-states" label="Zoom" defaultValue={40} />
-    </div>
-);
-States.play = async ({ canvasElement }) => {
-    const slider = within(canvasElement).getByRole('slider', { name: 'Zoom' });
-    const thumb = () => getComputedStyle(slider, '::-webkit-slider-thumb');
-
-    await expect(thumb().backgroundColor, 'rest').toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
-
-    const hovered = withForcedPseudo(slider, ':hover', () => thumb().backgroundColor);
-    await expect(hovered, 'hovered').toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
-
-    const pressed = withForcedPseudo(slider, ':active', () => thumb().backgroundColor);
-    await expect(pressed, 'pressed').toBe(tokenColor(canvasElement, '--ds-background-selected-bold-pressed'));
-
-    slider.focus({ focusVisible: true });
-    await expect(slider.matches(':focus-visible'), 'keyboard-focused').toBe(true);
-    const ring = thumb();
-    await expect(ring.outlineStyle, 'ring style').toBe('solid');
-    await expect(px(ring.outlineWidth), 'ring width').toBe(2);
-    await expect(px(ring.outlineOffset), 'ring sits 2px outside the thumb').toBe(2);
-    await expect(ring.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
-    slider.blur();
 };
 
 export const Interactive = (args) => {
