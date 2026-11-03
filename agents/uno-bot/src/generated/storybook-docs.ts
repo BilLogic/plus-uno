@@ -28,11 +28,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-button-group--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Cascader.",
-    "Cascader",
-    "components-forms-and-inputs-cascader--docs"
-  ],
-  [
     "design-system/src/components/forms-and-inputs/Checkbox.",
     "Checkbox",
     "components-forms-and-inputs-checkbox--docs"
@@ -73,19 +68,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-file-upload--docs"
   ],
   [
+    "design-system/src/components/forms-and-inputs/IconButton/",
+    "IconButton",
+    "components-forms-and-inputs-button-icon-button--docs"
+  ],
+  [
     "design-system/src/components/forms-and-inputs/InlineEdit/",
     "InlineEdit",
     "components-forms-and-inputs-inline-edit--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/Input.",
-    "Input",
-    "components-forms-and-inputs-text-field--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/InputGroup/",
-    "InputGroup",
-    "components-forms-and-inputs-input-group--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.",
@@ -93,9 +83,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-label-caption--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/NumberInput.",
-    "NumberInput",
-    "components-forms-and-inputs-number-input--docs"
+    "design-system/src/components/forms-and-inputs/LinkButton/",
+    "LinkButton",
+    "components-forms-and-inputs-button-link-button--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/LinkIconButton/",
+    "LinkIconButton",
+    "components-forms-and-inputs-button-link-icon-button--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Radio.",
@@ -118,29 +113,24 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-rich-text-editor--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Select.",
-    "Select",
-    "components-forms-and-inputs-select--docs"
-  ],
-  [
     "design-system/src/components/forms-and-inputs/TagInput.",
     "TagInput",
     "components-forms-and-inputs-tag-input--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Textarea.",
-    "Textarea",
+    "design-system/src/components/forms-and-inputs/TextArea/",
+    "TextArea",
     "components-forms-and-inputs-text-area--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/TextField/",
+    "TextField",
+    "components-forms-and-inputs-text-field--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/Toggle.",
     "Toggle",
     "components-forms-and-inputs-toggle--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/TreeSelect.",
-    "TreeSelect",
-    "components-forms-and-inputs-tree-select--docs"
   ],
   [
     "design-system/src/components/images-and-icons/Avatar/",
@@ -233,8 +223,8 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-layout-and-structure-scrollbar--docs"
   ],
   [
-    "design-system/src/components/loading/Progress/",
-    "Progress",
+    "design-system/src/components/loading/ProgressBar/",
+    "ProgressBar",
     "components-loading-progress-bar--docs"
   ],
   [
@@ -301,11 +291,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/overlays-and-layering/Tooltip/",
     "Tooltip",
     "components-overlays-and-layering-tooltip--docs"
-  ],
-  [
-    "design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/",
-    "OptionChip",
-    "specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip"
   ],
   [
     "design-system/src/specs/Universal/Cards/OverviewCard/",

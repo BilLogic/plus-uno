@@ -148,12 +148,8 @@
 
 .completion-progress {
     flex: 1;
-    height: 8px;
-    border-radius: 4px;
-    background-color: var(--color-surface-variant);
 
-    // Override bootstrap progress bar inner
-    :global(.progress-bar) {
+    :global(.plus-progressbar-fill) {
         border-radius: 4px;
     }
 }

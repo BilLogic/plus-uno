@@ -953,8 +953,7 @@
     max-width: 100px;
 }
 
-.goal-progress-bar--effort .plus-progress-bar,
-.goal-progress-bar--effort .progress-bar {
+.goal-progress-bar--effort .plus-progressbar-fill {
     background-color: var(--color-mastering-content, #8659a9) !important;
 }
 
@@ -1859,14 +1858,12 @@
     border-bottom-right-radius: 4px !important;
 }
 
-.monthly-report .review-progress-bar.plus-progress,
-.monthly-report .review-progress-bar.progress {
+.monthly-report .review-progress-bar.plus-progressbar {
     border-radius: 6px !important;
     overflow: hidden !important;
 }
 
-.monthly-report .review-progress-bar .plus-progress-bar,
-.monthly-report .review-progress-bar .progress-bar {
+.monthly-report .review-progress-bar .plus-progressbar-fill {
     border-radius: 6px !important;
 }
 
@@ -2040,8 +2037,7 @@
     animation-delay: var(--segment-delay, 340ms);
 }
 
-.monthly-report .review-progress-bar.review-progress-bar--intro .plus-progress-bar,
-.monthly-report .review-progress-bar.review-progress-bar--intro .progress-bar {
+.monthly-report .review-progress-bar.review-progress-bar--intro .plus-progressbar-fill {
     animation: monthlyProgressGlow 700ms cubic-bezier(0.22, 1, 0.36, 1) 320ms 1;
 }
 
@@ -2049,8 +2045,7 @@
 
     .monthly-report .data-anim-enter,
     .monthly-report .time-allocation-segment,
-    .monthly-report .review-progress-bar .plus-progress-bar,
-    .monthly-report .review-progress-bar .progress-bar {
+    .monthly-report .review-progress-bar .plus-progressbar-fill {
         animation: none !important;
         transition: none !important;
     }

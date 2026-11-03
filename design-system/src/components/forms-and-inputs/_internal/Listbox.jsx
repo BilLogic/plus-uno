@@ -468,7 +468,7 @@ const Listbox = ({
  */
 export const ListboxMessage = ({ kind, children }) => (
     <div className={`plus-listbox-message plus-listbox-message--${kind}`} role="presentation">
-        {kind === 'loading' && <Spinner size="sm" role="presentation" />}
+        {kind === 'loading' && <Spinner size={16} label="" />}
         {kind === 'error' && <i className="fa-solid fa-circle-exclamation" aria-hidden="true" />}
         <span>{children}</span>
     </div>

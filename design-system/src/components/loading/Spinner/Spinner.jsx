@@ -1,58 +1,39 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Spinner as BootstrapSpinner } from 'react-bootstrap';
 import './Spinner.scss';
 
+export const SPINNER_SIZES = [16, 24, 48];
+export const SPINNER_APPEARANCES = ['inherit', 'invert'];
+
+/**
+ * `Spinner` — an animated ring that says a wait is in progress, with no
+ * duration to report. `size` is a pixel diameter; `appearance="inherit"`
+ * takes the surrounding text color, `"invert"` is for a bold or colored
+ * background.
+ */
 const Spinner = ({
-    variant = 'border', // 'border', 'grow', 'growing', 'rotating', 'stacking'
-    size, // 'sm' or null
+    size = 24,
+    appearance = 'inherit',
+    label = 'Loading',
     className = '',
-    role = 'status',
-    ...props
-}) => {
-    const { color: _legacyColor, ...restProps } = props;
-
-    // Custom Variants handled via CSS/Divs
-    if (['growing', 'rotating', 'stacking'].includes(variant)) {
-        const blocks = {
-            'growing': 9,
-            'rotating': 4,
-            'stacking': 4
-        }[variant];
-
-        return (
-            <div
-                className={`plus-spinner-custom plus-spinner-${variant} ${size ? `plus-spinner-${size}` : ''} ${className}`}
-                role={role}
-                aria-label="Loading"
-                {...restProps}
-            >
-                {Array.from({ length: blocks }).map((_, i) => (
-                    <div key={i} className="spinner-block"></div>
-                ))}
-            </div>
-        );
-    }
-
-    // Simple Bootstrap Mappings ('border', 'grow') — color is always neutral (see Spinner.scss).
-    return (
-        <BootstrapSpinner
-            animation={variant === 'default' ? 'border' : variant}
-            size={size}
-            className={`plus-spinner ${className}`}
-            role={role}
-            {...restProps}
-        >
-            <span className="visually-hidden">Loading...</span>
-        </BootstrapSpinner>
-    );
-};
+}) => (
+    <div
+        className={['plus-spinner', `plus-spinner--${appearance}`, className].filter(Boolean).join(' ')}
+        data-size={size}
+        role="status"
+    >
+        <span className="visually-hidden">{label}</span>
+    </div>
+);
 
 Spinner.propTypes = {
-    variant: PropTypes.oneOf(['border', 'grow', 'growing', 'rotating', 'stacking', 'default']),
-    size: PropTypes.oneOf(['sm']),
+    /** A pixel diameter: 16, 24 or 48. */
+    size: PropTypes.oneOf(SPINNER_SIZES),
+    /** `inherit` takes the surrounding text color; `invert` is for a bold or colored background. */
+    appearance: PropTypes.oneOf(SPINNER_APPEARANCES),
+    /** Read by assistive tech; never shown. */
+    label: PropTypes.string,
     className: PropTypes.string,
-    role: PropTypes.string
 };
 
 export default Spinner;

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import Alert from '@/components/messaging/Alert/Alert';
-import Progress from '@/components/loading/Progress/Progress';
+import ProgressBar from '@/components/loading/ProgressBar/ProgressBar';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import { RecommendedLessons } from '@/specs/Home/Cards';
@@ -584,10 +584,10 @@ export default function MonthlyReportContent() {
                                 <span className="review-label">Review progress</span>
                                 <div className="review-bar-row">
                                     <div className="review-progress-track">
-                                        <Progress
+                                        <ProgressBar
                                             value={hasPlayedDataAnim ? (reviewedCount / totalDimensions) * 100 : animatedReviewPct}
+                                            ariaLabel="Review progress"
                                             className={`review-progress-bar ${isDataAnimActive ? 'review-progress-bar--intro' : ''}`}
-                                            style="primary"
                                         />
                                     </div>
                                     <span className="review-count">{reviewedCount}/{totalDimensions}</span>
@@ -837,11 +837,10 @@ export default function MonthlyReportContent() {
                                         </td>
                                         <td>
                                             <div className="goal-cell">
-                                                <Progress
+                                                <ProgressBar
                                                     value={row.progressGoal}
-                                                    style="primary"
+                                                    ariaLabel="Goal progress"
                                                     className="goal-progress-bar"
-                                                    size="small"
                                                 />
                                                 <span className="goal-value">{row.progressGoal}%</span>
                                                 <span className={`goal-delta goal-delta--${row.progressDeltaType}`}>
@@ -852,11 +851,10 @@ export default function MonthlyReportContent() {
                                         </td>
                                         <td>
                                             <div className="goal-cell">
-                                                <Progress
+                                                <ProgressBar
                                                     value={row.effortGoal}
-                                                    style="secondary"
+                                                    ariaLabel="Effort progress"
                                                     className="goal-progress-bar goal-progress-bar--effort"
-                                                    size="small"
                                                 />
                                                 <span className="goal-value">{row.effortGoal}%</span>
                                                 <span className={`goal-delta goal-delta--${row.effortDeltaType}`}>

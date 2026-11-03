@@ -1,9 +1,10 @@
 /*
  * Skeleton — a gray placeholder shape while content loads.
  *
- * THE LOOK. Fill is surface-container, so it keeps its contrast in any theme.
- * The shimmer is a band of surface-container-lowest swept across the fill.
- * There are no motion tokens yet, so the one duration is declared here.
+ * THE LOOK. Fill is `color.skeleton`, the token built for the job, so it keeps
+ * its contrast in any theme. The shimmer is a band of `color.skeleton.subtle`
+ * swept across the fill. There are no motion tokens yet, so the one duration
+ * is declared here.
  * Under `prefers-reduced-motion: reduce` there is no animation, only the flat
  * fill, which is also what `isShimmering={false}` gives.
  *
@@ -42,7 +43,7 @@
     margin: 0;
     border-radius: var(--plus-skeleton-radius);
     vertical-align: middle;
-    background-color: var(--color-surface-container, #edeef0);
+    background-color: var(--ds-skeleton);
     pointer-events: none;
     user-select: none;
 }
@@ -139,7 +140,7 @@
     background-image: linear-gradient(
         90deg,
         transparent 0%,
-        var(--color-surface-container-lowest, #ffffff) 50%,
+        var(--ds-skeleton-subtle) 50%,
         transparent 100%
     );
     background-repeat: no-repeat;

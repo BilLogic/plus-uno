@@ -1,0 +1,181 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as ProgressBarStories from './ProgressBar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "progress-bar",
+      "name": "Progress Bar",
+      "componentSetNodeId": "49:6872",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={ProgressBarStories} />
+
+<Title />
+
+A determinate bar for a task whose proportion done is known.
+
+<DocsTabs of={ProgressBarStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressBar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A single bar at 50%, the 8px height every bar shares.</>}>
+    <Canvas of={ProgressBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<><code>success</code> marks completion; <code>inverse</code> reads on a bold or colored background.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Appearances} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>The bar's own height has no room for a label — put the text beside it.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.WithACaption} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Indeterminate
+
+<DocsCanvasShell description={<>The duration is unknown: a segment sweeps the track instead of a fixed width.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Indeterminate} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ProgressBarStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ProgressBar` when the proportion done is known and worth showing — an
+upload, a course, a multi-step form. If you cannot say how far along it is,
+a `Spinner` is the honest control.
+
+`value` is a percent, 0 to 100, ignored when `isIndeterminate`. `appearance`
+is `default`, `success` or `inverse`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `isIndeterminate` drops `value`.
+
+```jsx
+// Incorrect — value is announced even though the duration is unknown.
+<ProgressBar value={40} isIndeterminate />
+
+// Correct.
+<ProgressBar isIndeterminate ariaLabel="Loading" />
+```
+
+### Keep `value` inside its bounds.
+
+The drawn width and the announced `aria-valuenow` clamp together, so a
+`value` outside 0–100 never draws a full bar while reporting a number past
+its own maximum.
+
+### Name the bar for what it measures.
+
+```jsx
+// Incorrect — two bars on a page both announce "Progress".
+<ProgressBar value={68} />
+
+// Correct.
+<ProgressBar value={68} ariaLabel="68% of goals met" />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The bar is a real progressbar.** `role="progressbar"` with
+  `aria-valuenow`, `aria-valuemin` and `aria-valuemax` when determinate, and
+  an `aria-label` that defaults to "Progress".
+- **The indeterminate state drops the value attributes rather than faking
+  one.** A screen reader hears that work is under way, not a number that
+  does not mean anything.
+- **Reduced motion is handled.** The indeterminate sweep stops under
+  `prefers-reduced-motion: reduce`.
+- **Color is not the message.** `appearance` colors the bar; it carries no
+  text of its own, so pair it with a caption when the value needs to be read.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For an indeterminate wait with no track at all, use `Spinner`.
+- For the outcome when it finishes, use `Toast` or `Alert`.
+- For position in a hierarchy rather than progress through a task, use
+  `Breadcrumb`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

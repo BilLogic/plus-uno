@@ -530,7 +530,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 431: the reflection prototype's base styles took --ds- tokens, and their four
     // color fallbacks went.
     // 404: the Labels moved onto the --ds- tokens, and their 27 color fallbacks went.
-    expect(comparable).toBe(404);
+    // 402: Skeleton's fill and shimmer moved onto color.skeleton tokens, and
+    // their two hex fallbacks went.
+    expect(comparable).toBe(402);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.
