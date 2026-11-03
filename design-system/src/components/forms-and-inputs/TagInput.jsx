@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TAG_ACCEPTED_COLORS, TAG_COLORS, resolveTagColor } from '@/components/labels/Tag';
+import Tag, { TAG_COLORS } from '@/components/labels/Tag';
 import TagGroup from '@/components/labels/TagGroup';
 import Button from '@/components/forms-and-inputs/Button';
 import Input from './Input';
@@ -24,7 +24,7 @@ const TAG_INPUT_COLOR_ALIASES = {
 };
 
 /** Every name a tag's `color` accepts: what Tag accepts, then TagInput's own aliases. */
-const ACCEPTED_COLORS = [...TAG_ACCEPTED_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
+const ACCEPTED_COLORS = [...TAG_COLORS, ...Object.keys(TAG_INPUT_COLOR_ALIASES)];
 
 /** Tag's ten colors as the option menu names them. */
 const COLOR_NAMES = {
@@ -68,7 +68,7 @@ const tagColorOf = (color) => {
         warn(`color "${color}" is deprecated; use "${TAG_INPUT_COLOR_ALIASES[color]}".`);
         return TAG_INPUT_COLOR_ALIASES[color];
     }
-    if (resolveTagColor(color)) return color;
+    if (TAG_COLORS.includes(color)) return color;
     warn(`color "${color}" is not a Tag color; it falls back to gray.`);
     return 'gray';
 };
@@ -727,7 +727,7 @@ const TagInput = ({
                         {currentTags.length > 0 && (
                             <TagGroup
                                 label={`Selected: ${labelText}`}
-                                disabled={disabled}
+                                isDisabled={disabled}
                                 overflow={expanded ? 'wrap' : 'collapse'}
                                 onOverflowClick={() => inputRef.current?.focus()}
                                 className="plus-tag-input__tags"
@@ -739,9 +739,9 @@ const TagInput = ({
                                             // Values can repeat, so the position is part of the key.
                                             key={`${index}-${text}`}
                                             color={tagColorOf(typeof tag === 'object' ? tag.color : undefined)}
-                                            behavior={canRemove ? 'removable' : 'read-only'}
+                                            isRemovable={canRemove}
                                             isLoading={typeof tag === 'object' && Boolean(tag.pending)}
-                                            onRemove={canRemove ? () => removeAt(index) : undefined}
+                                            onAfterRemoveAction={canRemove ? () => removeAt(index) : undefined}
                                         >
                                             {text}
                                         </Tag>

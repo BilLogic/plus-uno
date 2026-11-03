@@ -28,15 +28,15 @@ export default function SelectChips({
                 className="plus-select-tags"
                 label={label}
                 overflow={collapsed ? 'collapse' : 'wrap'}
-                disabled={disabled}
+                isDisabled={disabled}
                 onOverflowClick={live ? onOverflowClick : undefined}
             >
                 {values.map((v) => (
                     <Tag
                         key={v}
                         color="gray"
-                        behavior={live ? 'removable' : 'read-only'}
-                        onRemove={live ? () => onRemove(v) : undefined}
+                        isRemovable={live}
+                        onAfterRemoveAction={live ? () => onRemove(v) : undefined}
                     >
                         {textFor(v)}
                     </Tag>

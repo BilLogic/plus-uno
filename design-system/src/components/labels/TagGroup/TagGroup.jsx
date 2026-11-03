@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Tag, { TAG_BEHAVIOR, TagContext, resolveTagBehavior, useTagContext } from '../Tag';
+import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
 import Dropdown from '../../forms-and-inputs/Dropdown';
 import './TagGroup.scss';
 
@@ -30,13 +30,13 @@ import './TagGroup.scss';
  * selectable tag toggles there, a link tag is a link there, and a read-only
  * tag is a plain item. Removing stays on the row.
  *
- * DISABLED IS THE FIELD'S. `disabled` reaches every Tag and Suggestion in the
+ * DISABLED IS THE SET'S. `isDisabled` reaches every Tag and Suggestion in the
  * group through `TagContext`, the same context a field uses, so no member can
  * disagree with the one beside it.
  */
 
 export const TAG_GROUP_OVERFLOWS = ['wrap', 'collapse'];
-export const TAG_GROUP_ALIGNMENTS = ['left', 'right'];
+export const TAG_GROUP_ALIGNMENTS = ['start', 'end'];
 
 /*
  * The row's measured members, marked so measuring and observing read the same
@@ -75,13 +75,13 @@ const isSuggestion = (child) => {
 const menuItemOf = (child) => {
     const props = child.props || {};
     const text = labelOf(child);
-    const behavior = resolveTagBehavior(props);
+    const kind = resolveTagKind(props);
     // Saving, whatever the behavior: the disabled row, busy, not actionable.
     if (props.isLoading) {
         return { text, disabled: true, isBusy: true };
     }
-    switch (behavior) {
-        case TAG_BEHAVIOR.SELECTABLE:
+    switch (kind) {
+        case 'selectable':
             return {
                 text,
                 isToggle: true,
@@ -93,7 +93,7 @@ const menuItemOf = (child) => {
                 keepOpen: true,
                 onClick: props.onClick,
             };
-        case TAG_BEHAVIOR.LINK:
+        case 'link':
             return {
                 text,
                 href: props.href,
@@ -101,8 +101,6 @@ const menuItemOf = (child) => {
                 trailingIcon: 'arrow-right',
                 onClick: props.onClick,
             };
-        case TAG_BEHAVIOR.ACTION:
-            return { text, onClick: props.onClick };
         default:
             return { text, isStatic: true };
     }
@@ -141,8 +139,8 @@ export const TagGroup = ({
     children,
     label,
     overflow = 'wrap',
-    alignment = 'left',
-    disabled = false,
+    alignment = 'start',
+    isDisabled: isDisabledProp = false,
     maxVisible,
     overflowLabel,
     onOverflowClick,
@@ -151,7 +149,7 @@ export const TagGroup = ({
     ...rest
 }) => {
     const parent = useTagContext();
-    const isDisabled = Boolean(disabled || parent.isDisabled);
+    const isDisabled = Boolean(isDisabledProp || parent.isDisabled);
     const context = useMemo(() => ({ ...parent, isDisabled }), [parent, isDisabled]);
 
     // `null`/`false` children are ordinary in JSX (`{cond && <Tag/>}`), and
@@ -262,7 +260,7 @@ export const TagGroup = ({
      */
     const overflowTag = (label, extra) => (
         <Tag
-            behavior="selectable"
+            isSelected={false}
             color="gray"
             className="plus-tag-group__overflow"
             {...extra}
@@ -313,7 +311,7 @@ export const TagGroup = ({
                 className={[
                     'plus-tag-group',
                     `plus-tag-group--${collapses ? 'collapse' : 'wrap'}`,
-                    alignment === 'right' ? 'plus-tag-group--right' : '',
+                    alignment === 'end' ? 'plus-tag-group--end' : '',
                     className,
                 ].filter(Boolean).join(' ')}
                 {...rest}
@@ -367,10 +365,10 @@ TagGroup.propTypes = {
     label: PropTypes.string,
     /** `wrap` flows onto more lines; `collapse` keeps one line, shows as many tags as fit, and puts the rest behind `+n`. */
     overflow: PropTypes.oneOf(TAG_GROUP_OVERFLOWS),
-    /** `right` lines the tags and the `+n` up on the right edge, for a right-aligned table column. */
+    /** `end` lines the tags and the `+n` up on the end edge, for a right-aligned table column. */
     alignment: PropTypes.oneOf(TAG_GROUP_ALIGNMENTS),
     /** Disables every Tag and Suggestion in the group, as a disabled field does. */
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     /** `collapse` only: the most tags to show before `+n`, even when more would fit. By default, as many as fit. */
     maxVisible: PropTypes.number,
     /** Formats the overflow tag's visible label. Defaults to `+n`; its accessible name starts with that label: "+3 more tags" ("+1 more tag"), or "<label>, 3 more tags" for a custom one. */
