@@ -1,0 +1,326 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as IconButtonStories from './IconButton.stories.jsx';
+import { IconButton, Button } from '@/components';
+import {
+    DocsCanvasShell,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "icon": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "appearance": {
+      "type": "enum",
+      "values": [
+        "default",
+        "subtle",
+        "primary",
+        "discovery"
+      ]
+    },
+    "spacing": {
+      "type": "enum",
+      "values": [
+        "default",
+        "compact"
+      ]
+    },
+    "shape": {
+      "type": "enum",
+      "values": [
+        "default",
+        "circle"
+      ]
+    },
+    "isSelected": {
+      "type": "boolean"
+    },
+    "isDisabled": {
+      "type": "boolean"
+    },
+    "isLoading": {
+      "type": "boolean"
+    }
+  },
+  "sets": [
+    {
+      "id": "storybook-resources",
+      "name": "Button page (Core)",
+      "componentSetNodeId": "3497:19482",
+      "isComponentSet": false,
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
+      "source": "storybook-mdx",
+      "status": "docs-page",
+      "notes": "The Button page in Core holds Icon button: Updated components, Docs and Playground. Read-only from code."
+    }
+  ]
+};
+
+<Meta of={IconButtonStories} />
+
+<Title />
+An icon button is a button with an icon and no visible label. Its required `label` is the accessible name and the tooltip.
+
+<DocsTabs of={IconButtonStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/IconButton"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell description={<>A default icon button at default spacing. <a href="https://atlassian.design/components/button/icon-button">ADS documentation</a></>}>
+    <Canvas of={IconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+<DocsCanvasShell description={<>An icon button with its label shown as the tooltip.</>}>
+    <Canvas of={IconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
+2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
+3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
+4. **Spinner** (loading only). Replaces the icon while the button is busy.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+<thead>
+<tr><th>Property</th><th>Values</th><th>Default</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><code>icon</code></td><td>a Font Awesome Free glyph name, or a node</td><td>required</td><td>The glyph.</td></tr>
+<tr><td><code>label</code></td><td>string</td><td>required</td><td>The accessible name and the tooltip. Sentence case; name the object acted on.</td></tr>
+<tr><td><code>appearance</code></td><td><code>default</code>, <code>subtle</code>, <code>primary</code>, <code>discovery</code></td><td><code>default</code></td><td>The visual style.</td></tr>
+<tr><td><code>spacing</code></td><td><code>default</code> (32), <code>compact</code> (24)</td><td><code>default</code></td><td>Height, width and radius. Compact is for tables and tight toolbars.</td></tr>
+<tr><td><code>shape</code></td><td><code>default</code>, <code>circle</code></td><td><code>default</code></td><td>Square or round. Round is for top navigation.</td></tr>
+<tr><td><code>isSelected</code></td><td>boolean</td><td><code>false</code></td><td>Marks the button selected and sets <code>aria-pressed</code>.</td></tr>
+<tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Prevents interaction. Avoid it; see Accessibility.</td></tr>
+<tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>Shows a spinner in place of the icon and blocks interaction.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Variants
+
+### Appearance
+
+<DocsCanvasShell description={<>One of each appearance. Warning and danger belong to Button, which has room for a label that explains a risky action.</>}>
+    <Canvas of={IconButtonStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most icon buttons: an action with a clear, familiar glyph. Example: Edit page.</td></tr>
+<tr><td>Subtle</td><td>Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row.</td></tr>
+<tr><td>Primary</td><td>The main action of a small area when space allows no label. Use sparingly. Example: Send comment.</td></tr>
+<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new view.</td></tr>
+</tbody>
+</DocsTable>
+
+### Spacing
+
+<DocsCanvasShell description={<>Default draws 32; compact draws 24. Radius is 6 and 4.</>}>
+    <Canvas of={IconButtonStories.Spacing} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### Shape
+
+<DocsCanvasShell description={<>Square is the default. Circle is for top navigation.</>}>
+    <Canvas of={IconButtonStories.Shapes} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Selected, disabled and loading. Hover, pressed and focus are the browser's own.</>}>
+    <Canvas of={IconButtonStories.States} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill and icon. Avoid disabling icon buttons.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the icon. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: primary, discovery</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+<tr><td>Radius</td><td>6: <code>--element-radius-item-sm</code>. Compact 4: <code>--element-radius-md</code>. Circle 50%.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={IconButtonStories.Interactive}
+    description={
+        <>
+            Use the table in the panel below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
+            the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use an icon button when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header. Where space allows, or the action is important, use a Button with a text label.
+
+### Pick a glyph people know.
+
+If you cannot find a suitable glyph in five seconds, it probably will not communicate the action. Check the meaning holds across cultures and languages, and do not reuse one glyph for several meanings.
+
+### Group icon buttons that act together.
+
+Put related icon buttons in a Button group, and use `isSelected` for a choice between views.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the object acted on: "Edit page", "Delete session".</td><td>A bare verb such as "Edit", or a label that repeats the glyph: "Pencil icon".</td></tr>
+<tr><td>Use sentence case: "Copy link".</td><td>Title case: "Copy Link".</td></tr>
+<tr><td>Describe the action, not the picture.</td><td>Describe the picture: "Trash can".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- `label` is required. It is the accessible name and the tooltip. A missing label fails `check:icon-button-name`.
+- Avoid `isDisabled`. A disabled button leaves the tab order and receives no events. Explain what is unavailable in nearby text instead, and never attach a tooltip to a disabled control.
+- Selected is not color alone: `isSelected` sets `aria-pressed`.
+- The focus ring is 2px in `--ds-border-focused`. Never remove it.
+- The glyph is decoration once the button has a name, so it is hidden from assistive technology.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+<thead>
+<tr><th>ADS</th><th>PLUS</th><th>Note</th></tr>
+</thead>
+<tbody>
+<tr><td><code>label</code> (required, visually hidden text)</td><td><code>label</code> (required), set as <code>aria-label</code> and <code>title</code></td><td>Same contract; the name reaches assistive technology the same way.</td></tr>
+<tr><td><code>icon</code> (Atlassian icon component)</td><td><code>icon</code>: a Font Awesome Free glyph name or a node</td><td>The icon library differs.</td></tr>
+<tr><td><code>appearance</code>: default, subtle, primary, discovery</td><td>Same four</td><td>Matches. Warning and danger stay on Button.</td></tr>
+<tr><td><code>spacing</code>: default, compact</td><td>Same; 32 and 24</td><td>Matches.</td></tr>
+<tr><td><code>shape</code>: default, circle</td><td>Same</td><td>Matches.</td></tr>
+<tr><td><code>isSelected</code>, <code>isDisabled</code>, <code>isLoading</code></td><td>Same</td><td>Selected keeps the blue selected role.</td></tr>
+<tr><td><code>isTooltipDisabled</code>, <code>tooltip</code> props</td><td>Not built</td><td>The tooltip is the native <code>title</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+[ADS documentation: Icon button](https://atlassian.design/components/button/icon-button)
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- To act with a label, use Button.
+- To navigate with an icon, use Link icon button.
+- To dismiss a surface, use Close button.
+- To group related icon buttons, use Button group.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
