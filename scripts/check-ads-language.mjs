@@ -73,6 +73,11 @@ export const LEGACY_COMPONENTS = [
 /** Patterns whose old names collide with React-Bootstrap's: counted only when not imported from it. */
 const PATTERN_COMPONENTS = ['Overlay', 'Surface'];
 
+/** A component renamed with no alias (ADR-037 "clean replace"): the old name may not survive in doc prose either. */
+const RENAMED_NO_ALIAS = { Toast: 'Flag' };
+/** Where doc prose is checked for a stale renamed-away name — component docs, not specs or prototypes. */
+const DOC_PATH = /^design-system\/src\/components\/.*\.mdx$/;
+
 const LINE_RULES = [
   ['state-step', /--[a-z0-9-]*-state-(?:08|12|16)(?![0-9])/],
   ['prop:style', /\bstyle="[a-z][a-z-]*"/],
@@ -124,6 +129,13 @@ export function measure(sources) {
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
+    if (DOC_PATH.test(file)) {
+      for (const [oldName] of Object.entries(RENAMED_NO_ALIAS)) {
+        const re = new RegExp(`\\b${oldName}\\b`);
+        const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
+        add(`stale-name:${oldName}`, file, hits.length, hits[0]);
+      }
+    }
     const body = live.join('\n');
     const where = (name) => Math.max(1, live.findIndex((l) => l.includes(name)) + 1);
     for (const name of LEGACY_COMPONENTS) {
@@ -149,7 +161,17 @@ export function sourcesOf(repoRoot) {
 
 /** Rules that allow none: a hit is a finding, whatever the baseline says. */
 const HARD_RULES = ['state-step'];
-const isHard = (key) => HARD_RULES.includes(key.split(' ')[0]);
+const isHard = (key) => {
+  const rule = key.split(' ')[0];
+  return HARD_RULES.includes(rule) || rule.startsWith('stale-name:');
+};
+/** Per-hard-rule reason, keyed by rule name. */
+const HARD_RULE_MESSAGE = new Map(
+  Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
+    `stale-name:${oldName}`,
+    `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,
+  ]),
+);
 
 /** The ratchet's side of a measurement: a plain `key -> count` object in key order, hard rules left out. */
 const asRecord = (found) =>
@@ -186,10 +208,13 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
   for (const [key, { count, line }] of found) {
     if (!isHard(key)) continue;
     const [rule, ...rest] = key.split(' ');
+    const why =
+      HARD_RULE_MESSAGE.get(rule) ??
+      'the 08 / 12 / 16 state steps are gone, so zero allowed (use the named hovered, pressed and selected tokens)';
     findings.push({
       file: rest.join(' '),
       line,
-      message: `old language: ${count} x ${rule}; the 08 / 12 / 16 state steps are gone, so zero allowed (use the named hovered, pressed and selected tokens)`,
+      message: `old language: ${count} x ${rule}; ${why}`,
     });
   }
   if (!ratchet.absent) {
