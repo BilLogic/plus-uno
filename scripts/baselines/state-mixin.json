@@ -1,0 +1,26 @@
+{
+  "why": "Hand-rolled focus-ring patterns the state mixin (design-system/src/styles/_state.scss) exists to replace: a raw `outline: none` reset, the legacy `--color-focus-ring` token, and a hand-written forced-colors `Highlight` ring. Counted per rule and per file in design-system/src/components and design-system/src/patterns. A count may fall and never rise; a new file starts at zero. Regenerate with `npm run check:state-mixin -- --update`; never edit by hand.",
+  "counts": {
+    "highlight-ring design-system/src/components/forms-and-inputs/_internal/Calendar.scss": 1,
+    "highlight-ring design-system/src/components/forms-and-inputs/_internal/Field.scss": 1,
+    "highlight-ring design-system/src/components/forms-and-inputs/_internal/Listbox.scss": 1,
+    "highlight-ring design-system/src/components/forms-and-inputs/_internal/OptionRow.scss": 1,
+    "legacy-ring-token design-system/src/components/forms-and-inputs/FileUpload.scss": 1,
+    "legacy-ring-token design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 3,
+    "legacy-ring-token design-system/src/components/layout-and-structure/Accordion/Accordion.scss": 2,
+    "legacy-ring-token design-system/src/components/layout-and-structure/Collapse/Collapse.scss": 1,
+    "legacy-ring-token design-system/src/components/navigation/NavPills/NavPills.scss": 4,
+    "legacy-ring-token design-system/src/components/navigation/Pagination/Pagination.scss": 1,
+    "outline-none design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss": 1,
+    "outline-none design-system/src/components/forms-and-inputs/Range.scss": 2,
+    "outline-none design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 3,
+    "outline-none design-system/src/components/forms-and-inputs/Select/Select.scss": 1,
+    "outline-none design-system/src/components/forms-and-inputs/_internal/Field.scss": 2,
+    "outline-none design-system/src/components/forms-and-inputs/_internal/Listbox.scss": 1,
+    "outline-none design-system/src/components/labels/Tag/Tag.scss": 1,
+    "outline-none design-system/src/components/layout-and-structure/Accordion/Accordion.scss": 1,
+    "outline-none design-system/src/components/layout-and-structure/Carousel/Carousel.scss": 1,
+    "outline-none design-system/src/components/navigation/NavPills/NavPills.scss": 2,
+    "outline-none design-system/src/components/navigation/Pagination/Pagination.scss": 1
+  }
+}

@@ -1,6 +1,7 @@
 @use "sass:map";
 @use "sass:list";
 @use "sass:string";
+@use "../../../styles/state" as *;
 
 /*
  * Button styles. Six appearances (default, primary, subtle, warning, danger,
@@ -75,12 +76,12 @@ $btn-appearances: (
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 
-    // Keyboard focus is the focus ring alone: 2px wide, 2px off the edge. The
-    // outline follows the corner radius. `.btn` in the selector outranks
-    // Bootstrap's `.btn:focus-visible`, which drops the outline.
-    &.btn:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-stroke-lg);
+    // Keyboard focus is the state mixin's ring alone: 2px wide, 2px off the
+    // edge, following the corner radius. `.btn` in the selector outranks
+    // Bootstrap's `.btn:focus-visible`, which drops the outline, so the mixin
+    // is included on `&.btn` rather than on the bare `&`.
+    &.btn {
+        @include plus-state();
     }
 
     // --- SPACING ---

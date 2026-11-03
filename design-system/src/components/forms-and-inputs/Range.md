@@ -9,7 +9,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, ReportsNumber
+**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, States, Interactive, ReportsNumber
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range.mdx`
 
@@ -33,7 +33,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--size-element-stroke-lg` · `--value-percent`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 

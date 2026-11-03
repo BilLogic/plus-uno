@@ -2,8 +2,10 @@
  * Toggle — a track and a thumb, in a 24 row with the label.
  * 16: track 32×16, thumb 12. 20: track 40×20, thumb 16. Pad 2 on both.
  * Off: neutral bold track. On: selected bold track. The thumb is `icon.inverse`.
- * Keyboard focus is the 2px ring on `border.focused`, 2px off the track.
+ * Keyboard focus is the state mixin's 2px ring on `border.focused`, 2px off
+ * the track.
  */
+@use '../../styles/state' as *;
 
 .plus-toggle-wrapper {
     --plus-toggle-track-h: 16px;
@@ -106,17 +108,13 @@
             background-color: var(--ds-background-selected-bold-hovered) !important;
         }
 
-        // Keyboard focus is the ring Checkbox and Radio draw: 2px of
-        // `border.focused`, 2px off the track. A pointer focus draws none.
-        &:focus {
-            outline: none;
-            box-shadow: none;
-        }
+        // Keyboard focus is the ring Checkbox and Radio draw, through the
+        // state mixin: 2px of `border.focused`, 2px off the track. A pointer
+        // focus draws none. The ring sits outside the track, on the page the
+        // track is laid on, not on the track's own fill.
+        @include plus-state();
 
         &:focus-visible {
-            // @grounds: --color-surface --color-surface-container
-            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-            outline-offset: var(--size-element-stroke-lg);
             box-shadow: none;
         }
 

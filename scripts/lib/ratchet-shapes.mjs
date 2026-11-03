@@ -131,6 +131,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/state-mixin.json',
+    check: 'check:state-mixin',
+    command: 'node scripts/check-state-mixin.mjs --update',
+    prose: 'why',
+    // `<rule> <path>` -> count of hand-rolled focus-ring patterns the state
+    // mixin replaces. A pair may fall; one that reaches zero leaves the
+    // record, and the stale sweep asks for a regenerate.
+    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
+  },
+  {
     file: 'scripts/baselines/react-bootstrap-imports.json',
     check: 'check:react-bootstrap-imports',
     command: 'node scripts/check-react-bootstrap-imports.mjs --update',
