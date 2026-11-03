@@ -6,7 +6,7 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5615-214381&m=dev
  */
 import React from 'react';
-import Toast from '@/components/messaging/Toast';
+import Flag from '@/components/messaging/Flag';
 
 export default {
     title: 'Specs/Profile/Elements/Update Profile Toast',
@@ -25,7 +25,7 @@ export default {
 const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
     return (
         <div style={{ width: 'var(--columns-col-8, 445.33px)' }}>
-            <Toast
+            <Flag
                 show={show}
                 onClose={onClose}
                 style="primary"
@@ -51,7 +51,7 @@ const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
                     </a>{' '}
                     to finish setup.
                 </span>
-            </Toast>
+            </Flag>
         </div>
     );
 };

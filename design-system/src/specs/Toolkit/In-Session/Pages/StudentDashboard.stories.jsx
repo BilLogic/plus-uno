@@ -6,7 +6,7 @@ import { TableRow, TableHeaderRow } from '../Tables/StudentList.stories';
 import SessionControlsConsolidated from '../Elements/SessionControlsConsolidated/SessionControlsConsolidated';
 import { SortingOptions } from '../Elements/SortingOptions.stories';
 import MATHiaGoalStatusBanner from '../Elements/MATHiaGoalStatusBanner';
-import { Toast } from '@/components/messaging/Toast';
+import { Flag } from '@/components/messaging/Flag';
 
 import * as InSessionModals from '../Modals/InSessionPopUpModal.stories';
 import { StartingZoomSession } from '../Modals/StartingZoomSession.stories';
@@ -968,7 +968,7 @@ const RegularTutorViewRender = (args) => {
                     )}
                 </PageLayout>
 
-                {/* Toast — only in loaded state; visibility driven by the `toast` arg. */}
+                {/* Flag — only in loaded state; visibility driven by the `toast` arg. */}
                 {viewState === 'loaded' && args.toast && (
                     <div style={{
                         position: 'fixed',
@@ -979,13 +979,13 @@ const RegularTutorViewRender = (args) => {
                         width: '672px',
                     }}>
                         {args.toastType === 'assignment-all' ? (
-                            <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
+                            <Flag style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
                                 <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                     Your student roster was just updated. Take a moment to review your new assignments.
                                 </span>
-                            </Toast>
+                            </Flag>
                         ) : (
-                            <Toast style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
+                            <Flag style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
                                 <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                     Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                                     Personalized goals will be available in a few weeks.{' '}
@@ -993,7 +993,7 @@ const RegularTutorViewRender = (args) => {
                                         Remember to check in with each student and mark them as helped.
                                     </span>
                                 </span>
-                            </Toast>
+                            </Flag>
                         )}
                     </div>
                 )}
@@ -1015,8 +1015,8 @@ export const RegularTutorView = {
         viewState: { control: 'radio', options: ['loaded', 'empty'], name: 'View state', table: { category: 'State' } },
         goalBanner: { control: 'boolean', name: 'Goal banner', table: { category: 'State' } },
         sessionType: { control: 'radio', options: ['goal-setting', 'non-goal-setting'], name: 'Session type', table: { category: 'State' } },
-        toast: { control: 'boolean', name: 'Toast', table: { category: 'State' } },
-        toastType: { control: 'radio', options: ['assignment-all', 'goal-setting-warmup'], name: 'Toast type', table: { category: 'State' } },
+        toast: { control: 'boolean', name: 'Flag', table: { category: 'State' } },
+        toastType: { control: 'radio', options: ['assignment-all', 'goal-setting-warmup'], name: 'Flag type', table: { category: 'State' } },
     },
     args: { viewState: 'loaded', goalBanner: true, sessionType: 'goal-setting', toast: false, toastType: 'assignment-all' },
 };
@@ -1132,24 +1132,24 @@ const LeadSupervisorViewRender = (args) => {
                 )}
             </PageLayout>
 
-            {/* Toast — loaded state only; visibility driven by the `toast` arg. */}
+            {/* Flag — loaded state only; visibility driven by the `toast` arg. */}
             {viewState === 'loaded' && args.toast && (
                 <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 'var(--layout-z-index-flag)', width: '672px' }}>
                     {args.toastType === 'assignment-leads' ? (
-                        <Toast style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
+                        <Flag style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
                             <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                 It&apos;s been 10 minutes since the session started. Would you like to{' '}
                                 <a href="#" className="body3-txt font-weight-bold" style={{ color: 'var(--color-on-surface)', textDecoration: 'underline' }} onClick={(e) => e.preventDefault()}>review and adjust assignments</a>?{' '}
                             </span>
-                        </Toast>
+                        </Flag>
                     ) : (
-                        <Toast style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
+                        <Flag style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
                             <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
                                 Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                                 Personalized goals will be available in a few weeks.{' '}
                                 <span className="body3-txt font-weight-semibold">Remember to check in with each student and mark them as helped.</span>
                             </span>
-                        </Toast>
+                        </Flag>
                     )}
                 </div>
             )}
@@ -1185,8 +1185,8 @@ export const LeadSupervisorView = {
         viewState: { control: 'radio', options: ['loaded', 'empty'], name: 'View state', table: { category: 'State' } },
         goalBanner: { control: 'boolean', name: 'Goal banner', table: { category: 'State' } },
         sessionType: { control: 'radio', options: ['goal-setting', 'non-goal-setting'], name: 'Session type', table: { category: 'State' } },
-        toast: { control: 'boolean', name: 'Toast', table: { category: 'State' } },
-        toastType: { control: 'radio', options: ['assignment-leads', 'goal-setting-warmup'], name: 'Toast type', table: { category: 'State' } },
+        toast: { control: 'boolean', name: 'Flag', table: { category: 'State' } },
+        toastType: { control: 'radio', options: ['assignment-leads', 'goal-setting-warmup'], name: 'Flag type', table: { category: 'State' } },
         scrim1: { control: 'select', options: ['none', ...Object.keys(scrim1ModalMap)], name: 'Scrim 1 modal', table: { category: 'Scrims' } },
         scrim2: { control: 'select', options: ['none', ...Object.keys(scrim2ModalMap)], name: 'Scrim 2 modal (needs Scrim 1)', table: { category: 'Scrims' } },
     },
