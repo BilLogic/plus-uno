@@ -15,6 +15,8 @@ verified: 2026-11-03
 
 **Relationship to ADR-009.** [ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) (Bootstrap first, no alternative UI frameworks) is already marked contradicted. This ADR does not revive or repeal it: it adds one scoped exception, the AI components, and leaves Bootstrap as the framework for the rest of product UI.
 
+**Widened by ADR-037.** [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md) extends this decision from AI components to every interactive PLUS component, carrying over the same version pin and styling pattern. This ADR's own reasoning and signature stand as the record of the first, scoped decision.
+
 **What would reopen it.** Base UI dropping a part the AI components rely on, or a breaking major that costs more to follow than to replace; AI components needing patches to Base UI's behavior (the sign the wrapper is the wrong shape); or the AI surface being folded into a framework that brings its own primitives.
 
 — Claude (agent), Nov 2026, on Bill's approval to install `@base-ui/react@1.7.0` and remove `@assistant-ui/react`

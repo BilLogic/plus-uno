@@ -113,7 +113,7 @@ Do **not** merge one-off experiments onto `main`. Captures go on the Notion row 
 The component library lives in `design-system/src/`: **56 UI components (form elements among them, grouped under `components/forms-and-inputs/`), 25 DataViz chart components across 6 categories, and page specs for 7 product areas** — generated inventory in `design-system/agent-views/`, narrative in [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md). Browse it at [localhost:4200](http://localhost:4200) (Storybook) or [live](https://plus-uno.netlify.app/storybook/).
 
 **Key rules for agents and contributors:**
-- Use PLUS components first — only fall back to React-Bootstrap when no PLUS equivalent exists
+- Use PLUS components first — interactive behavior is built on Base UI (`@base-ui/react`), not React-Bootstrap (ADR-037)
 - Never hardcode colors, spacing, or typography — use design tokens
 - Start at `design-system/guidelines/overview.md` before building UI
 - After editing component MDX or token-mapping: `npm run generate:agent`
