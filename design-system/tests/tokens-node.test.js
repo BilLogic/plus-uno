@@ -519,9 +519,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 38 `var(--color-*, rgba(…))` sites, every one
+   * Measured over the live tree: 34 `var(--color-*, rgba(…))` sites, every one
    * captured, and every one names a defined token and is compared with
-   * alpha on both sides. All 38 agree (81 until 2026-10-24, when a Dropdown
+   * alpha on both sides. All 34 agree (81 until 2026-10-24, when a Dropdown
    * fallback that duplicated its token was dropped and Tag's × lost its focus
    * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
    * tokens, which carry no fallbacks), because the disagreeing washes were
@@ -545,7 +545,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(38);
+    expect(washes).toBe(34);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -589,7 +589,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // (plain and elevated) went.
     // 38: Tag and Suggestion moved onto the --ds- tokens, and their 40 state
     // and border washes went with the legacy names.
-    expect(withAlpha).toBe(38);
+    // 34: Range's thumb took the brand bold steps, and its four state washes went.
+);
     // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
     // fallbacks with it. 620: the date pickers moved onto the shared field and
     // calendar, and the old Dropdown option list went, each with its fallbacks.
