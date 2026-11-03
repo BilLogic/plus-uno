@@ -14,7 +14,7 @@ import { request } from 'node:http';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const DIST_DIR = path.join(REPO_ROOT, 'archive-storybook-static');
-const BANNER_TEXT = 'Archived: pre-ADS library, for comparison only';
+const BANNER_TEXT = 'Archived: previous library, for comparison only';
 
 function fail(message) {
   console.error(`✗ ${message}`);

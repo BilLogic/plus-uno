@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Builds the archived pre-ADS Storybook: React-Bootstrap components on the
+ * Builds the archived previous-library Storybook: React-Bootstrap components on the
  * previous tokens, frozen at the tag below. The source is never modified —
  * this script extracts it read-only via `git archive`, builds it in an
  * isolated temp directory with its own commit's build command, then
@@ -23,7 +23,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const ARCHIVE_REF = 'archive/storybook-pre-ads';
 const ARCHIVE_COMMIT = '7304a5e5c5cec50f9bdd74f25c6ad4d6e3cf9a3c';
 const OUT_DIR = path.join(REPO_ROOT, 'archive-storybook-static');
-const BANNER_TEXT = 'Archived: pre-ADS library, for comparison only';
+const BANNER_TEXT = 'Archived: previous library, for comparison only';
 
 function sh(cmd, args, cwd) {
   return execFileSync(cmd, args, { cwd, stdio: 'pipe', encoding: 'utf8' });
