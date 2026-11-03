@@ -22,12 +22,8 @@
         color: var(--ds-text);
         text-decoration: none;
 
-        &:hover,
-        &[data-hovered] {
-            text-decoration: underline;
-        }
-
         @include plus-state((
+            hovered: (text-decoration: underline),
             pressed: (color: var(--ds-link-pressed)),
         ));
     }
