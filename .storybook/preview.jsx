@@ -274,6 +274,7 @@ const preview = {
             [
               "Accordion",
               "Carousel",
+              "Page header",
               "Scrollbar",
               "Visually hidden",
               "Card",
