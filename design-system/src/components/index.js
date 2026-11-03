@@ -39,6 +39,7 @@ export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } fr
 export { default as Avatar, AVATAR_COLORS, AVATAR_SHAPES, AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from '@/components/images-and-icons/Avatar';
 export { default as AvatarGroup } from '@/components/images-and-icons/AvatarGroup';
 export { default as Illustration, ILLUSTRATION_CHARACTERS, ILLUSTRATION_SIZES, MATH_CHARACTERS, SMART_CHARACTERS } from '@/components/images-and-icons/Illustration';
+export { default as Image, IMAGE_SIZES } from '@/components/images-and-icons/Image';
 export { default as Logo } from '@/components/images-and-icons/Logo';
 export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZES } from '@/components/images-and-icons/Tile';
 export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar';

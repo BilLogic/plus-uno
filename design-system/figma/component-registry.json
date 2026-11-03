@@ -913,6 +913,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
       }
     },
+    "Image": {
+      "code": {
+        "import": "@/components/images-and-icons",
+        "export": "default",
+        "mdxPath": "design-system/src/components/images-and-icons/Image/Image.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/images-and-icons/Image/Image.jsx",
+        "storybookId": "components-images-and-icons-image--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "image",
+            "name": "Image",
+            "componentSetNodeId": "20094:220",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-220",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ]
+      }
+    },
     "InlineEdit": {
       "code": {
         "import": "@/components/forms-and-inputs",

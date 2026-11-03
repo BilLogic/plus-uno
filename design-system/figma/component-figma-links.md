@@ -102,6 +102,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Flag | Flag | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
 | Components | Heading | Heading | `20626:95` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95) | verified |
 | Components | Illustration | Character | `19786:47743` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743) | verified |
+| Components | Image | Image | `20094:220` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-220) | verified |
 | Components | Jumbotron | Jumbotron | `19627:113213` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-113213) | verified |
 | Components | LabelAndCaption | _Form Caption | `13726:9599` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599) | verified |
 | Components | LabelAndCaption | Label | `14851:17069` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069) | verified |

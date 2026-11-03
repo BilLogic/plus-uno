@@ -1,0 +1,14 @@
+.plus-image {
+    display: block;
+
+    &--fixed {
+        width: auto;
+        height: auto;
+        max-width: none;
+    }
+
+    &--fluid {
+        width: 100%;
+        height: auto;
+    }
+}

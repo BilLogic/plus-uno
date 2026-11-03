@@ -1,0 +1,35 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as ImageStories from './Image.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "image",
+      "name": "Image",
+      "componentSetNodeId": "20094:220",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-220",
+      "source": "node-chart",
+      "status": "verified"
+    }
+  ]
+};
+
+<Meta of={ImageStories} />
+
+<Title />
+
+<DocsTabs of={ImageStories}>
+
+<DocsTab tab="examples">
+
+A bitmap, with a dark-mode variant the browser swaps in.
+
+<Canvas of={ImageStories.Sizes} />
+
+<ArgTypes of={ImageStories} />
+
+</DocsTab>
+
+</DocsTabs>

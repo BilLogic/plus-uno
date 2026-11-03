@@ -27,7 +27,7 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 ## Related
 
-Same group: `AiIcon` · `Avatar` · `Illustration` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
