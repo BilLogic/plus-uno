@@ -57,6 +57,8 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Pagination](../../src/components/navigation/Pagination/index.md)
 - [Popover](../../src/components/overlays-and-layering/Popover/index.md)
 - [Progress](../../src/components/loading/Progress/index.md)
+- [ProgressIndicator](../../src/components/status-indicators/ProgressIndicator/index.md)
+- [ProgressTracker](../../src/components/status-indicators/ProgressTracker/index.md)
 - [Radio](../../src/components/forms-and-inputs/Radio.md)
 - [Range](../../src/components/forms-and-inputs/Range.md)
 - [Rating](../../src/components/forms-and-inputs/Rating.md)
