@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (42)
+## UI components (43)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiLabel](../../src/components/labels/AiLabel/index.md)
@@ -48,6 +48,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [TagInput](../../src/components/forms-and-inputs/TagInput.md)
 - [TextArea](../../src/components/forms-and-inputs/TextArea/index.md)
 - [TextField](../../src/components/forms-and-inputs/TextField/index.md)
+- [TimePicker](../../src/components/forms-and-inputs/TimePicker/index.md)
 - [Toggle](../../src/components/forms-and-inputs/Toggle.md)
 - [Tooltip](../../src/components/overlays-and-layering/Tooltip/index.md)
 - [UserAvatar](../../src/components/images-and-icons/UserAvatar/index.md)

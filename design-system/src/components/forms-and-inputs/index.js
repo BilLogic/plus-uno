@@ -8,6 +8,7 @@ export { default as Radio } from './Radio';
 export { default as Toggle } from './Toggle';
 export { default as DatePicker } from './DatePicker';
 export { default as DateTimePicker } from './DateTimePicker';
+export { default as TimePicker } from './TimePicker';
 export { default as InlineEdit } from './InlineEdit';
 export { default as InlineEditableTextfield } from './InlineEditableTextfield';
 export { default as Cascader } from './Cascader';

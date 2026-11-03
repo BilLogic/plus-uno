@@ -18,6 +18,8 @@ const ChoiceGrid = ({
     values = {}, // { rowId: { columnId: boolean } } for checkbox, { rowId: columnId } for radio
     disabled = false,
     readOnly = false,
+    /** Option-label font size in px (`12` · `14` · `16`), and the control width that goes with it (`10` · `12` · `12`). Unset keeps the default rendering. */
+    size,
     onChange,
     className = '',
     style,
@@ -73,7 +75,7 @@ const ChoiceGrid = ({
     const rowHeaderId = `${baseId}-row-header`;
 
     return (
-        <div className={wrapperClasses} style={style} {...props}>
+        <div className={wrapperClasses} style={style} data-size={size} {...props}>
             <table className="plus-choice-grid-table">
                 <thead>
                     <tr>
@@ -153,6 +155,8 @@ ChoiceGrid.propTypes = {
     disabled: PropTypes.bool,
     /** Shown and focusable, not changeable. */
     readOnly: PropTypes.bool,
+    /** Option-label font size in px, and the control width that goes with it. Unset keeps the default rendering. */
+    size: PropTypes.oneOf([12, 14, 16]),
     onChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object

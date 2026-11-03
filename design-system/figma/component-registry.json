@@ -145,42 +145,6 @@
         "sets": []
       }
     },
-    "AvatarGroup": {
-      "code": {
-        "import": "@/components/images-and-icons",
-        "export": "default",
-        "mdxPath": "design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/AvatarGroup",
-        "source": "design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx",
-        "storybookId": "components-images-and-icons-avatar-group--docs",
-        "props": {
-          "size": {
-            "type": "enum",
-            "values": [
-              "16",
-              "20",
-              "24",
-              "32",
-              "40",
-              "48",
-              "96",
-              "128"
-            ]
-          },
-          "shape": {
-            "type": "enum",
-            "values": [
-              "circle",
-              "square"
-            ]
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
-      }
-    },
     "Breadcrumb": {
       "code": {
         "import": "@/components/navigation",
@@ -534,7 +498,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx",
         "githubLink": null,
         "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-        "storybookId": "components-forms-and-inputs-date-picker--docs"
+        "storybookId": "components-forms-and-inputs-date-time-picker-date-picker--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -592,17 +556,7 @@
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
-            "notes": "A date field and a `_Time Field` side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          },
-          {
-            "id": "time-field",
-            "name": "_Time Field",
-            "componentSetNodeId": "16560:4508",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The time half, state × filled? × spacing: hours, minutes and the AM/PM menu, which opens 4px (`gap-xs`) below. In code it lives inside `DateTimePicker.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
+            "notes": "A date field and a time field side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`gap-xs`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`. The time half is the public `Time picker` set — see its own page."
           }
         ]
       }
@@ -672,32 +626,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
       }
     },
-    "DynamicTable": {
-      "code": {
-        "import": "@/components/text-and-data-display",
-        "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/DynamicTable.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/DynamicTable.stories.jsx",
-        "storybookId": "components-text-and-data-display-dynamic-table--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "dynamic-table-page",
-            "name": "Dynamic table (page)",
-            "componentSetNodeId": "19685:27042",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
-            "source": "manual",
-            "status": "docs-page",
-            "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
-      }
-    },
     "FileUpload": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -720,30 +648,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
-      }
-    },
-    "Flag": {
-      "code": {
-        "import": "@/components/messaging",
-        "export": "default",
-        "mdxPath": "design-system/src/components/messaging/Flag/Flag.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Flag",
-        "source": "design-system/src/components/messaging/Flag/Flag.jsx",
-        "storybookId": "components-messaging-flag--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "flag",
-            "name": "Flag",
-            "componentSetNodeId": "44:4803",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
       }
     },
     "Footer": {
@@ -917,7 +821,7 @@
         "mdxPath": "design-system/src/components/forms-and-inputs/LabelAndCaption.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
         "source": "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.jsx",
-        "storybookId": "components-forms-and-inputs-form--docs"
+        "storybookId": "components-forms-and-inputs-label-caption--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1881,14 +1785,49 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872"
       }
     },
-    "StaticTable": {
+    "Suggestion": {
+      "code": {
+        "import": "@/components/labels",
+        "export": "default",
+        "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
+        "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
+        "storybookId": "components-labels-ai-label-suggestion--docs",
+        "props": {
+          "type": {
+            "type": "enum",
+            "values": [
+              "insert",
+              "prompt"
+            ]
+          }
+        }
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "suggestion",
+            "name": "Suggestion",
+            "componentSetNodeId": "17878:1769",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true,
+            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
+      }
+    },
+    "Table": {
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/StaticTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/Table/Table.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/StaticTable.jsx",
-        "storybookId": "components-text-and-data-display-static-table--docs",
+        "source": "design-system/src/components/text-and-data-display/Table/Table.jsx",
+        "storybookId": "components-text-and-data-display-table--docs",
         "props": {
           "size": {
             "type": "enum",
@@ -1939,44 +1878,29 @@
             "source": "manual",
             "status": "docs-page",
             "notes": "The Static table page: the Static table set and the shared _Table parts it is built from."
+          },
+          {
+            "id": "dynamic-table-page",
+            "name": "Dynamic table (page)",
+            "componentSetNodeId": "19685:27042",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
+            "source": "manual",
+            "status": "docs-page",
+            "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
+          },
+          {
+            "id": "tree-table-page",
+            "name": "Tree table (page)",
+            "componentSetNodeId": "19685:27043",
+            "isComponentSet": false,
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
+            "source": "manual",
+            "status": "docs-page",
+            "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
-      }
-    },
-    "Suggestion": {
-      "code": {
-        "import": "@/components/labels",
-        "export": "default",
-        "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
-        "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
-        "storybookId": "components-labels-ai-label-suggestion--docs",
-        "props": {
-          "type": {
-            "type": "enum",
-            "values": [
-              "insert",
-              "prompt"
-            ]
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "suggestion",
-            "name": "Suggestion",
-            "componentSetNodeId": "17878:1769",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
       }
     },
     "Tag": {
@@ -2244,6 +2168,55 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
       }
     },
+    "TimePicker": {
+      "code": {
+        "import": "@/components/forms-and-inputs",
+        "export": "default",
+        "mdxPath": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
+        "storybookId": "components-forms-and-inputs-date-time-picker-time-picker--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "time-picker",
+            "name": "Time picker",
+            "componentSetNodeId": "16560:4508",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
+            "source": "manual",
+            "status": "unpublished",
+            "isComponentSet": true,
+            "notes": "Hours, minutes and an AM/PM menu that opens 4px (`gap-xs`) below: state × filled? × spacing. Same field anatomy as DatePicker. In code it is `TimePicker.jsx`."
+          }
+        ]
+      }
+    },
+    "Toast": {
+      "code": {
+        "import": "@/components/messaging",
+        "export": "default",
+        "mdxPath": "design-system/src/components/messaging/Toast/Toast.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Toast",
+        "source": "design-system/src/components/messaging/Toast/Toast.jsx",
+        "storybookId": "components-messaging-flag--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "toast",
+            "name": "Toast",
+            "componentSetNodeId": "44:4803",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
+      }
+    },
     "Toggle": {
       "code": {
         "import": "@/components/forms-and-inputs",
@@ -2330,32 +2303,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227860"
-      }
-    },
-    "TreeTable": {
-      "code": {
-        "import": "@/components/text-and-data-display",
-        "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/TreeTable.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/TreeTable.stories.jsx",
-        "storybookId": "components-text-and-data-display-tree-table--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "tree-table-page",
-            "name": "Tree table (page)",
-            "componentSetNodeId": "19685:27043",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
-            "source": "manual",
-            "status": "docs-page",
-            "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043"
       }
     },
     "UserAvatar": {

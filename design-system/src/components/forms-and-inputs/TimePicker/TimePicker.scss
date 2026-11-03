@@ -1,0 +1,61 @@
+/**
+ * Time Picker — `_Field` with an AM/PM toggle in Trailing, the PLUS Dropdown.
+ */
+
+.plus-time-picker__input {
+    width: 100%;
+}
+
+.plus-time-picker__period-dropdown {
+    height: var(--item-height-sm);
+
+    // The toggle is 24, like a button in a field's Trailing slot.
+    > :not(.dropdown-menu) {
+        height: 100%;
+    }
+}
+
+.plus-time-picker__period-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-radius: var(--size-element-radius-sm);
+    background: transparent;
+    color: var(--ds-text-brand);
+    font: inherit;
+    font-weight: var(--type-weight-semibold);
+    cursor: pointer;
+
+    .fa-caret-down {
+        color: var(--ds-icon-brand);
+    }
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-border);
+    }
+
+    &:disabled {
+        color: inherit;
+        cursor: default;
+    }
+
+    .plus-field--invalid & {
+        color: var(--ds-text-danger);
+
+        .fa-caret-down {
+            color: var(--ds-icon-danger);
+        }
+    }
+
+    .plus-field--valid & {
+        color: var(--ds-text-success);
+
+        .fa-caret-down {
+            color: var(--ds-icon-success);
+        }
+    }
+}

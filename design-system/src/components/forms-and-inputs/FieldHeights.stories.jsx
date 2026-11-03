@@ -153,7 +153,7 @@ ButtonInside.play = async ({ canvasElement }) => {
 
     // The AM/PM menu is centered in the time field.
     const timeBox = fieldIn(canvasElement, 'AM/PM');
-    const period = rect(timeBox.querySelector('.plus-datetime-am-pm-toggle'));
+    const period = rect(timeBox.querySelector('.plus-time-picker__period-toggle'));
     await expect(heightOf(timeBox), 'Time field height').toBe(40);
     await expect(Math.abs(middle(period) - middle(rect(timeBox))), 'AM/PM centered').toBeLessThanOrEqual(0.5);
 

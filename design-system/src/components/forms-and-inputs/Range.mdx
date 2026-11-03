@@ -74,6 +74,7 @@ A range lets a person choose an approximate value on a slider.
         <tr><td><code>min</code>, <code>max</code></td><td>number</td><td><code>0</code>, <code>100</code></td><td>The span.</td></tr>
         <tr><td><code>step</code></td><td>number</td><td><code>1</code></td><td>The increment.</td></tr>
         <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Disabled fill on the track and handle.</td></tr>
+        <tr><td><code>size</code></td><td><code>8 | 12 | 16</code></td><td>unset</td><td>PLUS addition. The handle and bar in px; the track between them follows a step behind (4/6/8). Unset keeps the default rendering.</td></tr>
         <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the new value as a number, then the event.</td></tr>
     </tbody>
 </DocsTable>
@@ -106,6 +107,16 @@ A range lets a person choose an approximate value on a slider.
 
 <DocsCanvasShell description={<>Disabled takes the disabled fill on the track and the handle.</>}>
     <DsCanvasQuiet of={RangeStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<DocsCanvasShell description={<>The handle and bar in px (8 · 12 · 16); the track between them follows a step behind.</>}>
+    <DsCanvasQuiet of={RangeStories.Size} />
 </DocsCanvasShell>
 
 </div>

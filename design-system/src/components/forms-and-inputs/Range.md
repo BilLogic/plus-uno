@@ -9,7 +9,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, ReportsNumber
+**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range.mdx`
 
@@ -27,19 +27,26 @@ A range input carries its value, never its meaning: "49" says nothing about what
 | `defaultValue` | number | — | — |
 | `step` | number | `1` | Slider increment |
 | `isDisabled` | bool | `false` | Disable the slider |
+| `size` | enum | — | The dot and bar in px; the track follows at 4/6/8. Unset keeps the default rendering. |
 | `onChange` | func | — | Called with the new value as a number, then the change event. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
+## Variants
+
+**`size`** — `8` · `12` · `16`
+
+Anything not listed is not a valid value.
+
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--plus-range-dot-size` · `--plus-range-track-height` · `--size-element-gap-xs` · `--size-element-radius-full` · `--size-element-stroke-lg` · `--value-percent`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

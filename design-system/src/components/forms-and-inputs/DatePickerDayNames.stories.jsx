@@ -17,7 +17,7 @@ import DatePicker from './DatePicker/DatePicker';
  */
 
 export default {
-    title: 'Components/Forms and inputs/Date picker day names',
+    title: 'Components/Forms and inputs/Date time picker/Date picker/Day names',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

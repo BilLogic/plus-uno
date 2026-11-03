@@ -27,7 +27,7 @@ import DateTimePicker from './DateTimePicker/DateTimePicker';
  * why the cover is an interaction and a rendered value rather than a snapshot.
  */
 export default {
-    title: 'Components/Forms and inputs/Date time round trip',
+    title: 'Components/Forms and inputs/Date time picker/Round trip',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
@@ -52,7 +52,7 @@ const timeField = (canvas) => canvas.getByLabelText('Time');
  * which react-bootstrap renders whether or not the menu is open. Only the
  * toggle says what the control is currently set to.
  */
-const period = (root) => root.querySelector('.plus-datetime-am-pm-toggle').textContent.trim();
+const period = (root) => root.querySelector('.plus-time-picker__period-toggle').textContent.trim();
 
 export const TwelveHourValueSurvives = {
     render: () => (
@@ -97,7 +97,7 @@ MidnightAndNoonReadAsTwelve.play = async ({ canvasElement }) => {
     const [midnight, noon] = canvas.getAllByLabelText('Time');
     await waitFor(() => expect(midnight).toHaveValue('12:15'));
     await expect(noon).toHaveValue('12:45');
-    const toggles = [...canvasElement.querySelectorAll('.plus-datetime-am-pm-toggle')];
+    const toggles = [...canvasElement.querySelectorAll('.plus-time-picker__period-toggle')];
     await expect(toggles[0].textContent.trim()).toBe('AM');
     await expect(toggles[1].textContent.trim()).toBe('PM');
 };
@@ -111,20 +111,23 @@ HourFieldRefusesWhatItCannotShow.play = async ({ canvasElement }) => {
     const time = timeField(canvas);
 
     /*
-     * Pasted, not typed. The field inserts its own colon after the first
-     * digit, so typing `2` then `0` produces `02:00` and never reaches an hour
-     * of 20 at all — the bound is only reachable by a paste or a programmatic
-     * value, which is exactly why nothing had noticed it.
+     * Checked on blur, like DatePicker checks a typed date on blur: typing or
+     * pasting is free, and leaving the field is what picks a real time or
+     * marks what was typed invalid.
      */
     await userEvent.click(time);
-    await userEvent.paste('20:30');
-    // 20 is a legal hour on a 24-hour clock. This control shows AM/PM, so it is
-    // not a legal hour here, and the field keeps only what it can render.
-    await waitFor(() => expect(time).not.toHaveValue('20:30'));
+    await userEvent.paste('00:30');
+    await userEvent.tab();
+    // 0 is a legal hour on a 24-hour clock. This control shows AM/PM, so it has
+    // no hour 0 to render, and the field keeps what was typed, marked invalid.
+    await waitFor(() => expect(time).toHaveValue('00:30'));
+    await expect(time).toHaveAttribute('aria-invalid', 'true');
 
     await userEvent.clear(time);
     await userEvent.paste('11:30');
+    await userEvent.tab();
     await waitFor(() => expect(time).toHaveValue('11:30'));
+    await expect(time).not.toHaveAttribute('aria-invalid', 'true');
 };
 
 export const PeriodChangeIsReportedWithoutADate = {
@@ -139,7 +142,7 @@ PeriodChangeIsReportedWithoutADate.play = async ({ args, canvasElement }) => {
     await waitFor(() => expect(timeField(canvas)).toHaveValue('09:15'));
     args.onChange.mockClear();
 
-    await userEvent.click(canvasElement.querySelector('.plus-datetime-am-pm-toggle'));
+    await userEvent.click(canvasElement.querySelector('.plus-time-picker__period-toggle'));
     await userEvent.click(await canvas.findByRole('button', { name: 'PM' }));
 
     /*
