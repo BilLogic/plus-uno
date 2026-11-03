@@ -1,0 +1,37 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as CalendarStories from './Calendar.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "calendar",
+      "name": "_Calendar",
+      "componentSetNodeId": "18819:40157",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
+      "source": "manual",
+      "status": "unpublished",
+      "isComponentSet": true,
+      "notes": "The month grid DatePicker and DateTimePicker open, one variant per size. In code it is the public `Calendar`, wrapping the shared `_internal/Calendar.jsx` the pickers also use."
+    }
+  ]
+};
+
+<Meta of={CalendarStories} />
+
+<Title />
+The month grid a date field opens.
+
+<DocsTabs of={CalendarStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={CalendarStories.Overview} />
+
+<ArgTypes of={CalendarStories} />
+
+</DocsTab>
+
+</DocsTabs>

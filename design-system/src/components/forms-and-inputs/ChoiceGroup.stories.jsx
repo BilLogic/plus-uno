@@ -41,6 +41,12 @@ export default {
             options: ['plain', 'card'],
             table: { category: 'Design' },
         },
+        size: {
+            control: 'select',
+            options: [10, 12, 14],
+            description: 'Radio control (dot) width in px. Unset keeps today\'s rendering. No effect on type="checkbox".',
+            table: { category: 'Design' },
+        },
         leadingText: { control: 'text', table: { category: 'Content' } },
         trailingText: { control: 'text', table: { category: 'Content' } },
         error: { control: 'text', table: { category: 'Behavior' } },
@@ -140,6 +146,25 @@ export const Orientation = () => (
         <ChoiceGroup name="cg-inline" legend="Inline" orientation="inline" options={subjects} />
     </div>
 );
+
+/** `size` sets the radio control width. Unset keeps today's rendering; no effect on checkboxes. */
+export const Size = () => (
+    <div style={stack}>
+        {[10, 12, 14].map((size) => (
+            <ChoiceGroup
+                key={size}
+                name={`cg-size-${size}`}
+                legend={String(size)}
+                size={size}
+                options={subjects}
+            />
+        ))}
+    </div>
+);
+Size.play = async ({ canvasElement }) => {
+    const groups = [...canvasElement.querySelectorAll('.plus-choice-group-radio')];
+    await expect(groups.map((group) => group.getAttribute('data-size'))).toEqual(['10', '12', '14']);
+};
 
 export const ScaleEnds = () => (
     <div style={stack}>

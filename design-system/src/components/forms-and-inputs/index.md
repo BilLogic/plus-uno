@@ -2,17 +2,18 @@
 
 # Forms and inputs
 
-30 components. Each row links to the generated facts; the three columns after it are the
+31 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
+| [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
-| [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
+| [ChoiceGroup](ChoiceGroup.md) | 20 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
@@ -38,7 +39,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 14/30 (47%) · Correct/incorrect 7/30 (23%) · Accessibility 18/30 (60%)
+**Authored coverage:** When to use 14/31 (45%) · Correct/incorrect 7/31 (23%) · Accessibility 18/31 (58%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

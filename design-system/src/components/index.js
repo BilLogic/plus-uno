@@ -5,6 +5,7 @@ import '../styles/main.scss';
 
 export { default as Button, BUTTON_APPEARANCES, BUTTON_SPACINGS } from '@/components/forms-and-inputs/Button';
 export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGroup';
+export { default as Calendar } from '@/components/forms-and-inputs/Calendar';
 export { default as Cascader, CASCADER_SPACINGS } from '@/components/forms-and-inputs/Cascader';
 export { default as Checkbox } from '@/components/forms-and-inputs/Checkbox';
 export { default as ChoiceGrid } from '@/components/forms-and-inputs/ChoiceGrid';
