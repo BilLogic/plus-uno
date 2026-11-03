@@ -1,7 +1,8 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react';
 import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
 import { useAnchoredPopup } from '../_internal/anchorPlacement';
 import '../_internal/Listbox.scss';
@@ -352,14 +353,14 @@ const Cascader = ({
      * pointing at it names the combobox.
      */
     return (
-        <FieldStack disabled={isDisabled} className={className} style={style}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={className} style={style}>
             {label && (
                 <FieldLabel htmlFor={fieldId} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     <span id={labelId}>{label}</span>
                 </FieldLabel>
             )}
             <div ref={wrapperRef} className="plus-cascader-wrapper">
-                <Field
+                <FieldBox
                     spacing={spacing}
                     disabled={isDisabled}
                     state={isOpen ? 'focus' : undefined}
@@ -390,7 +391,7 @@ const Cascader = ({
                         {...tones.control}
                         {...props}
                     />
-                </Field>
+                </FieldBox>
 
                 {/* The listbox surface; its body holds one column per level. */}
                 {isOpen && (
@@ -456,7 +457,7 @@ const Cascader = ({
                 <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
             ))}
             <FieldCaption messageId={messageId} message={message} tone={tone} />
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

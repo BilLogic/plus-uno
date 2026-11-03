@@ -1,7 +1,8 @@
 @use '../../labels/label-heights' as label;
+@use '../../../styles/state' as *;
 
 /**
- * _Field — one look for every text-like field.
+ * FieldBox — one look for every text-like field.
  *
  * One 1px border (`--size-element-border`) in `border.input` on one fill,
  * `background.input`. Hover turns the border `border.focused`. Focus draws
@@ -21,67 +22,10 @@
  *
  * Hover turns the border `border.focused`; focus draws the ring and changes
  * no fill. A warning is `border.warning`.
+ *
+ * The chrome half of the field split (A7): label and caption live in
+ * `FieldFrame.scss` instead.
  */
-
-.plus-field-stack {
-    display: flex;
-    flex-direction: column;
-    gap: var(--size-element-gap-xs);
-    width: 100%;
-}
-
-// The box fades itself; the stack fades only what sits around it, so a
-// disabled field fades once.
-.plus-field-stack--disabled > :not(.plus-field) {
-    opacity: var(--ds-opacity-disabled);
-}
-
-.plus-field-label-row {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-xs);
-}
-
-.plus-field-label {
-    margin-bottom: 0;
-    color: var(--ds-text);
-    font: var(--body-small);
-}
-
-.plus-field-required {
-    color: var(--ds-text-danger);
-    margin-left: var(--size-element-gap-xs);
-}
-
-// Hidden, not removed: the label still names the control.
-.plus-field-label--hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
-.plus-field-info {
-    display: inline-flex;
-    align-items: center;
-    padding: 0;
-    border: 0;
-    background: none;
-    color: var(--ds-icon-subtle);
-    font: var(--body-small);
-    cursor: help;
-
-    &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-border);
-        border-radius: var(--size-element-radius-sm);
-    }
-}
 
 .plus-field {
     position: relative;
@@ -203,7 +147,9 @@
     padding: 0;
     border: 0;
     border-radius: 0;
-    outline: none;
+    // The box draws the ring on `:focus-within`; the control itself never
+    // rings, so its own outline is suppressed outright, not reset-then-redrawn.
+    outline-style: none;
     box-shadow: none;
     background: transparent;
     color: inherit;
@@ -213,11 +159,6 @@
     &::placeholder {
         color: var(--ds-text-subtlest);
         opacity: 1;
-    }
-
-    &:focus {
-        outline: none;
-        box-shadow: none;
     }
 
     &:disabled {
@@ -240,8 +181,7 @@ textarea.plus-field__control {
 
 .plus-field:focus-within,
 .plus-field--focus {
-    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg);
+    @include plus-ring();
 }
 
 .plus-field--invalid {
@@ -316,8 +256,7 @@ textarea.plus-field__control {
     &:focus-within,
     &.plus-field--focus {
         border-color: var(--ds-border-input);
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-stroke-lg);
+        @include plus-ring();
     }
 
     &.plus-field--invalid {
@@ -356,73 +295,16 @@ textarea.plus-field__control {
     }
 }
 
-// ── Caption ─────────────────────────────────────────────────────────────────
-
-.plus-field-caption {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: var(--size-element-gap-sm);
-    font: var(--body-small);
-}
-
-.plus-field-caption__message {
-    display: flex;
-    align-items: center;
-    gap: var(--size-element-gap-xs);
-    min-width: 0;
-
-    i {
-        flex-shrink: 0;
-        font-size: var(--icon-sm);
-    }
-
-    &--help {
-        color: var(--ds-text-subtle);
-    }
-
-    &--invalid {
-        color: var(--ds-text-danger);
-    }
-
-    &--warning {
-        color: var(--ds-text-warning);
-    }
-
-    &--success {
-        color: var(--ds-text-success);
-    }
-}
-
-.plus-field-caption__count {
-    flex-shrink: 0;
-    margin-left: auto;
-    color: var(--ds-text-subtle);
-    font-variant-numeric: tabular-nums;
-
-    &--over {
-        color: var(--ds-text-danger);
-    }
-}
-
 // "saving…" in Trailing while a subtle field's save runs.
 .plus-field-saving {
     color: var(--ds-text-subtle);
     font-style: italic;
 }
 
-// ── Subtle editing: Save / Cancel under a multi-line field ──────────────────
-
-.plus-field-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--size-element-gap-xs);
-}
-
 // Forced colors (Windows High Contrast) repaint the ring's color to match
 // the border at rest, so the ring is named in the system Highlight color.
 @media (forced-colors: active) {
     .plus-field:focus-within {
-        outline: var(--size-element-stroke-lg) solid Highlight;
+        @include plus-ring($ring-token: Highlight);
     }
 }

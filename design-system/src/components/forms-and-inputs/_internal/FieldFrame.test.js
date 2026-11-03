@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect } from 'vitest';
-import { toneProps } from './Field';
+import { toneProps } from './FieldFrame';
 
 describe('toneProps', () => {
     it('marks the box and the control invalid for an error', () => {

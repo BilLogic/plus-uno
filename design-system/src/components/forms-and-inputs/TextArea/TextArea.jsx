@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button/Button';
 import useFieldId from '../useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import useInlineEdit from '../_internal/useInlineEdit';
 
 export const TEXT_AREA_APPEARANCES = ['standard', 'subtle'];
@@ -109,11 +110,11 @@ const TextArea = ({
     const showActions = edit.enabled && edit.editing;
 
     return (
-        <FieldStack disabled={isDisabled} className={`plus-text-area ${className}`.trim()} style={style}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-area ${className}`.trim()} style={style}>
             <FieldLabel htmlFor={fieldId} required={isRequired} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
-            <Field
+            <FieldBox
                 spacing={spacing}
                 multiline
                 subtle={isSubtle}
@@ -145,7 +146,7 @@ const TextArea = ({
                     aria-describedby={describedBy}
                     {...toneProps(tone).control}
                 />
-            </Field>
+            </FieldBox>
             {showActions && (
                 <div className="plus-field-actions">
                     <Button
@@ -171,7 +172,7 @@ const TextArea = ({
                 count={length}
                 maxLength={maxLength}
             />
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

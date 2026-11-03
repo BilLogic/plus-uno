@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import Field from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
 import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
@@ -40,7 +40,7 @@ const fromValue = (value, range) => {
 /**
  * DatePicker — a date field that opens a month calendar (Figma `DatePicker`).
  *
- * Built from the shared parts: the field is `_Field` with the calendar icon in
+ * Built from the shared parts: the field is `FieldBox` with the calendar icon in
  * Trailing, and the calendar is the shared `Calendar` on the `_Listbox`
  * surface, which DateTimePicker opens too.
  *
@@ -194,7 +194,7 @@ const DatePicker = ({
 
     return (
         <>
-            <Field
+            <FieldBox
                 ref={fieldRef}
                 spacing={spacing}
                 disabled={isDisabled}
@@ -244,7 +244,7 @@ const DatePicker = ({
                     onFocus={onFocus}
                     onBlur={handleBlur}
                 />
-            </Field>
+            </FieldBox>
             {open && createPortal(
                 <div
                     ref={popupRef}

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '../IconButton/IconButton';
-import { FieldLabel } from '../_internal/Field';
+import { FieldLabel } from '../_internal/FieldFrame';
 import { SAVE_FAILED } from '../_internal/useInlineEdit';
 import './InlineEdit.scss';
 
