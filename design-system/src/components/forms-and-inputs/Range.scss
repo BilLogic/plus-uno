@@ -3,6 +3,7 @@
  * Implements range input component with all states and sizes
  * using Design System tokens to match Figma specifications exactly.
  */
+@use '../../styles/state' as *;
 
 .plus-form-range-wrapper {
     display: flex;
@@ -119,13 +120,11 @@
 
     &:focus-visible {
         &::-webkit-slider-thumb {
-            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-            outline-offset: var(--size-element-stroke-lg);
+            @include plus-ring();
         }
 
         &::-moz-range-thumb {
-            outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-            outline-offset: var(--size-element-stroke-lg);
+            @include plus-ring();
         }
     }
 

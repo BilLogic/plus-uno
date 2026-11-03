@@ -1,0 +1,136 @@
+@use 'sass:map';
+
+// The state mixin — one place that draws hover, press, selection,
+// disabled and the focus ring, for both a hand-rolled control (`:hover`,
+// `:active`, `[aria-selected]`, `:disabled`) and a Base UI part, which emits
+// the same states as `data-*` attributes (`[data-hovered]`, `[data-pressed]`,
+// `[data-selected]`, `[data-disabled]`, `[data-focus-visible]`) instead of
+// pseudo-classes. A component that wraps Base UI and one that does not both
+// `@include plus-state(...)` and get the same pair of selectors for whichever
+// kind applies to it; the other kind simply never matches.
+//
+// `$states` is a map of `hovered` / `pressed` / `selected` / `disabled` to a
+// map of CSS declarations, the one token map ADR-037's state styling calls
+// for: write it once in `--ds-*` tokens and both selector sets read it.
+// Leaving a key out of `$states` skips that state entirely, so a control with
+// no disabled state (Tag's remove button) does not get an empty rule.
+//
+//     @include plus-state((
+//         hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+//         pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+//     ));
+//
+// THE FOCUS RING. `$ring: true` (the default) adds the 2px ring on
+// `--ds-border-focused`, outside the edge, on `:focus-visible` and
+// `[data-focus-visible]` alike — the only ring this system draws outside
+// forced-colors mode. It also resets `:focus` to no outline first, because an
+// unconditional `outline: 2px solid var(--ds-border-focused)` on
+// `:focus-visible` still leaves a browser's default `:focus` outline for a
+// pointer click in browsers that do not suppress it on their own. That reset
+// is the one `outline: none` `check:state-mixin` does not count, because it
+// lives here instead of being retyped per component.
+//
+// `$ring-token` swaps in `--ds-border-focused-inverse` for a ring drawn on a
+// bold fill (the inverse case). `$high-contrast: true` adds the
+// `Highlight` ring `@media (forced-colors: active)` wants, for a part dense
+// enough that the ordinary ring can vanish under a forced palette; leave it
+// off everywhere the ordinary ring already reads (every adopter below does).
+// `$important: true` marks the ring's declarations `!important`, for a native
+// control (Radio) still overriding a Bootstrap rule of its own.
+@mixin plus-state(
+    $states: (),
+    $ring: true,
+    $ring-offset: var(--size-element-stroke-lg),
+    $ring-token: --ds-border-focused,
+    $high-contrast: false,
+    $important: false
+) {
+    $bang: null;
+    @if $important {
+        $bang: '!important';
+    }
+    $hovered: map.get($states, 'hovered');
+    @if $hovered {
+        &:hover,
+        &[data-hovered] {
+            @include plus-state-apply($hovered);
+        }
+    }
+
+    $pressed: map.get($states, 'pressed');
+    @if $pressed {
+        &:active,
+        &[data-pressed] {
+            @include plus-state-apply($pressed);
+        }
+    }
+
+    $selected: map.get($states, 'selected');
+    @if $selected {
+        &.active,
+        &[aria-selected='true'],
+        &[aria-current='true'],
+        &[data-selected] {
+            @include plus-state-apply($selected);
+        }
+    }
+
+    $disabled: map.get($states, 'disabled');
+    @if $disabled {
+        &:disabled,
+        &[aria-disabled='true'],
+        &[data-disabled] {
+            @include plus-state-apply($disabled);
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    }
+
+    @if $ring {
+        &:focus {
+            outline: none #{$bang};
+            box-shadow: none #{$bang};
+        }
+
+        &:focus-visible,
+        &[data-focus-visible] {
+            @include plus-ring($ring-offset, $ring-token, $important);
+        }
+
+        @if $high-contrast {
+            @media (forced-colors: active) {
+                &:focus-visible,
+                &[data-focus-visible] {
+                    outline-color: Highlight;
+                }
+            }
+        }
+    }
+}
+
+// The ring's own declarations, with no selector of its own — for a control
+// whose ring has to be drawn on a descendant, not on the rule `plus-state` is
+// included in. Range's thumb is the one adopter: the track element itself
+// stays un-ringed (`&:focus { outline: none; }`, written by hand, since there
+// is nothing of its own to ring) and each `::-webkit-slider-thumb` /
+// `::-moz-range-thumb` under `&:focus-visible` includes this instead.
+@mixin plus-ring(
+    $ring-offset: var(--size-element-stroke-lg),
+    $ring-token: --ds-border-focused,
+    $important: false
+) {
+    $bang: null;
+    @if $important {
+        $bang: '!important';
+    }
+    outline: $ring-offset solid var(#{$ring-token}) #{$bang};
+    outline-offset: $ring-offset;
+}
+
+/// Applies a map of CSS declarations as-is; the mixin's own helper, not meant
+/// to be called on its own.
+@mixin plus-state-apply($rules) {
+    @each $prop, $val in $rules {
+        #{$prop}: $val;
+    }
+}
