@@ -2087,6 +2087,30 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872"
       }
     },
+    "Spotlight": {
+      "code": {
+        "import": "@/components/messaging",
+        "export": "default",
+        "mdxPath": "design-system/src/components/messaging/Spotlight/Spotlight.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/messaging/Spotlight/Spotlight.jsx",
+        "storybookId": "components-messaging-spotlight--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "spotlight",
+            "name": "Spotlight",
+            "componentSetNodeId": "20630:74",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-74",
+            "source": "node-chart",
+            "status": "verified",
+            "isComponentSet": false
+          }
+        ]
+      }
+    },
     "StaticTable": {
       "code": {
         "import": "@/components/text-and-data-display",

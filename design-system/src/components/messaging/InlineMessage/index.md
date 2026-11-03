@@ -3,7 +3,7 @@
 
 # InlineMessage
 
-message. Built on Popup so placement, dismissal and focus return are shared with every other popup in the system.
+message. Built on Popover so placement, dismissal and focus return are shared with every other popup in the system.
 
 **Import:** `import { InlineMessage } from '@/components';`
 
@@ -42,7 +42,7 @@ From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. 
 
 ## Related
 
-Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage`
+Same group: `Alert` · `Banner` · `EmptyState` · `Flag` · `Modal` · `Spotlight`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

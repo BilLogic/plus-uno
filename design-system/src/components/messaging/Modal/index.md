@@ -77,6 +77,6 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 
 ## Related
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage`
+Same group: `Alert` · `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
