@@ -61,8 +61,8 @@ export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
  * Each SMART subject, by its token name, and the accent its SMART tokens alias:
  * the Tag color a SMART subject draws, and the hue a SMART area's
  * swatch falls back to. The SMART layer (`color.*.smart.{subject}`) holds the
- * same pairing in the tokens; a SMART area reads those through
- * `StaticBadgeSmart`, so this map and the tokens must name the same accent.
+ * same pairing in the tokens; `SmartTag` reads it through this map, so the
+ * two must name the same accent.
  */
 export const TAG_COLOR_OF_CURRICULUM = Object.freeze({
     'social-emotional': 'orange',

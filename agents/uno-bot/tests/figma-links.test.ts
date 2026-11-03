@@ -324,8 +324,10 @@ describe("only registry components", () => {
     const names = Object.keys(registry.components);
     // 67: Select, Cascader and Tree select dropped their figmaMeta when the
     // family moved to ADS props and a minimal MDX stub; Phase D backfills
-    // Figma from the rebuilt code and the registry entries return.
-    assert.equal(names.length, 67);
+    // Figma from the rebuilt code and the registry entries return. 66: Date
+    // tag and Smart tag split out of Status tag, and Status tag's own entry
+    // folded into the split rather than staying a third registry row.
+    assert.equal(names.length, 66);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

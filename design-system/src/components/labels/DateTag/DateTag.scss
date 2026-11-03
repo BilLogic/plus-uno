@@ -1,0 +1,125 @@
+/*
+ * Date tag — a due or event date, outlined with a fixed icon.
+ *
+ * THE BOX. Shares Status tag's heights: default 20 tall (B3 12, icon 12,
+ * radius 4), spacious 32 (B2 14, icon 16, radius 6), from
+ * `_label-heights.scss`.
+ *
+ * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
+ * (`__content`) whose right padding, added to the outer right padding, makes
+ * the label's right inset equal its left one: 4 in default, 12 in spacious.
+ *
+ * NO FILL. The border is the only ground: a 1px inside border (an inset
+ * shadow, so it takes no layout), neutral for a date that is not close and
+ * the appearance's subtle border for warning and danger.
+ */
+@use '../label-heights' as label;
+
+.plus-date-tag {
+    --plus-date-tag-height: #{label.$status-height};
+    --plus-date-tag-icon-box: 20px;
+
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    box-sizing: border-box;
+    height: var(--plus-date-tag-height);
+    min-width: 0;
+    /* The cap from `maxWidth` (200 by default), never wider than the container. */
+    max-width: min(var(--plus-date-tag-max, 200px), 100%);
+    margin: 0;
+    padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--size-element-pad-x-xs, 4px);
+    gap: var(--size-spacing-small-space-025, 2px);
+    border-radius: var(--size-element-radius-md, 4px);
+    vertical-align: middle;
+    white-space: nowrap;
+    background-color: transparent;
+    box-shadow: inset 0 0 0 var(--size-element-stroke-sm, 1px) var(--plus-date-tag-edge);
+}
+
+.plus-date-tag__content {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    padding-right: var(--size-spacing-small-space-025, 2px);
+    gap: var(--size-element-gap-xs, 4px);
+}
+
+.plus-date-tag--spacious {
+    --plus-date-tag-height: #{label.$status-height-spacious};
+    --plus-date-tag-icon-box: 22px;
+
+    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--size-element-pad-x-md, 12px);
+    gap: 0;
+    border-radius: var(--size-border-radius-radius-150, 6px);
+
+    .plus-date-tag__content {
+        padding-right: var(--size-spacing-small-space-075, 6px);
+        gap: var(--size-spacing-small-space-075, 6px);
+    }
+
+    .plus-date-tag__label {
+        font: var(--body-default);
+    }
+}
+
+.plus-date-tag__visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    height: var(--plus-date-tag-icon-box);
+
+    > i {
+        font-size: var(--icon-sm);
+        line-height: 1;
+    }
+}
+
+.plus-date-tag--spacious .plus-date-tag__visual > i {
+    font-size: var(--icon-md);
+}
+
+/*
+ * Past `maxWidth` the label ends in an ellipsis; the full text is a tooltip.
+ * The label is body.small 12/16, and body.default 14/20 on a spacious one.
+ */
+.plus-date-tag__label {
+    min-width: 0;
+    font: var(--body-small);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * The color map: [text, inside border] per appearance. The border is the
+ * neutral border for neutral and the appearance's subtle border for warning
+ * and danger, the border every outlined label uses.
+ */
+$date-look: (
+    'neutral': (var(--ds-text-subtle), var(--ds-border)),
+    'warning': (var(--ds-text-warning), var(--ds-border-warning-subtle)),
+    'danger': (var(--ds-text-danger), var(--ds-border-danger-subtle)),
+);
+
+@each $name, $look in $date-look {
+    .plus-date-tag--#{$name} {
+        --plus-date-tag-edge: #{nth($look, 2)};
+
+        color: nth($look, 1);
+    }
+}
+
+/* Focusable only while truncated, as the tooltip's trigger. */
+.plus-date-tag:focus-visible {
+    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--size-element-stroke-lg, 2px);
+}
+
+/* Forced colors drop box-shadows; a real border keeps the edge. */
+@media (forced-colors: active) {
+    .plus-date-tag {
+        border: var(--size-element-stroke-sm, 1px) solid CanvasText;
+    }
+}

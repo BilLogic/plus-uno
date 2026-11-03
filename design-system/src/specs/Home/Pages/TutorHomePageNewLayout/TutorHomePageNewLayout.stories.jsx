@@ -234,8 +234,8 @@ const expectButtons = async (canvasElement, list) => {
 
 /**
  * One icon set: every Font Awesome glyph draws in the 16 icon box, centered
- * on its line within 1px. Status draws its own icon at the size its
- * component prescribes for its height.
+ * on its line within 1px. Status and Smart tag draw their own icon at the
+ * size each component prescribes for its height.
  */
 const expectIcons = async (canvasElement) => {
     const md = tokenLength(canvasElement, '--icon-md');
@@ -243,7 +243,8 @@ const expectIcons = async (canvasElement) => {
     for (const i of canvasElement.querySelectorAll('i[class*="fa-"]')) {
         const label = i.className.split(' ').find((c) => c.startsWith('fa-') && c !== 'fa-solid');
         const size = parseFloat(getComputedStyle(i).fontSize);
-        await expect(size, `${label} draws at its icon size`).toBeCloseTo(i.closest('.plus-status') ? sm : md, 0);
+        const isSmall = i.closest('.plus-status') || i.closest('.plus-tag');
+        await expect(size, `${label} draws at its icon size`).toBeCloseTo(isSmall ? sm : md, 0);
         const r = rect(i);
         const line = rect(i.parentElement);
         await expect(Math.abs((r.top + r.height / 2) - (line.top + line.height / 2)), `${label} is centered on its line`).toBeLessThanOrEqual(1);
@@ -308,8 +309,8 @@ export const XLarge1440 = {
 
 /**
  * The page's colors in light, dark and each at more contrast: the lesson cards
- * rest on the raised pair with no border, each lesson's tag is its SMART
- * subject's fill and ink, the badge callout is a well, the stats split on the
+ * rest on the raised pair with no border, each lesson's Smart tag is outlined
+ * in its subject's accent with neutral text, the badge callout is a well, the stats split on the
  * border color, and the slot text takes the text ladder.
  */
 export const ColorModes = {
@@ -324,9 +325,9 @@ export const ColorModes = {
                 await expect(css.boxShadow, `${mode}: a lesson card has the raised shadow`).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
                 await expect(css.borderTopWidth, `${mode}: a lesson card has no border`).toBe('0px');
             }
-            const tag = queryOne('.plus-home-new__lesson .plus-smart-badge');
-            await expect(getComputedStyle(tag).backgroundColor, `${mode}: the SMART tag's fill`).toBe(token('--ds-background-smart-mastering-content'));
-            await expect(getComputedStyle(tag).color, `${mode}: the SMART tag's ink`).toBe(token('--ds-text-smart-mastering-content'));
+            const tag = queryOne('.plus-home-new__lesson .plus-tag--teal');
+            await expect(getComputedStyle(tag).borderColor, `${mode}: the Smart tag's border`).toBe(token('--ds-border-accent-teal-subtle'));
+            await expect(getComputedStyle(tag).color, `${mode}: the Smart tag's text stays neutral`).toBe(token('--ds-text'));
             await expect(getComputedStyle(queryOne('.plus-home-new__callout')).backgroundColor, `${mode}: the callout is a well`).toBe(token('--ds-surface-container'));
             // The divider is on the inline start while the stats share a row, and on the block start once they stack.
             const second = getComputedStyle(queryOne('.plus-home-new__stat + .plus-home-new__stat'));

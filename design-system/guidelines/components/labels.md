@@ -1,26 +1,31 @@
 ---
-summary: The label family — Status tag, Count tag, Tag, TagGroup, Suggestion and AI label — and how to choose between them
+summary: The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the labels group -->
 
 # Labels — which component to reach for
 
-The label family: `StatusTag`, `CountTag`, `Tag`, `TagGroup`, `Suggestion` and
-`AiLabel`. Generated facts are in `design-system/src/components/labels/index.md`;
-when to use each is on its own docs page.
+The label family: `StatusTag`, `DateTag`, `CountTag`, `Tag`, `SmartTag`,
+`TagGroup`, `Suggestion` and `AiLabel`. Generated facts are in
+`design-system/src/components/labels/index.md`; when to use each is on its own
+docs page.
 
-Three questions choose between the first three:
+Four questions choose between the first four:
 
 - **Is it a number?** `CountTag`.
+- **Is it a due or event date?** `DateTag`, outlined with a fixed icon the app
+  picks from the date and the due-soon window.
 - **Is it the condition something is in, and can that condition change?**
   `StatusTag`, whether the system calculated it or a person set it.
-- **Otherwise** (a subject, a person, a category): `Tag`.
+- **Otherwise** (a subject, a person, a category): `Tag`, or `SmartTag` for a
+  SMART competency area, which fixes the Tag color and icon from the subject.
 
 `StatusTag` takes `appearance` (neutral, success, warning, danger, info,
-discovery, and the five SMART subjects) and `spacing` (default 20, compact 16,
-spacious 32). `CountTag` takes `appearance`, `spacing` (default 20, compact 16)
-and the `isBold`, `isInverse`, `isDot` and `hasRing` booleans.
+discovery) and `spacing` (default 20, spacious 32). `DateTag` takes
+`appearance` (neutral, warning, danger) and the same `spacing`. `CountTag`
+takes `appearance`, `spacing` (default 20, compact 16) and the `isBold`,
+`isInverse`, `isDot` and `hasRing` booleans.
 
 Both are read-only: no `onClick`, and no button semantics, because a label sits
 inside buttons, tabs and rows and nesting one control inside another is invalid

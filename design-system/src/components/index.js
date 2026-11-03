@@ -22,6 +22,7 @@ export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock } from '@/components/text-and-data-display/CodeBlock';
 export { default as Collapse } from '@/components/layout-and-structure/Collapse';
 export { default as CountTag } from '@/components/labels/CountTag';
+export { default as DateTag } from '@/components/labels/DateTag';
 export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Dropdown } from '@/components/forms-and-inputs/Dropdown';
 export { default as Footer } from '@/components/_internal/Footer/Footer';
@@ -54,12 +55,12 @@ export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner } from '@/components/loading/Spinner';
 export { default as GenerativeBorder } from '@/components/loading/GenerativeBorder';
 export { default as StatusTag } from '@/components/labels/StatusTag';
-export { default as StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart';
 
 export { default as Suggestion } from '@/components/labels/Suggestion';
 export { default as Tag } from '@/components/labels/Tag';
 // The disabled state a field hands the tags it wraps in `TagContext.Provider`.
 export { TagContext, useTagContext } from '@/components/labels/Tag';
+export { default as SmartTag } from '@/components/labels/SmartTag';
 export { default as TagGroup } from '@/components/labels/TagGroup';
 export { default as Table } from '@/components/_internal/Table';
 export { StaticTable, HeadCell, TableCell, TableRow, TableMessageRow, TableSummaryRow, TableFooter } from '@/components/_internal/Table';

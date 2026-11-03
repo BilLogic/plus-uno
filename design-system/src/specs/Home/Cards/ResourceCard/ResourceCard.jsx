@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Card from '@/components/layout-and-structure/Card';
 import Button from '@/components/forms-and-inputs/Button';
-import StaticBadgeSmart from '@/components/_internal/StaticBadgeSmart';
+import SmartTag from '@/components/labels/SmartTag';
 import './ResourceCard.scss';
 
 /**
@@ -68,7 +68,7 @@ const ResourceCard = ({
             {/* Footer with badge and button */}
             <div className="plus-resource-card-footer">
                 {badgeType && (
-                    <StaticBadgeSmart type={badgeType} />
+                    <SmartTag subject={badgeType} />
                 )}
                 <Button
                     text={actionButtonText}
@@ -102,7 +102,7 @@ ResourceCard.propTypes = {
     title: PropTypes.string.isRequired,
     duration: PropTypes.string,
     status: PropTypes.oneOf(['completed', 'in-progress', 'not-started']),
-    badgeType: PropTypes.oneOf(['socio-emotional', 'mastering-content', 'advocacy', 'relationships', 'technology-tools']),
+    badgeType: PropTypes.oneOf(['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools']),
     actionButtonText: PropTypes.string,
     onActionClick: PropTypes.func,
     className: PropTypes.string,

@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import { StaticBadgeSmart } from '@/components/_internal/StaticBadgeSmart/StaticBadgeSmart';
+import SmartTag from '@/components/labels/SmartTag';
 import './GroupTrainingProgressTable.scss';
 
 /**
@@ -105,7 +105,7 @@ const GroupTrainingProgressTable = ({
     const defaultData = [
         {
             id: 1,
-            competencyArea: 'socio-emotional',
+            competencyArea: 'social-emotional',
             completion: '12/16',
             accuracy: '75%',
             rating: '4.5/5',
@@ -146,7 +146,7 @@ const GroupTrainingProgressTable = ({
         },
         {
             id: 4,
-            competencyArea: 'relationships',
+            competencyArea: 'relationship',
             completion: '8/16',
             accuracy: '70%',
             rating: '4.2/5',
@@ -164,7 +164,7 @@ const GroupTrainingProgressTable = ({
         },
         {
             id: 6,
-            competencyArea: 'socio-emotional',
+            competencyArea: 'social-emotional',
             completion: '9/16',
             accuracy: '60%',
             rating: '3.8/5',
@@ -191,7 +191,7 @@ const GroupTrainingProgressTable = ({
         },
         {
             id: 9,
-            competencyArea: 'relationships',
+            competencyArea: 'relationship',
             completion: '13/16',
             accuracy: '82%',
             rating: '4.6/5',
@@ -231,7 +231,7 @@ const GroupTrainingProgressTable = ({
                                     className={`fas ${isExpanded ? 'fa-caret-down' : 'fa-caret-right'}`}
                                     style={{ color: 'var(--color-on-surface)' }}
                                 />
-                                <StaticBadgeSmart type={item.competencyArea} />
+                                <SmartTag subject={item.competencyArea} />
                             </button>
                         )}
                         {item.level === 2 && (

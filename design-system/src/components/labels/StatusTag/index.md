@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, Dates, WithCount, TrailingMetricAppearance, LeadingVisual, Truncation, NarrowContainer, NeverAButton, DateStyleFallback, PinnedWeight, UnknownValuesFallBack, Interactive
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, LeadingVisual, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 
@@ -16,11 +16,10 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
-| `type` | enum | `'state'` | `state` for a condition; `date` for a due or event date, outlined with a fixed icon. |
-| `appearance` | oneOf | `'neutral'` | The meaning. `date` takes only neutral (not close), warning (due soon) and danger (overdue). Info is Tertiary; discovery is the curriculum purple. The five SMART subjects draw their own `smart` tokens. |
+| `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
-| `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. Ignored by `date`, which has its own. |
-| `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. Status appearances only: a date and the SMART subjects take none. |
+| `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. |
+| `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
 | `className` | string | `''` | — |
@@ -28,7 +27,7 @@
 
 ## Variants
 
-**`type`** — `state` · `date`
+**`appearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
 
 **`spacing`** — `default` · `spacious`
 
@@ -36,12 +35,12 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-advocacy` · `--ds-background-smart-advocacy-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-smart-relationship` · `--ds-background-smart-relationship-pressed` · `--ds-background-smart-social-emotional` · `--ds-background-smart-social-emotional-pressed` · `--ds-background-smart-technology-tools` · `--ds-background-smart-technology-tools-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-advocacy` · `--ds-text-smart-mastering-content` · `--ds-text-smart-relationship` · `--ds-text-smart-social-emotional` · `--ds-text-smart-technology-tools` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
+`--body-default` · `--body-small` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-md` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-lg` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `CountTag` · `DateTag` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
