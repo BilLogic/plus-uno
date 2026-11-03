@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import PatternSection from '@/patterns/PatternSection';
+import { PatternSection } from '@/patterns';
 import { useReflectionChrome } from '@/specs/Toolkit/Post-Session/reflectionChrome';
 import { formatLastUpdated } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 

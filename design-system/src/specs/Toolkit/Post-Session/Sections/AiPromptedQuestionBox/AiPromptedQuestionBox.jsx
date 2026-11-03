@@ -1,9 +1,7 @@
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { TextArea } from '@/components';
-import { Spinner } from '@/components';
+import { AiIcon, Spinner, TextArea } from '@/components';
 import { PRIVACY_WARNING } from '@/specs/Toolkit/Post-Session/reflectionCopy';
-import SparkleIcon from './SparkleIcon';
 
 /**
  * Dynamic AI-prompted question card
@@ -66,7 +64,7 @@ const AiPromptedQuestionBox = ({
     if (state === 'empty') {
         return (
             <div className={className} style={shellStyle}>
-                <SparkleIcon size={24} />
+                <AiIcon name="generate" size={24} />
                 <p className="body3-txt m-0" style={{ color: 'var(--ds-text-subtle)', flex: 1 }}>
                     No more questions for now — you’ve got it covered. Let’s move on to the next section!
                 </p>
@@ -76,7 +74,7 @@ const AiPromptedQuestionBox = ({
 
     return (
         <div className={className} style={shellStyle}>
-            <SparkleIcon size={24} />
+            <AiIcon name="generate" size={24} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-sm, 10px)', flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
                     <p className="h6 m-0" style={{ color: 'var(--ds-text)' }}>{question}</p>
