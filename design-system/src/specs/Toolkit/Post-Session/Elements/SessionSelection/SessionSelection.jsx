@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Select from '@/components/forms-and-inputs/Select';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 
 /**
  * Session selection (Figma Elements · Session selection `20:24370`).
@@ -92,12 +92,11 @@ const SessionSelection = ({
             </div>
 
             {showDidNotHappen && (
-                <Switch
+                <Toggle
                     id={`${id}-did-not-happen`}
                     label="Session did not happen"
-                    checked={didNotHappen}
-                    onChange={(event) => onDidNotHappenChange?.(event.target.checked)}
-                />
+                    isChecked={didNotHappen}
+                    onChange={(event) => onDidNotHappenChange?.(event.target.checked)}/>
             )}
         </div>
     );

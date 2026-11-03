@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadioStories from './Radio.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Radio } from '@/components';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,7 +22,7 @@ export const figmaMeta = {
 <Meta of={RadioStories} />
 
 <Title />
-Use radio when a user needs to select one option from a list.
+A radio lets a person choose one option from a set. [ADS documentation](https://atlassian.design/components/radio/usage).
 
 <DocsTabs of={RadioStories}>
 
@@ -38,10 +39,87 @@ Use radio when a user needs to select one option from a list.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Anatomy
 
-<DocsCanvasShell attachSourceBelow description={<>Two-option group with a selected value.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Radios that share a name form a group: choosing one clears the others.</>}>
     <Canvas of={RadioStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsTable>
+    <thead>
+        <tr><th>Part</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>1 Radio</td><td>A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.</td></tr>
+        <tr><td>2 Label</td><td>14/20 text beside the radio. It names the option.</td></tr>
+        <tr><td>3 Description</td><td>Optional 12/16 text under the label that describes the option. It does not name it.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>name</code></td><td>string</td><td>required</td><td>Shared by the radios of one group.</td></tr>
+        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the option. Without a label, pass <code>aria-label</code>.</td></tr>
+        <tr><td><code>value</code></td><td>string, number</td><td>none</td><td>The value this option submits.</td></tr>
+        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
+        <tr><td><code>isInvalid</code></td><td>boolean</td><td><code>false</code></td><td>Danger edge on an unselected radio only.</td></tr>
+        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Out of the tab order, disabled fill.</td></tr>
+        <tr><td><code>isRequired</code></td><td>boolean</td><td><code>false</code></td><td>Requires an answer natively.</td></tr>
+        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
+        <tr><td><code>description</code></td><td>node</td><td>none</td><td>PLUS addition. Linked with <code>aria-describedby</code>.</td></tr>
+        <tr><td><code>appearance</code></td><td><code>plain</code>, <code>card</code></td><td><code>plain</code></td><td>PLUS addition. <code>card</code> draws the option as a bordered tile.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## ADS parity
+
+<DocsTable>
+    <thead>
+        <tr><th>ADS prop</th><th>PLUS</th><th>Note</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>isChecked</code></td><td><code>isChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>defaultChecked</code></td><td><code>defaultChecked</code></td><td>Same.</td></tr>
+        <tr><td><code>isInvalid</code></td><td><code>isInvalid</code></td><td>Same. Marks the unselected radio only.</td></tr>
+        <tr><td><code>isDisabled</code></td><td><code>isDisabled</code></td><td>Same.</td></tr>
+        <tr><td><code>isRequired</code></td><td><code>isRequired</code></td><td>Same.</td></tr>
+        <tr><td><code>label</code>, <code>name</code>, <code>value</code>, <code>onChange</code></td><td>same</td><td>Same.</td></tr>
+        <tr><td><code>xcss</code>, <code>testId</code></td><td>not shipped</td><td>Style through tokens; test by role and name.</td></tr>
+        <tr><td>none</td><td><code>isReadOnly</code>, <code>description</code>, <code>appearance</code></td><td>PLUS additions.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Selected, unselected and disabled.</>}>
+    <DsCanvasQuiet of={RadioStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Invalid marks the unselected radios. A selected radio keeps its fill.</>}>
+    <DsCanvasQuiet of={RadioStories.Invalid} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
+    <DsCanvasQuiet of={RadioStories.ReadOnly} />
 </DocsCanvasShell>
 
 </div>
@@ -50,32 +128,8 @@ Use radio when a user needs to select one option from a list.
 
 ## Content
 
-<DocsCanvasShell description={<>Labels and selection within one group.</>}>
+<DocsCanvasShell description={<>Concise labels, in a logical order, stacked.</>}>
     <DsCanvasQuiet of={RadioStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>Small, medium, and large.</>}>
-    <DsCanvasQuiet of={RadioStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Selected, unselected, and disabled.</>}>
-    <DsCanvasQuiet of={RadioStories.InteractionStates} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the choice does not change.</>}>
-    <DsCanvasQuiet of={RadioStories.ReadOnly} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
@@ -112,15 +166,20 @@ Use radio when a user needs to select one option from a list.
 
 ## When to use
 
-- **Exactly one answer, from a set that is short enough to show.** Every option
-  is on the page at once, so the reader compares them without opening anything.
-  Past roughly seven options the set stops being scannable and belongs in
-  `Select`.
-- **When the options are worth reading.** A radio group spends vertical space to
-  make the alternatives visible; if the reader already knows what they want and
-  the list is long, that space is wasted.
-- **Not for on/off.** One radio on its own cannot be unchecked once chosen, so a
-  single yes/no is a `Switch` or a `Checkbox`.
+Use Radio when the options need custom presentation, such as options listed in a table. For a plain list of options, use ChoiceGroup, which owns the group label, the value and the error.
+
+Make one option the default. Pick the safest and lowest-risk option, and never preselect a high-risk choice such as one about privacy or payment. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
+
+<DoDontGrid
+    pairs={[
+        {
+            doExample: <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}><Radio name="do-order" label="In person" value="a" defaultChecked /><Radio name="do-order" label="Online" value="b" /><Radio name="do-order" label="Either" value="c" /></div>,
+            doCaption: 'Order options from most to least likely, or from least to most risk.',
+            dontExample: <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}><Radio name="dont-order" label="Online" value="a" /><Radio name="dont-order" label="Either" value="b" /><Radio name="dont-order" label="In person" value="c" /></div>,
+            dontCaption: "Alphabetical order cannot be localized and says nothing about which option fits most people.",
+        },
+    ]}
+/>
 
 </div>
 
@@ -128,28 +187,17 @@ Use radio when a user needs to select one option from a list.
 
 ## Usage notes
 
-- **`readOnly` keeps the choice readable and fixed.** The radio stays in the tab
-  order at full contrast and ignores clicks and arrow keys. ARIA lets a radio
-  group say `aria-readonly` and not a single radio, so put read-only radios in a
-  `ChoiceGroup`, which announces it.
-- **`description` describes; the label names.** It renders under the label and
-  is wired with `aria-describedby`. `appearance="card"` draws the option as one
-  bordered tile.
-- **`Radio` is one option, not the group.** The group is whatever shares a
-  `name`. Nothing here renders the set, names it or manages which member is
-  chosen — `ChoiceGroup` and `ChoiceGrid` do that.
-- **`checked` makes it controlled and `defaultChecked` is then ignored.** Pass
-  `checked` with an `onChange` that sets it, or pass `defaultChecked` and let
-  the browser hold the state. Passing both is the mistake that renders a radio
-  which cannot be selected.
-- **`size` changes the control as well as the label.** The dot is 10px on
-  `small`, 12px on `medium` and 14px on `large`, and the label takes
-  `body3-txt`, `body2-txt` and `body1-txt` to match. All three dots are well
-  under a 24px target, so the hit area comes from the label — which is why a
-  radio without a `label` is a hard thing to point at as well as an unnamed one.
-- **Extra props land on the input.** `aria-label`, `required`, `data-*` and the
-  rest are spread onto the control rather than the wrapper, so they reach the
-  thing that has the role.
+### A lone Radio is not a group.
+
+Radios that share a `name` are one group; each option gets its own id. ARIA allows `aria-readonly` on a radiogroup and not on a radio, so a read-only question belongs in ChoiceGroup, which announces it.
+
+### Avoid long lists and overlapping ranges.
+
+For a long list, use Select. Do not write numeric options that overlap ("0-20", "20-40") or skip a number.
+
+### A description describes; the label names.
+
+`description` renders under the label and is read after the name.
 
 </div>
 
@@ -157,24 +205,11 @@ Use radio when a user needs to select one option from a list.
 
 ## Accessibility
 
-- **The label is wired for you, `id` or no `id`.** One id is derived through
-  `useFieldId` and handed to the underlying form check, which renders the
-  `label` with a matching `htmlFor`. Pass `id` when something outside the
-  component needs to point at the input — an `aria-describedby`, a test
-  selector — and you get exactly the id you passed.
-- **A group's shared `name` cannot double as its ids.** The id used to
-  fall back to `name`, and radios in a group share a `name` — that is what makes
-  them one group. So a group written without `id`s gave every option the same
-  id, and every label in it resolved to whichever radio the browser reached
-  first. Each radio now derives its own id, so the group is wired correctly with
-  no `id`s at all.
-- **A radio with no `label` has no accessible name.** Nothing substitutes for it.
-  Where the design has no room for visible text, pass `aria-label`; it is spread
-  onto the input.
-- **Nothing here names the set.** `name` groups the radios for the form, not for
-  a screen reader. Wrap related radios in a `fieldset` with a `legend`, or hand
-  the whole set to `ChoiceGroup` — see
-  `design-system/guidelines/foundations/accessibility.md`.
+- **Each option has its own id.** The component derives one per instance, so labels never resolve to the first radio of the group.
+- **A radio with no `label` has no accessible name.** Pass `aria-label` where the design has no room for visible text.
+- **Include an error message for a required or invalid group**, for example "Select an option".
+- **Do not disable an option that must stay reachable.** Use validation, so a screen reader user hears why it cannot be chosen.
+- **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
 
 </div>
 
@@ -182,11 +217,10 @@ Use radio when a user needs to select one option from a list.
 
 ## Related
 
-- For a group of radios, use `ChoiceGroup`. A group is the group component's job: it owns the value and the group label, where Radios mapped by hand in each screen own neither.
-- For a point on a labeled scale, use `ChoiceGroup` with `orientation="inline"`, `leadingText` and `trailingText`.
-- For any number of answers rather than exactly one, use `Checkbox`.
-- For choices in a popup rather than on the page, use `Select`.
-- For a rows-by-columns matrix of choices, use `ChoiceGrid`.
+- For several answers from a list, use Checkbox.
+- For a longer list of options, use Select.
+- To turn something on or off, use Toggle.
+- For a whole group with its label, value and error, use ChoiceGroup.
 
 </div>
 

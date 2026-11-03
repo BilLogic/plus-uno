@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Switch, Tag } from '@/components';
+import { Button, Tag, Toggle } from '@/components';
 import { PatternCard } from '@/patterns';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 
@@ -60,7 +60,7 @@ export const Rules = () => (
         </div>
         <div style={col('var(--element-stack-md)')}>
             <span style={{ display: 'inline-flex', gap: 'var(--element-inline-md)', alignItems: 'center' }}>
-                <Switch id="radius-pill" label="Repeats weekly" defaultChecked />
+                <Toggle id="radius-pill" label="Repeats weekly" defaultChecked/>
             </span>
             <span style={title}>Pills and circles</span>
             <span style={caption}>Toggle, radio, avatar and pill tag take <C>--element-radius-full</C>.</span>

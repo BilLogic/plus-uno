@@ -11,8 +11,8 @@ authored half (#166), counted rather than assumed.
 | [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
-| [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
-| [ChoiceGroup](ChoiceGroup.md) | 20 | ✅ | ✕ | ✅ |
+| [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
+| [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 4 | ✅ | ✅ | ✅ |
 | [DateAndTimePicker](DateAndTimePicker.md) | 28 | ✅ | ✕ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
@@ -23,17 +23,17 @@ authored half (#166), counted rather than assumed.
 | [Input](Input.md) | 30 | ✅ | ✅ | ✅ |
 | [InputGroup](InputGroup/index.md) | 24 | ✅ | ✅ | ✅ |
 | [NumberInput](NumberInput.md) | 27 | ✅ | ✕ | ✅ |
-| [Radio](Radio.md) | 17 | ✅ | ✕ | ✅ |
-| [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
+| [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
+| [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
-| [Switch](Switch.md) | 15 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
+| [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 23/25 (92%) · Correct/incorrect 15/25 (60%) · Accessibility 24/25 (96%)
+**Authored coverage:** When to use 23/25 (92%) · Correct/incorrect 14/25 (56%) · Accessibility 24/25 (96%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

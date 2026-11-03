@@ -25,7 +25,6 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 | `values` | object | `{}` | Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. |
 | `disabled` | bool | `false` | Disable the choice grid |
 | `readOnly` | bool | `false` | Shown and focusable, not changeable. |
-| `size` | enum | `'medium'` | Size variant of the choice grid |
 | `onChange` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
@@ -33,8 +32,6 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 ## Variants
 
 **`type`** — `radio` · `checkbox`
-
-**`size`** — `small` · `medium` · `large`
 
 Anything not listed is not a valid value.
 
@@ -46,7 +43,7 @@ From `design-system/src/components/forms-and-inputs/ChoiceGrid.scss`. Override t
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

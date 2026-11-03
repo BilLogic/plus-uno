@@ -16,7 +16,7 @@ export default {
 };
 
 /**
- * Default empty state with caption + controllable escalate Switch.
+ * Default empty state with caption + controllable escalate Toggle.
  *
  * @param {object} args
  */

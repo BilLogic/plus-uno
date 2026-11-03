@@ -11,7 +11,7 @@ import { Modal, Table, Form } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import Pagination from '@/components/navigation/Pagination/Pagination';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 import './StudentModal.scss';
 
 const StudentModal = ({
@@ -201,14 +201,12 @@ const StudentModal = ({
                         <div className="student-modal__sessions-content">
                             {/* Show Future Sessions toggle */}
                             <div className="student-modal__sessions-toggle">
-                                <Switch
+                                <Toggle
                                     id="show-future-sessions"
-                                    checked={showFutureSessions}
+                                    isChecked={showFutureSessions}
                                     onChange={(e) => setShowFutureSessions(e.target.checked)}
                                     label="Show Future Sessions"
-                                    size="medium"
-                                    className="student-modal__switch"
-                                />
+                                    className="student-modal__switch"/>
                             </div>
 
                             {/* Sessions Table */}

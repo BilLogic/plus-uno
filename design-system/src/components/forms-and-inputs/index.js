@@ -5,7 +5,7 @@ export { default as TagInput } from './TagInput';
 export { default as Input } from './Input';
 export { default as Checkbox } from './Checkbox';
 export { default as Radio } from './Radio';
-export { default as Switch } from './Switch';
+export { default as Toggle } from './Toggle';
 export { default as DatePicker } from './DatePicker';
 export { default as DateAndTimePicker } from './DateAndTimePicker';
 export { default as InlineEdit } from './InlineEdit';

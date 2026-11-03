@@ -3,13 +3,13 @@
 
 # Checkbox
 
-Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
+Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
 
 **Import:** `import { Checkbox } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, Content, Sizes, InteractionStates, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox.mdx`
 
@@ -19,15 +19,15 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `label` | node | — | Label text for the checkbox |
+| `label` | node | — | Text that names the checkbox |
 | `value` | string or number | — | — |
-| `checked` | bool | — | — |
+| `isChecked` | bool | — | — |
 | `defaultChecked` | bool | — | — |
-| `indeterminate` | bool | `false` | Indeterminate visual state |
-| `size` | enum | `'medium'` | Size variant |
-| `disabled` | bool | `false` | Disable the checkbox |
-| `readOnly` | bool | `false` | — |
-| `required` | bool | `false` | Show required indicator |
+| `isIndeterminate` | bool | `false` | Mixed state, for a parent of partly selected children |
+| `isInvalid` | bool | `false` | Marks the unselected box as failing validation |
+| `isDisabled` | bool | `false` | Disable the checkbox |
+| `isReadOnly` | bool | `false` | Shown and announced, not changeable |
+| `isRequired` | bool | `false` | Show the required marker and require it natively |
 | `description` | node | — | — |
 | `appearance` | enum | `'plain'` | — |
 | `onChange` | func | — | — |
@@ -39,20 +39,18 @@ Supports controlled (`checked`) and uncontrolled (`defaultChecked`) usage.
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
-
 **`appearance`** — `plain` · `card`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-danger` · `--item-height-sm` · `--layout-control-checkbox` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-danger` · `--item-height-sm` · `--layout-control-checkbox` · `--size-element-gap-sm` · `--size-element-radius-sm` · `--size-element-stroke-lg` · `--size-element-stroke-md` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `Textarea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

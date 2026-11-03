@@ -189,24 +189,12 @@
     }
 }
 
-// Size variants
-.plus-form-checkbox-small {
-    .plus-form-checkbox .form-check-input {
-        width: 16px;
-        height: 16px;
-        min-width: 16px;
-        min-height: 16px;
-
-        &::before {
-            width: calc(16px - 4px);
-            height: calc(16px - 4px);
-        }
-
-        &::after {
-            width: 8px;
-            height: 2px;
-        }
+// Invalid marks the unselected box only: a selected or mixed box keeps its
+// Lagoon fill, so the red edge never competes with the mark. The danger edge
+// holds on hover; the hovered input fill still applies.
+.plus-form-checkbox-invalid .plus-form-checkbox .form-check-input {
+    &:not(:checked):not(:indeterminate):not(:disabled),
+    &:not(:checked):not(:indeterminate):not(:disabled):hover {
+        border-color: var(--ds-border-danger);
     }
 }
-
-// `large` is deprecated and draws like `medium`, so it has no rule of its own.

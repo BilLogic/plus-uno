@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Textarea from '@/components/forms-and-inputs/Textarea';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 
 /**
  * Free-text question block (Figma Sections · Free Response Question `791:137860`).
@@ -83,12 +83,11 @@ const FreeResponseQuestion = ({
         />
 
         {showEscalate ? (
-            <Switch
+            <Toggle
                 id={`${id}-escalate`}
                 label={escalateLabel}
-                checked={escalate}
-                onChange={(event) => onEscalateChange?.(event.target.checked)}
-            />
+                isChecked={escalate}
+                onChange={(event) => onEscalateChange?.(event.target.checked)}/>
         ) : null}
     </div>
 );

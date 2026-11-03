@@ -3,7 +3,7 @@ import Modal from '@/components/messaging/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import Select from '@/components/forms-and-inputs/Select';
 import Textarea from '@/components/forms-and-inputs/Textarea';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 
 // Import CTA button components from Tutor View
 import {
@@ -168,15 +168,13 @@ const WithdrawToggle = ({ checked, onChange }) => (
         <div style={{ marginRight: 'var(--size-element-gap-md)' }}>
             {/*
               * The text to the left is a `<span>` in its own column, not a
-              * label, so it names nothing. `Switch` spreads no rest props, so
-              * the name goes through `inputProps` (#213).
+              * label, so it names nothing. `Toggle` passes `aria-label`
+              * to its input, so the name goes there.
               */}
-            <Switch
-                checked={checked}
+            <Toggle
+                isChecked={checked}
                 onChange={onChange}
-                size="medium"
-                inputProps={{ 'aria-label': 'Withdraw from all recurring sessions' }}
-            />
+                aria-label="Withdraw from all recurring sessions"/>
         </div>
     </div>
 );
@@ -190,7 +188,7 @@ const WithdrawToggle = ({ checked, onChange }) => (
  * - Button (plus-ds)
  * - Select (plus-ds/forms)
  * - Textarea (plus-ds/forms)
- * - Switch (plus-ds/forms)
+ * - Toggle (plus-ds/forms)
  * - CallOffAlert (local component)
  * 
  * Semantic tokens used:

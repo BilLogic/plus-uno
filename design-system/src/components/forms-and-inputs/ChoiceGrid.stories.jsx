@@ -41,12 +41,6 @@ export default {
             description: 'Number of columns in the demo grid',
             table: { category: 'Content' },
         },
-        size: {
-            control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant of the choice grid',
-            table: { category: 'Design' },
-        },
         disabled: {
             control: 'boolean',
             description: 'Disable the choice grid',
@@ -259,7 +253,6 @@ export const Interactive = (args) => {
                 rows={rows}
                 columns={cols}
                 values={args.type === 'radio' ? radioValues : checkboxValues}
-                size={args.size}
                 disabled={args.disabled}
                 onChange={
                     args.type === 'radio'
@@ -275,6 +268,5 @@ Interactive.args = {
     type: 'radio',
     rowCount: singleRow.length,
     columnCount: columns.length,
-    size: 'medium',
     disabled: false,
 };

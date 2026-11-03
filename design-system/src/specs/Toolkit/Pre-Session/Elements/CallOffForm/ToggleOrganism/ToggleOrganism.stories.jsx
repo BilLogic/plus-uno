@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Alert from '@/components/messaging/Alert/Alert';
 import Form from 'react-bootstrap/Form';
-import Switch from '@/components/forms-and-inputs/Switch';
+import Toggle from '@/components/forms-and-inputs/Toggle';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import Select from '@/components/forms-and-inputs/Select';
 
@@ -48,17 +48,15 @@ const CallOffFormOrganism = ({
                 {/*
                   * The heading to the left is the switch's visible text, but it
                   * is a `<strong>` in its own column rather than a label, so it
-                  * names nothing. `Switch` spreads no rest props, so the name
-                  * goes through `inputProps` (#213).
+                  * names nothing. `Toggle` passes `aria-label` to its
+                  * input, so the name goes there.
                   */}
-                <Switch
+                <Toggle
                     id={`call-off-switch-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
-                    checked={isToggled}
+                    isChecked={isToggled}
                     onChange={handleToggle}
-                    size="small"
-                    inputProps={{ 'aria-label': 'Call off entire recurring session' }}
-                    style={{ width: 'auto' }}
-                />
+                    aria-label="Call off entire recurring session"
+                    style={{ width: 'auto' }}/>
             </div>
 
             {isToggled && (
@@ -79,14 +77,12 @@ const CallOffFormOrganism = ({
                         }}>
                             <Checkbox
                                 id={`supervisor-check-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
-                                checked={isChecked}
+                                isChecked={isChecked}
                                 onChange={handleCheck}
-                                size="small"
                                 style={{ '--size-element-gap-xs': 'var(--size-element-gap-sm)' }}
                                 label={
                                     <span className="body2-txt">I have already spoken with my supervisor about dropping this recurring session <span className="text-danger">*</span></span>
-                                }
-                            />
+                                }/>
                             <div className="text-danger body2-txt" style={{
                                 paddingLeft: '24px', // Approx alignment without nested checkbox padding
                                 lineHeight: '1.571'

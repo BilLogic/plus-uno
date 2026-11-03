@@ -87,7 +87,7 @@ const SummaryAsDynamicCase = () => (
         <tbody>
             {weekdays.map(([day, sessions, minutes]) => (
                 <tr key={day}>
-                    <td><Checkbox aria-label={`Select ${day}`} /></td>
+                    <td><Checkbox aria-label={`Select ${day}`}/></td>
                     <td>{day}</td>
                     <td style={numeric}>{sessions}</td>
                     <td style={numeric}>{minutes}</td>
@@ -140,7 +140,7 @@ const RosterSection = () => (
             <tbody>
                 {roster.map(([student, tutor, last, sessions, attendance], i) => (
                     <tr key={student} aria-selected={i < 2}>
-                        <td><Checkbox aria-label={`Select ${student}`} checked={i < 2} readOnly /></td>
+                        <td><Checkbox aria-label={`Select ${student}`} isChecked={i < 2} isReadOnly/></td>
                         <td>{student}</td>
                         <td>{tutor}</td>
                         <td>{last}</td>
