@@ -165,7 +165,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/006-strip-npm-publishing-from-design-system-package.md`](docs/adr/006-strip-npm-publishing-from-design-system-package.md) | Strip npm publishing from design system package |
 | [`docs/adr/007-agent-agnostic-skills-under-agent-skills.md`](docs/adr/007-agent-agnostic-skills-under-agent-skills.md) | Agent-agnostic skills under .agent/skills/ |
 | [`docs/adr/008-compound-loop-for-cross-session-learning.md`](docs/adr/008-compound-loop-for-cross-session-learning.md) | Compound loop for cross-session learning |
-| [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks |
+| [`docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md`](docs/adr/009-bootstrap-first-no-alternative-ui-frameworks.md) | Bootstrap-first, no alternative UI frameworks — superseded by ADR-037 on the fallback-behavior half |
 | [`docs/adr/010-three-tier-context-loading-architecture.md`](docs/adr/010-three-tier-context-loading-architecture.md) | Three-tier context loading architecture |
 | [`docs/adr/011-doc-splitting-by-task-context.md`](docs/adr/011-doc-splitting-by-task-context.md) | Doc splitting by task context (Index + Modules pattern) |
 | [`docs/adr/012-declarative-route-manifest-over-parallel-maps.md`](docs/adr/012-declarative-route-manifest-over-parallel-maps.md) | Declarative route manifest over parallel maps |
@@ -193,6 +193,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md`](docs/adr/034-the-worker-writes-the-blueprint-behind-the-gate.md) | uno-bot writes approved blueprint revisions itself, through the authoring RPCs under its own rpc_writer identity, all or none, on a ✅ from a confirmer the card names; it may delete through the delete RPCs, and every row it causes in authoring_changes reads author uno-bot; writers/blueprint becomes the IDE writer plus the Worker's gated writer (2026-10-15) |
 | [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
 | [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
+| [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -221,6 +222,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-150 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+151 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
