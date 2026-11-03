@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Footer from '@/components/_internal/Footer';
+import Footer from '@/components/layout-and-structure/Footer';
 
 /**
  * Login page footer with version, copyright, and terms link.

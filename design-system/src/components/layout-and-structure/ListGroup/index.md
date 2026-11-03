@@ -48,7 +48,7 @@ Implemented as `ListGroupItem`.
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

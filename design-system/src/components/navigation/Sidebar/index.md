@@ -7,7 +7,7 @@ The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in
 
 **Import:** `import { Sidebar } from '@/components';`
 
-**Source:** `design-system/src/components/_internal/Sidebar/Sidebar.jsx`
+**Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
 ## Props
 
@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Table` · `UserAvatar`
+Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Scrollspy` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

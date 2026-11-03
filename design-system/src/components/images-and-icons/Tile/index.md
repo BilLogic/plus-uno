@@ -44,6 +44,6 @@ From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override th
 
 ## Related
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

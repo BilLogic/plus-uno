@@ -161,6 +161,15 @@ export const CHECKS = [
     guards: 'the generated Figma-links spreadsheet against the component MDX it is built from.',
   },
   {
+    name: 'check:component-barrel',
+    script: 'node scripts/generate-component-barrel.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-component-barrel.mjs',
+    guards:
+      "design-system/src/components/index.js against the folder shape it is generated from — a group's own index.js (forms-and-inputs) re-exported wholesale, every other group's component folders picked up by name. A hand edit to the barrel, or a component folder moved without regenerating, shows as drift. `_internal` is excluded from the scan entirely, so a component can never reach the public barrel through it (#1702).",
+  },
+  {
     name: 'check:figma-node-types',
     script: 'node scripts/check-figma-node-types.mjs',
     pkg: 'root',

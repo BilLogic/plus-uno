@@ -7,11 +7,11 @@ Top navigation bar component for page layouts
 
 **Import:** `import { Navbar } from '@/components';`
 
-**Source:** `design-system/src/components/_internal/Navbar/Navbar.jsx`
+**Source:** `design-system/src/components/navigation/Navbar/Navbar.jsx`
 
-**Stories:** `design-system/src/components/_internal/Navbar/Navbar.stories.jsx` — Overview, Dark, Primary
+**Stories:** `design-system/src/components/navigation/Navbar/Navbar.stories.jsx` — Overview, Dark, Primary
 
-**Storybook page:** `design-system/src/components/_internal/Navbar/Navbar.mdx`
+**Storybook page:** `design-system/src/components/navigation/Navbar/Navbar.mdx`
 
 ## Props
 
@@ -34,11 +34,11 @@ Anything not listed is not a valid value.
 
 `--color-inverse-on-surface` · `--color-inverse-surface` · `--color-on-primary` · `--color-on-surface` · `--color-outline-variant` · `--color-primary` · `--color-primary-border` · `--color-surface-container` · `--heading-medium` · `--size-element-gap-lg` · `--size-element-pad-x-lg` · `--size-element-pad-y-md` · `--type-weight-regular`
 
-From `design-system/src/components/_internal/Navbar/Navbar.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/navigation/Navbar/Navbar.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Footer` · `LoadingGif` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table` · `UserAvatar`
+Same group: `Breadcrumb` · `NavPills` · `NavTabs` · `Pagination` · `Scrollspy` · `Sidebar` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

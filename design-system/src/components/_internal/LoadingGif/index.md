@@ -33,7 +33,7 @@ From `design-system/src/components/_internal/LoadingGif/LoadingGif.scss`. Overri
 
 ## Related
 
-Same group: `Footer` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table` · `UserAvatar`
+Same group: `SessionAvailabilitySnackbar` · `SessionManagementSnackbar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

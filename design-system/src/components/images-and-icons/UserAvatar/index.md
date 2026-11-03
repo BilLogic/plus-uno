@@ -7,7 +7,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 **Import:** `import { UserAvatar } from '@/components';`
 
-**Source:** `design-system/src/components/_internal/UserAvatar/UserAvatar.jsx`
+**Source:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx`
 
 ## Props
 
@@ -38,11 +38,11 @@ Anything not listed is not a valid value.
 
 `--body-default` · `--body-small` · `--color-danger-text` · `--color-disabled-opacity` · `--color-on-surface` · `--color-primary-text` · `--color-surface-container-lowest` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-interaction-hovered` · `--element-inline-md` · `--element-pad-x-sm` · `--element-radius-full` · `--element-radius-item-md` · `--image-md` · `--image-sm` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--size-element-gap-md` · `--size-element-pad-x-md` · `--size-element-pad-x-sm` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
-From `design-system/src/components/_internal/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Footer` · `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Tile`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

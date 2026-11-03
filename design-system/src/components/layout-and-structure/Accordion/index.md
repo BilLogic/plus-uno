@@ -49,6 +49,6 @@ Implemented as `AccordionItem`.
 
 ## Related
 
-Same group: `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
+Same group: `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

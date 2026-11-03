@@ -224,7 +224,7 @@
 
 @include meta.load-css("../components/messaging/Modal/Modal");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
-@include meta.load-css("../components/_internal/Navbar/Navbar");
+@include meta.load-css("../components/navigation/Navbar/Navbar");
 // @import "../components/Form/Form"; // forms live under src/components/forms-and-inputs/
 // @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
 // @import "../components/Radio/Radio"; // no Radio in components/
@@ -242,12 +242,12 @@
 @include meta.load-css("../components/messaging/Toast/Toast");
 @include meta.load-css("../components/navigation/Scrollspy/Scrollspy");
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
-@include meta.load-css("../components/_internal/Table/Table");
+@include meta.load-css("../components/text-and-data-display/Table/Table");
 @include meta.load-css("../components/navigation/NavTabs/NavTabs");
 @include meta.load-css("../components/navigation/NavPills/NavPills");
 @include meta.load-css("../components/messaging/Alert/Alert");
 @include meta.load-css("../components/layout-and-structure/Accordion/Accordion");
-@include meta.load-css("../components/_internal/UserAvatar/UserAvatar");
+@include meta.load-css("../components/images-and-icons/UserAvatar/UserAvatar");
 @include meta.load-css("../assets/Logo/Logo");
 
 // Base Styles

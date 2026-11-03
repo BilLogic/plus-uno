@@ -33,6 +33,6 @@ From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scs
 
 ## Related
 
-Same group: `Code`
+Same group: `Code` · `Table`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

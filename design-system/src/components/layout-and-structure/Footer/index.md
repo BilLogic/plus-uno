@@ -7,7 +7,7 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 **Import:** `import { Footer } from '@/components';`
 
-**Source:** `design-system/src/components/_internal/Footer/Footer.jsx`
+**Source:** `design-system/src/components/layout-and-structure/Footer/Footer.jsx`
 
 ## Props
 
@@ -22,7 +22,7 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 ## Related
 
-Same group: `LoadingGif` · `Navbar` · `SessionAvailabilitySnackbar` · `SessionManagementSnackbar` · `Sidebar` · `Table` · `UserAvatar`
+Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Jumbotron` · `ListGroup` · `MediaObject` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

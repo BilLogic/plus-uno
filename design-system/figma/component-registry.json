@@ -1133,11 +1133,11 @@
     },
     "Navbar": {
       "code": {
-        "import": "@/components",
+        "import": "@/components/navigation",
         "export": "default",
-        "mdxPath": "design-system/src/components/_internal/Navbar/Navbar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Navbar",
-        "source": "design-system/src/components/_internal/Navbar/Navbar.jsx",
+        "mdxPath": "design-system/src/components/navigation/Navbar/Navbar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Navbar",
+        "source": "design-system/src/components/navigation/Navbar/Navbar.jsx",
         "storybookId": "components-navigation-tabs-nav-pills-navbar-navbar--docs",
         "props": {
           "backgroundColor": {
@@ -1832,11 +1832,11 @@
     },
     "Table": {
       "code": {
-        "import": "@/components",
+        "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/_internal/Table/Table.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/_internal/Table",
-        "source": "design-system/src/components/_internal/Table/Table.jsx",
+        "mdxPath": "design-system/src/components/text-and-data-display/Table/Table.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
+        "source": "design-system/src/components/text-and-data-display/Table/Table.jsx",
         "storybookId": "components-text-and-data-display-table--docs",
         "props": {
           "size": {

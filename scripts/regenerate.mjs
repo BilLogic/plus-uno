@@ -49,6 +49,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const GENERATORS = [
   'npm run generate:component-registry',
   'npm run generate:component-docs',
+  'npm run generate:component-barrel',
   'npm run generate:figma-links',
   'npm run generate:legacy-color-list',
   'npm run generate:knowledge-components',
