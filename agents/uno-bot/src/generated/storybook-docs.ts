@@ -73,6 +73,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-file-upload--docs"
   ],
   [
+    "design-system/src/components/forms-and-inputs/InlineEdit/",
+    "InlineEdit",
+    "components-forms-and-inputs-inline-edit--docs"
+  ],
+  [
     "design-system/src/components/forms-and-inputs/Input.",
     "Input",
     "components-forms-and-inputs-text-field--docs"
@@ -138,6 +143,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-tree-select--docs"
   ],
   [
+    "design-system/src/components/images-and-icons/Avatar/",
+    "Avatar",
+    "components-images-and-icons-avatar--docs"
+  ],
+  [
     "design-system/src/components/images-and-icons/Illustration/",
     "Illustration",
     "components-images-and-icons-illustrations--docs"
@@ -153,19 +163,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-labels-ai-label-ai-label--docs"
   ],
   [
-    "design-system/src/components/labels/Badge/",
-    "Badge",
-    "components-labels-deprecated-badge--docs"
+    "design-system/src/components/labels/CountTag/",
+    "CountTag",
+    "components-labels-status-count-tag-count-tag--docs"
   ],
   [
-    "design-system/src/components/labels/Count/",
-    "Count",
-    "components-labels-status-count-tag-count--docs"
-  ],
-  [
-    "design-system/src/components/labels/Status/",
-    "Status",
-    "components-labels-status-count-tag-status--docs"
+    "design-system/src/components/labels/StatusTag/",
+    "StatusTag",
+    "components-labels-status-count-tag-status-tag--docs"
   ],
   [
     "design-system/src/components/labels/Suggestion/",
