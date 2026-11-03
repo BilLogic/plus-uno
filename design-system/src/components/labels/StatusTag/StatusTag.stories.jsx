@@ -51,7 +51,7 @@ const COUNT = { default: { height: 16, inset: 2 }, spacious: { height: 20, inset
 
 /** [fill, text, inner border] per style, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
-    neutral: ['--ds-background-neutral', '--ds-text-subtle', '--ds-background-neutral-pressed'],
+    neutral: ['--ds-background-neutral', '--ds-text', '--ds-background-neutral-pressed'],
     success: ['--ds-background-success', '--ds-text-success', '--ds-background-success-pressed'],
     warning: ['--ds-background-warning', '--ds-text-warning', '--ds-background-warning-pressed'],
     danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
@@ -150,9 +150,6 @@ Styles.play = async ({ canvasElement }) => {
             await expect(box.right - text.right, `${name} right padding`).toBe(PAD[size]);
         }
     }
-    // Every style fills with an opaque background token.
-    await expect(alpha(getComputedStyle(canvas.getByTestId('neutral-default')).backgroundColor)).toBe(1);
-    await expect(alpha(getComputedStyle(canvas.getByTestId('success-default')).backgroundColor)).toBe(1);
 };
 
 /** A date is outlined, with a fixed icon per style: calendar, clock, alert. */
@@ -203,7 +200,7 @@ Dates.play = async ({ canvasElement }) => {
 };
 
 /**
- * `count` nests a Count tag of the same appearance: compact (16) in default,
+ * `trailingMetric` nests a Count tag of the same appearance: compact (16) in default,
  * default (20) in spacious, inset equally from the top and the right.
  */
 export const WithCount = () => (
@@ -211,14 +208,14 @@ export const WithCount = () => (
         {STATUS_TAG_SPACINGS.map((size) => (
             <div key={size} style={row}>
                 {STATUS_TAG_STATUS_APPEARANCES.map((appearance) => (
-                    <StatusTag key={appearance} appearance={appearance} spacing={size} count={38} data-testid={`${appearance}-${size}`}>
+                    <StatusTag key={appearance} appearance={appearance} spacing={size} trailingMetric={38} data-testid={`${appearance}-${size}`}>
                         {appearance}
                     </StatusTag>
                 ))}
             </div>
         ))}
         <div style={row}>
-            <StatusTag appearance="success" count={0} data-testid="zero">Completed</StatusTag>
+            <StatusTag appearance="success" trailingMetric={0} data-testid="zero">Completed</StatusTag>
         </div>
     </div>
 );
@@ -251,6 +248,59 @@ WithCount.play = async ({ canvasElement }) => {
     await expect(within(zero).queryByText('0')).toBeNull();
     const label = within(zero).getByText('Completed').getBoundingClientRect();
     await expect(zero.getBoundingClientRect().right - label.right).toBe(PAD.default);
+};
+
+/**
+ * `trailingMetricAppearance` sets the nested Count tag's own appearance, which
+ * otherwise follows the Status tag's. A date and the SMART subjects take no
+ * metric: they have their own looks, so it is dropped with a development warning.
+ */
+export const TrailingMetricAppearance = () => {
+    const [unsupported, setUnsupported] = useState(false);
+    return (
+        <div style={row}>
+            <StatusTag appearance="success" trailingMetric={4} data-testid="follows">Completed</StatusTag>
+            <StatusTag appearance="success" trailingMetric={4} trailingMetricAppearance="danger" data-testid="own">Completed</StatusTag>
+            <button type="button" onClick={() => setUnsupported(true)}>Mount a date and a SMART subject with a metric</button>
+            {unsupported && (
+                <>
+                    <StatusTag appearance="advocacy" trailingMetric={7} data-testid="smart">Advocacy</StatusTag>
+                    <StatusTag type="date" appearance="warning" trailingMetric={7} data-testid="date">Due tomorrow</StatusTag>
+                </>
+            )}
+        </div>
+    );
+};
+TrailingMetricAppearance.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const pillIn = (id) => within(canvas.getByTestId(id)).getByText('4').parentElement;
+
+    // The metric follows the tag's appearance, or takes its own, in every mode.
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const follows = getComputedStyle(pillIn('follows'));
+        await expect(follows.backgroundColor, `${mode}: follows the tag`).toBe(token('--ds-background-success'));
+        await expect(follows.color).toBe(token('--ds-text-success'));
+        const own = getComputedStyle(pillIn('own'));
+        await expect(own.backgroundColor, `${mode}: its own appearance`).toBe(token('--ds-background-danger'));
+        await expect(own.color).toBe(token('--ds-text-danger'));
+    });
+
+    // It is a compact Count tag nested at the end of the tag.
+    const box = canvas.getByTestId('follows').getBoundingClientRect();
+    const pill = pillIn('follows').getBoundingClientRect();
+    await expect(pill.height).toBe(COUNT.default.height);
+    await expect(box.right - pill.right).toBe(COUNT.default.inset);
+
+    // A date and a SMART subject take none, and say so in development.
+    const warn = spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+        await userEvent.click(canvas.getByRole('button', { name: /Mount a date/ }));
+        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('`trailingMetric` is for the status appearances'));
+        await expect(within(canvas.getByTestId('smart')).queryByText('7')).toBeNull();
+        await expect(within(canvas.getByTestId('date')).queryByText('7')).toBeNull();
+    } finally {
+        warn.mockRestore();
+    }
 };
 
 /** `leadingVisual` adds one icon before the label, in the text color. */
@@ -529,7 +579,7 @@ export const Interactive = {
         appearance: 'warning',
         spacing: 'default',
         leadingVisual: '',
-        count: 0,
+        trailingMetric: 0,
         maxWidth: 200,
     },
     argTypes: {

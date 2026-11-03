@@ -101,13 +101,13 @@
  * The color map: [fill, text, inside border] per style for `state`.
  *
  * fill    the style's tinted background token.
- * text    the style's (Text) color; neutral is the subtle text.
+ * text    the style's (Text) color.
  * border  the style's pressed background token.
  * Info is Tertiary and discovery is the curriculum palette's purple, the same
  * mapping Count tag and Tag use. The five SMART subjects read their own tokens.
  */
 $status-state: (
-    'neutral': (var(--ds-background-neutral), var(--ds-text-subtle), var(--ds-background-neutral-pressed)),
+    'neutral': (var(--ds-background-neutral), var(--ds-text), var(--ds-background-neutral-pressed)),
     'success': (var(--ds-background-success), var(--ds-text-success), var(--ds-background-success-pressed)),
     'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed)),
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),

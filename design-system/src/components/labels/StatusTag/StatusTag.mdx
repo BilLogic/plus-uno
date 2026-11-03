@@ -11,7 +11,7 @@ export const figmaMeta = {
     "appearance": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery", "social-emotional", "mastering-content", "advocacy", "relationship", "technology-tools"] },
     "spacing": { "type": "enum", "values": ["default", "spacious"] },
     "leadingVisual": { "type": "boolean" },
-    "count": { "type": "boolean" }
+    "trailingMetric": { "type": "boolean" }
   },
   "sets": [
     {
@@ -93,8 +93,12 @@ something is in, whether the system calculated it or a person set it.
     <DsCanvasQuiet of={StatusTagStories.LeadingVisual} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<><code>count</code> nests a Count tag of the same appearance: compact (16) in default, default (20) in spacious, inset equally from the top and the right. A count of 0 is hidden.</>}>
+<DocsCanvasShell description={<><code>trailingMetric</code> nests a Count tag of the same appearance: compact (16) in default, default (20) in spacious, inset equally from the top and the right. A count of 0 is hidden.</>}>
     <DsCanvasQuiet of={StatusTagStories.WithCount} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<><code>trailingMetricAppearance</code> sets the count's own appearance, which otherwise follows the Status tag. A date and the SMART subjects take no metric.</>}>
+    <DsCanvasQuiet of={StatusTagStories.TrailingMetricAppearance} />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>A Status tag is never a button. An <code>onClick</code> passed to it is dropped with a development warning.</>}>
@@ -136,7 +140,7 @@ Benchmarked against the [ADS documentation](https://atlassian.design/components/
         <tr><td><code>isBold</code></td><td>None</td><td>Status tags are filled with a tinted background; a bold fill is not part of the PLUS set.</td></tr>
         <tr><td><code>maxWidth</code></td><td><code>maxWidth</code></td><td>Same; the full text is a tooltip, reachable by keyboard.</td></tr>
         <tr><td>None</td><td><code>spacing</code> (default 20, spacious 32)</td><td>Spacious sits beside a heading.</td></tr>
-        <tr><td>None</td><td><code>type</code> (state, date), <code>leadingVisual</code>, <code>count</code></td><td>A date is outlined with a fixed icon; a count nests a Count tag.</td></tr>
+        <tr><td>None</td><td><code>type</code> (state, date), <code>leadingVisual</code>, <code>trailingMetric</code>, <code>trailingMetricAppearance</code></td><td>A date is outlined with a fixed icon; a count nests a Count tag.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -204,8 +208,20 @@ and write the label as people say it.
 <StatusTag appearance="success">Completed</StatusTag> <CountTag value={38} />
 
 // Correct — one label; the number reads as part of it.
-<StatusTag appearance="success" count={38}>Completed</StatusTag>
+<StatusTag appearance="success" trailingMetric={38}>Completed</StatusTag>
 ```
+
+### Give the metric its own appearance when it means something else.
+
+`trailingMetricAppearance` defaults to the Status tag's own appearance. Set it
+only when the number carries a different meaning from the status, such as a
+success status with a danger count of failures.
+
+```jsx
+<StatusTag appearance="success" trailingMetric={38} trailingMetricAppearance="danger">Completed</StatusTag>
+```
+
+A date and the SMART subjects have their own looks and take no metric.
 
 ### Edit in the field, not on the label.
 
@@ -239,7 +255,7 @@ success · warning · danger).
 
 ## Related
 
-- For a number on its own, use `CountTag`; Status tag nests one through `count`.
+- For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
 - For a category, a subject or a person, use `Tag`.
 
 </div>

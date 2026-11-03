@@ -254,10 +254,10 @@ Styles.play = async ({ canvasElement }) => {
         for (const [appearance, styles] of Object.entries(expected)) {
             for (const size of COUNT_TAG_SPACINGS) {
                 for (const [style, [ground, ink]] of Object.entries(styles)) {
-                    const name = `${mode}: ${appearance} ${style} ${size}`;
+                    const name = `${appearance} ${style} ${size}`;
                     const s = getComputedStyle(pill(name));
-                    await expect(s.backgroundColor, `${name} ground`).toBe(token(ground));
-                    await expect(s.color, `${name} ink`).toBe(token(ink));
+                    await expect(s.backgroundColor, `${mode}: ${name} ground`).toBe(token(ground));
+                    await expect(s.color, `${mode}: ${name} ink`).toBe(token(ink));
                     await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'compact' ? 16 : 20);
                 }
             }

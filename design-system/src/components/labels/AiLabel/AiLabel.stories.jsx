@@ -188,7 +188,7 @@ NoBrandHueIsAssumed.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(plain).color, `${mode}: text`).toBe(token('--ds-text'));
         await expect(getComputedStyle(plain).borderTopColor, `${mode}: edge`).toBe(token('--ds-border'));
         await expect(getComputedStyle(low).backgroundColor, `${mode}: low ground`).toBe(token('--ds-background-warning'));
-        await expect(getComputedStyle(low).color, `${mode}: low text`).toBe(token('--ds-text-warning'));
+        await expect(getComputedStyle(low).color, `${mode}: low text`).toBe(token('--ds-text-warning-bolder'));
     });
 };
 
