@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from 'react-bootstrap';
 import { BrowserRouter } from 'react-router-dom';
 import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
@@ -13,10 +12,8 @@ import './styles/plus-tokens.scss';
  */
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ThemeProvider>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </React.StrictMode>,
 );
