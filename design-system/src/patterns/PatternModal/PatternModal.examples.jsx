@@ -1,6 +1,6 @@
 import React from 'react';
 import PatternModal from '@/patterns/PatternModal';
-import { Button, Input } from '@/components';
+import { Button, TextField } from '@/components';
 
 /**
  * Live compositions for the Modal page's do and don't pairs. Each is a real
@@ -22,7 +22,7 @@ const stack = (gap, children) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap }}>{children}</div>
 );
 
-const field = (label, placeholder) => <Input label={label} placeholder={placeholder} size="small" />;
+const field = (label, placeholder) => <TextField label={label} placeholder={placeholder} spacing="compact" />;
 
 /** The actions sit in the footer slot, apart from the fields. */
 export const FooterActions = () => (

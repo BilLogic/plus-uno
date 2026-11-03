@@ -4,7 +4,7 @@ import StatusTag from '@/components/labels/StatusTag';
 import Alert from '@/components/messaging/Alert/Alert';
 import Progress from '@/components/loading/Progress/Progress';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import { ShellContext } from '../../home-redesign/src/context/ShellContext';
 import './MonthlyReportPage.scss';
@@ -717,17 +717,17 @@ export default function MonthlyReportContent() {
                                                             </div>
                                                         </div>
                                                     )}
-                                                    {/* Feedback Input for Negative Feedback */}
+                                                    {/* Feedback field for Negative Feedback */}
                                                     {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate' || feedbackSelections[dim.id] === 'helpful'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
                                                         <div className="feedback-input-container" style={{ marginTop: 'var(--size-element-gap-md)' }}>
-                                                            <Input
+                                                            <TextField
                                                                 label={feedbackSelections[dim.id] === 'not_helpful' ? "What’s missing or off about this insight?" : "What feels inaccurate from this AI insight?"}
                                                                 value={feedbackText[dim.id] || ''}
                                                                 onChange={(e) => setFeedbackText(prev => ({ ...prev, [dim.id]: e.target.value }))}
                                                                 autoFocus={state === 'under_review'}
-                                                                required
-                                                                validation={(feedbackText[dim.id] || '').length > 0 && (feedbackText[dim.id] || '').length < 10 ? 'invalid' : 'none'}
-                                                                validationMessage={(feedbackText[dim.id] || '').length < 10
+                                                                isRequired
+                                                                isInvalid={(feedbackText[dim.id] || '').length > 0 && (feedbackText[dim.id] || '').length < 10}
+                                                                errorMessage={(feedbackText[dim.id] || '').length < 10
                                                                     ? `${(feedbackText[dim.id] || '').length}/10 characters minimum`
                                                                     : `${(feedbackText[dim.id] || '').length} characters`
                                                                 }

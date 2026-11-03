@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Call-Off Form/Text Input Additional Details',
-    component: Textarea,
+    component: TextArea,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
@@ -29,7 +29,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Unfilled State (Placeholder)</h6>
             <div style={{ maxWidth: '592px' }}>
-                <Textarea
+                <TextArea
                     label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Provide additional context..."
                     rows={2}
@@ -40,7 +40,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6 mb-3">Filled State</h6>
             <div style={{ maxWidth: '592px' }}>
-                <Textarea
+                <TextArea
                     label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     defaultValue="Bla bla bla bla"
                     rows={2}
@@ -64,7 +64,7 @@ export const Interactive = () => {
                 Provide additional context for the call-off request.
             </p>
             <div style={{ maxWidth: '592px' }}>
-                <Textarea
+                <TextArea
                     label={<>Additional details <span style={{ color: 'var(--color-danger)' }}>*</span></>}
                     placeholder="Provide additional context..."
                     value={details}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dropdown, Input, Popover } from '@/components';
+import { Button, Dropdown, TextField, Popover } from '@/components';
 
 /**
  * Live compositions for the Popover family page's do and don't pairs. The
@@ -52,8 +52,8 @@ export const PopupForm = () => (
     <Plain>
         <HeldPopup title="Add a note">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
-                <Input label="Student" placeholder="Select a student" size="small" />
-                <Input label="Note" placeholder="Write a note" size="small" />
+                <TextField label="Student" placeholder="Select a student" spacing="compact" />
+                <TextField label="Note" placeholder="Write a note" spacing="compact" />
                 <div><Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} /></div>
             </div>
         </HeldPopup>

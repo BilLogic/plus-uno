@@ -2,11 +2,11 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import DatePicker from './DatePicker/DatePicker';
-import Input from './Input';
-import InputGroup from './InputGroup/InputGroup';
-import NumberInput from './NumberInput';
+import TextField from './TextField/TextField';
+
+
 import Select from './Select';
-import Textarea from './Textarea';
+import TextArea from './TextArea/TextArea';
 import Listbox from './_internal/Listbox';
 
 /**
@@ -128,10 +128,10 @@ SelectTriggerShowsFocus.play = async ({ canvasElement }) => {
  */
 export const ForcedColorsKeepFocusAndSelection = () => (
     <div style={stack}>
-        <Input id="fv-name" label="Name" />
-        <Textarea id="fv-notes" label="Notes" />
-        <NumberInput id="fv-hours" label="Hours" />
-        <InputGroup id="fv-amount" label="Amount" leadingVisual="£" />
+        <TextField id="fv-name" label="Name" />
+        <TextArea id="fv-notes" label="Notes" />
+        <TextField type="number" id="fv-hours" label="Hours" />
+        <TextField id="fv-amount" label="Amount" elemBefore="£" />
         <DatePicker id="fv-date" aria-label="Date" />
         <Select aria-label="Subject" options={[{ value: 'maths', label: 'Maths' }]} />
         <Listbox aria-label="Day" options={['Monday', 'Tuesday']} defaultValue="Tuesday" />

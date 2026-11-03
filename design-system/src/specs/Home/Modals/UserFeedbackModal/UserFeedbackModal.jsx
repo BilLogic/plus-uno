@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Modal from '@/components/messaging/Modal';
 import Button from '@/components/forms-and-inputs/Button';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import Divider from '@/components/layout-and-structure/Divider';
 import { ProductAreaDropdown } from '@/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown';
 import './UserFeedbackModal.scss';
@@ -265,14 +265,13 @@ const UserFeedbackModal = ({
                                 </div>
 
                                 <div className="plus-user-feedback-modal-textarea">
-                                    <Textarea
+                                    <TextArea
                                         id={`${id}-description`}
                                         name="description"
                                         value={description}
                                         onChange={(e) => setDescription(e.target.value)}
                                         placeholder={config.placeholder}
                                         rows={6}
-                                        size="medium"
                                     />
                                 </div>
 

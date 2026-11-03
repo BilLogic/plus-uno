@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Input from '@/components/forms-and-inputs/Input';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import '../shared/login-field.scss';
 
@@ -31,15 +31,15 @@ export function LoginInstitutionField({
                 Register With Your Institution {required && <span className="login-field__required">*</span>}
             </div>
 
-            <Input
+            <TextField
                 id={id}
                 name={id}
                 label="Register With Your Institution"
-                required={required}
-                showLabel={false}
+                isRequired={required}
+                isLabelHidden
                 placeholder={placeholder}
-                trailingVisual="dropdown"
-                readonly
+                elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                isReadOnly
             />
 
             <div className="login-field__caption body3-txt">
@@ -89,14 +89,13 @@ export default function InstitutionFormSpec() {
                 <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
                     Register With Your Institution
                 </div>
-                <Input
+                <TextField
                     id="institution-form-official"
                     name="institution-form-official"
                     label="Register With Your Institution"
-                    showLabel={false}
+                    isLabelHidden
                     placeholder="Select your institution from the list"
-                    trailingVisual="dropdown"
-                    size="medium"
+                    elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 />
                 <div
                     className="body3-txt"
@@ -123,14 +122,13 @@ export default function InstitutionFormSpec() {
                 <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
                     Institution Name
                 </div>
-                <Input
+                <TextField
                     id="institution-form-independent"
                     name="institution-form-independent"
                     label="Institution Name"
-                    showLabel={false}
+                    isLabelHidden
                     placeholder="Add your institution name..."
-                    trailingVisual="dropdown"
-                    size="medium"
+                    elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 />
                 <div
                     className="body3-txt"

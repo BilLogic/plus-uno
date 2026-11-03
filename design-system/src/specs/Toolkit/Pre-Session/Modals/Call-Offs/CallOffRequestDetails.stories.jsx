@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Modal from '@/components/messaging/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import Select from '@/components/forms-and-inputs/Select';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import Toggle from '@/components/forms-and-inputs/Toggle';
 
 // Import CTA button components from Tutor View
@@ -143,7 +143,7 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
             </span>
             <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
         </div>
-        <Textarea
+        <TextArea
             placeholder="Placeholder"
             value={value}
             onChange={onChange}
@@ -233,7 +233,7 @@ export const CallOff_Request_Details = () => (
                     {/* Reason Dropdown */}
                     <ReasonDropdown value="" onChange={() => { }} />
 
-                    {/* Additional Details Textarea */}
+                    {/* Additional Details text area */}
                     <AdditionalDetailsTextarea value="" onChange={() => { }} />
 
                     {/* Withdraw Toggle */}

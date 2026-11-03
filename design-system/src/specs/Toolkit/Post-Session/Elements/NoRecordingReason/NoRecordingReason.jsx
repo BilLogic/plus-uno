@@ -1,7 +1,7 @@
 import React, { useId, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Select from '@/components/forms-and-inputs/Select';
-import Textarea from '@/components/forms-and-inputs/Textarea';
+import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 
 const DEFAULT_REASONS = [
     'Forgot to record',
@@ -81,14 +81,13 @@ const NoRecordingReason = ({
                         Other (please specify)
                         <span style={{ color: 'var(--color-danger)' }}> *</span>
                     </label>
-                    <Textarea
+                    <TextArea
                         id={otherId}
                         name={otherId}
                         value={otherDetail}
                         onChange={onOtherDetailChange}
                         placeholder="Briefly describe why there’s no recording"
                         rows={1}
-                        size="medium"
                     />
                 </div>
             )}

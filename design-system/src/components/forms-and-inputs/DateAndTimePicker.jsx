@@ -10,7 +10,6 @@ import { formatIso } from './_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from './_internal/timeZones';
 import './_internal/Listbox.scss';
 import './DateAndTimePicker.scss';
-import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 const DateAndTimePicker = ({
     id,
@@ -58,7 +57,6 @@ const DateAndTimePicker = ({
      */
     ...props
 }) => {
-    useDeprecatedFieldSize('DateAndTimePicker', size);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [viewDate, setViewDate] = useState(new Date());
@@ -407,7 +405,7 @@ const DateAndTimePicker = ({
                 {showSectionLabels && <div id={dateSectionLabelId} className="plus-datetime-section-label">Date</div>}
                 <Field
                     ref={dateFieldRef}
-                    size={size}
+                    spacing={size === 'small' ? 'compact' : 'default'}
                     disabled={disabled}
                     readOnly={readonly}
                     {...tones.field}
@@ -479,7 +477,7 @@ const DateAndTimePicker = ({
             <div className="plus-datetime-section">
                 {showSectionLabels && <div id={timeSectionLabelId} className="plus-datetime-section-label">Time</div>}
                 <Field
-                    size={size}
+                    spacing={size === 'small' ? 'compact' : 'default'}
                     disabled={disabled}
                     readOnly={readonly}
                     {...tones.field}

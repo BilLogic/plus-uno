@@ -28,7 +28,7 @@ It reads as the text, or the placeholder when there is none, and opens as the st
 | `keepEditViewOpenOnBlur` | bool | — | — |
 | `startWithEditViewOpen` | bool | — | — |
 | `hideActionButtons` | bool | — | — |
-| `compact` | bool | — | — |
+| `compact` | bool | `false` | — |
 | `readViewFitContainerWidth` | bool | — | — |
 | `editLabel` | string | — | — |
 | `confirmLabel` | string | — | — |
@@ -37,7 +37,7 @@ It reads as the text, or the placeholder when there is none, and opens as the st
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

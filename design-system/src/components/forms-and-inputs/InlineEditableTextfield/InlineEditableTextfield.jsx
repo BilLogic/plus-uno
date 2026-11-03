@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Input from '../Input';
+import TextField from '../TextField/TextField';
 import InlineEdit from '../InlineEdit';
 
 /**
- * InlineEditableTextfield — `InlineEdit` with an `Input` for its edit view.
+ * InlineEditableTextfield — `InlineEdit` with a Text field for its edit view.
  *
  * It reads as the text, or the placeholder when there is none, and opens as
  * the standard text field at the same size. Validation shows under the field
@@ -23,6 +23,7 @@ const InlineEditableTextfield = ({
     type = 'text',
     required = false,
     onConfirm,
+    compact = false,
     ...inlineEditProps
 }) => {
     const [kept, setKept] = useState(defaultValue);
@@ -37,6 +38,7 @@ const InlineEditableTextfield = ({
     return (
         <InlineEdit
             {...inlineEditProps}
+            compact={compact}
             id={id}
             label={label}
             defaultValue={text}
@@ -45,16 +47,17 @@ const InlineEditableTextfield = ({
                 ? text
                 : <span className="plus-inline-edit__placeholder">{placeholder}</span>)}
             editView={({ validation, validationMessage, value: draft, onChange, id: fieldId }) => (
-                <Input
+                <TextField
                     id={fieldId}
                     value={draft ?? ''}
                     onChange={onChange}
                     placeholder={placeholder}
                     maxLength={maxLength}
                     type={type}
-                    required={required}
-                    validation={validation}
-                    validationMessage={validationMessage}
+                    spacing={compact ? 'compact' : 'default'}
+                    isRequired={required}
+                    isInvalid={validation === 'invalid'}
+                    errorMessage={validationMessage}
                 />
             )}
         />

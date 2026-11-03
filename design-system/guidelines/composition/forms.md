@@ -21,13 +21,12 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 
 | Role | Component | Import |
 |------|-----------|--------|
-| Text | `Input` | `@/components` |
-| Multi-line | `Textarea` | `@/components` |
+| Text, number | `TextField` | `@/components` |
+| Multi-line | `TextArea` | `@/components` |
 | Pick one | `Select`, `Radio` | `@/components` |
 | Pick many | `Checkbox`, `Select mode="multi"` | `@/components` |
 | Toggle | `Switch` | `@/components` |
 | Date/time | `DatePicker`, `DateAndTimePicker` | `@/components` |
-| Grouped field | `InputGroup` | `@/components` |
 | Submit / cancel | `Button` | `@/components` |
 | Section container | `Card` | `@/components` |
 
@@ -36,7 +35,7 @@ See `design-system/agent-views/components/index.md` for the full component index
 ## Standard structure
 
 ```jsx
-import { Card, Button, Input, Select, Checkbox } from '@/components';
+import { Card, Button, TextField, Select, Checkbox } from '@/components';
 
 function ExampleForm() {
   return (
@@ -45,7 +44,7 @@ function ExampleForm() {
         className="d-flex flex-column"
         style={{ gap: 'var(--size-element-gap-md)' }}
       >
-        <Input id="name" label="Student name" required value={name} onChange={...} />
+        <TextField id="name" label="Student name" isRequired value={name} onChange={...} />
         {/* Select has no `label` prop — it forwards `id` to the trigger and
             nothing else, so the label has to be wired from outside. */}
         <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-sm)' }}>
@@ -70,7 +69,7 @@ function ExampleForm() {
 
 | Gap | Token | Apply between |
 |-----|-------|----------------|
-| Fields in one group | `--size-element-gap-md` | Stacked `Input` / `Select` |
+| Fields in one group | `--size-element-gap-md` | Stacked `TextField` / `Select` |
 | Label to section | `--size-card-gap-md` | Field group → button row |
 | Card internal | `--size-card-pad-x-md`, `--size-card-pad-y-md` | Via `Card` `paddingSize` |
 
@@ -81,8 +80,8 @@ Never hardcode `padding: 16px` between fields.
 ```jsx
 <Modal show={show} onClose={onClose} title="Quick add" width={480} showBottomButtons={false}>
   <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
-    <Input id="title" label="Title" value={title} onChange={...} />
-    <Input id="note" label="Note" value={note} onChange={...} />
+    <TextField id="title" label="Title" value={title} onChange={...} />
+    <TextField id="note" label="Note" value={note} onChange={...} />
   </div>
 </Modal>
 ```
@@ -93,7 +92,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 ### Correct
 
-- One `Input` per label; validation via `validation` + `validationMessage`
+- One `TextField` per label; validation via `isInvalid` + `errorMessage`
 - Cancel left, primary right in button row
 - Import form elements and actions from `@/components` (forms live in `design-system/src/components/forms-and-inputs/`, re-exported via `components/index.js`)
 - Field stack uses `flex-column` + `--size-element-gap-md`
@@ -114,7 +113,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 ## Related component docs
 
-- `design-system/agent-views/components/index.md` — confirm `Input`, `Button`, `Modal`, `Card` exist
+- `design-system/agent-views/components/index.md` — confirm `TextField`, `Button`, `Modal`, `Card` exist
 - their Storybook MDX and `*.stories.jsx` — props, variants, usage
 - `surfaces.md` — the modal this form sits in when it is an overlay
 - `form-behavior.md` — when the form validates, what submit does with errors, read-only and unsaved changes

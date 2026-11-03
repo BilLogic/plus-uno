@@ -115,10 +115,10 @@ explains, and it carries a state: `default`, `success`, `danger`, `warning`,
 ```jsx
 // Incorrect — an instruction where the name should be. It reads badly in a
 // screen reader's list of form fields, where the labels appear without context.
-<Input label="Enter your email address" />
+<TextField label="Enter your email address" />
 
 // Correct — the instruction is a caption if it is needed at all.
-<Input label="Email address" />
+<TextField label="Email address" />
 ```
 
 ### A caption is help; a placeholder is not.
@@ -126,21 +126,16 @@ explains, and it carries a state: `default`, `success`, `danger`, `warning`,
 A hint written into `placeholder` disappears the moment the user types, which is
 when they need it, and it is low contrast by design. Put help in a caption.
 
-### The neutral caption has no prop on most fields.
+### Standing help is a caption; a state has its own message.
 
 ```jsx
-// Incorrect — there is no caption or helper prop. Input, NumberInput and
-// FileUpload render a message only in a validation state.
-<Input label="Phone" caption="Include the area code" />
+// Standing help, with no state.
+<TextField label="Phone" caption="Include the area code" />
 
-// What exists — a message tied to success or failure.
-<Input label="Phone" validation="invalid"
-       validationMessage="Include the area code." />
-
-// For standing help with no state, render the line yourself under the field,
-// give it an id, and point the control at it.
-<Input label="Phone" aria-describedby="phone-help" />
-<p id="phone-help" className="body3-txt">Include the area code.</p>
+// A message tied to success, warning or failure.
+<TextField label="Phone" isInvalid errorMessage="Enter a 10-digit number." />
+<TextField label="Phone" warningMessage="This number looks like a landline." />
+<TextField label="Phone" successMessage="Number verified." />
 ```
 
 ### Write the error, not the fact that there is one.
@@ -168,15 +163,14 @@ users and your own validation is what enforces it.
   `label` element would point at one control and clicking it would select that
   one. `ChoiceGroup` uses a `fieldset` named by its `legend`, and `Rating` a
   `span` with an id and `aria-labelledby` — those are the patterns to copy.
-- **Validation messages are attached to their fields.** `Input`, `NumberInput`,
+- **Validation messages are attached to their fields.** `TextField`, `TextArea`,
   `FileUpload` and `DateAndTimePicker` give the message an id and point the
   control at it, and mark an invalid field `aria-invalid`. Your own
   `aria-describedby` is composed with theirs, not replaced by it.
-- **Standing help is still yours to attach.** There is no `caption` prop, so a
-  neutral line under the field is text you render — give it an id and pass
-  `aria-describedby`, and it will be read before any validation message.
-- **Do not hide the label.** `showLabel={false}` is meant to move pixels, not to
-  remove the name; on `Input` it clips the label and keeps it, which is the
+- **Standing help is described, not announced.** A `caption` is attached to the
+  control with `aria-describedby`; an error is also announced when it appears.
+- **Do not hide the label.** `isLabelHidden` is meant to move pixels, not to
+  remove the name; on `TextField` it clips the label and keeps it, which is the
   behavior to expect.
 - **State is never color alone.** The caption states carry an icon as well as a
   color, and the words should stand without either.
@@ -188,7 +182,7 @@ users and your own validation is what enforces it.
 ## Related
 
 - For the fullest treatment of naming a field, including why the label cannot be
-  taken away, see `Input`.
+  taken away, see `TextField`.
 - For a group of controls under one question, see `ChoiceGroup`.
 - For a message about the whole form rather than one field, use `Alert`.
 

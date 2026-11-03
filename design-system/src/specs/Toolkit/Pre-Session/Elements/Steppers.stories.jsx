@@ -1,6 +1,7 @@
 import React from 'react';
 import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
-import InputGroup from '@/components/forms-and-inputs/InputGroup/InputGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
+import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Steppers',
@@ -13,11 +14,11 @@ export default {
 /**
  * Stepper Component
  * A numeric stepper input with minus and plus buttons on either side.
- * Reuses the InputGroup component with button addons from the forms library.
+ * Reuses the Text field with buttons in its before and after slots.
  * Matches the Figma "Steppers" spec.
  *
  * Spacing:
- * - Gap between label and input group: --size-element-gap-xs
+ * - Gap between label and field: --size-element-gap-xs
  *
  * States:
  * - steppers-enabled: Both minus and plus buttons are active
@@ -45,31 +46,20 @@ const Stepper = ({
             {/* Label */}
             <Label text={label} required={true} />
 
-            {/* Input Group with minus/plus buttons */}
-            <InputGroup
+            {/* Text field with minus and plus buttons */}
+            <TextField
                 placeholder={value}
                 value={value}
-                size="medium"
-                readonly
-                leadingVisual={{
-                    type: 'button',
-                    text: '−',
-                    appearance: 'default',
-                    disabled: isMinusDisabled,
-                }}
-                trailingVisual={{
-                    type: 'button',
-                    text: '+',
-                    appearance: 'default',
-                    disabled: isPlusDisabled,
-                }}
-                className="stepper-input-group"
+                isReadOnly
+                elemBefore={<Button appearance="default" spacing="compact" text="−" isDisabled={isMinusDisabled} />}
+                elemAfter={<Button appearance="default" spacing="compact" text="+" isDisabled={isPlusDisabled} />}
+                className="stepper-field"
             />
             <style>{`
-                .plus-field.stepper-input-group {
+                .stepper-field .plus-field {
                     background-color: var(--color-surface-container-lowest);
                 }
-                .stepper-input-group .plus-field__control {
+                .stepper-field .plus-field__control {
                     text-align: center;
                 }
             `}</style>

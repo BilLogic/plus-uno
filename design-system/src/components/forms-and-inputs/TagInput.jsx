@@ -3,12 +3,11 @@ import PropTypes from 'prop-types';
 import Tag, { TAG_COLORS } from '@/components/labels/Tag';
 import TagGroup from '@/components/labels/TagGroup';
 import Button from '@/components/forms-and-inputs/Button';
-import Input from './Input';
+import TextField from './TextField/TextField';
 import useFieldId from './useFieldId';
 import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
-import { useDeprecatedFieldSize } from '../../lib/useDeprecatedLargeSize';
 
 /**
  * The status names the chips used to take, kept as deprecated aliases for the
@@ -144,7 +143,6 @@ const TagInput = ({
     style,
     ...props
 }) => {
-    useDeprecatedFieldSize('TagInput', size);
     const [internalTags, setInternalTags] = useState(defaultTags);
     const isControlled = Array.isArray(tags);
     const currentTags = isControlled ? tags : internalTags;
@@ -700,7 +698,7 @@ const TagInput = ({
                 onBlur={handleBlur}
             >
                 <Field
-                    size={size}
+                    spacing={size === 'small' ? 'compact' : 'default'}
                     grow
                     disabled={disabled}
                     readOnly={readOnly}
@@ -835,10 +833,10 @@ const TagInput = ({
                     }}
                     header={onRename ? (
                         <div className="plus-tag-input__rename">
-                            <Input
+                            <TextField
                                 label="Name"
-                                showLabel={false}
-                                size="small"
+                                isLabelHidden
+                                spacing="compact"
                                 value={renameDraft}
                                 inputRef={renameRef}
                                 aria-controls={menuListId}

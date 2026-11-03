@@ -273,8 +273,8 @@ SameHeight.play = async ({ canvasElement }) => {
         await waitFor(() => expect(canvas.queryByRole('textbox')).toBeNull());
     };
 
-    await measure('Regular Ada Lovelace', 32);
-    await measure('Compact Ada Lovelace', 24);
+    await measure('Regular Ada Lovelace', 40);
+    await measure('Compact Ada Lovelace', 32);
 
     // The read view's text starts where the field's text does.
     const read = canvas.getByRole('button', { name: 'Regular Ada Lovelace' });
@@ -288,11 +288,11 @@ SameHeight.play = async ({ canvasElement }) => {
     // The sizes hold in every color mode, and the edit view is a visible box.
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         const readButton = canvas.getByRole('button', { name: 'Regular Ada Lovelace' });
-        await expect(px(getComputedStyle(readButton).height), mode).toBe(32);
+        await expect(px(getComputedStyle(readButton).height), mode).toBe(40);
         await expect(getComputedStyle(readButton).borderTopColor, mode).toBe('rgba(0, 0, 0, 0)');
         await userEvent.click(readButton);
         const box = canvas.getByRole('textbox').closest('.plus-field');
-        await expect(px(getComputedStyle(box).height), mode).toBe(32);
+        await expect(px(getComputedStyle(box).height), mode).toBe(40);
         await expect(getComputedStyle(box).borderTopColor, mode).toBe(token('--ds-border-input'));
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(canvas.queryByRole('textbox')).toBeNull());

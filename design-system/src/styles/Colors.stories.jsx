@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Button, Input } from '@/components';
+import { Button, TextField } from '@/components';
 import { ModeCompare, Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 
@@ -289,12 +289,12 @@ export const FocusIsARing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field. The fill stays as it was.</>}>
             <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--element-radius-item-md)' }}>
-                <Input id="color-focus-do" label="Student name" showLabel={false} placeholder="Search students" />
+                <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Do>
         <Dont caption="Focus shown by tinting the field. A fill reads as selected or hovered, and keyboard users lose their place.">
             <div style={{ borderRadius: 'var(--element-radius-item-md)', background: 'var(--ds-background-selected)' }}>
-                <Input id="color-focus-dont" label="Student name" showLabel={false} placeholder="Search students" />
+                <TextField id="color-focus-dont" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Dont>
     </DoDont>

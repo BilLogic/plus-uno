@@ -1,10 +1,10 @@
 /**
  * InlineEdit — a read view that is the same size as the field it opens into.
  *
- * The read view is drawn on the field's own box: 32 high (`--item-height-md`),
+ * The read view is drawn on the field's own box: 40 high (`--height-250`),
  * the same 1px border (transparent at rest) and the same side padding, so
  * opening the editor changes the fill and the border and nothing else. The
- * compact variant is 24 (`--item-height-sm`) in both views.
+ * compact variant is 32 (`--item-height-md`) in both views.
  *
  * Confirm and cancel sit under the edit view, over whatever follows it, so
  * showing them does not push the page down.
@@ -29,12 +29,12 @@
     display: inline-flex;
     align-items: center;
     max-width: 100%;
-    height: var(--item-height-md);
+    height: var(--height-250);
     box-sizing: border-box;
     margin: 0;
     padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
     border: var(--size-element-border) solid transparent;
-    border-radius: var(--size-element-radius-sm);
+    border-radius: var(--radius-0625);
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);
@@ -109,6 +109,6 @@
 .plus-inline-edit--compact {
     .plus-inline-edit__read,
     .plus-field {
-        height: var(--item-height-sm);
+        height: var(--item-height-md);
     }
 }

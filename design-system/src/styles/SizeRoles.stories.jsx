@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Input, Tile } from '@/components';
+import { Button, TextField, Tile } from '@/components';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
@@ -69,15 +69,15 @@ export const Roles = () => (
 /** Controls come in two heights: 32, and 24 only in table rows and toolbars. */
 export const ControlHeights = () => (
     <DoDont>
-        <Do caption={<>A form at 32 (<C>--item-height-md</C>): the field and its buttons share one height.</>}>
+        <Do caption={<>A form at 40 (<C>--height-250</C>): fields are 40 and their buttons 32.</>}>
             <div style={{ ...row('var(--element-inline-md)'), alignItems: 'flex-end' }}>
-                <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><Input id="size-do" label="Student" placeholder="Search students" /></div>
+                <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><TextField id="size-do" label="Student" placeholder="Search students" /></div>
                 <Button text="Add" appearance="primary" />
             </div>
         </Do>
         <Dont caption="A compact 24 button beside a 32 field. Compact is for table rows and inline toolbars only.">
             <div style={{ ...row('var(--element-inline-md)'), alignItems: 'flex-end' }}>
-                <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><Input id="size-dont" label="Student" placeholder="Search students" /></div>
+                <div style={{ flex: 1, minWidth: 'var(--field-width-sm)' }}><TextField id="size-dont" label="Student" placeholder="Search students" /></div>
                 <Button text="Add" spacing="compact" appearance="primary" />
             </div>
         </Dont>
