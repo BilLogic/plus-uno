@@ -10,7 +10,7 @@ authored half (#166), counted rather than assumed.
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Suggestion](Suggestion/index.md) | 8 | ✅ | ✅ | ✅ |
+| [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 

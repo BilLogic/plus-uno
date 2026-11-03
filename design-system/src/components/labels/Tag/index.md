@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, DeprecatedNames, Interactive
+**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerChips, IsDisabled, Interactive
 
 **Storybook page:** `design-system/src/components/labels/Tag/Tag.mdx`
 
@@ -17,34 +17,30 @@
 |------|------|---------|-------------|
 | `text` | string | — | The label (alternative to children). |
 | `children` | node | — | The label (takes precedence over `text`). |
-| `behavior` | enum | — | What a person can do with the tag. `read-only` by default; `link` needs `href`. |
-| `variant` | enum | — | Deprecated: use `behavior`. `dismissible` is `removable`. `operational` still renders a plain button but warns: use `behavior="selectable"` with `aria-expanded`. |
-| `color` | enum | `'gray'` | A category color: an accent family, on the border and swatch. Never a status. `grey` is a deprecated alias for `gray`. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
+| `color` | enum | `'gray'` | A category color: an accent family, on the border and swatch. Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
 | `type` | oneOf | `'plain'` | What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
-| `count` | number or string | — | `selectable` only: a compact neutral Count tag, such as a filter's result count. Ignored with a warning elsewhere. |
+| `trailingMetric` | number or string | — | Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. |
 | `elemBefore` | node | — | Leading content in place of the swatch, such as an icon. Plain tags only: an avatar type leads with its avatar. |
 | `swatchBefore` | string | — | Overrides the swatch color, for a tag acting as a chart legend entry. Any CSS color. |
 | `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |
-| `href` | string | — | Where a `link` tag goes. |
-| `linkComponent` | elementType | — | Router link to render instead of `<a>` for a `link` tag. |
-| `isSelected` | bool | `false` | `selectable` only: the toggle's state, published as `aria-pressed`. |
+| `href` | string | — | Makes the tag a link to this address. |
+| `linkComponent` | elementType | — | Router link to render instead of `<a>` for a link tag. |
+| `isSelected` | bool | — | Makes the tag a toggle, true or false: it publishes `aria-pressed` and fires `onClick`. Leave it out for a tag that is not selectable. |
+| `isRemovable` | bool | `false` | Adds a Remove button, with the 2px focus ring on the button itself. Not shown while the tag is disabled. |
+| `isDisabled` | bool | — | Disables this tag. A field disables all of its tags through `TagContext`. |
 | `isLoading` | bool | `false` | Saving: a spinner replaces the swatch or avatar and the tag ignores presses until it is done. |
-| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. `read-only` and `link` only, on every type; ignored with a warning on `removable` and `selectable`. |
-| `onClick` | func | — | Fires on `selectable`, and on a `link`. |
-| `onRemove` | func | — | `removable`, or a `link` with a separate ×: called when the × is pressed. |
-| `removeLabel` | string | — | Overrides the ×'s accessible name. Defaults to `Remove <label>`. |
+| `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. |
+| `onClick` | func | — | Fires on a selectable tag and on a link. |
+| `onAfterRemoveAction` | func | — | Called with the tag's text and the event after the Remove button is pressed. The caller removes the tag. |
+| `removeButtonLabel` | string | — | Overrides the Remove button's accessible name. Defaults to `Remove <label>`. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 | `style` | object | — | — |
 
 ## Variants
 
-**`behavior`** — `read-only` · `removable` · `selectable` · `link`
-
-**`variant`** — `read-only` · `dismissible` · `selectable` · `operational`
-
-**`color`** — `gray` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange` · `lime` · `brown` · `grey`
+**`color`** — `gray` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange` · `lime` · `brown`
 
 Anything not listed is not a valid value.
 
