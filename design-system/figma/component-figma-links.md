@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-56 docs-page links + 77 style/variant entries across 69 components.
+56 docs-page links + 78 style/variant entries across 70 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -100,6 +100,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Dropdown | Dropdown List | `9109:14766` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766) | verified |
 | Components | FileUpload | File Upload | `13696:8299` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299) | verified |
 | Components | Flag | Flag | `44:4803` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803) | verified |
+| Components | Heading | Heading | `20626:95` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95) | verified |
 | Components | Illustration | Character | `19786:47743` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743) | verified |
 | Components | Jumbotron | Jumbotron | `19627:113213` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19627-113213) | verified |
 | Components | LabelAndCaption | _Form Caption | `13726:9599` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599) | verified |
