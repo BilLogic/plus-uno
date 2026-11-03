@@ -88,7 +88,7 @@ npm run check:token-registry
 ## Code-side source of truth
 
 - Components: `design-system/src/components/` (forms live in `components/forms-and-inputs/`), `specs/`
-- Tokens: `design-system/src/tokens/` (synced from Figma via `npm run sync:tokens`)
+- Tokens: `design-system/src/tokens/` (most families synced from a manual Figma export; deep-foundation tokens in `tokens/deep/` generate the other way, code → Figma, per ADR-038)
 - Agent knowledge entry: `design-system/guidelines/overview.md`
 - Agent views (generated): `design-system/agent-views/`
 
@@ -110,7 +110,7 @@ npm run generate:token-registry
 npm run check:token-registry
 
 # Sync tokens from Figma (requires .env)
-npm run sync:tokens && npm run generate:tokens
+npm run generate:tokens  # exported Figma JSON under tokens/source/ -> SCSS
 
 # Review a prototype for DS compliance
 bash skills/uno-review/scripts/run-review-checks.sh prototypes/<name>/src

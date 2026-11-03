@@ -523,6 +523,34 @@ export const CHECKS = [
       'the list of components, specs and prototype files still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components, design-system/src/specs and prototypes (scripts/lib/color/legacy-components.mjs). Interns pick their next row from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
   },
   {
+    name: 'check:design-tokens',
+    script: 'node scripts/generate-design-tokens.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-design-tokens.mjs',
+    guards:
+      'the generated deep-foundation token files in design-system/src/tokens/deep/ (container and element role SCSS, motion SCSS, the legacy-size alias SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
+  },
+  {
+    name: 'check:old-size-tokens',
+    script: 'node scripts/check-old-size-tokens.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-old-size-tokens.mjs',
+    baseline: 'scripts/baselines/old-size-tokens.json',
+    guards:
+      'files staying off the pre-ADR-038 size vocabularies (--size-element-*, --card-*, --section-*, --modal-*, --surface-*) that the deep-foundation role tokens replace, counted per file in design-system/src, prototypes and src. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:old-size-tokens -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
+    name: 'check:old-size-token-list',
+    script: 'node scripts/generate-old-size-token-list.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-old-size-token-list.mjs',
+    guards:
+      'the list of files still on old size tokens in design-system/guidelines/foundations/spacing.md against the same scan check:old-size-tokens ratchets. A family PR picks its next row from that list, so a file migrated without regenerating it stays on the list, and one that gains an old use is missing from it. Fix: npm run generate:old-size-token-list.',
+  },
+  {
     name: 'check:atlassian-benchmark',
     script: 'node scripts/check-atlassian-benchmark.mjs',
     pkg: 'root',

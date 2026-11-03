@@ -27,7 +27,7 @@ How to draft a design-system fix once the intake routes there. Harness maintenan
 ## Workflow A — token sync & regeneration
 
 1. Confirm `.env` Figma values (`FIGMA_FILE_KEY`, `FIGMA_ACCESS_TOKEN`).
-2. `npm run sync:tokens` (pull from Figma) → `npm run generate:tokens`.
+2. Re-export the Figma JSON under `design-system/src/tokens/source/` → `npm run generate:tokens`.
 3. Inspect the diff in `design-system/src/tokens/*.scss` — never hand-edit generated token files (`AGENTS.md` § Hard rules, `no-hand-edited-generated-files`).
 4. Run Storybook; inspect token-dependent stories.
 5. Naming/values changed → update the token docs in the same branch.
@@ -61,7 +61,6 @@ Files to modify: {paths}
 
 | Script | Entrypoint | When |
 |---|---|---|
-| `scripts/sync-figma-tokens.js` | `npm run sync:tokens` | pull token variables from Figma |
 | `scripts/generate-all-tokens.js` | `npm run generate:tokens` | regenerate SCSS from token source |
 | `scripts/storybook-networkinterfaces-fix.cjs` | auto via `npm run storybook` | Storybook startup stability |
 | `scripts/poll-figma-library.js` | `npm run figma:poll` | Figma library change detection — see automations registry. Notifies (Notion PRD + Slack) as well as recording; use the two below when you only want the snapshot re-recorded |
