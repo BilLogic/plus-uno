@@ -1,26 +1,25 @@
 ---
 embodiment: all
 disclosure: reference
-summary: Figma's six annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts
-description: writing, classifying or auditing a Figma annotation — the six category labels and what each holds, the Logic / data vs Development test, and where status and construction notes go instead; read before labeling one or judging a label.
+summary: Figma's five annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts
+description: writing, classifying or auditing a Figma annotation — the five category labels and what each holds, the Logic / data vs Development test, and where status and construction notes go instead; read before labeling one or judging a label.
 ---
 
 # Figma annotation category labels
 
-<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · moved out of the overview 2026-10-14, read on demand. -->
+<!-- canonical per ADR-017 (docs/adr/) · distilled 2026-07-07 with the Figma overview · categories consolidated 2026-10-09 · Tooltip folded into Content 2026-11-03 · moved out of the overview 2026-10-14, read on demand. -->
 
-Every annotation carries exactly one category label. There are six:
+Every annotation carries exactly one category label. There are five:
 
 | Label | Color | What it holds |
 |---|---|---|
 | `Development` | green | API, field names, implementation and component-construction constraints |
 | `Interaction` | blue | click, hover, focus, tap; when a thing shows, hides, enables or disables |
-| `Content` | orange | copy, labels, empty states, string templates |
+| `Content` | orange | copy, labels, empty states, string templates, tooltip and help text |
 | `Logic / data` | violet | conditions, what is counted, what is derived, where a number comes from, what is recorded |
-| `Tooltip` | teal | hover and help text |
 | `Accessibility` | pink | focus order, keyboard, labels, contrast |
 
-The first four are Figma's presets, kept at their preset colors; `Logic / data` and `Tooltip` are the file's own. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
+The first four are Figma's presets, kept at their preset colors; `Logic / data` is the file's own. Tooltip text is copy, so it is `Content`; when a tooltip shows is `Interaction`. Handoff notes are annotations with the relevant category — written per `docs/conventions/writing.md`.
 
 **`Logic / data` is not `Development`, and the test is the reader.** A product rule a non-engineer can review is `Logic / data`; an endpoint only a developer can review is `Development`. Ask *could a non-engineer tell me this is wrong?* — yes is `Logic / data`.
 
@@ -35,5 +34,5 @@ The first four are Figma's presets, kept at their preset colors; `Logic / data` 
 
 Annotation categories are per-file; a library does not carry them. Pasting a layer into another file recreates its category there unless the label **and** the color both match, so a near-duplicate spawns silently. Preferring the presets is the cheapest defense, since every file already has them at a fixed color.
 
-To retire a category, re-point every annotation off it first, then delete it; `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
+A file that still carries a `Tooltip` category re-points those annotations to `Content`. To retire a category, re-point every annotation off it first, then delete it; `getAnnotationCategoriesAsync` may serve the old list for a while afterwards.
 <!-- /ide-only -->

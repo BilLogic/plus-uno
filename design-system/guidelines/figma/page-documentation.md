@@ -116,7 +116,7 @@ wholly inside its Section.
 
 ## Annotations
 
-`docs/connectors/figma/annotations.md` is the convention: the six category
+`docs/connectors/figma/annotations.md` is the convention: the five category
 labels, what each holds, and where construction, usage and status go instead.
 Read it before writing or judging an annotation. What it means on a library
 page:
@@ -140,9 +140,10 @@ page:
 - **One line each**, at most 120 characters. An Anatomy callout leads with its
   part's number and name from the key, in bold: `**3 Resize grip** · …`. The
   key stays as text beside the instance, since exports render no annotations.
-- **The categories are the six labels, at their colors.** The BS4 file
+- **The categories are the five labels, at their colors.** The BS4 file
   carries only the four presets plus Before, Guidance and two Tooltips; its
-  component pages use the four presets until the file is brought in line.
+  component pages use the four presets until the file is brought in line,
+  and tooltip text goes under Content.
 
 Example, the Textarea page: an Interaction callout on the Anatomy instance's
 resize grip, an Accessibility note on the instance itself, a Content note on
@@ -205,7 +206,7 @@ Each of these is a violation the scan counts:
   `<Set> / Variant matrix`. See Layout and spacing.
 - **Misplaced annotations**: an annotation on a set, variant or part, or
   anywhere outside a Docs frame; a label over its length limit; a category
-  outside the six labels. See Annotations.
+  outside the five labels. See Annotations.
 - **Rasters**: any node with an IMAGE fill. Rebuild the picture from live
   instances inside the Docs frame. Iconography's brand imagery is the one
   exception.
@@ -251,7 +252,7 @@ A page is done when a read-only scan of it finds:
 - every set of two or more variants in a labeled variant matrix, public sets
   above parts, and the Docs frame rightmost;
 - no annotation on a set, variant or part; every annotation on a layer inside
-  a Docs frame, in one of the six labels, within its length limit;
+  a Docs frame, in one of the five labels, within its length limit;
 - zero rasters, default names, broken or detached instances, stray frames,
   HTML entities, issue numbers and legacy template frames;
 - every Docs frame gap and padding bound to a variable, and every text node on
