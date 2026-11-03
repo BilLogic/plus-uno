@@ -65,7 +65,7 @@ export function specCodeSyntax(spec) {
 
 const STATIC = {
   figmaFileKey: 'zAecJNRdvJzAUOcjV32tRX',
-  syncCommand: 'npm run sync:tokens && npm run generate:tokens',
+  syncCommand: 'npm run generate:tokens',
   codeTokenRoot: `${TOKEN_DIR}/`,
   humanReference: 'design-system/guidelines/figma/token-mapping.md',
 };

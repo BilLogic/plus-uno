@@ -23,7 +23,7 @@ Figma component set (instance on canvas)
         ↕  component-registry.json
 PLUS Button.jsx  ←  imported in prototypes via @/
         ↕  same tokens
-Figma Variables  ←  sync:tokens → design-system/src/tokens/
+Figma Variables  →  (manual export) → design-system/src/tokens/; deep-foundation tokens go the other way (ADR-038)
         ↕  token-registry.json
 ```
 
@@ -101,7 +101,7 @@ Requires: `figma-use` skill before canvas writes; summon `writers/figma` for pla
 |-------|----------------|
 | Figma library changed | `npm run figma:poll` (also opens a PRD and posts to Slack) |
 | Snapshots gone stale | `npm run check:figma-snapshots` reports the age; `npm run snapshot:figma-components` and `npm run snapshot:figma-variables` re-record them |
-| Token drift | `npm run sync:tokens` + compare |
+| Token drift | re-export the Figma JSON under `tokens/source/`, `npm run generate:tokens`, compare |
 | Code compliance | `bash skills/uno-review/scripts/run-review-checks.sh <prototype>/src` |
 | Registry stale node | Re-copy link after Figma restructure |
 
