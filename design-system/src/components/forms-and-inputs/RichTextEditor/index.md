@@ -49,6 +49,6 @@ From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEdito
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

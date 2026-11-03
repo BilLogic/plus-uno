@@ -38,12 +38,12 @@ The read view and the edit view are drawn at the same size, so opening the edito
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-border-focused` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--element-pad-x-md` · `--item-height-md` · `--item-height-sm` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-border-focused` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--element-pad-x-md` · `--height-250` · `--item-height-md` · `--radius-0625` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -62,7 +62,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `Switch` · `TagInput` · `TextArea` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `Toggle` · `TreeSelect`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

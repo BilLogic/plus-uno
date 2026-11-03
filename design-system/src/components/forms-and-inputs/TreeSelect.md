@@ -27,7 +27,7 @@
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Input` · `InputGroup` · `NumberInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `Textarea` · `Toggle`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DateAndTimePicker` · `DatePicker` · `Dropdown` · `FileUpload` · `InlineEdit` · `InlineEditableTextfield` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `Toggle`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

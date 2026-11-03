@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-25 components. Each row links to the generated facts; the three columns after it are the
+23 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -20,20 +20,18 @@ authored half (#166), counted rather than assumed.
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
-| [Input](Input.md) | 30 | ✅ | ✅ | ✅ |
-| [InputGroup](InputGroup/index.md) | 24 | ✅ | ✅ | ✅ |
-| [NumberInput](NumberInput.md) | 27 | ✅ | ✕ | ✅ |
 | [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
-| [Textarea](Textarea.md) | 26 | ✅ | ✅ | ✅ |
+| [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
+| [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 23/25 (92%) · Correct/incorrect 14/25 (56%) · Accessibility 24/25 (96%)
+**Authored coverage:** When to use 21/23 (91%) · Correct/incorrect 11/23 (48%) · Accessibility 22/23 (96%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

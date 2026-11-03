@@ -7,7 +7,7 @@ export const SAVE_FAILED = 'Couldn’t save. Try again.';
  * Editing in place, for a subtle field.
  *
  * Two models, chosen by `multiline`:
- *   - single-line (Input, NumberInput): saves when the field loses focus or on
+ *   - single-line (Text field): saves when the field loses focus or on
  *     Enter, and Esc cancels — Notion's model, with no buttons.
  *   - multi-line (Textarea): Save and Cancel buttons, and the field stays open
  *     when it loses focus — Atlassian's InlineEdit, because a click elsewhere
