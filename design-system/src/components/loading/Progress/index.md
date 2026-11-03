@@ -41,6 +41,6 @@ From `design-system/src/components/loading/Progress/Progress.scss`. Override the
 
 ## Related
 
-Same group: `Skeleton` · `Spinner`
+Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
