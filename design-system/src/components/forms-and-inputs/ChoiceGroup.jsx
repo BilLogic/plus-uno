@@ -40,6 +40,8 @@ const ChoiceGroup = ({
     trailingText,
     other,
     appearance = 'plain',
+    /** Radio control (dot) width, in px; unset keeps today's rendering. No effect on `type="checkbox"`. */
+    size,
     required = false,
     disabled = false,
     readOnly = false,
@@ -174,6 +176,7 @@ const ChoiceGroup = ({
     return (
         <fieldset
             className={classes}
+            data-size={!isCheckbox ? size : undefined}
             style={style}
             /*
              * A radio group is a `radiogroup`: it is the role ARIA lets carry
@@ -274,6 +277,8 @@ ChoiceGroup.propTypes = {
     }),
     /** Passed to every choice. `card` draws each as a bordered tile. */
     appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Radio control (dot) width, in px; unset keeps today's rendering. No effect on `type="checkbox"`. */
+    size: PropTypes.oneOf([10, 12, 14]),
     /** The group needs an answer. Marked on the legend. */
     required: PropTypes.bool,
     disabled: PropTypes.bool,
