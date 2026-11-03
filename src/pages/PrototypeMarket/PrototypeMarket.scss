@@ -468,8 +468,8 @@ html.market-active #root {
 
   &__divider {
     width: 100%;
-    height: var(--size-element-stroke-sm);
-    border-radius: var(--size-element-radius-sm);
+    height: var(--border-default);
+    border-radius: var(--element-radius-sm);
     background-color: var(--ds-border-bold);
     opacity: 0.1;
   }

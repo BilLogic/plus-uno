@@ -91,7 +91,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
 | [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
-| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Toast or Modal — choosing by how long the message lives and whether it blocks |
+| [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Flag or Modal — choosing by how long the message lives and whether it blocks |
 | [`design-system/guidelines/components/navigation.md`](design-system/guidelines/components/navigation.md) | Four navigation components sorted by what the user is moving between |
 | [`design-system/guidelines/components/overlays-and-layering.md`](design-system/guidelines/components/overlays-and-layering.md) | Tooltip or Popover (Popup) — hover description versus click-triggered content |
 | [`design-system/guidelines/components/overview.md`](design-system/guidelines/components/overview.md) | What each component is for, when to reach for it, and how it composes |
@@ -194,6 +194,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md`](docs/adr/035-colors-are-generated-from-plans-in-atlassians-grammar.md) | PLUS colors follow Atlassian's token grammar under --ds- (semantic) and --palette- (primitive), generated in the repo from plan files that hold primitive values only; a plan swaps without touching the semantic layer, and a parity check enforces it (2026-10-25) |
 | [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
 | [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
+| [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, container and element roles keyed to density (default/compact/spacious, default/compact) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -222,6 +223,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-151 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+152 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
