@@ -90,7 +90,7 @@ export const Empty = {
     render: () => renderShell(STATE_PROPS.empty),
 };
 
-/** AI generating after gated chips. */
+/** Proposal, not shipped: the AI question generating after the gated chips. */
 export const InProgressAi = {
     name: 'In progress (AI generating)',
     render: () => renderShell(STATE_PROPS.generating),

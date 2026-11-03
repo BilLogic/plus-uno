@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChoiceGroup } from '@/components';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
-import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import SessionDate from '@/specs/Toolkit/Post-Session/Elements/SessionDate/SessionDate';
 import SessionSelection from '@/specs/Toolkit/Post-Session/Elements/SessionSelection/SessionSelection';
 import UploadFiles from '@/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles';
@@ -111,25 +111,7 @@ const SessionInfoForm = ({
     const canSave = hasDateAndSession;
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-md)',
-                flex: '1 0 0',
-                minWidth: 0,
-                width: '100%',
-            }}
-        >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    Session Information
-                </h2>
-                <LastUpdated
-                    text={typeof lastUpdated === 'string' ? lastUpdated : undefined}
-                    value={lastUpdated instanceof Date ? lastUpdated : undefined}
-                />
-            </div>
+        <ReflectionStep title="Session Information" lastUpdated={lastUpdated}>
 
             {/* Figma Session Info Questions: stacked column (Date → Session), not a side-by-side row */}
             <div
@@ -163,7 +145,7 @@ const SessionInfoForm = ({
                         type="checkbox"
                         required
                         legend={(
-                            <span className="body1-txt font-weight-semibold">
+                            <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                 Select one or more reasons why the session did not happen.
                             </span>
                         )}
@@ -178,7 +160,7 @@ const SessionInfoForm = ({
                     <FreeResponseQuestion
                         id="cancellation-description"
                         label="Please briefly describe the situation."
-                        required
+                        isRequired
                         value={formData.cancellationDescription}
                         onChange={(event) => patchForm({ cancellationDescription: event.target.value })}
                     />
@@ -230,7 +212,7 @@ const SessionInfoForm = ({
                 onNext={() => onSave?.(snapshot())}
                 onSubmit={() => onSave?.(snapshot())}
             />
-        </div>
+        </ReflectionStep>
     );
 };
 

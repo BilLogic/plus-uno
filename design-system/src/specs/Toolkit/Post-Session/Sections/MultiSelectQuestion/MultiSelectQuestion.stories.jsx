@@ -7,7 +7,7 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-/** Default with Other chip (shows Other Text Input when selected). */
+/** Default with the Other answer (shows Other Text Input when selected). */
 export const Overview = {
     render: function MultiSelectQuestionStory() {
         const [selectedIds, setSelectedIds] = useState([]);

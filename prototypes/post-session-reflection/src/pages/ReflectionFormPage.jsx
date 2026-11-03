@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components';
 import ReflectionFlow from '@/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow';
 import { REFLECTIONS } from '../data/reflections';
 
@@ -20,9 +21,7 @@ export default function ReflectionFormPage() {
             <div style={{ padding: 'var(--size-section-gap-md)' }}>
                 <h4 className="h4">Reflection not found</h4>
                 <p className="body1-txt">No draft matches id “{reflectionId}”.</p>
-                <button type="button" className="body2-txt" onClick={() => navigate('/')}>
-                    Back to sessions
-                </button>
+                <Button text="Back to sessions" onClick={() => navigate('/')} />
             </div>
         );
     }

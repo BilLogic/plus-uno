@@ -32,11 +32,11 @@ const RECORDING = 'design-system/figma/node-types.json';
 /**
  * The floor. A comparison over an empty recording agrees with everything, so
  * the size is asserted rather than assumed. Lower it only when a mapping is
- * genuinely deleted, and say which one in the commit. 95: Input, Textarea,
+ * genuinely deleted, and say which one in the commit. 94: OptionChip left with the answer Tags, taking its node 10661:10292 out of the registry. Before that, 95: Input, Textarea,
  * Number input and Input group left with Text field and Text area, taking their
  * six Figma nodes (`_Field` among them) out of the registry.
  */
-export const MIN_RECORDED = 95;
+export const MIN_RECORDED = 94;
 
 export const REMEDY =
   `  -> Re-measure with \`npm run audit:figma-registry\`, run the printed probe in\n` +

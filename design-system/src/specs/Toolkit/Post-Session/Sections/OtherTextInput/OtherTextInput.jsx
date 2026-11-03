@@ -1,9 +1,9 @@
 import React, { useId } from 'react';
 import PropTypes from 'prop-types';
-import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
+import { TextArea } from '@/components';
 
 /**
- * Free-text follow-up when an "Other" option chip is selected
+ * Free-text follow-up when an "Other" answer is selected
  * (Figma Sections · Other Text Input `10807:115523`).
  *
  * @param {object} props
@@ -11,7 +11,7 @@ import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
  * @param {string} [props.placeholder='Tell us more…']
  * @param {string} [props.value]
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
- * @param {boolean} [props.required=true]
+ * @param {boolean} [props.isRequired=true]
  * @param {string} [props.id] - Unique field id (defaults to React useId)
  */
 const OtherTextInput = ({
@@ -19,33 +19,19 @@ const OtherTextInput = ({
     placeholder = 'Tell us more…',
     value = '',
     onChange,
-    required = true,
+    isRequired = true,
     id,
 }) => {
     const autoId = useId();
     const fieldId = id || autoId;
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-element-gap-xs)',
-                width: '100%',
-                maxWidth: 'var(--col-7)',
-            }}
-        >
-            <label
-                htmlFor={fieldId}
-                className="body3-txt font-weight-semibold m-0"
-                style={{ color: 'var(--color-on-surface)' }}
-            >
-                {label}
-                {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-            </label>
+        <div style={{ width: '100%', maxWidth: 'var(--col-7)' }}>
             <TextArea
                 id={fieldId}
                 name={fieldId}
+                label={label}
+                isRequired={isRequired}
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
@@ -60,7 +46,7 @@ OtherTextInput.propTypes = {
     placeholder: PropTypes.string,
     value: PropTypes.string,
     onChange: PropTypes.func,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     id: PropTypes.string,
 };
 

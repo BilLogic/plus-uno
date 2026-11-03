@@ -5,7 +5,8 @@ import AiPromptedQuestionBox from '@/specs/Toolkit/Post-Session/Sections/AiPromp
 import FreeResponseQuestion from '@/specs/Toolkit/Post-Session/Sections/FreeResponseQuestion/FreeResponseQuestion';
 import MultiSelectQuestion from '@/specs/Toolkit/Post-Session/Sections/MultiSelectQuestion/MultiSelectQuestion';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
-import LastUpdated from '@/specs/Toolkit/Post-Session/Elements/LastUpdated/LastUpdated';
+import { QuestionLabel } from '@/specs/Toolkit/Post-Session/QuestionText';
+import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import {
     WHAT_WORKED_OPTIONS,
     WHAT_COULD_IMPROVE_OPTIONS,
@@ -114,31 +115,11 @@ const SessionReflectionForm = ({
     const canNext = gatedComplete && escalationOk;
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-md)',
-                flex: '1 0 0',
-                minWidth: 0,
-            }}
-        >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
-                <h2 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
-                    Session Reflection
-                </h2>
-                <LastUpdated
-                    text={typeof lastUpdated === 'string' ? lastUpdated : undefined}
-                    value={lastUpdated instanceof Date ? lastUpdated : undefined}
-                />
-            </div>
+        <ReflectionStep title="Session Reflection" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <p className="body1-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-                        How was the overall session?
-                        <span style={{ color: 'var(--color-danger)' }}> *</span>
-                    </p>
+                    <QuestionLabel rank="question" isRequired>How was the overall session?</QuestionLabel>
                     <SessionRating
                         id="session-reflection-rating"
                         value={rating}
@@ -155,7 +136,7 @@ const SessionReflectionForm = ({
                     ))}
                     otherValue={otherWorked}
                     onOtherChange={(event) => setOtherWorked(event.target.value)}
-                    required={positiveRequired}
+                    isRequired={positiveRequired}
                 />
 
                 <MultiSelectQuestion
@@ -167,7 +148,7 @@ const SessionReflectionForm = ({
                     ))}
                     otherValue={otherImprove}
                     onOtherChange={(event) => setOtherImprove(event.target.value)}
-                    required={improveRequired}
+                    isRequired={improveRequired}
                 />
 
                 {aiState === 'generating' && <AiPromptedQuestionBox state="loading" />}
@@ -199,7 +180,7 @@ const SessionReflectionForm = ({
                     <FreeResponseQuestion
                         id="session-followup-description"
                         label="Please describe the concern."
-                        required
+                        isRequired
                         value={followUpDescription}
                         onChange={(event) => setFollowUpDescription(event.target.value)}
                     />
@@ -216,7 +197,7 @@ const SessionReflectionForm = ({
                 onSaveAndExit={() => onSaveAndExit?.(snapshot())}
                 onNext={() => onNext?.(snapshot())}
             />
-        </div>
+        </ReflectionStep>
     );
 };
 

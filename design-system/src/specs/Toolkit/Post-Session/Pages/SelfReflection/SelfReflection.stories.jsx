@@ -101,7 +101,7 @@ export const Filled = {
     render: () => renderShell(STATE_PROPS.filled),
 };
 
-/** AI loading after gated selections. */
+/** Proposal, not shipped: the AI question loading after the gated selections. */
 export const InProgressAi = {
     name: 'In progress (AI generating)',
     render: () => renderShell(STATE_PROPS.aiGenerating),

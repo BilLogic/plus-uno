@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Button from '@/components/forms-and-inputs/Button';
+import { Button } from '@/components';
 
 const ACTION_CONFIG = {
     start: { text: 'Start', appearance: 'default' },
@@ -14,16 +14,16 @@ const ACTION_CONFIG = {
  * @param {object} props
  * @param {'start'|'continue'|'edit'} [props.action='start']
  * @param {() => void} [props.onClick]
- * @param {boolean} [props.disabled]
+ * @param {boolean} [props.isDisabled]
  */
-const ReflectionFormActions = ({ action = 'start', onClick, disabled = false }) => {
+const ReflectionFormActions = ({ action = 'start', onClick, isDisabled = false }) => {
     const config = ACTION_CONFIG[action] || ACTION_CONFIG.start;
     return (
         <Button
             text={config.text}
             appearance={config.appearance}
             spacing="compact"
-            isDisabled={disabled}
+            isDisabled={isDisabled}
             onClick={onClick}
         />
     );
@@ -32,7 +32,7 @@ const ReflectionFormActions = ({ action = 'start', onClick, disabled = false }) 
 ReflectionFormActions.propTypes = {
     action: PropTypes.oneOf(['start', 'continue', 'edit']),
     onClick: PropTypes.func,
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
 };
 
 export default ReflectionFormActions;

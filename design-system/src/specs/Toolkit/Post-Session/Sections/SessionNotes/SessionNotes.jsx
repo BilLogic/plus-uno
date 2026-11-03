@@ -11,8 +11,8 @@ import PropTypes from 'prop-types';
 const SessionNotes = ({ state = 'empty', notes = '' }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-surface-variant)',
-            border: `1px solid ${state === 'filled' ? 'var(--color-outline)' : 'var(--color-outline-variant)'}`,
+            backgroundColor: 'var(--ds-background-neutral)',
+            border: `1px solid ${state === 'filled' ? 'var(--ds-border-bold)' : 'var(--ds-border)'}`,
             padding: 'var(--size-element-pad-y-md) var(--size-element-pad-x-sm)',
             width: '100%',
             maxWidth: 'var(--col-8)',
@@ -20,13 +20,13 @@ const SessionNotes = ({ state = 'empty', notes = '' }) => (
     >
         {state === 'filled' ? (
             <>
-                <p className="body2-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <p className="body2-txt font-weight-semibold m-0" style={{ color: 'var(--ds-text)' }}>
                     Your Notes from the session:
                 </p>
-                <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>{notes}</p>
+                <p className="body2-txt m-0" style={{ color: 'var(--ds-text)' }}>{notes}</p>
             </>
         ) : (
-            <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt m-0" style={{ color: 'var(--ds-text-subtle)' }}>
                 You didn’t leave notes for this student in this session.
             </p>
         )}

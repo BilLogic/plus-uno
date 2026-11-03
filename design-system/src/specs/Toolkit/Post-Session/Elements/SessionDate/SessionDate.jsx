@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import DatePicker from '@/components/forms-and-inputs/DatePicker';
+import { DatePicker } from '@/components';
+import { QuestionLabel } from '@/specs/Toolkit/Post-Session/QuestionText';
 
 /**
  * Session date field (Figma Elements · Session date `10882:170725`).
@@ -11,20 +12,17 @@ import DatePicker from '@/components/forms-and-inputs/DatePicker';
  * @param {string} [props.label='Select Date']
  * @param {string} [props.value]
  * @param {(value: string) => void} [props.onChange]
- * @param {boolean} [props.required=true]
+ * @param {boolean} [props.isRequired=true]
  */
 const SessionDate = ({
     id = 'session-date',
     label = 'Select Date',
     value = '',
     onChange,
-    required = true,
+    isRequired = true,
 }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', width: '100%', maxWidth: 'var(--col-4)' }}>
-        <label htmlFor={id} className="body3-txt font-weight-semibold m-0" style={{ color: 'var(--color-on-surface)' }}>
-            {label}
-            {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
-        </label>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', width: '100%', maxWidth: 'var(--col-4)' }}>
+        <QuestionLabel htmlFor={id} isRequired={isRequired}>{label}</QuestionLabel>
         <DatePicker
             id={id}
             name="date"
@@ -42,7 +40,7 @@ SessionDate.propTypes = {
     label: PropTypes.string,
     value: PropTypes.string,
     onChange: PropTypes.func,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
 };
 
 export default SessionDate;

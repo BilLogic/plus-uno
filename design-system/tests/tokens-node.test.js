@@ -525,7 +525,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // tokens, and their three color fallbacks went.
     // 435: the Admin, Training, Home, Login and Universal state washes moved onto
     // the --ds- tokens, and their 13 color fallbacks went with the legacy names.
-    expect(comparable).toBe(435);
+    // 431: the reflection prototype's base styles took --ds- tokens, and their four
+    // color fallbacks went.
+    expect(comparable).toBe(431);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

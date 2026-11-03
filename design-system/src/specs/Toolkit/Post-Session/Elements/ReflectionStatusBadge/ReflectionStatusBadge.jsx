@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import StatusTag from '@/components/labels/StatusTag';
+import { StatusTag } from '@/components';
 
 const STATUS_CONFIG = {
     'not-started': {

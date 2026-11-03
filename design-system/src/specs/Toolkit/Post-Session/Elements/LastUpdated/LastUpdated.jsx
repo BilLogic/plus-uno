@@ -14,7 +14,7 @@ import { formatLastUpdated } from '@/specs/Toolkit/Post-Session/reflectionCopy';
 const LastUpdated = ({ value, text, className = '' }) => (
     <p
         className={`body3-txt m-0 ${className}`.trim()}
-        style={{ color: 'var(--color-on-surface-variant)' }}
+        style={{ color: 'var(--ds-text-subtle)' }}
     >
         {text || formatLastUpdated(value)}
     </p>

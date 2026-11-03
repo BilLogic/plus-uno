@@ -30,15 +30,16 @@ export const Overview = {
                     flexWrap: 'wrap',
                     gap: 'var(--size-section-gap-lg)',
                     alignItems: 'flex-start',
-                    backgroundColor: 'var(--color-surface-variant)',
+                    backgroundColor: 'var(--ds-surface-sunken)',
                     padding: 'var(--size-section-pad-y-sm)',
                 }}
             >
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Students confirmed
                     </span>
                     <SideNavBar
+                        label="Steps, students confirmed"
                         state="students-confirmed"
                         students={SAMPLE_STUDENTS}
                         activeTab={activeTab}
@@ -48,10 +49,11 @@ export const Overview = {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Pre-student add
                     </span>
                     <SideNavBar
+                        label="Steps, pre-student add"
                         state="pre-student-add"
                         students={[]}
                         activeTab="session-information"
@@ -60,10 +62,11 @@ export const Overview = {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
-                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         In progress
                     </span>
                     <SideNavBar
+                        label="Steps, in progress"
                         state="in-progress"
                         students={SAMPLE_STUDENTS}
                         activeTab="session-reflection"

@@ -18,7 +18,7 @@ export const Overview = {
             style={{
                 display: 'flex',
                 flexWrap: 'wrap',
-                gap: '24px',
+                gap: 'var(--section-stack-lg)',
                 alignItems: 'flex-start',
             }}
         >
