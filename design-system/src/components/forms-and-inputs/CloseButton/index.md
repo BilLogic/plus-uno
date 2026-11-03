@@ -3,13 +3,13 @@
 
 # CloseButton
 
-The one dismiss control for surfaces that close as a whole — Alert, Toast, Modal. A fixed 32×32 hit area holding a 16px xmark: it never scales with the text around it, so placing it on a line of text is the parent's job. `tone="inverse"` is for colored or dark grounds. There is no disabled state (a close control is never disabled) and no color variants (the × is neutral on every intent). Its name is "Close", or "Dismiss {what}" when `what` is passed.
+The one dismiss control for a surface that closes as a whole — Modal dialog, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: "Close" for a surface that blocks (Modal dialog), "Dismiss {what}" for a message. `tone="inverse"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.
 
 **Import:** `import { CloseButton } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.stories.jsx` — Tones, FixedSize, Names, Focus, InverseGrounds, Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.stories.jsx` — Overview, Spacing, Tones, Focus, InverseGrounds, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.mdx`
 
@@ -17,20 +17,23 @@ The one dismiss control for surfaces that close as a whole — Alert, Toast, Mod
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `tone` | enum | `'default'` | `default` on neutral surfaces, `inverse` only on the declared colored and dark grounds |
-| `what` | string | — | What closes — the accessible name becomes "Dismiss {what}" |
-| `onClick` | func | — | Called when the button is pressed |
-| `className` | string | `''` | Additional CSS classes |
+| `label` | string | `'Close'` | "Close" for a surface that blocks; "Dismiss {what}" for a message |
+| `tone` | enum | `'default'` | `default` on neutral surfaces; `inverse` only on the declared colored and dark grounds |
+| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
+| `onClick` | func | — | — |
+| `className` | string | — | — |
 
 ## Variants
 
 **`tone`** — `default` · `inverse`
 
+**`spacing`** — `default` · `compact`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-focus-ring` · `--color-focus-ring-inverse` · `--color-on-surface-variant` · `--color-surface` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--icon-md` · `--item-height-md` · `--size-element-radius-lg` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--ds-border-focused-inverse` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-text-inverse`
 
 From `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss`. Override these through the token layer, never with a literal.
 
@@ -38,4 +41,8 @@ From `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss
 
 Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet — when to use, correct/incorrect, and accessibility
+> are unwritten for this component (#166). Nothing above tells you whether
+> reaching for `CloseButton` is the right call, only what it accepts.

@@ -1,134 +1,36 @@
-@use "sass:map";
-@use "sass:list";
-
 /*
- * ButtonGroup Component Styles
- * Strictly implements Design System tokens for grouped buttons.
- * Uses tonal fill as default per Figma specification.
+ * Button group: a connected row of Button children. The group itself paints
+ * nothing — each button keeps its own appearance and spacing — it only
+ * squares off the corners between neighbors so the row reads as one control.
+ * Radius matches Button's own default (6); a child's own compact radius (4)
+ * is left to that child, so a mixed-height group is a caller's choice to avoid.
  */
-
 .plus-button-group {
-    // Reset default RB button-group styles
     display: inline-flex;
+    align-items: center;
     vertical-align: middle;
     gap: 0;
-    --plus-button-group-radius: var(--size-element-radius-md);
-    border-radius: var(--plus-button-group-radius);
-    overflow: hidden;
 
-    // Direct Button children styling for group context
-    >.plus-btn,
-    >.btn {
-        // Start fully rounded, then "square off" per adjacency rules below.
-        // This matches: has-left-neighbor => no left radii, has-right-neighbor => no right radii.
-        border-radius: var(--plus-button-group-radius);
-        border: none;
-        margin: 0;
+    > .plus-btn {
+        border-radius: var(--element-radius-item-sm);
         position: relative;
-        box-shadow: none;
-        outline: none;
 
-        // Has a button to its LEFT => square off left corners
         &:not(:first-child) {
+            margin-left: calc(-1 * var(--size-element-border));
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
 
-        // Has a button to its RIGHT => square off right corners
         &:not(:last-child) {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
-    }
 
-    // Override Bootstrap's .btn-group rules which have higher specificity
-    &.btn-group {
-        >.btn,
-        >.plus-btn {
-            border: none;
-            margin-left: 0;
-            margin-right: 0;
-            box-shadow: none;
-
-            &:not(:first-child) {
-                margin-left: 0;
-            }
-
-            &:focus,
-            &:active,
-            &.active {
-                box-shadow: none;
-                outline: none;
-            }
-        }
-    }
-
-    // --- VERTICAL ALIGNMENT ---
-    &.btn-group-vertical,
-    &--vertical {
-        flex-direction: column;
-
-        >.plus-btn,
-        >.btn {
-            border-radius: var(--plus-button-group-radius);
-
-            // Has a button ABOVE => square off top corners
-            &:not(:first-child) {
-                border-top-left-radius: 0;
-                border-top-right-radius: 0;
-            }
-
-            // Has a button BELOW => square off bottom corners
-            &:not(:last-child) {
-                border-bottom-left-radius: 0;
-                border-bottom-right-radius: 0;
-            }
-        }
-
-        &.btn-group {
-            >.btn,
-            >.plus-btn {
-                &:not(:first-child) {
-                    margin-top: 0;
-                    margin-left: 0;
-                }
-            }
-        }
-    }
-
-    // --- SIZE VARIANTS ---
-
-    &.btn-group-sm {
-        --plus-button-group-radius: var(--size-element-radius-sm);
-        border-radius: var(--plus-button-group-radius);
-
-        >.plus-btn,
-        >.btn {
-            border-radius: var(--plus-button-group-radius);
-        }
-
-        &.btn-group-vertical {
-
-            >.plus-btn,
-            >.btn {
-                border-radius: var(--plus-button-group-radius);
-            }
-        }
-    }
-
-    &.btn-group-lg {
-        --plus-button-group-radius: var(--size-element-radius-md);
-        border-radius: var(--plus-button-group-radius);
-    }
-
-    &--block {
-        display: flex;
-        width: 100%;
-
-        >.plus-btn,
-        >.btn {
-            flex: 1;
-            width: 100%;
+        // A neighbor's edge should never cover another button's focus ring
+        // or hover fill.
+        &:hover,
+        &:focus-visible {
+            z-index: 1;
         }
     }
 }

@@ -8,14 +8,14 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
-| [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
+| [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
+| [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
-| [CloseButton](CloseButton/index.md) | 4 | ✅ | ✅ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
-| [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
+| [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
+| [DateAndTimePicker](DateAndTimePicker.md) | 28 | ✅ | ✕ | ✅ |
+| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
@@ -28,16 +28,16 @@ authored half (#166), counted rather than assumed.
 | [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 42 | ✕ | ✕ | ✕ |
+| [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 10 | ✕ | ✕ | ✕ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
-| [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
+| [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 16/29 (55%) · Correct/incorrect 9/29 (31%) · Accessibility 20/29 (69%)
+**Authored coverage:** When to use 19/29 (66%) · Correct/incorrect 9/29 (31%) · Accessibility 23/29 (79%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -1,267 +1,121 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
+
+const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
 
 export default {
-    title: 'Components/Forms and inputs/Button group',
+    title: 'Components/Forms and inputs/Button/Button group',
     component: ButtonGroup,
+    /** Hide CSF stories from the sidebar; docs live on ButtonGroup.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Follows Button: `appearance` and `spacing` (default 32, compact 24) set every button in the group.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Follows Button group (https://atlassian.design/components/button/button-group): a plain container for Button children, each keeping its own appearance and spacing. `appearance`, `spacing`, the `buttons` config array and `vertical` are gone; `ariaLabel` is `label`.' },
         ],
-        docs: {
-            description: {
-                component: 'Button Group component for grouping related buttons together. Supports horizontal and vertical layouts, with the appearance and spacing of Button.'
-            }
-        }
+        docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
-        // DESIGN
-        appearance: {
-            control: 'select',
-            options: ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'],
-            description: 'Appearance of every button in the group',
-            table: { category: 'Design' }
-        },
-        spacing: {
-            control: 'select',
-            options: ['default', 'compact'],
-            description: 'Spacing of every button in the group: default 32, compact 24',
-            table: { category: 'Design' }
-        },
-        vertical: {
-            control: 'boolean',
-            description: 'Stack buttons vertically',
-            table: { category: 'Design' }
-        },
-
-        // CONTENT
-        buttonCount: {
-            control: { type: 'range', min: 2, max: 5, step: 1 },
-            description: 'Number of buttons in the group',
-            table: { category: 'Content' }
-        },
-
-        // DEVELOPMENT
-        id: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        className: {
-            control: false,
-            table: { disable: true, category: 'Development' }
-        },
-        ariaLabel: {
-            table: { disable: true, category: 'Development' }
-        },
-        buttons: {
-            table: { disable: true, category: 'Development' }
-        },}
-};
-
-const bgCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
-
-function ButtonGroupSizesDemos() {
-    return (
-        <section>
-            <div style={{ display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Compact</span>
-                    <ButtonGroup
-                        spacing="compact"
-                        buttons={[{ text: 'Left' }, { text: 'Right' }]}
-                    />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Default</span>
-                    <ButtonGroup
-                        buttons={[{ text: 'Left' }, { text: 'Right' }]}
-                    />
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function ButtonGroupLayoutDemos() {
-    return (
-        <section>
-            <div style={{ display: 'flex', gap: '48px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Horizontal</span>
-                    <ButtonGroup
-                        buttons={[{ text: 'Left' }, { text: 'Center' }, { text: 'Right' }]}
-                    />
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)' }}>Vertical</span>
-                    <ButtonGroup
-                        vertical
-                        buttons={[{ text: 'Top' }, { text: 'Middle' }, { text: 'Bottom' }]}
-                    />
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function ButtonGroupCountsDemos() {
-    return (
-        <section>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>2 Buttons</span>
-                    <ButtonGroup buttons={[{ text: 'Left' }, { text: 'Right' }]} />
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>3 Buttons</span>
-                    <ButtonGroup buttons={[{ text: 'Left' }, { text: 'Center' }, { text: 'Right' }]} />
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>4 Buttons</span>
-                    <ButtonGroup buttons={[{ text: 'One' }, { text: 'Two' }, { text: 'Three' }, { text: 'Four' }]} />
-                </div>
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <span className="plus-body-3" style={{ color: 'var(--color-on-surface)', minWidth: '80px' }}>5 Buttons</span>
-                    <ButtonGroup buttons={[{ text: 'One' }, { text: 'Two' }, { text: 'Three' }, { text: 'Four' }, { text: 'Five' }]} />
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function ButtonGroupUseCasesDemos() {
-    return (
-        <section>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <ButtonGroup
-                        buttons={[
-                            { leadingVisual: 'chevron-left', props: { 'aria-label': 'Previous page' } },
-                            { text: '1' },
-                            { text: '2', active: true },
-                            { text: '3' },
-                            { trailingVisual: 'chevron-right', props: { 'aria-label': 'Next page' } }
-                        ]}
-                    />
-                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Pagination Controls</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <ButtonGroup
-                        appearance="subtle"
-                        buttons={[
-                            { leadingVisual: 'bold', props: { 'aria-label': 'Bold' } },
-                            { leadingVisual: 'italic', props: { 'aria-label': 'Italic' } },
-                            { leadingVisual: 'underline', props: { 'aria-label': 'Underline' } }
-                        ]}
-                    />
-                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Text Formatting Toolbar</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    <ButtonGroup
-                        buttons={[
-                            { text: 'Day', active: true },
-                            { text: 'Week' },
-                            { text: 'Month' }
-                        ]}
-                    />
-                    <span className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>Toggle Selection</span>
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function ButtonGroupChildrenDemos() {
-    return (
-        <section>
-            <ButtonGroup>
-                <Button appearance="primary" text="Custom" iconBefore="star" />
-                <Button appearance="primary" text="Button" />
-                <Button appearance="primary" text="Children" iconAfter="arrow-right" />
-            </ButtonGroup>
-        </section>
-    );
-}
-
-export const Sizes = () => (
-    <div style={bgCol}>
-        <ButtonGroupSizesDemos />
-    </div>
-);
-
-export const Layout = () => (
-    <div style={bgCol}>
-        <ButtonGroupLayoutDemos />
-    </div>
-);
-
-export const Counts = () => (
-    <div style={bgCol}>
-        <ButtonGroupCountsDemos />
-    </div>
-);
-
-export const Patterns = () => (
-    <div style={bgCol}>
-        <ButtonGroupUseCasesDemos />
-    </div>
-);
-
-export const Children = () => (
-    <div style={bgCol}>
-        <ButtonGroupChildrenDemos />
-    </div>
-);
-
-function renderButtonGroupPlayground(args) {
-    const buttonLabels = ['Left', 'Center', 'Right', 'Fourth', 'Fifth'];
-    const buttons = Array.from({ length: args.buttonCount || 3 }, (_, i) => ({
-        text: buttonLabels[i] || `Button ${i + 1}`
-    }));
-
-    return (
-        <ButtonGroup
-            {...args}
-            buttons={buttons}
-        />
-    );
-}
-
-const buttonGroupOverviewArgs = {
-    appearance: 'default',
-    vertical: false,
-    buttonCount: 3
-};
-
-const buttonGroupPlaygroundArgs = {
-    appearance: 'default',
-    vertical: false,
-    buttonCount: 4
+        label: { control: 'text', description: "The group's accessible name. Strongly recommended.", table: { category: 'Content' } },
+        testId: { table: { disable: true, category: 'Development' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
+        id: { control: false, table: { disable: true, category: 'Development' } },
+    },
+    args: { label: 'Date range' },
 };
 
 export const Overview = {
-    render: renderButtonGroupPlayground,
-    args: { ...buttonGroupOverviewArgs },
-    parameters: {
-        docs: {
-            source: { language: 'jsx', code: webAppSourceSnippets.buttonGroup }
-        }
-    }
+    render: (args) => (
+        <ButtonGroup {...args}>
+            <Button text="Week" />
+            <Button text="Month" />
+        </ButtonGroup>
+    ),
+    parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.buttonGroup } } },
+    play: async ({ canvasElement }) => {
+        const group = within(canvasElement).getByRole('group', { name: 'Date range' });
+        await expect(group).toHaveClass('plus-button-group');
+        await expect(within(group).getAllByRole('button')).toHaveLength(2);
+    },
 };
 
-/**
- * Interactive Playground
- * Customize the button group attributes in real-time.
- */
+export const Appearances = {
+    render: () => (
+        <ButtonGroup label="Appearances">
+            <Button text="Default" />
+            <Button text="Primary" appearance="primary" />
+        </ButtonGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Default' })).toHaveClass('plus-btn--default');
+        await expect(canvas.getByRole('button', { name: 'Primary' })).toHaveClass('plus-btn--primary');
+    },
+};
+
+export const Spacing = {
+    render: () => (
+        <div style={row}>
+            <ButtonGroup label="Compact group">
+                <Button text="Day" spacing="compact" />
+                <Button text="Week" spacing="compact" />
+            </ButtonGroup>
+            <ButtonGroup label="Default group">
+                <Button text="Day" />
+                <Button text="Week" />
+            </ButtonGroup>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const group = canvas.getByRole('group', { name: 'Compact group' });
+        const compact = within(group).getByRole('button', { name: 'Day' });
+        await expect(compact.getBoundingClientRect().height).toBe(24);
+    },
+};
+
+export const IconOnly = {
+    render: () => {
+        const [view, setView] = useState('grid');
+        return (
+            <ButtonGroup label="View mode">
+                <IconButton icon="grip" label="Grid view" isSelected={view === 'grid'} onClick={() => setView('grid')} />
+                <IconButton icon="list" label="List view" isSelected={view === 'list'} onClick={() => setView('list')} />
+            </ButtonGroup>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Grid view' })).toHaveAttribute('aria-pressed', 'true');
+    },
+};
+
+export const Selected = {
+    render: () => {
+        const [range, setRange] = useState('week');
+        return (
+            <ButtonGroup label="Date range">
+                <Button text="Week" isSelected={range === 'week'} onClick={() => setRange('week')} />
+                <Button text="Month" isSelected={range === 'month'} onClick={() => setRange('month')} />
+            </ButtonGroup>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Week' })).toHaveAttribute('aria-pressed', 'true');
+        await expect(canvas.getByRole('button', { name: 'Month' })).toHaveAttribute('aria-pressed', 'false');
+    },
+};
+
 export const Interactive = {
-    render: renderButtonGroupPlayground,
-    args: { ...buttonGroupPlaygroundArgs }
+    render: (args) => (
+        <ButtonGroup {...args}>
+            <Button text="Week" />
+            <Button text="Month" />
+        </ButtonGroup>
+    ),
 };

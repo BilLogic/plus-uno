@@ -227,7 +227,7 @@ Dismiss.play = async ({ canvasElement }) => {
 
         button.focus({ focusVisible: true });
         await expect(button.matches(':focus-visible'), `${style}: keyboard-focused`).toBe(true);
-        await expect(getComputedStyle(button, '::after').borderTopColor, `${style}: default ring`).toBe(ring);
+        await expect(getComputedStyle(button).outlineColor, `${style}: default ring`).toBe(ring);
         button.blur();
     }
 
