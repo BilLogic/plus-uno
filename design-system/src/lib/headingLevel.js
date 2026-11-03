@@ -28,11 +28,7 @@ export const headingTag = (level) => `h${Math.min(Math.max(Math.round(level), 1)
  */
 export const HeadingContextProvider = ({ value, children }) => {
     const ambient = useHeadingLevel();
-    return (
-        <HeadingLevelContext.Provider value={value ?? ambient + 1}>
-            {children}
-        </HeadingLevelContext.Provider>
-    );
+    return React.createElement(HeadingLevelContext.Provider, { value: value ?? ambient + 1 }, children);
 };
 
 HeadingContextProvider.propTypes = {

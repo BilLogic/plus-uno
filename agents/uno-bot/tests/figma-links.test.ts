@@ -333,10 +333,10 @@ describe("only registry components", () => {
     // (+2 net, replacing the single Table row).
     // 68: TimePicker became its own public component, carrying forward the
     // `_Time Field` node id that used to live on DateTimePicker's own entry
-    // (+1 net).
-    // 69: Calendar became its own public component, wrapping the shared
-    // `_Calendar` part DatePicker and DateTimePicker already open (+1 net).
-    assert.equal(names.length, 69);
+    // (+1 net). 69: Calendar became its own public component, wrapping the
+    // shared `_Calendar` part DatePicker and DateTimePicker already open
+    // (+1 net). 70: Heading is a new component with its own figmaMeta (+1).
+    assert.equal(names.length, 70);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
