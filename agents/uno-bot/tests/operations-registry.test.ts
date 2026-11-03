@@ -19,7 +19,19 @@ function jobKinds(): string[] {
   const src = readFileSync(resolve(process.cwd(), "src", "scheduled", "runs.ts"), "utf8");
   const union = src.match(/export type ScheduledJobKind =([\s\S]*?);/)?.[1];
   assert.ok(union, "ScheduledJobKind is declared in src/scheduled/runs.ts");
-  return [...union.matchAll(/"([a-z-]+)"/g)].map((m) => m[1] ?? "");
+  const kinds = [...union!.matchAll(/"([a-z-]+)"/g)].map((m) => m[1] ?? "");
+  // The floor is read off the union itself rather than held as a literal: each
+  // member is one `|`, so a quoting change that made the capture miss a kind
+  // (or double-count one) shows up as a mismatch against a count the regex
+  // cannot also get wrong the same way.
+  const members = (union!.match(/\|/g) ?? []).length;
+  assert.equal(
+    kinds.length,
+    members,
+    `parsed ${kinds.length} quoted kind(s) from ${members} union member(s) in ` +
+      "src/scheduled/runs.ts; the quoting style changed and the capture missed one",
+  );
+  return kinds;
 }
 
 test("read_reference serves the automations registry by name", () => {
@@ -31,7 +43,6 @@ test("read_reference serves the automations registry by name", () => {
 test("every scheduled job kind has a row in the registry", () => {
   const { text } = JSON.parse(readReference({ name: REGISTRY })) as { text: string };
   const kinds = jobKinds();
-  assert.ok(kinds.length > 20, `read ${kinds.length} job kinds; the union's shape changed`);
   const missing = kinds.filter((k) => !text.includes(`\`${k}\``));
   assert.deepEqual(missing, [], "add each to docs/engineering/operations.md and rerun `npm run bundle:harness`");
 });
