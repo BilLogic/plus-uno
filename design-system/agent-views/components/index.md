@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (71)
+## UI components (74)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
@@ -35,6 +35,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Dropdown](../../src/components/forms-and-inputs/Dropdown/index.md)
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
+- [FilterButton](../../src/components/forms-and-inputs/FilterButton/index.md)
 - [Footer](../../src/components/_internal/Footer/index.md)
 - [GenerativeBorder](../../src/components/loading/GenerativeBorder/index.md)
 - [IconButton](../../src/components/forms-and-inputs/IconButton/index.md)
@@ -65,6 +66,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [SidebarTab](../../src/components/navigation/SidebarTab/index.md)
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
 - [Spinner](../../src/components/loading/Spinner/index.md)
+- [SplitButton](../../src/components/forms-and-inputs/SplitButton/index.md)
 - [StaticBadgeSmart](../../src/components/_internal/StaticBadgeSmart/index.md)
 - [StatusTag](../../src/components/labels/StatusTag/index.md)
 - [Suggestion](../../src/components/labels/Suggestion/index.md)
@@ -80,4 +82,5 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Tooltip](../../src/components/overlays-and-layering/Tooltip/index.md)
 - [TreeSelect](../../src/components/forms-and-inputs/TreeSelect.md)
 - [UserAvatar](../../src/components/_internal/UserAvatar/index.md)
+- [VerticalButton](../../src/components/forms-and-inputs/VerticalButton/index.md)
 - [VisuallyHidden](../../src/components/layout-and-structure/VisuallyHidden/index.md)

@@ -2,12 +2,12 @@
 
 # Forms and inputs
 
-26 components. Each row links to the generated facts; the three columns after it are the
+29 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 17 | ✕ | ✕ | ✅ |
+| [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
@@ -18,6 +18,7 @@ authored half (#166), counted rather than assumed.
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
+| [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
 | [IconButton](IconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
@@ -28,13 +29,15 @@ authored half (#166), counted rather than assumed.
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
+| [SplitButton](SplitButton/index.md) | 10 | ✕ | ✕ | ✕ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
+| [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 21/26 (81%) · Correct/incorrect 11/26 (42%) · Accessibility 25/26 (96%)
+**Authored coverage:** When to use 21/29 (72%) · Correct/incorrect 11/29 (38%) · Accessibility 25/29 (86%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

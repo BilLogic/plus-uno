@@ -44,6 +44,24 @@ export const webAppSourceSnippets = {
         '  appearance="primary"',
         '/>'
     ]),
+    splitButton: snippet([
+        '<SplitButton',
+        '  text="Save"',
+        '  menuLabel="More save options"',
+        '/>'
+    ]),
+    filterButton: snippet([
+        '<FilterButton',
+        '  text="Status"',
+        '  trailingMetric={2}',
+        '/>'
+    ]),
+    verticalButton: snippet([
+        '<VerticalButton',
+        '  icon="user-gear"',
+        '  label="Admin"',
+        '/>'
+    ]),
     iconButton: snippet([
         '<IconButton',
         '  icon="pen"',

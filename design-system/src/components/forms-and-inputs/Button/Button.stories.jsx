@@ -107,9 +107,6 @@ export default {
             description: '`default` draws 32. `compact` draws 24, for tables and tight toolbars.',
             table: { category: 'Design' }
         },
-        vertical: {
-            table: { disable: true, category: 'Design' }
-        },
         shouldFitContainer: {
             control: 'boolean',
             description: 'Stretch to the width of the container',

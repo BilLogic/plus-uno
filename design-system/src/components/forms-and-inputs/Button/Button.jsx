@@ -62,7 +62,6 @@ export const Button = ({
     // Icons
     iconBefore,
     iconAfter,
-    vertical = false,
 
     id,
     ...props
@@ -74,7 +73,6 @@ export const Button = ({
         `plus-btn--${appearance}`,
         {
             'plus-btn--compact': spacing === 'compact',
-            'plus-btn--vertical': vertical,
             'plus-btn--fit-container': shouldFitContainer,
             'plus-btn--loading': isLoading,
             'plus-btn--selected': isSelected,
@@ -129,7 +127,6 @@ Button.propTypes = {
     // Icons: a Font Awesome Free glyph name (`plus`) or a node.
     iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    vertical: PropTypes.bool,
 
     id: PropTypes.string,
 };
