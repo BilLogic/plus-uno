@@ -11,7 +11,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CloseButton, LinkButton } from '@/components';
+import { Button, CloseButton, LinkButton } from '@/components';
 import { Frame, PatternDrawer } from '@/patterns';
 import { TopBar, Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
@@ -79,14 +79,24 @@ const FocusedFrame = ({
     const topbar = (
         <header className="plus-page-focused__topbar">
             {hasBack ? (
-                <LinkButton
-                    className="plus-page-focused__back"
-                    appearance="subtle"
-                    iconBefore="arrow-left"
-                    text={backLabel}
-                    href={backHref}
-                    onClick={onBack}
-                />
+                backHref ? (
+                    <LinkButton
+                        className="plus-page-focused__back"
+                        appearance="subtle"
+                        iconBefore="arrow-left"
+                        text={backLabel}
+                        href={backHref}
+                        onClick={onBack}
+                    />
+                ) : (
+                    <Button
+                        className="plus-page-focused__back"
+                        appearance="subtle"
+                        iconBefore="arrow-left"
+                        text={backLabel}
+                        onClick={onBack}
+                    />
+                )
             ) : null}
             {/* The focused page names its task here, so it needs a title; the spacer keeps Close at the end without one. */}
             {title ? <h1 className="plus-page-focused__title">{title}</h1> : <span className="plus-page-focused__title" aria-hidden="true" />}

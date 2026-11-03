@@ -77,16 +77,26 @@ const Topbar = ({
                     <Skeleton shape="circle" width="var(--item-height-md)" />
                 ) : (
                     <>
-                        <LinkIconButton
-                            className="plus-topbar__help"
-                            appearance="subtle"
-                            icon="circle-question"
-                            label="Help Center"
-                            href={helpHref}
-                            target={helpHref ? '_blank' : undefined}
-                            rel={helpHref ? 'noreferrer' : undefined}
-                            onClick={onHelpClick}
-                        />
+                        {helpHref ? (
+                            <LinkIconButton
+                                className="plus-topbar__help"
+                                appearance="subtle"
+                                icon="circle-question"
+                                label="Help Center"
+                                href={helpHref}
+                                target="_blank"
+                                rel="noreferrer"
+                                onClick={onHelpClick}
+                            />
+                        ) : (
+                            <IconButton
+                                className="plus-topbar__help"
+                                appearance="subtle"
+                                icon="circle-question"
+                                label="Help Center"
+                                onClick={onHelpClick}
+                            />
+                        )}
                         {user ? (
                             <UserAvatar
                                 size="md"
