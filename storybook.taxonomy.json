@@ -79,6 +79,10 @@
       "Popup",
       "Tooltip"
     ],
+    "Status indicators": [
+      "Progress indicator",
+      "Progress tracker"
+    ],
     "Text and data display": [
       "Code",
       "Code block",
@@ -239,6 +243,11 @@
       [
         "Popup",
         "Tooltip"
+      ],
+      "Status indicators",
+      [
+        "Progress indicator",
+        "Progress tracker"
       ],
       "Text and data display",
       [

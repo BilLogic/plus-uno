@@ -41,6 +41,8 @@ export { default as NavTabs } from '@/components/navigation/NavTabs';
 export { default as Pagination } from '@/components/navigation/Pagination';
 export { default as Popover } from '@/components/overlays-and-layering/Popover';
 export { default as Progress } from '@/components/loading/Progress';
+export { default as ProgressIndicator } from '@/components/status-indicators/ProgressIndicator';
+export { default as ProgressTracker } from '@/components/status-indicators/ProgressTracker';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 export { default as Scrollspy } from '@/components/navigation/Scrollspy';
