@@ -62,6 +62,7 @@
     "Layout and structure": [
       "Accordion",
       "Carousel",
+      "Page header",
       "Scrollbar",
       "Visually hidden",
       "Card",
@@ -233,6 +234,7 @@
       [
         "Accordion",
         "Carousel",
+        "Page header",
         "Scrollbar",
         "Visually hidden",
         "Card",
