@@ -29,11 +29,11 @@ export const ProductAreaDropdown = ({
         id={id}
         label={label}
         placeholder={placeholder}
-        size="small"
+        spacing="compact"
         options={options.map(({ value: optionValue, text }) => ({ value: optionValue, label: text }))}
         value={value ?? ''}
         onChange={onChange}
-        required={required}
+        isRequired={required}
         defaultOpen={defaultOpen}
         className={`plus-product-area-dropdown ${className}`.trim()}
     />

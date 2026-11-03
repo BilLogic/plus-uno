@@ -16,14 +16,9 @@ const REGIONS = [
     { label: 'Wales', value: 'wales' },
 ];
 
-const Harness = ({ initial = [] }) => {
+const Harness = ({ initial = [], ...props }) => {
     const [path, setPath] = useState(initial);
-    return (
-        <>
-            <label htmlFor="cc">Region</label>
-            <Cascader id="cc" options={REGIONS} value={path} onChange={setPath} />
-        </>
-    );
+    return <Cascader id="cc" label="Region" options={REGIONS} value={path} onChange={setPath} {...props} />;
 };
 
 describe('Cascader', () => {
@@ -60,5 +55,19 @@ describe('Cascader', () => {
         await user.click(screen.getByRole('option', { name: 'Edinburgh' }));
         expect(trigger).toHaveValue('Scotland / Edinburgh');
         expect(screen.queryByRole('listbox')).toBeNull();
+    });
+
+    it('draws the error border and announces errorMessage when isInvalid', () => {
+        render(<Harness isInvalid errorMessage="Pick a region" />);
+        const trigger = screen.getByRole('combobox', { name: 'Region' });
+        expect(trigger.closest('.plus-field')).toHaveClass('plus-field--invalid');
+        expect(screen.getByRole('alert')).toHaveTextContent('Pick a region');
+    });
+
+    it('draws rows at 32 with spacing="compact"', async () => {
+        const user = userEvent.setup();
+        render(<Harness spacing="compact" />);
+        await user.click(screen.getByRole('combobox', { name: 'Region' }));
+        expect(screen.getAllByRole('option')[0]).toHaveClass('plus-option-row--compact');
     });
 });

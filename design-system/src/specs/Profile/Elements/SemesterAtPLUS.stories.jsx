@@ -45,14 +45,13 @@ export const SemesterAtPLUS = ({ id = 'semester-plus', value, onChange, defaultV
             <Label text={label} required={required} />
             <Select
                 id={id}
-                mode="multi"
+                isMulti
                 options={semesterOptions}
                 value={value}
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select semester(s)"
-                readonly={true}
-                size="medium"
+                isReadOnly={true}
                 style={{ width: '100%' }}
                 {...props}
             />

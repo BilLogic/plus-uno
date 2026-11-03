@@ -81,7 +81,7 @@ const SortingOptions = ({
             <Select
                 aria-label="Sort by"
                 clearable={false}
-                size="small"
+                spacing="compact"
                 options={sortOptions}
                 value={sort}
                 onChange={handleSortChange}
@@ -91,7 +91,7 @@ const SortingOptions = ({
             <Select
                 aria-label="Order"
                 clearable={false}
-                size="small"
+                spacing="compact"
                 options={SORT_CONFIG[sort].orders.map(({ id, label }) => ({ value: id, label }))}
                 value={order}
                 onChange={handleOrderChange}

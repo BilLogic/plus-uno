@@ -9,7 +9,7 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Cascader](Cascader.md) | 8 | ✅ | ✕ | ✅ |
+| [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 11 | ✅ | ✕ | ✅ |
 | [ChoiceGroup](ChoiceGroup.md) | 19 | ✅ | ✕ | ✅ |
@@ -28,16 +28,16 @@ authored half (#166), counted rather than assumed.
 | [Range](Range.md) | 13 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Select](Select.md) | 42 | ✅ | ✅ | ✅ |
+| [Select](Select/index.md) | 42 | ✕ | ✕ | ✕ |
 | [SplitButton](SplitButton/index.md) | 10 | ✕ | ✕ | ✕ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
 | [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
-| [TreeSelect](TreeSelect.md) | 9 | ✅ | ✕ | ✅ |
+| [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 21/29 (72%) · Correct/incorrect 11/29 (38%) · Accessibility 25/29 (86%)
+**Authored coverage:** When to use 18/29 (62%) · Correct/incorrect 10/29 (34%) · Accessibility 22/29 (76%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -147,6 +147,7 @@ const OptionRow = ({
     trailing,
     tabbable,
     role,
+    spacing = 'default',
     onSelect,
     onClick,
     onKeyDown,
@@ -165,6 +166,7 @@ const OptionRow = ({
     const classes = [
         'plus-option-row',
         `plus-option-row--${kind}`,
+        spacing === 'compact' ? 'plus-option-row--compact' : '',
         selected ? 'is-selected' : '',
         highlighted ? 'is-highlighted' : '',
         disabled ? 'is-disabled' : '',
@@ -283,6 +285,8 @@ OptionRow.propTypes = {
     tabbable: PropTypes.bool,
     /** `option` by default; `treeitem` inside a tree. */
     role: PropTypes.oneOf(['option', 'treeitem']),
+    /** `default` draws 40 and `compact` draws 32, matching the field it belongs to. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** Called with `value` on click, and on Enter or Space when the row holds focus. */
     onSelect: PropTypes.func,
     onClick: PropTypes.func,

@@ -8,12 +8,13 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'ADS props: `isDisabled`, `isRequired`, `isInvalid`/`errorMessage`, `spacing` (default 40, compact 32); gained `label` and `caption` on the shared `_Field` base.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
         ],
         docs: {
             description: {
                 component:
-                    'Cascader component allows hierarchical selection through multiple levels. When opened, it displays columns horizontally - each column represents a level in the hierarchy. Selecting an option with children opens a new column to the right.',
+                    'Cascader allows hierarchical selection through multiple levels. When opened, it displays columns horizontally - each column represents a level in the hierarchy. Selecting an option with children opens a new column to the right.',
             },
         },
     },
@@ -33,9 +34,21 @@ export default {
         value: {
             table: { disable: true, category: 'Development' },
         },
-        disabled: {
+        label: {
+            control: 'text',
+            table: { category: 'Content' },
+        },
+        spacing: {
+            control: { type: 'inline-radio' },
+            options: ['default', 'compact'],
+            table: { category: 'Design' },
+        },
+        isDisabled: {
             control: 'boolean',
-            description: 'Disable the cascader component',
+            table: { category: 'Behavior' },
+        },
+        isInvalid: {
+            control: 'boolean',
             table: { category: 'Behavior' },
         },
         onChange: {
@@ -95,6 +108,7 @@ export const Overview = () => {
         <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 360 }}>
             <Cascader
                 id="cascader-overview"
+                aria-label="Region"
                 value={value}
                 options={sampleOptions}
                 onChange={setValue}
@@ -115,30 +129,16 @@ export const Content = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">EMPTY SELECTION</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                    Opens the menu and builds a path from the hierarchy.
-                </p>
-                <Cascader id="cascader-basic" value={value1} options={sampleOptions} onChange={setValue1} />
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PRE-SELECTED PATH</span>
-                <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                    Value shown in the field; opening reveals columns up to the current level.
-                </p>
-                <Cascader id="cascader-preselected" value={value2} options={sampleOptions} onChange={setValue2} />
-            </div>
+            <Cascader id="cascader-basic" label="Empty selection" caption="Opens the menu and builds a path from the hierarchy." value={value1} options={sampleOptions} onChange={setValue1} />
+            <Cascader id="cascader-preselected" label="Pre-selected path" caption="Value shown in the field; opening reveals columns up to the current level." value={value2} options={sampleOptions} onChange={setValue2} />
         </div>
     );
 };
 
-export const Layout = () => (
-    <div style={{ maxWidth: '800px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-            Each level opens as an additional column to the right of the previous one.
-        </p>
-        <Cascader id="cascader-layout" value={[]} options={sampleOptions} onChange={() => {}} />
+export const Spacing = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
+        <Cascader id="cascader-default" label="Default" value={[]} options={sampleOptions} onChange={() => {}} />
+        <Cascader id="cascader-compact" label="Compact" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
 
@@ -146,14 +146,9 @@ export const InteractionStates = () => {
     const [value3, setValue3] = useState([]);
 
     return (
-        <div style={{ maxWidth: '800px' }}>
-            <Cascader
-                id="cascader-disabled"
-                value={value3}
-                options={sampleOptions}
-                onChange={setValue3}
-                disabled
-            />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
+            <Cascader id="cascader-disabled" label="Disabled" value={value3} options={sampleOptions} onChange={setValue3} isDisabled />
+            <Cascader id="cascader-invalid" label="Invalid" value={[]} options={sampleOptions} onChange={() => {}} isInvalid errorMessage="Pick a region" />
         </div>
     );
 };
@@ -173,12 +168,13 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '600px' }}>
             <Cascader
                 id="cascader-interactive"
+                label={args.label}
                 value={value}
                 options={sampleOptions}
                 onChange={(newValue) => {
                     setValue(newValue);
                 }}
-                disabled={args.disabled}
+                isDisabled={args.isDisabled}
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
@@ -192,6 +188,7 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     contentPreset: 'empty',
-    disabled: false,
+    label: 'Region',
+    isDisabled: false,
     placeholder: 'Please select',
 };

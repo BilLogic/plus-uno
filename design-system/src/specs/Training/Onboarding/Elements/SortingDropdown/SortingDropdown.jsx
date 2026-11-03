@@ -54,7 +54,7 @@ const SortingDropdown = ({
         <div className={`sorting-dropdown ${className}`} {...props}>
             <Select
                 aria-label="Sort by"
-                size="small"
+                spacing="compact"
                 options={sortOptions}
                 value={sortBy}
                 onChange={(next) => onChange && onChange({ sortBy: next, sortOrder: SORTS[next].orders[0].value })}
@@ -63,7 +63,7 @@ const SortingDropdown = ({
             />
             <Select
                 aria-label="Order"
-                size="small"
+                spacing="compact"
                 options={orders}
                 value={order}
                 onChange={(next) => onChange && onChange({ sortBy, sortOrder: next })}

@@ -117,8 +117,7 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    mode="single"
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -134,8 +133,7 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    mode="single"
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -148,10 +146,9 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    mode="single"
                     searchable
                     defaultValue="mondays"
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -164,10 +161,9 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    mode="single"
                     searchable
-                    required
-                    invalid
+                    isRequired
+                    isInvalid
                     caption="Days is required"
                 />
             </FieldWrapper>
@@ -207,16 +203,15 @@ export const Interactive = () => {
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                     value={selectedDay}
                     onChange={(val) => {
                         setSelectedDay(val);
                         setTouched(true);
                     }}
                     onBlur={() => setTouched(true)}
-                    invalid={hasError}
+                    isInvalid={hasError}
                     caption={hasError ? 'Days is required' : undefined}
                 />
             </FieldWrapper>

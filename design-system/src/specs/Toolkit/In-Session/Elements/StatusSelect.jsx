@@ -9,8 +9,7 @@ import './StatusSelect.scss';
  * of the status picked (`tone`), so a table still scans by color.
  */
 export const StatusSelect = ({ tone, className = '', ...props }) => (
-    <Select
-        size="small"
+    <Select spacing="compact"
         className={['status-select', tone ? `status-select--${tone}` : '', className].filter(Boolean).join(' ')}
         {...props}
     />

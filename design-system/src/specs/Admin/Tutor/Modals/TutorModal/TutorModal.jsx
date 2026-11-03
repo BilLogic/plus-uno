@@ -342,7 +342,7 @@ const TutorModal = ({
                                         ]}
                                         value={formData.group}
                                         onChange={(val) => setFormData({ ...formData, group: val })}
-                                        size="small"
+                                        spacing="compact"
                                         style={{ width: '100%' }} // Ensure full width
                                     />
                                 </div>
@@ -356,7 +356,7 @@ const TutorModal = ({
                                         ]}
                                         value={formData.student}
                                         onChange={(val) => setFormData({ ...formData, student: val })}
-                                        size="small"
+                                        spacing="compact"
                                         style={{ width: '100%' }} // Ensure full width
                                     />
                                 </div>

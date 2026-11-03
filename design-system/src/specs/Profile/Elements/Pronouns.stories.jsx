@@ -44,13 +44,11 @@ export const Pronouns = ({ id = 'pronouns', value, onChange, defaultValue, ...pr
             <Label text="Preferred Pronouns" required={false} />
             <Select
                 id={id}
-                mode="single"
                 options={pronounOptions}
                 value={value}
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select Pronouns"
-                size="medium"
                 style={{ width: '100%' }}
                 {...props}
             />

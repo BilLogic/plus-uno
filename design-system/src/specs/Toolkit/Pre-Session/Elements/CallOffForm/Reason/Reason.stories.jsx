@@ -57,8 +57,7 @@ export const Overview = () => (
                 <Select
                     options={reasonOptions}
                     placeholder="Select a reason"
-                    mode="single"
-                    required
+                    isRequired
                 />
             </div>
         </section>
@@ -82,9 +81,8 @@ export const Overview = () => (
                 <Select
                     options={reasonOptions}
                     placeholder="Select a reason"
-                    mode="single"
                     defaultValue="other"
-                    required
+                    isRequired
                 />
             </div>
         </section>
@@ -121,10 +119,9 @@ export const Interactive = () => {
                 <Select
                     options={reasonOptions}
                     placeholder="Select a reason"
-                    mode="single"
                     value={selectedReason}
                     onChange={(val) => setSelectedReason(val)}
-                    required
+                    isRequired
                 />
             </div>
             {selectedReason && (

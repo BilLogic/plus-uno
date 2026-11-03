@@ -115,9 +115,8 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -133,9 +132,8 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -148,10 +146,9 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    mode="single"
                     searchable
                     defaultValue="teacher-a"
-                    required
+                    isRequired
                 />
             </FieldWrapper>
         </section>
@@ -164,10 +161,9 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    mode="single"
                     searchable
-                    required
-                    invalid
+                    isRequired
+                    isInvalid
                     caption="Teacher is required"
                 />
             </FieldWrapper>
@@ -207,16 +203,15 @@ export const Interactive = () => {
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    mode="single"
                     searchable
-                    required
+                    isRequired
                     value={selectedTeacher}
                     onChange={(val) => {
                         setSelectedTeacher(val);
                         setTouched(true);
                     }}
                     onBlur={() => setTouched(true)}
-                    invalid={hasError}
+                    isInvalid={hasError}
                     caption={hasError ? 'Teacher is required' : undefined}
                 />
             </FieldWrapper>

@@ -126,7 +126,7 @@ const GroupTrainingProgressPage = ({
                         <Select
                             aria-label="Group"
                             clearable={false}
-                            size="small"
+                            spacing="compact"
                             options={groupOptions}
                             value={onGroupFilterChange ? selectedGroup : undefined}
                             defaultValue={selectedGroup}

@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as TreeSelectStories from './TreeSelect.stories.jsx';
+
+<Meta of={TreeSelectStories} />
+
+<Title />
+A tree select picks one or several nodes from a hierarchy.
+
+<DocsTabs of={TreeSelectStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={TreeSelectStories.Overview} />
+
+<ArgTypes of={TreeSelectStories} />
+
+</DocsTab>
+
+</DocsTabs>

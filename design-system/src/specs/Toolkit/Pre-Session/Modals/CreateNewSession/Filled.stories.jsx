@@ -110,7 +110,6 @@ const FilledModalBody = () => (
                         options={schoolOptions}
                         defaultValue="hogwarts"
                         placeholder="Select a school"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -119,7 +118,6 @@ const FilledModalBody = () => (
                         options={teacherOptions}
                         defaultValue="mr-dumbledore"
                         placeholder="Select a teacher"
-                        mode="single"
                         searchable
                     />
                 </FieldWrapper>
@@ -128,7 +126,6 @@ const FilledModalBody = () => (
                         options={dayOptions}
                         defaultValue="mondays"
                         placeholder="Select a day"
-                        mode="single"
                     />
                 </FieldWrapper>
             </div>

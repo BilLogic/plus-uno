@@ -1,14 +1,14 @@
 import React, { useCallback, useState, useEffect, useRef, useMemo } from 'react';
-import useFieldId from './useFieldId';
+import useFieldId from '../useFieldId';
 import PropTypes from 'prop-types';
-import Field from './_internal/Field';
-import OptionRow from './_internal/OptionRow';
-import { useAnchoredPopup } from './_internal/anchorPlacement';
-import './_internal/Listbox.scss';
+import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import OptionRow from '../_internal/OptionRow';
+import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import '../_internal/Listbox.scss';
 import './Cascader.scss';
 
 /**
- * The value and label of an option, for either supported shape (#323).
+ * The value and label of an option, for either supported shape.
  *
  * These were three copies of the same expression inline. They are lifted here
  * because the key handler needs them too, and a fourth copy of
@@ -34,13 +34,23 @@ const optionIsDisabled = (option) => typeof option === 'object' && Boolean(optio
  */
 const NO_PATH = [];
 
+export const CASCADER_SPACINGS = ['default', 'compact'];
+
 const Cascader = ({
     id,
+    name,
+    label,
+    caption,
+    info,
     value = NO_PATH,
     options = [],
     onChange,
     placeholder = 'Please select',
-    disabled = false,
+    spacing = 'default',
+    isDisabled = false,
+    isRequired = false,
+    isInvalid = false,
+    errorMessage,
     className = '',
     style,
     ...props
@@ -54,14 +64,15 @@ const Cascader = ({
     const close = useCallback(() => setIsOpen(false), []);
     const place = useAnchoredPopup({ open: isOpen, anchorRef: wrapperRef, popupRef: menuRef, onClose: close });
     /**
-     * #323. Where the keyboard cursor is: which column, and which row of it.
-     * The options are real elements, so focus moves between them with a roving
+     * Where the keyboard cursor is: which column, and which row of it. The
+     * options are real elements, so focus moves between them with a roving
      * `tabIndex` rather than through `aria-activedescendant`.
      */
     const optionRefs = useRef(new Map());
     const [activeCell, setActiveCell] = useState(null);
     const fieldId = useFieldId(id);
     const menuId = `${fieldId}-menu`;
+    const labelId = label ? `${fieldId}-label` : undefined;
 
     // Sync with value prop
     useEffect(() => {
@@ -71,32 +82,32 @@ const Cascader = ({
     // Get display text for input field
     const displayText = useMemo(() => {
         if (selectedPath.length === 0) return '';
-        
+
         const items = [];
         let levelOptions = options;
-        
+
         for (let i = 0; i < selectedPath.length; i++) {
             const pathValue = selectedPath[i];
             const foundOption = levelOptions.find(opt => {
                 const optValue = typeof opt === 'string' ? opt : (opt.value || opt.text || opt.label);
                 return optValue === pathValue;
             });
-            
+
             if (foundOption) {
                 const text = typeof foundOption === 'string' ? foundOption : (foundOption.text || foundOption.label || foundOption.value);
                 items.push(text);
-                
+
                 if (typeof foundOption === 'object' && foundOption.children) {
                     levelOptions = foundOption.children;
                 }
             }
         }
-        
+
         return items.join(' / ');
     }, [options, selectedPath]);
 
     const handleInputClick = () => {
-        if (disabled) return;
+        if (isDisabled) return;
         setIsOpen(!isOpen);
         if (!isOpen) {
             // Reset to first level when opening
@@ -105,7 +116,7 @@ const Cascader = ({
     };
 
     /* ---------------------------------------------------------------------
-     * #323. The keyboard half. Everything below this comment exists because the
+     * The keyboard half. Everything below this comment exists because the
      * menu was reachable only by pointer: the options were `div`s with an
      * `onClick`, no role, no tab stop and no key handler, and the trigger said
      * nothing about a menu existing at all.
@@ -155,7 +166,7 @@ const Cascader = ({
      * @param {React.KeyboardEvent} event
      */
     const handleMenuKeyDown = (event) => {
-        if (disabled || !activeCell) return;
+        if (isDisabled || !activeCell) return;
 
         const { column, index } = activeCell;
         const rows = activeColumns[column] || [];
@@ -233,7 +244,7 @@ const Cascader = ({
      * @param {React.KeyboardEvent} event
      */
     const handleTriggerKeyDown = (event) => {
-        if (disabled) return;
+        if (isDisabled) return;
         if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             if (!isOpen) {
@@ -247,18 +258,18 @@ const Cascader = ({
     };
 
     const handleOptionClick = (option, columnIndex) => {
-        if (disabled) return;
-        
+        if (isDisabled) return;
+
         const optionValue = typeof option === 'string' ? option : (option.value || option.text || option.label);
         const hasChildren = typeof option === 'object' && option.children && option.children.length > 0;
-        
+
         // Build path: use selectedPath up to this column, then add new selection
         const newPath = selectedPath.slice(0, columnIndex);
         newPath.push(optionValue);
-        
+
         // Update selected path
         setSelectedPath(newPath);
-        
+
         // If has children, show next column
         if (hasChildren) {
             const newColumns = activeColumns.slice(0, columnIndex + 1);
@@ -274,7 +285,7 @@ const Cascader = ({
     };
 
     const handleOptionHover = (option, columnIndex) => {
-        if (disabled) return;
+        if (isDisabled) return;
         const isOptionDisabled = typeof option === 'object' && option.disabled;
         if (isOptionDisabled) return;
 
@@ -294,21 +305,21 @@ const Cascader = ({
     // Rebuild columns based on selected path when opening
     const rebuildColumnsFromPath = useMemo(() => {
         if (!isOpen) return [options];
-        
+
         if (selectedPath.length === 0) {
             return [options];
         }
-        
+
         const columns = [options];
         let levelOptions = options;
-        
+
         for (let i = 0; i < selectedPath.length; i++) {
             const pathValue = selectedPath[i];
             const foundOption = levelOptions.find(opt => {
                 const optValue = typeof opt === 'string' ? opt : (opt.value || opt.text || opt.label);
                 return optValue === pathValue;
             });
-            
+
             if (foundOption && typeof foundOption === 'object' && foundOption.children) {
                 columns.push(foundOption.children);
                 levelOptions = foundOption.children;
@@ -316,7 +327,7 @@ const Cascader = ({
                 break;
             }
         }
-        
+
         return columns;
     }, [isOpen, selectedPath, options]);
 
@@ -327,103 +338,138 @@ const Cascader = ({
         }
     }, [isOpen, rebuildColumnsFromPath]);
 
+    const tone = isInvalid ? 'invalid' : 'help';
+    const tones = toneProps(tone);
+    const message = (isInvalid && errorMessage) || caption;
+    const { messageId, describedBy } = fieldDescription({
+        fieldId,
+        message,
+        describedBy: props['aria-describedby'],
+    });
+
     /*
      * `id` names the input, which is the element focus lands on, so a `label`
      * pointing at it names the combobox.
      */
     return (
-        <div className={`plus-cascader-wrapper ${className}`} style={style} ref={wrapperRef}>
-            <Field
-                disabled={disabled}
-                state={isOpen ? 'focus' : undefined}
-                className="plus-cascader-field"
-                onClick={handleInputClick}
-                trailing={(
-                    <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
-                )}
-            >
-                <input
-                    ref={inputRef}
-                    id={fieldId}
-                    type="text"
-                    readOnly
-                    value={displayText}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className="plus-field__control plus-cascader-input"
-                    onKeyDown={handleTriggerKeyDown}
-                    role="combobox"
-                    aria-haspopup="listbox"
-                    aria-expanded={isOpen}
-                    aria-controls={isOpen ? menuId : undefined}
-                    {...props}
-                />
-            </Field>
-
-            {/* The listbox surface; its body holds one column per level. */}
-            {isOpen && (
-                <div
-                    ref={menuRef}
-                    className="plus-listbox plus-listbox--anchored plus-cascader-menu"
-                    id={menuId}
-                    data-placement={place?.placement}
-                    data-side={place?.side}
-                >
-                    <div className="plus-listbox-body plus-cascader-columns">
-                        {activeColumns.map((columnOptions, columnIndex) => (
-                            <div
-                                key={columnIndex}
-                                className="plus-listbox-options plus-cascader-column"
-                                role="listbox"
-                                aria-label={columnIndex === 0
-                                    ? 'Options'
-                                    : `Options under ${selectedPath[columnIndex - 1]}`}
-                            >
-                                {columnOptions.map((option, optionIndex) => {
-                                    const optionValue = optionValueOf(option);
-                                    const hasChildren = optionChildrenOf(option).length > 0;
-                                    // Part of the path so far, in this column.
-                                    const isSelected = columnIndex < selectedPath.length
-                                        && optionValue === selectedPath[columnIndex];
-                                    const key = `${columnIndex}:${optionIndex}`;
-
-                                    return (
-                                        <OptionRow
-                                            key={key}
-                                            value={optionValue}
-                                            label={optionLabelOf(option)}
-                                            selected={isSelected}
-                                            disabled={disabled || optionIsDisabled(option)}
-                                            // The path is the value, so a row shows no check of its own.
-                                            check={false}
-                                            trailing={hasChildren ? <OptionRow.Chevron /> : undefined}
-                                            /* One tab stop per open menu, on the cursor. */
-                                            tabbable={Boolean(activeCell
-                                                && activeCell.column === columnIndex
-                                                && activeCell.index === optionIndex)}
-                                            ref={(element) => {
-                                                if (element) optionRefs.current.set(key, element);
-                                                else optionRefs.current.delete(key);
-                                            }}
-                                            onFocus={() => setActiveCell({ column: columnIndex, index: optionIndex })}
-                                            // The menu's keys, handled before the row's own Enter and Space.
-                                            onKeyDown={handleMenuKeyDown}
-                                            onSelect={() => handleOptionClick(option, columnIndex)}
-                                            onMouseEnter={() => handleOptionHover(option, columnIndex)}
-                                        />
-                                    );
-                                })}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+        <FieldStack disabled={isDisabled} className={className} style={style}>
+            {label && (
+                <FieldLabel htmlFor={fieldId} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
+                    <span id={labelId}>{label}</span>
+                </FieldLabel>
             )}
-        </div>
+            <div ref={wrapperRef} className="plus-cascader-wrapper">
+                <Field
+                    spacing={spacing}
+                    disabled={isDisabled}
+                    state={isOpen ? 'focus' : undefined}
+                    className="plus-cascader-field"
+                    {...tones.field}
+                    onClick={handleInputClick}
+                    trailing={(
+                        <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
+                    )}
+                >
+                    <input
+                        ref={inputRef}
+                        id={fieldId}
+                        type="text"
+                        readOnly
+                        value={displayText}
+                        placeholder={placeholder}
+                        disabled={isDisabled}
+                        className="plus-field__control plus-cascader-input"
+                        onKeyDown={handleTriggerKeyDown}
+                        role="combobox"
+                        aria-haspopup="listbox"
+                        aria-expanded={isOpen}
+                        aria-controls={isOpen ? menuId : undefined}
+                        aria-labelledby={props['aria-labelledby'] || labelId}
+                        aria-required={isRequired || undefined}
+                        aria-describedby={describedBy}
+                        {...tones.control}
+                        {...props}
+                    />
+                </Field>
+
+                {/* The listbox surface; its body holds one column per level. */}
+                {isOpen && (
+                    <div
+                        ref={menuRef}
+                        className="plus-listbox plus-listbox--anchored plus-cascader-menu"
+                        id={menuId}
+                        data-placement={place?.placement}
+                        data-side={place?.side}
+                    >
+                        <div className="plus-listbox-body plus-cascader-columns">
+                            {activeColumns.map((columnOptions, columnIndex) => (
+                                <div
+                                    key={columnIndex}
+                                    className="plus-listbox-options plus-cascader-column"
+                                    role="listbox"
+                                    aria-label={columnIndex === 0
+                                        ? 'Options'
+                                        : `Options under ${selectedPath[columnIndex - 1]}`}
+                                >
+                                    {columnOptions.map((option, optionIndex) => {
+                                        const optionValue = optionValueOf(option);
+                                        const hasChildren = optionChildrenOf(option).length > 0;
+                                        // Part of the path so far, in this column.
+                                        const isSelected = columnIndex < selectedPath.length
+                                            && optionValue === selectedPath[columnIndex];
+                                        const key = `${columnIndex}:${optionIndex}`;
+
+                                        return (
+                                            <OptionRow
+                                                key={key}
+                                                value={optionValue}
+                                                label={optionLabelOf(option)}
+                                                selected={isSelected}
+                                                disabled={isDisabled || optionIsDisabled(option)}
+                                                // The path is the value, so a row shows no check of its own.
+                                                check={false}
+                                                spacing={spacing}
+                                                trailing={hasChildren ? <OptionRow.Chevron /> : undefined}
+                                                /* One tab stop per open menu, on the cursor. */
+                                                tabbable={Boolean(activeCell
+                                                    && activeCell.column === columnIndex
+                                                    && activeCell.index === optionIndex)}
+                                                ref={(element) => {
+                                                    if (element) optionRefs.current.set(key, element);
+                                                    else optionRefs.current.delete(key);
+                                                }}
+                                                onFocus={() => setActiveCell({ column: columnIndex, index: optionIndex })}
+                                                // The menu's keys, handled before the row's own Enter and Space.
+                                                onKeyDown={handleMenuKeyDown}
+                                                onSelect={() => handleOptionClick(option, columnIndex)}
+                                                onMouseEnter={() => handleOptionHover(option, columnIndex)}
+                                            />
+                                        );
+                                    })}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+            {name && selectedPath.map((v) => (
+                <input key={v} type="hidden" name={name} value={v} disabled={isDisabled} />
+            ))}
+            <FieldCaption messageId={messageId} message={message} tone={tone} />
+        </FieldStack>
     );
 };
 
 Cascader.propTypes = {
     id: PropTypes.string,
+    /** Submitted with a form through hidden inputs, one per path segment. */
+    name: PropTypes.string,
+    /** The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. */
+    label: PropTypes.node,
+    /** Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. */
+    caption: PropTypes.node,
+    /** Text for the info tooltip beside the label. */
+    info: PropTypes.node,
     value: PropTypes.arrayOf(
         PropTypes.oneOfType([PropTypes.string, PropTypes.number])
     ),
@@ -441,12 +487,16 @@ Cascader.propTypes = {
     ),
     onChange: PropTypes.func,
     placeholder: PropTypes.string,
-    disabled: PropTypes.bool,
+    /** `default` draws 40 and `compact` draws 32. */
+    spacing: PropTypes.oneOf(CASCADER_SPACINGS),
+    isDisabled: PropTypes.bool,
+    /** Shows an asterisk on the label and sets `aria-required`. */
+    isRequired: PropTypes.bool,
+    /** Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. */
+    isInvalid: PropTypes.bool,
+    errorMessage: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object
 };
 
 export default Cascader;
-
-
-

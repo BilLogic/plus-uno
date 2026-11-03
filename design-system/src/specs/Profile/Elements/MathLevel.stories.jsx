@@ -45,7 +45,7 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
             <Label text="Math Level" required={required} />
             <Select
                 id={id}
-                mode="multi"
+                isMulti
                 options={mathTopicOptions}
                 value={value}
                 onChange={onChange}
@@ -53,7 +53,6 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
                 placeholder="Select Math Topics"
                 searchable={true}
                 creatable={false}
-                size="medium"
                 style={{ width: '100%' }}
                 {...props}
             />

@@ -14,8 +14,8 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'ADS props: `isMulti` replaces `mode`, `isInvalid`/`errorMessage` replace `validation`/`invalid`, `spacing` (default 40, compact 32) replaces `size`, and every boolean is `is…`-named.' },
             { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12, and a multi Select whose tags wrap grows from 32.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
         ],
         docs: {
             description: {
@@ -27,14 +27,13 @@ export default {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
-        mode: {
-            control: { type: 'select' },
-            options: ['single', 'multi'],
+        isMulti: {
+            control: 'boolean',
             table: { category: 'Design' }
         },
-        size: {
-            control: { type: 'select' },
-            options: ['small', 'medium', 'large'],
+        spacing: {
+            control: { type: 'inline-radio' },
+            options: ['default', 'compact'],
             table: { category: 'Design' }
         },
         displayMode: {
@@ -62,15 +61,19 @@ export default {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        invalid: {
+        isInvalid: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        readonly: {
+        isReadOnly: {
+            control: 'boolean',
+            table: { category: 'Behavior' }
+        },
+        isRequired: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
@@ -80,7 +83,7 @@ export default {
         },
         clearable: {
             control: 'boolean',
-            description: 'Shows the clear ×. Unset, it is on in multi mode and `!required` in single mode.',
+            description: 'Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise.',
             table: { category: 'Behavior' }
         },
         selectAll: {
@@ -91,8 +94,6 @@ export default {
             control: 'number',
             table: { category: 'Behavior' }
         },
-        readOnly: { table: { disable: true, category: 'Development' } },
-        required: { table: { disable: true, category: 'Development' } },
         options: { table: { disable: true, category: 'Development' } },
         value: { control: false, table: { disable: true, category: 'Development' } },
         defaultValue: { control: false, table: { disable: true, category: 'Development' } },
@@ -110,6 +111,10 @@ export default {
         lineWrap: { table: { disable: true, category: 'Development' } },
         truncate: { table: { disable: true, category: 'Development' } },
         open: { table: { disable: true, category: 'Development' } },
+        isValid: { table: { disable: true, category: 'Development' } },
+        successMessage: { table: { disable: true, category: 'Development' } },
+        errorMessage: { table: { disable: true, category: 'Development' } },
+        info: { table: { disable: true, category: 'Development' } },
         id: { control: false, table: { disable: true, category: 'Development' } },
         name: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
@@ -136,26 +141,30 @@ export const Content = {
     )
 };
 
-/** Modes — Multi-select with Tags or Badges, searchable and creatable. */
+/** Modes — isMulti with Tags, searchable and creatable. */
 export const Modes = {
     render: () => (
         <div className="sb-select-interactive-override" style={grid}>
-            <Select label="Multi (tags)" mode="multi" options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
+            <Select label="Multi (tags)" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
             <Select label="Searchable" searchable options={sampleOptions} placeholder="Type to search" />
-            <Select label="Creatable" mode="multi" creatable options={sampleOptions} placeholder="Type to search or create" />
+            <Select label="Creatable" isMulti creatable options={sampleOptions} placeholder="Type to search or create" />
         </div>
     )
 };
 
-/** Sizes — Small, medium, and large. */
-export const Sizes = {
+/** Spacing — default (40) and compact (32). */
+export const Spacing = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <Select label="Small" size="small" options={sampleOptions} placeholder="Select..." />
-            <Select label="Medium (default)" size="medium" options={sampleOptions} placeholder="Select..." />
-            <Select label="Large" size="large" options={sampleOptions} placeholder="Select..." />
+            <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
+            <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
         </div>
-    )
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('combobox', { name: 'Default' }).closest('.plus-field').getBoundingClientRect().height).toBe(40);
+        await expect(canvas.getByRole('combobox', { name: 'Compact' }).closest('.plus-field').getBoundingClientRect().height).toBe(32);
+    },
 };
 
 /** InteractionStates — Enabled, invalid, read-only and disabled. */
@@ -163,9 +172,9 @@ export const InteractionStates = {
     render: () => (
         <div className="sb-select-interactive-override" style={grid}>
             <Select label="Enabled" defaultValue="option-1" options={sampleOptions} />
-            <Select label="Invalid" invalid caption="Choose an option" options={sampleOptions} />
-            <Select label="Read only" readonly defaultValue="option-1" options={sampleOptions} />
-            <Select label="Disabled" disabled defaultValue="option-1" options={sampleOptions} />
+            <Select label="Invalid" isInvalid caption="Choose an option" options={sampleOptions} />
+            <Select label="Read only" isReadOnly defaultValue="option-1" options={sampleOptions} />
+            <Select label="Disabled" isDisabled defaultValue="option-1" options={sampleOptions} />
         </div>
     )
 };
@@ -239,16 +248,16 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => {
-        const [value, setValue] = useState(args.mode === 'multi' ? [] : '');
+        const [value, setValue] = useState(args.isMulti ? [] : '');
 
         useEffect(() => {
-            setValue(args.mode === 'multi' ? [] : '');
-        }, [args.mode]);
+            setValue(args.isMulti ? [] : '');
+        }, [args.isMulti]);
 
         return (
             <div style={{ maxWidth: '400px' }}>
                 <p className="body3-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
-                    Selected: {args.mode === 'multi'
+                    Selected: {args.isMulti
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')
                     }
@@ -263,17 +272,17 @@ export const Interactive = {
         );
     },
     args: {
-        mode: 'single',
+        isMulti: false,
         label: 'Option',
         placeholder: 'Select...',
         caption: '',
         searchable: false,
         creatable: false,
         displayMode: 'tags',
-        size: 'medium',
-        invalid: false,
-        disabled: false,
-        readonly: false,
+        spacing: 'default',
+        isInvalid: false,
+        isDisabled: false,
+        isReadOnly: false,
         commitOnClose: false,
         selectAll: false,
     }
@@ -295,7 +304,7 @@ export const Colors = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
             <Select label="Subject" options={COLOR_OPTIONS} placeholder="Pick a subject" />
-            <Select label="Subjects" mode="multi" selectAll options={COLOR_OPTIONS} defaultValue={['algebra']} />
+            <Select label="Subjects" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['algebra']} />
         </div>
     ),
     play: async ({ canvasElement }) => {

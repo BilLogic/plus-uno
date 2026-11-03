@@ -55,8 +55,7 @@ export const Overview = () => (
                 <Select
                     options={supervisorOptions}
                     placeholder="Select a supervisor"
-                    mode="single"
-                    required
+                    isRequired
                 />
             </div>
         </section>
@@ -80,9 +79,8 @@ export const Overview = () => (
                 <Select
                     options={supervisorOptions}
                     placeholder="Select a supervisor"
-                    mode="single"
                     defaultValue="supervisor-a"
-                    required
+                    isRequired
                 />
             </div>
         </section>
@@ -119,10 +117,9 @@ export const Interactive = () => {
                 <Select
                     options={supervisorOptions}
                     placeholder="Select a supervisor"
-                    mode="single"
                     value={selectedSupervisor}
                     onChange={(val) => setSelectedSupervisor(val)}
-                    required
+                    isRequired
                 />
             </div>
             {selectedSupervisor && (
