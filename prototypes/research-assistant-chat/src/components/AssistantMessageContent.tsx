@@ -1,6 +1,6 @@
 /**
  * Renders assistant message content: text parts and data parts (engagement-chart, strategy-heatmap).
- * Decoupled from assistant-ui context to allow manual rendering.
+ * Rendered by hand from plain message parts.
  */
 import React from 'react';
 import { EngagementChart } from './EngagementChart';
