@@ -67,7 +67,42 @@
         // the radio's edge, as Checkbox and Button draw it. The outline follows
         // the round border. A ring touching the edge merged into a checked
         // radio's border and stopped reading as focus.
-        @include plus-state($important: true);
+        //
+        // Hover: the input's hovered fill when unchecked; the named hovered
+        // step, opaque, when checked, edged in the same step. The dot keeps
+        // its `icon.inverse` drawing from the checked rule. Disabled:
+        // Atlassian's disabled colors, under the disabled fade.
+        @include plus-state(
+            $important: true,
+            $states: (
+                hovered: (
+                    accent-color: var(--ds-background-selected-bold) !important,
+                    background-color: var(--ds-background-input-hovered) !important,
+                    border-color: var(--ds-border-brand) !important,
+                ),
+                disabled: (
+                    opacity: var(--ds-opacity-disabled),
+                    cursor: not-allowed,
+                    border-color: var(--ds-border-disabled) !important,
+                    background-color: var(--ds-background-disabled) !important,
+                    accent-color: var(--ds-border-disabled) !important,
+                ),
+            ),
+            $hovered-selector: '&:hover:not(:disabled):not(:checked)',
+            $disabled-selector: '&:disabled'
+        );
+
+        @include plus-state(
+            $states: (
+                hovered: (
+                    border-color: var(--ds-background-selected-bold-hovered) !important,
+                    accent-color: var(--ds-background-selected-bold-hovered) !important,
+                    background-color: var(--ds-background-selected-bold-hovered) !important,
+                ),
+            ),
+            $ring: false,
+            $hovered-selector: '&:hover:not(:disabled):checked'
+        );
 
         &:focus-visible {
             border-color: var(--ds-border-brand) !important;
@@ -78,30 +113,6 @@
         &:focus:not(:focus-visible) {
             border-color: var(--ds-border-brand) !important;
             accent-color: var(--ds-background-selected-bold) !important;
-        }
-
-        // Hover state: the input's hovered fill when unchecked; the named
-        // hovered step, opaque, when checked, edged in the same step. The dot
-        // keeps its `icon.inverse` drawing from the checked rule.
-        &:hover:not(:disabled):not(:checked) {
-            border-color: var(--ds-border-brand) !important;
-            accent-color: var(--ds-background-selected-bold) !important;
-            background-color: var(--ds-background-input-hovered) !important;
-        }
-
-        &:hover:not(:disabled):checked {
-            border-color: var(--ds-background-selected-bold-hovered) !important;
-            accent-color: var(--ds-background-selected-bold-hovered) !important;
-            background-color: var(--ds-background-selected-bold-hovered) !important;
-        }
-
-        // Disabled state: Atlassian's disabled colors, under the disabled fade.
-        &:disabled {
-            opacity: var(--ds-opacity-disabled);
-            cursor: not-allowed;
-            border-color: var(--ds-border-disabled) !important;
-            background-color: var(--ds-background-disabled) !important;
-            accent-color: var(--ds-border-disabled) !important;
         }
 
         // A disabled checked radio keeps the disabled fill and edge; its dot

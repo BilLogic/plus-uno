@@ -151,6 +151,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/inline-jsx-tokens.json',
+    check: 'check:inline-jsx-tokens',
+    command: 'node scripts/check-inline-jsx-tokens.mjs --update',
+    prose: 'why',
+    // `<path>` -> count of literal style={{...}} properties (#1698). A count may
+    // fall and never rise; one that reaches zero leaves the record, and the
+    // stale sweep asks for a regenerate.
+    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
+  },
+  {
     file: 'scripts/baselines/react-bootstrap-imports.json',
     check: 'check:react-bootstrap-imports',
     command: 'node scripts/check-react-bootstrap-imports.mjs --update',

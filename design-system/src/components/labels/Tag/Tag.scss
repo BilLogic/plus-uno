@@ -315,29 +315,25 @@ $tag-colors: (
     cursor: pointer;
 }
 
-.plus-tag--selectable:hover,
-.plus-tag--link:not(.plus-tag--split):hover,
-.plus-tag--split:has(> .plus-tag__link:hover) {
-    background-color: var(--plus-tag-hovered);
-}
-
-.plus-tag--selectable:active,
-.plus-tag--link:not(.plus-tag--split):active,
-.plus-tag--split:has(> .plus-tag__link:active) {
-    background-color: var(--plus-tag-pressed);
-}
-
 /*
  * Selected is a full-color border as well as the subtler fill, so the choice is
  * not carried by a change of lightness alone. It holds the fill under hover
- * and press: the selectable steps above would otherwise change it.
+ * and press: the hovered/pressed states below would otherwise change it.
  */
-.plus-tag--selected,
-.plus-tag--selected:hover,
-.plus-tag--selected:active {
-    border-color: var(--plus-tag-border-selected);
-    background-color: var(--plus-tag-selected);
-}
+@include plus-state(
+    $states: (
+        hovered: (background-color: var(--plus-tag-hovered)),
+        pressed: (background-color: var(--plus-tag-pressed)),
+        selected: (
+            border-color: var(--plus-tag-border-selected),
+            background-color: var(--plus-tag-selected),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-tag--selectable:hover, .plus-tag--link:not(.plus-tag--split):hover, .plus-tag--split:has(> .plus-tag__link:hover)',
+    $pressed-selector: '.plus-tag--selectable:active, .plus-tag--link:not(.plus-tag--split):active, .plus-tag--split:has(> .plus-tag__link:active)',
+    $selected-selector: '.plus-tag--selected, .plus-tag--selected:hover, .plus-tag--selected:active'
+);
 
 /* A link underlines on hover and press only, never at rest. */
 .plus-tag--link {

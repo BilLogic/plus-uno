@@ -23,6 +23,11 @@
  *   highlight-ring       `Highlight` as an outline color, the forced-colors ring
  *                        written by hand instead of through `plus-ring`'s
  *                        `$high-contrast` option.
+ *   hand-hover           a `:hover` pseudo-class selector written by hand —
+ *                        the mixin's `hovered:` state key, not retyped per
+ *                        component (#1698).
+ *   hand-pressed         an `:active` pseudo-class selector written by
+ *                        hand — the mixin's `pressed:` state key.
  *
  * THE RATCHET. The count of a (rule, file) pair may fall and never rise, and a
  * pair the baseline does not hold is a finding: a new file starts at zero. A
@@ -57,10 +62,17 @@ export const SEARCHED = /\.scss$/;
 const MIXIN_FILE = 'design-system/src/styles/_state.scss';
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 
+/** A `$hovered-selector:` / `$pressed-selector:` argument passes `:hover` / `:active` text
+ * straight through `plus-state` as the sanctioned selector override (Range, Checkbox, Radio,
+ * Toggle); that line is the mixin call, not a hand-rolled rule next to it. */
+const SELECTOR_OVERRIDE = /[$-]?(?:hovered|pressed|selected|disabled)-selector\s*:/;
+
 const RULES = [
   ['outline-none', /outline\s*:\s*(none|0)\b/g],
   ['legacy-ring-token', /var\(\s*--color-focus-ring(-inverse)?\b/g],
   ['highlight-ring', /outline(?:-color)?\s*:[^;]*\bHighlight\b/g],
+  ['hand-hover', /:hover\b/g, SELECTOR_OVERRIDE],
+  ['hand-pressed', /:active\b/g, SELECTOR_OVERRIDE],
 ];
 
 /**
@@ -75,10 +87,11 @@ export function measure(sources) {
   for (const { path: file, text } of sources) {
     if (TEST.test(file) || file === MIXIN_FILE) continue;
     const lines = text.split('\n');
-    for (const [rule, re] of RULES) {
+    for (const [rule, re, exclude] of RULES) {
       let count = 0;
       let line;
       lines.forEach((l, i) => {
+        if (exclude?.test(l)) return;
         const hits = l.match(re)?.length ?? 0;
         if (hits) line ??= i + 1;
         count += hits;
@@ -119,6 +132,8 @@ const WHAT = {
   'outline-none': 'hand-rolled `outline: none`',
   'legacy-ring-token': 'legacy `--color-focus-ring` use',
   'highlight-ring': 'hand-rolled `Highlight` ring',
+  'hand-hover': 'hand-rolled `:hover` selector',
+  'hand-pressed': 'hand-rolled `:active` selector',
 };
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
@@ -159,14 +174,27 @@ export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
 }
 
 /**
- * `--update` re-records the ratchet downward. It refuses a rise or a pair the
- * record does not hold, so the only movement it can write is down. It falls
- * through to the gate, so a refused update still fails loudly.
+ * `--update` re-records the ratchet downward. It refuses a rise, or a pair
+ * under a RULE the record already tracks, so the only movement it can write
+ * for a known rule is down. It falls through to the gate, so a refused update
+ * still fails loudly.
+ *
+ * A pair under a rule the record has NEVER tracked (no file anywhere in the
+ * baseline carries that rule name) is the one-time seed for that rule, not a
+ * rise: `hand-hover` and `hand-pressed` did not exist as rules until this
+ * check was extended to them, so their first measurement across the whole
+ * tree is what the ratchet starts counting down from, same as the baseline's
+ * original rules did when this file did not exist yet.
  */
 function record() {
   const found = asRecord(measure(sourcesOf(REPO_ROOT)));
   const ratchet = ratchetFor(REPO_ROOT);
-  const rising = ratchet.absent ? [] : ratchet.failures(found).filter((f) => f.kind === 'new' || f.kind === 'rose');
+  const knownRules = new Set([...ratchet.entries.keys()].map((key) => key.split(' ')[0]));
+  const rising = ratchet.absent
+    ? []
+    : ratchet
+        .failures(found)
+        .filter((f) => (f.kind === 'new' || f.kind === 'rose') && knownRules.has(f.key.split(' ')[0]));
   if (rising.length) {
     console.error(`[check-state-mixin] not recorded: ${rising.length} pair(s) rose or are new. Use the state mixin instead.`);
     return;
@@ -174,9 +202,10 @@ function record() {
   ratchet.update(found, {
     seed: {
       why:
-        'Hand-rolled focus-ring patterns the state mixin (design-system/src/styles/_state.scss) exists to replace: ' +
-        'a raw `outline: none` reset, the legacy `--color-focus-ring` token, and a hand-written forced-colors ' +
-        '`Highlight` ring. Counted per rule and per file in design-system/src/components and design-system/src/patterns. ' +
+        'Hand-rolled focus-ring, hover and press patterns the state mixin (design-system/src/styles/_state.scss) exists ' +
+        'to replace: a raw `outline: none` reset, the legacy `--color-focus-ring` token, a hand-written forced-colors ' +
+        '`Highlight` ring, and a `:hover` / `:active` selector written outside the mixin\'s `hovered:` / `pressed:` ' +
+        'state keys. Counted per rule and per file in design-system/src/components and design-system/src/patterns. ' +
         'A count may fall and never rise; a new file starts at zero. Regenerate with `npm run check:state-mixin -- --update`; ' +
         'never edit by hand.',
     },

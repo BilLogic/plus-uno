@@ -104,6 +104,17 @@ test('a missing baseline fails loudly rather than passing', () => {
   assert.match(findings[0].message, /no baseline is recorded/);
 });
 
+test('a renamed-with-no-alias component surviving in doc prose fails with zero allowed, even with no baseline entry', () => {
+  const root = scratch({});
+  const mdx = '- For something the user only needs to know, use `Toast`.\n';
+  const findings = run({ repoRoot: root, sources: [src('design-system/src/components/loading/Spinner/Spinner.mdx', mdx)] });
+  assert.ok(findings.some((f) => /stale-name:Toast/.test(f.message) && /renamed with no alias/.test(f.message) && f.line === 1));
+});
+
+test('a renamed-with-no-alias name outside component docs is not flagged', () => {
+  assert.equal(measure([src('design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx', '<Toast />')]).get('stale-name:Toast design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx'), undefined);
+});
+
 test('the live tree holds its own baseline', () => {
   assert.deepEqual(run(), []);
 });

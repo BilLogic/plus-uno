@@ -295,7 +295,17 @@ export const CHECKS = [
     module: 'scripts/check-state-mixin.mjs',
     baseline: 'scripts/baselines/state-mixin.json',
     guards:
-      'the state mixin (`design-system/src/styles/_state.scss`) staying the one place a focus ring is drawn: a hand-rolled `outline: none` reset, the legacy `--color-focus-ring` token and a hand-written forced-colors `Highlight` ring are counted per rule and per file in design-system/src/components and design-system/src/patterns, excluding the mixin\'s own file. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:state-mixin -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+      'the state mixin (`design-system/src/styles/_state.scss`) staying the one place hover, press, selection, disabled and the focus ring are drawn: a hand-rolled `outline: none` reset, the legacy `--color-focus-ring` token, a hand-written forced-colors `Highlight` ring, and a `:hover` or `:active` selector written outside the mixin\'s `hovered:`/`pressed:` state keys are counted per rule and per file in design-system/src/components and design-system/src/patterns, excluding the mixin\'s own file. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:state-mixin -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
+    name: 'check:inline-jsx-tokens',
+    script: 'node scripts/check-inline-jsx-tokens.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-inline-jsx-tokens.mjs',
+    baseline: 'scripts/baselines/inline-jsx-tokens.json',
+    guards:
+      'a component reading its tokens through its own `.scss`, not a `style={{...}}` literal baked into the JSX (#1698): a quoted-string or bare-number property value inside a `style={{...}}` object, counted per file in design-system/src/components, stories and tests excluded. A count may fall and never rise, and a new file starts at zero; a migration PR moves the literal into the component\'s stylesheet and lowers the record with `npm run check:inline-jsx-tokens -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
     name: 'check:react-bootstrap-imports',
