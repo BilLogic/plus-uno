@@ -1,6 +1,7 @@
 /**
  * Time Picker — `_Field` with an AM/PM toggle in Trailing, the PLUS Dropdown.
  */
+@use '../../../styles/state' as *;
 
 .plus-time-picker__input {
     width: 100%;
@@ -18,24 +19,21 @@
 .plus-time-picker__period-toggle {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--element-gap-compact);
     height: 100%;
     padding: 0;
     border: 0;
-    border-radius: var(--size-element-radius-sm);
+    border-radius: var(--element-radius-default);
     background: transparent;
     color: var(--ds-text-brand);
     font: inherit;
     font-weight: var(--type-weight-semibold);
     cursor: pointer;
 
+    @include plus-state();
+
     .fa-caret-down {
         color: var(--ds-icon-brand);
-    }
-
-    &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-border);
     }
 
     &:disabled {

@@ -142,7 +142,7 @@ Interactive.args = {
 
 /** `size` scales the dot and the bar in px; the track between them follows a step behind. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)', maxWidth: '600px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '600px' }}>
         <Range id="range-size-8" label="8" defaultValue={50} size={8}/>
         <Range id="range-size-12" label="12" defaultValue={50} size={12}/>
         <Range id="range-size-16" label="16" defaultValue={50} size={16}/>
