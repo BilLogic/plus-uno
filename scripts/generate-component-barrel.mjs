@@ -5,19 +5,25 @@
  *
  * SOURCE OF TRUTH: the directory tree under `design-system/src/components/`.
  * Every immediate subdirectory of `components/` is a group, except `_internal`
- * (never a public import surface). Within a group:
- *   - a group that owns its own `index.js` (today, only `forms-and-inputs`) is
- *     re-exported wholesale (`export * from '@/components/<group>'`) — that
- *     file is the group's own curated public surface, and this script does not
- *     second-guess it;
- *   - otherwise, every immediate subdirectory with an `index.js` is a
- *     component folder. Its default export becomes the barrel's `<Name>`
- *     export, and any OTHER named export its own `index.js` exposes (tracing
- *     one `export * from './X'` hop into the component's own file, the usual
- *     shape) comes along too — `TagContext`/`useTagContext`, `ToastContainer`,
- *     the `Table` sub-parts. `<Name>` itself is never duplicated: a component
- *     whose own file both default- and named-exports itself (`Button`) gets
- *     one `Button` binding, not two.
+ * (never a public import surface). Within a group, every immediate
+ * subdirectory with an `index.js` is a component folder: its default export
+ * becomes the barrel's `<Name>` export, and any OTHER named export its own
+ * `index.js` exposes (tracing one `export * from './X'` hop into the
+ * component's own file, the usual shape) comes along too —
+ * `TagContext`/`useTagContext`, `ToastContainer`, the `Table` sub-parts.
+ * `<Name>` itself is never duplicated: a component whose own file both
+ * default- and named-exports itself (`Button`) gets one `Button` binding, not
+ * two.
+ *
+ * EVERY COMPONENT GETS ITS OWN LINE, ONE HOP FROM ITS FOLDER — even in a group
+ * that also has its own `index.js` (today, only `forms-and-inputs`, kept for
+ * the handful of callers that import it directly). A group re-export
+ * (`export * from '@/components/<group>'`) is a second hop through that
+ * file's own `export { default as X } from './X'` lines, and a star re-export
+ * chained two deep lost Button's and IconButton's default binding under this
+ * toolchain (#1702) — reproducible, not theoretical. One hop per component,
+ * straight from its own folder, is what the rest of this barrel already does,
+ * and it is what actually works.
  *
  * This is why `_internal` leaking into the barrel is a thing of the past
  * (#1702): a component that should be public lives in a group folder and is
@@ -85,9 +91,6 @@ function namedExportsOf(file, seen = new Set()) {
 
 function groupBlock(group) {
   const groupDir = path.join(COMPONENTS_DIR, group);
-  if (hasFile(path.join(groupDir, 'index.js'))) {
-    return [`export * from '@/components/${group}';`];
-  }
 
   const names = fs
     .readdirSync(groupDir)

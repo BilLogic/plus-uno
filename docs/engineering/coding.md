@@ -28,11 +28,13 @@ required — a component with no tests or no docs page just has fewer of them):
 and any named export it chooses to carry alongside it); `design-system/src/components/index.js`
 is generated from the folder tree by `npm run generate:component-barrel`
 (`npm run check:component-barrel` in CI) — a source for regeneration, same as
-`_colors.scss` and the other generated files above. A group folder that owns
-its own `index.js` (today, only `forms-and-inputs`) is re-exported wholesale;
-every other group's component folders are picked up by name. `_internal/` sits
-outside the scan entirely, so the public barrel only ever surfaces a component
-that lives in a group folder. A flat file still converging toward this shape
+`_colors.scss` and the other generated files above. Every component folder in
+every group is re-exported one hop from its own folder, even in a group that
+also owns its own `index.js` (today, only `forms-and-inputs`, kept for the
+handful of callers that import it directly): a chained re-export through that
+second file is a hop this generator does not take. `_internal/` sits outside
+the scan entirely, so the public barrel only ever surfaces a component that
+lives in a group folder. A flat file still converging toward this shape
 stays that way until its own family PR touches it, rather than as a side
 effect of a neighboring line (#1702).
 
