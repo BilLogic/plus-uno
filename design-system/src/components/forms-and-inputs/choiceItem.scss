@@ -32,7 +32,7 @@
 
     &:has(input:checked) {
         border-color: var(--color-primary-border);
-        background-color: var(--color-primary-state-08);
+        background-color: var(--ds-background-selected);
     }
 
     &:has(input:focus-visible) {

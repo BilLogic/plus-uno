@@ -276,8 +276,6 @@ test('NavTabs: neutral subtle hovered and pressed on every tab, focus a ring wit
 
 /* ─── Checkbox, Radio, Switch ────────────────────────────────────────────── */
 
-const SHADOW_08 = 'linear-gradient(var(--color-shadow-state-08), var(--color-shadow-state-08))';
-
 /*
  * Checkbox and Radio are on the new tokens: an unchecked control hovers to the
  * input's hovered fill, and a checked one steps its Lagoon fill to the opaque
@@ -307,16 +305,14 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
   assert.equal(checked['background-image'], undefined, 'a checked radio redraws its dot on hover; the checked rule draws it');
 });
 
-test('Switch: hover lays the 08 over the track, on or off', () => {
+test('Switch: hover steps the track, neutral off and brand bold on', () => {
   const file = 'components/forms-and-inputs/Switch.scss';
   const input = '.plus-form-switch .form-check-input[type=checkbox]';
   expectRule(file, `${input}:hover:not(:disabled):not(:checked)`, {
-    'background-color': layer('--color-surface'),
-    'background-image': 'linear-gradient(var(--color-primary-state-08), var(--color-primary-state-08))',
+    'background-color': layer('--ds-background-neutral-subtle-hovered'),
   });
   expectRule(file, `${input}:checked:hover:not(:disabled)`, {
-    'background-color': layer('--color-primary'),
-    'background-image': SHADOW_08,
+    'background-color': layer('--ds-background-brand-bold-hovered'),
   });
 });
 
@@ -458,26 +454,26 @@ test("Tag: the accent's hovered, pressed and selected steps; the × on the neutr
 
 /* ─── RichTextEditor toolbar ─────────────────────────────────────────────── */
 
-test('RichTextEditor: toolbar buttons hover 08, press 12, select 16; the block menu selects at 08', () => {
+test('RichTextEditor: toolbar buttons step neutral subtle and select; the block menu selects', () => {
   const file = 'components/forms-and-inputs/RichTextEditor/RichTextEditor.scss';
   const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn.btn';
-  expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--color-secondary-state-08') });
-  expectRule(file, `${btn}:active:not(:disabled):not(.active)`, { 'background-color': layer('--color-secondary-state-12') });
-  expectRule(file, `${btn}.active`, { 'background-color': layer('--color-primary-state-16') });
+  expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${btn}:active:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
+  expectRule(file, `${btn}.active`, { 'background-color': layer('--ds-background-selected') });
   expectRule(file, `${btn}:focus-visible`, RING_OUTSIDE);
   expectNoFill(file, `${btn}:focus-visible`);
 
   const toggle = '.plus-rich-text-editor-block-toggle';
-  expectRule(file, `${toggle}:hover:not(:disabled)`, { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(file, `${toggle}:active:not(:disabled)`, { 'background-color': layer('--color-on-surface-state-12') });
+  expectRule(file, `${toggle}:hover:not(:disabled)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${toggle}:active:not(:disabled)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(file, `${toggle}:focus-visible`, RING_OUTSIDE);
   expectNoFill(file, `${toggle}:focus-visible`);
 
-  // The block menu is a dense list, so it selects at primary 08 (color.md).
+  // The block menu is a dense list, so it selects on the selected fill.
   const item = '.plus-rich-text-editor-block-menu .dropdown-item';
-  expectRule(file, `${item}:hover`, { 'background-color': layer('--color-on-surface-state-08') });
-  expectRule(file, `${item}:active`, { 'background-color': layer('--color-on-surface-state-12') });
-  expectRule(file, `${item}.active`, { 'background-color': layer('--color-primary-state-08') });
+  expectRule(file, `${item}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${item}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
+  expectRule(file, `${item}.active`, { 'background-color': layer('--ds-background-selected') });
   expectRule(file, `${item}:focus-visible`, RING_INSIDE);
   expectNoFill(file, `${item}:focus-visible`);
   expectNoFill(file, `${item}:focus`);
