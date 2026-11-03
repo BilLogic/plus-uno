@@ -1,112 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Field } from '@base-ui/react/field';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
-import './Field.scss';
-
-/**
- * _Field — the one box behind every text-like input.
- *
- * It owns the height, the border, the fill and the state. A host (Text field,
- * Text area) decides only what goes in its three slots: `leading` (an icon, an affix, an addon), the content (`children`,
- * normally the control itself) and `trailing` (an icon, a caret, steppers,
- * "saving…").
- *
- * Hover and focus are live states, drawn from the pointer and from
- * `:focus-within`, so a host never tracks them. `state` exists only to draw
- * them still, for documentation; the Figma set has them as variants.
- *
- * It is a part: not exported from the barrel, never placed on a screen alone.
- */
-const Field = ({
-    spacing = 'default',
-    subtle = false,
-    disabled = false,
-    readOnly = false,
-    invalid = false,
-    valid = false,
-    warning = false,
-    busy = false,
-    multiline = false,
-    grow = false,
-    state,
-    leading,
-    trailing,
-    children,
-    className = '',
-    style,
-    ...props
-}) => {
-    const classes = [
-        'plus-field',
-        `plus-field--${spacing}`,
-        subtle && 'plus-field--subtle',
-        disabled && 'plus-field--disabled',
-        readOnly && !disabled && 'plus-field--readonly',
-        invalid && 'plus-field--invalid',
-        warning && !invalid && 'plus-field--warning',
-        valid && !invalid && !warning && 'plus-field--valid',
-        busy && 'plus-field--busy',
-        multiline && 'plus-field--multiline',
-        grow && !multiline && 'plus-field--grow',
-        state && state !== 'default' && `plus-field--${state}`,
-        className,
-    ].filter(Boolean).join(' ');
-
-    /*
-     * A press on the box's own padding puts the caret in the control, so the
-     * whole box behaves as the field it looks like. Presses on a slot's own
-     * controls (a stepper, an addon button) are theirs and are left alone.
-     */
-    const handleMouseDown = (event) => {
-        if (event.target !== event.currentTarget) return;
-        const control = event.currentTarget.querySelector('input, textarea');
-        if (!control || control.disabled) return;
-        event.preventDefault();
-        control.focus();
-    };
-
-    return (
-        <div
-            className={classes}
-            style={style}
-            data-spacing={spacing}
-            /* Marks the whole box inactive, so its affixes and icons are read
-             * as part of a disabled control and not as text on their own. */
-            aria-disabled={disabled || undefined}
-            onMouseDown={handleMouseDown}
-            {...props}
-        >
-            {leading && <span className="plus-field__leading">{leading}</span>}
-            <span className="plus-field__content">{children}</span>
-            {trailing && <span className="plus-field__trailing">{trailing}</span>}
-        </div>
-    );
-};
-
-Field.propTypes = {
-    /** `default` draws 40 and `compact` draws 32. */
-    spacing: PropTypes.oneOf(['default', 'compact']),
-    /** Borderless at rest, for editing in place. Editing looks the same as the standard field. */
-    subtle: PropTypes.bool,
-    disabled: PropTypes.bool,
-    readOnly: PropTypes.bool,
-    invalid: PropTypes.bool,
-    valid: PropTypes.bool,
-    warning: PropTypes.bool,
-    /** Something is happening in Trailing ("saving…"), so a subtle field keeps it on show. */
-    busy: PropTypes.bool,
-    /** The content is several lines (Textarea): slots align to the top, and the box starts at 80 and grows. */
-    multiline: PropTypes.bool,
-    /** The content wraps (tags in a Tag field): the box starts at its height and grows with each row. */
-    grow: PropTypes.bool,
-    /** Draws a live state still, for documentation. Live hover and focus need nothing. */
-    state: PropTypes.oneOf(['default', 'hover', 'focus']),
-    leading: PropTypes.node,
-    trailing: PropTypes.node,
-    children: PropTypes.node,
-    className: PropTypes.string,
-    style: PropTypes.object,
-};
+import './FieldFrame.scss';
 
 /**
  * What a caption tone means for the box and the control. One place, so every
@@ -261,20 +157,47 @@ FieldCaption.propTypes = {
 };
 
 /**
- * Label, field and caption stacked, with one disabled fade: the box fades
- * itself, and the stack fades only the label and caption around it.
+ * FieldFrame — label, field and caption stacked, with one disabled fade: the
+ * box fades itself, and the stack fades only the label and caption around it.
+ *
+ * The non-chrome half of the field split (A7): it wraps Base UI's `Field.Root`
+ * for `data-invalid`/`data-dirty`/`data-touched`/`data-disabled`, controlled
+ * by the host's own tone and state (a host's control is plain markup, not
+ * `Field.Control`, so these three stay host-reported rather than
+ * auto-tracked). Choice controls (Checkbox, Radio) use this and never
+ * `FieldBox`, which is chrome a choice control has none of.
  */
-export const FieldStack = ({ disabled = false, className = '', style, children }) => (
-    <div className={`plus-field-stack${disabled ? ' plus-field-stack--disabled' : ''} ${className}`.trim()} style={style}>
+export const FieldFrame = ({
+    disabled = false,
+    invalid,
+    dirty,
+    touched,
+    className = '',
+    style,
+    children,
+}) => (
+    <Field.Root
+        disabled={disabled}
+        invalid={invalid}
+        dirty={dirty}
+        touched={touched}
+        render={<div className={`plus-field-stack${disabled ? ' plus-field-stack--disabled' : ''} ${className}`.trim()} style={style} />}
+    >
         {children}
-    </div>
+    </Field.Root>
 );
 
-FieldStack.propTypes = {
+FieldFrame.propTypes = {
     disabled: PropTypes.bool,
+    /** Reported by the host from its own tone; drawn as `data-invalid`. */
+    invalid: PropTypes.bool,
+    /** Reported by the host, when it tracks it; drawn as `data-dirty`. */
+    dirty: PropTypes.bool,
+    /** Reported by the host, when it tracks it; drawn as `data-touched`. */
+    touched: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
     children: PropTypes.node,
 };
 
-export default Field;
+export default FieldFrame;

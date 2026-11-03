@@ -5,7 +5,8 @@ import TagGroup from '@/components/labels/TagGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import TextField from './TextField/TextField';
 import useFieldId from './useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from './_internal/Field';
+import FieldBox from './_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from './_internal/FieldFrame';
 import Listbox, { ListboxMessage } from './_internal/Listbox';
 import './TagInput.scss';
 
@@ -667,7 +668,7 @@ const TagInput = ({
     const listOpen = open && editable;
 
     return (
-        <FieldStack disabled={disabled} className={`plus-tag-input ${className}`.trim()} style={style}>
+        <FieldFrame disabled={disabled} invalid={tone === 'invalid'} className={`plus-tag-input ${className}`.trim()} style={style}>
             <FieldLabel htmlFor={fieldId} required={required} info={info}>
                 {label}
             </FieldLabel>
@@ -679,7 +680,7 @@ const TagInput = ({
                 onFocus={handleFocus}
                 onBlur={handleBlur}
             >
-                <Field
+                <FieldBox
                     spacing={size === 'small' ? 'compact' : 'default'}
                     grow
                     disabled={disabled}
@@ -757,7 +758,7 @@ const TagInput = ({
                             {...props}
                         />
                     </div>
-                </Field>
+                </FieldBox>
             </div>
             <FieldCaption messageId={messageId} message={message} tone={tone} />
             <Listbox
@@ -835,7 +836,7 @@ const TagInput = ({
                 <div id={`${fieldId}-reorder-keys`} className="visually-hidden">{REORDER_KEYS_SPOKEN}</div>
             )}
             <div className="visually-hidden plus-tag-input__announcer" role="status" aria-live="polite">{announcement}</div>
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

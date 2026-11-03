@@ -1,7 +1,7 @@
 import React, { useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import Dropdown from '../Dropdown/Dropdown';
-import Field from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
 import './TimePicker.scss';
 
 /**
@@ -58,7 +58,7 @@ const parseTyped = (text) => {
 /**
  * TimePicker — a time field with an AM/PM toggle (Figma `Time picker`).
  *
- * Built from the shared parts: the field is `_Field`, which owns the box,
+ * Built from the shared parts: the field is `FieldBox`, which owns the box,
  * the border, the fill, the size and every state, same as DatePicker; the
  * AM/PM menu in Trailing is the PLUS Dropdown.
  *
@@ -194,7 +194,7 @@ const TimePicker = ({
     ) : periodToggle;
 
     return (
-        <Field
+        <FieldBox
             spacing={spacing}
             disabled={isDisabled}
             readOnly={isReadOnly}
@@ -223,7 +223,7 @@ const TimePicker = ({
                 onFocus={onFocus}
                 onBlur={handleBlur}
             />
-        </Field>
+        </FieldBox>
     );
 };
 

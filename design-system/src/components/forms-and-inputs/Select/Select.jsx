@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox from '../_internal/Listbox';
 import SelectChips from '../_internal/SelectChips';
 import { SEARCH_FIRST_ABOVE, selectList } from '../_internal/selectList';
@@ -412,14 +413,14 @@ const Select = ({
 
     // A field waiting on its parent fades only its box: the caption saying why stays readable.
     return (
-        <FieldStack disabled={isDisabled} className={wrapperClasses} style={style}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={wrapperClasses} style={style}>
             {label && (
                 <FieldLabel htmlFor={typeable ? fieldId : undefined} required={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     <span id={labelId}>{label}</span>
                 </FieldLabel>
             )}
             <div className="plus-select-field" onFocus={handleFocus} onBlur={handleBlur}>
-                <Field
+                <FieldBox
                     ref={fieldRef}
                     spacing={spacing}
                     grow={multi && lineWrap}
@@ -431,7 +432,7 @@ const Select = ({
                 >
                     {chips}
                     {control}
-                </Field>
+                </FieldBox>
                 <Listbox
                     ref={listRef}
                     id={listId}
@@ -461,7 +462,7 @@ const Select = ({
                 <input key={v} type="hidden" name={name} value={v} disabled={disabled} />
             ))}
             <FieldCaption messageId={messageId} message={message} tone={tone} />
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

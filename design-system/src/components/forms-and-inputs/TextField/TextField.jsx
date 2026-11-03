@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '../Button/Button';
 import useFieldId from '../useFieldId';
-import Field, { FieldCaption, FieldLabel, FieldStack, fieldDescription, toneProps } from '../_internal/Field';
+import FieldBox from '../_internal/FieldBox';
+import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import renderFieldElem from '../_internal/fieldSlots';
 import useInlineEdit from '../_internal/useInlineEdit';
 
@@ -209,11 +210,11 @@ const TextField = ({
         : (edit.enabled ? { value: edit.draft } : { value, defaultValue });
 
     return (
-        <FieldStack disabled={isDisabled} className={`plus-text-field ${className}`.trim()} style={style}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-field ${className}`.trim()} style={style}>
             <FieldLabel htmlFor={fieldId} required={isRequired} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
-            <Field
+            <FieldBox
                 spacing={spacing}
                 subtle={isSubtle}
                 disabled={isDisabled}
@@ -246,7 +247,7 @@ const TextField = ({
                     aria-describedby={describedBy}
                     {...toneProps(tone).control}
                 />
-            </Field>
+            </FieldBox>
             <FieldCaption
                 messageId={messageId}
                 message={message}
@@ -255,7 +256,7 @@ const TextField = ({
                 count={length}
                 maxLength={maxLength}
             />
-        </FieldStack>
+        </FieldFrame>
     );
 };
 

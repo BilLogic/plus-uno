@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:string';
 
 // The state mixin — one place that draws hover, press, selection,
 // disabled and the focus ring, for both a hand-rolled control (`:hover`,
@@ -31,10 +32,15 @@
 // lives here instead of being retyped per component.
 //
 // `$ring-token` swaps in `--ds-border-focused-inverse` for a ring drawn on a
-// bold fill (the inverse case). `$high-contrast: true` adds the
-// `Highlight` ring `@media (forced-colors: active)` wants, for a part dense
-// enough that the ordinary ring can vanish under a forced palette; leave it
-// off everywhere the ordinary ring already reads (every adopter below does).
+// bold fill (the inverse case), or the bare keyword `Highlight` for a part
+// whose own `@media (forced-colors: active)` ring needs that system color
+// instead of a token — `plus-ring`'s one way to draw a ring with no `var()`
+// wrapper, so a component with its own forced-colors block never has to
+// hand-write `outline: ... Highlight` itself. `$high-contrast: true` on
+// `plus-state` covers the common case, the ordinary ring's own forced-colors
+// fallback; leave it off everywhere that already reads (every adopter below
+// does) and reach for `plus-ring($ring-token: Highlight)` only for a
+// standalone forced-colors block of a part's own.
 // `$important: true` marks the ring's declarations `!important`, for a native
 // control (Radio) still overriding a Bootstrap rule of its own.
 @mixin plus-state(
@@ -123,7 +129,10 @@
     @if $important {
         $bang: '!important';
     }
-    outline: $ring-offset solid var(#{$ring-token}) #{$bang};
+    // A token name (`--ds-*`) is wrapped in `var()`; a bare keyword
+    // (`Highlight`, forced-colors' own system color) is used as given.
+    $color: if(string.slice($ring-token, 1, 2) == '--', var(#{$ring-token}), $ring-token);
+    outline: $ring-offset solid $color #{$bang};
     outline-offset: $ring-offset;
 }
 
