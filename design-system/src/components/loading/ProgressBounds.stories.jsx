@@ -1,17 +1,17 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import Progress from './Progress/Progress';
+import ProgressBar from './ProgressBar/ProgressBar';
 
 /**
  * What a progress bar says when the number is out of range.
  *
  * WHY THIS FILE EXISTS (#325). The bar's WIDTH was clamped to 0–100% and the
- * announced value was not, so `value={140}` with `max={100}` drew a full bar
- * while reporting `aria-valuenow="140"` against `aria-valuemax="100"`. A value
- * above its own maximum is a state no assistive technology can render sensibly,
- * and it is the case that turns up in practice — a count that overshoots, a
- * percentage computed from a stale total.
+ * announced value was not, so `value={140}` drew a full bar while reporting
+ * `aria-valuenow="140"` against `aria-valuemax="100"`. A value above its own
+ * maximum is a state no assistive technology can render sensibly, and it is
+ * the case that turns up in practice — a count that overshoots, a percentage
+ * computed from a stale total.
  *
  * Nothing could have caught it. axe checks that a `progressbar` has the three
  * attributes, not that they agree with each other, and the bar looks right at
@@ -36,9 +36,9 @@ const stack = { display: 'flex', flexDirection: 'column', gap: '16px', maxWidth:
 
 export const OutOfRangeValuesAreClamped = () => (
     <div style={stack}>
-        <Progress value={140} max={100} label="Over" />
-        <Progress value={-20} max={100} label="Under" />
-        <Progress value={40} max={100} label="Within" />
+        <ProgressBar value={140} ariaLabel="Over" />
+        <ProgressBar value={-20} ariaLabel="Under" />
+        <ProgressBar value={40} ariaLabel="Within" />
     </div>
 );
 

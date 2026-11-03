@@ -1408,13 +1408,13 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
       }
     },
-    "Progress": {
+    "ProgressBar": {
       "code": {
         "import": "@/components/loading",
         "export": "default",
-        "mdxPath": "design-system/src/components/loading/Progress/Progress.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/Progress",
-        "source": "design-system/src/components/loading/Progress/Progress.jsx",
+        "mdxPath": "design-system/src/components/loading/ProgressBar/ProgressBar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/ProgressBar",
+        "source": "design-system/src/components/loading/ProgressBar/ProgressBar.jsx",
         "storybookId": "components-loading-progress-bar--docs"
       },
       "figma": {
@@ -1429,7 +1429,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872"
       }
     },
     "Radio": {
@@ -1792,7 +1792,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19485"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872"
       }
     },
     "Suggestion": {

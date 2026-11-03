@@ -33,12 +33,12 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-surface-container` · `--color-surface-container-lowest` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--size-border-radius-radius-150` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-sm` · `--size-spacing-large-space-1000` · `--size-spacing-large-space-600` · `--size-spacing-large-space-900` · `--size-spacing-medium-space-300`
+`--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--size-border-radius-radius-150` · `--size-element-gap-sm` · `--size-element-radius-full` · `--size-element-radius-md` · `--size-element-stroke-sm` · `--size-spacing-large-space-1000` · `--size-spacing-large-space-600` · `--size-spacing-large-space-900` · `--size-spacing-medium-space-300`
 
 From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `GenerativeBorder` · `Progress` · `Spinner`
+Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

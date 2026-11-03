@@ -41,7 +41,7 @@ export { default as NavPills } from '@/components/navigation/NavPills';
 export { default as NavTabs } from '@/components/navigation/NavTabs';
 export { default as Pagination } from '@/components/navigation/Pagination';
 export { default as Popover } from '@/components/overlays-and-layering/Popover';
-export { default as Progress } from '@/components/loading/Progress';
+export { default as ProgressBar } from '@/components/loading/ProgressBar';
 export { default as ProgressIndicator } from '@/components/status-indicators/ProgressIndicator';
 export { default as ProgressTracker } from '@/components/status-indicators/ProgressTracker';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';

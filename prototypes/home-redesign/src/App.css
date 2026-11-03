@@ -407,7 +407,7 @@
     color: var(--color-on-surface);
 }
 
-/* Progress bar: design system Progress (size small) – leaner height override */
+/* Progress bar: design system ProgressBar, reveal animation on the fill */
 .home-redesign-breakdown-progress-wrap {
     width: 100%;
 }
@@ -421,14 +421,12 @@
     }
 }
 
-.home-redesign-breakdown-progress .plus-progress-bar,
-.home-redesign-breakdown-progress .progress-bar {
+.home-redesign-breakdown-progress .plus-progressbar-fill {
     transform-origin: left;
     transform: scaleX(0);
 }
 
-.home-redesign-reveal-root.has-entered .home-redesign-breakdown-progress-wrap .plus-progress-bar,
-.home-redesign-reveal-root.has-entered .home-redesign-breakdown-progress-wrap .progress-bar {
+.home-redesign-reveal-root.has-entered .home-redesign-breakdown-progress-wrap .plus-progressbar-fill {
     animation: homeProgressFill 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
     animation-delay: var(--progress-delay, 0ms);
 }

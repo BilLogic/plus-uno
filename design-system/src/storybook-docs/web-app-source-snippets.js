@@ -212,8 +212,8 @@ export const webAppSourceSnippets = {
         '  </RBPopover>',
         '</div>'
     ]),
-    progress: snippet([
-        '<Progress value={50} style="primary" size="medium" showLabel />'
+    progressBar: snippet([
+        '<ProgressBar value={50} />'
     ]),
     richTextEditor: snippet([
         '<RichTextEditor',
@@ -243,7 +243,7 @@ export const webAppSourceSnippets = {
         '/>'
     ]),
     spinner: snippet([
-        '<Spinner variant="border" />'
+        '<Spinner />'
     ]),
     toast: snippet([
         '<ToastContainer className="p-3" style={{ position: "static" }}>',

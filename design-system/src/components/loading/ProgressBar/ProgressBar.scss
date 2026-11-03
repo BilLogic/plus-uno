@@ -1,0 +1,65 @@
+/*
+ * ProgressBar — a determinate (or indeterminate) track and fill.
+ *
+ * THE TRACK AND FILL. `background.neutral` for the track, `background.brand.
+ * bold` for the default fill, `background.success.bold` for success (the
+ * pattern-row rule, foundations/color-migration.md). `inverse` reads on a
+ * bold or colored page background, so both steps move to the inverse-subtle
+ * pair instead: `background.inverse.subtle` for the track (Atlassian's own
+ * use for "elements on a bold background") and its pressed step for the
+ * fill, which needs the extra contrast since it carries the value.
+ *
+ * THE HEIGHT. 8px (`--size-progressbar-height`), full pill radius.
+ */
+
+.plus-progressbar {
+    display: flex;
+    height: var(--size-progressbar-height);
+    width: 100%;
+    background-color: var(--ds-background-neutral);
+    border-radius: var(--size-element-radius-full);
+    overflow: hidden;
+    /* Component-scoped override: a caller drawing several same-appearance
+     * bars in different hues (a breakdown chart's per-segment color, for
+     * example) can redeclare this on an ancestor. */
+    --plus-progressbar-fill-color: var(--ds-background-brand-bold);
+}
+
+.plus-progressbar-fill {
+    height: 100%;
+    background-color: var(--plus-progressbar-fill-color);
+    border-radius: var(--size-element-radius-full);
+    transition: width 0.3s ease;
+}
+
+.plus-progressbar--success .plus-progressbar-fill {
+    background-color: var(--ds-background-success-bold);
+}
+
+.plus-progressbar--inverse {
+    background-color: var(--ds-background-inverse-subtle);
+}
+
+.plus-progressbar--inverse .plus-progressbar-fill {
+    background-color: var(--ds-background-inverse-subtle-pressed);
+}
+
+/* ------------------------------------------------------------ indeterminate */
+
+.plus-progressbar--indeterminate .plus-progressbar-fill {
+    width: 40%;
+    animation: plus-progressbar-sweep 1.4s ease-in-out infinite;
+}
+
+@keyframes plus-progressbar-sweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-progressbar--indeterminate .plus-progressbar-fill {
+        animation: none;
+        width: 40%;
+        transform: none;
+    }
+}

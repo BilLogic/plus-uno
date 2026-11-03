@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
-import Progress from '@/components/loading/Progress/Progress';
+import ProgressBar from '@/components/loading/ProgressBar/ProgressBar';
 import { ShellContext } from '../../home-redesign/src/context/ShellContext';
 import './MonthlyReportsListPage.scss';
 
@@ -86,12 +86,7 @@ export default function MonthlyReportsListContent() {
         return (status === 'Unviewed' || status === 'Not viewed') ? 'warning' : 'success';
     };
 
-    const getProgressColor = (done, total) => {
-        const pct = (done / total) * 100;
-        if (pct >= 100) return 'success';
-        if (pct >= 60) return 'info';
-        return 'warning';
-    };
+    const getProgressAppearance = (done, total) => (done / total) * 100 >= 100 ? 'success' : 'default';
 
     return (
         <div
@@ -184,11 +179,11 @@ export default function MonthlyReportsListContent() {
                                             className="completion-progress-shell"
                                             style={{ '--progress-delay': `${520 + i * 80}ms` }}
                                         >
-                                            <Progress
+                                            <ProgressBar
                                                 value={(report.completion.done / report.completion.total) * 100}
-                                                style={getProgressColor(report.completion.done, report.completion.total)}
+                                                appearance={getProgressAppearance(report.completion.done, report.completion.total)}
+                                                ariaLabel="Report completion"
                                                 className="completion-progress completion-progress--staged"
-                                                size="small"
                                             />
                                         </div>
                                         <span className="body3-txt">

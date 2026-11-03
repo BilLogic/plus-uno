@@ -48,7 +48,7 @@ const AiPromptedQuestionBox = ({
         };
         return (
             <div className={className} role="status" aria-live="polite" style={shellStyle}>
-                <Spinner size="sm" variant="border" />
+                <Spinner size={16} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', flex: 1, minWidth: 0 }}>
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '84%' }} />
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '60%' }} />

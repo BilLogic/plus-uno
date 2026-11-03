@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [GenerativeBorder](GenerativeBorder/index.md) | 5 | ✕ | ✕ | ✕ |
-| [Progress](Progress/index.md) | 11 | ✅ | ✅ | ✅ |
+| [ProgressBar](ProgressBar/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Skeleton](Skeleton/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✅ | ✅ |
 

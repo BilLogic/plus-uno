@@ -218,13 +218,13 @@ Shapes.play = async ({ canvasElement }) => {
     const thumb = canvas.getByTestId('thumb');
     await expect(radius(thumb), 'radius takes a token name').toBe(12);
 
-    // The look: surface-container, with the shimmer toward the lowest surface.
+    // The look: color.skeleton, with the shimmer toward color.skeleton.subtle.
     for (const el of [rect, circle, text, thumb]) {
         const s = getComputedStyle(el);
-        await expect(s.backgroundColor, 'fill is surface-container').toBe(tokenColor(canvasElement, '--color-surface-container'));
+        await expect(s.backgroundColor, 'fill is color.skeleton').toBe(tokenColor(canvasElement, '--ds-skeleton'));
         await expect(s.backgroundImage, 'the shimmer is a gradient').toContain('linear-gradient');
-        await expect(s.backgroundImage, 'toward surface-container-lowest').toContain(
-            tokenColor(canvasElement, '--color-surface-container-lowest'),
+        await expect(s.backgroundImage, 'toward color.skeleton.subtle').toContain(
+            tokenColor(canvasElement, '--ds-skeleton-subtle'),
         );
         await expect(s.animationName, 'shimmering by default').not.toBe('none');
         await expectInert(el, 'shape');
@@ -308,7 +308,7 @@ Shimmer.play = async ({ canvasElement }) => {
     await expect(on.animationName).not.toBe('none');
     await expect(off.animationName, 'no animation when off').toBe('none');
     await expect(off.backgroundImage, 'a flat fill when off').toBe('none');
-    await expect(off.backgroundColor).toBe(tokenColor(canvasElement, '--color-surface-container'));
+    await expect(off.backgroundColor).toBe(tokenColor(canvasElement, '--ds-skeleton'));
 
     // The sweep is Skeleton's own keyframe, defined once. Another stylesheet
     // defining the same name would silently replace one of the two sweeps.
@@ -363,7 +363,7 @@ ReducedMotion.play = async ({ canvasElement }) => {
     for (const s of reduced) {
         await expect(s.animation, 'no animation under reduced motion').toBe('none');
         await expect(s.image, 'a flat fill under reduced motion').toBe('none');
-        await expect(s.fill).toBe(tokenColor(canvasElement, '--color-surface-container'));
+        await expect(s.fill).toBe(tokenColor(canvasElement, '--ds-skeleton'));
     }
 };
 
@@ -470,7 +470,7 @@ export const LoadingCard = () => {
                     gap: '10px',
                     width: '294px',
                     padding: '16px',
-                    border: '1px solid var(--color-outline-variant)',
+                    border: '1px solid var(--ds-border)',
                     borderRadius: 'var(--size-card-radius-sm)',
                 }}
             >
