@@ -26,28 +26,22 @@ export default {
 /**
  * Button Group for Pending/Past toggle
  */
-const CallOffStateToggle = ({ selected, onSelect, interactive = true }) => {
-    const buttons = [
-        {
-            text: 'Pending',
-            isSelected: selected === 'pending',
-            onClick: interactive ? () => onSelect('pending') : undefined
-        },
-        {
-            text: 'Past',
-            isSelected: selected === 'past',
-            onClick: interactive ? () => onSelect('past') : undefined
-        }
-    ];
-
-    return (
-        <ButtonGroup
-            buttons={buttons}
+const CallOffStateToggle = ({ selected, onSelect, interactive = true }) => (
+    <ButtonGroup label="Call-off state toggle">
+        <Button
+            text="Pending"
             spacing="compact"
-            ariaLabel="Call-off state toggle"
+            isSelected={selected === 'pending'}
+            onClick={interactive ? () => onSelect('pending') : undefined}
         />
-    );
-};
+        <Button
+            text="Past"
+            spacing="compact"
+            isSelected={selected === 'past'}
+            onClick={interactive ? () => onSelect('past') : undefined}
+        />
+    </ButtonGroup>
+);
 
 /**
  * Main Content Area for Call-Offs Page

@@ -237,16 +237,17 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 {/* Content tabs: AI Insights, Goals, Notes – tonal buttons; container full width, fit-content height, border-box to contain padding */}
                 <div style={{ padding: '0 24px 4px', width: '100%', height: 'fit-content', boxSizing: 'border-box', marginTop: '0', marginBottom: 0 }}>
                     <div className="modal-header-reveal" style={{ animationDelay: '200ms' }}>
-                        <ButtonGroup
-                            buttons={contentTabLabels.map((label, i) => ({
-                                id: contentTabIds[i],
-                                text: label,
-                                isSelected: activeContentTab === contentTabIds[i],
-                                onClick: () => setActiveContentTab(contentTabIds[i])
-                            }))}
-                            ariaLabel="Content sections"
-                            block
-                        />
+                        <ButtonGroup label="Content sections" className="w-100">
+                            {contentTabLabels.map((label, i) => (
+                                <Button
+                                    key={contentTabIds[i]}
+                                    text={label}
+                                    isSelected={activeContentTab === contentTabIds[i]}
+                                    onClick={() => setActiveContentTab(contentTabIds[i])}
+                                    shouldFitContainer
+                                />
+                            ))}
+                        </ButtonGroup>
                     </div>
                 </div>
 

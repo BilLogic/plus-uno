@@ -1,52 +1,47 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
+import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import './CloseButton.scss';
 
 /**
- * The one dismiss control for surfaces that close as a whole — Alert, Toast,
- * Modal. A fixed 32×32 hit area holding a 16px xmark: it never scales with the
- * text around it, so placing it on a line of text is the parent's job.
- *
- * `tone="inverse"` is for colored or dark grounds. There is no disabled state
- * (a close control is never disabled) and no color variants (the × is neutral
- * on every intent). Its name is "Close", or "Dismiss {what}" when `what` is
- * passed.
+ * The one dismiss control for a surface that closes as a whole — Modal
+ * dialog, Section message, Flag. An Icon button, subtle, fixed to the ×
+ * glyph. `label` is required: "Close" for a surface that blocks (Modal
+ * dialog), "Dismiss {what}" for a message. `tone="inverse"` is for colored or
+ * dark grounds, where the subtle appearance's own hover and pressed read as
+ * nearly invisible. There is no disabled state: a close control is always
+ * available.
  */
 const CloseButton = ({
+    label = 'Close',
     tone = 'default',
-    what,
+    spacing = 'default',
+    className,
     onClick,
-    className = '',
-    'aria-label': ariaLabel,
     ...props
-}) => {
-    // `type` is set AFTER the spread: a close control never submits a form,
-    // whatever a caller passes.
-    const name = ariaLabel || (what ? `Dismiss ${what}` : 'Close');
-    const classes = [
-        'plus-close-btn',
-        tone === 'inverse' ? 'plus-close-btn--inverse' : '',
-        className,
-    ].filter(Boolean).join(' ');
-
-    return (
-        <button className={classes} aria-label={name} onClick={onClick} {...props} type="button">
-            <i className="plus-close-btn__icon fa-solid fa-xmark" aria-hidden="true" />
-        </button>
-    );
-};
+}) => (
+    <IconButton
+        {...props}
+        icon="xmark"
+        label={label}
+        appearance="subtle"
+        spacing={spacing}
+        onClick={onClick}
+        type="button"
+        className={classNames('plus-close-btn', { 'plus-close-btn--inverse': tone === 'inverse' }, className)}
+    />
+);
 
 CloseButton.propTypes = {
+    /** The accessible name and tooltip. "Close" for a surface that blocks; "Dismiss {what}" for a message. */
+    label: PropTypes.string,
     /** `default` for neutral surfaces; `inverse` for colored or dark grounds */
     tone: PropTypes.oneOf(['default', 'inverse']),
-    /** What closes, for the accessible name "Dismiss {what}". Without it the name is "Close" */
-    what: PropTypes.string,
-    /** Called when the button is pressed */
+    /** `default` draws 32. `compact` draws 24. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     onClick: PropTypes.func,
-    /** Additional CSS classes */
     className: PropTypes.string,
-    /** Overrides the accessible name outright, for call sites with an established label */
-    'aria-label': PropTypes.string,
 };
 
 export default CloseButton;
