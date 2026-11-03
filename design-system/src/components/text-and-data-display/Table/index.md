@@ -54,7 +54,7 @@ From `design-system/src/components/text-and-data-display/Table/Table.scss`. Over
 
 ## Related
 
-Same group: `Code` · `CodeBlock`
+Same group: `Code` · `CodeBlock` · `Heading`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
