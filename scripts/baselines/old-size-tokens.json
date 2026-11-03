@@ -66,7 +66,6 @@
     "design-system/src/components/messaging/Alert/Alert.scss": 2,
     "design-system/src/components/messaging/EmptyState/EmptyState.scss": 7,
     "design-system/src/components/messaging/Modal/Modal.scss": 10,
-    "design-system/src/components/messaging/Toast/Toast.scss": 1,
     "design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss": 2,
     "design-system/src/components/navigation/NavPills/NavPills.scss": 20,
     "design-system/src/components/navigation/NavPills/NavPills.stories.jsx": 2,
