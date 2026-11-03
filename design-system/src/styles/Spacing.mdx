@@ -1,28 +1,43 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
-import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+    AdsParity,
+    TokenSwatches,
+} from '@/storybook-docs/foundation-page.jsx';
 import * as SpacingStories from './Spacing.stories.jsx';
+
 
 <Meta of={SpacingStories} />
 
-<Title />
-
-Spacing tokens name a job, not a size. Pick the pattern you are in (Surface,
-Section, Card, Modal, Popover, Table, or an Element inside a component), then
-the relationship (**pad** inside a box, **stack** between rows, **inline**
-between things side by side), then the size. So the gap between a card's
-title and its body is `--card-stack-md`, wherever the card sits. Radius and
-the size roles have pages of their own.
-
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-55024"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/tokens"
+<FoundationHero
+    title="Spacing"
+    summary="The kind of box sets its pad; the pattern it sits in sets its stack and inline."
+    adsHref="https://atlassian.design/foundations/spacing"
 />
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+<FoundationContents />
 
-<div className="sb-ds-doc-section">
-### Principles
+<FoundationSection title="Overview">
+
+Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or Element inside a component), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Primitives hold the raw numbers and stay hidden: designers and code bind the semantic token, never a primitive and never a typed number.
+
+```css
+padding: var(--card-pad-md);
+gap: var(--card-stack-md);
+```
+
+Figma holds them in `spacing / foundations` (Element, Border, Size), `spacing / patterns` (Frame, Section, Card, Table, Blanket, Modal, Popup, Tile), `spacing / layout` (Page, Grid, Content, Screen) and the hidden `spacing / primitives`.
+
+</FoundationSection>
+
+<FoundationSection title="Principles">
 
 Five principles decide which tier a gap takes. Similar things share one gap,
 a new group gets a bigger one, tiers grow from the component to the page,
@@ -63,10 +78,10 @@ Pad the modal on every side, and leave the largest gap of its tier between the
 content and the footer buttons.
 
 <Canvas of={SpacingStories.WhiteSpace} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Tokens
+</FoundationSection>
+
+<FoundationSection title="Tokens">
 
 Spacing has two layers.
 
@@ -93,17 +108,17 @@ context a value belongs to, step back to the box that holds it.
     ]}
 />
 
-Margin, shell, slot and viewport are never token words. What other systems
-call a page margin is the surface pad, `--surface-pad`.
+Margin, slot and viewport are never token words. What other systems
+call a page margin is the Page pad, `--surface-pad`.
 
 <TokenTable
     showFigma={false}
     rows={['0', '00625', '0125', '025', '03125', '0375', '050', '0625', '075', '0875', '100', '125', '150', '200', '250', '300', '400', '500'].map((s) => ({ token: `--space-${s}` }))}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Three kinds of box
+</FoundationSection>
+
+<FoundationSection title="Three kinds of box">
 
 Every box on a page is one of three kinds, and the kind decides its padding.
 
@@ -114,10 +129,10 @@ Every box on a page is one of three kinds, and the kind decides its padding.
   gap or a grid.
 
 <Canvas of={SpacingStories.ThreeKinds} sourceState="none" />
-</div>
 
-<div className="sb-ds-doc-section">
-### Padding
+</FoundationSection>
+
+<FoundationSection title="Padding">
 
 An Item pads by its height, a Container pads by its size, and a Wrapper has no
 pad.
@@ -125,9 +140,10 @@ pad.
 **Items: height first**
 
 The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24
-and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Controls come
-in two heights only: 32 for everything, fields included, and 24 compact inside
-table rows and inline toolbars. Labels (Tag, Status, Count) pad 4 across.
+and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons and tabs come in
+32, or 24 compact inside table rows and inline toolbars. Fields and menu rows come
+in 40, or 32 compact, with pad-y 10 at 40. Buttons round 6 (4 compact); every
+other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 across.
 
 <Canvas of={SpacingStories.ItemHeights} sourceState="none" />
 
@@ -153,12 +169,12 @@ Card pad of its size: a Section message and File upload take 16, a Jumbotron
         { token: '--card-pad-md', figma: 'Card/pad-md', use: 'The default card' },
         { token: '--card-pad-lg', figma: 'Card/pad-lg' },
         { token: '--modal-pad', figma: 'Modal/pad', use: 'Every side, at every width' },
-        { token: '--popover-pad', figma: 'Popover/Popup and flag/pad', use: 'Popup and flag' },
-        { token: '--popover-pad-menu', figma: 'Popover/Menu/pad-menu', use: 'The outer box of a menu' },
-        { token: '--overlay-pad-x', figma: 'Overlay/pad-x', use: 'The scrim’s side pad' },
-        { token: '--overlay-pad-y', figma: 'Overlay/pad-y', use: 'The scrim’s top and bottom pad' },
-        { token: '--surface-container-pad', figma: 'Surface container/pad', use: 'The frame around the surface' },
-        { token: '--surface-pad', figma: 'Surface/pad', value: '16 · 16 · 24', use: 'Inside the surface, at MD · LG · XL' },
+        { token: '--popover-pad', figma: 'Popup and flag/pad', use: 'Popup and flag' },
+        { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
+        { token: '--overlay-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
+        { token: '--overlay-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
+        { token: '--surface-container-pad', figma: 'Frame/pad', use: 'The Frame around the Page' },
+        { token: '--surface-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'Inside the Page, at MD · LG · XL' },
     ]}
 />
 
@@ -176,10 +192,10 @@ flush with the table's edge.
         { token: '--table-indent', figma: 'Table/indent', use: 'One level of a tree' },
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Stack and inline
+</FoundationSection>
+
+<FoundationSection title="Stack and inline">
 
 Gaps come in tiers that grow with the box. The space between sections is two
 to three times the space inside them. A card stacks its parts 8 apart at every
@@ -192,7 +208,7 @@ size: stack follows use, not the size of the box.
         ['Card', '4', '8', '12', 'The parts of a card: title, body, footer'],
         ['Modal', '8', '16', '24', 'Header, body and footer content'],
         ['Section', '8', '16', '24', 'A section’s heading, its body and its footer'],
-        ['Surface', '16', '24', '40', 'Sections on a page; 40 before a new topic'],
+        ['Page', '16', '24', '40', 'Sections on a page; 40 before a new topic'],
         ['Grid', '—', '16', '—', 'Anything side by side on the grid: the gutter'],
     ]}
 />
@@ -207,27 +223,27 @@ size: stack follows use, not the size of the box.
         { token: '--element-inline-lg', figma: 'Element/inline-lg' },
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Pattern tokens
+</FoundationSection>
+
+<FoundationSection title="Pattern tokens">
 
 Every pattern has its own tokens, so a value is read from where it sits.
 
-**Surface container and Surface**
+**Frame and Page**
 
-The Surface container is the whole frame: the topbar above a row holding the
-sidebar and the surface. The Surface is the rounded box that holds the page
-content, and its pad is the content grid's margin.
+The Frame is the whole screen: the topbar above a row holding the sidebar and
+the Page. The Page is the rounded box that holds the content, and its pad is
+the content grid's margin.
 
 <TokenTable
     rows={[
-        { token: '--surface-container-pad', figma: 'Surface container/pad' },
-        { token: '--surface-container-stack', figma: 'Surface container/stack' },
-        { token: '--surface-pad', figma: 'Surface/pad', value: '16 · 16 · 24', use: 'MD · LG · XL' },
-        { token: '--surface-stack-sm', figma: 'Surface/stack-sm' },
-        { token: '--surface-stack-md', figma: 'Surface/stack-md', use: 'Between sections' },
-        { token: '--surface-stack-lg', figma: 'Surface/stack-lg', use: 'Before a new topic' },
+        { token: '--surface-container-pad', figma: 'Frame/pad' },
+        { token: '--surface-container-stack', figma: 'Frame/stack' },
+        { token: '--surface-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'MD · LG · XL' },
+        { token: '--surface-stack-sm', figma: 'Page/stack-sm' },
+        { token: '--surface-stack-md', figma: 'Page/stack-md', use: 'Between sections' },
+        { token: '--surface-stack-lg', figma: 'Page/stack-lg', use: 'Before a new topic' },
     ]}
 />
 
@@ -285,14 +301,14 @@ Plain and full-span by default.
     ]}
 />
 
-**Overlay and Modal**
+**Blanket and Modal**
 
-The overlay pads the screen. A modal pads 16 on every side at every width.
+The Blanket pads the screen. A modal pads 16 on every side at every width.
 
 <TokenTable
     rows={[
-        { token: '--overlay-pad-x', figma: 'Overlay/pad-x' },
-        { token: '--overlay-pad-y', figma: 'Overlay/pad-y' },
+        { token: '--overlay-pad-x', figma: 'Blanket/pad-x' },
+        { token: '--overlay-pad-y', figma: 'Blanket/pad-y' },
         { token: '--modal-pad', figma: 'Modal/pad' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
@@ -303,32 +319,32 @@ The overlay pads the screen. A modal pads 16 on every side at every width.
     ]}
 />
 
-**Popover**
+**Popup, menu and tooltip**
 
-Menu, popup, flag and tooltip float without a scrim. The outer box of a menu
+Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu
 pads 4, and a popup or flag pads 16.
 
 <TokenTable
     rows={[
-        { token: '--popover-pad', figma: 'Popover/Popup and flag/pad' },
-        { token: '--popover-width-sm', figma: 'Popover/Popup and flag/width-sm' },
-        { token: '--popover-width-md', figma: 'Popover/Popup and flag/width-md' },
-        { token: '--popover-width-lg', figma: 'Popover/Popup and flag/width-lg' },
-        { token: '--popover-width-flag', figma: 'Popover/Popup and flag/width-flag' },
-        { token: '--popover-stack-flag', figma: 'Popover/Popup and flag/stack-flag' },
-        { token: '--popover-pad-menu', figma: 'Popover/Menu/pad-menu' },
-        { token: '--popover-min-width-menu', figma: 'Popover/Menu/min-width-menu' },
-        { token: '--popover-max-width-menu', figma: 'Popover/Menu/max-width-menu' },
-        { token: '--popover-max-height-menu', figma: 'Popover/Menu/max-height-menu' },
-        { token: '--popover-pad-y-tooltip', figma: 'Popover/Tooltip/pad-y-tooltip' },
-        { token: '--popover-max-width-tooltip', figma: 'Popover/Tooltip/max-width-tooltip' },
-        { token: '--popover-gap-screen', figma: 'Popover/Placement/gap-screen', use: 'The closest a popover comes to the screen edge' },
+        { token: '--popover-pad', figma: 'Popup and flag/pad' },
+        { token: '--popover-width-sm', figma: 'Popup and flag/width-sm' },
+        { token: '--popover-width-md', figma: 'Popup and flag/width-md' },
+        { token: '--popover-width-lg', figma: 'Popup and flag/width-lg' },
+        { token: '--popover-width-flag', figma: 'Popup and flag/width-flag' },
+        { token: '--popover-stack-flag', figma: 'Popup and flag/stack-flag' },
+        { token: '--popover-pad-menu', figma: 'Menu/pad-menu' },
+        { token: '--popover-min-width-menu', figma: 'Menu/min-width-menu' },
+        { token: '--popover-max-width-menu', figma: 'Menu/max-width-menu' },
+        { token: '--popover-max-height-menu', figma: 'Menu/max-height-menu' },
+        { token: '--popover-pad-y-tooltip', figma: 'Tooltip/pad-y-tooltip' },
+        { token: '--popover-max-width-tooltip', figma: 'Tooltip/max-width-tooltip' },
+        { token: '--popover-gap-screen', figma: 'Placement/gap-screen', use: 'The closest a floating layer comes to the screen edge' },
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Usage
+</FoundationSection>
+
+<FoundationSection title="Usage">
 
 How to build a feature that spaces like the rest of PLUS.
 
@@ -337,7 +353,7 @@ Before you pick a token, group the content from the inside out; each step out
 is one tier up. In a modal form:
 
 1. Pair a control with what it changes, such as a field and its "Repeats
-   weekly" switch: `--element-stack-md` (8).
+   weekly" toggle: `--element-stack-md` (8).
 2. Gather related fields: `--modal-stack-md` (16) between them.
 3. Separate unrelated groups: `--modal-stack-lg` (24).
 4. Separate the header from the body, and the body from the footer:
@@ -362,7 +378,7 @@ changes. A one-off value takes the nearest semantic token of its context, or
 becomes a proposed token.
 
 **Build features from patterns and slots.** Start from the pattern (Section,
-Card, Modal, Popover) and keep it attached; never detach it. The pattern owns
+Card, Modal, Popup) and keep it attached; never detach it. The pattern owns
 the pad, the stacks and the size, and you add content only inside its slots.
 If you copy a layout to get a variation, it needs a slot, not a new variant.
 
@@ -375,58 +391,118 @@ stacks and dividers in the card body, not more cards.
 overflow or clipping means a larger one. Cards hug their content, with an
 optional maximum height that scrolls the body. Modals hug or fill. Tables,
 sections and tab groups grow to fit.
+
+</FoundationSection>
+
+<FoundationSection title="Space never speaks alone">
+
+A gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair it with a heading, a label or a divider.
+
+- Group first, then space: related fields sit close and each group takes a bigger gap than the one inside it.
+- Pick one stack tier for the context and keep it across the container. All three metric cards on Home take the same stack.
+- An optical nudge is allowed where the eye needs it, such as an icon beside an all-caps label. Note it on the layer; never leave a silent hard-code. Keep the nudge on a scale unit.
+
+**Name the groups the space separates.** The create-session form has student fields, then schedule fields.
+
+<DoDont>
+<Do caption="A 24 gap and a subsection heading say the same thing twice.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        <strong style={{ font: 'var(--heading-xsmall)' }}>Student</strong>
+        <span style={{ font: 'var(--body-default)' }}>School · Teacher</span>
+    </div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        <strong style={{ font: 'var(--heading-xsmall)' }}>Schedule</strong>
+        <span style={{ font: 'var(--body-default)' }}>Session date · Time</span>
+    </div>
 </div>
+</Do>
+<Dont caption="Four fields and one unexplained gap. People who cannot see the spacing, or whose screen reader skips it, miss the break.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)', font: 'var(--body-default)' }}>
+    <span>School</span><span>Teacher</span><span style={{ marginBlockStart: 'var(--modal-stack-lg)' }}>Session date</span><span>Time</span>
+</div>
+</Dont>
+</DoDont>
 
-<div className="sb-ds-doc-section">
-### From the Spacing Guide
+</FoundationSection>
 
-The 2026 Spacing Guide shaped the principles above. If you learned the
-guide, this table maps its words to the ones on this page.
+<FoundationSection title="Do and don't">
 
-<RefTable
-    head={['The guide said', 'Now']}
+Group by proximity, match the token to the container you are in, and take every value from a variable.
+
+**Group by proximity.** Elements placed close together read as related. Keep a label near its own field and put the larger gap between groups.
+
+<DoDont>
+<Do caption="Label to field 8 (Element/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-small)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}><span>School</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+</div>
+</Do>
+<Dont caption="Label to field 24 and group to group 8: each label sits nearer the previous field than its own.">
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-small)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+</div>
+</Dont>
+</DoDont>
+
+**Match the token to the context.** Element tokens for elements, card tokens for cards.
+
+<DoDont>
+<Do caption="A card pads with a card token, so the content breathes at the card scale.">
+<div style={{ padding: 'var(--card-pad-md)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
+</Do>
+<Dont caption="An element token on a card squeezes the content to a button-sized pad.">
+<div style={{ padding: 'var(--element-pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
+</Dont>
+</DoDont>
+
+**Never hardcode spacing.** Always use the variable; the code token is the same name with `var()`.
+
+<DoDont>
+<Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-md)</C></Do>
+<Dont caption="A literal 13 matches no step on the scale and will not follow a token change."><C>padding: 13px</C></Dont>
+</DoDont>
+
+</FoundationSection>
+
+<FoundationSection title="ADS parity">
+
+<AdsParity
     rows={[
-        [<><C>inset-*</C>, <C>inset-x</C>, <C>inset-y</C></>, <><C>pad</C>, <C>pad-x</C>, <C>pad-y</C></>],
-        ['Three tiers: component, alias, primitive', 'Two: semantic tokens, and primitives that stay hidden'],
-        ['8-base names (space-100 = 8)', 'rem × 100 (space-100 = 16, space-050 = 8)'],
-        ['Bind a primitive for a one-off value', 'Take the nearest semantic token, or propose a token'],
-        ['Element = the smallest component (button, toast)', 'Item, Container or Wrapper; an Element is a part inside a component; a toast is a Flag'],
-        ['Eight categories, with Tab group', 'The patterns: Surface container, Surface, Section, Card, Table, Overlay, Modal, Popover; tabs sit in the Section header'],
-        ['Sizes picked from rendered-width bands', 'Items by height, cards by minimum width, modals by screen-grid columns, rows by content'],
-        [<C>card-compact</C>, 'Card sm · md · lg'],
-        ['Fall back to Element tokens when unsure', 'The kind of box decides; a non-pattern container takes the Card pad of its size'],
-        ['Add extra padding when it still looks off', 'Step to the next tier; never hand-space'],
-        ['A table always sits inside a card', 'A plain table spans its section, under the Section header'],
-        ['Surfaces step darker with depth (card 1, modal 3)', 'Cards on the raised pair, modals and popovers on the overlay pair; gray fills only for recessed areas'],
-        ['A card of three mini cards', 'No card inside a card'],
-        ['A maximum height per size', 'Cards hug, with an optional maximum height; modals hug or fill'],
-        ['Gutter 8, cap 1296, modals outside the grid', 'Gutter 16, cap 1232, modals span 6 · 8 · 10 screen-grid columns'],
+        ["Scale names", "space.100 is 8px (percent of an 8px base)", "space-100 is 16px (rem \u00d7 100)", "PLUS names its scale by rem, so a token reads as the unit it is. Convert ADS spacing guidance to pixels before reuse."],
+        ["Token layers", "Space tokens by value", "Space by job: pad, stack, inline per pattern", "Tutors and students meet the same patterns everywhere, so the pattern names the gap."],
+        ["Negative spacing", "space.negative tokens", "None; use the layout to bleed a child", "Nothing in the product needs one."],
+        ["Gutter", "Per breakpoint", "16 at every breakpoint", "One gutter keeps cards and columns aligned."],
+        ["Control heights", "Buttons and fields 32 and 24", "Buttons 32 and 24; fields 40 and 32", "Fields are larger touch targets for students."],
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Accessibility
+</FoundationSection>
 
-- Keep the focus ring's room. The ring is drawn 2 outside a control, so a
-  control never sits flush against a clipping edge, and Element and Card
-  tokens leave room for it.
-- Spacing groups content for sighted readers. The same groups need structure
-  for everyone: a heading for each section, and a fieldset or a group label
-  for related fields.
-</div>
+<FoundationSection title="Accessibility">
 
-<div className="sb-ds-doc-section">
+- Spacing groups content, so keep the grouping consistent.
+- Related items sit closer together (a tighter stack) than unrelated ones (a looser stack), so a reader can tell what belongs together without reading every label.
+- Spacing never carries meaning alone. If a gap separates two groups, a heading, label or divider says so as well.
+- Pick one stack tier for the context, then keep to it across the container, so the rhythm reads the same on every screen.
+- Keep the focus ring's room. The ring is drawn 2 outside a control, so a control never sits flush against a clipping edge, and Element and Card tokens leave room for it.
+- The same groups need structure for everyone: a heading for each section, and a fieldset or a group label for related fields.
 
-### Related
+</FoundationSection>
 
-- **Radius**, for the corner of every box on this page.
-- **Size roles**, for control, row, icon and media sizes.
-- **Layout & grid**, for columns, gutters, content caps and modal widths.
-- **Typography**, for the 14/20 label that sets every Item height.
-- **Patterns**, for the patterns that bake these tokens in.
-- **Elevation**, for raised and overlay surfaces and their shadows.
+<FoundationSection title="Related">
 
-</div>
+<FoundationRelated
+    items={[
+        { title: "Layout & grid", description: "Columns, gutters, content caps, modal widths and size roles.", href: "?path=/docs/foundations-layout-grid--docs" },
+        { title: "Radius", description: "Corner radius, and how a menu's rows round inside it.", href: "?path=/docs/foundations-radius--docs" },
+        { title: "Border", description: "Border widths and the colors they pair with.", href: "?path=/docs/foundations-border--docs" },
+        { title: "Iconography", description: "Icon sizes.", href: "?path=/docs/foundations-iconography--docs" },
+        { title: "Typography", description: "The 14/20 label that sets every item height.", href: "?path=/docs/foundations-typography--docs" },
+        { title: "Elevation", description: "Raised and floating layers and their shadows.", href: "?path=/docs/foundations-elevation--docs" },
+    ]}
+/>
 
-</div>
+</FoundationSection>

@@ -1,111 +1,315 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
-import { RefTable, TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
-import * as RadiusStories from './Radius.stories.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+    AdsParity,
+} from '@/storybook-docs/foundation-page.jsx';
 
-<Meta of={RadiusStories} />
+export const Control = ({ height, radius, children, ring }) => (
+    <span
+        style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            height: `var(${height})`,
+            padding: '0 var(--element-pad-x-md)',
+            borderRadius: radius.startsWith('calc') ? radius : `var(${radius})`,
+            background: 'var(--ds-background-neutral)',
+            color: 'var(--ds-text)',
+            font: 'var(--body-small)',
+            ...(ring ? { outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' } : {}),
+        }}
+    >
+        {children}
+    </span>
+);
 
-<Title />
+export const Menu = ({ rowRadius }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', width: 'var(--popover-min-width-menu)', padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popover-radius-menu-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
+        {['Rename', 'Duplicate', 'Move to…'].map((t, i) => (
+            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: 'var(--item-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: rowRadius, background: i === 0 ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{t}</span>
+        ))}
+    </div>
+);
 
-Radius is the roundness of a box's corners. Each component sets its own, and
-it does not change with where the component sits. An **Item**, a control with
-a fixed height such as a button or a field, takes its height ÷ 4. A container
-takes its pattern's radius. A part inset inside a parent takes the parent's
-radius minus the inset.
+<Meta title="Foundations/Radius" tags={['!dev']} />
 
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=18314-55024"
-    githubLink="https://github.com/BilLogic/plus-uno/blob/main/design-system/src/tokens/_scales.scss"
+<FoundationHero
+    title="Radius"
+    summary="A control rounds at a quarter of its height; buttons round 6 and 4; containers own their tokens."
+    adsHref="https://atlassian.design/foundations/radius"
 />
 
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+<FoundationContents />
 
-<div className="sb-ds-doc-section">
-### The rules
+<FoundationSection title="Overview">
 
-<Canvas of={RadiusStories.Rules} sourceState="none" />
+Radius tokens keep corners consistent across the tutor and student apps. A control's radius is a quarter of its height, so a 24 high control takes 6, a 32 high one takes 8 and a 40 high one takes 10. Buttons are the exception and match ADS: 6 default and 4 compact. Containers take the step their pattern names, and pair every radius with a focus ring that is 2 larger.
+
+Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--element-radius-*`, `--card-radius`, `--modal-radius`, `--popover-radius-*`, `--tile-radius-*` and `--surface-radius` as semantic tokens. Figma holds the primitives in `spacing / primitives`, and the semantic tokens in `spacing / foundations`, `spacing / layout` (Page/radius) and `spacing / patterns`.
+
+</FoundationSection>
+
+<FoundationSection title="About radius tokens">
+
+Radius tokens standardize how round a corner is, so a session card, a menu and a status tag read as one family. The primitive steps are building blocks; features use the semantic tokens below.
+
+</FoundationSection>
+
+<FoundationSection title="Radius tokens and usage">
+
+Use the token for the role, not the one that matches a pixel value. Values are read from the page.
+
+<FoundationBanner title="PLUS differences from ADS">
+Controls round at a quarter of their height, so a 32 high field takes 8 and a 40 high field takes 10, where ADS inputs use 6. Buttons are the exception and match ADS at 6 and 4. Cards and the Page round at 16, where ADS uses 8 and 12, because containers own their tokens: Table 8, Modal and Popup 12, Menu 10, 12 or 14, Tooltip 6.
+</FoundationBanner>
+
+<FoundationSubsection title="Controls and elements">
+
+<TokenTable
+    rows={[
+        { token: '--element-radius-sm', figma: 'Element/radius-sm', use: 'Small detail elements: checkboxes, Count tags, keyboard shortcuts.' },
+        { token: '--element-radius-md', figma: 'Element/radius-md', use: 'Supporting elements: Status tags, Tags, session-time chips, 16 high controls.' },
+        { token: '--element-radius-item-sm', figma: 'Element/radius-item-sm', use: '24 high controls and items: filter chips, table-row actions.' },
+        { token: '--element-radius-lg', figma: 'Element/radius-lg', use: 'Interactive elements, 32 high: tabs, navigation items, and fields in the compact density.' },
+        { token: '--element-radius-item-md', figma: 'Element/radius-item-md', use: 'Items, 32 high: the same 8 as radius-lg.' },
+        { token: '--element-radius-full', figma: 'Element/radius-full', use: 'Circular, people-related elements: avatars, pills, toggles.' },
+    ]}
+/>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Buttons">
+
+Every button rounds the same way: 6 at the default height of 32 and 4 compact at 24. Their focus rings draw at 8 and 6. This is the ADS value, and it is not the height ÷ 4 rule. Element/radius-lg (8) is for fields, tabs and navigation, not for buttons.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Containers">
+
+<TokenTable
+    rows={[
+        { token: '--card-radius', figma: 'Card/radius', use: 'Large page elements: cards.' },
+        { token: '--surface-radius', figma: 'Page/radius', use: 'Large page elements: the Page.' },
+        { token: '--card-radius-sm', figma: 'Card/radius-sm', use: 'Compact cards.' },
+        { token: '--modal-radius', figma: 'Modal/radius', use: 'Modals.' },
+        { token: '--popover-radius', figma: 'Popup and flag/radius', use: 'Popups and flags.' },
+        { token: '--popover-radius-menu-sm', figma: 'Menu/radius-menu-sm', use: 'Menus whose rows are 24 high.' },
+        { token: '--popover-radius-menu-md', figma: 'Menu/radius-menu-md', use: 'Menus whose rows are 32 high.' },
+        { token: '--popover-radius-tooltip', figma: 'Tooltip/radius-tooltip', use: 'Tooltips.' },
+        { token: '--table-radius', figma: 'Table/radius', use: 'Tables.' },
+        { token: '--tile-radius-sm', figma: 'Tile/radius-sm', use: 'The Tile component only: 25% of the tile size (20 → 5).' },
+        { token: '--tile-radius-lg', figma: 'Tile/radius-lg', use: 'The Tile component only (40 → 10).' },
+    ]}
+/>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Radius examples and usage">
+
+Every control except a button takes a radius of its height ÷ 4. The same quarter keeps a 24, 32 and 40 control looking like one family, and it matches how Atlassian derives its tile radius (25%).
+
+<FoundationExample caption="Each control takes the radius of its height divided by four. Buttons are the exception: 6 default, 4 compact.">
+<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)' }}>
+    <Control height="--item-height-sm" radius="--element-radius-item-sm">24 · radius 6</Control>
+    <Control height="--item-height-md" radius="--element-radius-lg">32 · radius 8</Control>
+    <Control height="--row-height-md" radius="calc(var(--row-height-md) / 4)">40 · radius 10</Control>
+    <Control height="--item-height-md" radius="--element-radius-item-sm">Button 32 · radius 6</Control>
+    <Control height="--item-height-sm" radius="--element-radius-md">Compact button 24 · radius 4</Control>
+</div>
+</FoundationExample>
 
 <RefTable
-    head={['Rule', 'Values', 'Where']}
+    head={['Control height', 'Radius', 'Token']}
     rows={[
-        ['Items: height ÷ 4', '24 → 6 · 32 → 8', <><C>--element-radius-item-sm</C> and <C>-md</C>: buttons, fields, tabs, menu rows</>],
-        ['Containers keep their own radius', 'Surface 16 · Card 16 (sm 12) · Modal 12 · Popup and flag 12 · Table 8 · Tooltip 6', 'The pattern’s radius token, whatever it sits in'],
-        ['Inset parts: the parent’s radius minus the inset', 'Menu 12, rows inset 4 → 8 · a menu of 24 rows → 10', 'Menu rows, a segmented control’s thumb'],
-        ['Flush parts are clipped', 'No radius of their own', 'A table’s head row, a card’s image: the parent clips them'],
-        ['Pills and circles are fully round', <C>--element-radius-full</C>, 'Toggle, Radio, Avatar, pill Tag, Progress bar'],
-        ['The focus ring sits 2 outside', 'Control radius + 2: 8 → 10', 'Every focusable control'],
+        ['8', '2', <C>--element-radius-sm</C>],
+        ['16', '4', <C>--element-radius-md</C>],
+        ['24', '6', <C>--element-radius-item-sm</C>],
+        ['32', '8', <><C>--element-radius-lg</C> · <C>--element-radius-item-md</C></>],
+        ['40', '10', <>the 0625 step, <C>--radius-0625</C></>],
+        ['Menu with 24 or 32 high rows', '10 or 12', <><C>--popover-radius-menu-sm</C> · <C>--popover-radius-menu-md</C></>],
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Tokens
+A menu's radius is its item radius plus its padding: 24 high rows round at 6 and the menu at 10, 32 high rows at 8 and the menu at 12, 40 high rows at 10 and the menu at 14. Pills and avatars use `--element-radius-full`.
 
-Element radii are for parts and Items. Each pattern carries its own.
+Flush parts are clipped, not rounded: a part that touches its parent's edge, such as a table's head row or a card's image, takes no radius of its own. The parent's radius clips it.
+
+</FoundationSection>
+
+<FoundationSection title="Scale">
+
+Ten steps. The name is the rem value × 100 (0625 = 0.625rem = 10px); each Radius step aliases the Space step of the same name, and full is the only literal.
 
 <TokenTable
+    showFigma={false}
+    rows={['0125', '025', '03125', '0375', '050', '0625', '075', '0875', '100', 'full'].map((s) => ({ token: `--radius-${s}`, figma: `Radius/radius-${s}` }))}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Which pattern takes which step">
+
+Components bind the semantic token, never the primitive. This is what the code assigns.
+
+<RefTable
+    head={['Pattern', 'Code token']}
     rows={[
-        { token: '--element-radius-sm', figma: 'Element/radius-sm', use: 'A part inside a component' },
-        { token: '--element-radius-md', figma: 'Element/radius-md', use: 'A part inside a component' },
-        { token: '--element-radius-lg', figma: 'Element/radius-lg', use: 'A part inside a component' },
-        { token: '--element-radius-item-sm', figma: 'Element/radius-item-sm', use: 'Compact 24 Items' },
-        { token: '--element-radius-item-md', figma: 'Element/radius-item-md', use: 'Default 32 Items' },
-        { token: '--element-radius-full', figma: 'Element/radius-full', use: 'Pills and circles' },
+        ['Page (content box)', <C>--surface-radius</C>],
+        ['Card', <C>--card-radius</C>],
+        ['Card, small', <C>--card-radius-sm</C>],
+        ['Modal', <C>--modal-radius</C>],
+        ['Popup and flag', <C>--popover-radius</C>],
+        ['Menu, small and medium', <><C>--popover-radius-menu-sm</C> · <C>--popover-radius-menu-md</C></>],
+        ['Tooltip', <C>--popover-radius-tooltip</C>],
+        ['Table', <C>--table-radius</C>],
+        ['Tile, small and large', <><C>--tile-radius-sm</C> · <C>--tile-radius-lg</C></>],
+        ['Controls', <><C>--element-radius-sm</C> · <C>-md</C> · <C>-item-sm</C> · <C>-lg</C> · <C>-item-md</C></>],
     ]}
 />
 
-<TokenTable
+</FoundationSection>
+
+<FoundationSection title="Radius token for focus state">
+
+A component's focus state is critical for accessibility. The corner radius of the focus ring must align visually with the component it surrounds.
+
+- Offset: the focus ring sits 2 away from the component's bounding box, so its corner radius is the component's own + 2.
+- Stroke: `Border/focused` (2) in `color/border/focused`; use `color/border/focused/inverse` on a colored ground.
+- In code, interactive PLUS components draw the ring for you, and the browser rounds an outline to the control's own radius.
+- Containers draw no ring of their own.
+
+<RefTable
+    head={['Control', 'Radius', 'Focus ring radius']}
     rows={[
-        { token: '--surface-radius', figma: 'Surface/radius' },
-        { token: '--card-radius', figma: 'Card/radius' },
-        { token: '--card-radius-sm', figma: 'Card/radius-sm', use: 'A small card, or a well inside a card' },
-        { token: '--modal-radius', figma: 'Modal/radius' },
-        { token: '--popover-radius', figma: 'Popover/Popup and flag/radius' },
-        { token: '--popover-radius-menu-sm', figma: 'Popover/Menu/radius-menu-sm', use: 'A menu of 24 rows' },
-        { token: '--popover-radius-menu-md', figma: 'Popover/Menu/radius-menu-md', use: 'A menu of 32 rows' },
-        { token: '--popover-radius-tooltip', figma: 'Popover/Tooltip/radius-tooltip' },
-        { token: '--table-radius', figma: 'Table/radius', use: 'A framed table only' },
-        { token: '--tile-radius-lg', figma: 'Tile/radius-lg', use: 'The 40 tile' },
-        { token: '--tile-radius-sm', figma: 'Tile/radius-sm', use: 'The smallest tiles; Tile sets the rest from its size, except the 40 tile' },
+        ['Default button (32)', '6', '8'],
+        ['Compact button (24)', '4', '6'],
+        ['24 high control', '6', '8'],
+        ['32 high control', '8', '10'],
+        ['40 high control', '10', '12'],
+        ['Small detail element', '2', '4'],
     ]}
 />
 
-Border widths sit beside radius: strokes are 1 at rest, and 2 for selected
-and focused.
+<FoundationExample caption="The ring is drawn 2 outside each control and rounds to its radius plus 2.">
+<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--element-pad-x-md)' }}>
+    <Control height="--item-height-md" radius="--element-radius-lg" ring>32 · ring 10</Control>
+    <Control height="--item-height-sm" radius="--element-radius-item-sm" ring>24 · ring 8</Control>
+</div>
+</FoundationExample>
 
-<TokenTable
+</FoundationSection>
+
+<FoundationSection title="Tiles and placement">
+
+A Tile rounds at 25% of its size. Every part keeps the radius of its own component, wherever it is placed.
+
+<FoundationExample>
+<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)' }}>
+    {[['20', 20, '--tile-radius-sm', 5], ['24', 24, '--element-radius-item-sm', 6], ['32', 32, '--element-radius-lg', 8], ['40', 40, '--tile-radius-lg', 10], ['48', 48, '--card-radius-sm', 12]].map(([label, size, token, r]) => (
+        <span key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', alignItems: 'center', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+            <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, borderRadius: `var(${token})`, background: 'var(--ds-background-accent-blue-subtler)', color: 'var(--ds-icon-accent-blue)' }}><i className="fa-solid fa-book-open" /></span>
+            {label} · radius {r}
+        </span>
+    ))}
+</div>
+</FoundationExample>
+
+- Tile size 20 rounds at 5, 40 at 10: the radius is a quarter of the side, so the corner reads the same at every size.
+- A Status tag, a Tag and a Count tag keep their own radius in a table cell, in a card and in a menu. Do not change it to suit the neighbor.
+
+**Keep a part's radius wherever it sits.** The Status tag is 4 in the table row and 4 in the session card.
+
+<DoDont>
+<Do caption="The same tag, the same corner, in both places.">
+<span style={{ display: 'inline-block', padding: '0 var(--element-pad-x-xs)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
+</Do>
+<Dont caption="The card gives its tag a pill corner, so one component now has two shapes.">
+<span style={{ display: 'inline-block', padding: '0 var(--element-pad-x-sm)', borderRadius: 'var(--element-radius-full)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
+</Dont>
+</DoDont>
+
+</FoundationSection>
+
+<FoundationSection title="Button radius">
+
+Every control except a button takes a radius of its height ÷ 4: a 24 chip rounds at 6, a 32 field at 8 and a 40 field at 10. Buttons are the named exception and match ADS: 6 default and 4 compact, with focus rings at 8 and 6. This covers Button, Icon button, Link button, Split button, Filter button, Close button and Vertical button. Containers keep their own tokens: Card 16, Modal 12.
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+<FoundationSubsection title="Nested corners">
+
+An inner shape inside a padded container rounds at the container's radius minus the padding, like a session tile inside a card, or the rows inside a menu.
+
+<DoDont>
+<Do caption="Rows inset 4 inside a 12 menu take 8, so the gap between the two curves stays even.">
+<Menu rowRadius="var(--element-radius-item-md)" />
+</Do>
+<Dont caption="Rows at the menu's own 12. Their corners bulge toward the menu's edge, and the inset looks uneven.">
+<Menu rowRadius="var(--popover-radius-menu-md)" />
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Match the height">
+
+Take the radius from the height of the control, not from the nearest look.
+
+<DoDont>
+<Do caption="24 high takes 6.">
+<Control height="--item-height-sm" radius="--element-radius-item-sm">24 high, radius 6</Control>
+</Do>
+<Dont caption="8 belongs to a 32 high control; on a 24 high one it looks inconsistent beside its siblings.">
+<Control height="--item-height-sm" radius="--element-radius-lg">24 high, radius 8</Control>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="ADS parity">
+
+<AdsParity
     rows={[
-        { token: '--border-default', figma: 'Border/default' },
-        { token: '--border-selected', figma: 'Border/selected' },
-        { token: '--border-focused', figma: 'Border/focused' },
+        ['Inputs and fields', 'Radius 6', 'Height ÷ 4: 10 at 40, 8 at 32', 'The quarter rule keeps every control one family at any height.'],
+        ['Buttons', '6 default, 4 compact', 'The same, rings at 8 and 6', 'Matches ADS.'],
+        ['Cards and the Page', '8 and 12', '16', 'Containers own their tokens.'],
+        ['Table, Modal, Popup, Menu, Tooltip', 'Per component', 'Table 8, Modal and Popup 12, Menu 10 to 14, Tooltip 6', 'Each container names its own step.'],
+        ['Tile', '25% of the size', '25% of the size', 'Matches ADS.'],
+        ['Focus ring', 'Component radius plus the offset', 'Component radius + 2', 'Matches ADS.'],
     ]}
 />
-</div>
 
-<div className="sb-ds-doc-section">
-### Do and don't
+</FoundationSection>
 
-<Canvas of={RadiusStories.InsetRows} sourceState="none" />
-</div>
+<FoundationSection title="Accessibility">
 
-<div className="sb-ds-doc-section">
-### Accessibility
+- Radius is decoration. Never use a corner shape alone to signal state or meaning.
+- The focus ring must follow the control's shape and keep 3:1 contrast against its ground.
+- Keep padding at least as large as the radius so text and icons do not crowd or clip at a rounded corner.
 
-- The focus ring follows the control's shape at its radius + 2, so it reads
-  as belonging to the control. Never clip it with the parent's radius or
-  overflow.
-- Radius never carries meaning on its own. A pill and a square tag are the
-  same component at two shapes, not two states.
-</div>
+</FoundationSection>
 
-<div className="sb-ds-doc-section">
+<FoundationSection title="Related">
 
-### Related
+<FoundationRelated
+    items={[
+        { title: 'Border', description: 'Stroke widths and the focus ring color pair.', href: '?path=/docs/foundations-border--docs' },
+        { title: 'Spacing', description: 'Radius steps alias the Space steps of the same name.', href: '?path=/docs/foundations-spacing--docs' },
+        { title: 'Elevation', description: 'Surfaces that round and lift.', href: '?path=/docs/foundations-elevation--docs' },
+        { title: 'Tokens', description: 'How names and layers work.', href: '?path=/docs/foundations-tokens--docs' },
+    ]}
+/>
 
-- **Spacing**, for the pad inside each box.
-- **Size roles**, for the Item heights that set an Item's radius.
-- **Tile**, for the radius of each tile size.
-
-</div>
-
-</div>
+</FoundationSection>

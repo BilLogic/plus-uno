@@ -88,3 +88,13 @@ Toast and Flag, the Frame's floating sidebar, and modals. A modal is set apart f
 1. **Use sparingly** - Elevation should create meaningful hierarchy
 2. **Match to context** - Higher elevation for more important overlays
 3. **Never hardcode shadows** - Always use elevation tokens
+
+
+## Foundation rules
+
+- Five levels: sunken (the frame), default (the page), raised (cards), overlay (menus, popups, flags, the open sidebar, modals, dragged cards) and overflow (a shadow only). A surface lifts by its shadow, never by a darker fill.
+- A card rests on the raised pair with no border; a clickable card lifts to the overlay shadow on hover and settles back on press. This is a deliberate PLUS difference from ADS.
+- The tooltip is the one floating layer off the overlay pair: `--ds-background-neutral-bold` with `--ds-text-inverse`.
+- Layers stack by the `--layout-z-index-*` tokens, never by a raw number.
+- Raise one focal point; group related overlay actions in one toolbar.
+

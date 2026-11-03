@@ -1,0 +1,294 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationBanner,
+    FoundationRelated,
+    FoundationExample,
+    AdsParity,
+} from '@/storybook-docs/foundation-page.jsx';
+
+import { Illustration, Tile } from '@/components';
+
+export const Row = ({ children }) => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)' }}>{children}</div>
+);
+
+export const Captioned = ({ caption, children }) => (
+    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-sm)' }}>
+        {children}
+        <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>
+    </figure>
+);
+
+<Meta title="Foundations/Illustrations" tags={['!dev']} />
+
+<FoundationHero
+    title="Illustrations"
+    summary="Illustrations help a page say something simply, and reflect the mood and context of the tutor or student looking at it."
+    adsHref="https://atlassian.design/foundations/illustrations"
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Overview">
+
+In PLUS the illustrations are hand-drawn characters: one for each SMART area, plus a set of math-symbol characters. Use one where a page has room to breathe, such as an empty state, onboarding or a moment of completion. Its body takes the area's color token, so the character follows Light and Dark.
+
+The characters are spot illustrations. A low-fidelity illustration of the UI uses basic shapes in mostly gray and never a real screenshot. The component page lives under Components, Images and icons.
+
+</FoundationSection>
+
+<FoundationSection title="Anatomy">
+
+A character is four parts: a body, a face, two arms and two legs.
+
+<FoundationExample>
+<Row>
+    <Illustration character="technology" size={160} title="Technology character" />
+</Row>
+</FoundationExample>
+
+<RefTable
+    head={['Part', 'What it is', 'Fill']}
+    rows={[
+        ['1 · Body', 'The textured shape. 12 types.', <>A SMART character takes <C>color/background/smart/&lt;area&gt;/subtle</C>; a math character takes an accent hue at <C>color/background/accent/&lt;hue&gt;/subtle</C>.</>],
+        ['2 · Face', 'Eyes, nose and mouth in line work. 15 options.', <C>color/icon/subtle</C>],
+        ['3 · Arm', 'Left and right, 14 options each.', <C>color/icon/subtle</C>],
+        ['4 · Leg', 'Left and right, 13 options each.', <C>color/icon/subtle</C>],
+    ]}
+/>
+
+The parts are private. Compose a new character from them; do not restyle a part in place.
+
+</FoundationSection>
+
+<FoundationSection title="Properties">
+
+One variant property, `character`, makes 12 variants. The default is mastering content. Every variant sits on the same 1000 × 1000 frame.
+
+<RefTable
+    head={['Property', 'Type', 'Default', 'Values']}
+    rows={[
+        [<C>character</C>, 'Variant', 'mastering-content', 'SMART: mastering-content, advocacy, technology, relationships, social-emotional. Math: dot, approximately-equal, root, all, pi, equal, divider.'],
+        [<C>size</C>, 'Number', '96', 'The frame width and height in pixels: 48, 96, 160 or 240.'],
+        [<C>title</C>, 'String', 'none', 'Makes the character an image with this name. Without it the character is decorative and hidden.'],
+    ]}
+/>
+
+<FoundationSubsection title="Parts">
+
+<RefTable
+    head={['Part', 'Property', 'Values']}
+    rows={[
+        ['Body', 'type', '12 types, one for each character.'],
+        ['Face', 'option', '15 options, 1 to 15.'],
+        ['Arm', 'side · option', 'left, right · 14 options, 1 to 14.'],
+        ['Leg', 'side · option', 'left, right · 13 options, 1 to 13.'],
+    ]}
+/>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Characters">
+
+Twelve characters. The five SMART characters each stand for an area; the seven math characters stand for nothing and take a free accent hue.
+
+<FoundationSubsection title="SMART characters">
+
+<FoundationExample>
+<Row>
+    {['mastering-content', 'advocacy', 'technology', 'relationships', 'social-emotional'].map((c) => (
+        <Captioned key={c} caption={c}><Illustration character={c} size={96} title={c.replace(/-/g, ' ')} /></Captioned>
+    ))}
+</Row>
+</FoundationExample>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Math characters">
+
+<FoundationExample>
+<Row>
+    {['dot', 'approximately-equal', 'root', 'all', 'pi', 'equal', 'divider'].map((c) => (
+        <Captioned key={c} caption={c}><Illustration character={c} size={96} title={c.replace(/-/g, ' ')} /></Captioned>
+    ))}
+</Row>
+</FoundationExample>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Color and SMART mapping">
+
+All 12 bodies sit at one mid strength, so the set reads equally light in Light and Dark. The five SMART characters take `color/background/smart/<area>/subtle`, the SMART step made for illustration bodies. The seven math characters take an accent hue at `color/background/accent/<hue>/subtle` and never a SMART hue, so they use red, blue, green and purple, and three hues repeat: red for dot and pi, blue for approximately equal and equal, green for root and divider. Line work takes `color/icon/subtle`.
+
+<RefTable
+    head={['Character', 'Body token']}
+    rows={[
+        ['mastering content', <C>--ds-background-smart-mastering-content-subtle</C>],
+        ['advocacy', <C>--ds-background-smart-advocacy-subtle</C>],
+        ['technology', <C>--ds-background-smart-technology-tools-subtle</C>],
+        ['relationships', <C>--ds-background-smart-relationship-subtle</C>],
+        ['social emotional', <C>--ds-background-smart-social-emotional-subtle</C>],
+        ['dot · pi', <C>--ds-background-accent-red-subtle</C>],
+        ['approximately equal · equal', <C>--ds-background-accent-blue-subtle</C>],
+        ['root · divider', <C>--ds-background-accent-green-subtle</C>],
+        ['all', <C>--ds-background-accent-purple-subtle</C>],
+        ['Face, arms and legs, all characters', <C>--ds-icon-subtle</C>],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Sizes">
+
+Scale uniformly to one of four sizes. Below 48 the line work breaks up; above 240 the texture turns coarse.
+
+<FoundationExample>
+<Row>
+    {[48, 96, 160, 240].map((s) => (
+        <Captioned key={s} caption={String(s)}><Illustration character="technology" size={s} title="Technology character" /></Captioned>
+    ))}
+</Row>
+</FoundationExample>
+
+<RefTable
+    head={['Size', 'Use']}
+    rows={[
+        ['48', 'Beside a heading or in a compact card.'],
+        ['96', 'Cards and small empty states.'],
+        ['160', 'Page empty states.'],
+        ['240', 'Onboarding and full-page moments.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Usage">
+
+Use an illustration where the page has room to breathe: empty states, onboarding, and success and completion moments. Decide first that it is needed; it supports the copy and never replaces it. Keep it out of dense working surfaces.
+
+<FoundationSubsection title="When to use">
+
+<RefTable
+    head={['Where', 'Illustration', 'Guidance']}
+    rows={[
+        ['Empty state', 'Yes', 'One character above the message: 96 on a card, 160 on a page.'],
+        ['Onboarding and tours', 'Yes', 'One character for each step: 160 or 240.'],
+        ['Completion and encouragement', 'Yes', 'A finished session or a met goal: 160 or 240.'],
+        ['SMART area header', 'Yes', 'The area’s own character, at 48 or 96.'],
+        ['Tables, forms and toolbars', 'No', 'These are working surfaces. Try icons, copy or another affordance before an illustration.'],
+        ['Inline errors and buttons', 'No', 'These need words, not mood. Use a Banner.'],
+    ]}
+/>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Rules">
+
+- Use a Character instance; never detach it or recolor its parts. Color comes from the tokens, so Light and Dark follow.
+- Pick a size from the scale (48, 96, 160 or 240) and scale uniformly.
+- Limbs reach past the 1000 frame, so leave room around the instance and do not clip it.
+- The math characters do not stand for a SMART area. Their accent hues are free choices; never reuse a SMART character's color on them.
+- Reuse the existing characters first. A new character, or a new kind of illustration, is a design lead's call.
+- An illustration works with the copy and never replaces it. Art with no job to do stays out of working surfaces; too much of it adds to what a reader has to take in.
+- Other visual aids have their own homes: Avatar for people, Icon for actions with labels, Logo for brand, Image for photos.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Match the character to its SMART area">
+
+The body color stands for the area, so a character only appears with its own area.
+
+<DoDont>
+<Do caption="The technology character with the Technology & tools lesson.">
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Technology & tools</strong></div>
+</Do>
+<Dont caption="The mastering content character on a Relationships lesson.">
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Relationships</strong></div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep the proportions">
+
+Scale with the size; the limbs and texture distort when stretched.
+
+<DoDont>
+<Do caption="Scaled uniformly to a size on the scale.">
+<Illustration character="technology" size={96} />
+</Do>
+<Dont caption="Stretched to fill a banner.">
+<div style={{ width: 'calc(var(--icon-lg) * 6)', height: 'var(--image-xl)', overflow: 'hidden' }}><div style={{ transform: 'scale(2.5, 0.5)', transformOrigin: 'top left' }}><Illustration character="technology" size={96} /></div></div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="One character per moment">
+
+A single character carries the mood; a crowd competes with the message.
+
+<DoDont>
+<Do caption="One character above the empty-state message.">
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-md)', textAlign: 'center' }}>
+    <Illustration character="relationships" size={96} />
+    <strong style={{ font: 'var(--heading-xsmall)' }}>No sessions yet</strong>
+    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+</div>
+</Do>
+<Dont caption="Four characters crowding one empty state. A collage like this belongs on a marketing page, not in the product.">
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-md)', textAlign: 'center' }}>
+    <span style={{ display: 'flex' }}>{['mastering-content', 'advocacy', 'technology', 'relationships'].map((c) => <Illustration key={c} character={c} size={48} />)}</span>
+    <strong style={{ font: 'var(--heading-xsmall)' }}>No sessions yet</strong>
+    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+</div>
+</Dont>
+</DoDont>
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="ADS parity">
+
+<AdsParity
+    rows={[
+        ['Types', 'Spot, low-fidelity UI and ambient pattern', 'Characters are spot illustrations; a low-fidelity UI uses basic shapes in mostly gray and never a real screenshot', 'PLUS draws one set of hand-made characters for tutoring.'],
+        ['Color', 'Illustration palette', 'Body from SMART or accent tokens, line work from the icon token', 'Characters follow Light and Dark through tokens.'],
+        ['Sizes', 'Per illustration type', 'Four sizes: 48, 96, 160, 240', 'Below 48 the line work breaks up; above 240 the texture turns coarse.'],
+        ['Other visual aids', 'Avatar, icon, logo, image', 'The same set', 'Matches ADS.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Accessibility">
+
+- Decorative by default. In code, a character with no `title` is hidden from screen readers.
+- When a character carries meaning the text around it does not, give it a `title` that names the idea, not the drawing: "Technology and tools", not "brown equals sign with arms".
+- Never put the only copy of information in an illustration.
+- Line work uses `color/icon/subtle`, about 2.6:1 on the bodies in Light, as in the source art. Decorative art is not held to 3:1, so keep illustrations decorative.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Illustration', description: 'The component page, under Images and icons.', href: '?path=/docs/components-images-and-icons-illustration--docs' },
+        { title: 'Tile', description: 'A square frame for an icon, logo or image.', href: '?path=/docs/components-images-and-icons-tile--docs' },
+        { title: 'Logos', description: 'The PLUS mark.', href: '?path=/docs/foundations-logos--docs' },
+        { title: 'Iconography', description: 'Icons for actions and objects.', href: '?path=/docs/foundations-iconography--docs' },
+    ]}
+/>
+
+</FoundationSection>

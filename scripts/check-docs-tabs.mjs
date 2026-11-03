@@ -309,7 +309,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const all = [...found];
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 60 components + the one named exception — Tag and
+  // rather than green. 60 components, and the named exceptions (now none) — Tag and
   // TagGroup took it from 48 in #276, AiLabel added one in #269,
   // Tile, Count, Status,
   // Skeleton and Suggestion added one each, and CloseButton added one when

@@ -168,15 +168,20 @@ const preview = {
           ],
           "Foundations",
           [
-            "Introduction",
-            "Iconography",
+            "Foundations overview",
+            "Tokens",
             "Color",
-            "Elevation",
             "Typography",
             "Spacing",
-            "Radius",
-            "Size roles",
             "Layout & grid",
+            "Elevation",
+            "Border",
+            "Radius",
+            "Iconography",
+            "Illustrations",
+            "Logos",
+            "Motion",
+            "Accessibility",
             "Patterns",
             [
               "Introduction",
@@ -193,9 +198,7 @@ const preview = {
               "Popover family",
               "Drawer"
             ],
-            "Imagery",
-            "Design tokens",
-            "Accessibility"
+            "Imagery"
           ],
           "Components",
           [

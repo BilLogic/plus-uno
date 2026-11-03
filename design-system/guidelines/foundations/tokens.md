@@ -35,3 +35,13 @@ The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/p
 - [Spacing](spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
 - [Typography](typography.md) — Font families, weights, classes, sizing
 - [Elevation](elevation.md) — Shadow depth tokens
+
+
+## Reading and binding tokens
+
+- A token's name says how to use it: foundation, property, modifier. In Figma the parts join with slashes (`color/text/subtle`); in code a color token drops its foundation and gains the `ds` prefix (`--ds-text-subtle`), and a pattern token lowercases the collection and joins with dashes (`Card/radius-sm` is `--card-radius-sm`).
+- Numeric steps are the rem value × 100: `space-050` is 8, `space-100` is 16, `space-0625` is 10.
+- A token is used bare. Never write a fallback: `var(--ds-text)`, not `var(--ds-text, #172b4d)`.
+- Choose by meaning, never by a matching value. Never bind a primitive in a component.
+- Themes are variable modes: `color / foundations` has Light, Dark, Light IC and Dark IC; `spacing / layout` has 768, 1024 and 1440.
+

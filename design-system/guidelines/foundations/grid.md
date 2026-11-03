@@ -1,5 +1,5 @@
 ---
-summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Overlay layer for modals and overlays, the content grid inside the surface and the only grid a page frame carries
+summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Blanket layer for modals and drawers, the content grid inside the Page and the only grid a page frame carries
 ---
 
 <!-- Tier: 2 -->
@@ -9,8 +9,8 @@ summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen gr
 PLUS has **two grids**, both 12 columns (`--layout-columns`) with gutter 16
 (`--layout-gutter`):
 
-- **The screen grid** spans the screen and lives on the Overlay layer only.
-  Modals and overlays size from it.
+- **The screen grid** spans the screen and lives on the Blanket layer only.
+  Modals and drawers size from it.
 - **The content grid** sits inside the surface. Page content aligns to it, and
   it is the only grid a page frame carries.
 
@@ -34,11 +34,11 @@ grid.
 ## The screen grid
 
 Twelve columns across the screen, inside the screen pad, **centered and capped
-at 1232**. It ignores the sidebar, so an overlay sits in the same place whether
+at 1232**. It ignores the sidebar, so a modal sits in the same place whether
 the sidebar is docked or closed.
 
-The screen grid belongs to the **Overlay layer**: in a design file it is set on
-that layer, so it shows when the overlay shows and hides with it. A page frame
+The screen grid belongs to the **Blanket layer**: in a design file it is set on
+that layer, so it shows when the Blanket shows and hides with it. A page frame
 carries the content grid alone. Code draws no grid at all; the Modal reads the
 screen-grid tokens below to size itself.
 
@@ -104,10 +104,10 @@ Medium width and ignores the sidebar. The frame and layer token test pins the
 formula to `--layout-width-column-screen` at 768, 1024 and 1440.
 
 Pass `width="sm" | "md" | "lg"` to `<Modal>`; a fixed pixel width ignores the
-screen grid. The modal itself, its overlay and its pads: the Modal component
+screen grid. The modal itself, its Blanket and its pads: the Modal component
 docs.
 
-## App shell tokens
+## Frame tokens
 
 The `Frame` pattern draws, from the same file:
 
@@ -115,24 +115,21 @@ The `Frame` pattern draws, from the same file:
 |:---|:---|:---|
 | `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
 | `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
-| `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-surface row: 8 while the sidebar is closed, 0 once it docks |
+| `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-Page row: 8 while the sidebar is closed, 0 once it docks |
 | `--surface-container-pad` / `--surface-container-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
-| `--surface-pad` | 16 · 16 · 24 | Surface pad, the content grid's margin |
+| `--surface-pad` | 16 · 16 · 24 | Page pad, the content grid's margin |
 
 ## Ownership layering
 
 - The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
-- `Pattern/Surface container` (`Frame` in code) fills it: the topbar row, then the row with the sidebar and `Pattern/Surface`. The surface carries the content grid and the Content slot.
+- `Pattern/Frame` fills it: the topbar row, then the row with the sidebar and `Pattern/Page`. The Page carries the content grid and the Content slot.
 - The **sidebar** docks by `Sidebar/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
-- The **Overlay layer** sits above the frame and carries the screen grid; the
-  grid shows and hides with the overlay.
+- The **Blanket** sits above the frame and carries the screen grid; the
+  grid shows and hides with the Blanket.
 
-## The legacy spec-page grid
+## Size roles
 
-`--layout-grid-gap` (8) and `--col-1` … `--col-12` in `_layout.scss` are an
-older grid: 12 columns with an 8 gutter on a 672 · 748 · 1164 content width.
-Only the spec pages under `design-system/src/specs/` read them. New work uses
-the screen and content grid tokens above.
+One size scale, used through five roles: Control (`--item-height-sm`, `-md`: 24, 32), Row (32, 40, 48), Label (16, 20), Media (16 to 48) and Field (widths 80 to 480, minimum heights 80 and 120). Buttons and tabs are 32 (24 compact); fields and menu rows are 40 (32 compact). The pixel leads and the token is the binding.
 
 ## Related
 

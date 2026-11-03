@@ -57,3 +57,13 @@ Before using an icon, verify it exists in FontAwesome Free:
 2. For other icons, reference [FontAwesome Free Icons](https://fontawesome.com/search?o=r&m=free&s=solid).
 
 **If the icon doesn't exist in FA Free, choose a different icon.**
+
+
+## Foundation rules
+
+- Icons come in three sizes: 12 (`--icon-sm`: chevrons, validation, compact parts), 16 (`--icon-md`: the default beside text) and 24 (`--icon-lg`). Above 24, use a Tile.
+- Font Awesome Free only: `fa-solid`, `fa-regular`, `fa-brands`. Pro families render blank.
+- Color an icon with a color token; a status icon takes its hue's icon token.
+- Pair an icon with a label where there is room; one glyph for one meaning. Before adding an icon, check that a similar one does not exist, that an existing one cannot serve, that it cannot be confused with another and that a label would not do better.
+- Partner and tool logos go in a Tile, never in the Logo set.
+
