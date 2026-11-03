@@ -5,11 +5,11 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 import * as GridStories from './Grid.stories.jsx';
 
 
@@ -26,9 +26,10 @@ import * as GridStories from './Grid.stories.jsx';
 
 PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on the Blanket layer: modals and drawers size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its `spacing / layout` mode, never by hand-editing its grid. The grid decides where containers sit; the spacing tokens decide everything inside them.
 
-<FoundationBanner title="How the PLUS grid differs from a standard one">
+<Banner appearance="announcement">
+<strong>How the PLUS grid differs from a standard one</strong><br />
 PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 16 below 1440 and 24 from 1440. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal and Drawer take their width from the screen grid.
-</FoundationBanner>
+</Banner>
 
 <Canvas of={GridStories.GridAnatomy} sourceState="none" />
 

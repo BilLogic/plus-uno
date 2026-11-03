@@ -15,7 +15,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `Scheduled-maintenance announcement banner. Built on top of the PLUS Alert component with the warning style, a fixed title, and a maintenance-window message with emphasized start/end times.`
+                component: `Scheduled-maintenance announcement banner. Built on the PLUS Banner component with the warning appearance, a fixed title, and a maintenance-window message with emphasized start/end times.`
             }
         }
     }

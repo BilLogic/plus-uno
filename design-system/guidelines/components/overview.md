@@ -18,7 +18,7 @@ Groups follow Atlassian's component categories, in Atlassian's order, and
 - [Labels](labels.md) — `StatusTag`, `CountTag`, `Tag`, `TagGroup`, `Suggestion` and `AiLabel`
 - [Layout and structure](layout-and-structure.md) — nine containers
 - [Loading](loading.md) — `Progress`, `Skeleton`, `Spinner`
-- [Messaging](messaging.md) — `Alert`, `Toast`, `Modal`
+- [Messaging](messaging.md) — `Alert`, `Toast`, `Modal`, `Banner`, `InlineMessage`
 - [Navigation](navigation.md) — six, sorted by what the user moves between
 - [Overlays and layering](overlays-and-layering.md) — `Tooltip`, `Popover`
 

@@ -8,13 +8,14 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (74)
+## UI components (76)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
 - [Alert](../../src/components/messaging/Alert/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)
 - [AvatarGroup](../../src/components/images-and-icons/AvatarGroup/index.md)
+- [Banner](../../src/components/messaging/Banner/index.md)
 - [Breadcrumb](../../src/components/navigation/Breadcrumb/index.md)
 - [Button](../../src/components/forms-and-inputs/Button/index.md)
 - [ButtonGroup](../../src/components/forms-and-inputs/ButtonGroup/index.md)
@@ -42,6 +43,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)
+- [InlineMessage](../../src/components/messaging/InlineMessage/index.md)
 - [Jumbotron](../../src/components/layout-and-structure/Jumbotron/index.md)
 - [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)

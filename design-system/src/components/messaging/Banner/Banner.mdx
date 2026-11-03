@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as BannerStories from './Banner.stories.jsx';
+
+<Meta of={BannerStories} />
+
+<Title />
+A prominent message at the top of a page.
+
+<DocsTabs of={BannerStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={BannerStories.Overview} />
+
+<ArgTypes of={BannerStories} />
+
+</DocsTab>
+
+</DocsTabs>

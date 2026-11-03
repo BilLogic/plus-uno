@@ -315,12 +315,13 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // Skeleton and Suggestion added one each, and CloseButton added one when
   // Alert's dismiss control became a shared component, and TagInput added one
   // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
-  // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two — the deliberate
+  // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two,
+  // and Banner and InlineMessage added one each — the deliberate
   // edit this number is here to force.
   //
-  if (tabbed.length !== 67) {
+  if (tabbed.length !== 69) {
     all.push(
-      `expected 67 tabbed docs pages (67 components + ${TABBED_EXCEPTIONS.length} named ` +
+      `expected 69 tabbed docs pages (69 components + ${TABBED_EXCEPTIONS.length} named ` +
         `exception), found ${tabbed.length}. If a component was added or removed, ` +
         `update this number deliberately.`,
     );

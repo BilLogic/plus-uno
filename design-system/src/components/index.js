@@ -2,7 +2,9 @@ import '../styles/main.scss';
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Alert } from '@/components/messaging/Alert';
+export { default as Banner } from '@/components/messaging/Banner';
 export { default as EmptyState } from '@/components/messaging/EmptyState';
+export { default as InlineMessage } from '@/components/messaging/InlineMessage';
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 
 export { default as Button } from '@/components/forms-and-inputs/Button';

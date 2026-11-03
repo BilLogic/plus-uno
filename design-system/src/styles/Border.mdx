@@ -5,10 +5,10 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 
 export const field = (extra = {}) => ({
     display: 'flex',
@@ -47,9 +47,10 @@ border-width: var(--border-focused);
 
 Figma holds Border/default, Border/selected and Border/focused in `spacing / foundations`, built on Stroke/stroke-1 and stroke-2 in `spacing / primitives`. Pair them with `color/border/*` in `color / foundations`.
 
-<FoundationBanner title="Border rules">
+<Banner appearance="announcement">
+<strong>Border rules</strong><br />
 A card has no border: its edge comes from elevation. The focus ring rounds to the control's radius plus 2, and buttons ring at 8 (6 compact). A border never draws a colored side stripe: meaning comes from the fill, the icon and the full outline.
-</FoundationBanner>
+</Banner>
 
 </FoundationSection>
 
@@ -159,9 +160,10 @@ A selected option takes the 2 selected width in `color/border/selected` on every
 
 <FoundationSection title="Dividers">
 
-<FoundationBanner title="There is no Divider component">
+<Banner appearance="announcement">
+<strong>There is no Divider component</strong><br />
 A divider is a 1 line in `color/border/default`: a border, not a component.
-</FoundationBanner>
+</Banner>
 
 - Space comes first. Add a line only when spacing alone does not separate two groups.
 - A horizontal rule spans the content width of its container. A vertical one sits between controls and takes their height.

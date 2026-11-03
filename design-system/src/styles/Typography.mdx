@@ -5,10 +5,10 @@ import {
     FoundationContents,
     FoundationSection,
     FoundationSubsection,
-    FoundationBanner,
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import { Banner } from '@/components';
 import * as TypographyStories from './Typography.stories.jsx';
 
 export const Sample = ({ font, weight, children = 'Tutors plan the week from here' }) => (
@@ -42,9 +42,10 @@ Figma holds the text styles Heading/*, Body/*, Metric/* and Code/default, bound 
 
 Typography is the system of fonts and text styles. It carries communication, reinforces the product's voice and guides how people feel using it. Follow three principles, together with the color and spacing tokens.
 
-<FoundationBanner title="Type choices">
+<Banner appearance="announcement">
+<strong>Type choices</strong><br />
 Headings 32 to 20 are Noto Serif at weight 500; headings 16 to 12 and metrics are Noto Sans at 600. Code/default is 12/16. There is no separate button style: labels use Body/default/medium.
-</FoundationBanner>
+</Banner>
 
 <FoundationSubsection title="Optimize for readability">
 Help every reader understand easily, regardless of ability. Use Body/large for long reading, such as a lesson or a help article.
