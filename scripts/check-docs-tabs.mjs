@@ -6,8 +6,18 @@
  * Storybook `types.TAB` addons drawn in the manager's preview toolbar. That
  * toolbar is in a different document from `<Title />`, so it could never render
  * below the title; the tabs are now part of the docs page itself. Tab membership
- * therefore lives in 49 MDX files as `<DocsTab tab="…">` wrappers, and this is
- * what stops those 49 drifting apart.
+ * therefore lives in each tabbed MDX file as `<DocsTab tab="…">` wrappers, and
+ * this is what stops them drifting apart.
+ *
+ * THE POPULATION IS A FLOOR, NOT A LITERAL. The page count used to be an exact
+ * match against a hand-edited number, which meant every component that gained
+ * or lost a docs page required someone to find this file and move the digit
+ * deliberately. It is now a recorded floor (`scripts/baselines/docs-tabs.json`,
+ * through `scripts/lib/ratchet.mjs`): it may rise on its own — a new tabbed page
+ * is progress, never a finding — and only fails when the count falls below what
+ * was last recorded, which is a page silently going untabbed. `npm run
+ * check:docs-tabs -- --update` raises the floor to match; a genuine removal is
+ * recorded by hand in the baseline, with the reason in the commit.
  *
  * WHY NOT THE VITEST CONTRACT TEST. `design-system/tests/component-tabs-contract.test.js`
  * holds the pure half — ids, order, changelog shape — and still does. It cannot
@@ -28,6 +38,7 @@ import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 import {
   TABBED_EXCEPTIONS,
@@ -300,8 +311,15 @@ const inputs = byRoot((repoRoot) => {
  */
 const LOCATED = /^([\w./-]+\.mdx): ([\s\S]*)$/;
 
+export const BASELINE = 'scripts/baselines/docs-tabs.json';
+
 export const REMEDY =
-  '  -> The tag is the tab. See docs/adr/025 and design-system/src/storybook-docs/docs-tabs.jsx.';
+  '  -> The tag is the tab. See docs/adr/025 and design-system/src/storybook-docs/docs-tabs.jsx.\n'
+  + '     If the population fell, run `npm run check:docs-tabs -- --update` only if a page was\n'
+  + '     genuinely removed, and say which one in the commit.';
+
+/** Opened fresh on every call: `--update` writes the record and the gate then reads it back. */
+const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
@@ -309,23 +327,19 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const all = [...found];
 
   // The population itself, so a selector that quietly stops matching is loud
-  // rather than green. 60 components, and the named exceptions (now none) — Tag and
-  // TagGroup took it from 48 in #276, AiLabel added one in #269,
-  // Tile, Count, Status,
-  // Skeleton and Suggestion added one each, and CloseButton added one when
-  // Alert's dismiss control became a shared component, and TagInput added one
-  // when it got a page of its own, and ChoiceGroup replaced MultipleChoice and
-  // Scale, two pages for one, Illustration added one, VisuallyHidden added one, and Code and CodeBlock added two,
-  // Banner and InlineMessage added one each (69), and Progress indicator and
-  // Progress tracker added one each (71), and Date tag and Smart tag added one
-  // each when they split out of Status tag — the deliberate
-  // edit this number is here to force.
-  //
-  if (tabbed.length !== 73) {
+  // rather than green. Held to a floor (`scripts/baselines/docs-tabs.json`)
+  // rather than an exact count: a page gained is progress, never a finding; a
+  // page lost is the regression this exists to catch.
+  const ratchet = ratchetFor(repoRoot);
+  for (const failure of ratchet.failures({ tabbedPages: tabbed.length })) {
+    if (failure.kind === 'absent') {
+      all.push(failure.message);
+      continue;
+    }
     all.push(
-      `expected 73 tabbed docs pages (73 components + ${TABBED_EXCEPTIONS.length} named ` +
-        `exception), found ${tabbed.length}. If a component was added or removed, ` +
-        `update this number deliberately.`,
+      `${tabbed.length} tabbed docs page(s) (${TABBED_EXCEPTIONS.length} named exception(s) ` +
+        `among them), fewer than the ${failure.recorded} the baseline holds. If a page was ` +
+        `removed on purpose, record it by hand in ${BASELINE} and say which one in the commit.`,
     );
   }
 
@@ -344,4 +358,34 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   );
 }
 
-main(import.meta.url, 'check:docs-tabs', { run, summary, remedy: REMEDY });
+/**
+ * `--update` raises the floor to what was just measured. It refuses a fall —
+ * a genuine removal is recorded by hand in `scripts/baselines/docs-tabs.json`,
+ * never by this flag.
+ */
+function record(repoRoot = REPO_ROOT) {
+  const { tabbed } = inputs(repoRoot);
+  const ratchet = ratchetFor(repoRoot);
+  const refused = !ratchet.absent && ratchet.failures({ tabbedPages: tabbed.length }).length > 0;
+  if (refused) {
+    console.error(
+      `[check-docs-tabs] not recorded: ${tabbed.length} is fewer than the current floor. ` +
+        `If a page was genuinely removed, edit ${BASELINE} by hand and say which one in the commit.`,
+    );
+    return;
+  }
+  ratchet.update(
+    { tabbedPages: tabbed.length },
+    {
+      seed: {
+        why:
+          'The floor under the tabbed component docs population. It may rise as a component ' +
+          'gains a docs page, and never falls except by a hand edit that names the removal. ' +
+          'Re-measure and raise it with `npm run check:docs-tabs -- --update`.',
+      },
+    },
+  );
+  console.log(`[check-docs-tabs] floor recorded: ${tabbed.length}`);
+}
+
+main(import.meta.url, 'check:docs-tabs', { run, summary, remedy: REMEDY, fallThrough: { '--update': record } });
