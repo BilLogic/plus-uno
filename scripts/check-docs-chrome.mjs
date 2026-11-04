@@ -40,7 +40,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { chromeFailures, managerFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
-import { resolveManagerThemes } from './lib/manager-theme.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -217,16 +216,17 @@ async function measureToc(context, baseUrl) {
 /**
  * Opens the manager (not the iframe), reads the sidebar, switches the toolbar's
  * Color mode to Dark through its menu, and reads again. The expected colors are
- * the token-resolved literals from scripts/lib/manager-theme.mjs.
+ * not taken from our own resolver: they are what the preview iframe, which the
+ * same toolbar switch puts into that mode, computes for the same tokens.
  */
 async function measureManager(context, baseUrl) {
-  const themes = resolveManagerThemes();
   const page = await context.newPage();
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${baseUrl}/?path=/docs/${TOC_PAGE}`, { waitUntil: 'load' });
   await page.waitForSelector('.sidebar-container [data-selected="true"]', { timeout: 60_000 });
-  const read = (step) =>
-    page.evaluate((s) => {
+  const preview = page.frameLocator('#storybook-preview-iframe');
+  const read = async (step) => {
+    const painted = await page.evaluate((s) => {
       const paint = (el) => getComputedStyle(el).backgroundColor;
       return {
         step: s,
@@ -235,16 +235,32 @@ async function measureManager(context, baseUrl) {
         selected: paint(document.querySelector('.sidebar-container [data-selected="true"]')),
       };
     }, step);
-  const settle = () => page.waitForTimeout(1000);
+    const tokens = await preview.locator('body').evaluate((body) => {
+      const resolved = (token) => {
+        const probe = document.createElement('div');
+        probe.style.background = `var(${token})`;
+        body.appendChild(probe);
+        const color = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return color;
+      };
+      return { dark: document.documentElement.dataset.colorMode, sidebar: resolved('--ds-surface-sunken'), selected: resolved('--ds-background-brand-bold') };
+    });
+    return { painted, tokens };
+  };
+  const settle = () => page.waitForTimeout(1500);
   await settle();
   const light = await read('light');
   await page.getByRole('button', { name: /Color mode/i }).click();
-  await page.getByText('Dark', { exact: true }).first().click();
+  await page.getByRole('option', { name: 'Dark', exact: true }).or(page.getByText('Dark', { exact: true })).first().click();
   await settle();
   const dark = await read('dark');
   await page.close();
-  const want = (key) => ({ mode: key, sidebar: themes[key].theme.appBg, selected: themes[key].vars['--plus-manager-selected-bg'] });
-  return managerFailures([light, dark], { light: want('light-no-preference'), dark: want('dark-no-preference') });
+  const want = (r, mode) => ({ mode, sidebar: r.tokens.sidebar, selected: r.tokens.selected });
+  return managerFailures([light.painted, dark.painted], {
+    light: want(light, 'light-no-preference'),
+    dark: want(dark, 'dark-no-preference'),
+  });
 }
 
 let exitCode = 0;
@@ -286,7 +302,7 @@ try {
 
   const tocProblems = missing.includes(TOC_PAGE) ? [] : await measureToc(context, base);
 
-  const managerProblems = await measureManager(context, base);
+  const managerProblems = missing.includes(TOC_PAGE) ? [] : await measureManager(context, base);
 
   const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems];
   if (failures.length) {

@@ -40,6 +40,7 @@ if (!globalThis.__PLUS_STORYBOOK_MANAGER_CONSOLE_PATCHED__) {
 // reads the OS the way applyColorModes does for the preview.
 
 const THEMES = globalThis.__PLUS_MANAGER_THEMES__ ?? {};
+if (!Object.keys(THEMES).length) console.error('[plus] manager themes missing: main.js managerHead did not inline them');
 const prefers = (query) => Boolean(globalThis.matchMedia?.(query).matches);
 
 /** `<color>-<contrast>` key of the set to show, for the toolbar's two globals. */
