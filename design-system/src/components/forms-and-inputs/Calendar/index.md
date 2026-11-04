@@ -3,7 +3,7 @@
 
 # Calendar
 
-`_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** small, medium and large draw 28, 36 and 44px days.
+`_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
 
 **Import:** `import { Calendar } from '@/components';`
 
@@ -24,13 +24,13 @@
 | `rangeEnd` | string or instanceOf | — | — |
 | `minDate` | string or instanceOf | — | Optional minimum allowed date |
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
-| `size` | enum | — | Day cell size: 28, 36 or 44px |
+| `size` | enum | — | Day cell width in pixels |
 | `onPick` | func (required) | — | `(date)` when an enabled day is pressed. |
 | `className` | string | — | — |
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
+**`size`** — `28` · `36` · `44`
 
 Anything not listed is not a valid value.
 

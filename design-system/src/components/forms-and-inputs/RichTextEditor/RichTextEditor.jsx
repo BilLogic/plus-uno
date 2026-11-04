@@ -66,7 +66,7 @@ const RichTextEditor = ({
     placeholder,
     value,
     defaultValue = '',
-    size = 'medium',
+    spacing = 'default',
     readOnly = false,
     disabled = false,
     minHeight,
@@ -173,7 +173,7 @@ const RichTextEditor = ({
 
     const containerClasses = [
         'plus-rich-text-editor',
-        `plus-rich-text-editor-${size}`,
+        spacing === 'compact' ? 'plus-rich-text-editor--compact' : '',
         useFullToolbar ? 'plus-rich-text-editor--full' : '',
         readOnly ? 'plus-rich-text-editor-readonly' : '',
         disabled ? 'plus-rich-text-editor-disabled' : '',
@@ -335,7 +335,8 @@ RichTextEditor.propTypes = {
     placeholder: PropTypes.string,
     value: PropTypes.string,
     defaultValue: PropTypes.string,
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    /** `default` or `compact`. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     readOnly: PropTypes.bool,
     disabled: PropTypes.bool,
     minHeight: PropTypes.number,

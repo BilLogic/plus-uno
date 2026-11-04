@@ -27,6 +27,9 @@
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`.
+ *   proptype:size    lines declaring `size: PropTypes.oneOf(['small', ...])`, the prop-type
+ *                    side of `prop:size`: a component that declares the old vocabulary
+ *                    never writes it as JSX, so only the declaration shows it.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
  *   word:Atlassian   zero allowed: MDX prose, story doc strings and `atlassian.design` links.
@@ -116,6 +119,7 @@ const LINE_RULES = [
   ['prop:style', /\bstyle="[a-z][a-z-]*"/],
   ['prop:fill', /\bfill="(?:filled|tonal|outline|ghost|text)"/],
   ['prop:size', /\bsize="(?:small|medium|large|sm|md|lg)"/],
+  ['proptype:size', /\bsize:\s*(?:PropTypes\.)?oneOf\(\s*\[\s*['"](?:small|medium|large|sm|md|lg)['"]/],
   ['class:plus-btn', /plus-btn--(?:filled|tonal|outline|ghost|text|small|medium|large)/],
   ['word:surface-container', /surface container/i],
   ['word:scrim', /\bscrim/i],
@@ -176,6 +180,12 @@ export function measure(sources) {
     for (const [rule, re] of LINE_RULES) {
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
+    }
+    // `size: PropTypes.oneOf(SIZES)` with `const SIZES = ['sm', ...]` in the same file.
+    const constSize = text.match(/\bsize:\s*(?:PropTypes\.)?oneOf\(\s*([A-Z_]+)\s*\)/);
+    if (constSize && new RegExp(`const\\s+${constSize[1]}\\s*=\\s*\\[\\s*['"](?:small|medium|large|sm|md|lg)['"]`).test(text)) {
+      const line = live.findIndex((l) => constSize[0] && l.includes(constSize[0])) + 1;
+      add('proptype:size', file, 1, line || 1);
     }
     if (DOC_PATH.test(file)) {
       for (const [oldName] of Object.entries(RENAMED_NO_ALIAS)) {

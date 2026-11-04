@@ -9,7 +9,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, Sizes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, Spacings, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput.mdx`
 
@@ -27,7 +27,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 | `options` | arrayOf or string or shape or oneOf | `[]` | The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it. |
 | `tags` | arrayOf | — | The picked tags, controlled. Pass `onChange` with it. |
 | `defaultTags` | arrayOf | `[]` | The picked tags at first, uncontrolled. |
-| `size` | enum | `'medium'` | — |
+| `spacing` | enum | `'default'` | `default` draws a 40 field and `compact` a 32 one. |
 | `disabled` | bool | `false` | Disables every tag and the entry. |
 | `readOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
 | `validation` | enum | `'none'` | — |
@@ -47,7 +47,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
+**`spacing`** — `default` · `compact`
 
 **`validation`** — `none` · `invalid`
 
