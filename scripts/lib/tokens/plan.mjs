@@ -214,8 +214,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Border', new: '--border-focused', old: '--border-focused' },
 
   // ─── Semantics / Focus (net new) ──────────────────────────────────────
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', note: 'matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs' },
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', note: 'matches the outline-offset magnitude at Tag/DateTag/Suggestion (outset); NavTabs negates it for an inset ring' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline-offset magnitude at Tag/DateTag/Suggestion (outset); NavTabs negates it for an inset ring' },
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-radius', old: null, value: '--radius-sm', note: 'first pass, no existing source; a family PR refines it' },
 
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
@@ -318,7 +318,7 @@ export const TOKEN_LADDER = [
   // ─── Patterns / Blanket (renamed from Overlay) ───────────────────────
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x' },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y' },
-  { tier: 'patterns', group: 'Blanket', new: '--blanket-scrim', old: '--overlay-scrim' },
+  { tier: 'patterns', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word" },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal' },
 
   // ─── Patterns / Modal ─────────────────────────────────────────────────
@@ -407,7 +407,7 @@ export const TOKEN_LADDER = [
   { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation' },
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup' },
-  { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim' },
+  { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word" },
   { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal' },
   { tier: 'layers', group: 'Layer', new: '--layer-flag', old: '--layout-z-index-flag' },
   { tier: 'layers', group: 'Layer', new: '--layer-spotlight', old: '--layout-z-index-spotlight' },

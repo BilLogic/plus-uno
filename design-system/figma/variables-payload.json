@@ -329,10 +329,10 @@
           }
         },
         {
-          "name": "Blanket/scrim",
+          "name": "Blanket/fill",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--blanket-scrim)"
+            "WEB": "var(--blanket-fill)"
           }
         },
         {

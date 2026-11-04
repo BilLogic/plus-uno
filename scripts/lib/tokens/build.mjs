@@ -134,7 +134,12 @@ function tierScss({ tier, heading }) {
   for (const [group, groupRows] of byGroup) {
     scss += `\n    /* ${group} */\n`;
     for (const row of groupRows) {
-      const ref = row.old ? `var(${row.old})` : `var(${row.value})`;
+      // `ref` overrides what the declaration resolves to, independent of what
+      // `old` documents in the name map — used where the old declaration's
+      // own name or value carries banned ADS language (check:ads-language's
+      // `scrim`), so the generated file reads the primitive or literal
+      // directly instead of a `var()` of the old name.
+      const ref = row.ref ?? (row.old ? `var(${row.old})` : `var(${row.value})`);
       const note = row.note ? ` /* ${row.note} */` : '';
       scss += `    ${row.new}: ${ref};${note}\n`;
     }

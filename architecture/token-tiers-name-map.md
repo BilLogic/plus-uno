@@ -46,7 +46,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Border | `--border-default` | `--border-default` (reclassified, unchanged) |  |
 | Border | `--border-selected` | `--border-selected` (reclassified, unchanged) |  |
 | Border | `--border-focused` | `--border-focused` (reclassified, unchanged) |  |
-| Focus | `--size-element-stroke-lg` | `--focus-ring-width` | matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs |
+| Focus | `--size-element-stroke-lg` | `--focus-ring-width` | matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet |
 | Focus | `--size-element-stroke-lg` | `--focus-ring-offset` | matches the outline-offset magnitude at Tag/DateTag/Suggestion (outset); NavTabs negates it for an inset ring |
 | Focus | *(new)* | `--focus-ring-radius` | first pass, no existing source; a family PR refines it |
 | Grid | `--layout-gutter` | `--grid-gutter` |  |
@@ -135,7 +135,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Table | `--table-min-width-title` | `--table-min-width-title` (reclassified, unchanged) |  |
 | Blanket | `--overlay-pad-x` | `--blanket-pad-x` |  |
 | Blanket | `--overlay-pad-y` | `--blanket-pad-y` |  |
-| Blanket | `--overlay-scrim` | `--blanket-scrim` |  |
+| Blanket | `--overlay-scrim` | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
 | Blanket | `--layout-max-height-modal` | `--blanket-max-height-modal` |  |
 | Modal | `--modal-pad` | `--modal-pad` (reclassified, unchanged) |  |
 | Modal | `--modal-stack-sm` | `--modal-stack-sm` (reclassified, unchanged) |  |
@@ -212,7 +212,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Layer | `--layout-z-index-navigation` | `--layer-navigation` |  |
 | Layer | `--layout-z-index-dialog` | `--layer-dialog` |  |
 | Layer | `--layout-z-index-popup` | `--layer-popup` |  |
-| Layer | `--layout-z-index-scrim` | `--layer-blanket` |  |
+| Layer | `--layout-z-index-scrim` | `--layer-blanket` | the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word |
 | Layer | `--layout-z-index-modal` | `--layer-modal` |  |
 | Layer | `--layout-z-index-flag` | `--layer-flag` |  |
 | Layer | `--layout-z-index-spotlight` | `--layer-spotlight` |  |

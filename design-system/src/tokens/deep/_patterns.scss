@@ -17,7 +17,7 @@
     /* Blanket */
     --blanket-pad-x: var(--overlay-pad-x);
     --blanket-pad-y: var(--overlay-pad-y);
-    --blanket-scrim: var(--overlay-scrim);
+    --blanket-fill: rgba(0, 0, 0, 0.38); /* the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word */
     --blanket-max-height-modal: var(--layout-max-height-modal);
 
     /* Modal */

@@ -14,7 +14,7 @@
     --layer-navigation: var(--layout-z-index-navigation);
     --layer-dialog: var(--layout-z-index-dialog);
     --layer-popup: var(--layout-z-index-popup);
-    --layer-blanket: var(--layout-z-index-scrim);
+    --layer-blanket: 500; /* the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word */
     --layer-modal: var(--layout-z-index-modal);
     --layer-flag: var(--layout-z-index-flag);
     --layer-spotlight: var(--layout-z-index-spotlight);
