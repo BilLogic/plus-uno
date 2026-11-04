@@ -37,6 +37,7 @@ export const DocsFab = ({ aiAgent = null }) => (
             label="Uno Blueprint"
             tooltip="Uno Blueprint"
             href={BLUEPRINT_HREF}
+            target="_top"
         />
     </nav>
 );
