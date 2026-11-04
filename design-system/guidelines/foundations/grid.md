@@ -11,7 +11,7 @@ PLUS has **two grids**, both 12 columns (`--layout-columns`) with gutter 16
 
 - **The screen grid** spans the screen and lives on the Blanket layer only.
   Modals and drawers size from it.
-- **The content grid** sits inside the surface. Page content aligns to it, and
+- **The content grid** sits inside the Page. Page content aligns to it, and
   it is the only grid a page frame carries.
 
 Source of truth: the `spacing / layout` collection in Figma, generated into
@@ -45,7 +45,7 @@ screen-grid tokens below to size itself.
 | Token | Value | Description |
 |:---|:---|:---|
 | `--layout-width-screen` | 768 · 1024 · 1440 | The screen each mode is worked at |
-| `--layout-pad-x-screen` | 24 · 24 · 32 | Screen pad, the container pad plus the surface pad |
+| `--layout-pad-x-screen` | 24 · 24 · 32 | Screen pad, the container pad plus the Page pad |
 | `--layout-width-column-screen` | 45.33 · 66.67 · 88 | One screen-grid column |
 
 The grid is `clamp(720, screen − 2 × 24, 1232)` wide: 720 · 976 · 1232 at the
@@ -55,7 +55,7 @@ the grid stops growing and centers.
 
 ## The content grid
 
-Twelve columns inside the surface, after the sidebar and the surface pad have
+Twelve columns inside the Page, after the sidebar and the Page pad have
 taken their share. Page content (cards, tables, forms, charts) aligns to it.
 
 | Token | Value | Description |
@@ -63,11 +63,11 @@ taken their share. Page content (cards, tables, forms, charts) aligns to it.
 | `--layout-width-content` | 720 · 744 · 1144 | Content width at each mode's screen |
 | `--layout-width-column` | 45.33 · 47.33 · 80.67 | One content-grid column |
 | `--layout-max-width-content` / `--layout-max-width-reading` | 1232 / 864 | Content cap, centered past it; the reading cap for long-form text |
-| `--layout-min-width-content` | 720 | Content minimum; the surface scrolls sideways under it |
+| `--layout-min-width-content` | 720 | Content minimum; the Page scrolls sideways under it |
 
 At X-Large the content width is
-`1440 − 240 sidebar, from the screen edge − 8 container pad − 2 × 24 surface pad` = 1144.
-At Medium the sidebar is closed, so the surface starts at the container pad and
+`1440 − 240 sidebar, from the screen edge − 8 container pad − 2 × 24 Page pad` = 1144.
+At Medium the sidebar is closed, so the Page starts at the container pad and
 content holds its 720 minimum.
 
 ```css

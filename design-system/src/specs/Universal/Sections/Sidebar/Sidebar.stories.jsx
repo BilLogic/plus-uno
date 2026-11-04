@@ -31,7 +31,7 @@ const panel = {
     width: 'var(--layout-width-sidebar)',
     boxSizing: 'border-box',
     padding: 'var(--frame-pad)',
-    backgroundColor: 'var(--surface-sunken)',
+    backgroundColor: 'var(--ds-surface-sunken)',
 };
 
 /** The item labels in each named group, in order. */
