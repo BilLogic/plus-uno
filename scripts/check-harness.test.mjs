@@ -403,7 +403,7 @@ test('a sentinel the check enforces but the row does not declare is a finding', 
     messages.join('\n'),
   );
   assert.ok(
-    messages.some((m) => /MIN_RULES = 44 as a private constant/.test(m)),
+    messages.some((m) => /MIN_RULES = 43 as a private constant/.test(m)),
     messages.join('\n'),
   );
 });
