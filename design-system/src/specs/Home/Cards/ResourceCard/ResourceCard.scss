@@ -2,7 +2,7 @@
     width: 100%;
     max-width: 388.67px;
     box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.06);
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--ds-surface-raised);
 }
 
 .plus-resource-card-content {
@@ -45,7 +45,7 @@
     font-weight: var(--font-weight-title);
     font-size: var(--font-size-h5);
     line-height: var(--font-line-height-h5);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -56,7 +56,7 @@
 }
 
 .plus-resource-card-duration {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 

@@ -34,7 +34,7 @@
         font-size: 24px;
         font-weight: 600;
         line-height: 1.333;
-        color: var(--color-on-surface, #191c1e);
+        color: var(--ds-text);
         margin: 0;
     }
 
@@ -47,7 +47,7 @@
         padding: 0;
         border: none;
         background: transparent;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         font-size: 20px; // Adjusted icon size
         cursor: pointer;
         border-radius: var(--size-element-radius-sm, 4px);
@@ -164,7 +164,7 @@
         label {
             font-size: 12px;
             font-weight: 400;
-            color: var(--color-on-surface, #191c1e);
+            color: var(--ds-text);
             margin-bottom: 6px;
 
             &.required::after {
@@ -193,14 +193,14 @@
         align-items: center;
         gap: 8px;
         padding: 8px 12px;
-        background-color: var(--color-surface-container-high, #e7eef2); // Gray background as per screenshot
+        background-color: var(--ds-background-neutral); // Gray background as per screenshot
         border-radius: 4px;
         width: 100%;
         min-height: 48px; // Match input height
     }
 
     &__student-count {
-        color: var(--color-on-surface-variant, #5a5a5a);
+        color: var(--ds-text-subtle);
         margin-top: 4px;
         font-size: 12px;
     }
@@ -247,7 +247,7 @@
 
         .body3-txt {
             font-size: 12px;
-            color: var(--color-on-surface-variant, #5a5a5a);
+            color: var(--ds-text-subtle);
         }
     }
 

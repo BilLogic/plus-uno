@@ -145,7 +145,7 @@ const MainContent = ({
         >
             {/* Left: Title and Status Filter */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
-                <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
+                <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
                 <StatusFilter
                     statuses={statusFilter}
                     onChange={isInteractive ? onStatusFilterChange : undefined}
@@ -382,7 +382,7 @@ const RegularTutorEmptyState = () => (
                     <h4
                         className="h4"
                         style={{
-                            color: 'var(--color-on-surface)',
+                            color: 'var(--ds-text)',
                             margin: 0,
                             textAlign: 'center',
                             overflow: 'hidden',
@@ -404,7 +404,7 @@ const RegularTutorEmptyState = () => (
                     <p
                         className="body1-txt"
                         style={{
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-text-subtle)',
                             margin: 0,
                             textAlign: 'center',
                             overflow: 'hidden',
@@ -506,7 +506,7 @@ const LeadSupervisorEmptyState = () => (
                     <h4
                         className="h4"
                         style={{
-                            color: 'var(--color-on-surface)',
+                            color: 'var(--ds-text)',
                             margin: 0,
                             textAlign: 'center',
                             overflow: 'hidden',
@@ -528,7 +528,7 @@ const LeadSupervisorEmptyState = () => (
                     <p
                         className="body1-txt"
                         style={{
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-text-subtle)',
                             margin: 0,
                             textAlign: 'center',
                             overflow: 'hidden',
@@ -602,7 +602,7 @@ const RegularTutorLoadedContent = ({
             }}
         >
             {/* Title */}
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -687,7 +687,7 @@ const RegularTutorEmptyContent = ({
             }}
         >
             {/* Title */}
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -766,7 +766,7 @@ const LeadSupervisorLoadedContent = ({
             }}
         >
             {/* Title */}
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -851,7 +851,7 @@ const LeadSupervisorEmptyContent = ({
             }}
         >
             {/* Title */}
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Students</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
 
             {/* Right: Control Buttons */}
             <div
@@ -980,13 +980,13 @@ const RegularTutorViewRender = (args) => {
                     }}>
                         {args.toastType === 'assignment-all' ? (
                             <Flag style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
-                                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                                     Your student roster was just updated. Take a moment to review your new assignments.
                                 </span>
                             </Flag>
                         ) : (
                             <Flag style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
-                                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                                     Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                                     Personalized goals will be available in a few weeks.{' '}
                                     <span className="body3-txt font-weight-semibold">
@@ -1137,14 +1137,14 @@ const LeadSupervisorViewRender = (args) => {
                 <div style={{ position: 'fixed', bottom: 'var(--size-section-gap-lg)', left: '50%', transform: 'translateX(-50%)', zIndex: 'var(--layout-z-index-flag)', width: '672px' }}>
                     {args.toastType === 'assignment-leads' ? (
                         <Flag style="secondary" title="Review Assignments" timestamp="11 mins ago" show autohide={false} onClose={() => {}} className="w-100">
-                            <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                            <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                                 It&apos;s been 10 minutes since the session started. Would you like to{' '}
-                                <a href="#" className="body3-txt font-weight-bold" style={{ color: 'var(--color-on-surface)', textDecoration: 'underline' }} onClick={(e) => e.preventDefault()}>review and adjust assignments</a>?{' '}
+                                <a href="#" className="body3-txt font-weight-bold" style={{ color: 'var(--ds-text)', textDecoration: 'underline' }} onClick={(e) => e.preventDefault()}>review and adjust assignments</a>?{' '}
                             </span>
                         </Flag>
                     ) : (
                         <Flag style="info" title="Warmup phase in progress." show autohide={false} onClose={() => {}} className="w-100">
-                            <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                            <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                                 Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                                 Personalized goals will be available in a few weeks.{' '}
                                 <span className="body3-txt font-weight-semibold">Remember to check in with each student and mark them as helped.</span>

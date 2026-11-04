@@ -193,7 +193,7 @@ export const Interactive = {
             <div>
                 <div style={{
                     padding: '16px',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     marginBottom: '16px',
                     display: 'flex',
                     alignItems: 'center',

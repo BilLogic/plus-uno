@@ -46,7 +46,7 @@ export const SessionInfoCard = ({
                 className={icon}
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     lineHeight: 'var(--font-line-height-fa-h4-solid)',
                 }}
             />
@@ -60,7 +60,7 @@ export const SessionInfoCard = ({
             {/* Title */}
             <span
                 className="body2-txt font-weight-semibold"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 {title}
             </span>
@@ -86,7 +86,7 @@ export const SessionInfoCard = ({
                 ) : (
                     <span
                         className="body2-txt font-weight-light"
-                        style={{ color: 'var(--color-on-surface)' }}
+                        style={{ color: 'var(--ds-text)' }}
                     >
                         {content}
                     </span>

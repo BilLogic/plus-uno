@@ -37,7 +37,7 @@ export const FillInTableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Date & time
             </span>
         </div>
@@ -51,7 +51,7 @@ export const FillInTableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 School & teacher
             </span>
         </div>
@@ -65,7 +65,7 @@ export const FillInTableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Tutor count
             </span>
         </div>
@@ -79,7 +79,7 @@ export const FillInTableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Actions
             </span>
         </div>
@@ -149,10 +149,10 @@ export const FillInTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -169,11 +169,11 @@ export const FillInTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
                 {teacher && (
-                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                         {teacher}
                     </span>
                 )}
@@ -189,7 +189,7 @@ export const FillInTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
                 {needLead && (
@@ -253,7 +253,7 @@ export const FillInModalHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Date & time
             </span>
         </div>
@@ -267,7 +267,7 @@ export const FillInModalHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 School & teacher
             </span>
         </div>
@@ -281,7 +281,7 @@ export const FillInModalHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Tutor Count
             </span>
         </div>
@@ -371,10 +371,10 @@ export const FillInModalRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -391,11 +391,11 @@ export const FillInModalRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
                 {teacher && (
-                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                         {teacher}
                     </span>
                 )}
@@ -411,7 +411,7 @@ export const FillInModalRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
                 {needLead && (
@@ -430,7 +430,7 @@ export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', padding: 'var(--size-spacing-medium-space-400)' }}>
         <section>
             <h5 className="h5 mb-4">Fill-In Table</h5>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>
                 7-column grid layout for fill-in sessions. Shows date & time, school & teacher, tutor count, and action button.
             </p>
 
@@ -474,7 +474,7 @@ export const Overview = () => (
 
         <section>
             <h5 className="h5 mb-4">Fill-In Table with Need Lead Badge</h5>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>
                 Shows the "Need Lead" badge in the tutor count column when a lead tutor is needed.
             </p>
 
@@ -521,7 +521,7 @@ export const Overview = () => (
 
         <section>
             <h5 className="h5 mb-4">Fill-In Modal Table (with Checkbox)</h5>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>
                 5-column grid layout for modal with checkbox selection. Used in modals for selecting multiple sessions.
             </p>
 
@@ -645,7 +645,7 @@ export const Interactive = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <h6 className="h6 mb-3">Fill-In Table - Interactive</h6>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>
                 Click "Fill in" to register for a session. Hover over rows to see state changes.
             </p>
             <FillInTableHeaderRow />
@@ -662,7 +662,7 @@ export const Interactive = () => {
                 />
             ))}
             <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Filled in for: {filledInSessions.length} session(s)
                 </span>
             </div>

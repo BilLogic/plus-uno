@@ -11,7 +11,7 @@
 
 .plus-students-overview-section-overview {
     flex: 1;
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-border-radius-radius-100);
     padding: var(--size-card-pad-x-md) var(--size-section-gap-lg);
     padding-bottom: var(--size-section-pad-y-lg);
@@ -25,7 +25,7 @@
 }
 
 .plus-students-overview-section-title {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -42,7 +42,7 @@
 
 .plus-students-overview-section-students {
     flex: 1;
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-border-radius-radius-100);
     padding: var(--size-card-pad-x-md) var(--size-section-gap-lg);
     padding-bottom: var(--size-section-pad-y-lg);
@@ -71,7 +71,7 @@
 
 .plus-overview-card--relationships {
     background: linear-gradient(90deg, rgba(199, 11, 119, 0.08) 0%, rgba(199, 11, 119, 0.08) 100%),
-                linear-gradient(90deg, var(--color-surface-bright) 0%, var(--color-surface-bright) 100%);
+                linear-gradient(90deg, var(--ds-surface-raised) 0%, var(--ds-surface-raised) 100%);
 }
 
 .plus-overview-card-header {
@@ -82,12 +82,12 @@
 }
 
 .plus-overview-card-title {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
 }
 
 .plus-overview-card-header i {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     font-size: 16px;
     width: 20px;
     height: 20px;
@@ -122,7 +122,7 @@
 }
 
 .plus-overview-card-value {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin-bottom: 0;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .plus-overview-card-text p {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
 }
 
@@ -162,7 +162,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
 }
 
@@ -188,7 +188,7 @@
 .plus-overview-card-smart-bar-bg {
     width: 6px;
     height: 80px;
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--ds-surface-raised);
     border-radius: var(--size-border-radius-radius-400);
     position: relative;
     transform: rotate(270deg);
@@ -204,7 +204,7 @@
 }
 
 .plus-overview-card-smart-bar span {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     text-transform: uppercase;
 }
 

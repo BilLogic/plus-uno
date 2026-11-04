@@ -67,7 +67,7 @@ export const TableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Name
             </span>
             <i
@@ -89,7 +89,7 @@ export const TableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Status
             </span>
             <i
@@ -110,7 +110,7 @@ export const TableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Attendance
             </span>
         </div>
@@ -124,7 +124,7 @@ export const TableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Engagement
             </span>
         </div>
@@ -138,7 +138,7 @@ export const TableHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Action
             </span>
         </div>
@@ -215,7 +215,7 @@ export const TableRow = ({
                 <span
                     className="body3-txt"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
@@ -391,7 +391,7 @@ export const Interactive = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
-                backgroundColor: 'var(--color-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 padding: 'var(--size-section-gap-lg)',
                 minHeight: '100vh'
             }}
@@ -403,7 +403,7 @@ export const Interactive = () => {
 
             <div
                 style={{
-                    backgroundColor: 'var(--color-surface-container-lowest)',
+                    backgroundColor: 'var(--ds-surface)',
                     borderRadius: 'var(--size-card-radius-sm)',
                     padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)'
                 }}

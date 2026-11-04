@@ -84,7 +84,7 @@ const DonutChart = ({
                             cy="90"
                             r={radius}
                             fill="none"
-                            stroke="var(--color-surface-container-highest, #e2e2e5)"
+                            stroke="var(--ds-background-neutral)"
                             strokeWidth="16"
                         />
                         {/* Progress circle */}

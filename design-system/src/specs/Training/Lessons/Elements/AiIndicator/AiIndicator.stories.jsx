@@ -56,14 +56,14 @@ export const InContext = {
     render: () => (
         <div style={{
             padding: 'var(--size-section-pad-y-lg, 32px)',
-            backgroundColor: 'var(--color-surface)'
+            backgroundColor: 'var(--ds-surface)'
         }}>
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '12px',
                 padding: '16px',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-raised)',
                 borderRadius: '8px'
             }}>
                 <span className="body2-txt">Lesson Title</span>

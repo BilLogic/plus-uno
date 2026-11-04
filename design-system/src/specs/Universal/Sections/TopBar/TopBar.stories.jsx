@@ -38,7 +38,7 @@ export const Overview = {
                 <section>
                     <h6 className="h6" style={{ marginBottom: '12px' }}>Interactive TopBar (click button to toggle)</h6>
                     <div style={{
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         padding: '12px 16px',
                         borderRadius: '8px'
                     }}>
@@ -52,7 +52,7 @@ export const Overview = {
                             user={{ name: 'John Doe', type: 'lead tutor' }}
                         />
                     </div>
-                    <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <p className="body3-txt mt-2" style={{ color: 'var(--ds-text-subtle)' }}>
                         Current mode: <strong>{mode}</strong>
                     </p>
                 </section>
@@ -72,7 +72,7 @@ export const Interactive = {
         return (
             <div>
                 <div style={{
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: '12px 16px',
                     borderRadius: '8px'
                 }}>
@@ -90,7 +90,7 @@ export const Interactive = {
                         }}
                     />
                 </div>
-                <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body3-txt mt-2" style={{ color: 'var(--ds-text-subtle)' }}>
                     Mode: <strong>{mode}</strong>
                 </p>
             </div>

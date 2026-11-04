@@ -7,7 +7,7 @@
     // Let inner Card content stretch so metric tiles can equalize heights
     align-items: stretch;
     justify-content: flex-start;
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--ds-surface-raised);
     
     // Responsive: adjust min dimensions on smaller screens
     @media (max-width: 768px) {
@@ -95,7 +95,7 @@
     font-weight: var(--font-weight-headline);
     font-size: var(--font-size-h3);
     line-height: var(--font-line-height-h3);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
 }
 
@@ -141,7 +141,7 @@
 .plus-metrics-card-item {
     flex: 1 1 0;
     width: 100%;
-    background-color: var(--color-surface-container);
+    background-color: var(--ds-surface-container);
     border: var(--size-card-border-sm) solid var(--color-outline-variant);
     border-radius: var(--size-border-radius-radius-100);
     display: flex;
@@ -167,12 +167,12 @@
     font-weight: var(--font-weight-title);
     font-size: var(--font-size-h4);
     line-height: var(--font-line-height-h4);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
 .plus-metrics-card-item-label {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -200,7 +200,7 @@
     width: 100%;
     
     // Individual card background (white/surface-container-lowest)
-    background-color: var(--color-surface-container-lowest) !important;
+    background-color: var(--ds-surface-raised) !important;
 
     .plus-pattern-card-inner {
         padding: 0 !important;
@@ -223,12 +223,12 @@
     font-weight: var(--font-weight-headline);
     font-size: var(--font-size-h3);
     line-height: var(--font-line-height-h3);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
 }
 
 .plus-metrics-stacked-card-label {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 

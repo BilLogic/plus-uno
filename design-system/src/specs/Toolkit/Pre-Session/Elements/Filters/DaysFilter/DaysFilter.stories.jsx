@@ -61,8 +61,8 @@ export const Interactive = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
             <DaysFilter value={days} onChange={setDays} />
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {days.length ? days.join(', ') : 'all days'}
                 </strong>
             </p>

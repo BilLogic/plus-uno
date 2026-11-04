@@ -53,7 +53,7 @@ export const Overview = () => (
             ].map(section => (
                 <section key={section.title} style={{
                     padding: '24px',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: '8px'
                 }}>
                     <h2 className="h4" style={{ marginBottom: '12px' }}>{section.title}</h2>

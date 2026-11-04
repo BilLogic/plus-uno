@@ -18,7 +18,7 @@ const UnsavedWarningModalBody = () => (
         className="d-flex flex-column"
         style={{
             gap: 'var(--size-modal-gap-lg)',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
             padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
             borderRadius: 'var(--size-modal-radius-lg)',
         }}
@@ -30,7 +30,7 @@ const UnsavedWarningModalBody = () => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />
@@ -59,13 +59,13 @@ const UnsavedWarningModalBody = () => (
                     gap: 'var(--size-modal-gap-md)',
                 }}
             >
-                <h4 className="h4 m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <h4 className="h4 m-0" style={{ color: 'var(--ds-text)' }}>
                     Are you sure you want to leave?
                 </h4>
                 <p
                     className="body2-txt m-0"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         fontWeight: 300,
                     }}
                 >

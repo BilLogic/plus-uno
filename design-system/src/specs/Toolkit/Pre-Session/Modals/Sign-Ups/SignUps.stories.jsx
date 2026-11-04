@@ -45,7 +45,7 @@ export const RecurringSession_PreSignUp = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -57,7 +57,7 @@ export const RecurringSession_PreSignUp = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -159,7 +159,7 @@ export const ConfirmSignUp = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -171,7 +171,7 @@ export const ConfirmSignUp = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -233,7 +233,7 @@ export const SuccessAll = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -245,7 +245,7 @@ export const SuccessAll = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -275,17 +275,17 @@ export const SuccessAll = () => (
                             }}
                         >
                             <div style={{ padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                     Date & time
                                 </span>
                             </div>
                             <div style={{ padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                     School & teacher
                                 </span>
                             </div>
                             <div style={{ padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                     Tutor Count
                                 </span>
                             </div>
@@ -306,10 +306,10 @@ export const SuccessAll = () => (
                                 flexDirection: 'column',
                                 justifyContent: 'center'
                             }}>
-                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                     Tue, Sep 9
                                 </span>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                     12:30 PM - 1:30 PM
                                 </span>
                             </div>
@@ -319,10 +319,10 @@ export const SuccessAll = () => (
                                 flexDirection: 'column',
                                 justifyContent: 'center'
                             }}>
-                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                     Hogwarts
                                 </span>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                     Mr. Snape
                                 </span>
                             </div>
@@ -331,7 +331,7 @@ export const SuccessAll = () => (
                                 display: 'flex',
                                 alignItems: 'center'
                             }}>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                     1/5
                                 </span>
                             </div>

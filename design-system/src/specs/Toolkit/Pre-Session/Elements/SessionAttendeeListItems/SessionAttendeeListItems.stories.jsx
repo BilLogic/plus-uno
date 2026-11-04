@@ -41,7 +41,7 @@ const SessionAttendeeListItem = ({
                     ? 'var(--size-element-pad-y-lg) var(--element-pad-compact)'
                     : 'var(--size-element-pad-y-lg) 0',
                 borderRadius: 'var(--size-element-radius-md)',
-                backgroundColor: isEditMode ? 'var(--color-surface-container-highest)' : 'transparent',
+                backgroundColor: isEditMode ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent',
                 width: '100%'
             }}
         >
@@ -51,7 +51,7 @@ const SessionAttendeeListItem = ({
                     className="fa-solid fa-grip-vertical"
                     style={{
                         fontSize: 'var(--font-size-fa-body2-solid)',
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-icon-subtle)',
                         cursor: 'grab'
                     }}
                 />
@@ -70,7 +70,7 @@ const SessionAttendeeListItem = ({
                 <span
                     className={tab === 'assignment' && userType === 'tutor' ? 'body2-txt' : 'body2-txt font-weight-light'}
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
@@ -130,7 +130,7 @@ export const Overview = () => (
         {/* Tutor - Attendance Tab States */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Tutor - Attendance Tab</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Tutor list items with attendance dropdown and status badges.
             </p>
             <div style={{
@@ -138,7 +138,7 @@ export const Overview = () => (
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-sm)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
             }}>
                 {/* Default Tutor with Select dropdown */}
@@ -172,7 +172,7 @@ export const Overview = () => (
         {/* Tutor - Assignment Tab States */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Tutor - Assignment Tab</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Tutor list items showing assignment count.
             </p>
             <div style={{
@@ -180,7 +180,7 @@ export const Overview = () => (
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-sm)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
             }}>
                 {/* Tutor with assignment count */}
@@ -207,7 +207,7 @@ export const Overview = () => (
         {/* Student - Attendance Tab States */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Student - Attendance Tab</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Student list items with attendance status badges.
             </p>
             <div style={{
@@ -215,7 +215,7 @@ export const Overview = () => (
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-sm)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
             }}>
                 {/* Student - Unknown status */}
@@ -274,7 +274,7 @@ export const Overview = () => (
         {/* Student - Assignment Tab States */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Student - Assignment Tab</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Student list items in assignment view with edit mode.
             </p>
             <div style={{
@@ -282,7 +282,7 @@ export const Overview = () => (
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-sm)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
             }}>
                 {/* Student - Default mode */}

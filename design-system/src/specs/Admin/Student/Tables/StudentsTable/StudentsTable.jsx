@@ -73,7 +73,7 @@ const StudentsTable = ({
                                         style={{
                                             color: header.active
                                                 ? 'var(--color-secondary-text)'
-                                                : 'var(--color-on-surface)',
+                                                : 'var(--ds-text)',
                                             fontWeight: 400
                                         }}
                                     >
@@ -110,7 +110,7 @@ const StudentsTable = ({
                                     className="body3-txt"
                                     style={{
                                         fontWeight: 400,
-                                        color: 'var(--color-on-surface)'
+                                        color: 'var(--ds-text)'
                                     }}
                                 >
                                     {student.name}
@@ -123,7 +123,7 @@ const StudentsTable = ({
                                     className="body3-txt"
                                     style={{
                                         fontWeight: 300,
-                                        color: 'var(--color-on-surface)'
+                                        color: 'var(--ds-text)'
                                     }}
                                 >
                                     {student.school}
@@ -136,7 +136,7 @@ const StudentsTable = ({
                                     className="body3-txt"
                                     style={{
                                         fontWeight: 300,
-                                        color: 'var(--color-on-surface)'
+                                        color: 'var(--ds-text)'
                                     }}
                                 >
                                     {student.teacher}

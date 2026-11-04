@@ -81,7 +81,7 @@
         height: 100%;
         grid-column: 1;
         padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
-        background-color: var(--color-surface-container-low); // Gray background fill around this card
+        background-color: var(--ds-surface-raised); // Gray background fill around this card
         border-radius: var(--size-surface-radius, 16px);
         box-sizing: border-box; // Ensure padding is included in width calculation
         
@@ -114,7 +114,7 @@
         height: 100%;
         grid-column: 2;
         padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
-        background-color: var(--color-surface-container-low); // Gray background fill around this card
+        background-color: var(--ds-surface-container); // Gray background fill around this card
         border-radius: var(--size-surface-radius, 16px);
         box-sizing: border-box; // Ensure padding is included in width calculation
         
@@ -150,7 +150,7 @@
         gap: var(--size-section-gap-lg);
         width: 100%;
         padding: var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 32px);
-        background-color: var(--color-surface-container-low); // Gray background fill around recommendations section
+        background-color: var(--ds-surface-container); // Gray background fill around recommendations section
         border-radius: var(--size-surface-radius, 16px);
         box-sizing: border-box; // Ensure padding is included in width calculation
         // Align left and right edges with middle section cards by using same padding

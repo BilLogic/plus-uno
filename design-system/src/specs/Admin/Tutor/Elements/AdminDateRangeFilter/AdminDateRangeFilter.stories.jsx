@@ -42,16 +42,16 @@ export const Overview = {
         dateTo: '02/10/25'
     },
     render: (args) => (
-        <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
-            <h3 className="h3" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
+        <div style={{ padding: '24px', backgroundColor: 'var(--ds-surface)' }}>
+            <h3 className="h3" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Admin Date Range Filter
             </h3>
-            <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
                 Shared filter component with school, tutor, and date range selectors.
             </p>
             <div style={{
                 padding: '20px',
-                backgroundColor: 'var(--color-surface-container-lowest)',
+                backgroundColor: 'var(--ds-surface)',
                 borderRadius: '8px',
                 border: '1px solid var(--color-outline-variant)'
             }}>
@@ -77,14 +77,14 @@ export const Interactive = {
         const dateToOptions = ['02/10/25', '01/31/25', '12/31/24', '11/30/24'];
 
         return (
-            <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)', minHeight: '400px' }}>
+            <div style={{ padding: '24px', backgroundColor: 'var(--ds-surface)', minHeight: '400px' }}>
                 <div style={{
                     padding: '24px',
                     backgroundColor: 'white',
                     borderRadius: '16px',
                     boxShadow: 'var(--elevation-light-1)'
                 }}>
-                    <h4 className="h4" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
+                    <h4 className="h4" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                         Filter Controls
                     </h4>
 
@@ -106,24 +106,24 @@ export const Interactive = {
                     <div style={{
                         marginTop: '32px',
                         padding: '16px',
-                        backgroundColor: 'var(--color-surface-container)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: '8px'
                     }}>
-                        <h5 className="h6" style={{ marginBottom: '12px', color: 'var(--color-on-surface)' }}>
+                        <h5 className="h6" style={{ marginBottom: '12px', color: 'var(--ds-text)' }}>
                             Current Filters:
                         </h5>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                            <p className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                 <strong>School:</strong> <span data-testid="applied-school">{selectedSchool}</span>
                             </p>
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                            <p className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                 <strong>Tutor:</strong> <span data-testid="applied-tutor">{selectedTutor}</span>
                             </p>
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                            <p className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                                 <strong>Date Range:</strong> {dateFrom} to {dateTo}
                             </p>
                         </div>
-                        <p className="body3-txt" style={{ marginTop: '12px', color: 'var(--color-on-surface-variant)', fontStyle: 'italic' }}>
+                        <p className="body3-txt" style={{ marginTop: '12px', color: 'var(--ds-text-subtle)', fontStyle: 'italic' }}>
                             Pick a school, a tutor or a date to change the filters
                         </p>
                     </div>

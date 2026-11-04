@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--card-gap-md, 16px);
-    background-color: var(--color-surface-container-lowest, #ffffff);
+    background-color: var(--ds-surface-raised);
     border-radius: var(--size-card-radius-sm);
     padding: var(--card-pad-y-lg, 24px) var(--card-pad-x-lg, 24px);
     width: 556px;
@@ -30,7 +30,7 @@
         font-size: 24px;
         font-weight: 600;
         line-height: 1.333;
-        color: var(--color-on-surface, #191c1e);
+        color: var(--ds-text);
         margin: 0;
     }
 
@@ -78,7 +78,7 @@
 
     &__spinner {
         font-size: 52px;
-        color: var(--color-on-surface-variant, #3f484a);
+        color: var(--ds-text-subtle);
 
         i {
             animation: spin 1s linear infinite;

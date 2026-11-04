@@ -27,7 +27,7 @@ export default {
  */
 export const Overview = {
     render: () => (
-        <div style={{ backgroundColor: 'var(--color-surface)', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ backgroundColor: 'var(--ds-surface)', padding: '16px', borderRadius: '8px' }}>
             <Footer
                 version="v5.2.0"
                 copyright="Copyright © Carnegie Mellon University 2024"
@@ -44,7 +44,7 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => (
-        <div style={{ backgroundColor: 'var(--color-surface)', padding: '16px', borderRadius: '8px' }}>
+        <div style={{ backgroundColor: 'var(--ds-surface)', padding: '16px', borderRadius: '8px' }}>
             <Footer {...args} />
         </div>
     ),

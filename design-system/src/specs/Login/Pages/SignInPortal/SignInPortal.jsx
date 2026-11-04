@@ -20,7 +20,7 @@ export default function SignInPortal() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
             }}
         >
             <div
@@ -51,7 +51,7 @@ export default function SignInPortal() {
                     className="body1-txt"
                     style={{
                         marginTop: 'var(--size-section-pad-y-lg)',
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         textAlign: 'center',
                     }}
                 >

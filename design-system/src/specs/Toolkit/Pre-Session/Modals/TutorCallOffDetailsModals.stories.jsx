@@ -33,7 +33,7 @@ export const PreReview_TutorRequest = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -45,7 +45,7 @@ export const PreReview_TutorRequest = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -111,8 +111,8 @@ export const PreReview_TutorRequest = () => (
  */
 const FieldRow = ({ label, value }) => (
     <div className="d-flex justify-content-between align-items-baseline body2-txt">
-        <span style={{ color: 'var(--color-on-surface)' }}>{label}:</span>
-        <span style={{ color: 'var(--color-on-surface)', textAlign: 'right' }}>{value}</span>
+        <span style={{ color: 'var(--ds-text)' }}>{label}:</span>
+        <span style={{ color: 'var(--ds-text)', textAlign: 'right' }}>{value}</span>
     </div>
 );
 
@@ -130,7 +130,7 @@ export const PreReview_WithdrawRequest = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -142,7 +142,7 @@ export const PreReview_WithdrawRequest = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -164,7 +164,7 @@ export const PreReview_WithdrawRequest = () => (
 
                     {/* Confirmation Text */}
                     <h4 className="h5 m-0">Are you sure you want to withdraw this request?</h4>
-                    <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    <p className="body2-txt m-0" style={{ color: 'var(--ds-icon)' }}>
                         This will cancel your call-off request and you will be expected to attend the session.
                     </p>
                 </div>
@@ -193,7 +193,7 @@ export const PreReview_RequestWithdrawn = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -205,7 +205,7 @@ export const PreReview_RequestWithdrawn = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -227,7 +227,7 @@ export const PreReview_RequestWithdrawn = () => (
 
                     {/* Success Text */}
                     <h4 className="h5 m-0">Request withdrawn</h4>
-                    <p className="body2-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                    <p className="body2-txt m-0" style={{ color: 'var(--ds-text)' }}>
                         Your request has been withdrawn. The related sessions have been restored to your schedule and you are expected to attend.
                     </p>
                 </div>
@@ -255,7 +255,7 @@ export const PostReview_SupervisorReview = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -267,7 +267,7 @@ export const PostReview_SupervisorReview = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -332,7 +332,7 @@ export const PostReview_TutorRequest = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -344,7 +344,7 @@ export const PostReview_TutorRequest = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -421,7 +421,7 @@ const StateLabel = ({ stage, tab }) => (
         <div className="h6" style={{ color: 'var(--color-primary-text)', marginBottom: '4px' }}>
             Stage: <strong>{stage}</strong>
         </div>
-        <div className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <div className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Tab: <strong>{tab}</strong>
         </div>
     </div>

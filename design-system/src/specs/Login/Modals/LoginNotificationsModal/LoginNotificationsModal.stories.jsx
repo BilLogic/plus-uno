@@ -25,7 +25,7 @@ export default {
 
 const modalWellStyle = {
     padding: 'var(--size-section-pad-y-lg)',
-    backgroundColor: 'var(--color-surface-variant)',
+    backgroundColor: 'var(--ds-background-neutral)',
 };
 
 /**
@@ -50,7 +50,7 @@ export const Overview = () => (
 
         <div
             style={{
-                backgroundColor: 'var(--color-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 padding: 'var(--size-section-pad-y-md)',
                 borderRadius: 'var(--size-section-radius-md)',
                 display: 'flex',

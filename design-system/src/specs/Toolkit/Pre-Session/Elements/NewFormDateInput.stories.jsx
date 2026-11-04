@@ -55,7 +55,7 @@ const DateInput = ({
                 width: '100%',
                 borderRadius: 'var(--size-element-radius-sm)',
                 border: `1px solid ${validation === 'invalid' ? 'var(--color-danger)' : 'var(--color-outline-variant)'}`,
-                backgroundColor: disabled ? 'var(--color-surface-container-low)' : 'var(--color-surface-container-lowest)',
+                backgroundColor: disabled ? 'var(--ds-background-neutral)' : 'var(--ds-background-input)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 opacity: disabled ? 0.6 : 1,
             }}
@@ -64,7 +64,7 @@ const DateInput = ({
                 className="body2-txt"
                 style={{
                     flex: '1 0 0',
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                     fontWeight: 300,
                     lineHeight: 1.571,
                 }}
@@ -76,7 +76,7 @@ const DateInput = ({
                 style={{
                     fontSize: 'var(--font-size-fa-body2-solid)',
                     lineHeight: 1.833,
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                 }}
             />
         </div>
@@ -145,7 +145,7 @@ const SessionDateInput = ({
                 <span
                     className="body2-txt"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         fontWeight: 300,
                         lineHeight: 1.571,
                         width: 9,

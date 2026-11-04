@@ -11,7 +11,7 @@
     height: fit-content;
     min-width: 0; // Allow flex/grid item to shrink
     max-width: 100%; // Allow it to shrink in grid
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
     border-radius: var(--size-section-radius-md);
     padding-top: 0;
     
@@ -45,7 +45,7 @@
     .nav-link,
     .plus-nav-link {
         // Default (inactive) state
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         
         // Active state - secondary color tokens
         &.active {
@@ -56,7 +56,7 @@
         
         // Hover state
         &:hover:not(.disabled):not(:disabled):not(.active) {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
         }
     }
 }
@@ -90,7 +90,7 @@
     font-size: var(--font-size-h2);
     font-weight: var(--font-weight-headline);
     line-height: var(--font-line-height-h2);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
     width: 100%;
     height: fit-content;
@@ -102,7 +102,7 @@
     font-size: var(--font-size-body1);
     font-weight: var(--font-weight-normal);
     line-height: var(--font-line-height-body1);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
     width: 100%;
     height: fit-content;

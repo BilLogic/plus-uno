@@ -74,7 +74,7 @@ const OnboardingModulesTable = ({
                                         style={{ 
                                             color: header.active 
                                                 ? 'var(--color-secondary-text)' 
-                                                : 'var(--color-on-surface)',
+                                                : 'var(--ds-text)',
                                             fontWeight: 400
                                         }}
                                     >
@@ -128,7 +128,7 @@ const OnboardingModulesTable = ({
 
                             {/* Duration column */}
                             <td className="onboarding-modules-table__cell onboarding-modules-table__cell--center">
-                                <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                     {module.duration}
                                 </span>
                             </td>

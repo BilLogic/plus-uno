@@ -63,7 +63,7 @@
 
     // N/A State (Neutral)
     &--na {
-        background-color: var(--color-surface-container, #edeef0);
-        color: var(--color-on-surface-variant, #444746);
+        background-color: var(--ds-surface-container);
+        color: var(--ds-text-subtle);
     }
 }

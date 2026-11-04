@@ -62,8 +62,8 @@ export const Interactive = () => {
             <h6 className="h6 mb-3">Interactive demo</h6>
             <p className="body2-txt mb-4">Pick a filter type.</p>
             <FilterWrapper value={type} onChange={setType} />
-            <p className="body3-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {type}
                 </strong>
             </p>

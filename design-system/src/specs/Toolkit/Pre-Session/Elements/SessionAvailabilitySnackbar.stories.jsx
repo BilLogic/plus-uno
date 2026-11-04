@@ -31,7 +31,7 @@ export default {
 const Template = (args) => <SessionAvailabilitySnackbar {...args} />;
 
 export const AllVariations = () => (
-    <div className="d-flex flex-column" style={{ padding: 'var(--size-section-gap-lg)', gap: 'var(--size-section-gap-lg)', backgroundColor: 'var(--color-surface-variant)', minHeight: '100vh' }}>
+    <div className="d-flex flex-column" style={{ padding: 'var(--size-section-gap-lg)', gap: 'var(--size-section-gap-lg)', backgroundColor: 'var(--ds-background-neutral)', minHeight: '100vh' }}>
         <div>
             <h5 className="text-muted mb-2">Session Availability Confirmation</h5>
             <p className="text-muted small mb-0">All supported variations. Fixed width: 300px.</p>

@@ -82,7 +82,7 @@ const TutorProfilePage = ({
                 <h2
                     className="h3"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         margin: 0,
                     }}
                 >

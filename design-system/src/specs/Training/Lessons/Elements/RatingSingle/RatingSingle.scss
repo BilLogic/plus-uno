@@ -57,7 +57,7 @@
         transition: all 0.2s ease;
 
         &--checked {
-            background-color: var(--color-surface);
+            background-color: var(--ds-surface);
             padding: var(--size-spacing-small-space-025); // 2px
         }
     }

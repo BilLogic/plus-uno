@@ -57,7 +57,7 @@ const Stepper = ({
             />
             <style>{`
                 .stepper-field .plus-field {
-                    background-color: var(--color-surface-container-lowest);
+                    background-color: var(--ds-surface);
                 }
                 .stepper-field .plus-field__control {
                     text-align: center;

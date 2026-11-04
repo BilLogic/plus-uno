@@ -12,7 +12,7 @@ export default {
 
 export const CtaSupervisorViewButtons = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-lg)' }}>
-        <p className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>
+        <p className="plus-body-2" style={{ color: 'var(--ds-text)' }}>
             Overview of CTA / Supervisor View buttons.
         </p>
 

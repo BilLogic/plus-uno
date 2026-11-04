@@ -132,8 +132,8 @@ export const Interactive = () => {
         <div className="border rounded" style={{ padding: 'var(--size-card-pad-y-lg)', minHeight: '400px' }}>
             <h6 className="h6 mb-3">Interactive demo</h6>
             <SortingOptions initialSort="name" onChange={setApplied} />
-            <p className="body3-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Sorted by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
+                Sorted by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {`${applied.sort} ${applied.order}`}
                 </strong>
             </p>

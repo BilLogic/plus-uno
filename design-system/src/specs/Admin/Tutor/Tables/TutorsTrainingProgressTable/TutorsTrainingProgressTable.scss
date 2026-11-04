@@ -54,7 +54,7 @@
                 border: none;
                 vertical-align: middle;
                 font-weight: var(--font-weight-normal);
-                color: var(--color-on-surface);
+                color: var(--ds-text);
             }
         }
     }
@@ -89,7 +89,7 @@
         gap: var(--table-cell-gap, 10px);
 
         span {
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             white-space: nowrap;
         }
     }
@@ -115,7 +115,7 @@
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background-color: var(--color-surface, #ffffff);
+        background-color: var(--ds-surface);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -123,7 +123,7 @@
         box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
 
         i {
-            color: var(--color-on-surface-variant, #40484c);
+            color: var(--ds-text-subtle);
             font-size: 16px;
         }
     }
@@ -136,7 +136,7 @@
     }
 
     &__email {
-        color: var(--color-on-surface-variant, #40484c);
+        color: var(--ds-text-subtle);
         font-size: 12px;
         font-weight: 300;
     }

@@ -47,7 +47,7 @@ export const ConfirmationAlert = ({
                 onChange={onChange}
                 aria-label={label}
                 style={{ flexShrink: 0, width: 'auto', margin: 0, padding: 0 }}/>
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 {label}
                 <span style={{ color: 'var(--color-danger)' }}> *</span>
             </span>
@@ -91,10 +91,10 @@ const UpdateAlert = ({ title, description, onClose }) => (
                 gap: 'var(--size-element-gap-sm)'
             }}
         >
-            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="h6" style={{ color: 'var(--ds-text)' }}>
                 {title}
             </span>
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 {description}
             </span>
         </div>
@@ -114,7 +114,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--color-on-surface-variant)'
+                    color: 'var(--ds-icon-subtle)'
                 }}
             />
         </button>
@@ -138,7 +138,7 @@ const TimeWarningAlert = ({ onClose }) => (
             width: 'var(--col-12)'
         }}
     >
-        <span className="body2-txt" style={{ color: 'var(--color-on-surface)', flex: 1 }}>
+        <span className="body2-txt" style={{ color: 'var(--ds-text)', flex: 1 }}>
             This session begins in <strong>less than 12 hours</strong>. Dropping now may leave students without enough tutors. Please think carefully before submitting your call-off request, as it <strong>may not be excused</strong> and could count toward your absences.
         </span>
         <button
@@ -157,7 +157,7 @@ const TimeWarningAlert = ({ onClose }) => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--color-on-surface-variant)'
+                    color: 'var(--ds-icon-subtle)'
                 }}
             />
         </button>

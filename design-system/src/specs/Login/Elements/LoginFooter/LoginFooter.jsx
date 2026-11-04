@@ -22,7 +22,7 @@ export default function LoginFooter({
     return (
         <div
             style={{
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface)',
                 padding: 'var(--size-section-pad-y-md)',
             }}
         >

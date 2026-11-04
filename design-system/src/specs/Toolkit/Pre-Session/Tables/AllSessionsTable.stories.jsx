@@ -25,7 +25,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
             borderRadius: 'var(--size-border-radius-radius-100)'
         }}
     >
-        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)', textTransform: 'capitalize' }}>
+        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)', textTransform: 'capitalize' }}>
             {label}
         </span>
         {sortable && (
@@ -33,7 +33,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
                 className="fa-solid fa-arrow-up"
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
-                    color: 'var(--color-on-surface-variant)'
+                    color: 'var(--ds-icon-subtle)'
                 }}
             />
         )}
@@ -174,10 +174,10 @@ export const AllSessionsTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -194,10 +194,10 @@ export const AllSessionsTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>
@@ -225,7 +225,7 @@ export const AllSessionsTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
                 {needLead && (
@@ -243,7 +243,7 @@ export const AllSessionsTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {studentCount}
                 </span>
             </div>
@@ -477,11 +477,11 @@ export const Interactive = () => {
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-lg)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
                 flexWrap: 'wrap'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Total Sessions: <strong>{sessions.length}</strong>
                 </span>
                 <span className="body2-txt" style={{ color: 'var(--color-info)' }}>
@@ -501,11 +501,11 @@ export const Interactive = () => {
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
                 flexWrap: 'wrap'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                     Filter by Status:
                 </span>
                 {['all', 'in-progress', 'upcoming', 'completed', 'canceled'].map(status => (
@@ -522,10 +522,10 @@ export const Interactive = () => {
             {/* Instructions */}
             <div style={{
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Click "Details" to view session information. Hover over rows to see interactive states.
                 </span>
             </div>
@@ -551,7 +551,7 @@ export const Interactive = () => {
                     <div style={{
                         padding: 'var(--size-section-pad-y-lg) var(--size-section-pad-x-lg)',
                         textAlign: 'center',
-                        color: 'var(--color-on-surface-variant)'
+                        color: 'var(--ds-text-subtle)'
                     }}>
                         <span className="body2-txt">No sessions found for the selected filter.</span>
                     </div>

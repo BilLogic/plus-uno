@@ -73,8 +73,8 @@
         align-items: center;
         justify-content: space-between;
         padding: var(--size-element-pad-y-lg, 16px) var(--size-element-pad-x-lg, 16px);
-        background-color: var(--color-surface-container-lowest, #ffffff);
-        color: var(--color-on-surface, #191c1e);
+        background-color: var(--ds-surface);
+        color: var(--ds-text);
         min-height: 52px;
     }
 

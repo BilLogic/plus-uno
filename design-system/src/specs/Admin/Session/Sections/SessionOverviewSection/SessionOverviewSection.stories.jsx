@@ -70,7 +70,7 @@ Node ID: 987-127692
  */
 export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--ds-surface)' }}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Session Overview Charts</h6>
             <SessionOverviewSection
                 timeAllocation={60}
@@ -88,7 +88,7 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--ds-surface)' }}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
                 Session Overview Charts - Interactive
             </h6>

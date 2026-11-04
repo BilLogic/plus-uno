@@ -45,7 +45,7 @@ const MainContent = ({
     >
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Sessions</h2>
             <Button appearance="primary" iconBefore="calendar-plus">
                 Fill in
             </Button>

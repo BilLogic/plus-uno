@@ -175,7 +175,7 @@ const SessionAdminPage = ({
                 {/* Session Overview Section */}
                 <div className="session-admin-page__overview-section">
                     <div className="session-admin-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Session Overview
                         </h2>
                         <div className="session-admin-page__filters">
@@ -205,7 +205,7 @@ const SessionAdminPage = ({
                 {/* Session Details Section */}
                 <div className="session-admin-page__details-section">
                     <div className="session-admin-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Session Details
                         </h2>
                     </div>
@@ -218,7 +218,7 @@ const SessionAdminPage = ({
 
                     {/* Pagination Footer */}
                     <div className="session-admin-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination

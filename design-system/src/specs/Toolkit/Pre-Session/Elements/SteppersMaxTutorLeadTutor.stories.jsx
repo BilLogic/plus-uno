@@ -57,7 +57,7 @@ const ErrorStepper = ({ label = 'Max # of lead tutors', value = '4' }) => (
         </div>
         <style>{`
             .error-stepper-input-group .plus-field {
-                background-color: var(--color-surface-container-lowest);
+                background-color: var(--ds-surface);
             }
             .error-stepper-input-group .plus-field__control {
                 text-align: center;

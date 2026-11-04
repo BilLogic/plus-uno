@@ -68,10 +68,10 @@ export const AllVariations = () => (
         flexDirection: 'column',
         gap: 'var(--size-section-gap-lg)',
         padding: 'var(--size-section-pad-y-lg)',
-        backgroundColor: 'var(--color-surface)',
+        backgroundColor: 'var(--ds-surface)',
     }}>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--color-on-surface-variant)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
                 Lead Tutor
             </h6>
             <SessionControlsConsolidated
@@ -83,7 +83,7 @@ export const AllVariations = () => (
             />
         </div>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--color-on-surface-variant)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
                 Non-lead Tutor
             </h6>
             <SessionControlsConsolidated
@@ -94,7 +94,7 @@ export const AllVariations = () => (
             />
         </div>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--color-on-surface-variant)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
                 Lead Tutor — room count waiting (before assignment)
             </h6>
             <SessionControlsConsolidated
@@ -123,7 +123,7 @@ export const Interactive = (args) => {
             flexDirection: 'column',
             gap: 'var(--size-section-gap-lg)',
             padding: 'var(--size-section-pad-y-lg)',
-            backgroundColor: 'var(--color-surface)',
+            backgroundColor: 'var(--ds-surface)',
             minWidth: 400,
         }}>
             <SessionControlsConsolidated
@@ -140,14 +140,14 @@ export const Interactive = (args) => {
             {log.length > 0 && (
                 <div style={{
                     padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                    backgroundColor: 'var(--color-surface-container-low)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: 'var(--size-card-radius-sm)',
                 }}>
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0, marginBottom: 'var(--size-element-gap-xs)' }}>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0, marginBottom: 'var(--size-element-gap-xs)' }}>
                         Action log:
                     </p>
                     {log.map((entry, i) => (
-                        <p key={i} className="body2-txt" style={{ margin: 0, color: i === 0 ? 'var(--color-on-surface)' : 'var(--color-on-surface-variant)' }}>
+                        <p key={i} className="body2-txt" style={{ margin: 0, color: i === 0 ? 'var(--ds-text)' : 'var(--ds-text-subtle)' }}>
                             {entry}
                         </p>
                     ))}

@@ -18,7 +18,7 @@ export const Overview = () => (
             gap: '40px',
             flexWrap: 'wrap',
             padding: '24px',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
         }}
     >
         <RecommendedLessons

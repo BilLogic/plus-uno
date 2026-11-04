@@ -63,7 +63,7 @@ const CallOffAlert = ({ onClose }) => (
                 gap: 'var(--size-element-gap-sm)'
             }}
         >
-            <span className="body1-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body1-txt" style={{ color: 'var(--ds-text)' }}>
                 This session begins in <strong>less than 12 hours</strong>. Dropping now may leave students without enough tutors. Please think carefully before submitting your call-off request, as it <strong>may not be excused</strong> and could count toward your absences.
             </span>
         </div>
@@ -83,7 +83,7 @@ const CallOffAlert = ({ onClose }) => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)'
+                    color: 'var(--ds-icon-subtle)'
                 }}
             />
         </button>
@@ -106,7 +106,7 @@ const ReasonDropdown = ({ value, onChange }) => (
         }}
     >
         <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
-            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Reason for call-Off
             </span>
             <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
@@ -137,7 +137,7 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
         }}
     >
         <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
-            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Additional details
             </span>
             <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
@@ -161,7 +161,7 @@ const WithdrawToggle = ({ checked, onChange }) => (
         className="d-flex justify-content-between align-items-center"
         style={{ width: '100%' }}
     >
-        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
             Withdraw from all recurring sessions.
         </span>
         <div style={{ marginRight: 'var(--size-element-gap-md)' }}>
@@ -206,7 +206,7 @@ export const CallOff_Request_Details = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -218,7 +218,7 @@ export const CallOff_Request_Details = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />

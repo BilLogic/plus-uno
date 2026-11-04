@@ -151,7 +151,7 @@ const TutorToolUsagePage = ({
                 {/* Tool Usage Section */}
                 <div className="tutor-tool-usage-page__overview-section">
                     <div className="tutor-tool-usage-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Tool Usage
                         </h2>
                         <AdminDateRangeFilter
@@ -177,7 +177,7 @@ const TutorToolUsagePage = ({
                 {/* Tool Usage Details Section */}
                 <div className="tutor-tool-usage-page__details-section">
                     <div className="tutor-tool-usage-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Tool Usage Details
                         </h2>
 
@@ -193,7 +193,7 @@ const TutorToolUsagePage = ({
 
                     {/* Pagination Footer */}
                     <div className="tutor-tool-usage-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination
