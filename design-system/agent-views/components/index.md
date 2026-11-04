@@ -33,7 +33,6 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
-- [NavTabs](../../src/components/navigation/NavTabs/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [PromptInput](../../src/components/forms-and-inputs/PromptInput/index.md)
 - [PromptStarters](../../src/components/labels/PromptStarters/index.md)
@@ -46,6 +45,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Sidebar](../../src/components/navigation/Sidebar/index.md)
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
 - [SplitButton](../../src/components/forms-and-inputs/SplitButton/index.md)
+- [Tabs](../../src/components/navigation/Tabs/index.md)
 - [TagInput](../../src/components/forms-and-inputs/TagInput.md)
 - [TextArea](../../src/components/forms-and-inputs/TextArea/index.md)
 - [TextField](../../src/components/forms-and-inputs/TextField/index.md)

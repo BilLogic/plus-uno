@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import { SectionMessage, CountTag, NavTabs, Select, SmartTag, StatusTag, Tag, Button, IconButton } from '@/components';
+import { SectionMessage, CountTag, Tabs, Select, SmartTag, StatusTag, Tag, Button, IconButton } from '@/components';
 import { LineChart, RadarChart } from '@/dataviz';
 import PatternCard from '@/patterns/PatternCard';
 import PatternSection from '@/patterns/PatternSection';
@@ -238,13 +238,13 @@ const TutorHomePageNewLayout = ({
                 title="Next session"
                 data-block="session"
                 tabs={(
-                    <NavTabs mode="tabs" activeKey={sessionTab} onSelect={setSessionTab} aria-label="Next session">
-                        <NavTabs.Item eventKey="sign-up">Sign up / Edit</NavTabs.Item>
-                        <NavTabs.Item eventKey="session">
+                    <Tabs activeKey={sessionTab} onSelect={setSessionTab} aria-label="Next session">
+                        <Tabs.Tab eventKey="sign-up">Sign up / Edit</Tabs.Tab>
+                        <Tabs.Tab eventKey="session">
                             <TabLabel after={<CountTag value={sessionLinks.length} spacing="compact" />}>Session links</TabLabel>
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="reflection">Reflection</NavTabs.Item>
-                    </NavTabs>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="reflection">Reflection</Tabs.Tab>
+                    </Tabs>
                 )}
             >
                 <div className="plus-home-new__stack">
@@ -308,10 +308,10 @@ const TutorHomePageNewLayout = ({
                         title="Skills"
                         data-block="skills"
                         tabs={(
-                            <NavTabs mode="tabs" activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
-                                <NavTabs.Item eventKey="skills-overview"><TabLabel after={infoGlyph}>Overview</TabLabel></NavTabs.Item>
-                                <NavTabs.Item eventKey="skills-progress"><TabLabel after={infoGlyph}>Progress</TabLabel></NavTabs.Item>
-                            </NavTabs>
+                            <Tabs activeKey={skillsTab} onSelect={setSkillsTab} aria-label="Skills">
+                                <Tabs.Tab eventKey="skills-overview"><TabLabel after={infoGlyph}>Overview</TabLabel></Tabs.Tab>
+                                <Tabs.Tab eventKey="skills-progress"><TabLabel after={infoGlyph}>Progress</TabLabel></Tabs.Tab>
+                            </Tabs>
                         )}
                     >
                         <div className="plus-home-new__chart">

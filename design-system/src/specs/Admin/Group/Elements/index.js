@@ -9,5 +9,5 @@
 // - Button (from components/Button)
 // - Badge (from components/Badge)
 // - SmartTag (from components/SmartTag)
-// - NavTabs (from components/NavTabs)
+// - Tabs (from components/Tabs)
 // - Pagination (from components/Pagination)

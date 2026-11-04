@@ -8,7 +8,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Tabs from '@/components/navigation/Tabs/Tabs';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import GroupsTable from '@/specs/Admin/Group/Tables/GroupsTable/GroupsTable';
@@ -81,18 +81,18 @@ const GroupInfoPage = ({
         >
             <div className="group-info-page__content">
                 {/* Tab Navigation */}
-                <NavTabs
+                <Tabs
                     activeKey={activeTab}
                     onSelect={handleTabSelect}
                     className="group-info-page__tabs"
                 >
-                    <NavTabs.Item eventKey="group-info" active={activeTab === 'group-info'}>
+                    <Tabs.Tab eventKey="group-info">
                         Group Info
-                    </NavTabs.Item>
-                    <NavTabs.Item eventKey="training-progress" active={activeTab === 'training-progress'}>
+                    </Tabs.Tab>
+                    <Tabs.Tab eventKey="training-progress">
                         Training Progress
-                    </NavTabs.Item>
-                </NavTabs>
+                    </Tabs.Tab>
+                </Tabs>
 
                 {/* Title Section */}
                 <div className="group-info-page__title-section">

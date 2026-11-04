@@ -184,12 +184,12 @@ export const webAppSourceSnippets = {
         '  <NavPills.Item eventKey="3">Messages</NavPills.Item>',
         '</NavPills>'
     ]),
-    navTabs: snippet([
-        '<NavTabs defaultActiveKey="1">',
-        '  <NavTabs.Item eventKey="1">Home</NavTabs.Item>',
-        '  <NavTabs.Item eventKey="2">Profile</NavTabs.Item>',
-        '  <NavTabs.Item eventKey="3">Messages</NavTabs.Item>',
-        '</NavTabs>'
+    tabs: snippet([
+        '<Tabs defaultActiveKey="1">',
+        '  <Tabs.Tab eventKey="1">Home</Tabs.Tab>',
+        '  <Tabs.Tab eventKey="2">Profile</Tabs.Tab>',
+        '  <Tabs.Tab eventKey="3">Messages</Tabs.Tab>',
+        '</Tabs>'
     ]),
     pagination: snippet([
         '<Pagination',

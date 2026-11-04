@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import PatternCard from '@/patterns/PatternCard';
-import NavTabs from '@/components/navigation/NavTabs';
+import Tabs from '@/components/navigation/Tabs';
 import { IconButton } from '@/components';
 import chartTheme from '@/dataviz/chartTheme';
 import { RadarChart } from '@/dataviz';
@@ -147,30 +147,28 @@ const DataVisualizationSkillsProgress = ({
                     </button>
                 </div>
             ) : (
-                <NavTabs
+                <Tabs
                     activeKey={activeTab}
                     onSelect={(key) => setActiveTab(key)}
                     className="plus-data-viz-tabs"
                 >
-                    <NavTabs.Item 
+                    <Tabs.Tab 
                         eventKey="skills-overview"
-                        active={activeTab === 'skills-overview'}
                     >
                         <div className="plus-data-viz-tab-content">
                             <span>Skills Overview</span>
                             <i className="fas fa-circle-info" aria-hidden="true"></i>
                         </div>
-                    </NavTabs.Item>
-                    <NavTabs.Item 
+                    </Tabs.Tab>
+                    <Tabs.Tab 
                         eventKey="skills-progress"
-                        active={activeTab === 'skills-progress'}
                     >
                         <div className="plus-data-viz-tab-content">
                             <span>Skills Progress</span>
                             <i className="fas fa-circle-info" aria-hidden="true"></i>
                         </div>
-                    </NavTabs.Item>
-                </NavTabs>
+                    </Tabs.Tab>
+                </Tabs>
             )}
 
             <div className="plus-data-viz-content">

@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Tabs from '@/components/navigation/Tabs/Tabs';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import AdminDateRangeFilter from '@/specs/Admin/Tutor/Elements/AdminDateRangeFilter/AdminDateRangeFilter';
 import TutorPerformanceSection from '@/specs/Admin/Tutor/Sections/TutorPerformanceSection/TutorPerformanceSection';
@@ -160,24 +160,24 @@ const TutorPerformancePage = ({
             <div className="tutor-performance-page__content">
                 {/* Tab Navigation */}
                 <div className="tutor-performance-page__tabs">
-                    <NavTabs
+                    <Tabs
                         activeKey={currentTab}
                         onSelect={handleTabSelect}
                         className="tutor-performance-page__nav-tabs"
                     >
-                        <NavTabs.Item eventKey="performance" active={currentTab === 'performance'}>
+                        <Tabs.Tab eventKey="performance">
                             Tutor Performance
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="statusWarnings" active={currentTab === 'statusWarnings'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="statusWarnings">
                             Status And Warnings
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="toolUsage" active={currentTab === 'toolUsage'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="toolUsage">
                             Tool Usage
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="trainingProgress" active={currentTab === 'trainingProgress'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="trainingProgress">
                             Training Progress
-                        </NavTabs.Item>
-                    </NavTabs>
+                        </Tabs.Tab>
+                    </Tabs>
                 </div>
 
                 {/* Action Buttons */}

@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 import ModalManager from '@restart/ui/ModalManager';
 import { PageLayout } from '@/specs/Universal/Pages';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Tabs from '@/components/navigation/Tabs/Tabs';
 import Pagination from '@/components/navigation/Pagination/Pagination';
 import SessionsTable from '@/specs/Admin/Session/Tables/SessionsTable/SessionsTable';
 import SessionOverviewSection from '@/specs/Admin/Session/Sections/SessionOverviewSection/SessionOverviewSection';
@@ -152,24 +152,24 @@ const SessionAdminPage = ({
             <div className="session-admin-page__content">
                 {/* Tab Navigation */}
                 <div className="session-admin-page__tabs">
-                    <NavTabs
+                    <Tabs
                         activeKey={currentTab}
                         onSelect={handleTabSelect}
                         className="session-admin-page__nav-tabs"
                     >
-                        <NavTabs.Item eventKey="warnings" active={currentTab === 'warnings'}>
+                        <Tabs.Tab eventKey="warnings">
                             Warnings
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="currentTutors" active={currentTab === 'currentTutors'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="currentTutors">
                             Current Tutors
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="incomingTutors" active={currentTab === 'incomingTutors'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="incomingTutors">
                             Incoming Tutors
-                        </NavTabs.Item>
-                        <NavTabs.Item eventKey="details" active={currentTab === 'details'}>
+                        </Tabs.Tab>
+                        <Tabs.Tab eventKey="details">
                             Details
-                        </NavTabs.Item>
-                    </NavTabs>
+                        </Tabs.Tab>
+                    </Tabs>
                 </div>
 
                 {/* Session Overview Section */}
