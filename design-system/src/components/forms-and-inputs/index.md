@@ -15,8 +15,8 @@ authored half (#166), counted rather than assumed.
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✕ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✕ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
-| [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
+| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✕ | ✅ |
+| [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✕ | ✅ |
 | [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✕ | ✅ |
 | [Fieldset](Fieldset.md) | 8 | ✅ | ✕ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
@@ -37,12 +37,12 @@ authored half (#166), counted rather than assumed.
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✕ | ✅ |
-| [TimePicker](TimePicker/index.md) | 14 | ✕ | ✕ | ✕ |
+| [TimePicker](TimePicker/index.md) | 14 | ✅ | ✕ | ✅ |
 | [Toggle](Toggle.md) | 16 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 26/34 (76%) · Correct/incorrect 6/34 (18%) · Accessibility 30/34 (88%)
+**Authored coverage:** When to use 29/34 (85%) · Correct/incorrect 6/34 (18%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
