@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-text-subtle` · `--element-stack-sm` · `--heading-small`
+`--body-default` · `--ds-text-subtle` · `--heading-small` · `--stack-sm`
 
 From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. Override these through the token layer, never with a literal.
 

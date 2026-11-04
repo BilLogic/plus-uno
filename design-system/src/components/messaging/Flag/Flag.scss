@@ -15,7 +15,7 @@
 .toast.plus-flag {
     display: flex;
     align-items: flex-start;
-    gap: var(--element-inline-lg);
+    gap: var(--inline-lg);
     box-sizing: border-box;
     width: var(--popover-width-flag);
     max-width: calc(100vw - 2 * var(--popover-gap-screen));
@@ -51,14 +51,14 @@
         display: flex;
         flex: 1 1 auto;
         flex-direction: column;
-        gap: var(--element-stack-sm);
+        gap: var(--stack-sm);
         min-width: 0;
     }
 
     .plus-flag-header {
         display: flex;
         align-items: baseline;
-        gap: var(--element-inline-md);
+        gap: var(--inline-md);
     }
 
     .plus-flag-title {
@@ -138,7 +138,7 @@
 // --- TOAST CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
 .plus-flag-container,
 .toast-container {
-    z-index: var(--layout-z-index-flag);
+    z-index: var(--layer-flag);
     display: flex;
     flex-direction: column;
     gap: var(--popover-stack-flag);

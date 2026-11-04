@@ -7,13 +7,13 @@
 .plus-inline-message-content {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 .plus-inline-message-heading {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 .plus-inline-message-title {

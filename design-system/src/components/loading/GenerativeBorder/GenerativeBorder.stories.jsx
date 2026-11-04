@@ -45,7 +45,7 @@ const box = {
     boxSizing: 'border-box',
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--element-inline-md)',
+    gap: 'var(--inline-md)',
     padding: 'var(--card-pad-default)',
     border: 'var(--border-default) solid var(--ds-border)',
     borderRadius: 'var(--generative-border-radius, var(--card-radius))',
@@ -59,7 +59,7 @@ const wrap = { maxWidth: 'var(--section-min-width-main)' };
 const toggle = {
     padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
     border: 'var(--border-default) solid var(--ds-border-input)',
-    borderRadius: 'var(--element-radius-md)',
+    borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-input)',
     color: 'var(--ds-text)',
     font: 'var(--body-default)',
@@ -152,7 +152,7 @@ ReducedMotion.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- radius */
 
 export const Radii = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--layout-gutter)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)' }}>
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>
@@ -176,7 +176,7 @@ Radii.play = async ({ canvasElement }) => {
 export const Interactive = (args) => {
     const [isActive, setIsActive] = useState(Boolean(args.isActive));
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--layout-gutter)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--grid-gutter)', alignItems: 'flex-start' }}>
             <GenerativeBorder {...args} isActive={isActive} data-testid="wrapper" style={wrap}>
                 <Draft />
             </GenerativeBorder>

@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-danger-text` · `--color-disabled-opacity` · `--color-primary-text` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-interaction-hovered` · `--ds-surface` · `--ds-text` · `--element-inline-md` · `--element-pad-compact` · `--element-pad-default` · `--element-pad-x-sm` · `--element-radius-full` · `--element-radius-item-md` · `--image-md` · `--image-sm` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--size-element-gap-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
+`--body-default` · `--body-small` · `--color-danger-text` · `--color-disabled-opacity` · `--color-primary-text` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-interaction-hovered` · `--ds-surface` · `--ds-text` · `--element-pad-compact` · `--element-pad-default` · `--image-md` · `--image-sm` · `--inline-md` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--pad-x-sm` · `--radius-full` · `--radius-h32` · `--size-element-gap-md` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 

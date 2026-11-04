@@ -125,7 +125,7 @@ export const PopupLayers = () => {
             >
                 Notes stay with the session.
             </Popup>
-            <div className="modal" style={{ position: 'relative', display: 'block', zIndex: 'var(--layout-z-index-modal)' }}>
+            <div className="modal" style={{ position: 'relative', display: 'block', zIndex: 'var(--layer-modal)' }}>
                 <Popup
                     id="pf-popup-modal"
                     triggerType="manual"
@@ -150,11 +150,11 @@ PopupLayers.play = async ({ canvasElement }) => {
     });
     const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
     // On the popup layer (400) from the page, not above toasts.
-    await expect(getComputedStyle(page).zIndex, 'popup layer').toBe(z('--layout-z-index-popup'));
+    await expect(getComputedStyle(page).zIndex, 'popup layer').toBe(z('--layer-popup'));
     // Opened from a modal it mounts in the modal and so rides its layer (510).
     await expect(inModal.closest('.modal'), 'mounted in the modal').not.toBeNull();
-    await expect(getComputedStyle(inModal.closest('.modal')).zIndex, 'modal layer').toBe(z('--layout-z-index-modal'));
-    await expect(getComputedStyle(inModal).zIndex, 'popup layer inside the modal').toBe(z('--layout-z-index-popup'));
+    await expect(getComputedStyle(inModal.closest('.modal')).zIndex, 'modal layer').toBe(z('--layer-modal'));
+    await expect(getComputedStyle(inModal).zIndex, 'popup layer inside the modal').toBe(z('--layer-popup'));
 };
 
 export const PopupKeepsOffTheScreenEdge = () => {

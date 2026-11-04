@@ -7,10 +7,10 @@
 .plus-banner {
     display: flex;
     align-items: flex-start;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     width: 100%;
     box-sizing: border-box;
-    padding: var(--element-pad-y-md) var(--element-pad-x-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
     border-radius: 0;
 }
 

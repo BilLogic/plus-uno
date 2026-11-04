@@ -12,7 +12,7 @@
     gap: 0;
 
     > .plus-btn {
-        border-radius: var(--element-radius-item-sm);
+        border-radius: var(--button-radius-default);
         position: relative;
 
         &:not(:first-child) {

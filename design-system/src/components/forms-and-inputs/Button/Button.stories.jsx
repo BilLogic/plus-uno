@@ -209,8 +209,8 @@ export const Spacing = {
         await expect(Math.round(compact.getBoundingClientRect().height), 'compact height').toBe(24);
         await expect(px(getComputedStyle(defaults).borderTopLeftRadius), 'default radius').toBe(6);
         await expect(px(getComputedStyle(compact).borderTopLeftRadius), 'compact radius').toBe(4);
-        await expect(px(getComputedStyle(defaults).paddingLeft), 'default padding').toBe(tokenLength(canvasElement, '--element-pad-x-md'));
-        await expect(px(getComputedStyle(compact).paddingLeft), 'compact padding').toBe(tokenLength(canvasElement, '--element-pad-x-sm'));
+        await expect(px(getComputedStyle(defaults).paddingLeft), 'default padding').toBe(tokenLength(canvasElement, '--pad-x-md'));
+        await expect(px(getComputedStyle(compact).paddingLeft), 'compact padding').toBe(tokenLength(canvasElement, '--pad-x-sm'));
         for (const button of [defaults, compact]) {
             await expect(px(getComputedStyle(button).columnGap), 'icon-to-label gap').toBe(4);
             await expect(px(getComputedStyle(button.querySelector('.plus-btn-visual i')).fontSize), 'icon size').toBe(16);

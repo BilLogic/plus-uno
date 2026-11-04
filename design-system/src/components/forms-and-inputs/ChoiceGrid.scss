@@ -87,10 +87,10 @@
 
     .plus-form-checkbox,
     .plus-form-radio {
-        width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-        height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-        min-width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-        min-height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+        width: var(--plus-choice-grid-control-size, var(--checkbox-control-size));
+        height: var(--plus-choice-grid-control-size, var(--checkbox-control-size));
+        min-width: var(--plus-choice-grid-control-size, var(--checkbox-control-size));
+        min-height: var(--plus-choice-grid-control-size, var(--checkbox-control-size));
     }
 }
 

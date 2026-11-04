@@ -13,7 +13,7 @@
 }
 
 .plus-calendar {
-    --plus-calendar-day: var(--layout-calendar-day-md);
+    --plus-calendar-day: var(--calendar-day-md);
 
     display: flex;
     flex-direction: column;
@@ -23,11 +23,11 @@
 }
 
 .plus-calendar--small {
-    --plus-calendar-day: var(--layout-calendar-day-sm);
+    --plus-calendar-day: var(--calendar-day-sm);
 }
 
 .plus-calendar--large {
-    --plus-calendar-day: var(--layout-calendar-day-lg);
+    --plus-calendar-day: var(--calendar-day-lg);
 }
 
 .plus-calendar-header {
@@ -41,8 +41,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: var(--layout-calendar-nav);
-    height: var(--layout-calendar-nav);
+    width: var(--calendar-nav-size);
+    height: var(--calendar-nav-size);
     background: transparent;
     border: none;
     border-radius: var(--size-element-radius-sm);
