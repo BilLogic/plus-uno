@@ -9,7 +9,7 @@ import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
 import PatternModal from './PatternModal';
 import PatternSection from './PatternSection';
-import Surface from './Surface';
+import Page from './Page';
 
 /**
  * Heading tags follow nesting: one h1 per page, sections h2, subsections h3,
@@ -24,31 +24,31 @@ const outline = () => screen.queryAllByRole('heading').map((h) => [h.tagName.toL
 describe('the page outline', () => {
     it('steps one level per nesting: page h1, section h2, subsection h3', () => {
         render(
-            <Surface title="Sessions">
+            <Page title="Sessions">
                 <PatternSection title="This week">
                     <PatternSection title="Monday">
                         <p>Two sessions.</p>
                     </PatternSection>
                 </PatternSection>
-            </Surface>,
+            </Page>,
         );
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'This week'], ['h3', 'Monday']]);
     });
 
     it('keeps the level through a section with no title', () => {
         render(
-            <Surface title="Sessions">
+            <Page title="Sessions">
                 <PatternSection>
                     <PatternCard title="Wrapped" />
                 </PatternSection>
-            </Surface>,
+            </Page>,
         );
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'Wrapped']]);
     });
 
     it('titles a card one level below its section', () => {
         render(
-            <Surface title="Sessions">
+            <Page title="Sessions">
                 <PatternCard title="On the page" />
                 <PatternSection title="This week">
                     <PatternCard title="In a section" description="Two students" />
@@ -56,7 +56,7 @@ describe('the page outline', () => {
                         <PatternCard title="In a subsection" />
                     </PatternSection>
                 </PatternSection>
-            </Surface>,
+            </Page>,
         );
         expect(outline()).toEqual([
             ['h1', 'Sessions'],

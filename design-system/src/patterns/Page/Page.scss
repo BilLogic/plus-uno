@@ -1,87 +1,87 @@
 /**
- * Surface pattern (Patterns/Surfaces)
- * Bare tokenized surface — elevation level, padding, radius, border.
+ * Page pattern (Patterns/Page)
+ * Bare tokenized content box — elevation level, padding, radius, border.
  * Each level is a fill and its shadow, as a pair; every value is a token.
  */
 
 @use '../../styles/surface-edge' as *;
 
-.plus-pattern-surface {
+.plus-pattern-page {
     display: block;
     color: var(--ds-text);
 }
 
 /* Levels: a fill and its shadow, always together */
-.plus-pattern-surface-level-sunken {
+.plus-pattern-page-level-sunken {
     background-color: var(--ds-surface-sunken);
 }
 
 // The page: no shadow, only the surface edge.
-.plus-pattern-surface-level-default {
+.plus-pattern-page-level-default {
     background-color: var(--ds-surface);
     @include surface-edge;
 }
 
-.plus-pattern-surface-level-raised {
+.plus-pattern-page-level-raised {
     background-color: var(--ds-surface-raised);
     box-shadow: var(--ds-shadow-raised);
 }
 
-.plus-pattern-surface-level-overlay {
+.plus-pattern-page-level-overlay {
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
 
-/* Padding scale — md is the frame surface's pad, so a surface used alone pads
-   as the one inside the frame does. No sm/lg surface padding tokens exist
+/* Padding scale — md is the frame's own pad, so a Page used alone pads
+   as the one inside the frame does. No sm/lg padding tokens exist
    yet, so those steps borrow the Sections layer padding tokens (same
    semantic layer family). */
-.plus-pattern-surface-pad-none {
+.plus-pattern-page-pad-none {
     padding: 0;
 }
 
-.plus-pattern-surface-pad-sm {
+.plus-pattern-page-pad-sm {
     padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
 }
 
-.plus-pattern-surface-pad-md {
+.plus-pattern-page-pad-md {
     padding: var(--surface-pad);
 }
 
-.plus-pattern-surface-pad-lg {
+.plus-pattern-page-pad-lg {
     padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
 }
 
 /* Radius scale — lg is the canonical --size-surface-radius token;
    sm/md reuse the Sections layer radius steps. */
-.plus-pattern-surface-radius-none {
+.plus-pattern-page-radius-none {
     border-radius: 0;
 }
 
-.plus-pattern-surface-radius-sm {
+.plus-pattern-page-radius-sm {
     border-radius: var(--size-section-radius-sm);
 }
 
-.plus-pattern-surface-radius-md {
+.plus-pattern-page-radius-md {
     border-radius: var(--size-section-radius-md);
 }
 
-.plus-pattern-surface-radius-lg {
+.plus-pattern-page-radius-lg {
     border-radius: var(--size-surface-radius);
 }
 
 /* Border */
-.plus-pattern-surface-bordered {
+.plus-pattern-page-bordered {
     border: var(--size-surface-border) solid var(--ds-border-bold);
 }
 
-// A bordered default surface draws its border instead of the edge ring, never both.
-.plus-pattern-surface-level-default.plus-pattern-surface-bordered {
+// A bordered default page draws its border instead of the edge ring, never both.
+.plus-pattern-page-level-default.plus-pattern-page-bordered {
     box-shadow: none;
 }
 
 /* The page's h1: Heading/large 24/28, the top of the page outline. */
-.plus-pattern-surface-title {
+.plus-pattern-page-title {
     margin: 0 0 var(--surface-stack-md);
     font: var(--heading-large);
     letter-spacing: var(--heading-large-tracking);

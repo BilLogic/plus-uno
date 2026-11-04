@@ -8,9 +8,8 @@ import './Sidebar.scss';
 export const THREAD_END = 'plus-pattern-sidebar__thread-end';
 
 /**
- * Sidebar pattern: the foundation side navigation. Mirrors the Figma
- * `_Sidebar`, `_Sidebar section` and `_Sidebar open tab` parts in Patterns ›
- * Surface container.
+ * Sidebar pattern: the foundation side navigation, one of the parts Frame
+ * places.
  *
  * - **Header**: a slot that stays put, for the logo.
  * - **Body**: the top-level items (Home), then sections. It scrolls inside the

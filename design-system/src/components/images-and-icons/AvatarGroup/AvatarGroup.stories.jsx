@@ -112,7 +112,7 @@ Sizes.play = async ({ canvasElement }) => {
 
 export const GroupSizeAndShape = () => (
     <AvatarGroup label="Agents" size={24} shape="square" max={3}>
-        {PEOPLE.slice(0, 4).map((name) => <Avatar key={name} name={name} size={48} />)}
+        {PEOPLE.slice(0, 4).map((name) => <Avatar key={name} name={name} size={40} />)}
     </AvatarGroup>
 );
 

@@ -7,16 +7,16 @@ import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/li
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { SURFACE_EDGE } from '@/patterns/Surface';
+import { PAGE_EDGE } from '@/patterns/Page';
 
 /**
- * Surface container (in code, `Frame`) — the app frame: a 32 topbar over a row holding the
- * sidebar and the surface.
+ * Frame — the app frame: a 32 topbar over a row holding the sidebar and the
+ * page.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
  * the layout tokens switch on `@media (min-width: …)`, then asserts what a
  * person sees: where the toggle sits, whether the sidebar docks or floats,
- * where the surface starts, and how wide the content is. Every expected length
+ * where the page starts, and how wide the content is. Every expected length
  * is read from its token through a probe, never typed in.
  */
 
@@ -47,7 +47,7 @@ const FrameWithSlots = (args) => (
 );
 
 export default {
-    title: 'Foundations/Patterns/Surface container',
+    title: 'Foundations/Patterns/Frame',
     id: 'foundations-patterns-frame',
     component: Frame,
     tags: ['!dev', '!autodocs'],
@@ -176,7 +176,7 @@ export const ColorModes = {
             await expect(frameStyle.color, `${mode}: frame text`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
-                .toBe(computedShadow(canvasElement, SURFACE_EDGE));
+                .toBe(computedShadow(canvasElement, PAGE_EDGE));
             await expect(asideStyle.borderRightStyle, `${mode}: the docked sidebar's divider`).toBe('solid');
             await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--size-element-stroke-sm'), 1);
             await expect(asideStyle.borderRightColor, `${mode}: in the border color`).toBe(tokenColor(canvasElement, '--ds-border'));

@@ -1,8 +1,7 @@
 /**
- * Frame pattern (Patterns/Frame): the app frame.
- * Mirrors the Figma `Pattern/Surface container`, `_Topbar`, `_Sidebar` and
- * `Pattern/Surface`. Every length is a Layout, Surface container or Surface
- * token; the per-breakpoint values come from the tokens' own media queries.
+ * Frame pattern (Patterns/Frame): the app frame, holding the Topbar, the
+ * Sidebar and the page. Every length is a Layout, Frame or Page token; the
+ * per-breakpoint values come from the tokens' own media queries.
  */
 
 @use '../../styles/surface-edge' as *;
@@ -63,8 +62,8 @@
 
 /* ------------------------------------------------------------- footer */
 
-// A row under the surface, padded on the left as the surface row is, so what
-// it holds lines up with the surface.
+// A row under the page, padded on the left as the page row is, so what
+// it holds lines up with the page.
 .plus-frame__footer {
     display: flex;
     flex-shrink: 0;
@@ -92,7 +91,7 @@
 }
 
 // Docked, the sidebar ends in a divider on its right. It sits flush against the
-// surface, so where increased contrast draws the surface edge, that ring lies
+// page, so where increased contrast draws the page's edge, that ring lies
 // over this line rather than beside it: one line, never two.
 .plus-frame__sidebar--docked {
     position: static;
@@ -102,7 +101,7 @@
 }
 
 // Floating: over the page, from the top of the frame, with a shadow and no scrim.
-// The fill and shadow are Figma's Surface roles/surface-overlay pairing. It is on
+// The fill and shadow are the overlay role's fill/shadow pairing. It is on
 // the navigation layer (200), under popups (400) and a modal's scrim (500); the
 // toggle (one above) and the hover edge (one below) sit either side of it.
 .plus-frame__sidebar--floating {
@@ -123,7 +122,7 @@
 }
 
 // The hover strip that peeks a closed sidebar: the frame's left edge beside the
-// surface row. The topbar's corner belongs to the toggle, which peeks on its own,
+// page row. The topbar's corner belongs to the toggle, which peeks on its own,
 // so a pointer resting in the screen's top-left corner opens nothing.
 .plus-frame__edge {
     position: absolute;
@@ -134,7 +133,7 @@
     width: var(--surface-container-pad);
 }
 
-/* ------------------------------------------------------------- surface */
+/* ------------------------------------------------------------- page */
 
 .plus-frame__surface {
     position: relative;
@@ -152,7 +151,7 @@
 }
 
 // The 12-column content grid, capped and centered; never narrower than 720,
-// so a narrow surface scrolls sideways instead.
+// so a narrow page scrolls sideways instead.
 .plus-frame__content {
     display: grid;
     grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
