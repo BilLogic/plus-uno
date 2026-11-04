@@ -94,30 +94,33 @@ export const Button = ({
     /*
      * `Tag === 'button'` gets the real `disabled` attribute, which already
      * blocks clicks and keyboard activation on its own. An anchor has no such
-     * attribute, so it needs the click and the Enter/Space key handled by
-     * hand — the same behavior react-bootstrap's `useButtonProps` gave this
-     * component before the swap.
+     * attribute, so the click and the Enter/Space key are handled by hand —
+     * the same behavior react-bootstrap's `useButtonProps` gave this
+     * component before the swap, including a trivial (`#` or empty) `href`
+     * still swallowing the click rather than letting it navigate nowhere.
      */
+    const handleAnchorClick = (event) => {
+        if (disabled || (Tag === 'a' && isTrivialHref(href))) event.preventDefault();
+        if (disabled) {
+            event.stopPropagation();
+            return;
+        }
+        onClick?.(event);
+    };
+
     const tagProps = Tag === 'button'
-        ? { type, disabled }
+        ? { type, disabled, onClick: !isLoading ? onClick : undefined }
         : {
             role: role ?? 'button',
             tabIndex: disabled ? undefined : 0,
             href: disabled ? undefined : (href || '#'),
             target: Tag === 'a' ? target : undefined,
             rel: Tag === 'a' ? rel : undefined,
-            onClick: (event) => {
-                if (disabled || isTrivialHref(href)) event.preventDefault();
-                if (disabled) {
-                    event.stopPropagation();
-                    return;
-                }
-                onClick?.(event);
-            },
+            onClick: handleAnchorClick,
             onKeyDown: (event) => {
                 if (event.key === ' ') {
                     event.preventDefault();
-                    if (!disabled) onClick?.(event);
+                    handleAnchorClick(event);
                 }
             },
         };
@@ -130,7 +133,6 @@ export const Button = ({
             data-testid={testId}
             {...props}
             {...tagProps}
-            onClick={Tag === 'button' ? (!isLoading ? onClick : undefined) : tagProps.onClick}
             aria-disabled={disabled || undefined}
             aria-busy={isLoading || undefined}
             aria-pressed={isSelected}

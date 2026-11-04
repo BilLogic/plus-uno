@@ -359,3 +359,40 @@ export const KeyboardFocus = {
         await expect(style.backgroundColor, 'no focus fill').toBe('rgba(0, 0, 0, 0)');
     },
 };
+
+/**
+ * `href` renders a real anchor — role="button" by default, Enter and Space
+ * both fire `onClick`, and a disabled anchor drops its `href` so it can't
+ * navigate (no native `disabled` attribute exists for an `<a>`).
+ */
+export const AnchorKeyboard = {
+    parameters: { docs: { disable: true } },
+    render: (args) => {
+        const [clicks, setClicks] = React.useState(0);
+        return (
+            <div style={row}>
+                <Button text="Enabled link" href="https://example.com" onClick={() => setClicks((n) => n + 1)} testId="anchor-enabled" />
+                <Button text="Disabled link" href="https://example.com" isDisabled onClick={() => setClicks((n) => n + 1)} testId="anchor-disabled" />
+                <p data-testid="anchor-clicks">{clicks}</p>
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const link = canvas.getByTestId('anchor-enabled');
+        await expect(link.tagName).toBe('A');
+        await expect(link).toHaveAttribute('role', 'button');
+        await expect(link).toHaveAttribute('href', 'https://example.com');
+
+        link.focus();
+        await expect(link).toHaveFocus();
+        await userEvent.keyboard('{Enter}');
+        await userEvent.keyboard(' ');
+        await waitFor(() => expect(canvas.getByTestId('anchor-clicks').textContent).toBe('2'));
+
+        const disabledLink = canvas.getByTestId('anchor-disabled');
+        await expect(disabledLink).not.toHaveAttribute('href');
+        await expect(disabledLink).toHaveAttribute('aria-disabled', 'true');
+        await expect(disabledLink).not.toHaveAttribute('tabindex');
+    },
+};
