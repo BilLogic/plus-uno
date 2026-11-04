@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { POPOVER_OFFSET, SCREEN_GAP, readPopoverOffset, readScreenGap } from '@/lib/popoverPlacement';
+import { overlayMountOf } from '@/lib/overlay';
 
 /**
  * Where a popup opens against the field that opened it — the placement rule
@@ -55,12 +56,14 @@ export function placePopup({ anchor, width, height, viewport, align = 'left', of
  * A popup is on the popup layer (400), under a modal (510). One opened from a
  * field inside a modal takes the modal's layer instead: it mounts inside the
  * modal's overlay, so it draws above the dialog and stays inside its focus trap.
+ * Resolved through the shared overlay module (`@/lib/overlay`), the one place
+ * this rule is spelled out — `popupMountOf` (Popup) resolves the same rule.
  *
  * @param {{current: Element | null} | undefined} anchorRef the field
  * @returns {Element}
  */
 export function popupLayerOf(anchorRef) {
-    return anchorRef?.current?.closest('.modal') ?? document.body;
+    return overlayMountOf(anchorRef?.current);
 }
 
 const samePlace = (a, b) => Boolean(a && b)

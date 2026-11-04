@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { openOverlayCount, subscribeOverlays } from '@/lib/overlayStack';
+import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
 import Topbar from '../Topbar';
 import { SidebarControlContext } from './SidebarControl';
 import './Frame.scss';
@@ -63,9 +63,9 @@ const useWide = (ref) => {
  * - Hovering the toggle or the left edge peeks a closed sidebar: it floats over
  *   the page with a shadow and no scrim, so the page does not move. An outside
  *   click, Escape, or the pointer leaving closes the peek.
- * - Opening a modal closes a floating sidebar and leaves a docked one alone,
- *   and while a modal is open the sidebar does not peek. The frame hears it
- *   from the document's overlay stack (`@/lib/overlayStack`), so a page does
+ * - Opening a modal (or drawer) closes a floating sidebar and leaves a docked
+ *   one alone, and while one is open the sidebar does not peek. The frame
+ *   hears it from the shared overlay module (`@/lib/overlay`), so a page does
  *   not wire its modals to the frame. A modal opened from inside the floating
  *   sidebar hands focus to the toggle when it closes, since its trigger left
  *   with the sidebar.

@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternDrawer, { DRAWER_PLACEMENTS } from '@/patterns/PatternDrawer';
 import { BLANKET_WIDTHS } from '@/patterns/Blanket';
-import { Button } from '@/components';
+import { Button, Modal } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 
@@ -259,6 +259,69 @@ export const KeyboardAndFocus = {
         await userEvent.click(overlay, { clientX: box.left + 8, clientY: box.top + 8 });
         await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
         await expect(opener, 'a blanket click returns focus too').toHaveFocus();
+    },
+};
+
+/* --------------------------------------------------------- nested overlay */
+
+/**
+ * The drawer takes a stack slot from the shared overlay module (B4),
+ * alongside Modal: a drawer and a confirm raised from it are the same
+ * two-overlay limit, and a third — from either kind — is refused.
+ */
+const WithConfirm = () => {
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [thirdOpen, setThirdOpen] = useState(false);
+
+    return (
+        <>
+            <Button text="Open session details" onClick={() => setDrawerOpen(true)} />
+            <PatternDrawer
+                title="Session details"
+                open={drawerOpen}
+                onClose={() => setDrawerOpen(false)}
+                footer={<Button text="Delete session" appearance="danger" onClick={() => setConfirmOpen(true)} />}
+            >
+                <p style={{ margin: 0 }}>Ana Ruiz · Algebra I.</p>
+            </PatternDrawer>
+            <Modal
+                show={confirmOpen}
+                width="sm"
+                title="Delete this session?"
+                body="This cannot be undone."
+                primaryButton={{ text: 'Open a third', onClick: () => setThirdOpen(true) }}
+                onClose={() => setConfirmOpen(false)}
+            />
+            <Modal
+                show={thirdOpen}
+                width="sm"
+                title="Third"
+                body="At most two stack; this one is refused."
+                onClose={() => setThirdOpen(false)}
+            />
+        </>
+    );
+};
+
+/** A drawer and the confirm it raises share Modal's two-overlay limit: a third, from either kind, is refused. */
+export const DrawerSharesTheTwoOverlayLimit = {
+    render: () => <WithConfirm />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Open session details' }));
+        await waitFor(() => expect(body.queryByRole('dialog', { name: 'Session details' })).not.toBeNull());
+
+        await userEvent.click(body.getByRole('button', { name: 'Delete session' }));
+        await waitFor(() => expect(body.queryByRole('dialog', { name: 'Delete this session?' })).not.toBeNull());
+        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open underneath').not.toBeNull();
+
+        await userEvent.click(body.getByRole('button', { name: 'Open a third' }));
+        await expect(body.queryByRole('dialog', { name: 'Third' }), 'a third overlay is refused, whether raised from a drawer or a modal').toBeNull();
+        await expect(body.queryByRole('dialog', { name: 'Delete this session?' }), 'the confirm stays open').not.toBeNull();
+        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open').not.toBeNull();
     },
 };
 
