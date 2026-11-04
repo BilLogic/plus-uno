@@ -24,21 +24,27 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { pageOutlineFailure, IS_PAGE } from '../.storybook/page-outline.js';
+import { pageOutlineFailure, IS_PAGE, portaledDialogs } from '../.storybook/page-outline.js';
 import { assertRegistered, isPageTitle, metaTitle, isPagePath } from './check-page-outline.mjs';
 
 /**
  * The smallest DOM `pageOutlineFailure` needs: document-ordered headings, each
  * able to say whether it is laid out and whether an `aria-hidden` ancestor
  * covers it.
- * @param {Array<[string, string] | [string, string, {hidden?: boolean, ariaHidden?: boolean}]>} spec
+ * @param {Array<[string, string] | [string, string, {hidden?: boolean, ariaHidden?: boolean, modalInert?: boolean}]>} spec
  */
 function dom(spec) {
   const nodes = spec.map(([tag, text, opts = {}]) => ({
     tagName: tag.toUpperCase(),
     textContent: text,
     getClientRects: () => (opts.hidden ? [] : [{}]),
-    closest: (sel) => (opts.ariaHidden && sel === '[aria-hidden="true"]' ? {} : null),
+    // `modalInert`: hidden by an open modal, which also marks the element
+    // `data-base-ui-inert`, so the selector's `:not(...)` excludes it.
+    closest: (sel) => (
+      opts.ariaHidden && sel.startsWith('[aria-hidden="true"]')
+        && !(opts.modalInert && sel.includes(':not([data-base-ui-inert])'))
+        ? {} : null
+    ),
   }));
   return { querySelectorAll: () => nodes };
 }
@@ -86,6 +92,31 @@ test('an aria-hidden heading is ignored on both sides of the question', () => {
     pageOutlineFailure(dom([['h6', 'Chart', { ariaHidden: true }], ['h1', 'Tutor Performance'], ['h2', 'Overview']])),
     null,
   );
+});
+
+test('a page hidden behind an open modal keeps the outline it was authored with', () => {
+  // A modal dialog hides the page behind it from assistive tech while it is
+  // open. The page story still owns its outline, so that hiding does not count.
+  const behindModal = { ariaHidden: true, modalInert: true };
+  assert.equal(pageOutlineFailure(dom([['h1', 'Sessions', behindModal], ['h2', 'Today', behindModal]])), null);
+  assert.match(pageOutlineFailure(dom([['h3', 'Student', behindModal]])), /renders no <h1>/);
+});
+
+test('a modal dialog portaled outside the canvas is read after the page', () => {
+  // The page itself has no heading; the dialog it raised supplies the h1.
+  assert.equal(pageOutlineFailure(dom([]), [dom([['h1', 'Reflection submitted']])]), null);
+  // And a dialog does not lift a page whose own outline starts too low.
+  assert.match(pageOutlineFailure(dom([['h3', 'Student']]), [dom([['h1', 'Edit']])]), /not the top of its outline/);
+});
+
+test('portaledDialogs takes the open modal dialogs outside the canvas only', () => {
+  const inside = { name: 'inside' };
+  const outside = { name: 'outside' };
+  const canvas = {
+    contains: (el) => el === inside,
+    ownerDocument: { querySelectorAll: () => [inside, outside] },
+  };
+  assert.deepEqual(portaledDialogs(canvas), [outside]);
 });
 
 test('a display:none heading before the h1 is ignored too', () => {

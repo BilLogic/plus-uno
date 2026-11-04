@@ -87,11 +87,31 @@ export const IS_PAGE = (title) =>
  * `heading-order` looking at the same set of elements. A visually-hidden
  * heading (off-screen, clipped) still has a client rect and is still announced,
  * which is exactly what `PageLayout`'s `<h1>` relies on.
+ *
+ * The one `aria-hidden` that does not count is the one an open modal dialog
+ * puts on the page behind it (Base UI marks those elements
+ * `data-base-ui-inert`): that hides the page only while the dialog is open,
+ * and a page story showing a modal still owns the outline it was authored with.
  */
-function exposedHeadings(root) {
-  return Array.from(root.querySelectorAll('h1, h2, h3, h4, h5, h6')).filter(
-    (el) => el.getClientRects().length > 0 && !el.closest('[aria-hidden="true"]'),
+const AUTHORED_ARIA_HIDDEN = '[aria-hidden="true"]:not([data-base-ui-inert])';
+
+function exposedHeadings(roots) {
+  return roots.flatMap((root) => Array.from(root.querySelectorAll('h1, h2, h3, h4, h5, h6'))).filter(
+    (el) => el.getClientRects().length > 0 && !el.closest(AUTHORED_ARIA_HIDDEN),
   );
+}
+
+/**
+ * The open modal dialogs a page story raised outside its canvas. A dialog is
+ * portaled to the body, so it is read after the page, which is where it falls
+ * in the outline a reader meets.
+ * @param {Element} canvasElement
+ * @returns {Element[]}
+ */
+export function portaledDialogs(canvasElement) {
+  const doc = canvasElement.ownerDocument;
+  return Array.from(doc?.querySelectorAll?.('[role="dialog"][aria-modal="true"]') ?? [])
+    .filter((el) => !canvasElement.contains(el));
 }
 
 const describe = (el) => {
@@ -111,11 +131,12 @@ const GUIDANCE =
  * The assertion itself, separated from the annotation so its unit tests can run
  * it over a hand-built DOM. Returns null when the outline is well-formed and a
  * message when it is not.
- * @param {ParentNode} root
+ * @param {ParentNode} root the story canvas
+ * @param {ParentNode[]} [dialogs] open modal dialogs portaled outside it, read after it
  * @returns {string | null}
  */
-export function pageOutlineFailure(root) {
-  const headings = exposedHeadings(root);
+export function pageOutlineFailure(root, dialogs = []) {
+  const headings = exposedHeadings([root, ...dialogs]);
   const firstH1 = headings.findIndex((el) => el.tagName === 'H1');
 
   if (firstH1 === -1) {
@@ -141,7 +162,7 @@ export function pageOutlineFailure(root) {
 export const pageOutlineAnnotations = {
   afterEach(context) {
     if (!IS_PAGE(context?.title) || !context?.canvasElement) return;
-    const failure = pageOutlineFailure(context.canvasElement);
+    const failure = pageOutlineFailure(context.canvasElement, portaledDialogs(context.canvasElement));
     if (failure) {
       throw new Error(`[page-outline] ${context.id}: ${failure}${GUIDANCE}`);
     }

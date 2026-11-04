@@ -1,4 +1,4 @@
-import React, { useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { useId, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import Button from '@/components/forms-and-inputs/Button';
@@ -43,11 +43,13 @@ const resolveModalWidth = (width) => {
 /**
  * True while an element's content is taller than its box.
  * A body that scrolls has to be a tab stop so a keyboard can scroll it.
+ * Takes the element itself, from a callback ref, rather than a ref object:
+ * Base UI's portal mounts the dialog after the first layout pass, so a ref
+ * read then is still empty and would never be measured.
  */
-function useOverflows(ref, show, loading) {
+function useOverflows(el, loading) {
     const [overflows, setOverflows] = useState(false);
     useLayoutEffect(() => {
-        const el = ref.current;
         if (!el) return undefined;
         const measure = () => setOverflows(el.scrollHeight > el.clientHeight);
         measure();
@@ -56,7 +58,7 @@ function useOverflows(ref, show, loading) {
         observer.observe(el);
         if (el.firstElementChild) observer.observe(el.firstElementChild);
         return () => observer.disconnect();
-    }, [ref, show, loading]);
+    }, [el, loading]);
     return overflows;
 }
 
@@ -113,8 +115,7 @@ const Modal = ({
      */
     const titleId = useId();
     const descriptionId = useId();
-    const panelRef = useRef(null);
-    const bodyRef = useRef(null);
+    const [bodyEl, setBodyEl] = useState(null);
 
     const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
@@ -122,7 +123,7 @@ const Modal = ({
     const scrollable = type === 'scrollable';
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
-    const overflows = useOverflows(bodyRef, visible, loading);
+    const overflows = useOverflows(bodyEl, loading);
 
     // Base UI asks before it closes: Escape and a press outside the popup
     // (the blanket) arrive here with their reason, and `keyboard` and
@@ -188,7 +189,6 @@ const Modal = ({
         <HeadingLevelContext.Provider value={1}>
             <Panel
                 id={id}
-                ref={panelRef}
                 className={classes}
                 style={modalStyle}
                 data-testid={dataTestId}
@@ -222,7 +222,7 @@ const Modal = ({
                 )}
 
                 <div
-                    ref={bodyRef}
+                    ref={setBodyEl}
                     className={`plus-modal-body ${scrollable ? 'plus-modal-body-scrollable' : ''}`}
                     aria-busy={loading || undefined}
                     // A scrolling region must itself be reachable by keyboard
