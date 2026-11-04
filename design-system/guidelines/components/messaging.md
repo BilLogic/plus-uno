@@ -37,10 +37,11 @@ the component's own state and the render returns `null` on it, so a dismissed
 alert stays dismissed until it is remounted. Six `style` values: `primary`,
 `secondary`, `success`, `danger`, `warning`, `info`.
 
-**`Flag`** is fully controlled through `show` and `onClose`. `delay` is 5000ms
-and `autohide` is on, and autohide only applies while `delay` is above zero.
-`title` and `children` are both required. `FlagContainer` positions a stack;
-it maps the legacy `top-right`-style positions onto the current ones.
+**`Flag`** is fully controlled through `show` and `onDismiss`. `appearance` is
+`normal`, `information`, `warning`, `error` or `success`; `bold` fills it. `delay`
+is 8000ms and `autohide` is on for the calm appearances, and autohide only applies
+while `delay` is above zero. `title` is required; the description and `actions`
+are optional. `FlagGroup` positions a stack.
 
 **`Modal`** is the only one that interrupts. `keyboard` and `backdrop` both
 default to `true`, so Escape and an outside click close it. Its width system is
@@ -52,9 +53,9 @@ pages, never for a live dialog.
 
 ## Announcement, and why it is easy to overdo
 
-`Alert` renders `role="alert"`. A `danger` or `warning` `Flag` renders
+`Alert` renders `role="alert"`. An `error` or `warning` `Flag` renders
 `role="alert"` with `aria-live="assertive"` and `aria-atomic="true"`; every other
-`Flag` style is `role="status"` with `aria-live="polite"` and waits its turn.
+`Flag` appearance is `role="status"` with `aria-live="polite"` and waits its turn.
 Interrupting is right for something that just went wrong and heavy-handed for
 ambient information — a count, a timestamp, a "3 sessions this week" line is
 better as
@@ -65,11 +66,11 @@ announced at all, so anything rendered on mount has to read correctly as plain
 content too.
 
 Every close control in the group has a hard-coded label: `Close alert` on
-`Alert`, `Close` on `Flag`, `Close modal` on `Modal`. None of them can be
+`Alert`, `Dismiss flag` on `Flag`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
 `Alert` and `Flag` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
-its established label instead, and `Flag` keeps the default "Close".
+its established label instead, and `Flag` is named "Dismiss flag".
 
 ## Related
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
-import { Button, Popup, Flag, FlagContainer, Tooltip } from '@/components';
+import { Button, Popup, Flag, FlagGroup, Tooltip } from '@/components';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 
 /** The popup widths, Popover/width-sm · md · lg. */
@@ -106,22 +106,22 @@ export const Popups = {
 };
 
 const flagKinds = [
-    ['info', 'Heads up'],
+    ['information', 'Heads up'],
     ['success', 'Changes saved'],
     ['warning', 'Check your entries'],
-    ['danger', 'Something went wrong'],
+    ['error', 'Something went wrong'],
 ];
 
 /** Flags: 400 wide, 16 apart. In use they sit bottom-left; the newest is at the bottom. */
 export const Flags = {
     render: () => (
-        <FlagContainer containerPosition="static">
+        <FlagGroup containerPosition="static">
             {flagKinds.map(([style, title]) => (
-                <Flag key={style} style={style} title={title} show autohide={false}>
+                <Flag key={style} appearance={style} title={title} show autohide={false}>
                     One or two sentences on what happened and what to do next.
                 </Flag>
             ))}
-        </FlagContainer>
+        </FlagGroup>
     ),
     play: async ({ canvasElement }) => {
         const flags = canvasElement.querySelectorAll('.plus-flag');

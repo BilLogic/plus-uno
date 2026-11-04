@@ -376,8 +376,8 @@ function modalWidth(span, width, mode) {
 }
 
 test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, their gutters and the modal pad', () => {
-  assert.match(MODAL_SCSS, /\.plus-modal-width-md \{\s*--plus-modal-span: 8;/);
-  assert.match(MODAL_SCSS, /\.plus-modal-width-lg \{\s*--plus-modal-span: 10;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-8-col \{\s*--plus-modal-span: 8;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-10-col \{\s*--plus-modal-span: 10;/);
   const num = (name, mode) => parseFloat(atMode(name, mode));
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const span of [6, 8, 10]) {

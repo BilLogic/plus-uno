@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Flag, { FlagContainer } from './Flag';
+import Flag, { FlagGroup, FLAG_APPEARANCES } from './Flag';
 import Button from '@/components/forms-and-inputs/Button/Button';
 
 export default {
@@ -12,8 +12,9 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-10-25', kind: 'changed', summary: 'The flag moved to the new color tokens: the overlay surface and shadow, whose 1px ring replaces the border, with the role icon colors (info is blue) and color.text and color.text.subtle for the words.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'The flag became the Popover family\'s Flag: one surface 400 wide, padded 16, with the style shown in a 16 icon, the title in heading.xsmall and the × in CloseButton\'s default tone. Success and info close after 8 seconds; warning and danger stay. `FlagContainer` sits bottom-left by default, fixed 8 from the screen edge, with flags 16 apart.' },
+            { date: '2026-11-04', kind: 'changed', summary: 'The flag takes `appearance` (normal, information, warning, error, success), optional `actions` and `bold` in place of the Bootstrap `style`; `onClose` is `onDismiss`, the dismiss button is named "Dismiss flag", and `FlagContainer` is `FlagGroup`.' },
+            { date: '2026-10-25', kind: 'changed', summary: 'The flag moved to the new color tokens: the overlay surface and shadow, whose 1px ring replaces the border, with the role icon colors (information is blue) and color.text and color.text.subtle for the words.' },
+            { date: '2026-10-23', kind: 'changed', summary: 'The flag became the Popover family\'s Flag: one surface 400 wide, padded 16, with the appearance shown in a 16 icon, the title in heading.xsmall and the × in CloseButton\'s default tone. Success and information close after 8 seconds; warning and error stay. `FlagGroup` sits bottom-left by default, fixed 8 from the screen edge, with flags 16 apart.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton in its inverse tone on every header color: a fixed 24×24 box with a 16px × and a visible focus ring.' },
         ],
         docs: {
@@ -25,10 +26,15 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: {
+        appearance: {
             control: 'select',
-            options: ['primary', 'secondary', 'success', 'danger', 'warning', 'info'],
-            description: 'Color style variant',
+            options: FLAG_APPEARANCES,
+            description: 'Normal, information, warning, error or success',
+            table: { category: 'Design' }
+        },
+        bold: {
+            control: 'boolean',
+            description: 'Expand to the appearance\'s bold fill',
             table: { category: 'Design' }
         },
         position: {
@@ -61,7 +67,7 @@ export default {
             control: false,
             table: { disable: true, category: 'Development' }
         },
-        onClose: {
+        onDismiss: {
             table: { disable: true, category: 'Development' }
         }
     }
@@ -69,26 +75,26 @@ export default {
 
 function FlagVariantsDemos() {
     return (
-        <FlagContainer className="p-3" containerPosition="static">
-            <Flag title="Primary Flag" style="primary" timestamp="Just now" autohide={false}>
-                This is a primary flag.
+        <FlagGroup className="p-3" containerPosition="static">
+            <Flag title="Normal flag" timestamp="Just now" autohide={false}>
+                A neutral update.
             </Flag>
-            <Flag title="Secondary Flag" style="secondary" timestamp="Just now" autohide={false}>
-                This is a secondary flag (default).
+            <Flag appearance="information" title="Information flag" timestamp="Just now" autohide={false}>
+                Something worth knowing.
             </Flag>
-            <Flag title="Success Flag" style="success" timestamp="2 mins ago" autohide={false}>
-                Action completed successfully!
+            <Flag appearance="success" title="Success flag" timestamp="2 mins ago" autohide={false}>
+                It worked.
             </Flag>
-            <Flag title="Danger Flag" style="danger" timestamp="10 mins ago">
-                Something went wrong.
+            <Flag appearance="warning" title="Warning flag" actions={[{ text: 'Review' }]}>
+                Check this before you go on.
             </Flag>
-            <Flag title="Warning Flag" style="warning">
-                Please be careful.
+            <Flag appearance="error" title="Error flag" timestamp="10 mins ago" actions={[{ text: 'Retry' }, { text: 'Details' }]}>
+                It did not work.
             </Flag>
-            <Flag title="Info Flag" style="info" autohide={false}>
-                Here is some information.
+            <Flag appearance="success" bold title="Bold flag" autohide={false}>
+                Expanded to the bold fill.
             </Flag>
-        </FlagContainer>
+        </FlagGroup>
     );
 }
 
@@ -99,11 +105,11 @@ export const Styles = () => (
 );
 
 export const Overview = () => (
-    <FlagContainer className="p-3" containerPosition="static">
-        <Flag title="Secondary Flag" style="secondary" timestamp="Just now" autohide={false}>
-            This is a secondary flag (default).
+    <FlagGroup className="p-3" containerPosition="static">
+        <Flag title="Normal flag" timestamp="Just now" autohide={false}>
+            This is a normal flag (default).
         </Flag>
-    </FlagContainer>
+    </FlagGroup>
 );
 Overview.parameters = {
     docs: {
@@ -111,7 +117,7 @@ Overview.parameters = {
     }
 };
 
-const FlagInteractiveWrapper = ({ style, position, title, children, show, autohide, delay }) => {
+const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);
 
     React.useEffect(() => {
@@ -120,19 +126,20 @@ const FlagInteractiveWrapper = ({ style, position, title, children, show, autohi
 
     return (
         <div className="plus-flag-interactive-demo">
-            <FlagContainer position={position} className="p-3">
+            <FlagGroup position={position} className="p-3">
                 <Flag
                     show={isOpen}
-                    onClose={() => setIsOpen(false)}
+                    onDismiss={() => setIsOpen(false)}
                     title={title}
-                    style={style}
+                    appearance={appearance}
+                    bold={bold}
                     timestamp="Just now"
                     delay={delay}
                     autohide={autohide}
                 >
                     {children}
                 </Flag>
-            </FlagContainer>
+            </FlagGroup>
             <div className="plus-flag-interactive-demo__trigger">
                 <Button appearance="primary" text="Trigger Flag" onClick={() => setIsOpen(true)} />
             </div>
@@ -143,7 +150,8 @@ const FlagInteractiveWrapper = ({ style, position, title, children, show, autohi
 export const Interactive = (args) => <FlagInteractiveWrapper {...args} />;
 Interactive.args = {
     show: false,
-    style: 'success',
+    appearance: 'success',
+    bold: false,
     position: 'top-end',
     title: 'Flag Title',
     children: 'This is an interactive flag message.',
@@ -155,15 +163,15 @@ Interactive.parameters = {
     docs: {
         description: {
             story:
-                'Preview keeps the flag centered. In product code, `position` on `FlagContainer` still controls fixed corner placement.',
+                'Preview keeps the flag centered. In product code, `position` on `FlagGroup` still controls fixed corner placement.',
         },
     },
 };
 
-const FLAG_STYLE_LIST = ['primary', 'secondary', 'danger', 'success', 'info', 'warning'];
+const FLAG_STYLE_LIST = FLAG_APPEARANCES;
 
 /**
- * One flag per style, stacked. `flagProps(style)` supplies what
+ * One flag per appearance, stacked. `flagProps(appearance)` supplies what
  * differs per story (test id, visibility, body); `children` follows the stack.
  */
 const FlagPerStyle = ({ flagProps, children }) => (
@@ -171,7 +179,7 @@ const FlagPerStyle = ({ flagProps, children }) => (
         {FLAG_STYLE_LIST.map((style) => (
             <Flag
                 key={style}
-                style={style}
+                appearance={style}
                 title={`${style} flag`}
                 timestamp="Just now"
                 autohide={false}
@@ -187,7 +195,7 @@ const FlagPerStyle = ({ flagProps, children }) => (
  * the flag's surface, so its size and focus ring are CloseButton's own tests;
  * what is tested here is how the flag uses it: the last thing in the row, one
  * Element/inline-lg gap after the content, its × at least 3:1 on the surface.
- * Pressing it calls `onClose`.
+ * Pressing it calls `onDismiss`.
  */
 export const Dismiss = () => {
     const [closed, setClosed] = useState([]);
@@ -195,7 +203,7 @@ export const Dismiss = () => {
         <FlagPerStyle
             flagProps={(style) => ({
                 show: !closed.includes(style),
-                onClose: () => setClosed((list) => [...list, style]),
+                onDismiss: () => setClosed((list) => [...list, style]),
                 'data-testid': `dismiss-${style}`,
                 children: 'Press the × to close it.',
             })}
@@ -211,7 +219,7 @@ Dismiss.play = async ({ canvasElement }) => {
 
     for (const style of FLAG_STYLE_LIST) {
         const flag = canvas.getByTestId(`dismiss-${style}`);
-        const button = within(flag).getByRole('button', { name: 'Close' });
+        const button = within(flag).getByRole('button', { name: 'Dismiss flag' });
         const ground = getComputedStyle(flag).backgroundColor;
 
         // The × closes the row, one inline-lg gap after the content.
@@ -231,17 +239,17 @@ Dismiss.play = async ({ canvasElement }) => {
         button.blur();
     }
 
-    // Dismissal: the button, found by its name, calls onClose.
+    // Dismissal: the button, found by its name, calls onDismiss.
     const warning = canvas.getByTestId('dismiss-warning');
-    await userEvent.click(within(warning).getByRole('button', { name: 'Close' }));
+    await userEvent.click(within(warning).getByRole('button', { name: 'Dismiss flag' }));
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
 };
 
 /**
- * Every flag is the same surface, elevation.surface.overlay; the style shows
- * in its icon alone, drawn in the role's icon color. The title is color.text
- * and the message color.text.subtle on every style.
+ * Every flag is the same surface, elevation.surface.overlay; the appearance
+ * shows in its icon alone, drawn in the role's icon color. The title is color.text
+ * and the message color.text.subtle on every appearance.
  */
 export const FlagContent = () => (
     <FlagPerStyle
@@ -254,11 +262,10 @@ export const FlagContent = () => (
 );
 
 const ICON_COLOR = {
-    primary: '--ds-icon-brand',
-    secondary: '--ds-icon-subtle',
-    danger: '--ds-icon-danger',
+    normal: '--ds-icon-subtle',
+    error: '--ds-icon-danger',
     success: '--ds-icon-success',
-    info: '--ds-icon-information',
+    information: '--ds-icon-information',
     warning: '--ds-icon-warning',
 };
 
@@ -280,17 +287,17 @@ FlagContent.play = async ({ canvasElement }) => {
 };
 
 /**
- * A style outside the list renders as the default, secondary.
+ * An appearance outside the list renders as the default, normal.
  */
-export const UnknownStyle = () => (
-    <Flag style="not-a-style" title="Unknown style" show autohide={false} data-testid="unknown-style">
-        Falls back to secondary.
+export const UnknownAppearance = () => (
+    <Flag appearance="not-an-appearance" title="Unknown appearance" show autohide={false} data-testid="unknown-appearance">
+        Falls back to normal.
     </Flag>
 );
 
-UnknownStyle.play = async ({ canvasElement }) => {
-    const flag = within(canvasElement).getByTestId('unknown-style');
-    await expect(flag).toHaveClass('secondary');
+UnknownAppearance.play = async ({ canvasElement }) => {
+    const flag = within(canvasElement).getByTestId('unknown-appearance');
+    await expect(flag).toHaveClass('plus-flag--normal');
     const icon = flag.querySelector('.plus-flag-icon i');
     await expect(getComputedStyle(icon).color).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
 };

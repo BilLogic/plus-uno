@@ -3,13 +3,13 @@
 
 # Flag
 
-The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon in the style's icon color on the title's first line, the title and its message, and the close button.
+The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon in the appearance's icon color on the title's first line, the title and its optional description, actions, and the dismiss button. `bold` expands the surface to the appearance's bold fill.
 
 **Import:** `import { Flag } from '@/components';`
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownStyle
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownAppearance
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -18,14 +18,17 @@ The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `style` | enum | `'secondary'` | Color style variant |
-| `title` | node (required) | — | — |
-| `children` | node (required) | — | — |
+| `appearance` | enum | `'normal'` | Normal, information, warning, error or success |
+| `title` | node (required) | — | What happened, in a few words. |
+| `children` | node | — | An optional description under the title. |
+| `actions` | arrayOf (required) | — | Link-button actions under the description, in the order given. Avoid more than two. |
+| `bold` | bool | `false` | Expand to the appearance\'s bold fill |
+| `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `dismissible` | bool | `true` | — |
 | `show` | bool | `true` | — |
-| `onClose` | func | — | — |
+| `onDismiss` | func | — | — |
 | `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default. |
-| `autohide` | bool | — | Close itself after `delay`. Defaults to true for success, info, primary and secondary, false for warning and danger. |
+| `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. |
 | `className` | string | `''` | — |
 | `headerClass` | string | `''` | — |
 | `bodyClass` | string | `''` | — |
@@ -33,13 +36,13 @@ The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 
 ## Variants
 
-**`style`** — `secondary` · `success` · `danger` · `warning` · `info` · `primary`
+**`appearance`** — `normal` · `information` · `warning` · `error` · `success`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--size-spacing-medium-space-400` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--size-spacing-medium-space-400` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

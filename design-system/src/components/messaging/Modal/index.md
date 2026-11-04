@@ -37,10 +37,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `primaryButton` | buttonShape | — | — |
 | `secondaryButton` | buttonShape | — | — |
 | `onClose` | func | — | — |
-| `paddingSize` | enum | — | Deprecated: the old Modal/pad- tokens. The modal pads Modal/pad 16. |
-| `gapSize` | enum | — | Deprecated: the old Modal/gap- tokens. The modal stacks Modal/stack-md 16. |
-| `radiusSize` | enum | — | Deprecated: the old Modal/radius- tokens. The modal's radius is Modal/radius 12. |
-| `width` | enum | `'sm'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
+| `width` | enum | `'6-col'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `children` | node | — | — |
@@ -55,19 +52,13 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **`renderAs`** — `modal` · `inline`
 
-**`paddingSize`** — `sm` · `md` · `lg`
-
-**`gapSize`** — `sm` · `md` · `lg`
-
-**`radiusSize`** — `sm` · `md` · `lg`
-
-**`width`** — `sm` · `md` · `lg`
+**`width`** — `6-col` · `8-col` · `10-col`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--content-max-width` · `--content-min-width` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--grid-columns` · `--grid-gutter` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--size-modal-gap-lg` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-lg` · `--size-modal-pad-x-md` · `--size-modal-pad-x-sm` · `--size-modal-pad-y-lg` · `--size-modal-pad-y-md` · `--size-modal-pad-y-sm` · `--size-modal-radius-lg` · `--size-modal-radius-md` · `--size-modal-radius-sm` · `--space-150` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--content-max-width` · `--content-min-width` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--grid-columns` · `--grid-gutter` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--space-150` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

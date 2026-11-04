@@ -5,7 +5,7 @@
  * elevation.shadow.overlay, whose 1px ring is its edge, so no border). Icon,
  * content and close button sit in
  * a row Element/inline-lg 12 apart; the title and its message stack
- * Element/stack-sm 4 apart. The style shows only in the icon's color.
+ * Element/stack-sm 4 apart. The appearance shows in the icon's color; bold fills the surface.
  */
 
 @use '../../../styles/icon-glyph' as *;
@@ -76,7 +76,7 @@
     // colors, so on the flag the glyph and its steps take the flag's own
     // partners and flip with the surface in every mode; the ring is its own.
     // Remove this override when CloseButton moves to the new color tokens.
-    .plus-close-btn {
+    .plus-close-btn:not(.plus-close-btn--inverse) {
         flex-shrink: 0;
         color: var(--ds-icon-subtle);
 
@@ -89,41 +89,123 @@
         }
     }
 
-    // --- STYLE VARIANTS: the icon's color ---
+    // --- ACTIONS: link buttons under the description ---
+    .plus-flag-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--inline-lg);
+        margin-top: var(--stack-sm);
+    }
+
+    .plus-flag-action {
+        padding: 0;
+        border: 0;
+        background: none;
+        font: var(--body-default);
+        font-weight: var(--type-weight-medium);
+        color: var(--ds-text);
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    // --- APPEARANCES: the icon's color ---
     // One block per role, written out: check:text-contrast reads token names
     // from source, so a loop that interpolated the role would hide them.
-    &.danger .plus-flag-icon {
+    &.plus-flag--error .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-danger);
         }
     }
 
-    &.success .plus-flag-icon {
+    &.plus-flag--success .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-success);
         }
     }
 
-    &.warning .plus-flag-icon {
+    &.plus-flag--warning .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-warning);
         }
     }
 
-    &.info .plus-flag-icon {
+    &.plus-flag--information .plus-flag-icon {
         @include icon-glyph {
             // @contrast: non-text
             color: var(--ds-icon-information);
         }
     }
 
-    &.primary .plus-flag-icon {
-        @include icon-glyph {
-            // @contrast: non-text
-            color: var(--ds-icon-brand);
+    // --- BOLD: the appearance's bold fill, with inverse text and icon ---
+    &.plus-flag--bold {
+        .plus-flag-expand {
+            flex-shrink: 0;
+            color: var(--ds-text-inverse);
+        }
+
+        .plus-flag-title,
+        .plus-flag-body,
+        .plus-flag-timestamp,
+        .plus-flag-action {
+            color: var(--ds-text-inverse);
+        }
+
+        .plus-flag-icon {
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--ds-icon-inverse);
+            }
+        }
+    }
+
+    &.plus-flag--bold.plus-flag--normal {
+        background-color: var(--ds-background-neutral-bold);
+    }
+
+    &.plus-flag--bold.plus-flag--information {
+        background-color: var(--ds-background-information-bold);
+    }
+
+    &.plus-flag--bold.plus-flag--success {
+        background-color: var(--ds-background-success-bold);
+    }
+
+    &.plus-flag--bold.plus-flag--error {
+        background-color: var(--ds-background-danger-bold);
+    }
+
+    // Warning's bold fill is light enough to take dark text.
+    &.plus-flag--bold.plus-flag--warning {
+        background-color: var(--ds-background-warning-bold);
+
+        .plus-flag-title,
+        .plus-flag-body,
+        .plus-flag-timestamp,
+        .plus-flag-action {
+            color: var(--ds-text-warning-inverse);
+        }
+
+        .plus-flag-icon {
+            @include icon-glyph {
+                // @contrast: non-text
+                color: var(--ds-icon-warning-inverse);
+            }
+        }
+
+        .plus-flag-expand {
+            color: var(--ds-text-warning-inverse);
+        }
+
+        .plus-close-btn.plus-close-btn--inverse {
+            color: var(--ds-text-warning-inverse);
+
+            .fa-solid {
+                // @contrast: non-text
+                color: var(--ds-icon-warning-inverse);
+            }
         }
     }
 }

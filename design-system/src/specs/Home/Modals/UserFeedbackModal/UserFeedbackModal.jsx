@@ -182,8 +182,6 @@ const UserFeedbackModal = ({
                     id={id}
                     onClose={onClose}
                     showBottomButtons={false}
-                    paddingSize="md"
-                    gapSize="md"
                     width={672}
                     className="plus-user-feedback-modal-shell"
                 >
