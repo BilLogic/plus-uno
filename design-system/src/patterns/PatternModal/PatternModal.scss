@@ -8,6 +8,7 @@
  * Overlay pattern it is placed in.
  */
 @use '../../styles/screen-grid' as *;
+@use '../../styles/state' as *;
 
 .plus-pattern-modal {
     @include screen-grid-width(var(--modal-pad-x-default));
@@ -74,13 +75,13 @@
     color: var(--ds-icon-subtle);
     cursor: pointer;
 
-    &:hover {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:active {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
+    @include plus-state(
+        (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false
+    );
 }
 
 /* Body: takes what the header and footer leave and scrolls past the cap */

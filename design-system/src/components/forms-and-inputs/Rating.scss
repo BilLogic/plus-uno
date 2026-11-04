@@ -1,3 +1,5 @@
+@use '../../styles/state' as *;
+
 /**
  * Rating Component Styles
  * Implements rating component with circular star items
@@ -75,9 +77,13 @@
     }
     
     // Hover state (only when not disabled)
-    &:not(.plus-rating-item-disabled):hover {
-        background-color: var(--ds-background-neutral-hovered);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-hovered)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:not(.plus-rating-item-disabled):hover'
+    );
     
     // Focus state
     &:focus {

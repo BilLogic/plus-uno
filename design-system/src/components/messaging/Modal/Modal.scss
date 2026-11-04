@@ -7,6 +7,7 @@
  * Modal/stack-md 16, radius Modal/radius 12, centered in an overlay that pads
  * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
+@use '../../../styles/state' as *;
 
 .plus-modal {
     /*
@@ -140,14 +141,17 @@
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.plus-modal-close-btn:hover {
-    background-color: var(--ds-background-neutral-subtle-hovered);
-    color: var(--ds-icon);
-}
-
-.plus-modal-close-btn:active {
-    background-color: var(--ds-background-neutral-subtle-pressed);
-    color: var(--ds-icon);
+.plus-modal-close-btn {
+    @include plus-state((
+        hovered: (
+            background-color: var(--ds-background-neutral-subtle-hovered),
+            color: var(--ds-icon),
+        ),
+        pressed: (
+            background-color: var(--ds-background-neutral-subtle-pressed),
+            color: var(--ds-icon),
+        ),
+    ), $ring: false);
 }
 
 .plus-modal-close-btn:focus-visible {

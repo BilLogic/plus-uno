@@ -1,3 +1,5 @@
+@use '../../../styles/state' as *;
+
 /*
  * Button group: a connected row of Button children. The group itself paints
  * nothing — each button keeps its own appearance and spacing — it only
@@ -28,7 +30,13 @@
 
         // A neighbor's edge should never cover another button's focus ring
         // or hover fill.
-        &:hover,
+        @include plus-state(
+            $states: (
+                hovered: (z-index: 1),
+            ),
+            $ring: false
+        );
+
         &:focus-visible {
             z-index: 1;
         }

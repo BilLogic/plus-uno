@@ -5,6 +5,8 @@
  * (`--frame-sidebar-width`, set by the Frame).
  */
 
+@use '../../styles/state' as *;
+
 .plus-pattern-sidebar {
     display: flex;
     flex-direction: column;
@@ -101,25 +103,30 @@
         right: calc(var(--pad-x-xs) + var(--item-height-sm) + var(--inline-sm));
     }
 
-    &:hover,
-    &:focus-within {
-        > .plus-sidebar-tab-item > .plus-sidebar-tab {
-            // The chevron, a gap, and "Close all" (a small button, under 80).
-            padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + 2 * var(--inline-sm) + var(--width-500));
-        }
+    // The chevron, a gap, and "Close all" (a small button, under 80).
+    @include plus-state(
+        (hovered: (padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + 2 * var(--inline-sm) + var(--width-500)))),
+        $ring: false,
+        $hovered-selector: '&:hover > .plus-sidebar-tab-item > .plus-sidebar-tab, &:focus-within > .plus-sidebar-tab-item > .plus-sidebar-tab'
+    );
 
-        .plus-sidebar-tab__after {
-            visibility: hidden;
-        }
+    @include plus-state(
+        (hovered: (visibility: hidden)),
+        $ring: false,
+        $hovered-selector: '&:hover .plus-sidebar-tab__after, &:focus-within .plus-sidebar-tab__after'
+    );
 
-        .plus-sidebar-tab__actions {
-            visibility: visible;
-        }
-    }
+    @include plus-state(
+        (hovered: (visibility: visible)),
+        $ring: false,
+        $hovered-selector: '&:hover .plus-sidebar-tab__actions, &:focus-within .plus-sidebar-tab__actions'
+    );
 
-    &:hover > .plus-sidebar-tab-item > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state(
+        (hovered: (background-color: var(--ds-background-neutral-subtle-hovered))),
+        $ring: false,
+        $hovered-selector: '&:hover > .plus-sidebar-tab-item > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)'
+    );
 }
 
 .plus-pattern-sidebar__chevron {

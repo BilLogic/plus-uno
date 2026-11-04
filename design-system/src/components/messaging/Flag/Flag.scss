@@ -9,6 +9,7 @@
  */
 
 @use '../../../styles/icon-glyph' as *;
+@use '../../../styles/state' as *;
 
 .plus-flag {
     display: flex;
@@ -80,13 +81,10 @@
         flex-shrink: 0;
         color: var(--ds-icon-subtle);
 
-        &:hover {
-            background-color: var(--ds-background-neutral-subtle-hovered);
-        }
-
-        &:active {
-            background-color: var(--ds-background-neutral-subtle-pressed);
-        }
+        @include plus-state((
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ), $ring: false);
     }
 
     // --- ACTIONS: link buttons under the description ---

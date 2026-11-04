@@ -340,12 +340,15 @@ $tag-colors: (
     cursor: pointer;
 }
 
-.plus-tag--link:not(.plus-tag--split):hover .plus-tag__label,
-.plus-tag--link:not(.plus-tag--split):active .plus-tag__label,
-.plus-tag__link:hover .plus-tag__label,
-.plus-tag__link:active .plus-tag__label {
-    text-decoration: underline;
-}
+@include plus-state(
+    $states: (
+        hovered: (text-decoration: underline),
+        pressed: (text-decoration: underline),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-tag--link:not(.plus-tag--split):hover .plus-tag__label, .plus-tag__link:hover .plus-tag__label',
+    $pressed-selector: '.plus-tag--link:not(.plus-tag--split):active .plus-tag__label, .plus-tag__link:active .plus-tag__label'
+);
 
 /* The link half of a link with a separate ×. The outer tag draws the box. */
 .plus-tag__link {
@@ -402,12 +405,11 @@ $tag-colors: (
     line-height: 1;
 }
 
-.plus-tag__remove:hover {
-    background-color: var(--ds-background-neutral-subtle-hovered);
-}
-
-.plus-tag__remove:active {
-    background-color: var(--ds-background-neutral-subtle-pressed);
+.plus-tag__remove {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ), $ring: false);
 }
 
 /* Round on a person tag, as its host is. */
@@ -493,15 +495,29 @@ $tag-colors: (
  * WCAG exempts from text contrast. opacity.disabled is for images only, so a
  * photo avatar stays whole. A selected tag keeps a border.bold edge, so the
  * choice still shows.
+ *
+ * The same declarations repeat under hover and press because the hovered and
+ * pressed rules above outrank a bare `.plus-tag--disabled`. The mixin's own
+ * `disabled` state is not used: it would turn pointer events off and the
+ * cursor to not-allowed.
  */
-.plus-tag--disabled,
-.plus-tag--disabled:hover,
-.plus-tag--disabled:active {
-    border-color: transparent;
-    background-color: var(--ds-background-disabled);
-    color: var(--ds-text-disabled);
-    cursor: default;
+$tag-disabled: (
+    border-color: transparent,
+    background-color: var(--ds-background-disabled),
+    color: var(--ds-text-disabled),
+    cursor: default,
+);
+
+.plus-tag--disabled {
+    @include plus-state-apply($tag-disabled);
 }
+
+@include plus-state(
+    $states: (hovered: $tag-disabled, pressed: $tag-disabled),
+    $ring: false,
+    $hovered-selector: '.plus-tag--disabled:hover',
+    $pressed-selector: '.plus-tag--disabled:active'
+);
 
 .plus-tag--disabled .plus-tag__swatch {
     background-color: var(--ds-icon-disabled);
@@ -541,13 +557,22 @@ $tag-colors: (
  * solid ground, since the translucent disabled fill would sink into the image,
  * and takes only the disabled text and swatch.
  */
-.plus-tag--elevated,
-.plus-tag--elevated.plus-tag--disabled:hover,
-.plus-tag--elevated.plus-tag--disabled:active {
-    border-color: transparent;
-    background-color: var(--ds-surface-overlay);
-    box-shadow: var(--ds-shadow-overlay);
+$tag-elevated: (
+    border-color: transparent,
+    background-color: var(--ds-surface-overlay),
+    box-shadow: var(--ds-shadow-overlay),
+);
+
+.plus-tag--elevated {
+    @include plus-state-apply($tag-elevated);
 }
+
+@include plus-state(
+    $states: (hovered: $tag-elevated, pressed: $tag-elevated),
+    $ring: false,
+    $hovered-selector: '.plus-tag--elevated.plus-tag--disabled:hover',
+    $pressed-selector: '.plus-tag--elevated.plus-tag--disabled:active'
+);
 
 /*
  * A link's hover and press lay the neutral subtle hovered and pressed steps
@@ -555,23 +580,27 @@ $tag-colors: (
  * swapping the fill for the hue's tint. A one-color gradient is how CSS stacks
  * a second fill.
  */
-.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):hover,
-.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:hover) {
-    background-color: var(--ds-surface-overlay);
-    background-image: linear-gradient(
-        var(--ds-background-neutral-subtle-hovered),
-        var(--ds-background-neutral-subtle-hovered)
-    );
-}
-
-.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):active,
-.plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:active) {
-    background-color: var(--ds-surface-overlay);
-    background-image: linear-gradient(
-        var(--ds-background-neutral-subtle-pressed),
-        var(--ds-background-neutral-subtle-pressed)
-    );
-}
+@include plus-state(
+    $states: (
+        hovered: (
+            background-color: var(--ds-surface-overlay),
+            background-image: linear-gradient(
+                var(--ds-background-neutral-subtle-hovered),
+                var(--ds-background-neutral-subtle-hovered)
+            ),
+        ),
+        pressed: (
+            background-color: var(--ds-surface-overlay),
+            background-image: linear-gradient(
+                var(--ds-background-neutral-subtle-pressed),
+                var(--ds-background-neutral-subtle-pressed)
+            ),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):hover, .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:hover)',
+    $pressed-selector: '.plus-tag--elevated.plus-tag--link:not(.plus-tag--split):active, .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:active)'
+);
 
 /*
  * Focus: the standard ring 2px outside the tag, with the 2px between them

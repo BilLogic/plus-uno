@@ -2,6 +2,7 @@
 @use '../../../tokens/fonts' as *;
 @use '../../../tokens/spacing_semantics' as *;
 @use '../../../tokens/elevation' as *;
+@use '../../../styles/state' as *;
 
 .plus-session-snackbar {
     display: flex;
@@ -73,9 +74,12 @@
         display: flex;
         align-items: center;
 
-        &:hover {
-            opacity: 1;
-        }
+        @include plus-state(
+            $states: (
+                hovered: (opacity: 1),
+            ),
+            $ring: false
+        );
     }
 
     &__body {
@@ -94,9 +98,11 @@
         text-decoration: underline;
         color: inherit; // Keep text color but underline/bold
 
-        &:hover {
-            color: inherit;
-            text-decoration: none;
-        }
+        @include plus-state(
+            $states: (
+                hovered: (color: inherit, text-decoration: none),
+            ),
+            $ring: false
+        );
     }
 }

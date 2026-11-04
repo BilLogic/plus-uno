@@ -4,6 +4,7 @@
  * list order alone carries the sequence). `spacing` sets the gap between
  * items in either orientation.
  */
+@use '../../../styles/state' as *;
 
 .plus-progress-tracker__list {
     display: flex;
@@ -67,18 +68,15 @@
 a.plus-progress-tracker__item,
 button.plus-progress-tracker__item {
     cursor: pointer;
-}
 
-a.plus-progress-tracker__item:hover,
-button.plus-progress-tracker__item:hover {
-    background-color: var(--ds-background-neutral-subtle-hovered);
-    color: var(--ds-text-subtle);
-    text-decoration: none;
-}
-
-a.plus-progress-tracker__item:active,
-button.plus-progress-tracker__item:active {
-    background-color: var(--ds-background-neutral-subtle-pressed);
+    @include plus-state((
+        hovered: (
+            background-color: var(--ds-background-neutral-subtle-hovered),
+            color: var(--ds-text-subtle),
+            text-decoration: none,
+        ),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ), $ring: false);
 }
 
 a.plus-progress-tracker__item:focus-visible,

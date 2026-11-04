@@ -2,6 +2,7 @@
  * UserAvatar: an initial pill, the name, the role indicator and a counter.
  * `md` is the 32 topbar size; `lg` keeps the original padded table row.
  */
+@use '../../../styles/state' as *;
 
 .plus-user-avatar {
     display: flex;
@@ -17,10 +18,13 @@
     color: var(--ds-text);
     transition: background-color 0.15s ease;
 
-    &:hover,
-    &--hover {
-        background-color: var(--ds-interaction-hovered);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-interaction-hovered)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover, &--hover'
+    );
 
     &--clickable {
         cursor: pointer;

@@ -161,7 +161,9 @@
 @mixin plus-ring(
     $ring-offset: var(--focus-ring-width), /* see plus-state's own $ring-offset, above */
     $ring-token: --ds-border-focused,
-    $important: false
+    $important: false,
+    $ring-width: $ring-offset,
+    $ring-style: solid
 ) {
     $bang: null;
     @if $important {
@@ -170,9 +172,13 @@
     // A token name (`--ds-*`) is wrapped in `var()`; a bare keyword
     // (`Highlight`, forced-colors' own system color) is used as given.
     $color: if(string.slice($ring-token, 1, 2) == '--', var(#{$ring-token}), $ring-token);
-    outline: $ring-offset solid $color #{$bang};
+    outline: $ring-width $ring-style $color #{$bang};
     outline-offset: $ring-offset;
 }
+
+// `$ring-width` and `$ring-style` split the outline's thickness and line from
+// its offset, for a ring drawn inside the edge (a negative `$ring-offset`, which
+// is not a valid width) or a dashed range mark.
 
 // Resets the browser's own `:focus` outline with no ring of its own — for an
 // element whose ring is drawn elsewhere (Field draws the ring; its nested
