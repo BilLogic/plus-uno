@@ -75,11 +75,11 @@ ScaleStartsUnanswered.play = async ({ canvasElement }) => {
 
     await expect(radios).toHaveLength(3);
     // The discriminator: the first radio used to arrive checked.
-    await expect(radios.filter((radio) => radio.checked)).toHaveLength(0);
+    await expect(radios.filter((radio) => radio.nextElementSibling.checked)).toHaveLength(0);
 
     // And it still answers when asked to.
     await userEvent.click(radios[1]);
-    await expect(radios[1].checked).toBe(true);
+    await expect(radios[1].nextElementSibling.checked).toBe(true);
 };
 
 /**
@@ -108,8 +108,8 @@ ScaleAcceptsAFalsyDefault.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('radiogroup', { name: /Score/ });
     const radios = within(group).getAllByRole('radio');
-    await expect(radios[0].checked).toBe(false);
-    await expect(radios[1].checked).toBe(true);
+    await expect(radios[0].nextElementSibling.checked).toBe(false);
+    await expect(radios[1].nextElementSibling.checked).toBe(true);
 };
 
 /**
@@ -159,5 +159,5 @@ ChoiceGridDoesNotMutateItsInput.play = async ({ canvasElement }) => {
     await expect(before).toBe(snapshot);
 
     // And the change did land.
-    await expect(disagree.checked).toBe(true);
+    await expect(disagree.nextElementSibling.checked).toBe(true);
 };

@@ -359,3 +359,58 @@ export const KeyboardFocus = {
         await expect(style.backgroundColor, 'no focus fill').toBe('rgba(0, 0, 0, 0)');
     },
 };
+
+/**
+ * `href` renders a real anchor — role="button" by default, Enter and Space
+ * both fire `onClick`, and a disabled anchor drops its `href` so it can't
+ * navigate (no native `disabled` attribute exists for an `<a>`).
+ */
+export const AnchorKeyboard = {
+    parameters: { docs: { disable: true } },
+    render: (args) => {
+        const [clicks, setClicks] = React.useState(0);
+        return (
+            <div style={row}>
+                {/*
+                 * A trivial `#` href, not a real destination: Enter and
+                 * Space both fire a real browser navigation on a focused
+                 * anchor unless the click is swallowed, and only a trivial
+                 * href is swallowed (see Button.jsx's `isTrivialHref`) — a
+                 * real `href` navigating away mid-test would crash the
+                 * browser context this play function runs in.
+                 */}
+                <Button text="Enabled link" href="#" onClick={() => setClicks((n) => n + 1)} testId="anchor-enabled" />
+                <Button text="Disabled link" href="https://example.com" isDisabled onClick={() => setClicks((n) => n + 1)} testId="anchor-disabled" />
+                <p data-testid="anchor-clicks">{clicks}</p>
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const link = canvas.getByTestId('anchor-enabled');
+        await expect(link.tagName).toBe('A');
+        await expect(link).toHaveAttribute('role', 'button');
+
+        link.focus();
+        await expect(link).toHaveFocus();
+        await userEvent.keyboard('{Enter}');
+        await userEvent.keyboard(' ');
+        await waitFor(() => expect(canvas.getByTestId('anchor-clicks').textContent).toBe('2'));
+
+        const disabledLink = canvas.getByTestId('anchor-disabled');
+        await expect(disabledLink).not.toHaveAttribute('href');
+        await expect(disabledLink).toHaveAttribute('aria-disabled', 'true');
+        await expect(disabledLink).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** A real `href` renders on the anchor untouched — only ever exercised by attribute, never activated (a real destination navigating away would crash the test's browser context). */
+export const AnchorHref = () => (
+    <Button text="Open schedule" href="https://example.com/schedule" testId="anchor-href" />
+);
+AnchorHref.parameters = { docs: { disable: true } };
+AnchorHref.play = async ({ canvasElement }) => {
+    const link = within(canvasElement).getByTestId('anchor-href');
+    await expect(link.tagName).toBe('A');
+    await expect(link).toHaveAttribute('href', 'https://example.com/schedule');
+};

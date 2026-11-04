@@ -2,7 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './Button.scss';
-import RBButton from 'react-bootstrap/Button';
+
+/** A bare `#` or empty `href` names no real destination; Enter still needs one to fire a click on an anchor. */
+const isTrivialHref = (href) => !href || href.trim() === '#';
 
 export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'];
 export const BUTTON_SPACINGS = ['default', 'compact'];
@@ -65,8 +67,13 @@ export const Button = ({
 
     id,
     testId,
+    href,
+    target,
+    rel,
+    role,
     ...props
 }) => {
+    const disabled = isDisabled || isLoading;
     const iconOnly = !text && !children;
 
     const btnClasses = classNames(
@@ -82,26 +89,58 @@ export const Button = ({
         className
     );
 
+    const Tag = Component || (href != null || target != null || rel != null ? 'a' : 'button');
+
+    /*
+     * `Tag === 'button'` gets the real `disabled` attribute, which already
+     * blocks clicks and keyboard activation on its own. An anchor has no such
+     * attribute, so the click and the Enter/Space key are handled by hand —
+     * the same behavior react-bootstrap's `useButtonProps` gave this
+     * component before the swap, including a trivial (`#` or empty) `href`
+     * still swallowing the click rather than letting it navigate nowhere.
+     */
+    const handleAnchorClick = (event) => {
+        if (disabled || (Tag === 'a' && isTrivialHref(href))) event.preventDefault();
+        if (disabled) {
+            event.stopPropagation();
+            return;
+        }
+        onClick?.(event);
+    };
+
+    const tagProps = Tag === 'button'
+        ? { type, disabled, onClick: !isLoading ? onClick : undefined }
+        : {
+            role: role ?? 'button',
+            tabIndex: disabled ? undefined : 0,
+            href: disabled ? undefined : (href || '#'),
+            target: Tag === 'a' ? target : undefined,
+            rel: Tag === 'a' ? rel : undefined,
+            onClick: handleAnchorClick,
+            onKeyDown: (event) => {
+                if (event.key === ' ') {
+                    event.preventDefault();
+                    handleAnchorClick(event);
+                }
+            },
+        };
+
     return (
-        <RBButton
+        <Tag
             id={id}
-            as={Component}
-            variant=""
-            type={type}
             className={btnClasses}
-            onClick={!isLoading ? onClick : undefined}
-            disabled={isDisabled || isLoading}
-            aria-disabled={isDisabled || isLoading}
-            aria-busy={isLoading || undefined}
-            aria-pressed={isSelected}
             title={title}
             data-testid={testId}
             {...props}
+            {...tagProps}
+            aria-disabled={disabled || undefined}
+            aria-busy={isLoading || undefined}
+            aria-pressed={isSelected}
         >
             <ButtonContent text={text} iconBefore={iconBefore} iconAfter={iconAfter}>
                 {children}
             </ButtonContent>
-        </RBButton>
+        </Tag>
     );
 };
 
@@ -125,6 +164,12 @@ Button.propTypes = {
     isLoading: PropTypes.bool,
     type: PropTypes.string,
     as: PropTypes.elementType,
+    /** Renders as an anchor when set (and no `as` overrides it). */
+    href: PropTypes.string,
+    target: PropTypes.string,
+    rel: PropTypes.string,
+    /** Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). */
+    role: PropTypes.string,
 
     // Icons: a Font Awesome Free glyph name (`plus`) or a node.
     iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),

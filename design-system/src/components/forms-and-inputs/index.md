@@ -7,7 +7,7 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 17 | ✕ | ✕ | ✅ |
+| [Button](Button/index.md) | 21 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
@@ -27,7 +27,7 @@ authored half (#166), counted rather than assumed.
 | [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✕ | ✕ | ✕ |
-| [Radio](Radio.md) | 19 | ✅ | ✕ | ✅ |
+| [Radio](Radio.md) | 20 | ✅ | ✕ | ✅ |
 | [RadioGroup](RadioGroup.md) | 19 | ✕ | ✕ | ✕ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |

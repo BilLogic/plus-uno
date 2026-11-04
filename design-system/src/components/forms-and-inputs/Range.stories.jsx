@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { expect, fireEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Range from './Range';
 
@@ -180,4 +180,49 @@ ReportsNumber.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     fireEvent.change(canvas.getByRole('slider', { name: 'Reported' }), { target: { value: '72' } });
     await waitFor(() => expect(canvas.getByTestId('range-seen').textContent).toBe('number:72:change'));
+};
+
+/** The thumb reports its span and its value through ARIA, independent of what is on screen. */
+export const Aria = () => (
+    <div style={{ maxWidth: '600px' }}>
+        <Range id="range-aria" label="Volume" min={10} max={90} defaultValue={40} />
+    </div>
+);
+Aria.parameters = { docs: { disable: true } };
+Aria.play = async ({ canvasElement }) => {
+    const slider = within(canvasElement).getByRole('slider', { name: 'Volume' });
+    // The native `min`/`max` on the real input give the browser's accessibility
+    // tree `aria-valuemin`/`aria-valuemax` on their own; `aria-valuenow` is the
+    // one value Base UI sets explicitly, since it changes as the thumb moves.
+    await expect(slider).toHaveAttribute('min', '10');
+    await expect(slider).toHaveAttribute('max', '90');
+    await expect(slider).toHaveAttribute('aria-valuenow', '40');
+};
+
+/** Arrow keys step the value; Home and End jump to the span's ends. */
+export const Keyboard = () => {
+    const [value, setValue] = useState(50);
+    return (
+        <div style={{ maxWidth: '600px' }}>
+            <Range id="range-keyboard" label="Keyboard" value={value} onChange={setValue} />
+        </div>
+    );
+};
+Keyboard.parameters = { docs: { disable: true } };
+Keyboard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const slider = canvas.getByRole('slider', { name: 'Keyboard' });
+
+    slider.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await waitFor(() => expect(slider).toHaveAttribute('aria-valuenow', '51'));
+
+    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await waitFor(() => expect(slider).toHaveAttribute('aria-valuenow', '49'));
+
+    await userEvent.keyboard('{End}');
+    await waitFor(() => expect(slider).toHaveAttribute('aria-valuenow', '100'));
+
+    await userEvent.keyboard('{Home}');
+    await waitFor(() => expect(slider).toHaveAttribute('aria-valuenow', '0'));
 };

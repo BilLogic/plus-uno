@@ -1,13 +1,19 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import useFieldId from './useFieldId';
-import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
+import { choiceClasses } from './choiceItem';
+import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from './_internal/FieldFrame';
 import './Checkbox.scss';
 
 /**
  * Checkbox — single boolean control with optional indeterminate state.
  * Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
+ *
+ * Built on Base UI's Checkbox: a `role="checkbox"` span with a hidden native
+ * input beside it for form submission, wrapped in `FieldFrame` (A7) for the
+ * label and the description caption. `isInvalid` marks the unselected box
+ * only, through `data-invalid` scoped off `data-checked` in the stylesheet.
  */
 const Checkbox = ({
     id,
@@ -39,82 +45,59 @@ const Checkbox = ({
     testId,
     ...props
 }) => {
-    const wrapperRef = useRef(null);
-    const inputRef = useRef(null);
-    const isControlled = isChecked !== undefined;
-    /**
-     * `Form.Check` gives its label a `for` from the id it is handed, so an id of
-     * `undefined` produced a label that named nothing — the same defect #206
-     * fixed on the eight components that wrote `htmlFor={id || name}`, arriving
-     * here through the id instead of through the `for`. `useFieldId` supplies
-     * one when the caller gave none; a caller who passes `id` gets that id back.
-     * `name` is a form key, not an id, so it no longer stands in for one (#213).
-     */
     const fieldId = useFieldId(id);
-
-    // Callback ref to get the actual input element from Form.Check
-    const setInputRef = useCallback((node) => {
-        if (node) {
-            const input = node.querySelector('input[type="checkbox"]');
-            if (input) {
-                inputRef.current = input;
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        if (inputRef.current) {
-            inputRef.current.indeterminate = isIndeterminate;
-        }
-    }, [isIndeterminate]);
-
+    const isControlled = isChecked !== undefined;
+    const tone = isInvalid ? 'invalid' : undefined;
+    const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
-    const { descriptionId, inputProps } = choiceInputProps({
-        fieldId, description, readOnly: isReadOnly, onChange, onClick, describedBy,
+    const { messageId, describedBy: computedDescribedBy } = fieldDescription({
+        fieldId, message: description, describedBy,
     });
+
+    const handleCheckedChange = (checked) => {
+        onChange?.({ target: { name, value, checked } });
+    };
 
     const wrapperClasses = [
         'plus-form-checkbox-wrapper',
         isIndeterminate ? 'plus-form-checkbox-indeterminate' : '',
-        isDisabled ? 'plus-form-checkbox-disabled' : '',
         isRequired ? 'plus-form-checkbox-required' : '',
         isInvalid ? 'plus-form-checkbox-invalid' : '',
-        choiceClasses({ appearance, readOnly: isReadOnly, description }),
-        className
+        choiceClasses({ appearance, readOnly: isReadOnly }),
+        className,
     ].filter(Boolean).join(' ');
 
-    const labelContent = isRequired && label ? (
-        <>
-            {label}
-            <span className="plus-form-checkbox-required-asterisk" aria-label="required">*</span>
-        </>
-    ) : label;
-
     return (
-        <div className={wrapperClasses} style={style} ref={wrapperRef}>
-            <div ref={setInputRef}>
-                <Form.Check
-                    type="checkbox"
+        <FieldFrame disabled={isDisabled} invalid={isInvalid} className={wrapperClasses} style={style}>
+            <div className="plus-form-checkbox-row">
+                <BaseCheckbox.Root
                     id={fieldId}
                     name={name}
                     value={value}
                     checked={isControlled ? isChecked : undefined}
                     defaultChecked={!isControlled ? defaultChecked : undefined}
                     disabled={isDisabled}
+                    readOnly={isReadOnly}
                     required={isRequired}
+                    indeterminate={isIndeterminate}
+                    onCheckedChange={handleCheckedChange}
                     onFocus={onFocus}
                     onBlur={onBlur}
-                    label={labelContent}
+                    onClick={onClick}
                     className="plus-form-checkbox"
-                    {...inputRest}
-                    {...inputProps}
-                    aria-readonly={isReadOnly || undefined}
-                    aria-invalid={isInvalid || undefined}
+                    aria-describedby={computedDescribedBy}
                     data-testid={testId}
-                />
+                    {...control}
+                    {...inputRest}
+                >
+                    <BaseCheckbox.Indicator keepMounted className="plus-form-checkbox-indicator" />
+                </BaseCheckbox.Root>
+                <FieldLabel htmlFor={fieldId} required={isRequired} name={name} className="plus-form-checkbox-label">
+                    {label}
+                </FieldLabel>
             </div>
-            <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
-        </div>
+            <FieldCaption messageId={messageId} message={description} tone={tone ?? 'help'} />
+        </FieldFrame>
     );
 };
 
@@ -143,6 +126,3 @@ Checkbox.propTypes = {
 };
 
 export default Checkbox;
-
-
-

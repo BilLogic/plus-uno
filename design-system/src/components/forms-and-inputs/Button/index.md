@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -30,6 +30,10 @@
 | `isLoading` | bool | `false` | Show a spinner in place of the label and block interaction |
 | `type` | string | `'button'` | — |
 | `as` | elementType | — | — |
+| `href` | string | — | Renders as an anchor when set (and no `as` overrides it). |
+| `target` | string | — | — |
+| `rel` | string | — | — |
+| `role` | string | — | Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). |
 | `iconBefore` | string or node | — | Font Awesome glyph before the label |
 | `iconAfter` | string or node | — | Font Awesome glyph after the label |
 | `id` | string | — | — |

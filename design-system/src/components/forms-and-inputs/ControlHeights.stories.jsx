@@ -130,14 +130,14 @@ export const ChoiceRows = () => (
 
 ChoiceRows.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const [role, name] of [
-        ['checkbox', 'Checkbox'],
-        ['radio', 'Radio'],
+    for (const [role, name, rowClass, labelClass] of [
+        ['checkbox', 'Checkbox', '.plus-form-checkbox-row', '.plus-form-checkbox-label'],
+        ['radio', 'Radio', '.plus-form-radio-row', '.plus-form-radio-label'],
     ]) {
         const input = canvas.getByRole(role, { name });
-        const line = input.closest('.form-check');
+        const line = input.closest(rowClass);
         await expect(heightOf(line), `${name} row`).toBe(24);
-        await expectLabel(line.querySelector('.form-check-label'), name, '400');
+        await expectLabel(line.querySelector(labelClass), name, '400');
     }
     for (const name of ['Toggle 16', 'Toggle 20']) {
         const toggle = canvas.getByRole('switch', { name });
@@ -161,7 +161,10 @@ Ranges.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const slider = canvas.getByRole('slider', { name: 'Range' });
     await expect(heightOf(slider), 'slider').toBe(32);
-    await expectLabel(canvasElement.querySelector(`label[for="${slider.id}"]`), 'range label', '400');
+    // Range names its slider through `aria-labelledby`, not a native
+    // `label[for]` — Base UI's Slider has no DOM-query label lookup the way
+    // Checkbox and Radio do (see Range.jsx).
+    await expectLabel(canvasElement.querySelector('.plus-field-label'), 'range label', '400');
 };
 
 /** Rating items are 32 with a 16 star. */

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import Checkbox from './Checkbox';
 import Radio from './Radio';
 import useFieldId from './useFieldId';
@@ -97,38 +98,70 @@ const ChoiceGrid = ({
                     {rows.map((row) => {
                         const rowLabelId = `${baseId}-row-${row.id}-label`;
 
+                        const cells = columns.map((column) => {
+                            const checked = isChecked(row.id, column.id);
+                            const inputId = `${baseId}-${row.id}-${column.id}`;
+                            const inputName = type === 'radio' ? `${baseId}-${row.id}` : inputId;
+                            const columnHeaderId = `${baseId}-col-${column.id}`;
+                            const Control = type === 'radio' ? Radio : Checkbox;
+
+                            return (
+                                <td key={column.id} className="plus-choice-grid-cell">
+                                    <Control
+                                        id={inputId}
+                                        name={inputName}
+                                        value={column.id}
+                                        grouped={type === 'radio' ? true : undefined}
+                                        isChecked={type === 'radio' ? undefined : checked}
+                                        isDisabled={isDisabled}
+                                        isReadOnly={isReadOnly}
+                                        className="plus-choice-grid-control"
+                                        aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
+                                        onChange={type === 'radio' ? undefined : (e) => handleChange(
+                                            row.id,
+                                            column.id,
+                                            e.target.checked,
+                                        )}
+                                    />
+                                </td>
+                            );
+                        });
+
+                        const rowLabelCell = (
+                            <td id={rowLabelId} className="plus-choice-grid-row-label">
+                                {row.label}
+                            </td>
+                        );
+
+                        // A radio row shares one real Base UI RadioGroup, rendered
+                        // as the `<tr>` itself (`render`) — Base UI's roving
+                        // tabindex needs one real ancestor to coordinate across,
+                        // which a `<td>`-per-cell row cannot give it any other
+                        // way without breaking valid table markup. A checkbox
+                        // row has no such ancestor requirement (#325 — no
+                        // Base UI CheckboxGroup exists, and none is needed: each
+                        // box answers independently).
+                        if (type === 'radio') {
+                            return (
+                                <BaseRadioGroup
+                                    key={row.id}
+                                    name={`${baseId}-${row.id}`}
+                                    value={values[row.id]}
+                                    onValueChange={(columnId) => handleChange(row.id, columnId, true)}
+                                    disabled={isDisabled}
+                                    readOnly={isReadOnly}
+                                    render={<tr className="plus-choice-grid-row" />}
+                                >
+                                    {rowLabelCell}
+                                    {cells}
+                                </BaseRadioGroup>
+                            );
+                        }
+
                         return (
                             <tr key={row.id} className="plus-choice-grid-row">
-                                <td id={rowLabelId} className="plus-choice-grid-row-label">
-                                    {row.label}
-                                </td>
-                                {columns.map((column) => {
-                                    const checked = isChecked(row.id, column.id);
-                                    const inputId = `${baseId}-${row.id}-${column.id}`;
-                                    const inputName = type === 'radio' ? `${baseId}-${row.id}` : inputId;
-                                    const columnHeaderId = `${baseId}-col-${column.id}`;
-                                    const Control = type === 'radio' ? Radio : Checkbox;
-
-                                    return (
-                                        <td key={column.id} className="plus-choice-grid-cell">
-                                            <Control
-                                                id={inputId}
-                                                name={inputName}
-                                                value={column.id}
-                                                isChecked={checked}
-                                                isDisabled={isDisabled}
-                                                isReadOnly={isReadOnly}
-                                                className="plus-choice-grid-control"
-                                                aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
-                                                onChange={(e) => handleChange(
-                                                    row.id,
-                                                    column.id,
-                                                    type === 'radio' ? true : e.target.checked,
-                                                )}
-                                            />
-                                        </td>
-                                    );
-                                })}
+                                {rowLabelCell}
+                                {cells}
                             </tr>
                         );
                     })}

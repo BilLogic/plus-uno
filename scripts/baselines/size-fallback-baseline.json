@@ -24,7 +24,6 @@
     "--size-element-pad-y-md 12px",
     "--size-element-pad-y-md 8px",
     "--size-element-pad-y-sm 8px",
-    "--size-element-radius-full 50%",
     "--size-element-radius-md 8px",
     "--size-element-radius-sm 2px",
     "--size-element-stroke-md 2px",

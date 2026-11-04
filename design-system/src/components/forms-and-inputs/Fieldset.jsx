@@ -43,7 +43,7 @@ const Fieldset = ({
             {...props}
         >
             {legend && (
-                <BaseFieldset.Legend className="plus-fieldset-legend">
+                <BaseFieldset.Legend id={`${fieldId}-legend`} className="plus-fieldset-legend">
                     {legend}
                     {isRequired && (
                         <>

@@ -83,23 +83,53 @@ Overview.parameters = {
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // The question names the answers: a group whose name is the legend.
+    // The question names the answers: a group whose name is the legend, on
+    // the real Base UI radiogroup nested inside the Fieldset.
     const group = canvas.getByRole('radiogroup', { name: 'Which subject did you tutor?' });
-    await expect(group.tagName).toBe('FIELDSET');
+    await expect(group.closest('fieldset')).toBeTruthy();
 
     // Unanswered until someone answers.
     const radios = within(group).getAllByRole('radio');
     await expect(radios).toHaveLength(3);
-    await expect(radios.some((r) => r.checked)).toBe(false);
+    await expect(radios.some((r) => r.nextElementSibling.checked)).toBe(false);
 
-    // One name for the set, one id per option.
-    const names = new Set(radios.map((r) => r.name));
+    // One name for the set, one id per option. Base UI's accessible role
+    // lives on a span; the shared `name` and `checked` state live on the
+    // hidden native input rendered right beside it.
+    const names = new Set(radios.map((r) => r.nextElementSibling.name));
     await expect(names.size).toBe(1);
     await expect(new Set(radios.map((r) => r.id)).size).toBe(3);
 
     await userEvent.click(canvas.getByRole('radio', { name: 'Reading' }));
-    await expect(canvas.getByRole('radio', { name: 'Reading' }).checked).toBe(true);
+    await expect(canvas.getByRole('radio', { name: 'Reading' }).nextElementSibling.checked).toBe(true);
     await expect(canvas.getByTestId('rg-overview-value').textContent).toBe('Answer: reading');
+};
+
+/** Arrow keys move the roving tab stop across options and answer as they go, the Base UI radiogroup's own keyboard contract. */
+export const Keyboard = () => (
+    <RadioGroup id="rg-keyboard" name="rg-keyboard" legend="Keyboard" options={subjects} defaultValue="math" />
+);
+Keyboard.parameters = { docs: { disable: true } };
+Keyboard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const math = canvas.getByRole('radio', { name: 'Math' });
+    const reading = canvas.getByRole('radio', { name: 'Reading' });
+    const science = canvas.getByRole('radio', { name: 'Science' });
+
+    // Math starts answered, so it is the group's one tab stop.
+    await expect(math.getAttribute('tabindex')).toBe('0');
+    await expect(reading.getAttribute('tabindex')).toBe('-1');
+
+    math.focus();
+    await expect(document.activeElement).toBe(math);
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(document.activeElement).toBe(reading);
+    await expect(reading.getAttribute('aria-checked')).toBe('true');
+    await expect(math.getAttribute('aria-checked')).toBe('false');
+
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(document.activeElement).toBe(science);
+    await expect(science.getAttribute('aria-checked')).toBe('true');
 };
 
 export const Orientation = () => (
@@ -153,7 +183,7 @@ LinearScale.play = async ({ canvasElement }) => {
 
     // A number answer comes back as the number it was given.
     await userEvent.click(canvas.getByRole('radio', { name: '4' }));
-    await expect(canvas.getByRole('radio', { name: '4' }).checked).toBe(true);
+    await expect(canvas.getByRole('radio', { name: '4' }).nextElementSibling.checked).toBe(true);
 };
 
 const described = [
@@ -227,14 +257,14 @@ States.play = async ({ canvasElement }) => {
     const readOnly = canvas.getByRole('radiogroup', { name: 'Read-only' });
     await expect(readOnly.getAttribute('aria-readonly')).toBe('true');
     const science = within(readOnly).getByRole('radio', { name: 'Science' });
-    await expect(science.disabled).toBe(false);
+    await expect(science.nextElementSibling.disabled).toBe(false);
     await userEvent.click(science);
-    await expect(science.checked).toBe(false);
-    await expect(within(readOnly).getByRole('radio', { name: 'Math' }).checked).toBe(true);
+    await expect(science.nextElementSibling.checked).toBe(false);
+    await expect(within(readOnly).getByRole('radio', { name: 'Math' }).nextElementSibling.checked).toBe(true);
 
     // Disabled: every choice is.
     const disabled = canvas.getByRole('radiogroup', { name: 'Disabled' });
-    await expect(within(disabled).getAllByRole('radio').every((r) => r.disabled)).toBe(true);
+    await expect(within(disabled).getAllByRole('radio').every((r) => r.nextElementSibling.disabled)).toBe(true);
 };
 
 export const Validation = () => (
@@ -257,7 +287,7 @@ Validation.play = async ({ canvasElement }) => {
     await expect(alert.textContent).toBe('Choose an answer.');
     await expect(group.getAttribute('aria-describedby')).toBe(alert.id);
     await expect(group.getAttribute('aria-required')).toBe('true');
-    await expect(within(group).getAllByRole('radio').every((r) => r.required)).toBe(true);
+    await expect(within(group).getAllByRole('radio').every((r) => r.nextElementSibling.required)).toBe(true);
 };
 
 export const TwoGroupsWithoutIds = () => (
@@ -272,12 +302,12 @@ TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
     const second = within(canvas.getByRole('radiogroup', { name: 'Second' })).getAllByRole('radio');
 
     // No shared radio name and no shared ids, so answering one leaves the other.
-    await expect(first[0].name).not.toBe(second[0].name);
+    await expect(first[0].nextElementSibling.name).not.toBe(second[0].nextElementSibling.name);
     const ids = [...first, ...second].map((r) => r.id);
     await expect(new Set(ids).size).toBe(4);
     await userEvent.click(first[0]);
     await userEvent.click(second[1]);
-    await expect(first[0].checked).toBe(true);
+    await expect(first[0].nextElementSibling.checked).toBe(true);
 };
 
 export const Interactive = (args) => {

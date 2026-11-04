@@ -41,7 +41,9 @@ export const dateRangeOption = ({
     startPlaceholder = 'Select Date',
     endPlaceholder = 'Select Date',
 } = {}) => ({
-    id: 'delete-date-period',
+    // No explicit id: RadioGroup derives one from its own generated field id.
+    // A literal here collided across the four RadioGroup instances in the
+    // Overview story below, so every option but the first lost its label.
     value: 'date-period',
     label: <RadioLabel />,
     reveal: (
