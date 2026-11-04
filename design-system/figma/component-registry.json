@@ -1658,7 +1658,7 @@
         "import": "@/components/messaging",
         "export": "default",
         "mdxPath": "design-system/src/components/messaging/Spotlight/Spotlight.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Spotlight",
         "source": "design-system/src/components/messaging/Spotlight/Spotlight.jsx",
         "storybookId": "components-messaging-spotlight--docs"
       },
