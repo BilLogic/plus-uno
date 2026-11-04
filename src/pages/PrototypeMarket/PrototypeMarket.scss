@@ -243,7 +243,7 @@ html.market-active #root {
     align-items: center;
     justify-content: center;
     padding: var(--size-modal-pad-md, 16px);
-    z-index: var(--layout-z-index-scrim);
+    z-index: var(--layer-blanket);
   }
 
   &__modal {
@@ -469,7 +469,7 @@ html.market-active #root {
   &__divider {
     width: 100%;
     height: var(--border-default);
-    border-radius: var(--element-radius-sm);
+    border-radius: var(--radius-sm);
     background-color: var(--ds-border-bold);
     opacity: 0.1;
   }
