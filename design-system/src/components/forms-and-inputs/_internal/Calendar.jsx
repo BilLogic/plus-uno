@@ -3,9 +3,6 @@ import PropTypes from 'prop-types';
 import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
 import './Calendar.scss';
 
-/** Each pixel size reads its width from the token of the same value. */
-const DAY_TOKENS = { 28: '--calendar-day-sm', 36: '--calendar-day-md', 44: '--calendar-day-lg' };
-
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 /**
@@ -34,7 +31,6 @@ const Calendar = ({
     size = 36,
     onPick,
     className = '',
-    style,
     ...props
 }) => {
     const year = viewDate.getFullYear();
@@ -94,7 +90,7 @@ const Calendar = ({
     return (
         <div
             className={['plus-calendar', className].filter(Boolean).join(' ')}
-            style={{ '--plus-calendar-day': `var(${DAY_TOKENS[size] ?? DAY_TOKENS[36]})`, ...style }}
+            data-size={size}
             {...props}
         >
             <div className="plus-calendar-header">

@@ -10,14 +10,13 @@ const grid = (size) => {
 };
 
 describe('Calendar size', () => {
-    it('takes the day width in pixels and draws it from the matching token', () => {
-        expect(grid(28).style.getPropertyValue('--plus-calendar-day')).toBe('var(--calendar-day-sm)');
-        expect(grid(36).style.getPropertyValue('--plus-calendar-day')).toBe('var(--calendar-day-md)');
-        expect(grid(44).style.getPropertyValue('--plus-calendar-day')).toBe('var(--calendar-day-lg)');
+    it('takes the day width in pixels and marks the grid with it', () => {
+        expect(grid(28)).toHaveAttribute('data-size', '28');
+        expect(grid(44)).toHaveAttribute('data-size', '44');
     });
 
     it('draws 36 when size is left out', () => {
-        expect(grid().style.getPropertyValue('--plus-calendar-day')).toBe('var(--calendar-day-md)');
+        expect(grid()).toHaveAttribute('data-size', '36');
     });
 
     it('declares only pixel sizes', () => {

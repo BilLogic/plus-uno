@@ -22,6 +22,14 @@
     padding: var(--space-025) var(--pad-x-sm);
 }
 
+.plus-calendar[data-size='28'] {
+    --plus-calendar-day: var(--calendar-day-sm);
+}
+
+.plus-calendar[data-size='44'] {
+    --plus-calendar-day: var(--calendar-day-lg);
+}
+
 .plus-calendar-header {
     display: flex;
     align-items: center;
