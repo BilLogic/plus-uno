@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Table, StatusTag, Button, IconButton } from '@/components';
+import { Table, StatusTag, Button, IconButton } from '@/components';
+import PatternCard from '@/patterns/PatternCard';
 import { PageLayout } from '@/specs/Universal/Pages';
 import PatternSection from '@/patterns/PatternSection';
 import { Select } from '@/components/forms-and-inputs';
@@ -65,14 +66,14 @@ export const OnboardingSpec = () => {
                     </div>
                     <div className="d-flex gap-3 overflow-auto pb-3" style={{ scrollBehavior: 'smooth' }}>
                         {featuredModules.map((mod, idx) => (
-                            <Card
+                            <PatternCard
                                 key={idx}
                                 title={mod.title}
                                 style={{ minWidth: '300px', backgroundColor: 'var(--color-surface-container-low)' }}
                             >
                                 <div className="body2-txt text-muted mb-2">{mod.duration}</div>
                                 <Button text="Start Module" className="w-100" />
-                            </Card>
+                            </PatternCard>
                         ))}
                     </div>
                 </PatternSection>

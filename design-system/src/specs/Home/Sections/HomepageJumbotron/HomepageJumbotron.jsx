@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import NavTabs from '@/components/navigation/NavTabs';
 import Button from '@/components/forms-and-inputs/Button';
-import Divider from '@/components/layout-and-structure/Divider';
 import CountTag from '@/components/labels/CountTag';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
 import './HomepageJumbotron.scss';
@@ -81,7 +80,7 @@ const HomepageJumbotron = ({
                         Reflection
                     </NavTabs.Item>
                 </NavTabs>
-                <Divider size="sm" style="light" className="plus-homepage-jumbotron-divider" />
+                <div className="plus-homepage-jumbotron-divider" role="separator" />
             </div>
 
             {/* Content Area */}

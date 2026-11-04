@@ -6,9 +6,6 @@
  */
 
 @use "sass:meta";
-// The card title's type, shared with PatternCard. Mixin only — no CSS output,
-// so it needs no layer.
-@use "card-title" as *;
 
 // CSS cascade layers: declares precedence once, so legacy-alias precedence is
 // explicit and Bootstrap's CSS can later be deleted as a layer. The
@@ -71,177 +68,16 @@
   @include meta.load-css("../components/forms-and-inputs/Button/Button");
   @include meta.load-css("../components/navigation/Breadcrumb/Breadcrumb");
 
-  @include meta.load-css("../components/layout-and-structure/Divider/Divider");
-
   @include meta.load-css("../components/forms-and-inputs/ButtonGroup/ButtonGroup");
   // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
   @include meta.load-css("../components/forms-and-inputs/Dropdown/Dropdown");
 
-// Card padding classes (Card component uses React Bootstrap, but we need these utility classes)
-// Remove React Bootstrap's default Card.Body padding since we apply padding to the Card itself
-.plus-card {
-    --plus-card-pad-x: 0px;
-    --plus-card-pad-y: 0px;
-    margin: 0;
-    overflow: hidden; // clip image to card border-radius
-    // The raised pair (elevation.md): the raised surface with its shadow, whose
-    // 1px ring is the card's edge, so there is no border. A clickable card
-    // lifts to the overlay shadow while hovered and settles back while pressed.
-    --plus-card-surface: var(--ds-surface-raised);
-    background-color: var(--plus-card-surface);
-    border-color: transparent;
-    box-shadow: var(--ds-shadow-raised);
-    transition: box-shadow 0.15s ease, background-color 0.15s ease;
-}
-
-.plus-card--clickable:hover {
-    --plus-card-surface: var(--ds-surface-raised-hovered);
-    box-shadow: var(--ds-shadow-overlay);
-}
-
-.plus-card--clickable:active {
-    --plus-card-surface: var(--ds-surface-raised-pressed);
-    box-shadow: var(--ds-shadow-raised);
-}
-
-// A dragged card is over the UI: the overlay shadow.
-.plus-card--dragging,
-.plus-card--dragging:hover,
-.plus-card--dragging:active {
-    box-shadow: var(--ds-shadow-overlay);
-}
-
-// The bordered option (`showBorder`): flat on a 1px outline, no shadow at rest.
-// A clickable card still lifts on hover, and any card lifts while dragged.
-.plus-card--bordered {
-    border-color: var(--color-outline-variant);
-    box-shadow: none;
-}
-
-.plus-card--bordered.plus-card--clickable:hover,
-.plus-card--bordered.plus-card--clickable:active,
-.plus-card--bordered.plus-card--dragging {
-    --plus-card-surface: var(--ds-surface-raised);
-}
-
-.plus-card--bordered.plus-card--clickable:hover,
-.plus-card--bordered.plus-card--dragging {
-    box-shadow: var(--surface-raised-shadow);
-}
-
-.plus-card--bordered.plus-card--clickable:active {
-    box-shadow: none;
-}
-
-// `text="truncate"`: the title keeps one line and the subtitle and body keep
-// three, each ending in an ellipsis. Wrap, the default, shows all the text.
-.plus-card--truncate .plus-card-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.plus-card--truncate .plus-card-subtitle,
-.plus-card--truncate .plus-card-body {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    overflow: hidden;
-}
-
-.plus-card .plus-card-content {
-    padding: 0 !important; // Remove RB default padding - padding is on .plus-card itself
-}
-
-// Card type: the card title type (`_card-title.scss`) over a Body/default 14
-// description; everything else in the card is Body/default.
-.plus-card {
-    font: var(--body-default);
-    color: var(--color-on-surface);
-}
-
-.plus-card .plus-card-title {
-    @include card-title-type;
-    color: var(--color-on-surface);
-}
-
-.plus-card .plus-card-subtitle {
-    margin: 0 0 var(--element-stack-md);
-    font: var(--body-default);
-    color: var(--color-on-surface-variant);
-}
-
-// Image always flush to top/left/right edges regardless of card padding size
-.plus-card .plus-card-image {
-    display: block;
-    width: calc(100% + 2 * var(--plus-card-pad-x));
-    margin-top: calc(-1 * var(--plus-card-pad-y));
-    margin-left: calc(-1 * var(--plus-card-pad-x));
-    margin-right: calc(-1 * var(--plus-card-pad-x));
-}
-
-.plus-card-pad-sm {
-    --plus-card-pad-x: var(--size-card-pad-x-sm);
-    --plus-card-pad-y: var(--size-card-pad-y-sm);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
-}
-
-.plus-card-pad-md {
-    --plus-card-pad-x: var(--size-card-pad-x-md);
-    --plus-card-pad-y: var(--size-card-pad-y-md);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
-}
-
-.plus-card-pad-lg {
-    --plus-card-pad-x: var(--size-card-pad-x-lg);
-    --plus-card-pad-y: var(--size-card-pad-y-lg);
-    padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
-}
-
-.plus-card-gap-sm {
-    gap: var(--size-card-gap-sm);
-}
-
-.plus-card-gap-md {
-    gap: var(--size-card-gap-md);
-}
-
-.plus-card-gap-lg {
-    gap: var(--size-card-gap-lg);
-}
-
-.plus-card-radius-sm {
-    border-radius: var(--size-card-radius-sm);
-}
-
-.plus-card-radius-md {
-    border-radius: var(--size-card-radius-md);
-}
-
-.plus-card-border-sm {
-    border-width: var(--size-card-border-sm);
-}
-
-.plus-card-border-md {
-    border-width: var(--size-card-border-md);
-}
-
-.plus-card-border-lg {
-    border-width: var(--size-card-border-lg);
-}
-
 @include meta.load-css("../components/messaging/Modal/Modal");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
-@include meta.load-css("../components/navigation/Navbar/Navbar");
 // @import "../components/Form/Form"; // forms live under src/components/forms-and-inputs/
 // @import "../components/DatePicker/DatePicker"; // no DatePicker in components/
 // @import "../components/Radio/Radio"; // no Radio in components/
-@include meta.load-css("../components/layout-and-structure/ListGroup/ListGroup");
 @include meta.load-css("../components/layout-and-structure/Carousel/Carousel");
-@include meta.load-css("../components/layout-and-structure/Collapse/Collapse");
-@include meta.load-css("../components/layout-and-structure/Jumbotron/Jumbotron");
-@include meta.load-css("../components/layout-and-structure/MediaObject/MediaObject");
 @include meta.load-css("../components/loading/ProgressBar/ProgressBar");
 @include meta.load-css("../components/loading/Spinner/Spinner");
 @include meta.load-css("../components/_internal/LoadingGif/LoadingGif");
@@ -249,11 +85,9 @@
 @include meta.load-css("../components/navigation/Pagination/Pagination");
 @include meta.load-css("../components/overlays-and-layering/Tooltip/Tooltip");
 @include meta.load-css("../components/messaging/Flag/Flag");
-@include meta.load-css("../components/navigation/Scrollspy/Scrollspy");
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
 @include meta.load-css("../components/text-and-data-display/Table/Table");
 @include meta.load-css("../components/navigation/NavTabs/NavTabs");
-@include meta.load-css("../components/navigation/NavPills/NavPills");
 @include meta.load-css("../components/messaging/SectionMessage/SectionMessage");
 @include meta.load-css("../components/layout-and-structure/Accordion/Accordion");
 @include meta.load-css("../components/images-and-icons/UserAvatar/UserAvatar");

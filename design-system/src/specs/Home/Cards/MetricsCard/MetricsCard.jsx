@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import StatusTag from '@/components/labels/StatusTag';
 import './MetricsCard.scss';
 
@@ -162,18 +162,15 @@ const MetricsCard = ({
     }
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-metrics-card plus-metrics-card-page-${currentPage} ${className}`}
             style={style}
-            paddingSize="sm"
-            gapSize="sm"
-            radiusSize="md"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="sm"
         >
             {renderContent()}
-        </Card>
+        </PatternCard>
     );
 };
 
@@ -214,13 +211,10 @@ const StackedMetricCard = ({ value, label, showBadge = false, badgeState = 'incr
     };
 
     return (
-        <Card
+        <PatternCard
             className="plus-metrics-stacked-card"
-            paddingSize="sm"
-            gapSize="sm"
-            radiusSize="md"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="sm"
         >
             <div className="plus-metrics-stacked-card-content">
                 {/* A metric value is not a section — display type, no outline slot. */}
@@ -228,7 +222,7 @@ const StackedMetricCard = ({ value, label, showBadge = false, badgeState = 'incr
                 <p className="body2-txt plus-metrics-stacked-card-label">{label}</p>
                 {renderBadge()}
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

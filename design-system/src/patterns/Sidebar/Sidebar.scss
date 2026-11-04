@@ -69,6 +69,9 @@
 .plus-pattern-sidebar__divider {
     flex-shrink: 0;
     margin: var(--element-stack-sm) var(--element-pad-x-md);
+    height: var(--border-default);
+    border-radius: var(--element-radius-sm);
+    background-color: var(--ds-border);
 }
 
 /* ------------------------------------------------------------- open tabs */

@@ -31,7 +31,7 @@ From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Overr
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Carousel` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
 
@@ -46,15 +46,12 @@ const DataVisualizationTrainingProgress = ({
     ];
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-data-viz-card plus-data-viz-training-progress ${className}`}
             style={style}
-            paddingSize="sm"
-            gapSize="lg"
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="lg"
         >
             {/* Header with title and info icon */}
             <div className="plus-data-viz-header">
@@ -94,7 +91,7 @@ const DataVisualizationTrainingProgress = ({
                     </div>
                 </div>
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

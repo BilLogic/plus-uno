@@ -2,7 +2,6 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import LinkTo from '@storybook/addon-links/react';
 import StatusTag from '@/components/labels/StatusTag';
 import CountTag from '@/components/labels/CountTag';
-import Divider from '@/components/layout-and-structure/Divider';
 import Pagination from '@/components/navigation/Pagination';
 import Button from '@/components/forms-and-inputs/Button';
 
@@ -161,7 +160,7 @@ import Button from '@/components/forms-and-inputs/Button';
         <div className="sb-plus-intro-mini-canvas">
           <div className="rounded-lg border border-outline-variant p-3">
             <p className="body2-txt mb-2">Section A</p>
-            <Divider />
+            <div style={{ height: 'var(--border-default)', background: 'var(--ds-border)' }} />
             <p className="body2-txt mt-2">Section B</p>
           </div>
         </div>

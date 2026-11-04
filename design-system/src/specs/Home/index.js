@@ -5,11 +5,58 @@
 
 import { createPageLayout } from '../Universal/Pages/PageLayout.js';
 import { createSection } from '@/components/_internal/Section/index.js';
-import { createCard } from '@/components/layout-and-structure/Card/index.js';
 import { createTable } from '@/components/_internal/Table/index.js';
 
 // Export Home Cards
 export * from './Cards';
+
+/** A plain DOM card for the sections this module builds without React. */
+const createCard = ({ title, subtitle, image, body, actionButton } = {}) => {
+    const card = document.createElement('div');
+    card.className = 'plus-pattern-card plus-pattern-card-pad-md plus-pattern-card-gap-md';
+    if (image) {
+        const img = document.createElement('img');
+        img.className = 'plus-pattern-card-image';
+        img.src = image;
+        img.alt = '';
+        card.appendChild(img);
+    }
+    const inner = document.createElement('div');
+    inner.className = 'plus-pattern-card-inner';
+    const content = document.createElement('div');
+    content.className = 'plus-pattern-card-content';
+    const heading = document.createElement('div');
+    heading.className = 'plus-pattern-card-heading';
+    const titleEl = document.createElement('h3');
+    titleEl.className = 'plus-pattern-card-title';
+    titleEl.textContent = title;
+    heading.appendChild(titleEl);
+    if (subtitle) {
+        const subtitleEl = document.createElement('p');
+        subtitleEl.className = 'plus-pattern-card-description';
+        subtitleEl.textContent = subtitle;
+        heading.appendChild(subtitleEl);
+    }
+    content.appendChild(heading);
+    if (body) {
+        const bodyEl = document.createElement('div');
+        bodyEl.className = 'plus-pattern-card-body';
+        bodyEl.textContent = body;
+        content.appendChild(bodyEl);
+    }
+    inner.appendChild(content);
+    if (actionButton) {
+        const footer = document.createElement('div');
+        footer.className = 'plus-pattern-card-footer';
+        footer.appendChild(createButton({ btnText: actionButton.text }));
+        if (actionButton.onClick) {
+            footer.lastChild.addEventListener('click', actionButton.onClick);
+        }
+        inner.appendChild(footer);
+    }
+    card.appendChild(inner);
+    return card;
+};
 
 /** A plain DOM button for the sections this module builds without React. */
 const createButton = ({ btnText = 'Button', icon } = {}) => {

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 // needed a module series type was drawing on the wrong object.
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import NavTabs from '@/components/navigation/NavTabs';
 import { IconButton } from '@/components';
 import chartTheme from '@/dataviz/chartTheme';
@@ -257,31 +257,26 @@ const DataVisualizationSkillsProgress = ({
         return (
             <div
                 id={id}
-                className={`plus-card-content card-body ${className}`}
+                className={`plus-pattern-card-content card-body ${className}`}
                 style={style}
             >
-                <div className="plus-card-description">
-                    <div className="plus-card-body body1-txt card-text">
-                        {innerContent}
-                    </div>
+                <div className="plus-pattern-card-body body1-txt card-text">
+                    {innerContent}
                 </div>
             </div>
         );
     }
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-data-viz-card ${className}`}
             style={style}
-            paddingSize="md"
-            gapSize="lg"
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
+            padding="md"
+            gap="lg"
         >
             {innerContent}
-        </Card>
+        </PatternCard>
     );
 };
 

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Modal from '@/components/messaging/Modal';
 import { Button, IconButton } from '@/components';
 import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
-import Divider from '@/components/layout-and-structure/Divider';
 import { ProductAreaDropdown } from '@/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown';
 import './UserFeedbackModal.scss';
 
@@ -207,7 +206,7 @@ const UserFeedbackModal = ({
                             {config.description}
                         </div>
 
-                        <Divider size="1px" style="dark" opacity10={true} />
+                        <div className="plus-user-feedback-modal-divider" role="separator" />
 
                         <div className="plus-user-feedback-modal-body">
                             <div className="plus-user-feedback-modal-type-selection" role="group" aria-label="Feedback type">
@@ -287,7 +286,7 @@ const UserFeedbackModal = ({
                             </div>
                         </div>
 
-                        <Divider size="1px" style="dark" opacity10={true} />
+                        <div className="plus-user-feedback-modal-divider" role="separator" />
 
                         <div className="plus-user-feedback-modal-footer">
                             <div className="plus-user-feedback-modal-footer-text body3-txt">
