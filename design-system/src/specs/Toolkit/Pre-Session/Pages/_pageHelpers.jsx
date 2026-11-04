@@ -19,7 +19,7 @@ export const ModalScrim = ({ open, children }) => (
         alignItems: 'center',
         justifyContent: 'center',
         padding: 'var(--size-section-pad-x-lg)',
-        zIndex: 'var(--layout-z-index-scrim)',
+        zIndex: 'var(--layer-blanket)',
     }}>
         {children}
     </div>

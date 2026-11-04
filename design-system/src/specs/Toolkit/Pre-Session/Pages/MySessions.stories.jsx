@@ -494,7 +494,7 @@ export const WithModals = (args) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     padding: 'var(--size-section-pad-x-lg)',
-                    zIndex: 'var(--layout-z-index-scrim)'
+                    zIndex: 'var(--layer-blanket)'
                 }}>
                     {renderModal()}
                 </div>

@@ -25,7 +25,7 @@ const field = {
  * An open list floats under its field, so the row keeps the list's full
  * height clear below the field and the next state starts under the list.
  */
-const openRow = { paddingBottom: 'var(--layout-max-height-listbox)' };
+const openRow = { paddingBottom: 'var(--listbox-max-height)' };
 
 /**
  * Non-interactive spec strip for institution dropdown states: empty, open, typing, filled.

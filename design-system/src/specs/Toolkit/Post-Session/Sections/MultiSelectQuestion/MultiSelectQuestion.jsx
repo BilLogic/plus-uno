@@ -57,7 +57,7 @@ const MultiSelectQuestion = ({
                 maxWidth: 'var(--col-8)',
             }}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <div id={labelId}>
                     <QuestionLabel rank="question" isRequired={isRequired}>{question}</QuestionLabel>
                 </div>
@@ -67,7 +67,7 @@ const MultiSelectQuestion = ({
             <div
                 role="group"
                 aria-labelledby={labelId}
-                style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--element-inline-md)' }}
+                style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}
             >
                 {options.map((option) => {
                     const tag = (

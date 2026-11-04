@@ -27,7 +27,7 @@
     gap: var(--focused-page-inline-md);
     width: 100%;
     min-width: 0;
-    height: var(--layout-height-topbar);
+    height: var(--frame-topbar-height);
 }
 
 .plus-page-focused__back,
@@ -63,8 +63,8 @@
     justify-content: flex-end;
     gap: var(--focused-page-inline-sm);
     width: 100%;
-    min-width: var(--layout-min-width-content);
-    max-width: var(--layout-max-width-reading);
+    min-width: var(--content-min-width);
+    max-width: var(--content-max-width-reading);
     margin-inline: auto;
     box-sizing: border-box;
 }

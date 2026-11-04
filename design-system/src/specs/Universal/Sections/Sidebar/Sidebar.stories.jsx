@@ -28,7 +28,7 @@ export default {
 const panel = {
     display: 'flex',
     flexDirection: 'column',
-    width: 'var(--layout-width-sidebar)',
+    width: 'var(--frame-sidebar-width)',
     boxSizing: 'border-box',
     padding: 'var(--frame-pad)',
     backgroundColor: 'var(--ds-surface-sunken)',
@@ -48,11 +48,11 @@ export const Overview = {
     render: () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)' }}>
             <div>
-                <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--element-stack-md)' }}>Tutor</p>
+                <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--stack-md)' }}>Tutor</p>
                 <div style={panel}><Sidebar user="tutor" label="Tutor navigation" /></div>
             </div>
             <div>
-                <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--element-stack-md)' }}>Supervisor</p>
+                <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--stack-md)' }}>Supervisor</p>
                 <div style={panel}><Sidebar user="supervisor" label="Supervisor navigation" /></div>
             </div>
         </div>
