@@ -9,7 +9,7 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Breadcrumb](Breadcrumb/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✕ | ✕ | ✕ |
-| [MenuGroup](MenuGroup/index.md) | 6 | ✕ | ✕ | ✕ |
+| [MenuGroup](MenuGroup/index.md) | 7 | ✕ | ✕ | ✕ |
 | [NavTabs](NavTabs/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
 | [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |

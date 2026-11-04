@@ -18,7 +18,7 @@ export const ButtonAndLinkItems = () => (
             <LinkItem href="#" id="menu-item-recent-link">Recent doc</LinkItem>
         </Section>
         <Section title="Actions" hasSeparator>
-            <ButtonItem iconBefore={<i className="fa-solid fa-plus" aria-hidden="true" />} id="menu-item-create">Create</ButtonItem>
+            <ButtonItem elemBefore={<i className="fa-solid fa-plus" aria-hidden="true" />} id="menu-item-create">Create</ButtonItem>
             <ButtonItem isDisabled id="menu-item-disabled">Archive (disabled)</ButtonItem>
         </Section>
     </MenuGroup>

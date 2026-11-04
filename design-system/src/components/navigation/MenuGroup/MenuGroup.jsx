@@ -19,7 +19,7 @@ function useRoving() {
  * MenuGroup: the scrollable list a menu's sections sit in. Props follow
  * Atlassian's Menu (https://atlassian.design/components/menu).
  */
-export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, className, children, ...props }) => {
+export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
     const itemsRef = useRef([]);
 
     const register = useCallback((node) => {
@@ -43,6 +43,7 @@ export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, 
         <RovingContext.Provider value={context}>
             <div
                 role="menu"
+                data-testid={testId}
                 className={classNames('plus-menu-group', `plus-menu-group--${density}`, className)}
                 style={{ maxHeight, maxWidth, minWidth }}
                 {...props}
@@ -59,6 +60,7 @@ MenuGroup.propTypes = {
     maxHeight: PropTypes.string,
     maxWidth: PropTypes.string,
     minWidth: PropTypes.string,
+    testId: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
 };
@@ -91,20 +93,20 @@ Section.propTypes = {
 };
 
 /** The row shared by ButtonItem, LinkItem and CustomItem. */
-const ItemRow = ({ iconBefore, iconAfter, description, children }) => (
+const ItemRow = ({ elemBefore, elemAfter, description, children }) => (
     <>
-        {iconBefore && <span className="plus-menu-item-icon plus-menu-item-icon--before">{iconBefore}</span>}
+        {elemBefore && <span className="plus-menu-item-icon plus-menu-item-icon--before">{elemBefore}</span>}
         <span className="plus-menu-item-content">
             <span className="plus-menu-item-label">{children}</span>
             {description && <span className="plus-menu-item-description">{description}</span>}
         </span>
-        {iconAfter && <span className="plus-menu-item-icon plus-menu-item-icon--after">{iconAfter}</span>}
+        {elemAfter && <span className="plus-menu-item-icon plus-menu-item-icon--after">{elemAfter}</span>}
     </>
 );
 
 ItemRow.propTypes = {
-    iconBefore: PropTypes.node,
-    iconAfter: PropTypes.node,
+    elemBefore: PropTypes.node,
+    elemAfter: PropTypes.node,
     description: PropTypes.node,
     children: PropTypes.node,
 };
@@ -124,7 +126,7 @@ function useRovingHandlers(roving) {
 
 /** ButtonItem: a menu row that performs an action. */
 export const ButtonItem = ({
-    onClick, iconBefore, iconAfter, description, isSelected, isDisabled, className, children, ...props
+    onClick, elemBefore, elemAfter, description, isSelected, isDisabled, testId, className, children, ...props
 }) => {
     const roving = useRoving();
     const ref = useRef(null);
@@ -140,28 +142,30 @@ export const ButtonItem = ({
             aria-current={isSelected || undefined}
             onClick={onClick}
             onKeyDown={onKeyDown}
+            data-testid={testId}
             className={classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected }, className)}
             {...props}
         >
-            <ItemRow iconBefore={iconBefore} iconAfter={iconAfter} description={description}>{children}</ItemRow>
+            <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
         </button>
     );
 };
 
 ButtonItem.propTypes = {
     onClick: PropTypes.func,
-    iconBefore: PropTypes.node,
-    iconAfter: PropTypes.node,
+    elemBefore: PropTypes.node,
+    elemAfter: PropTypes.node,
     description: PropTypes.node,
     isSelected: PropTypes.bool,
     isDisabled: PropTypes.bool,
+    testId: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
 };
 
 /** LinkItem: a menu row that navigates. */
 export const LinkItem = ({
-    href, iconBefore, iconAfter, description, isSelected, isDisabled, className, children, ...props
+    href, elemBefore, elemAfter, description, isSelected, isDisabled, testId, className, children, ...props
 }) => {
     const roving = useRoving();
     const onKeyDown = useRovingHandlers(roving);
@@ -175,48 +179,56 @@ export const LinkItem = ({
             aria-current={isSelected || undefined}
             tabIndex={isDisabled ? -1 : undefined}
             onKeyDown={onKeyDown}
+            data-testid={testId}
             className={classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className)}
             {...props}
         >
-            <ItemRow iconBefore={iconBefore} iconAfter={iconAfter} description={description}>{children}</ItemRow>
+            <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
         </a>
     );
 };
 
 LinkItem.propTypes = {
     href: PropTypes.string.isRequired,
-    iconBefore: PropTypes.node,
-    iconAfter: PropTypes.node,
+    elemBefore: PropTypes.node,
+    elemAfter: PropTypes.node,
     description: PropTypes.node,
     isSelected: PropTypes.bool,
     isDisabled: PropTypes.bool,
+    testId: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
 };
 
 /** CustomItem: a menu row rendered through a caller's own component, for a row that isn't a button or a link. */
-export const CustomItem = ({ component: Component = 'div', iconBefore, iconAfter, description, isSelected, isDisabled, className, children, ...props }) => {
+export const CustomItem = ({ component: Component = 'div', elemBefore, elemAfter, description, isSelected, isDisabled, testId, className, children, ...props }) => {
     const roving = useRoving();
     const onKeyDown = useRovingHandlers(roving);
     const row = (
-        <ItemRow iconBefore={iconBefore} iconAfter={iconAfter} description={description}>{children}</ItemRow>
+        <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
     );
     const rowClassName = classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className);
 
     // `menuitem` is only a valid role on elements HTML-AAM allows it on (e.g. `div`); a
     // caller-supplied `component` (a `label`, say) keeps its own native semantics instead,
-    // wrapped in a plain `menuitem` so the parent `menu` still sees an allowed child.
+    // wrapped in a plain, unstyled `menuitem` so the parent `menu` still sees an allowed
+    // child — exposed once, on the wrapper, not duplicated onto `Component`. The row's own
+    // look (background, padding, selected/disabled state) goes on `Component` itself: it is
+    // the visible, clickable box, and a native control like `button` paints its own opaque
+    // background over the wrapper's otherwise.
     if (Component !== 'div') {
         return (
-            <div
-                ref={(node) => roving?.register(node)}
-                role="menuitem"
-                aria-disabled={isDisabled || undefined}
-                aria-current={isSelected || undefined}
-                onKeyDown={onKeyDown}
-                className={rowClassName}
-            >
-                <Component {...props}>{row}</Component>
+            <div role="menuitem" data-testid={testId}>
+                <Component
+                    ref={(node) => roving?.register(node)}
+                    aria-disabled={isDisabled || undefined}
+                    aria-current={isSelected || undefined}
+                    onKeyDown={onKeyDown}
+                    className={rowClassName}
+                    {...props}
+                >
+                    {row}
+                </Component>
             </div>
         );
     }
@@ -228,6 +240,7 @@ export const CustomItem = ({ component: Component = 'div', iconBefore, iconAfter
             aria-disabled={isDisabled || undefined}
             aria-current={isSelected || undefined}
             onKeyDown={onKeyDown}
+            data-testid={testId}
             className={rowClassName}
             {...props}
         >
@@ -239,11 +252,12 @@ export const CustomItem = ({ component: Component = 'div', iconBefore, iconAfter
 CustomItem.propTypes = {
     /** The element or component the row renders as. */
     component: PropTypes.elementType,
-    iconBefore: PropTypes.node,
-    iconAfter: PropTypes.node,
+    elemBefore: PropTypes.node,
+    elemAfter: PropTypes.node,
     description: PropTypes.node,
     isSelected: PropTypes.bool,
     isDisabled: PropTypes.bool,
+    testId: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
 };
