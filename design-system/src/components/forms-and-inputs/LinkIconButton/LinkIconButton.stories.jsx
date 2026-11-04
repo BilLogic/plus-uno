@@ -11,7 +11,7 @@ export default {
     title: 'Components/Forms and inputs/Button/Link icon button',
     component: LinkIconButton,
     /** Hide CSF stories from the sidebar; docs live on LinkIconButton.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Link icon button: an icon that navigates, with `href`, `icon`, a required `label`, `appearance`, `spacing` and `shape`.' },

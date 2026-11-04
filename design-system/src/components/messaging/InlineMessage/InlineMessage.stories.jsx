@@ -12,7 +12,7 @@ export default {
     title: 'Components/Messaging/Inline message',
     component: InlineMessage,
     /** Hide CSF stories from the sidebar; docs live on InlineMessage.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Inline message: an icon trigger that opens a Popup. `appearance` (info, warning, danger, success), `label`, `title`, `secondaryText`, `placement`.' },
