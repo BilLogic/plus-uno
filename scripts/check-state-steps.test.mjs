@@ -90,17 +90,17 @@ function expectNoFill(file, selector) {
 }
 
 const RING_OUTSIDE = {
-  outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
-  'outline-offset': 'var(--size-element-stroke-lg)',
+  outline: 'var(--focus-ring-width) solid var(--color-focus-ring)',
+  'outline-offset': 'var(--focus-ring-width)',
 };
 
 const RING_INSIDE = {
-  outline: 'var(--size-element-stroke-lg) solid var(--color-focus-ring)',
-  'outline-offset': 'calc(-1 * var(--size-element-stroke-lg))',
+  outline: 'var(--focus-ring-width) solid var(--color-focus-ring)',
+  'outline-offset': 'calc(-1 * var(--focus-ring-width))',
 };
 
 /** The rings on the new color tokens: `color.border.focused`, outside or inside the box. */
-const DS_RING = 'var(--size-element-stroke-lg) solid var(--ds-border-focused)';
+const DS_RING = 'var(--focus-ring-width) solid var(--ds-border-focused)';
 const DS_RING_OUTSIDE = { ...RING_OUTSIDE, outline: DS_RING };
 const DS_RING_INSIDE = { ...RING_INSIDE, outline: DS_RING };
 
@@ -194,8 +194,8 @@ test('Button: selected takes the selected role with its own steps', () => {
 
 test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill', () => {
   expectRule(BUTTON, '.plus-btn:focus-visible', {
-    outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
-    'outline-offset': 'var(--size-element-stroke-lg)',
+    outline: 'var(--focus-ring-width) solid var(--ds-border-focused)',
+    'outline-offset': 'var(--focus-ring-width)',
   });
   expectNoFill(BUTTON, '.plus-btn:focus-visible');
 });

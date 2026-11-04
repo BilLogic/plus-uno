@@ -41,8 +41,8 @@ button.plus-progress-indicator__dot:hover {
 }
 
 button.plus-progress-indicator__dot:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width);
 }
 
 .plus-progress-indicator__dot--selected {

@@ -59,7 +59,7 @@
     cursor: help;
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
         outline-offset: var(--size-element-border);
         border-radius: var(--size-element-radius-sm);
     }

@@ -585,8 +585,8 @@ $tag-colors: (
  */
 .plus-tag--elevated:focus-visible,
 .plus-tag--elevated.plus-tag--split:has(> .plus-tag__link:focus-visible) {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width, 2px);
     box-shadow:
         0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay),
         var(--ds-shadow-overlay);
@@ -598,7 +598,7 @@ $tag-colors: (
  * ring is restated for check:focus-ring, as above.
  */
 .plus-tag--elevated .plus-tag__remove:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width, 2px);
     box-shadow: 0 0 0 var(--size-element-stroke-lg, 2px) var(--ds-surface-overlay);
 }

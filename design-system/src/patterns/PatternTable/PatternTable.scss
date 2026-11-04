@@ -34,8 +34,8 @@
     // A bounded table's scroll region takes keyboard focus: the focus ring,
     // 2px offset 2px onto the surface.
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-stroke-lg);
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: var(--focus-ring-width);
     }
 }
 

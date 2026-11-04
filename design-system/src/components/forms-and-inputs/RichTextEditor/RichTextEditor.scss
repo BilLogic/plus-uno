@@ -75,8 +75,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-        outline-offset: var(--size-element-stroke-lg);
+        outline: var(--focus-ring-width) solid var(--color-focus-ring);
+        outline-offset: var(--focus-ring-width);
     }
 }
 
@@ -117,8 +117,8 @@
         }
 
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-            outline-offset: var(--size-element-stroke-lg);
+            outline: var(--focus-ring-width) solid var(--color-focus-ring);
+            outline-offset: var(--focus-ring-width);
         }
 
         &:disabled,
@@ -183,8 +183,8 @@
         }
 
         &:focus-visible {
-            outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-            outline-offset: calc(-1 * var(--size-element-stroke-lg));
+            outline: var(--focus-ring-width) solid var(--color-focus-ring);
+            outline-offset: calc(-1 * var(--focus-ring-width));
         }
     }
 }

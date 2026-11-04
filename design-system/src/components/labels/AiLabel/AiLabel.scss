@@ -105,6 +105,6 @@
 }
 
 .plus-ai-label__explain:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: var(--size-element-gap-xs);
 }

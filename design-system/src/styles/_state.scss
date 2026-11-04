@@ -54,7 +54,7 @@
 @mixin plus-state(
     $states: (),
     $ring: true,
-    $ring-offset: var(--size-element-stroke-lg),
+    $ring-offset: var(--focus-ring-width), /* one param, used for both outline and outline-offset below; Carousel overrides it with a literal for both too */
     $ring-token: --ds-border-focused,
     $high-contrast: false,
     $important: false,
@@ -159,7 +159,7 @@
 // nothing of its own to ring) and each `::-webkit-slider-thumb` /
 // `::-moz-range-thumb` under `&:focus-visible` includes this instead.
 @mixin plus-ring(
-    $ring-offset: var(--size-element-stroke-lg),
+    $ring-offset: var(--focus-ring-width), /* see plus-state's own $ring-offset, above */
     $ring-token: --ds-border-focused,
     $important: false
 ) {

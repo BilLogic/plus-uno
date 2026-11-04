@@ -71,8 +71,8 @@
  * The ground stays clear, so focus never reads as pressed.
  */
 .plus-suggestion:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width, 2px);
 }
 
 /*

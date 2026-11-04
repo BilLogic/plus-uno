@@ -116,8 +116,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: calc(var(--size-element-stroke-lg) * -1);
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(var(--focus-ring-width) * -1);
     }
 }
 
