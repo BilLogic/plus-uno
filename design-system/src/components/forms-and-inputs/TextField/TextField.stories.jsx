@@ -16,7 +16,7 @@ export default {
         ],
         docs: {
             description: {
-                component: 'A text field is an input that allows a user to write or edit text. Adapted from Atlassian Design System Text field.'
+                component: 'A text field is an input that allows a user to write or edit text.'
             }
         }
     },

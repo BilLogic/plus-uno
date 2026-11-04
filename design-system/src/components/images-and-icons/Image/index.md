@@ -3,7 +3,7 @@
 
 # Image
 
-in by the browser rather than by script. Props follow Atlassian's Image (https://atlassian.design/components/image).
+in by the browser rather than by script.
 
 **Import:** `import { Image } from '@/components';`
 

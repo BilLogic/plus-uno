@@ -3,7 +3,7 @@
 
 # GenerativeBorder
 
-The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two. Adapts https://atlassian.design/rovo-ui/generative-border.
+The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.
 
 **Import:** `import { GenerativeBorder } from '@/components';`
 

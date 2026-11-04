@@ -3,7 +3,7 @@
 
 # ButtonGroup
 
-Button group: a visually connected row of related actions. Follows Atlassian's Button group (https://atlassian.design/components/button/button-group) — a plain container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology.
+Button group: a visually connected row of related actions. A plain container for `Button` children, each keeping its own `appearance` and `spacing`. `label` names the group for assistive technology.
 
 **Import:** `import { ButtonGroup } from '@/components';`
 

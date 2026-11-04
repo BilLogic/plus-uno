@@ -29,6 +29,7 @@
  *                    `size="small|medium|large|sm|md|lg"`.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
+ *   word:Atlassian   zero allowed: MDX prose, story doc strings and `atlassian.design` links.
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
  *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
  *
@@ -85,6 +86,15 @@ const ALLOWED_PATHS = [
   /^design-system\/src\/tokens\/_elevation\.scss$/,
   /^design-system\/src\/tokens\/_color_roles\.scss$/,
 ];
+/**
+ * Decision records that cite the benchmark on purpose: each says what a
+ * candidate was weighed against, so the citation is the content. Named, not
+ * globbed; a new record earns its own line here.
+ */
+const ATLASSIAN_RECORDS = [
+  /^design-system\/src\/styles\/(?:TypeScaleCandidates|ColorCandidates|AiIdentity)\.stories\.jsx$/,
+];
+const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;
 
@@ -136,6 +146,19 @@ function componentCount(text, name, { pattern }) {
 }
 
 /**
+ * Is this line shipped doc that names Atlassian? Every MDX line is; in code
+ * only a non-comment line of a story is (its `docs` and `changelog` strings);
+ * and an `atlassian.design` link is anywhere, because JSDoc flows into the
+ * generated agent views.
+ */
+function atlassianShipped(file, line) {
+  if (/atlassian\.design/i.test(line)) return true;
+  if (!/atlassian/i.test(line)) return false;
+  if (/\.mdx$/.test(file)) return true;
+  return /\.stories\.jsx$/.test(file) && !COMMENT_LINE.test(line);
+}
+
+/**
  * Measure sources: `{ path, text }[]` in, `Map<key, {count, line}>` out, where
  * `line` is the first line the pair was found on, for the finding to point at.
  *
@@ -161,6 +184,10 @@ export function measure(sources) {
         add(`stale-name:${oldName}`, file, hits.length, hits[0]);
       }
     }
+    if (!ATLASSIAN_RECORDS.some((re) => re.test(file))) {
+      const hits = live.flatMap((l, i) => (atlassianShipped(file, l) ? [i + 1] : []));
+      add('word:Atlassian', file, hits.length, hits[0]);
+    }
     const body = live.join('\n');
     const where = (name) => Math.max(1, live.findIndex((l) => l.includes(name)) + 1);
     for (const name of LEGACY_COMPONENTS) {
@@ -185,7 +212,7 @@ export function sourcesOf(repoRoot) {
 }
 
 /** Rules that allow none: a hit is a finding, whatever the baseline says. */
-const HARD_RULES = ['state-step', 'token:surface-layout', 'token:color-surface'];
+const HARD_RULES = ['state-step', 'token:surface-layout', 'token:color-surface', 'word:Atlassian'];
 const isHard = (key) => {
   const rule = key.split(' ')[0];
   return HARD_RULES.includes(rule) || rule.startsWith('stale-name:');
@@ -196,6 +223,10 @@ const HARD_RULE_MESSAGE = new Map([
     `stale-name:${oldName}`,
     `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,
   ]),
+  [
+    'word:Atlassian',
+    'shipped docs state the PLUS rule and do not cite the benchmark (no name, no atlassian.design link); a decision record that must is named in ATLASSIAN_RECORDS',
+  ],
   [
     'token:surface-layout',
     'the surface-to-zero sweep (#1755) moved every component off the legacy `--surface-*` layout tokens; use the `--ds-surface-*` family',

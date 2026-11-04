@@ -8,7 +8,7 @@ import AiIcon, { AI_ICON_NAMES, AI_ICON_SIZES, AI_ICON_ALL_SIZES } from './AiIco
 /**
  * `AiIcon` -- icons for PLUS AI actions.
  *
- * Benchmark: atlassian.design/components/icon. Like it, one icon per meaning, in
+ * One icon per meaning, in
  * a square box exactly its size, filled with the icon color and paired with a
  * label unless its meaning is obvious. PLUS adds a sparkle badge on the actions
  * that generate.

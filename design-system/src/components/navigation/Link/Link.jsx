@@ -7,8 +7,7 @@ import './Link.scss';
 export const LINK_APPEARANCES = ['default', 'subtle', 'inverse'];
 
 /**
- * Link: an inline navigation anchor. Props follow Atlassian's Link
- * (https://atlassian.design/components/link).
+ * Link: an inline navigation anchor.
  */
 export const Link = ({
     href,

@@ -7,9 +7,9 @@ summary: Tokens — Overview & Decision Tree
 
 ## Non-Negotiable Rules
 
-- Color, spacing, typography, radius and elevation come from compile-ready tokens (e.g. `var(--color-on-surface)`) — not raw values, and not Figma literal names.
+- Color, spacing, typography, radius and elevation come from compile-ready tokens (e.g. `var(--ds-text)`) — not raw values, and not Figma literal names.
 - Never hardcode colors, spacing, typography, radius, or elevation when a token exists.
-- Choose semantic layer first (element/card/section/modal/table), then pick token.
+- Choose the tier first (component, then pattern, then semantics, then primitives; see the ladder below), then pick token.
 - Use primitives only for token-definition work, not feature implementation.
 
 ## The four-tier ladder (#1756)
@@ -32,7 +32,7 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 ## Token References
 
 - [Color](color.md) — Color roles, SMART framework, surfaces, interaction states
-- [Spacing](spacing.md) — Spacing hierarchy, element/card/section/modal/table tokens
+- [Spacing](spacing.md) — Spacing on the four-tier ladder
 - [Typography](typography.md) — Font families, weights, classes, sizing
 - [Elevation](elevation.md) — Shadow depth tokens
 
