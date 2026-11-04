@@ -115,7 +115,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   sit beside the old size files and generate
   `_scales.scss`. Each records `hiddenFromPublishing`, and its variables
   carry `scopes` and `codeSyntax`. A variable's `codeSyntax.WEB`
-  (`var(--pad-x-sm)`) is its CSS name, so the generator refuses a
+  (`var(--element-pad-x-sm)`, in the export) is its CSS name, so the generator refuses a
   variable without one instead of deriving a name.
 - The old `sync:tokens` Figma-pull script is deleted (ADR-038): it wrote to a
   `new tokens/` folder nothing read, and resolved only one alias level. These

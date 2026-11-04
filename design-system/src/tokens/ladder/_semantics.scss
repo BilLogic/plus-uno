@@ -35,8 +35,8 @@
     --radius-h40: var(--radius-0625); /* new step; control height 40; 40÷4 = 10 */
 
     /* Focus */
-    --focus-ring-width: var(--size-border-stroke-stroke-200); /* matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet */
-    --focus-ring-offset: var(--size-border-stroke-stroke-200); /* defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both (outline and outline-offset are the same value everywhere today, including the plus-state mixin, which takes one shared $ring-offset param) */
+    --focus-ring-width: var(--size-border-stroke-stroke-200); /* matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive */
+    --focus-ring-offset: var(--size-border-stroke-stroke-200); /* defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both */
     --focus-ring-radius: var(--radius-sm); /* first pass, no existing source; a family PR refines it */
 
     /* Grid */

@@ -92,6 +92,15 @@ test('a Figma variable is FLOAT unless its value is a color or a string', () => 
   }
 });
 
+test('the primitive-named radius still reaches the payload and is not declared twice', () => {
+  const variables = variablesPayload().collections.flatMap((c) => c.variables);
+  assert.ok(variables.find((v) => v.name === 'Radius/full'), 'Radius/full is in the payload');
+  const declarations = artifacts()
+    .filter(({ path }) => path.endsWith('.scss'))
+    .flatMap(({ content }) => [...content.matchAll(tokenDeclarationPattern())].map(([, name]) => name));
+  assert.equal(declarations.filter((name) => name === '--radius-full').length, 0);
+});
+
 test('every ladder row owns a value', () => {
   for (const row of TOKEN_LADDER.filter((r) => r.old !== r.new)) {
     assert.ok(row.ref ?? row.value, `${row.new} has no ref or value`);

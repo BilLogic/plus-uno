@@ -491,61 +491,6 @@ const BREAKPOINT_OVERRIDES = { 'xl-max': 1919.98 };
 const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
 
 /**
- * Layout tokens the stylesheet declares that Figma does not have, with the
- * comment each is written with and `figmaName`, the slug the variable would
- * have in `size / layout` (whose names slug to `grid-*`, `breakpoints-*` and
- * so on, never `layout-*`). The SideNav is a fixed 164px wide; Figma draws it
- * at that width but has no variable for it.
- */
-const CODE_ONLY_LAYOUT = {
-    'layout-sidebar-width': { value: 164, note: 'SideNav fixed width', figmaName: 'grid-sidebar-width' },
-};
-
-/**
- * Stacking layers. Figma has no z-index, so these are code's alone and are
- * written unitless. They are Atlassian's layer numbers, one scale for the whole
- * product, so nothing outside a modal sits above its scrim:
- * card 100 (sticky headers, raised cards), navigation 200 (sidebars, the page
- * frame's floating buttons), dialog 300 (side panels), popup 400, scrim 500,
- * modal 510, flag 600, spotlight 700, tooltip 800. A nested confirm reuses the
- * scrim and modal inside the first modal's layer rather than counting up.
- *
- * A popup or menu (400) sits under a modal (510). One opened from a field
- * inside a modal takes the modal's layer: it mounts inside the modal's
- * overlay (`popupLayerOf` in forms-and-inputs/_internal/anchorPlacement.js).
- */
-const CODE_ONLY_LAYERS = {
-    'layout-z-index-card': { value: 100, note: 'sticky headers and raised cards' },
-    'layout-z-index-navigation': { value: 200, note: 'sidebars and floating page navigation' },
-    'layout-z-index-dialog': { value: 300, note: 'side panels and inline dialogs' },
-    'layout-z-index-popup': { value: 400, note: 'popups and menus' },
-    'layout-z-index-scrim': { value: 500, note: 'the scrim under a modal' },
-    'layout-z-index-modal': { value: 510, note: 'a modal, over its scrim' },
-    'layout-z-index-flag': { value: 600, note: 'flags, above a modal' },
-    'layout-z-index-spotlight': { value: 700, note: 'onboarding spotlights' },
-    'layout-z-index-tooltip': { value: 800, note: 'tooltips, above everything' },
-};
-
-/**
- * Fixed dimensions Figma draws but has no variable for, written in px with
- * `figmaName`, the slug the variable would have in `size / layout`. The
- * spacing scale is pads, gaps and radii, so a box's own width (a checkbox, a
- * calendar day) has no semantic token to bind to; these are those widths,
- * named once so the components that share one stay in step.
- */
-const CODE_ONLY_DIMENSIONS = {
-    'layout-max-width-listbox': { value: 320, note: 'widest a field or button popup grows; a popup with columns is exempt', figmaName: 'max-widths-listbox' },
-    'layout-width-join-row': { value: 520, note: 'Home Join button with the session Select beside it', figmaName: 'widths-join-row' },
-    'layout-width-option-menu': { value: 240, note: 'the "…" menu on a TagInput row (Figma _Option menu)', figmaName: 'widths-option-menu' },
-    'layout-control-checkbox': { value: 18, note: 'checkbox box', figmaName: 'controls-checkbox' },
-    'layout-control-radio': { value: 12, note: 'radio dot', figmaName: 'controls-radio' },
-    'layout-calendar-day-sm': { value: 28, note: 'calendar day, small picker', figmaName: 'calendar-day-sm' },
-    'layout-calendar-day-md': { value: 36, note: 'calendar day, medium picker', figmaName: 'calendar-day-md' },
-    'layout-calendar-day-lg': { value: 44, note: 'calendar day, large picker', figmaName: 'calendar-day-lg' },
-    'layout-calendar-nav': { value: 32, note: 'calendar previous and next month buttons', figmaName: 'calendar-nav' },
-};
-
-/**
  * The semantic token the grid gutter is documented as equal to. The note is
  * checked, not trusted: Figma's `Grid/content-gutter` and this token's
  * resolved value have to match.
@@ -591,12 +536,6 @@ function generateLayoutSCSS() {
     for (const key of Object.keys(CODE_ONLY_BREAKPOINTS)) {
         if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
     }
-    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_LAYOUT)) {
-        if (figmaNames.has(figmaName)) stale('CODE_ONLY_LAYOUT', `Figma now has ${figmaName}; read --${token} from the export.`);
-    }
-    for (const [token, { figmaName }] of Object.entries(CODE_ONLY_DIMENSIONS)) {
-        if (figmaNames.has(figmaName)) stale('CODE_ONLY_DIMENSIONS', `Figma now has ${figmaName}; read --${token} from the export.`);
-    }
     Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
 
     const gutter = variable('Grid/content-gutter');
@@ -636,16 +575,11 @@ function generateLayoutSCSS() {
     /* Breakpoints */
 ${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
     /* App shell + content grid */
-${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
     /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
     --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --stack-md); col-* spans assume this */
 
-    /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
-${Object.entries(CODE_ONLY_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}
     /* Min and max heights — ${modes[0].key.toUpperCase()} values where they differ by breakpoint */
 ${heightLines(modes[0], '    ', () => true)}
-    /* Fixed dimensions; not Figma variables (CODE_ONLY_DIMENSIONS) */
-${Object.entries(CODE_ONLY_DIMENSIONS).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note} */\n`).join('')}
     /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
 ${columns(modes[0], '    ')}}
 `;
@@ -781,20 +715,12 @@ const NO_LIMIT_FRAME_LAYERS = { 'max-width-screen': 10000 };
  * is the variable that would replace each one.
  */
 const CODE_ONLY_FRAME_LAYERS = {
-    'layout-max-height-modal': {
-        value: 'calc(100dvh - 2 * var(--overlay-pad-y))',
-        note: 'a Hug modal grows to it; a Fill modal sits at it',
-        figmaName: 'Modal/max-height-modal (Spacing / Layout)',
-    },
     'popover-offset': {
         value: 'var(--space-025)',
         note: 'gap from a popover to its trigger',
         figmaName: 'Popover/Placement/offset',
     },
 };
-
-/** Under this screen height the overlay pads 24 above and below, not 64. Code only. */
-const SHORT_SCREEN = { maxHeight: 639.98, token: 'overlay-pad-y', value: 'var(--space-150)' };
 
 /**
  * Generate the frame and layer tokens SCSS
@@ -894,9 +820,6 @@ function generateFrameLayersSCSS() {
             stale('NO_LIMIT_FRAME_LAYERS', `no variable ends in ${leaf}; its stand-in has nothing to stand in for.`);
         }
     }
-    if (!declared.has(SHORT_SCREEN.token)) {
-        stale('SHORT_SCREEN', `Figma no longer has --${SHORT_SCREEN.token}; the short-screen override has nothing to override.`);
-    }
 
     let scss = `/**
  * Frame and Layer Tokens
@@ -919,13 +842,6 @@ ${Object.entries(CODE_ONLY_FRAME_LAYERS).map(([token, { value, note }]) => `    
     for (const at of [...blocks.keys()].sort((a, b) => a - b)) {
         scss += `\n@media (min-width: ${px(at)}) {\n    :root {\n${blocks.get(at)}    }\n}\n`;
     }
-    scss += `\n/* A short screen pads modals 24 above and below; code only (SHORT_SCREEN) */
-@media (max-height: ${px(SHORT_SCREEN.maxHeight)}) {
-    :root {
-        --${SHORT_SCREEN.token}: ${SHORT_SCREEN.value};
-    }
-}
-`;
     return scss;
 }
 

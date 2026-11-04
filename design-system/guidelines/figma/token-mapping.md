@@ -124,7 +124,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
 | spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
-| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--space-025` is 4; the new one is 2 |
+| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old Figma vertical pad step was 4; `--pad-y-sm` is 2 |
 | Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
 | Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--radius-h32)` | 2 · 4 · 8, items 6 · 8 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
@@ -154,7 +154,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Max Heights/listbox | `var(--listbox-max-height)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
 | Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
 | Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
-| — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | Atlassian's layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
+| — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | PLUS layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
 | — (code only) | `var(--listbox-max-width)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
 | — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
 | — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` · `var(--calendar-nav-size)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |

@@ -518,7 +518,7 @@ export function colorKey(value) {
  * renders anything, and a repo that changed its root font size revisits both.
  *
  * A PERCENTAGE IS NOT CONVERTED TO PX, which is the point rather than a
- * shortcut: `--radius-full` is `999px` and falls back to `50%`
+ * shortcut: `--radius-full` is `9999px` and falls back to `50%`
  * eleven times, and on a non-square box those are different shapes.
  *
  * A BARE `0` is `0px`, because zero is zero, and that is the one place the two

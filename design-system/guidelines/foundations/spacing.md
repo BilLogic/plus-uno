@@ -30,17 +30,19 @@ For buttons, badges, inputs, and other small components:
 | `--pad-x-sm` | 8px | Small horizontal padding |
 | `--pad-x-md` | 12px | Medium horizontal padding |
 | `--pad-x-lg` | 16px | Large horizontal padding |
-| `--space-025` | 4px | Small vertical padding |
+| `--pad-y-sm` | 2px | Extra small vertical padding |
 | `--pad-y-md` | 6px | Medium vertical padding |
 | `--pad-y-lg` | 8px | Large vertical padding |
-| `--stack-sm` | 4px | Extra small gap |
-| `--stack-md` | 8px | Small gap |
-| `--space-0625` | 10px | Medium gap |
-| `--stack-lg` | 12px | Large gap |
-| `--radius-md` | 4px | Small border radius |
+| `--stack-sm` · `--inline-sm` | 4px | Small gap |
+| `--stack-md` · `--inline-md` | 8px | Medium gap |
+| `--stack-lg` · `--inline-lg` | 12px | Large gap |
+| `--radius-sm` | 2px | Small border radius |
 | `--radius-md` | 4px | Medium border radius |
 | `--radius-lg` | 8px | Large border radius |
-| `--radius-full` | 999px | Pill shape |
+| `--radius-h24` · `--radius-h32` · `--radius-h40` | 6 · 8 · 10px | Control height ÷ 4 |
+| `--radius-full` | 9999px | Pill shape |
+
+No semantic step holds a 4px vertical pad or a 10px gap; read `--space-025` and `--space-0625` for those.
 
 ## Card Tokens
 

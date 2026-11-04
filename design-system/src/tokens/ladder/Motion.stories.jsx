@@ -5,7 +5,7 @@ import React from 'react';
  * `--motion-duration-*` and the standard easing.
  */
 export default {
-    title: 'Foundations/Motion Tokens',
+    title: 'Foundations/Motion tokens',
     tags: ['!dev', '!autodocs'],
 };
 

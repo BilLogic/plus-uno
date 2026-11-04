@@ -45,7 +45,8 @@ export const MOTION_EASINGS = {
  * is the primitive's name, and `at` holds the responsive overrides, each keyed
  * by the media query it applies under. `old` documents the retired name a row
  * replaced (null for a net-new token); `type` is the Figma variable type when
- * it is not FLOAT, and `codeOnly` keeps a row out of the Figma payload.
+ * it is not FLOAT, `codeOnly` keeps a row out of the Figma payload, and
+ * `primitive` keeps it out of the SCSS (its code name is a primitive).
  *
  * A row with `old === new` is not a rename — it is a tier the token was
  * already correctly named for (the Size dimension roles, most of Patterns'
@@ -98,9 +99,9 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--radius-0125)' },
   { tier: 'semantics', group: 'Radius', new: '--radius-md', old: '--element-radius-md', ref: 'var(--radius-025)' },
   { tier: 'semantics', group: 'Radius', new: '--radius-lg', old: '--element-radius-lg', ref: 'var(--radius-050)' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--radius-full' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-h24', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', ref: 'var(--radius-0375)', note: 'control height 24; 24÷4 = 6' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-h32', old: '--element-radius-item-md', ref: 'var(--radius-050)', ref: 'var(--radius-050)', note: 'control height 32; 32÷4 = 8' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--element-radius-full', ref: 'var(--radius-full)', primitive: true, note: 'Figma Radius/full; the code name is the --radius-full primitive, so no second declaration' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-h24', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', note: 'control height 24; 24÷4 = 6' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-h32', old: '--element-radius-item-md', ref: 'var(--radius-050)', note: 'control height 32; 32÷4 = 8' },
   { tier: 'semantics', group: 'Radius', new: '--radius-h40', old: null, value: '--radius-0625', note: 'new step; control height 40; 40÷4 = 10' },
 
   // ─── Semantics / Border (reclassified, unchanged names) ──────────────
@@ -109,8 +110,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Border', new: '--border-focused', old: '--border-focused' },
 
   // ─── Semantics / Focus (net new) ──────────────────────────────────────
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet' },
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both (outline and outline-offset are the same value everywhere today, including the plus-state mixin, which takes one shared $ring-offset param)' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both' },
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-radius', old: null, value: '--radius-sm', note: 'first pass, no existing source; a family PR refines it' },
 
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
@@ -157,7 +158,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--field-width-xl', old: '--field-width-xl' },
   { tier: 'semantics', group: 'Size', new: '--field-min-height-sm', old: '--field-min-height-sm' },
   { tier: 'semantics', group: 'Size', new: '--field-min-height-lg', old: '--field-min-height-lg' },
-  { tier: 'semantics', group: 'Size', new: '--control-sm', old: '--size-control-sm', ref: 'var(--size-150)', ref: 'var(--size-150)', note: 'new role; Control was missing from the Icon/Image/Item/Label/Row/Field set' },
+  { tier: 'semantics', group: 'Size', new: '--control-sm', old: '--size-control-sm', ref: 'var(--size-150)', note: 'new role; Control was missing from the Icon/Image/Item/Label/Row/Field set' },
   { tier: 'semantics', group: 'Size', new: '--control-md', old: '--size-control-md', ref: 'var(--size-200)' },
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)' },
 
@@ -166,7 +167,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Frame', new: '--frame-stack', old: '--frame-stack' },
   { tier: 'patterns', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above' },
 
   // ─── Patterns / Page ──────────────────────────────────────────────────
   { tier: 'patterns', group: 'Page', new: '--page-pad', old: '--page-pad' },
@@ -243,7 +244,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md' },
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg' },
   { tier: 'patterns', group: 'Modal', new: '--modal-radius', old: '--modal-radius' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' } },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' } },
 
@@ -289,8 +290,8 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md' },
 
   // ─── Components / Button ──────────────────────────────────────────────
-  { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', ref: 'var(--radius-0375)', note: '32-high control, radius 6' },
-  { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'var(--radius-025)', ref: 'var(--radius-025)', note: '24-high control, radius 4' },
+  { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'var(--radius-0375)', note: '32-high control, radius 6' },
+  { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'var(--radius-025)', note: '24-high control, radius 4' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
   { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px' },

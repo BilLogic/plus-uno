@@ -52,7 +52,7 @@ const movedRows = () => TOKEN_LADDER.filter((row) => row.old !== row.new);
 /** Figma collection renames, code-side names unchanged (payload documentation only). */
 export const COLLECTION_RENAMES = [
   { from: 'color / foundations', to: 'color / semantics' },
-  { from: 'opacity', to: 'color / opacity', note: "Element/opacity-disabled moves here; code's --color-disabled-opacity is unaffected" },
+  { from: 'opacity', to: 'color / opacity', note: "the disabled-opacity variable moves here; code's --color-disabled-opacity is unaffected" },
 ];
 
 /** The value one ladder row declares: its `ref`, or a `var()` of the primitive `value` names. */
@@ -60,7 +60,7 @@ const rowValue = (row) => row.ref ?? `var(${row.value})`;
 
 /** @returns {string} one tier's SCSS file, generated from `TOKEN_LADDER`. */
 function tierScss({ tier, heading }) {
-  const rows = movedRows().filter((r) => r.tier === tier);
+  const rows = movedRows().filter((r) => r.tier === tier && !r.primitive);
   const byGroup = new Map();
   for (const row of rows) {
     if (!byGroup.has(row.group)) byGroup.set(row.group, []);

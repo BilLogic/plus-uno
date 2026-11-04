@@ -37,15 +37,15 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Radius | `--element-radius-sm` | `--radius-sm` |  |
 | Radius | `--element-radius-md` | `--radius-md` |  |
 | Radius | `--element-radius-lg` | `--radius-lg` |  |
-| Radius | `--radius-full` | `--radius-full` (reclassified, unchanged) |  |
+| Radius | `--element-radius-full` | `--radius-full` | Figma Radius/full; the code name is the --radius-full primitive, so no second declaration |
 | Radius | `--element-radius-item-sm` | `--radius-h24` | control height 24; 24÷4 = 6 |
 | Radius | `--element-radius-item-md` | `--radius-h32` | control height 32; 32÷4 = 8 |
 | Radius | *(new)* | `--radius-h40` | new step; control height 40; 40÷4 = 10 |
 | Border | `--border-default` | `--border-default` (reclassified, unchanged) |  |
 | Border | `--border-selected` | `--border-selected` (reclassified, unchanged) |  |
 | Border | `--border-focused` | `--border-focused` (reclassified, unchanged) |  |
-| Focus | `--size-element-stroke-lg` | `--focus-ring-width` | matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet |
-| Focus | `--size-element-stroke-lg` | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both (outline and outline-offset are the same value everywhere today, including the plus-state mixin, which takes one shared $ring-offset param) |
+| Focus | `--size-element-stroke-lg` | `--focus-ring-width` | matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive |
+| Focus | `--size-element-stroke-lg` | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both |
 | Focus | *(new)* | `--focus-ring-radius` | first pass, no existing source; a family PR refines it |
 | Grid | `--layout-gutter` | `--grid-gutter` |  |
 | Grid | `--layout-columns` | `--grid-columns` |  |
