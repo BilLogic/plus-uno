@@ -192,7 +192,7 @@ to the brand hue. Two hues double as state colors — **lime** and
 **purple-500** overlap `success` and `discovery` — so a chart uses categorical
 colors or state colors, never both in the same chart.
 
-Slots 7 and 8 are darker reprises of 1 and 3, for overflow past the
+Slots 7 and 8 are reprises of 2 (orange) and 3 (blue), for overflow past the
 six-series limit only; group the smallest categories into "Other" before a
 chart needs them (see Do/Don't below). The sequence wraps back to slot 1 after
 8, repeating a color, so an eight-series chart is already past the point
