@@ -1,21 +1,161 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ProgressTrackerStories from './ProgressTracker.stories.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressTrackerStories} />
 
 <Title />
-
-Displays steps and journey progress, each done, current or upcoming.
+The steps of a journey, each labeled and marked done, current or upcoming.
+Unlike `ProgressIndicator`, every step shows its own name.
 
 <DocsTabs of={ProgressTrackerStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={ProgressTrackerStories.Default} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/status-indicators/ProgressTracker"
+/>
 
-<ArgTypes />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Four steps: one visited, one current, one unvisited, one disabled.</>}>
+    <Canvas of={ProgressTrackerStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Status
+
+A step's status drives its marker and whether it is reachable: `visited`
+shows a check, `current` and `unvisited` show a dot, and `disabled` steps take
+neither `href` nor `onClick`.
+
+<DocsCanvasShell description={<>Clicking a reachable step runs its action. Disabled steps have no control at all.</>}>
+    <DsCanvasQuiet of={ProgressTrackerStories.Clickable} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Every step visited but the last, which is current.</>}>
+    <DsCanvasQuiet of={ProgressTrackerStories.Completed} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout & composition
+
+<DocsCanvasShell description={<>`orientation="vertical"` stacks the steps instead of laying them in a row.</>}>
+    <DsCanvasQuiet of={ProgressTrackerStories.Vertical} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`spacing` sets the gap between steps: `comfortable`, `cozy` or `compact`.</>}>
+    <DsCanvasQuiet of={ProgressTrackerStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>items</code></td><td>array</td><td>Each item: <code>id</code>, <code>label</code>, <code>status</code>, and an optional <code>href</code> or <code>onClick</code>.</td></tr>
+        <tr><td><code>items[].status</code></td><td>enum</td><td><code>disabled</code>, <code>unvisited</code>, <code>current</code> or <code>visited</code>.</td></tr>
+        <tr><td><code>orientation</code></td><td>enum</td><td><code>horizontal</code> (default) or <code>vertical</code>.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>comfortable</code>, <code>cozy</code> (default) or <code>compact</code>.</td></tr>
+        <tr><td><code>label</code></td><td>string</td><td>Accessible name for the step list. Default "Progress tracker".</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ProgressTracker` when each step of a journey has its own name people
+need to see and, often, jump back to — a multi-page form, a setup flow, a
+reflection with named sections. When position alone is enough and the steps
+have no names to show, use `ProgressIndicator` instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### An item's status and its action are set separately.
+
+`status` alone decides how a step looks. Give any non-`disabled` item an
+`href` or `onClick` to make it reachable; without either, it renders as plain
+text even if its status says it can be revisited.
+
+```jsx
+<ProgressTracker
+    items={[
+        { id: 'info', label: 'Session information', status: 'visited', onClick: goTo('info') },
+        { id: 'reflection', label: 'Student reflection', status: 'current' },
+        { id: 'feedback', label: 'Form feedback', status: 'disabled' },
+    ]}
+/>
+```
+
+### A `disabled` item takes neither a link nor a button, whatever is passed.
+
+This keeps a step someone cannot reach yet from being focusable or clickable,
+regardless of what `href` or `onClick` the caller supplies.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named landmark.** The tracker is a `nav` with `label` as its accessible
+  name ("Progress tracker" by default), and its steps are an ordered list.
+- **The current step is `aria-current="step"`.** Screen readers announce it
+  as the one in progress.
+- **Reachable steps are real links or buttons.** Tab reaches any non-`disabled`
+  step that carries `href` or `onClick`; `disabled` steps are marked
+  `aria-disabled` and are not in the tab order.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a short sequence where position matters more than each step's name, use
+  `ProgressIndicator`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

@@ -1,20 +1,142 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InlineMessageStories from './InlineMessage.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InlineMessageStories} />
 
 <Title />
-An icon trigger that opens a Popup with the message.
+An icon trigger that opens a `Popup` carrying the full message. It keeps a
+secondary note out of the page's reading order until someone asks for it.
 
 <DocsTabs of={InlineMessageStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={InlineMessageStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/InlineMessage"
+/>
 
-<ArgTypes of={InlineMessageStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Click the icon to open the popup.</>}>
+    <Canvas of={InlineMessageStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>`info`, `warning`, `danger` and `success` set the trigger icon and its color. The popup's content stays the same style in every appearance.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.Appearances} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`secondaryText` adds a second line under the title, for a short follow-up like what to try instead.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.WithSecondaryText} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={InlineMessageStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `InlineMessage` for a note that explains or qualifies something right
+beside it — why a field is required, what a score means — without taking up
+space until someone asks. It is built on `Popup`, so placement, dismissal and
+focus return are shared with every other popup in the system.
+
+For a message that belongs to a whole page or section and should always be
+visible, use `Banner` or `SectionMessage` instead. `InlineMessage` is for
+detail that most people will never need to open.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `label` is the only visible text before the popup opens.
+
+The trigger is an icon button with no text of its own, so `label` carries its
+accessible name and its tooltip. Write it as the question the popup answers,
+not as "info" or "more."
+
+### Pick the appearance for what the note says, not for decoration.
+
+`info` is the default for a neutral explanation. Use `warning`, `danger` or
+`success` only when the note itself is cautionary, blocking or confirming
+something — the icon is a second cue, not a style choice.
+
+```jsx
+<InlineMessage label="Why this field is required" title="Required for billing">
+    Your institution uses this to route invoices.
+</InlineMessage>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger is a real button.** It is reached with Tab and opens with
+  Enter or Space, same as any `IconButton`.
+- **`label` is required.** It is the trigger's only accessible name; a vague
+  label like "info" tells a screen reader nothing about what the popup holds.
+- **Focus and dismissal follow `Popup`.** Opening moves focus into the popup;
+  Escape or a click outside closes it and returns focus to the trigger.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the popup mechanics this component is built on, see `Popup`.
+- For a message that stays visible without being opened, use `SectionMessage`
+  or `Banner`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

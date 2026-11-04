@@ -1,20 +1,138 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BannerStories from './Banner.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BannerStories} />
 
 <Title />
-A prominent message at the top of a page.
+A full-width strip at the top of a page for a message every visitor needs to
+see. It carries no dismiss — the caller mounts it while the condition holds
+and unmounts it once it clears.
 
 <DocsTabs of={BannerStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={BannerStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Banner"
+/>
 
-<ArgTypes of={BannerStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A warning banner, flush against the top of the page with no radius.</>}>
+    <Canvas of={BannerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>`warning` and `danger` carry a leading icon in the role's color. `announcement` has no icon and a neutral fill.</>}>
+    <DsCanvasQuiet of={BannerStories.Appearances} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`icon={false}` drops the appearance's default icon.</>}>
+    <DsCanvasQuiet of={BannerStories.WithoutIcon} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BannerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Banner` for a condition that applies to the whole page, for as long as it
+holds: scheduled maintenance, an outage, an account-wide notice. It has no
+timeout and no dismiss, so only mount it while the condition is true.
+
+For something that belongs to one part of the page and stays until resolved
+or dismissed, use `SectionMessage`. For a confirmation that something already
+happened and needs no reply, use `Flag` — a `success` or `info` flag times out
+on its own, and `warning` or `danger` stays until dismissed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick the appearance for what is true, not for emphasis.
+
+`warning` is the default, cautionary form. `danger` is for something that
+needs immediate attention. `announcement` carries no icon and no severity —
+use it for a general notice with nothing wrong.
+
+### Keep the message to one line where it can fit.
+
+A banner runs the full width of the page, so a short message reads at a
+glance. A link inside the message inherits the banner's text color and is
+underlined to stay visible against every fill.
+
+```jsx
+<Banner appearance="danger">
+    The scheduled call is delayed. <a href="/status">Check status</a>.
+</Banner>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Announced as a status.** The banner's role is `status`, so assistive
+  technology reports its content without interrupting the current task.
+- **Color is not the only cue.** `warning` and `danger` pair their fill with a
+  leading icon; only `announcement` relies on fill alone, which is
+  appropriate since it carries no severity.
+- **No focus trap.** A banner never captures focus or keyboard navigation —
+  it sits in the page's reading order like any other content.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a message scoped to one region of the page, use `SectionMessage`.
+- For a timed confirmation that something already happened, use `Flag`.
+- For a short message anchored to one object in a list, use `InlineMessage`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
