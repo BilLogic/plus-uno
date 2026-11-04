@@ -141,7 +141,7 @@ const DonutChart = ({
                         fontSize: 'var(--font-size-body3)',
                         lineHeight: '1.667',
                         color: 'var(--ds-text-subtle)',
-                        marginTop: '4px'
+                        marginTop: 'var(--pad-x-xs)'
                     }}>
                         {label}
                     </div>

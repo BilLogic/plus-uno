@@ -61,7 +61,7 @@ const DonutChartSVG = ({
         // Default to header styles for other sizes
         return {
             fontFamily: 'var(--font-family-header)',
-            fontWeight: 'bold',
+            fontWeight: 'var(--font-weight-bold)',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',
             color: 'var(--ds-text)'
@@ -137,7 +137,7 @@ const DonutChartSVG = ({
                         fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3)',
                         color: 'var(--ds-text-subtle)',
-                        marginTop: '4px'
+                        marginTop: 'var(--pad-x-xs)'
                     }}>
                         {label}
                     </span>

@@ -32,7 +32,7 @@ const DonutChartSVG = ({
         // Default to header styles for other sizes
         return {
             fontFamily: 'var(--font-family-header)',
-            fontWeight: 'bold',
+            fontWeight: 'var(--font-weight-bold)',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',
             color: 'var(--ds-text)'
@@ -103,21 +103,21 @@ const DonutChartSVG = ({
                         left: `${tooltipPosition.x}px`,
                         top: `${tooltipPosition.y - 40}px`,
                         transform: 'translate(-50%, -100%)',
-                        backgroundColor: 'var(--ds-text)',
-                        color: 'var(--ds-text-inverse)',
-                        padding: 'var(--pad-y-sm) var(--pad-x-sm)',
-                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: 'var(--ds-surface-overlay)',
+                        color: 'var(--ds-text)',
+                        padding: 'var(--popover-pad-y-tooltip) var(--pad-x-xs)',
+                        borderRadius: 'var(--popover-radius-tooltip)',
                         fontSize: 'var(--font-size-body3)',
                         fontFamily: 'var(--font-family-body)',
                         pointerEvents: 'none',
-                        zIndex: 'var(--layer-tooltip)',
+                        zIndex: 'var(--layer-popup)',
                         whiteSpace: 'nowrap',
                         boxShadow: 'var(--ds-shadow-overlay)',
                         textAlign: 'center'
                     }}
                 >
                     {paths[hoveredIndex].label && (
-                        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
+                        <div style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--pad-x-xs)' }}>
                             {paths[hoveredIndex].label}
                         </div>
                     )}
@@ -156,7 +156,7 @@ const DonutChartSVG = ({
                         fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3)',
                         color: 'var(--ds-text-subtle)',
-                        marginTop: '4px'
+                        marginTop: 'var(--pad-x-xs)'
                     }}>
                         {label}
                     </span>

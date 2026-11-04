@@ -29,7 +29,7 @@ const PyramidChart = ({
                     softConnector: true,
                     style: {
                         ...chartTheme.title?.style,
-                        fontWeight: 'normal'
+                        fontWeight: 'var(--font-weight-normal)'
                     }
                 },
                 center: ['50%', '50%'],
