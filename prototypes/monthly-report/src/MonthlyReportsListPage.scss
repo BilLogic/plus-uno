@@ -208,7 +208,7 @@
     gap: 8px;
 
     // Fix for pagination ellipsis color visibility
-    .plus-pagination .page-item-ellipsis .page-link {
+    .plus-pagination .plus-pagination__gap {
         color: var(--ds-text);
     }
 }

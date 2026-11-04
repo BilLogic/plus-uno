@@ -202,8 +202,8 @@ export const FillIn = () => (
                         currentPage={1}
                         totalPages={10}
                         onPageChange={() => {}}
-                        type="icon"
-                        size="default"
+                        navigator="icon"
+                        spacing="default"
                     />
                 </div>
                 {/* Footer: Close, Copy recruit message, Continue (0 selected) disabled (design system Button/CloseButton/CopyRecruitmentMessageButton) */}

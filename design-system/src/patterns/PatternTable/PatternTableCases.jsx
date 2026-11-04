@@ -39,7 +39,7 @@ const RowActions = ({ label }) => (
 const Pager = ({ range, pages }) => (
     <>
         <span style={{ font: 'var(--body-default)', ...subtle }}>{range}</span>
-        <Pagination currentPage={1} totalPages={pages} size="small" onPageChange={() => {}} />
+        <Pagination currentPage={1} totalPages={pages} spacing="compact" onPageChange={() => {}} />
     </>
 );
 

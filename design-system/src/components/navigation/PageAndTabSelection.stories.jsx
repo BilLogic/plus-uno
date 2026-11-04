@@ -151,7 +151,7 @@ TabSelection.play = async ({ canvasElement }) => {
  * Page numbers, Previous and Next all report the page they land on.
  *
  * Twenty pages rather than five so the windowing is exercised too: first and
- * last stay reachable behind an ellipsis, which is the only reason `maxVisible`
+ * last stay reachable behind an ellipsis, which is the only reason `max`
  * exists and is otherwise asserted nowhere.
  */
 export const PageSelection = () => {
@@ -162,7 +162,7 @@ export const PageSelection = () => {
         <div style={stack}>
             <Pagination
                 id="pts-pages"
-                type="text"
+                navigator="text"
                 currentPage={page}
                 totalPages={20}
                 onPageChange={(next) => {
@@ -179,56 +179,45 @@ PageSelection.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const log = canvas.getByTestId('page-log');
 
-    // On page 1 there is nowhere back to go, so Previous is unreachable rather
-    // than merely styled gray — and, since #223, it also refuses a click
-    // dispatched straight past the CSS shield instead of following its own
-    // `href="#"`. Reporting nothing is only half of it: the page has to still
-    // be here to report it.
-    const previous = canvas.getByRole('link', { name: 'Previous' });
-    await expectUnreachable(previous);
-    await expect(previous).toHaveAttribute('tabindex', '-1');
-    await expectRefusesDispatchedClick(previous);
+    // On page 1 there is nowhere back to go: Previous stays in the tab order,
+    // says it is disabled, and a click reports nothing.
+    const previous = canvas.getByRole('button', { name: 'Previous' });
+    await expect(previous).toHaveAttribute('aria-disabled', 'true');
+    // A dispatched click passes the CSS shield, so this is the handler's own refusal.
+    previous.click();
     await expect(log.textContent).toBe('');
 
     // A page number reports itself, and becomes the current page.
-    await userEvent.click(canvas.getByRole('link', { name: '3' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Page 3' }));
     await expect(log).toHaveTextContent(/^3$/);
-    await expect(canvas.getByRole('link', { name: '3' })).toHaveAttribute('aria-current', 'page');
+    await expect(canvas.getByRole('button', { name: 'Page 3' })).toHaveAttribute('aria-current', 'page');
 
     // Next and Previous step by one from wherever the caller now is.
-    await userEvent.click(canvas.getByRole('link', { name: 'Next' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
     await expect(log).toHaveTextContent(/^3,4$/);
-    await userEvent.click(canvas.getByRole('link', { name: 'Previous' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Previous' }));
     await expect(log).toHaveTextContent(/^3,4,3$/);
 
-    // The window keeps both ends reachable rather than stranding page 20.
-    await expect(canvas.getByRole('link', { name: '20' })).toBeInTheDocument();
-    await expect(canvas.getAllByText('...').length).toBeGreaterThan(0);
+    // The window keeps both ends reachable rather than stranding page 20, and
+    // the gap is hidden from assistive technology.
+    await expect(canvas.getByRole('button', { name: 'Page 20' })).toBeInTheDocument();
+    await expect(canvas.getAllByText('\u2026').length).toBeGreaterThan(0);
 
     // The far end refuses in the same way the near end did.
-    await userEvent.click(canvas.getByRole('link', { name: '20' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Page 20' }));
     await expect(log).toHaveTextContent(/^3,4,3,20$/);
-    const next = canvas.getByRole('link', { name: 'Next' });
-    await expectUnreachable(next);
-    await expect(next).toHaveAttribute('tabindex', '-1');
-    await expectRefusesDispatchedClick(next);
+    const next = canvas.getByRole('button', { name: 'Next' });
+    await expect(next).toHaveAttribute('aria-disabled', 'true');
+    next.click();
     await expect(log).toHaveTextContent(/^3,4,3,20$/);
 
-    // And an enabled control still navigates nothing — `preventDefault` moved in
-    // front of the disabled guard in #223, so it now runs on every activation,
-    // and a page click that stopped preventing the default would leave the whole
-    // suite on a different URL.
-    await expectRefusesDispatchedClick(canvas.getByRole('link', { name: '19' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Page 19' }));
     await expect(log).toHaveTextContent(/^3,4,3,20,19$/);
 
-    // Previous and Next are keyed by their role, not by the page they point at
-    // (#223): on page 19 of 20, `currentPage + 1` is 20 and `currentPage - 1` is
-    // 18, and both numbers are also page items in the same `<ul>`. React does not
-    // warn about that pair — it namespaces the mapped array's keys under the
-    // array's own slot, so the two never meet in one reconciliation set — which
-    // is exactly why the collision needs an assertion rather than a console. The
-    // consequence a caller would see is a current marker on the wrong node, and
-    // `aria-current` is what a screen reader reads, so exactly one link holds it.
+    // Previous and Next are separate items from the pages they point at: on
+    // page 19 of 20, `currentPage + 1` is 20 and `currentPage - 1` is 18, and
+    // both numbers are also pages in the same list. Exactly one control holds
+    // `aria-current`, the current page.
     const current = canvasElement.querySelectorAll('[aria-current="page"]');
     await expect(current.length).toBe(1);
     await expect(current[0]).toHaveTextContent('19');

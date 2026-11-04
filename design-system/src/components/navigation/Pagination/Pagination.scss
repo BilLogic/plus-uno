@@ -1,374 +1,145 @@
-/**
- * Pagination Component Styles
- * Pixel-accurate implementation matching Figma design exactly
- * 
- * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=53-19822
- * 
- * Design System: Single pill container with segmented buttons inside
- * - All segments have equal height, vertical centering, consistent horizontal padding
- * - Thin vertical dividers between segments; no gaps
- * - States: default / hover / active / disabled match Figma exactly
- */
 @use '../../../styles/state' as *;
 
-/* ============================================
-   PAGINATION CONTAINER
-   Single pill container with border
-   ============================================ */
+/*
+ * Pagination: one pill of segments. A page is a 32 row (`--item-height-md`), 24
+ * when compact (`--item-height-sm`), the label body/default, the current page
+ * on the selected tokens. Hovered and pressed come from the state mixin; the
+ * focus ring sits inside the segment so its neighbors do not cover it.
+ */
 
 .plus-pagination {
-    /* Reset Bootstrap defaults */
     margin: 0;
     padding: 0;
     list-style: none;
 
-    /* Flexbox layout - no gaps, items are connected */
     display: inline-flex;
     flex-wrap: nowrap;
     align-items: stretch;
     gap: 0;
 
-    /* Container border - single border around entire pill */
-    border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
-    /* #bec8ca */
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-full);
     background-color: var(--ds-surface);
     overflow: hidden;
 
-    /* Default (medium) border-radius: 999px (Pill) */
-    border-radius: var(--size-border-radius-radius-1000);
+    --_pagination-height: var(--item-height-md);
+    --_pagination-pad: var(--pad-x-md);
+
+    &.plus-pagination--compact {
+        --_pagination-height: var(--item-height-sm);
+        --_pagination-pad: var(--pad-x-sm);
+    }
 }
 
-/* ============================================
-   PAGE ITEM
-   ============================================ */
-
-.plus-pagination .page-item {
-    /* Reset Bootstrap defaults */
+.plus-pagination__item {
     margin: 0;
     list-style: none;
-
-    /* Flex item */
     flex: 0 0 auto;
     display: flex;
     align-items: stretch;
+
+    & + & {
+        border-left: var(--border-default) solid var(--ds-border);
+    }
 }
 
-/* ============================================
-   PAGE LINK
-   Base styles for all segments
-   ============================================ */
-
-.plus-pagination .page-link {
-    position: relative;
+.plus-pagination__page,
+.plus-pagination__navigator,
+.plus-pagination__gap {
     display: flex;
     align-items: center;
     justify-content: center;
-
-    /* Default (medium) padding: 10px horizontal, 6px vertical */
-    padding: var(--size-spacing-small-space-075) var(--size-spacing-small-space-150);
-    /* 6px, 10px */
-
-    /* No individual borders - container has border, segments have dividers */
+    box-sizing: border-box;
+    height: var(--_pagination-height);
+    min-width: var(--_pagination-height);
+    margin: 0;
+    padding: 0 var(--_pagination-pad);
     border: none;
     border-radius: 0;
-
-    /* A page number is a control label: body.default 14/20 at medium, every size */
+    background-color: var(--ds-surface);
+    color: var(--ds-text-subtle);
     font: var(--body-default);
     font-weight: var(--type-weight-medium);
-
-    /* Text color */
-    color: var(--color-secondary-text) !important;
-    /* #3b525f */
-
-    /* Remove Bootstrap defaults */
     text-decoration: none;
-    margin: 0;
+}
 
-    /* Background */
-    background-color: var(--ds-surface);
-
-    /* Cursor */
+.plus-pagination__page,
+.plus-pagination__navigator {
+    position: relative;
     cursor: pointer;
+    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard);
 
-    /* Box sizing */
-    box-sizing: border-box;
-
-    /* Fill item */
-    width: 100%;
-    height: 100%;
-
-    /* Vertical divider between segments */
-    border-right: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
-    /* #bec8ca */
-
-    /* Transition */
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-/* Remove border from last item */
-.plus-pagination .page-item:last-child .page-link {
-    border-right: none;
-}
-
-/* ============================================
-   ICON BUTTONS (Previous/Next)
-   Square segments so caret glyphs stay centered (text-cell padding
-   made the first/last cells look wider and off-balance).
-   ============================================ */
-
-.plus-pagination .page-item-icon {
-    flex: 0 0 auto;
-}
-
-.plus-pagination .page-item-icon .page-link {
-    /* Match vertical padding; keep horizontal equal so the cell is square-ish */
-    padding: var(--size-spacing-small-space-075);
-    /* 6px all sides */
-    min-width: calc(
-        var(--font-size-fa-body2) + (2 * var(--size-spacing-small-space-075))
-    );
-    width: auto;
-    box-sizing: border-box;
-
-    /* Icon color - secondary color */
-    color: var(--color-secondary) !important;
-    /* #445c6a */
-
-    /* Icon sizing - default (medium): Fontawesome/Solid/B2 */
-    i {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 1em;
-        font-size: var(--font-size-fa-body2);
-        /* 12px */
-        line-height: 1;
-        color: var(--color-secondary) !important;
-        font-weight: 900;
-        /* Font Awesome Solid — optical center for asymmetric caret glyphs */
-        transform: translateX(0);
-    }
-
-    .fa-caret-left {
-        transform: translateX(-0.05em);
-    }
-
-    .fa-caret-right {
-        transform: translateX(0.05em);
+    &:focus {
+        @include plus-ring-reset;
     }
 }
 
-/* ============================================
-   ROUNDED ENDS
-   First and last items have rounded ends
-   ============================================ */
-
-/* Icon type: fully rounded pill (999px) */
-.plus-pagination .page-item:first-child .page-link {
-    border-top-left-radius: var(--size-border-radius-radius-1000);
-    /* 999px */
-    border-bottom-left-radius: var(--size-border-radius-radius-1000);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.plus-pagination .page-item:last-child .page-link {
-    border-top-right-radius: var(--size-border-radius-radius-1000);
-    /* 999px */
-    border-bottom-right-radius: var(--size-border-radius-radius-1000);
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-right: none;
-}
-
-/* Text type: rounded ends (100px) */
-.plus-pagination.plus-pagination-text .page-item:first-child .page-link {
-    border-top-left-radius: 100px;
-    border-bottom-left-radius: 100px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-.plus-pagination.plus-pagination-text .page-item:last-child .page-link {
-    border-top-right-radius: 100px;
-    border-bottom-right-radius: 100px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-right: none;
-}
-
-/* ============================================
-   STATES
-   ============================================ */
-
-/* Hover and pressed */
-.plus-pagination .page-item:not(.disabled):not(.active) .page-link {
-    @include plus-state((
-        hovered: (
-            background-color: var(--ds-background-neutral-subtle-hovered),
-            color: var(--color-secondary-text) !important,
-            z-index: 2,
-        ),
-        pressed: (
-            background-color: var(--ds-background-neutral-subtle-pressed),
-            color: var(--color-secondary-text) !important,
-            z-index: 2,
-        ),
-    ), $ring: false);
-}
-
-/*
- * Focus: the ring alone, inside the page's edge so the segments beside it do
- * not cover it. A pointer focus draws nothing.
- */
-.plus-pagination .page-link:focus {
-    @include plus-ring-reset;
-}
-
-.plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus-visible,
-.plus-pagination .page-item.active .page-link:focus-visible {
+// Each part draws its own ring, inside the segment so its neighbors do not
+// cover it.
+.plus-pagination__page:focus-visible {
     outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: calc(-1 * var(--focus-ring-width));
-    color: var(--color-secondary-text) !important;
     z-index: 2;
 }
 
-/* Current page: selected, so the 16 step. */
-.plus-pagination .page-item.active .page-link {
-    background-color: var(--ds-background-selected);
-    color: var(--color-secondary-text) !important;
-    /* #3b525f */
-    cursor: default;
-    /* The current page is semibold, as a selected tab is. */
-    font-weight: var(--type-weight-semibold);
-    z-index: 3;
-    border-right-color: var(--color-outline-variant);
+.plus-pagination__navigator:focus-visible {
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: calc(-1 * var(--focus-ring-width));
+    z-index: 2;
 }
 
-/* Active state - icon buttons */
-.plus-pagination .page-item.active.page-item-icon .page-link {
-    color: var(--color-secondary-text) !important;
+// The current page is selected, so it reads as a selected tab does: semibold on
+// the selected fill. Listed after hovered so it wins on a hover.
+.plus-pagination__page {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        selected: (
+            background-color: var(--ds-background-selected),
+            color: var(--ds-text-selected),
+            font-weight: var(--type-weight-semibold),
+            cursor: default,
+        ),
+    ), $ring: false, $selected-selector: "&[aria-current='page']");
+}
+
+.plus-pagination__navigator {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        disabled: (
+            background-color: var(--ds-background-disabled),
+            color: var(--ds-text-disabled),
+            cursor: not-allowed,
+        ),
+    ), $ring: false);
+
+    &[aria-disabled='true'] i {
+        color: var(--ds-icon-disabled);
+    }
+}
+
+// Square cells so the caret centers.
+.plus-pagination__navigator--icon {
+    padding: 0;
 
     i {
-        color: var(--color-secondary-text) !important;
+        font-size: var(--icon-sm);
+        line-height: 1;
+        color: var(--ds-icon-subtle);
     }
 }
 
-/* Disabled state - Figma: opacity-40 (40%) */
-.plus-pagination .page-item.disabled .page-link {
-    color: color-mix(in srgb, var(--color-secondary-text) 38%, transparent) !important;
-    background-color: var(--ds-surface);
-    cursor: not-allowed;
-    pointer-events: none;
-    opacity: 0.4;
-    /* 40% per Figma */
-}
-
-/* Disabled state - icon buttons */
-.plus-pagination .page-item.disabled.page-item-icon .page-link {
-    color: color-mix(in srgb, var(--color-secondary) 38%, transparent) !important;
-    opacity: 0.4;
-    /* 40% per Figma */
-
-    i {
-        color: color-mix(in srgb, var(--color-secondary) 38%, transparent) !important;
-    }
-}
-
-/* Ellipsis styling - same as regular segments */
-.plus-pagination .page-item-ellipsis .page-link {
-    color: var(--color-secondary-text) !important;
-    background-color: var(--ds-surface);
+.plus-pagination__gap {
     cursor: default;
-    pointer-events: none;
-    opacity: 1;
 }
 
-/*
- * Preserve border radius in all states: hovered and pressed through the state
- * mixin, focus and the current page beside it, all from one map per end.
- */
-@function pagination-end-radius($end, $radius) {
-    $near: if($end == first, left, right);
-    $far: if($end == first, right, left);
-    @return (
-        border-top-#{$near}-radius: $radius !important,
-        border-bottom-#{$near}-radius: $radius !important,
-        border-top-#{$far}-radius: 0 !important,
-        border-bottom-#{$far}-radius: 0 !important,
-    );
-}
-
-@each $type, $radius in ('': var(--size-border-radius-radius-1000), '.plus-pagination-text': 100px) {
-    @each $end in (first, last) {
-        $radii: pagination-end-radius($end, $radius);
-
-        .plus-pagination#{$type} .page-item:#{$end}-child .page-link {
-            @include plus-state((hovered: $radii, pressed: $radii), $ring: false);
-
-            &:focus {
-                @include plus-state-apply($radii);
-            }
-        }
-
-        .plus-pagination#{$type} .page-item:#{$end}-child.active .page-link {
-            @include plus-state-apply($radii);
-        }
+@media (forced-colors: active) {
+    .plus-pagination__navigator[aria-disabled='true'] {
+        color: GrayText;
     }
-}
 
-/* ============================================
-   SIZE VARIANTS
-   ============================================ */
-
-/* Small size */
-.plus-pagination.plus-pagination-small {
-    border-radius: var(--size-border-radius-radius-1000);
-    /* Pill */
-}
-
-.plus-pagination.plus-pagination-small .page-link {
-    padding: var(--size-spacing-small-space-050) var(--size-spacing-small-space-100);
-    /* 4px, 8px */
-}
-
-.plus-pagination.plus-pagination-small .page-item-icon .page-link {
-    padding: var(--size-spacing-small-space-050);
-    /* 4px all sides */
-    min-width: calc(
-        var(--font-size-fa-body3) + (2 * var(--size-spacing-small-space-050))
-    );
-}
-
-.plus-pagination.plus-pagination-small .page-item-icon .page-link i {
-    font-size: var(--font-size-fa-body3);
-    /* 10px */
-    line-height: 1;
-}
-
-/* Large size */
-.plus-pagination.plus-pagination-large {
-    border-radius: var(--size-border-radius-radius-1000);
-    /* Pill */
-}
-
-.plus-pagination.plus-pagination-large .page-link {
-    /* Text buttons: 16px horizontal, 8px vertical */
-    padding: var(--size-spacing-small-space-100) var(--size-spacing-medium-space-300);
-    /* 8px, 16px */
-}
-
-/* Large icon buttons: square cell matching large text vertical rhythm */
-.plus-pagination.plus-pagination-large .page-item-icon .page-link {
-    padding: var(--size-spacing-small-space-100);
-    /* 8px all sides */
-    min-width: calc(
-        var(--font-size-fa-body1) + (2 * var(--size-spacing-small-space-100))
-    );
-}
-
-.plus-pagination.plus-pagination-large .page-item-icon .page-link i {
-    font-size: var(--font-size-fa-body1);
-    /* 14px */
-    line-height: 1;
+    .plus-pagination__page[aria-current='page'] {
+        @include plus-ring($ring-offset: calc(-1 * var(--border-default)), $ring-token: Highlight, $ring-width: var(--border-default));
+    }
 }

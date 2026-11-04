@@ -32,13 +32,13 @@
 
         // Link Style (Inactive / Navigable)
         a {
-            color: var(--color-primary-text); // Figma: #00547e
+            color: var(--ds-link);
             text-decoration: none;
 
             @include plus-state((
                 hovered: (
                     text-decoration: underline,
-                    color: var(--color-primary-text),
+                    color: var(--ds-link),
                 ),
             ), $ring: false);
         }

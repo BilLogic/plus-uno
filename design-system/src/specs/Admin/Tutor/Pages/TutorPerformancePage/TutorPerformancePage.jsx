@@ -247,9 +247,9 @@ const TutorPerformancePage = ({
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={onPageChange}
-                            type="icon"
-                            size="small"
-                            ariaLabel="Tutors table pagination"
+                            navigator="icon"
+                            spacing="compact"
+                            label="Tutors table pagination"
                         />
                     </div>
                 </div>

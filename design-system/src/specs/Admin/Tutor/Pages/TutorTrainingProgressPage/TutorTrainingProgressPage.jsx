@@ -338,8 +338,8 @@ const TutorTrainingProgressPage = ({
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={onPageChange}
-                            type="icon"
-                            size="small"
+                            navigator="icon"
+                            spacing="compact"
                         />
                     </div>
                 </div>
