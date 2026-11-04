@@ -1,15 +1,14 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Button, Navbar, Navigation, Jumbotron } from '@/components';
+import { Button, Navigation } from '@/components';
+import Topbar from '@/patterns/Topbar';
+import PatternSection from '@/patterns/PatternSection';
 
 // A simple App component to serve as the entry point
 const App = () => {
     return (
         <div className="app-container">
-            <Navbar
-                brand={{ text: 'PLUS Design System', href: '#' }}
-                user={{ name: 'User', avatar: 'https://via.placeholder.com/40' }}
-            />
+            <Topbar breadcrumbs={[{ label: 'PLUS Design System' }]} />
             <div className="d-flex">
                 <Navigation
                     items={[
@@ -22,7 +21,8 @@ const App = () => {
                     <Container fluid>
                         <Row className="mb-4">
                             <Col>
-                                <Jumbotron
+                                <PatternSection
+                                    level="page"
                                     title="Welcome to PLUS Design System"
                                     description="This is the React implementation of the PLUS Design System."
                                     actions={<Button text="Get started" appearance="primary" />}

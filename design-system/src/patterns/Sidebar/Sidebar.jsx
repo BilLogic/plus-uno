@@ -1,6 +1,6 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { CountTag, Divider, SidebarTab, Button, IconButton } from '@/components';
+import { CountTag, SidebarTab, Button, IconButton } from '@/components';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 
@@ -250,7 +250,7 @@ const PatternSidebar = ({
                                 </div>
                                 {list(section.items)}
                             </div>
-                            {section.divider ? <Divider size="sm" className="plus-pattern-sidebar__divider" /> : null}
+                            {section.divider ? <div className="plus-pattern-sidebar__divider" role="separator" /> : null}
                         </React.Fragment>
                     );
                 })}

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button';
 import { STAGES, PRODUCT_PILLARS, STAGE_META, PILLAR_META } from './prototypes-data';
@@ -42,11 +42,10 @@ const PrototypeCard = ({
   const isClickable = !isNotDeployed;
 
   return (
-    <Card
+    <PatternCard
       className={`prototype-card ${isClickable ? 'prototype-card--clickable' : ''} ${isNotDeployed ? 'prototype-card--not-deployed' : ''}`}
-      paddingSize="md"
-      gapSize="md"
-      radiusSize="sm"
+      padding="md"
+      gap="md"
       onClick={isClickable ? handleCardClick : undefined}
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
@@ -144,7 +143,7 @@ const PrototypeCard = ({
           />
         </div>
       </div>
-    </Card>
+    </PatternCard>
   );
 };
 

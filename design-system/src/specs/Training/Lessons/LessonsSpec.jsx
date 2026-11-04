@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, StatusTag, Select, Button, IconButton } from '@/components';
+import { Table, StatusTag, Select, Button, IconButton } from '@/components';
+import PatternCard from '@/patterns/PatternCard';
 import { PageLayout } from '@/specs/Universal/Pages';
 
 export const LessonsSpec = () => {
@@ -112,14 +113,14 @@ export const LessonsSpec = () => {
                     ) : (
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
                             {lessons.map((lesson, idx) => (
-                                <Card key={idx} title={lesson.title}>
+                                <PatternCard key={idx} title={lesson.title}>
                                     <div className="d-flex justify-content-between mb-2">
                                         <StatusTag>{lesson.status}</StatusTag>
                                         <span className="body3-txt text-muted">{lesson.duration}</span>
                                     </div>
                                     <div className="body2-txt mb-3">{lesson.competencyArea}</div>
                                     <Button text="Start Lesson" className="w-100" />
-                                </Card>
+                                </PatternCard>
                             ))}
                         </div>
                     )}

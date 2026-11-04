@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card } from '@/components';
+import { Button } from '@/components';
 import DashboardLayout from '@/components/_internal/layout/DashboardLayout';
 import LessonProgressBar from '@/components/_internal/training/LessonProgressBar';
 import LikertScale from '@/components/_internal/training/LikertScale';

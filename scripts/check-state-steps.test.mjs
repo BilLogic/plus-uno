@@ -356,39 +356,6 @@ test('FieldBox: hover turns the border border.focused, subtle hover the neutral 
  * pins the steps the table in color.md names.
  */
 
-/* ─── NavPills ───────────────────────────────────────────────────────────── */
-
-test('NavPills: hovered, pressed, focus a ring with no fill, selected or not', () => {
-  const file = 'components/navigation/NavPills/NavPills.scss';
-  for (const pill of ['.plus-nav-pills .nav-link', '.nav-pills .plus-nav-item-pill']) {
-    expectRule(file, `${pill}:hover${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-    expectRule(file, `${pill}:active${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-    expectRule(file, `${pill}:focus-visible${NOT}`, RING_OUTSIDE);
-    expectNoFill(file, `${pill}:focus-visible${NOT}`);
-
-    // The primary border carries selection, by class or by attribute; the
-    // steps lay over it.
-    for (const selected of ['.active', '[aria-selected=true]', '[aria-current=page]', '[aria-current=true]']) {
-      expectRule(file, `${pill}${selected}:hover`, { 'background-color': layer('--ds-background-selected-hovered') });
-      expectRule(file, `${pill}${selected}:active`, { 'background-color': layer('--ds-background-selected-pressed') });
-      expectRule(file, `${pill}${selected}:focus-visible`, RING_OUTSIDE);
-      expectNoFill(file, `${pill}${selected}:focus-visible`);
-    }
-  }
-
-  const item = '.plus-nav-pills .nav-item';
-  expectRule(file, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  expectNoFill(file, `${item}.pseudo-focus > .nav-link${NOT}`);
-  expectRule(file, `${item}.pseudo-focus > .nav-link${NOT}`, RING_OUTSIDE);
-  expectRule(file, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': layer('--ds-background-selected-pressed') });
-  expectNoFill(file, `${item}.pseudo-focus > .nav-link.active`);
-  expectRule(file, `${item}.pseudo-focus > .nav-link.active`, RING_OUTSIDE);
-
-  expectRule(file, '.plus-nav-pills .dropdown .dropdown-toggle:active', {
-    'background-color': layer('--ds-background-neutral-subtle-pressed'),
-  });
-});
-
 /* ─── CloseButton ────────────────────────────────────────────────────────── */
 
 test('CloseButton: an Icon button, subtle — inverse repaints the named hovered, pressed and focus-ring steps', () => {

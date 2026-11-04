@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import Table from '@/components/text-and-data-display/Table';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
@@ -24,12 +24,10 @@ const OverviewCard = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <Card
+        <PatternCard
             className={cardClasses}
-            paddingSize="md"
-            gapSize="md"
-            radiusSize="md"
-            showBorder={true}
+            padding="md"
+            gap="md"
         >
             <div className="plus-overview-card-header">
                 <h5 className="plus-overview-card-title h5">{title}</h5>
@@ -48,7 +46,7 @@ const OverviewCard = ({
                     </div>
                 )}
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

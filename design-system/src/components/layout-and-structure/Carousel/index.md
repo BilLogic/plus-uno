@@ -48,6 +48,6 @@ From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`.
 
 ## Related
 
-Same group: `Accordion` · `Card` · `Collapse` · `Divider` · `Footer` · `Jumbotron` · `ListGroup` · `MediaObject` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

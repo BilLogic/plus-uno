@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 import SmartTag from '@/components/labels/SmartTag';
 import './ResourceCard.scss';
@@ -80,18 +80,15 @@ const ResourceCard = ({
     );
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-resource-card ${className}`}
             style={style}
-            paddingSize="sm"
-            gapSize="md"
-            radiusSize="sm"
-            borderSize="sm"
-            showBorder={true}
+            padding="sm"
+            gap="md"
         >
             {cardContent}
-        </Card>
+        </PatternCard>
     );
 };
 

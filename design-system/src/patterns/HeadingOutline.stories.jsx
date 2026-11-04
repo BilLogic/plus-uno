@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Card, Dropdown, Modal, Popup, Table, Flag } from '@/components';
+import { Dropdown, Modal, Popup, Table, Flag } from '@/components';
 import { PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
@@ -60,15 +60,13 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
 };
 
 /**
- * A card's title is 14 at every level; its tag is one below its section. Card
- * and PatternCard share the one card title type.
+ * A card's title is 14 at every level; its tag is one below its section.
  */
 export const CardTitles = () => (
     <Page title="Sessions">
         <PatternSection title="This week">
-            <Card title="Algebra I" subtitle="Two students" body="Thursday at 4:00 PM." />
+            <PatternCard title="Algebra I" description="Two students" />
             <PatternSection title="Monday">
-                <Card title="Geometry" subtitle="One student" />
                 <PatternCard title="Chemistry" description="Three students" />
             </PatternSection>
         </PatternSection>
@@ -78,11 +76,9 @@ export const CardTitles = () => (
 CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expectStyle(headingNamed(canvas, 3, 'Algebra I'), 'card in a section', HEADING_XSMALL);
-    await expectStyle(headingNamed(canvas, 4, 'Geometry'), 'card in a subsection', HEADING_XSMALL);
     await expectStyle(headingNamed(canvas, 4, 'Chemistry'), 'pattern card in a subsection', HEADING_XSMALL);
     await expectStyle(canvas.getByText('Three students'), 'pattern card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
-    await expectStyle(canvas.getByText('Thursday at 4:00 PM.'), 'card body', BODY_DEFAULT);
 };
 
 /** A modal's title is the dialog's h1 at 20, and names the dialog. */

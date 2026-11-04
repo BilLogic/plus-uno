@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import CertifiedTutorBadge from '@/specs/Home/Elements/CertifiedTutorBadge';
@@ -39,14 +39,12 @@ const BadgeCard = ({
     const sizeClass = size === 'M' ? 'plus-badge-card--m' : 'plus-badge-card--gt-m';
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={`plus-badge-card ${sizeClass} ${className}`.trim()}
             style={style}
-            paddingSize={null}
-            gapSize={null}
-            radiusSize="md"
-            showBorder={false}
+            padding="sm"
+            gap="sm"
         >
             <div className="plus-badge-card__inner">
                 <div className="plus-badge-card__title">
@@ -91,7 +89,7 @@ const BadgeCard = ({
                     </div>
                 </div>
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

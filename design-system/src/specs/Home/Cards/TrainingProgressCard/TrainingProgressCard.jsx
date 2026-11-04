@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Card from '@/components/layout-and-structure/Card';
+import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 import './TrainingProgressCard.scss';
 
@@ -108,15 +108,12 @@ const TrainingProgressCard = ({
     };
 
     return (
-        <Card
+        <PatternCard
             id={id}
             className={cardClasses}
             style={cardStyle}
-            paddingSize="md"
-            gapSize={size === 'small' ? 'sm' : 'md'}
-            radiusSize="md"
-            borderSize="sm"
-            showBorder={true}
+            padding="md"
+            gap={size === 'small' ? 'sm' : 'md'}
         >
             <div className="plus-training-progress-content">
                 {/* Title with info icon */}
@@ -183,7 +180,7 @@ const TrainingProgressCard = ({
                     )}
                 </div>
             </div>
-        </Card>
+        </PatternCard>
     );
 };
 

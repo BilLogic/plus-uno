@@ -263,7 +263,7 @@
     padding: var(--size-card-pad-y-sm, 16px) var(--size-spacing-medium-space-200, 12px) !important;
     
     // Ensure no extra padding on internal elements
-    .plus-card-content {
+    .plus-pattern-card-inner {
         padding: 0 !important;
         // Make content area a flex container to properly apply gap spacing
         display: flex;

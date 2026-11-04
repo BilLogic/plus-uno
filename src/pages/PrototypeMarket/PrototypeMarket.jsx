@@ -4,7 +4,6 @@ import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import StatusTag from '@/components/labels/StatusTag';
 import { Button, IconButton } from '@/components';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
-import Divider from '@/components/layout-and-structure/Divider';
 import PrototypeCard from './PrototypeCard';
 import {
   prototypes,
@@ -486,7 +485,7 @@ const PrototypeMarket = () => {
                 </div>
               </>
             )}
-            <Divider size="1px" style="dark" opacity10={true} />
+            <div className="prototype-market__divider" role="separator" />
             <h5 className="prototype-market__modal-section h5">Comments</h5>
             <div className="prototype-market__modal-comments">
               {(commentsById[activePrototype.id] || []).map((comment, idx) => (
@@ -523,7 +522,7 @@ const PrototypeMarket = () => {
                 label="Send comment"
               />
             </div>
-            <Divider size="1px" style="dark" opacity10={true} />
+            <div className="prototype-market__divider" role="separator" />
             <h5 className="prototype-market__modal-section h5">Preview</h5>
             <div className="prototype-market__modal-preview">
               {getPrototypeOpenUrl(activePrototype) ? (
