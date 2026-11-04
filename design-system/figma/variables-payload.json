@@ -479,6 +479,34 @@
           "codeSyntax": {
             "WEB": "var(--option-menu-width)"
           }
+        },
+        {
+          "name": "Spinner/size-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spinner-size-sm)"
+          }
+        },
+        {
+          "name": "Spinner/size-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spinner-size-md)"
+          }
+        },
+        {
+          "name": "Spinner/size-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spinner-size-lg)"
+          }
+        },
+        {
+          "name": "Progress/bar-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-bar-height)"
+          }
         }
       ]
     },

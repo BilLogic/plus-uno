@@ -402,6 +402,14 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Tile', new: '--tile-radius-sm', old: '--tile-radius-sm' },
   { tier: 'components', group: 'Tile', new: '--tile-radius-lg', old: '--tile-radius-lg' },
 
+  // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
+  // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
+  // this tier, not through Semantics' size roles) ───────────────────────
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', note: 'matches the old --size-spinner-sm (16px)' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', note: 'matches the old --size-spinner-md (24px)' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', note: 'matches the old --size-spinner-lg (48px)' },
+  { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', note: 'matches the old --size-progressbar-height (8px)' },
+
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card' },
   { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation' },
