@@ -68,4 +68,12 @@ describe('FileUpload', () => {
         expect(container.querySelector('input[type="file"]')).toHaveAttribute('aria-readonly', 'true');
         expect(screen.getByText('zoom_0.mp4')).toBeInTheDocument();
     });
+
+    it('labels the file input with a plain label element', () => {
+        render(<FileUpload id="rec" label="Recording" />);
+        const label = screen.getByText('Recording');
+        expect(label.tagName).toBe('LABEL');
+        expect(label).toHaveAttribute('for', 'rec');
+        expect(label).not.toHaveClass('form-label');
+    });
 });
