@@ -4,14 +4,14 @@ import Tabs from '@/components/navigation/Tabs';
 import Button from '@/components/forms-and-inputs/Button';
 import CountTag from '@/components/labels/CountTag';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
-import './HomepageJumbotron.scss';
+import './HomeHero.scss';
 
 /**
- * HomepageJumbotron component for Home page
+ * HomeHero component for Home page
  * Displays a jumbotron with tabs for sign-up, session, and reflection views
  * Matches Figma design specifications
  */
-const HomepageJumbotron = ({
+const HomeHero = ({
     id,
     activeTab: controlledTab,
     onTabChange,
@@ -49,15 +49,15 @@ const HomepageJumbotron = ({
     return (
         <div
             id={id}
-            className={`plus-homepage-jumbotron ${className}`}
+            className={`plus-home-hero ${className}`}
             style={style}
         >
             {/* Tab Navigation */}
-            <div className="plus-homepage-jumbotron-tabs-wrapper">
+            <div className="plus-home-hero-tabs-wrapper">
                 <Tabs
                     activeKey={currentTab}
                     onSelect={handleTabChange}
-                    className="plus-homepage-jumbotron-nav-tabs"
+                    className="plus-home-hero-nav-tabs"
                 >
                     <Tabs.Tab
                         eventKey="sign-up"
@@ -69,7 +69,7 @@ const HomepageJumbotron = ({
                     >
                         Session links
                         {' '}
-                        <CountTag value={sessionLinks.length} className="plus-homepage-jumbotron-tab-badge" />
+                        <CountTag value={sessionLinks.length} className="plus-home-hero-tab-badge" />
                     </Tabs.Tab>
                     <Tabs.Tab
                         eventKey="reflection"
@@ -77,20 +77,20 @@ const HomepageJumbotron = ({
                         Reflection
                     </Tabs.Tab>
                 </Tabs>
-                <div className="plus-homepage-jumbotron-divider" role="separator" />
+                <div className="plus-home-hero-divider" role="separator" />
             </div>
 
             {/* Content Area */}
-            <div className="plus-homepage-jumbotron-content">
+            <div className="plus-home-hero-content">
                 {currentTab === 'sign-up' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h2">
+                        <h2 className="plus-home-hero-title h2">
                             Sign up for your next session, {tutorName}!
                         </h2>
-                        <p className="plus-homepage-jumbotron-description body1-txt">
+                        <p className="plus-home-hero-description body1-txt">
                             Your students are counting on you! Click below to sign up for your next session and edit if needed.
                         </p>
-                        <div className="plus-homepage-jumbotron-actions">
+                        <div className="plus-home-hero-actions">
                             <Button
                                 text="Sign up now"
                                 appearance="primary"
@@ -109,10 +109,10 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'session' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h2">
+                        <h2 className="plus-home-hero-title h2">
                             Get ready to shine, {tutorName}.
                         </h2>
-                        <p className="plus-homepage-jumbotron-description body1-txt">
+                        <p className="plus-home-hero-description body1-txt">
                             Your session links for today are ready. Select a session and click 'Join session' to begin.
                         </p>
                         <ButtonContainer
@@ -130,13 +130,13 @@ const HomepageJumbotron = ({
 
                 {currentTab === 'reflection' && (
                     <>
-                        <h2 className="plus-homepage-jumbotron-title h2">
+                        <h2 className="plus-home-hero-title h2">
                             How did your session go, {tutorName}?
                         </h2>
-                        <p className="plus-homepage-jumbotron-description body1-txt">
+                        <p className="plus-home-hero-description body1-txt">
                             Share your thoughts about the session to ensure a great experience for all.
                         </p>
-                        <div className="plus-homepage-jumbotron-actions">
+                        <div className="plus-home-hero-actions">
                             <Button
                                 text="Submit Your Reflection"
                                 appearance="primary"
@@ -152,7 +152,7 @@ const HomepageJumbotron = ({
     );
 };
 
-HomepageJumbotron.propTypes = {
+HomeHero.propTypes = {
     id: PropTypes.string,
     activeTab: PropTypes.oneOf(['sign-up', 'session', 'reflection']),
     onTabChange: PropTypes.func,
@@ -173,4 +173,4 @@ HomepageJumbotron.propTypes = {
     style: PropTypes.object
 };
 
-export default HomepageJumbotron;
+export default HomeHero;
