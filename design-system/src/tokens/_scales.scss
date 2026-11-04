@@ -5,8 +5,6 @@
  */
 
 :root {
-
-    /* spacing / primitives (hidden in Figma; point semantic tokens at these, not components) */
     /* Space */
     --space-0: 0px;
     --space-00625: 1px;
@@ -62,7 +60,6 @@
     --size-7700: 1232px;
     --size-4000: 640px;
 
-    /* spacing / foundations */
     /* Size */
     --height-100: var(--size-100);
     --height-125: var(--size-125);
@@ -105,24 +102,6 @@
     --image-md: var(--size-200);
     --image-lg: var(--size-250);
     --image-xl: var(--size-300);
-    /* Element */
-    --element-pad-x-xs: var(--space-025);
-    --element-pad-x-sm: var(--space-050);
-    --element-pad-x-md: var(--space-075);
-    --element-pad-y-sm: var(--space-0125);
-    --element-pad-y-md: var(--space-0375);
-    --element-stack-sm: var(--space-025);
-    --element-stack-md: var(--space-050);
-    --element-stack-lg: var(--space-075);
-    --element-inline-sm: var(--space-025);
-    --element-inline-md: var(--space-050);
-    --element-inline-lg: var(--space-075);
-    --element-radius-sm: var(--radius-0125);
-    --element-radius-md: var(--radius-025);
-    --element-radius-lg: var(--radius-050);
-    --element-radius-item-sm: var(--radius-0375);
-    --element-radius-item-md: var(--radius-050);
-    --element-radius-full: var(--radius-full);
     /* Border */
     --border-default: var(--stroke-1);
     --border-selected: var(--stroke-2);

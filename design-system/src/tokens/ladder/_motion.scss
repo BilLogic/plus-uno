@@ -1,7 +1,7 @@
 /**
- * Motion Tokens (ADR-038)
+ * Motion (ADR-038)
  * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
- * Duration and easing roles for Base UI's data-starting-style/data-ending-
+ * Duration and easing tokens for Base UI's data-starting-style/data-ending-
  * style transitions. Reduced motion is handled once, here: every duration
  * collapses to 0ms under prefers-reduced-motion, so a component that reads
  * --motion-duration-* needs no reduced-motion branch of its own.

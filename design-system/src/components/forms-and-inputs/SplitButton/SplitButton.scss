@@ -13,7 +13,7 @@
         border-start-start-radius: 0;
         border-end-start-radius: 0;
         // Overlap the 1px edge so the seam is one line, not two.
-        margin-inline-start: calc(-1 * var(--size-element-border));
+        margin-inline-start: calc(-1 * var(--border-default));
     }
 
     > .plus-btn:focus-visible {
@@ -22,7 +22,7 @@
 
     // Primary has no edge of its own, so a primary menu trigger draws the seam.
     > .plus-btn--primary:last-child {
-        border-inline-start: var(--size-element-border) solid var(--ds-border-inverse);
+        border-inline-start: var(--border-default) solid var(--ds-border-inverse);
         margin-inline-start: 0;
     }
 }

@@ -82,7 +82,7 @@
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
     text-align: center;
     z-index: 2;
@@ -156,7 +156,7 @@
 .plus-metrics-card-item-content {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
     text-align: center;
     width: 100%;
@@ -210,7 +210,7 @@
 .plus-metrics-stacked-card-content {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
     text-align: center;
     width: 100%;

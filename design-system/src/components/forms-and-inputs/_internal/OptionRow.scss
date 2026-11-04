@@ -79,8 +79,8 @@
     z-index: 1;
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
-    outline: var(--size-element-border) solid var(--ds-border);
-    outline-offset: calc(-1 * var(--size-element-border));
+    outline: var(--border-default) solid var(--ds-border);
+    outline-offset: calc(-1 * var(--border-default));
     cursor: grabbing;
 }
 
@@ -93,7 +93,7 @@
         position: absolute;
         right: 0;
         left: 0;
-        height: var(--size-element-stroke-lg);
+        height: var(--stroke-2);
         background-color: var(--ds-border-selected);
         pointer-events: none;
     }
@@ -135,7 +135,7 @@
     gap: 0;
 
     > * + * {
-        margin-left: var(--size-element-gap-md);
+        margin-left: var(--space-0625);
     }
 
     > .plus-option-row-indent + *,
@@ -145,7 +145,7 @@
 }
 
 .plus-option-row-trailing {
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     color: var(--ds-text-subtle);
 }
 
@@ -201,12 +201,12 @@
     width: var(--size-spacing-medium-space-300);
     height: var(--size-spacing-medium-space-300);
     box-sizing: border-box;
-    border: var(--size-element-stroke-md) solid var(--ds-border-input);
+    border: var(--size-border-stroke-stroke-150) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
     transition: background-color 0.2s, border-color 0.2s;
 
     &--checkbox {
-        border-radius: var(--size-element-radius-sm);
+        border-radius: var(--radius-md);
 
         // The check and the dash only render on a checked or partly-checked
         // mark, which is filled with `background.selected.bold`; the check is
@@ -218,13 +218,13 @@
     }
 
     &--radio {
-        border-radius: var(--size-element-radius-full);
+        border-radius: var(--radius-full);
 
         &.is-checked::before {
             content: '';
             width: var(--size-spacing-small-space-100);
             height: var(--size-spacing-small-space-100);
-            border-radius: var(--size-element-radius-full);
+            border-radius: var(--radius-full);
             background-color: var(--ds-icon-inverse);
         }
     }

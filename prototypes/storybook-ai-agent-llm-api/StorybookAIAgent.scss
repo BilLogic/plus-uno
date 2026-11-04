@@ -251,7 +251,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--size-element-gap-md);
+  gap: var(--space-0625);
   position: relative;
   flex-shrink: 0;
 }
@@ -259,11 +259,11 @@
 .sb-ai-agent__quick-btn {
   display: flex;
   align-items: center;
-  gap: var(--size-element-gap-md);
-  padding: var(--size-element-pad-y-lg) var(--element-pad-default);
+  gap: var(--space-0625);
+  padding: var(--pad-y-lg) var(--pad-x-md);
   background: var(--ds-surface);
-  border: var(--size-element-border) solid var(--color-outline);
-  border-radius: var(--size-element-radius-full);
+  border: var(--border-default) solid var(--color-outline);
+  border-radius: var(--radius-full);
   cursor: pointer;
   transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
   box-shadow: var(--elevation-light-1);
@@ -282,9 +282,9 @@
 
 .sb-ai-agent__quick-icon {
   /* 12 + 12 + 4 → 28px circle (element gap tokens) */
-  width: calc(var(--size-element-gap-lg) + var(--size-element-gap-lg) + var(--size-element-gap-xs));
-  height: calc(var(--size-element-gap-lg) + var(--size-element-gap-lg) + var(--size-element-gap-xs));
-  border-radius: var(--size-element-radius-full);
+  width: calc(var(--stack-lg) + var(--stack-lg) + var(--stack-sm));
+  height: calc(var(--stack-lg) + var(--stack-lg) + var(--stack-sm));
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -293,8 +293,8 @@
 
   svg {
     /* 10 + 4 → 14px (gap-md + gap-xs) */
-    width: calc(var(--size-element-gap-md) + var(--size-element-gap-xs));
-    height: calc(var(--size-element-gap-md) + var(--size-element-gap-xs));
+    width: calc(var(--space-0625) + var(--stack-sm));
+    height: calc(var(--space-0625) + var(--stack-sm));
   }
 
   &--onboarding {
@@ -338,7 +338,7 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: var(--size-element-gap-lg);
+  gap: var(--stack-lg);
   flex: 1;
   min-width: 0;
   max-width: 100%;
@@ -346,7 +346,7 @@
 
 .sb-ai-agent__quick-actions--below-bubble {
   justify-content: center;
-  padding-inline: var(--size-element-gap-xs);
+  padding-inline: var(--stack-sm);
 }
 
 /* ── Skills Router: full-width inside bot bubble (no outer gray canvas) ── */
@@ -446,7 +446,7 @@
   max-width: 100%;
   margin-top: var(--size-card-gap-md);
   padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
-  border-radius: var(--size-element-radius-lg);
+  border-radius: var(--radius-lg);
   border: none;
   background: var(--ds-surface-container);
   box-shadow: none;
@@ -459,7 +459,7 @@
 }
 
 .sb-ai-agent__skills-router-pipeline-title {
-  margin: 0 0 var(--size-element-gap-xs);
+  margin: 0 0 var(--stack-sm);
   font-weight: 600;
   font-size: 12px;
   color: var(--ds-text);
@@ -547,7 +547,7 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: var(--size-element-radius-full);
+  border-radius: var(--radius-full);
   border: none;
   display: inline-flex;
   align-items: center;
@@ -574,8 +574,8 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--size-element-gap-xs);
-  margin: 0 0 var(--size-element-gap-sm);
+  gap: var(--stack-sm);
+  margin: 0 0 var(--stack-md);
   font-family: var(--font-family-body);
   font-size: 14px;
   font-weight: 400;
@@ -593,7 +593,7 @@
 .sb-ai-agent__skill-card__path {
   display: inline-flex;
   align-items: center;
-  gap: var(--size-element-gap-sm);
+  gap: var(--stack-md);
   width: auto;
   max-width: 100%;
   margin: 0 0 var(--size-card-gap-sm);
@@ -626,7 +626,7 @@
 }
 
 .sb-ai-agent__skill-card__field {
-  margin-top: var(--size-element-gap-md);
+  margin-top: var(--space-0625);
 
   &:first-of-type {
     margin-top: 0;
@@ -635,7 +635,7 @@
 
 .sb-ai-agent__skill-card__label {
   display: block;
-  margin-bottom: var(--size-element-gap-xs);
+  margin-bottom: var(--stack-sm);
   font-family: var(--font-family-body);
   font-size: 12px;
   font-weight: 600;
@@ -646,14 +646,14 @@
 .sb-ai-agent__skill-card__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--size-element-gap-sm);
+  gap: var(--stack-md);
 }
 
 .sb-ai-agent__skill-card__tag {
   display: inline-flex;
   align-items: center;
-  padding: var(--size-element-pad-y-sm) var(--element-pad-default);
-  border-radius: var(--size-element-radius-full);
+  padding: var(--space-025) var(--pad-x-md);
+  border-radius: var(--radius-full);
   border: none;
   font-family: var(--font-family-body);
   font-size: 12px;

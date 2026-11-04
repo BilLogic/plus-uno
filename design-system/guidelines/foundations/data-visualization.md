@@ -80,7 +80,7 @@ own `title` option (every chart sets `title: { text: null }`).
 ## Motion
 
 Series entrance and hover transitions take the motion tokens in
-`design-system/src/tokens/deep/_motion.scss`
+`design-system/src/tokens/ladder/_motion.scss`
 (`--motion-duration-short/medium/long`). `prefers-reduced-motion` is handled
 once, globally, at `:root` — every duration token collapses to `0ms` under it
 — so a chart that reads the token needs no reduced-motion branch of its own. A

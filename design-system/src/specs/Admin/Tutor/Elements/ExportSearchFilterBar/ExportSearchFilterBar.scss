@@ -19,7 +19,7 @@
         border-radius: var(--size-border-radius-radius-50);
 
         // Override small button padding to match Figma (4px vertical, 8px horizontal)
-        padding: var(--size-element-pad-y-sm, 4px) var(--element-pad-compact, 8px) !important;
+        padding: var(--space-025, 4px) var(--pad-x-sm, 8px) !important;
         line-height: 1.5 !important;
     }
 

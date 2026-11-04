@@ -12,7 +12,7 @@
 
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-sm); // Figma: 8px gap
+        gap: var(--stack-md); // Figma: 8px gap
         flex-wrap: wrap;
     }
 
@@ -23,7 +23,7 @@
         // Separator Style
         & + .plus-breadcrumb-item {
             &::before {
-                padding-right: var(--size-element-gap-sm);
+                padding-right: var(--stack-md);
                 color: var(--ds-text-subtlest);
                 content: var(--plus-breadcrumb-divider, '/');
             }

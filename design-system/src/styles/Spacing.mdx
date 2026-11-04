@@ -95,7 +95,7 @@ context a value belongs to, step back to the box that holds it.
 <RefTable
     head={['Word', 'Means', 'Example']}
     rows={[
-        [<C>pad</C>, 'The space between a box’s edge and its content, the same on all four sides', <><C>--card-pad-md</C> 20</>],
+        [<C>pad</C>, 'The space between a box’s edge and its content, the same on all four sides', <><C>--card-pad-default</C> 20</>],
         [<><C>pad-x</C> · <C>pad-y</C></>, 'Used only when the two axes differ, as on an Item', <><C>--pad-x-md</C> 12 · <C>--pad-y-md</C> 6</>],
         [<C>stack</C>, 'The vertical gap between rows, chosen by use, never by the size of the box', <><C>--section-stack-md</C> 16</>],
         [<C>inline</C>, 'The horizontal gap between things side by side', <><C>--modal-inline-sm</C> 8</>],
@@ -161,9 +161,9 @@ Card pad of its size: a Section message and File upload take 16.
 
 <TokenTable
     rows={[
-        { token: '--card-pad-sm', figma: 'Card/pad-sm' },
-        { token: '--card-pad-md', figma: 'Card/pad-md', use: 'The default card' },
-        { token: '--card-pad-lg', figma: 'Card/pad-lg' },
+        { token: '--card-pad-compact', figma: 'Card/pad-sm' },
+        { token: '--card-pad-default', figma: 'Card/pad-md', use: 'The default card' },
+        { token: '--card-pad-spacious', figma: 'Card/pad-lg' },
         { token: '--modal-pad', figma: 'Modal/pad', use: 'Every side, at every width' },
         { token: '--popover-pad', figma: 'Popup and flag/pad', use: 'Popup and flag' },
         { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
@@ -264,9 +264,9 @@ Pad and radius follow the card's size; stack and inline follow use.
 
 <TokenTable
     rows={[
-        { token: '--card-pad-sm', figma: 'Card/pad-sm' },
-        { token: '--card-pad-md', figma: 'Card/pad-md' },
-        { token: '--card-pad-lg', figma: 'Card/pad-lg' },
+        { token: '--card-pad-compact', figma: 'Card/pad-sm' },
+        { token: '--card-pad-default', figma: 'Card/pad-md' },
+        { token: '--card-pad-spacious', figma: 'Card/pad-lg' },
         { token: '--card-stack-sm', figma: 'Card/stack-sm', use: 'Title to description' },
         { token: '--card-stack-md', figma: 'Card/stack-md', use: 'Header to body' },
         { token: '--card-stack-lg', figma: 'Card/stack-lg', use: 'Body to footer' },

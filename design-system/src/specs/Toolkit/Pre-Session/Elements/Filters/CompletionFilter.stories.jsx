@@ -53,7 +53,7 @@ export const Overview = () => (
         </section>
         <section style={{ marginTop: 'var(--size-section-gap-lg)' }}>
             <h6 className="h6 mb-3">Different picks</h6>
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-lg)' }}>
                 <CompletionFilter defaultValue="incomplete" />
                 <CompletionFilter defaultValue="completed" />
                 <CompletionFilter defaultValue="both" />
@@ -66,7 +66,7 @@ export const Overview = () => (
 export const Interactive = () => {
     const [completion, setCompletion] = useState('incomplete');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
             <CompletionFilter value={completion} onChange={setCompletion} />
             <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                 Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>

@@ -40,7 +40,7 @@ const ROSTER = () => [
 
 /** A single student row with its room-number chip. */
 const StudentRow = ({ s }) => (
-    <div className="d-flex align-items-center justify-content-between" style={{ gap: 'var(--size-element-gap-md)', padding: '4px 0' }}>
+    <div className="d-flex align-items-center justify-content-between" style={{ gap: 'var(--space-0625)', padding: '4px 0' }}>
         <span className="body3-txt" style={{ color: s.absent ? 'var(--ds-text-subtle)' : 'var(--ds-text)', textDecoration: s.absent ? 'line-through' : 'none' }}>
             {s.name}{s.absent ? ' (absent)' : ''}
         </span>
@@ -100,7 +100,7 @@ export const Interactive = () => {
     return (
         <div className="d-flex flex-column" style={{ gap: 'var(--size-section-gap-md)', maxWidth: 900 }}>
             {/* Header — room count badge (waiting vs active) */}
-            <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-md)' }}>
+            <div className="d-flex align-items-center" style={{ gap: 'var(--space-0625)' }}>
                 <span className="body2-txt" style={{ fontWeight: 600 }}>Room count</span>
                 <StatusTag appearance={'neutral'} leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={assigned ? "Rooms to create in Zoom (includes each tutor's buffer)" : 'Assign students to tutors to size breakout rooms'}>{assigned ? String(roomCount) : '—'}</StatusTag>
                 <span className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
@@ -110,7 +110,7 @@ export const Interactive = () => {
             </div>
 
             {/* Controls */}
-            <div className="d-flex flex-wrap" style={{ gap: 'var(--size-element-gap-sm)' }}>
+            <div className="d-flex flex-wrap" style={{ gap: 'var(--stack-md)' }}>
                 {!assigned ? (
                     <Button text="Run initial assignment" appearance="primary" spacing="compact" iconBefore="wand-magic-sparkles" onClick={runAssignment} />
                 ) : (
@@ -126,7 +126,7 @@ export const Interactive = () => {
 
             {/* Tutor columns */}
             {assigned && (
-                <div className="d-flex flex-wrap" style={{ gap: 'var(--size-element-gap-md)' }}>
+                <div className="d-flex flex-wrap" style={{ gap: 'var(--space-0625)' }}>
                     {state.order.map((tid) => <TutorColumn key={tid} state={state} tutorId={tid} />)}
                 </div>
             )}

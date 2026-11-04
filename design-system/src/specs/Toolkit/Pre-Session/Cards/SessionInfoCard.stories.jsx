@@ -30,7 +30,7 @@ export const SessionInfoCard = ({
         className="d-flex align-items-center"
         style={{
             gap: 'var(--size-modal-gap-md)',
-            padding: 'var(--size-modal-pad-y-lg) var(--size-element-pad-x-lg)',
+            padding: 'var(--size-modal-pad-y-lg) var(--pad-x-lg)',
         }}
     >
         {/* Icon Container */}
@@ -68,7 +68,7 @@ export const SessionInfoCard = ({
             {/* Content Row */}
             <div
                 className="d-inline-flex align-items-center"
-                style={{ gap: 'var(--size-element-gap-sm)' }}
+                style={{ gap: 'var(--stack-md)' }}
             >
                 {contentLink ? (
                     <a

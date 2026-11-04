@@ -6,44 +6,7 @@
  * in the generator script.
  */
 
-import { CONTAINER_PAD_ROLES, ELEMENT_ROLES, LEGACY_ALIASES, MOTION_DURATIONS, MOTION_EASINGS, TOKEN_LADDER } from './plan.mjs';
-
-const DENSITIES = ['default', 'compact', 'spacious'];
-
-/** `{container:'section', axis:'x'}` -> `section-pad-x`; axis `null` -> `card-pad`. */
-function roleName(container, axis) {
-  return axis ? `${container}-pad-${axis}` : `${container}-pad`;
-}
-
-/** @returns {string} `_roles.scss` */
-export function rolesScss() {
-  let scss = `/**
- * Role Tokens (ADR-038)
- * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
- * Container roles keyed to density (default / compact / spacious); element
- * roles keyed to density (default / compact). Every value is a reference to
- * the --space-* and --radius-* primitive ladder in _scales.scss.
- */
-
-:root {
-    /* Container roles */
-`;
-  for (const { container, axis, steps } of CONTAINER_PAD_ROLES) {
-    const name = roleName(container, axis);
-    for (const density of DENSITIES) {
-      scss += `    --${name}-${density}: var(${steps[density]});\n`;
-    }
-  }
-  scss += `
-    /* Element roles */
-`;
-  for (const { kind, steps } of ELEMENT_ROLES) {
-    scss += `    --element-${kind}-default: var(${steps.default});\n`;
-    scss += `    --element-${kind}-compact: var(${steps.compact});\n`;
-  }
-  scss += `}\n`;
-  return scss;
-}
+import { MOTION_DURATIONS, MOTION_EASINGS, RETIRED_RENAMES, TOKEN_LADDER } from './plan.mjs';
 
 /** @returns {string} `_motion.scss` */
 export function motionScss() {
@@ -57,9 +20,9 @@ export function motionScss() {
     .map((name) => `        --motion-duration-${name}: 0ms;\n`)
     .join('');
   return `/**
- * Motion Tokens (ADR-038)
+ * Motion (ADR-038)
  * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
- * Duration and easing roles for Base UI's data-starting-style/data-ending-
+ * Duration and easing tokens for Base UI's data-starting-style/data-ending-
  * style transitions. Reduced motion is handled once, here: every duration
  * collapses to 0ms under prefers-reduced-motion, so a component that reads
  * --motion-duration-* needs no reduced-motion branch of its own.
@@ -72,26 +35,6 @@ ${durations}${easings}}
     :root {
 ${zeroed}    }
 }
-`;
-}
-
-/** @returns {string} `_legacy-size-aliases.scss` */
-export function legacyAliasesScss() {
-  const lines = LEGACY_ALIASES.map(({ old, role }) => `    ${old}: var(${role}); /* ADR-038, one cycle */\n`).join('');
-  return `/**
- * Legacy Size Aliases (ADR-038)
- * Generated from scripts/lib/tokens/plan.mjs — never hand-edit.
- * Old names this generator's role tokens make redundant, pointed at their
- * replacement for one cycle so an unmigrated caller still resolves. Loads
- * after _spacing_semantics.scss and _frame_layers.scss, so it wins; every
- * value here is identical to what those files already declare for the same
- * name (see plan.mjs's LEGACY_ALIASES comment), so this changes no pixel.
- * A family PR deletes both the original declaration and its row here in the
- * same PR, once its callers read the role token instead.
- */
-
-:root {
-${lines}}
 `;
 }
 
@@ -109,12 +52,15 @@ const movedRows = () => TOKEN_LADDER.filter((row) => row.old !== row.new);
 /** Figma collection renames, code-side names unchanged (payload documentation only). */
 export const COLLECTION_RENAMES = [
   { from: 'color / foundations', to: 'color / semantics' },
-  { from: 'opacity', to: 'color / opacity', note: "Element/opacity-disabled moves here; code's --color-disabled-opacity is unaffected" },
+  { from: 'opacity', to: 'color / opacity', note: "the disabled-opacity variable moves here; code's --color-disabled-opacity is unaffected" },
 ];
+
+/** The value one ladder row declares: its `ref`, or a `var()` of the primitive `value` names. */
+const rowValue = (row) => row.ref ?? `var(${row.value})`;
 
 /** @returns {string} one tier's SCSS file, generated from `TOKEN_LADDER`. */
 function tierScss({ tier, heading }) {
-  const rows = movedRows().filter((r) => r.tier === tier);
+  const rows = movedRows().filter((r) => r.tier === tier && !r.primitive);
   const byGroup = new Map();
   for (const row of rows) {
     if (!byGroup.has(row.group)) byGroup.set(row.group, []);
@@ -123,10 +69,8 @@ function tierScss({ tier, heading }) {
   let scss = `/**
  * ${heading}
  * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
- * Every row here is additive: the old name it names (where one exists) keeps
- * its own declaration elsewhere, untouched, so this file only adds a second
- * way to read the same value. A family PR moving a caller onto one of these
- * deletes the old declaration and this comment stops applying to that row.
+ * Each row declares its own value; a responsive row repeats under the media
+ * query the plan names for it, below the :root block.
  */
 
 :root {
@@ -134,17 +78,21 @@ function tierScss({ tier, heading }) {
   for (const [group, groupRows] of byGroup) {
     scss += `\n    /* ${group} */\n`;
     for (const row of groupRows) {
-      // `ref` overrides what the declaration resolves to, independent of what
-      // `old` documents in the name map — used where the old declaration's
-      // own name or value carries banned ADS language (check:ads-language's
-      // `scrim`), so the generated file reads the primitive or literal
-      // directly instead of a `var()` of the old name.
-      const ref = row.ref ?? (row.old ? `var(${row.old})` : `var(${row.value})`);
       const note = row.note ? ` /* ${row.note} */` : '';
-      scss += `    ${row.new}: ${ref};${note}\n`;
+      scss += `    ${row.new}: ${rowValue(row)};${note}\n`;
     }
   }
   scss += `}\n`;
+  const queries = new Map();
+  for (const row of rows) {
+    for (const [query, value] of Object.entries(row.at ?? {})) {
+      if (!queries.has(query)) queries.set(query, []);
+      queries.get(query).push({ name: row.new, value });
+    }
+  }
+  for (const [query, overrides] of queries) {
+    scss += `\n@media ${query} {\n    :root {\n${overrides.map(({ name, value }) => `        ${name}: ${value};\n`).join('')}    }\n}\n`;
+  }
   return scss;
 }
 
@@ -166,14 +114,22 @@ function toVariable(token, resolvedType = 'FLOAT') {
 /** @returns {object} one tier's Figma variables, from `TOKEN_LADDER`. */
 function tierFigmaVariables(tier) {
   return movedRows()
-    .filter((r) => r.tier === tier)
-    .map((row) => toVariable(row.new));
+    .filter((r) => r.tier === tier && !r.codeOnly)
+    .map((row) => toVariable(row.new, row.type));
 }
 
-/** @returns {object} the combined Figma variables payload for every tier plus the existing roles/motion collection. */
+/** The motion tokens as their own Figma collection, like `typography` and `layers`. */
+function motionFigmaVariables() {
+  return [
+    ...Object.keys(MOTION_DURATIONS).map((name) => toVariable(`--motion-duration-${name}`)),
+    ...Object.keys(MOTION_EASINGS).map((name) => toVariable(`--motion-easing-${name}`, 'STRING')),
+  ];
+}
+
+/** @returns {object} the combined Figma variables payload: every ladder tier, then motion. */
 export function variablesPayload() {
   const collections = LADDER_TIERS.map(({ tier, collection }) => ({ name: collection, variables: tierFigmaVariables(tier) }));
-  collections.push({ name: 'Deep foundations / roles and motion', variables: figmaSpec().collections[0].variables });
+  collections.push({ name: 'motion', variables: motionFigmaVariables() });
   return {
     note:
       'Generated by scripts/generate-design-tokens.mjs (ADR-038, #1756) from scripts/lib/tokens/plan.mjs. ' +
@@ -181,29 +137,6 @@ export function variablesPayload() {
       'See architecture/token-tiers-name-map.md for the full old-to-new name list this payload implements.',
     collectionRenames: COLLECTION_RENAMES,
     collections,
-  };
-}
-
-/** @returns {object} the Figma variables payload (write-only; no push in this run) */
-export function figmaSpec() {
-  const variables = [];
-  for (const { container, axis, steps } of CONTAINER_PAD_ROLES) {
-    const name = roleName(container, axis);
-    for (const density of DENSITIES) variables.push(toVariable(`--${name}-${density}`));
-  }
-  for (const { kind } of ELEMENT_ROLES) {
-    for (const density of ['default', 'compact']) variables.push(toVariable(`--element-${kind}-${density}`));
-  }
-  for (const name of Object.keys(MOTION_DURATIONS)) variables.push(toVariable(`--motion-duration-${name}`));
-  for (const name of Object.keys(MOTION_EASINGS)) variables.push(toVariable(`--motion-easing-${name}`, 'STRING'));
-  return {
-    note:
-      'Generated by scripts/generate-design-tokens.mjs (ADR-038) from scripts/lib/tokens/plan.mjs. ' +
-      'This is the export step only — nothing here has been pushed to Figma. Direction is code -> ' +
-      'Figma, the reverse of the size/type/layout collections generate-all-tokens.js still reads FROM Figma.',
-    collections: [
-      { name: 'Deep foundations / roles and motion', variables },
-    ],
   };
 }
 
@@ -222,9 +155,7 @@ Generated from \`scripts/lib/tokens/plan.mjs\`'s \`TOKEN_LADDER\` by \`npm run g
 
 One plan, four tiers, most general to most specific: **primitives** (\`--space-*\` / \`--radius-*\` / \`--stroke-*\` / \`--size-*\`, unchanged — still Figma-sourced, \`generate-all-tokens.js\`) -> **semantics** -> **patterns** -> **components**, plus **layers** as its own non-spacing z-index family. Figma collection names: \`spacing / primitives\`, \`spacing / semantics\`, \`spacing / patterns\`, \`spacing / components\`, \`layers\`.
 
-This ladder's first PR (#1756 PR1) is additive only: every \`New\` name below is a generated alias (\`var(--old-name)\`, or a literal primitive reference where \`Old\` reads *(new)*) living in \`design-system/src/tokens/deep/_semantics.scss\`, \`_patterns.scss\`, \`_components.scss\`, \`_layers.scss\`. The \`Old\` declaration is untouched and still resolves exactly as it does today. A row where \`Old\` and \`New\` are identical is not a rename — it is a token already correctly named for its tier (listed here so this is every token, not just the ones that moved); those rows are excluded from the generated SCSS and Figma payload (an alias to itself is a no-op).
-
-Caller migration, by area, is PR2+; deleting the \`Old\` declarations and zeroing the ratchets is the final PR in this sequence.
+Every \`New\` name below is declared by the generator in \`design-system/src/tokens/ladder/_semantics.scss\`, \`_patterns.scss\`, \`_components.scss\` or \`_layers.scss\`, with its own value. The \`Old\` name is retired: its declaration is gone and nothing reads it. A row where \`Old\` and \`New\` are identical is not a rename — it is a token already correctly named for its tier (listed so this is every token, not just the ones that moved); those rows are excluded from the generated SCSS and Figma payload.
 
 Scope calls recorded in \`plan.mjs\`'s own header comment, repeated here:
 - \`--focus-ring-radius\` has no existing source; seeded at \`--radius-sm\` as a first pass.
@@ -244,6 +175,9 @@ Scope calls recorded in \`plan.mjs\`'s own header comment, repeated here:
     }
     body += '\n';
   }
+  body += `## Retired with no ladder row\n\n| Old | Now reads |\n|---|---|\n`;
+  for (const [old, now] of Object.entries(RETIRED_RENAMES)) body += `| \`${old}\` | \`${now}\` |\n`;
+  body += '\n';
   return body;
 }
 
@@ -254,11 +188,9 @@ Scope calls recorded in \`plan.mjs\`'s own header comment, repeated here:
  * `design-system/src/tokens`, at `design-system/figma/` and `architecture/`.
  */
 export function artifacts() {
-  const tierFiles = Object.fromEntries(LADDER_TIERS.map(({ file, ...tier }) => [`deep/${file}`, tierScss(tier)]));
+  const tierFiles = Object.fromEntries(LADDER_TIERS.map(({ file, ...tier }) => [`ladder/${file}`, tierScss(tier)]));
   return {
-    'deep/_roles.scss': rolesScss(),
-    'deep/_motion.scss': motionScss(),
-    'deep/_legacy-size-aliases.scss': legacyAliasesScss(),
+    'ladder/_motion.scss': motionScss(),
     ...tierFiles,
     '../../figma/variables-payload.json': `${JSON.stringify(variablesPayload(), null, 2)}\n`,
     '../../../architecture/token-tiers-name-map.md': nameMapMarkdown(),

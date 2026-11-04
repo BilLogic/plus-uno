@@ -17,7 +17,7 @@
     height: var(--progress-bar-height);
     width: 100%;
     background-color: var(--ds-background-neutral);
-    border-radius: var(--size-element-radius-full);
+    border-radius: var(--radius-full);
     overflow: hidden;
     /* Component-scoped override: a caller drawing several same-appearance
      * bars in different hues (a breakdown chart's per-segment color, for
@@ -28,7 +28,7 @@
 .plus-progressbar-fill {
     height: 100%;
     background-color: var(--plus-progressbar-fill-color);
-    border-radius: var(--size-element-radius-full);
+    border-radius: var(--radius-full);
     transition: width 0.3s ease;
 }
 

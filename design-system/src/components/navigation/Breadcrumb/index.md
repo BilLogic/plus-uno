@@ -26,7 +26,7 @@ Universal element component for navigation breadcrumbs. / /* `items` defaults to
 
 ## Tokens touched
 
-`--body-default` · `--color-primary-text` · `--ds-text-subtlest` · `--item-height-md` · `--plus-breadcrumb-divider` · `--size-element-gap-sm`
+`--body-default` · `--color-primary-text` · `--ds-text-subtlest` · `--item-height-md` · `--plus-breadcrumb-divider` · `--stack-md`
 
 From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Override these through the token layer, never with a literal.
 

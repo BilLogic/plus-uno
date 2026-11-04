@@ -41,9 +41,9 @@ export const UnavailableButton = ({ block = false, ...props }) => (
  * Uses the Button component from the design system with outline fill.
  *
  * Tokens:
- * - Border radius: --size-element-radius-md
- * - Padding: --size-element-pad-y-md / --size-element-pad-x-md
- * - Gap: --size-element-gap-md
+ * - Border radius: --radius-md
+ * - Padding: --pad-y-md / --pad-x-md
+ * - Gap: --space-0625
  * - Typography: h6 (Lato SemiBold, 16px, line-height 1.5)
  * - Border: success (--color-success) / danger (--color-danger)
  */

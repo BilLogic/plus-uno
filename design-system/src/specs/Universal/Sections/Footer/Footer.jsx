@@ -24,7 +24,7 @@ const Footer = ({
                 alignItems: 'center',
                 justifyContent: 'flex-start',
                 width: '100%',
-                padding: '0 0 var(--size-element-pad-y-lg) 0',
+                padding: '0 0 var(--pad-y-lg) 0',
                 ...style
             }}
         >

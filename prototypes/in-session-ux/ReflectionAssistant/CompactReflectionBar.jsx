@@ -41,7 +41,7 @@ export function CompactReflectionBar({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-end',
-                gap: 'var(--size-element-gap-md, 16px)',
+                gap: 'var(--space-0625, 16px)',
             }}
         >
             <AnimatePresence initial={false}>
@@ -85,7 +85,7 @@ export function CompactReflectionBar({
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'flex-end',
-                            gap: 'var(--size-element-gap-md, 16px)',
+                            gap: 'var(--space-0625, 16px)',
                             minWidth: DISCLOSED_MIN_WIDTH,
                             maxWidth: DISCLOSED_MAX_WIDTH,
                             width: DISCLOSED_MAX_WIDTH,
@@ -106,7 +106,7 @@ export function CompactReflectionBar({
                                 }}
                                 style={{
                                     display: 'flex',
-                                    gap: 'var(--size-element-gap-sm, 8px)',
+                                    gap: 'var(--stack-md, 8px)',
                                     flexWrap: 'nowrap',
                                     justifyContent: 'flex-start',
                                     alignItems: 'flex-start',
@@ -135,7 +135,7 @@ export function CompactReflectionBar({
                                             onClick={() => onExpand(prompt.title)}
                                             style={{
                                                 padding:
-                                                    'var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px)',
+                                                    'var(--pad-y-md, 6px) var(--pad-x-lg, 16px)',
                                                 background:
                                                     'var(--ds-surface-container)',
                                                 border:
@@ -190,7 +190,7 @@ export function CompactReflectionBar({
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'flex-start',
-                                gap: 'var(--size-element-gap-sm, 8px)',
+                                gap: 'var(--stack-md, 8px)',
                                 padding: '0 16px',
                                 minHeight: FAB_SIZE,
                                 height: FAB_SIZE,

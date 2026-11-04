@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+    padding: var(--pad-y-lg, 8px) var(--pad-x-lg, 16px);
     border-bottom: 1px solid var(--color-outline-variant);
 
     .student-modal__title {
@@ -47,7 +47,7 @@
         color: var(--ds-text-subtle);
         cursor: pointer;
         font-size: 24px;
-        border-radius: var(--size-element-radius-sm, 4px);
+        border-radius: var(--radius-md, 4px);
         transition: background-color 0.15s ease;
 
         i {
@@ -64,7 +64,7 @@
 .student-modal__tabs {
     display: flex;
     width: 100%;
-    border-radius: var(--size-element-radius-lg, 8px);
+    border-radius: var(--radius-lg, 8px);
     overflow: hidden;
 
     .student-modal__tab {
@@ -72,8 +72,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: var(--size-element-gap-md, 10px);
-        padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px);
+        gap: var(--space-0625, 10px);
+        padding: var(--pad-y-md, 6px) var(--pad-x-md, 10px);
         border: none;
         background-color: var(--ds-background-neutral);
         color: var(--color-secondary-text);
@@ -81,11 +81,11 @@
         transition: background-color 0.2s ease;
 
         &:first-child {
-            border-radius: var(--size-element-radius-md, 4px) 0 0 var(--size-element-radius-md, 4px);
+            border-radius: var(--radius-md, 4px) 0 0 var(--radius-md, 4px);
         }
 
         &:last-child {
-            border-radius: 0 var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0;
+            border-radius: 0 var(--radius-md, 4px) var(--radius-md, 4px) 0;
         }
 
         &--active {
@@ -95,8 +95,8 @@
 
         .student-modal__tab-badge {
             background-color: var(--ds-background-neutral-subtle-hovered);
-            padding: 0 var(--element-pad-compact, 8px);
-            border-radius: var(--size-element-radius-full);
+            padding: 0 var(--pad-x-sm, 8px);
+            border-radius: var(--radius-full);
         }
     }
 }
@@ -140,8 +140,8 @@
     .student-modal__input {
         background-color: var(--ds-background-input);
         border: 0.8px solid var(--color-outline-variant);
-        border-radius: var(--size-element-radius-sm, 2px);
-        padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px);
+        border-radius: var(--radius-md, 2px);
+        padding: var(--pad-y-md, 6px) var(--pad-x-md, 10px);
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-normal);
         color: var(--ds-text-subtle);
@@ -242,8 +242,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--size-element-gap-lg, 12px);
-    padding: var(--size-element-pad-y-lg, 8px) var(--size-element-pad-x-lg, 16px);
+    gap: var(--stack-lg, 12px);
+    padding: var(--pad-y-lg, 8px) var(--pad-x-lg, 16px);
     border-top: 1px solid var(--color-outline-variant);
 
     // Position delete button on the left

@@ -63,7 +63,7 @@ export default function MyPageWithModal() {
                 width={800} // Set explicit width if needed
             >
                 {/* ⬇️ YOUR MODAL CONTENT GOES HERE ⬇️ */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                     <p className="body1-txt">Here is the detailed breakdown.</p>
                 </div>
                 {/* ⬆️ YOUR MODAL CONTENT ENDS HERE ⬆️ */}
@@ -77,7 +77,7 @@ export default function MyPageWithModal() {
 
 When filling in the content blocks, use only semantic CSS variables — the names are in `design-system/agent-views/tokens/tokens.md`, the scales in `../foundations/spacing.md`:
 *   `gap: 'var(--size-section-gap-md)'` -> Spacing between major page blocks (like two diff Cards).
-*   `gap: 'var(--size-element-gap-md)'` -> Spacing between elements inside a Card (like headers and text).
+*   `gap: 'var(--space-0625)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.
 
 ## Navigation
@@ -97,10 +97,10 @@ navigation through it, so there is one navigation surface.
 Figma `Pattern/Surface container`), which owns every frame size and the sidebar's
 behavior:
 
-- **Topbar** — the `Topbar` pattern (`@/patterns`), 32 high (`--layout-height-topbar`): the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits at (8, 8) at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
-- **Sidebar** — 240 (`--layout-width-sidebar`), docked from 1024. Below 1024 it is closed: hovering the toggle or the left edge peeks it floating over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle docks it.
+- **Topbar** — the `Topbar` pattern (`@/patterns`), 32 high (`--frame-topbar-height`): the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits at (8, 8) at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
+- **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024. Below 1024 it is closed: hovering the toggle or the left edge peeks it floating over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle docks it.
 - **Page** — pads `--page-pad` (16 below 1440, 24 from 1440).
-- **Content** — a 12-column grid with gutter `--layout-gutter` 16, capped at 1232 (`--layout-max-width-content`) and centered on wide screens, never under 720 (`--layout-min-width-content`): narrower, the page scrolls sideways. A child spans all 12 columns; give it `grid-column: span N` to span fewer, in whole columns.
+- **Content** — a 12-column grid with gutter `--grid-gutter` 16, capped at 1232 (`--content-max-width`) and centered on wide screens, never under 720 (`--content-min-width`): narrower, the page scrolls sideways. A child spans all 12 columns; give it `grid-column: span N` to span fewer, in whole columns.
 
 Column spans and breakpoint tokens: `../foundations/grid.md`.
 

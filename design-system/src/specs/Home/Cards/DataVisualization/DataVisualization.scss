@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--size-element-gap-md, 16px);
+    gap: var(--space-0625, 16px);
     width: 100%;
     margin-bottom: var(--size-spacing-large-space-700, 40px);
     flex-wrap: nowrap;
@@ -30,7 +30,7 @@
 /* Nav buttons: same pattern as Student Momentum (arrow left/right) – two small outline buttons with gap */
 .plus-data-viz-nav-buttons {
     display: flex;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     flex-shrink: 0;
 }
 
@@ -45,7 +45,7 @@
     align-items: center;
     gap: 0;
     padding: 2px;
-    border-radius: var(--size-element-radius-full, 999px);
+    border-radius: var(--radius-full, 999px);
     background-color: var(--color-outline-variant, #e0e0e0);
     margin-bottom: var(--size-spacing-large-space-700, 40px);
 }
@@ -58,7 +58,7 @@
     height: 36px;
     padding: 0;
     border: none;
-    border-radius: var(--size-element-radius-full, 999px);
+    border-radius: var(--radius-full, 999px);
     background: transparent;
     color: var(--ds-text-subtle);
     cursor: pointer;
@@ -108,7 +108,7 @@
 .plus-data-viz-tab-content {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-lg);
+    gap: var(--stack-lg);
     
     i {
         font-size: 14px;
@@ -195,7 +195,7 @@
 
 .plus-data-viz-legend-item {
     display: flex;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
 }
 
@@ -209,7 +209,7 @@
 .plus-data-viz-header {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     width: 100%;
     margin-bottom: var(--size-card-gap-lg); // Spacing between header and content (32px)
     

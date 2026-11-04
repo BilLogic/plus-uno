@@ -72,17 +72,17 @@
     &__tab {
         background: none;
         border: none;
-        padding: var(--size-element-pad-y-md) 0;
+        padding: var(--pad-y-md) 0;
         cursor: pointer;
         position: relative;
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-xs);
+        gap: var(--stack-sm);
         white-space: nowrap;
 
         &:focus-visible {
             outline: 2px solid var(--color-focus-ring);
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
         }
     }
 

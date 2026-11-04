@@ -1,0 +1,44 @@
+/**
+ * Components (ADR-038 ladder)
+ * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
+ * Each row declares its own value; a responsive row repeats under the media
+ * query the plan names for it, below the :root block.
+ */
+
+:root {
+
+    /* Button */
+    --button-radius-default: var(--radius-0375); /* 32-high control, radius 6 */
+    --button-radius-compact: var(--radius-025); /* 24-high control, radius 4 */
+
+    /* Calendar */
+    --calendar-day-sm: 28px;
+    --calendar-day-md: 36px;
+    --calendar-day-lg: 44px;
+    --calendar-nav-size: 32px;
+
+    /* Checkbox */
+    --checkbox-control-size: 18px;
+
+    /* Radio */
+    --radio-control-size: 12px;
+
+    /* Listbox */
+    --listbox-max-width: 320px;
+    --listbox-min-height: 140px;
+    --listbox-max-height: 300px;
+
+    /* Join row */
+    --join-row-width: 520px;
+
+    /* Option menu */
+    --option-menu-width: 240px;
+
+    /* Spinner */
+    --spinner-size-sm: var(--space-100); /* matches the old --size-spinner-sm (16px) */
+    --spinner-size-md: var(--space-150); /* matches the old --size-spinner-md (24px) */
+    --spinner-size-lg: var(--space-300); /* matches the old --size-spinner-lg (48px) */
+
+    /* Progress bar */
+    --progress-bar-height: var(--space-050); /* matches the old --size-progressbar-height (8px) */
+}

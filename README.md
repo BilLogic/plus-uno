@@ -140,7 +140,7 @@ Hosted on Netlify (free tier). Build: `npm run build:all` (Vite + Storybook). De
 | Icons | Font Awesome Free 7.2 (no Pro icons — enforced) |
 | Deployment | Netlify |
 | Slack bot runtime | Cloudflare Worker (`agents/uno-bot/`) |
-| Figma Sync | `scripts/poll-figma-library.js` (component registry); deep-foundation tokens generate code -> Figma (ADR-038), no pull script |
+| Figma Sync | `scripts/poll-figma-library.js` (component registry); the token ladder and motion generate code -> Figma (ADR-038), no pull script |
 
 ## Commands
 

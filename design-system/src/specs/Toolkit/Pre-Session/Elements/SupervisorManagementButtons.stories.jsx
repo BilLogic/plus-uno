@@ -21,9 +21,9 @@ export default {
  * Filled (primary): I Understand
  *
  * Tokens:
- * - Border radius: --size-element-radius-md
- * - Padding: --size-element-pad-y-md / --size-element-pad-x-md
- * - Gap: --size-element-gap-md
+ * - Border radius: --radius-md
+ * - Padding: --pad-y-md / --pad-x-md
+ * - Gap: --space-0625
  * - Typography: h6 (Lato SemiBold, 16px, line-height 1.5)
  */
 
@@ -87,7 +87,7 @@ export const Overview = () => (
         {/* Filled Primary Buttons */}
         <section>
             <h6 className="h6 mb-3">Filled Primary</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                 <CreateSessionButton shouldFitContainer />
                 <SaveChangesButton shouldFitContainer />
                 <SaveButton shouldFitContainer />
@@ -99,7 +99,7 @@ export const Overview = () => (
         {/* Outline Primary Buttons */}
         <section>
             <h6 className="h6 mb-3">Outline Primary</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)', alignItems: 'flex-start' }}>
                 <CancelButton />
                 <BackButton />
             </div>
@@ -108,7 +108,7 @@ export const Overview = () => (
         {/* Outline Danger Button */}
         <section>
             <h6 className="h6 mb-3">Outline Danger</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                 <ConfirmCancelButton shouldFitContainer />
             </div>
         </section>
@@ -116,7 +116,7 @@ export const Overview = () => (
         {/* Filled Primary - I Understand */}
         <section>
             <h6 className="h6 mb-3">Filled Primary - Acknowledgment</h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                 <IUnderstandButton shouldFitContainer />
             </div>
         </section>

@@ -25,7 +25,7 @@ Button group: a visually connected row of related actions. Follows Atlassian's B
 
 ## Tokens touched
 
-`--button-radius-default` · `--size-element-border`
+`--border-default` · `--button-radius-default`
 
 From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss`. Override these through the token layer, never with a literal.
 

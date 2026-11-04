@@ -21,7 +21,7 @@ export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLa
             padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-md)',
+            gap: 'var(--space-0625)',
             flex: 1
         }}
     >
@@ -55,7 +55,7 @@ const FieldRow = ({ label, value }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)'
+            gap: 'var(--stack-sm)'
         }}
     >
         <span

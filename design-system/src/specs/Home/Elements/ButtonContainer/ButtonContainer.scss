@@ -6,7 +6,7 @@
 .plus-button-container {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: flex-start;
     justify-content: center;
     position: relative;
@@ -15,7 +15,7 @@
     &-group {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
         position: relative;
         flex-shrink: 0;
         width: var(--join-row-width);
@@ -30,7 +30,7 @@
 
     &-message {
         display: flex;
-        gap: var(--size-element-pad-y-sm);
+        gap: var(--space-025);
         align-items: flex-start;
         position: relative;
         flex-shrink: 0;

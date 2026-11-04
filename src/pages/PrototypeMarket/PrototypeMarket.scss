@@ -37,7 +37,7 @@ html.market-active #root {
   &__header {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
   }
 
   &__title {
@@ -54,7 +54,7 @@ html.market-active #root {
   &__filters {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-element-gap-lg, 20px);
+    gap: var(--stack-lg, 20px);
     // Align sort buttons with the select field row (not the label row).
     align-items: flex-end;
   }
@@ -62,7 +62,7 @@ html.market-active #root {
   &__filter-group {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
     // Keep filter controls at a fixed width and prevent growth from selected values.
     width: 300px;
     min-width: 300px;
@@ -97,7 +97,7 @@ html.market-active #root {
     margin-left: auto;
     display: flex;
     align-items: flex-end;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
     min-height: 100%;
   }
 
@@ -116,7 +116,7 @@ html.market-active #root {
     color: var(--ds-text-subtle);
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
   }
 
   &__count-emphasis {
@@ -274,14 +274,14 @@ html.market-active #root {
   &__modal-header-main {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
     min-width: 0;
     flex: 1 1 auto;
   }
 
   &__modal-badges {
     display: inline-flex;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
   }
 
   &__modal-upvote {
@@ -310,13 +310,13 @@ html.market-active #root {
   &__modal-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-element-gap-lg, 16px);
+    gap: var(--stack-lg, 16px);
     color: var(--ds-text-subtlest);
 
     span {
       display: inline-flex;
       align-items: center;
-      gap: var(--size-element-gap-xs, 4px);
+      gap: var(--stack-sm, 4px);
     }
   }
 
@@ -348,7 +348,7 @@ html.market-active #root {
       color: var(--color-primary, #1a73e8);
       text-decoration: underline;
       display: inline-flex;
-      gap: var(--size-element-gap-xs, 4px);
+      gap: var(--stack-sm, 4px);
       align-items: center;
     }
   }
@@ -362,7 +362,7 @@ html.market-active #root {
     position: relative;
     width: 100%;
     padding-bottom: 56.25%; // 16:9 aspect ratio
-    border-radius: var(--size-element-radius-md, 4px);
+    border-radius: var(--radius-md, 4px);
     overflow: hidden;
     background: var(--ds-surface-container);
 
@@ -388,31 +388,31 @@ html.market-active #root {
   &__modal-comments {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
     max-height: 240px;
     overflow: auto;
   }
 
   &__modal-comment {
-    border-left: var(--size-element-stroke-lg, 2px) solid var(--color-outline-variant, #cfd8dc);
-    padding-left: var(--element-pad-default, 10px);
+    border-left: var(--stroke-2, 2px) solid var(--color-outline-variant, #cfd8dc);
+    padding-left: var(--pad-x-md, 10px);
     margin-bottom: 0;
 
     &-head {
       display: inline-flex;
       align-items: center;
-      gap: var(--size-element-gap-sm, 8px);
+      gap: var(--stack-md, 8px);
     }
 
     p {
-      margin: var(--size-element-gap-xs, 4px) 0 0;
+      margin: var(--stack-sm, 4px) 0 0;
     }
   }
 
   &__modal-feedback-row {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
 
     .plus-form-input-wrapper,
     .plus-text-field {
@@ -430,9 +430,9 @@ html.market-active #root {
   &__modal-preview {
     width: 100%;
     min-height: 420px;
-    border: var(--size-element-border, 1px) solid var(--color-outline-variant, #d7dfe3);
+    border: var(--border-default, 1px) solid var(--color-outline-variant, #d7dfe3);
     background: var(--ds-surface);
-    border-radius: var(--size-element-radius-sm, 2px);
+    border-radius: var(--radius-md, 2px);
     overflow: hidden;
   }
 

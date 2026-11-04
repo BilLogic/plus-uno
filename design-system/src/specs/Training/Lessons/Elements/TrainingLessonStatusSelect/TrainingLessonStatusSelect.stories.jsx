@@ -30,19 +30,19 @@ export const Overview = {
     render: () => (
         <div style={{ padding: 'var(--size-section-pad-y-lg)', display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
             <div>
-                <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>All statuses</h4>
+                <h4 className="h6" style={{ marginBottom: 'var(--stack-lg)' }}>All statuses</h4>
                 <TrainingLessonStatusSelect />
             </div>
             <div>
-                <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>Completed picked</h4>
+                <h4 className="h6" style={{ marginBottom: 'var(--stack-lg)' }}>Completed picked</h4>
                 <TrainingLessonStatusSelect selectedStatuses={['completed']} />
             </div>
             <div>
-                <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>In Progress and Not Started picked</h4>
+                <h4 className="h6" style={{ marginBottom: 'var(--stack-lg)' }}>In Progress and Not Started picked</h4>
                 <TrainingLessonStatusSelect selectedStatuses={['in-progress', 'not-started']} />
             </div>
             <div style={{ paddingBottom: '240px' }}>
-                <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>Open</h4>
+                <h4 className="h6" style={{ marginBottom: 'var(--stack-lg)' }}>Open</h4>
                 <TrainingLessonStatusSelect open />
             </div>
         </div>
@@ -59,7 +59,7 @@ export const Interactive = {
 
         return (
             <div style={{ padding: 'var(--size-section-pad-y-lg)', minHeight: '360px' }}>
-                <p className="body2-txt" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)' }}>
                     Filtering by: <strong data-testid="applied">{statuses.length ? statuses.join(', ') : 'all statuses'}</strong>
                 </p>
                 <TrainingLessonStatusSelect

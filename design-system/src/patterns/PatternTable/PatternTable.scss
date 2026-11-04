@@ -54,7 +54,7 @@
     td {
         padding: var(--size-table-cell-y) var(--size-table-cell-x);
         text-align: left;
-        border-bottom: var(--size-element-border) solid var(--ds-border);
+        border-bottom: var(--border-default) solid var(--ds-border);
         font: var(--body-default);
         color: var(--ds-text);
         // Row states are layered over the fill, never swapped for it, so an
@@ -170,5 +170,5 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--size-element-gap-md);
+    gap: var(--space-0625);
 }

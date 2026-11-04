@@ -17,9 +17,9 @@ export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        padding: 'var(--size-element-pad-y-sm) var(--element-pad-compact)', // 4px 8px
+        padding: 'var(--space-025) var(--pad-x-sm)', // 4px 8px
         backgroundColor: isHovered ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent',
-        borderRadius: 'var(--size-element-radius-md)',
+        borderRadius: 'var(--radius-md)',
         cursor: 'default',
         // Ensure consistent height/vertical rhythm
         minHeight: '32px'
@@ -28,7 +28,7 @@ export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
     const nameStyle = {
         display: 'flex',
         alignItems: 'center',
-        gap: 'var(--size-element-gap-sm)', // 8px
+        gap: 'var(--stack-md)', // 8px
         flex: 1,
     };
 

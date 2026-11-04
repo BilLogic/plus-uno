@@ -23,7 +23,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 ## Tokens touched
 
-`--ds-border-inverse` · `--size-element-border`
+`--border-default` · `--ds-border-inverse`
 
 From `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.scss`. Override these through the token layer, never with a literal.
 

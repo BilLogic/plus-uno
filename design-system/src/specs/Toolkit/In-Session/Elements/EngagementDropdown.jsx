@@ -55,7 +55,7 @@ export const EngagementDropdown = ({
     };
 
     return (
-        <div className={`d-flex align-items-center ${className}`.trim()} style={{ gap: 'var(--size-element-gap-sm)' }}>
+        <div className={`d-flex align-items-center ${className}`.trim()} style={{ gap: 'var(--stack-md)' }}>
             <StatusSelect
                 aria-label="Engagement"
                 placeholder="Select"

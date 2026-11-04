@@ -37,7 +37,7 @@
  * - Card padding: var(--size-section-pad-x-md, 24px) / var(--size-section-pad-y-md, 24px)
  * - Card gap: var(--size-section-gap-md, 16px)
  * - Card border-radius: var(--size-section-radius-md, 12px)
- * - Row gap: var(--size-element-gap-sm)
+ * - Row gap: var(--stack-md)
  * - Row-to-row gap: var(--size-section-gap-md) (16px)
  * 
  * Width: ~896px (from Figma)
@@ -110,7 +110,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs, 4px)',
+                    gap: 'var(--stack-sm, 4px)',
                     width: '100%',
                 }}
             >
@@ -119,7 +119,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 'var(--size-element-pad-y-sm, 4px)',
+                        gap: 'var(--space-025, 4px)',
                         width: '100%',
                     }}
                 >
@@ -185,7 +185,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                 <div
                     style={{
                         display: 'flex',
-                        gap: 'var(--size-element-gap-sm)',
+                        gap: 'var(--stack-md)',
                         width: '100%',
                     }}
                 >
@@ -230,7 +230,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                 <div
                     style={{
                         display: 'flex',
-                        gap: 'var(--size-element-gap-sm)',
+                        gap: 'var(--stack-md)',
                         width: '100%',
                     }}
                 >
@@ -278,7 +278,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
 };
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <BackgroundAndMatchingSection changed={false} />
     </div>
 );
@@ -289,7 +289,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <BackgroundAndMatchingSection changed={false} />
@@ -309,7 +309,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <BackgroundAndMatchingSection changed={args.changed} />
         </div>
     ),

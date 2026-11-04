@@ -51,9 +51,9 @@ export const FillIn_EmptyState = () => (
                 }}
             >
                 {/* Header: Session Fill-ins + info icon + close — title-to-icon gap per Figma: element/gap-md */}
-                <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-md)' }}>
+                <div className="d-flex align-items-center" style={{ gap: 'var(--space-0625)' }}>
                     <h4 className="h4 m-0">Session Fill-ins</h4>
-                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--size-element-gap-sm)' }}>
+                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
                             className="fa-solid fa-circle-info"
                             style={{
@@ -144,9 +144,9 @@ export const FillIn = () => (
                 }}
             >
                 {/* Header: Session Fill-ins + info icon + close — title-to-icon gap per Figma: element/gap-md */}
-                <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-md)' }}>
+                <div className="d-flex align-items-center" style={{ gap: 'var(--space-0625)' }}>
                     <h4 className="h4 m-0">Session Fill-ins</h4>
-                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--size-element-gap-sm)' }}>
+                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
                             className="fa-solid fa-circle-info"
                             style={{
@@ -193,7 +193,7 @@ export const FillIn = () => (
                 {/* Pagination: "Showing 1 to 5 of 36 entries" + design system Pagination */}
                 <div
                     className="d-flex justify-content-between align-items-center"
-                    style={{ flexWrap: 'wrap', gap: 'var(--size-element-gap-sm)' }}
+                    style={{ flexWrap: 'wrap', gap: 'var(--stack-md)' }}
                 >
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Showing 1 to 5 of 36 entries
@@ -251,9 +251,9 @@ export const ConsentForm = () => (
                 }}
             >
                 {/* Header: Session Fill-ins + info icon + close — title-to-icon gap per Figma: element/gap-md */}
-                <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-md)' }}>
+                <div className="d-flex align-items-center" style={{ gap: 'var(--space-0625)' }}>
                     <h4 className="h4 m-0">Session Fill-ins</h4>
-                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--size-element-gap-sm)' }}>
+                    <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
                             className="fa-solid fa-circle-info"
                             style={{
@@ -278,17 +278,17 @@ export const ConsentForm = () => (
                     Please review and acknowledge the following forms before completing your sign-up.
                 </p>
                 {/* Consent items: card per item with checkbox, title* + external link icon, description (design system Checkbox) */}
-                <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-sm)' }}>
+                <div className="d-flex flex-column" style={{ gap: 'var(--stack-md)' }}>
                     {consentFormItems.map((item, i) => (
                         <div
                             key={i}
                             className="d-flex align-items-start"
                             style={{
-                                gap: 'var(--size-element-gap-sm)',
+                                gap: 'var(--stack-md)',
                                 padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
                                 backgroundColor: 'var(--ds-surface-container)',
                                 borderRadius: 'var(--size-modal-radius-md)',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
                             }}
                         >
                             <div style={{ flexShrink: 0, paddingTop: '2px' }}>
@@ -304,7 +304,7 @@ export const ConsentForm = () => (
                                     aria-label={`I acknowledge ${item.title}`}/>
                             </div>
                             <div className="d-flex flex-column" style={{ gap: 'var(--size-table-cell-gap)', flex: 1, minWidth: 0 }}>
-                                <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-xs)' }}>
+                                <div className="d-flex align-items-center" style={{ gap: 'var(--stack-sm)' }}>
                                     <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                         {item.title}
                                     </span>
@@ -365,7 +365,7 @@ export const SessionDetails = () => (
                 {/* Header: Lincoln High School - 8/14/2025 + gear + close (design system icons) */}
                 <div className="d-flex justify-content-between align-items-center">
                     <h4 className="h4 m-0">Lincoln High School - 8/14/2025</h4>
-                    <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
+                    <div className="d-flex align-items-center" style={{ gap: 'var(--stack-md)' }}>
                         <i
                             className="fa-solid fa-gear"
                             style={{
@@ -400,11 +400,11 @@ export const SessionDetails = () => (
                 {/* Session info grid (pre-session/cards/SessionInfoCard) */}
                 <div
                     style={{
-                        border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                        border: 'var(--border-default) solid var(--color-outline-variant)',
                         borderRadius: 'var(--size-modal-radius-md)',
                         display: 'grid',
                         gridTemplateColumns: '1fr 1fr',
-                        gap: 'var(--size-element-gap-sm)',
+                        gap: 'var(--stack-md)',
                         overflow: 'hidden',
                     }}
                 >

@@ -230,7 +230,7 @@
 .plus-user-feedback-modal-form {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 }
 
 .plus-user-feedback-modal-severity {
@@ -323,8 +323,8 @@
     .plus-user-feedback-modal-severity-btn {
         flex: 0 0 auto;
         min-width: 36px;
-        padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 12px);
-        border-radius: var(--size-element-radius-md, 4px);
+        padding: var(--pad-y-md, 6px) var(--pad-x-md, 12px);
+        border-radius: var(--radius-md, 4px);
 
         .plus-btn-text {
             display: none;

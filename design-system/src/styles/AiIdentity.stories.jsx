@@ -139,9 +139,9 @@ const AgentChip = ({ hex }) => (
         style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 'var(--size-element-gap-sm)',
+            gap: 'var(--stack-md)',
             padding: '6px 12px 6px 6px',
-            borderRadius: 'var(--size-element-radius-full)',
+            borderRadius: 'var(--radius-full)',
             border: `1px solid ${hex}`,
             background: 'var(--ds-surface-overlay)',
             boxShadow: 'var(--ds-shadow-overlay)',
@@ -197,7 +197,7 @@ export const Candidates = () => (
                                 background: hex,
                                 color: '#ffffff',
                                 padding: '16px',
-                                borderRadius: 'var(--size-element-radius-md)',
+                                borderRadius: 'var(--radius-md)',
                             }}
                             className="body1-txt"
                         >

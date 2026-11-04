@@ -58,7 +58,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss`. Override these through the token layer, never with a literal.
 

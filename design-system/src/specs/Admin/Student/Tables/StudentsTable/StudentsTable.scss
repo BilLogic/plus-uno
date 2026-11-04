@@ -83,8 +83,8 @@
         .students-table__status-badge {
             &.plus-badge {
                 height: 24px;
-                padding: 0 var(--element-pad-compact, 8px);
-                border-radius: var(--size-element-radius-full, 999px);
+                padding: 0 var(--pad-x-sm, 8px);
+                border-radius: var(--radius-full, 999px);
                 font-weight: 400;
                 line-height: 1;
                 display: inline-flex;

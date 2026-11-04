@@ -199,7 +199,10 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
   const color = documents(`${COLOR_TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).filter((rel) =>
     COLOR_TOKEN_FILES.includes(rel.slice(COLOR_TOKEN_DIR.length + 1)),
   );
-  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color].map((rel) => ({
+  // The token ladder (`tokens/ladder/`, generated from scripts/lib/tokens/plan.mjs) holds the semantics,
+  // pattern, component and layer tokens beside the Figma-exported ones.
+  const ladder = documents(`${TOKEN_DIR}/ladder/*`, { root, ext: ['.scss', '.css'] });
+  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color, ...ladder].map((rel) => ({
     path: rel,
     file: rel.slice(TOKEN_DIR.length + 1),
     text: text(rel, { root }),
@@ -324,7 +327,15 @@ export const FAMILIES = [
   { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
   { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
   { family: 'stroke', prefix: '--stroke-', what: 'the stroke-width primitives' },
-  { family: 'element', prefix: '--element-', what: 'what the parts of components share' },
+  { family: 'pad-x', prefix: '--pad-x-', what: 'the horizontal pad inside an element, xs to lg' },
+  { family: 'pad-y', prefix: '--pad-y-', what: 'the vertical pad inside an element, sm to lg' },
+  { family: 'stack', prefix: '--stack-', what: 'the gap between rows, sm to lg' },
+  { family: 'inline', prefix: '--inline-', what: 'the gap between things side by side, sm to lg' },
+  { family: 'focus-ring', prefix: '--focus-ring-', what: 'the focus ring width, offset and radius' },
+  { family: 'grid', prefix: '--grid-', what: 'the content grid: gutter, columns, column widths and the container pad' },
+  { family: 'screen', prefix: '--screen-', what: 'the screen at a breakpoint: width, range and side pad' },
+  { family: 'content', prefix: '--content-', what: 'the content column: width, minimum, maximum and reading width' },
+  { family: 'control', prefix: '--control-', what: 'control heights, 24, 32 and 40' },
   { family: 'height', prefix: '--height-', what: 'the common height scale' },
   { family: 'width', prefix: '--width-', what: 'the common width scale' },
   { family: 'item', prefix: '--item-', what: 'control heights, 24 and 32' },
@@ -339,7 +350,18 @@ export const FAMILIES = [
   { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
   { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
   { family: 'table', prefix: '--table-', what: 'table cell pad, footer pad-x, tree indent, minimum title width and radius' },
-  { family: 'overlay', prefix: '--overlay-', what: 'the full-screen layer under a modal: its pad and scrim' },
+  { family: 'blanket', prefix: '--blanket-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
+  { family: 'button', prefix: '--button-', what: 'Button radius, where a size has no shared radius role' },
+  { family: 'calendar', prefix: '--calendar-', what: 'calendar day and navigation button sizes' },
+  { family: 'checkbox', prefix: '--checkbox-', what: 'the checkbox box size' },
+  { family: 'radio', prefix: '--radio-', what: 'the radio dot size' },
+  { family: 'listbox', prefix: '--listbox-', what: 'listbox width and height limits' },
+  { family: 'join-row', prefix: '--join-row-', what: 'the Home Join row width' },
+  { family: 'option-menu', prefix: '--option-menu-', what: 'the option menu width' },
+  { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
+  { family: 'progress-bar', prefix: '--progress-bar-', what: 'Progress bar height' },
+  { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
+  { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
   { family: 'drawer', prefix: '--drawer-', what: 'drawer pad, stack and inline (the Modal steps, no radius)' },
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
@@ -496,7 +518,7 @@ export function colorKey(value) {
  * renders anything, and a repo that changed its root font size revisits both.
  *
  * A PERCENTAGE IS NOT CONVERTED TO PX, which is the point rather than a
- * shortcut: `--size-element-radius-full` is `999px` and falls back to `50%`
+ * shortcut: `--radius-full` is `9999px` and falls back to `50%`
  * eleven times, and on a non-square box those are different shapes.
  *
  * A BARE `0` is `0px`, because zero is zero, and that is the one place the two

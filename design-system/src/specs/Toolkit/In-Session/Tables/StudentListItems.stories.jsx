@@ -436,7 +436,7 @@ export const Overview = () => (
                 Row States Breakdown
             </h6>
 
-            <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
+            <div className="d-flex flex-column" style={{ gap: 'var(--space-0625)' }}>
                 <div>
                     <span className="small text-muted d-block mb-1">Default — Insights Available</span>
                     <div

@@ -4,9 +4,9 @@
 /**
  * FieldBox — one look for every text-like field.
  *
- * One 1px border (`--size-element-border`) in `border.input` on one fill,
+ * One 1px border (`--border-default`) in `border.input` on one fill,
  * `background.input`. Hover turns the border `border.focused`. Focus draws
- * the focus ring, 2px (`--size-element-stroke-lg`) and 2px off the box onto
+ * the focus ring, 2px (`--stroke-2`) and 2px off the box onto
  * the surface, in `border.focused`: the ring is never drawn inset. Hover and
  * focus share the color, so the width and the gap tell them apart. Invalid is `border.danger` with `text.danger` in the caption,
  * placeholder `text.subtlest`, helper text `text.subtle`, read-only
@@ -31,10 +31,10 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-md);
+    gap: var(--space-0625);
     width: 100%;
     box-sizing: border-box;
-    border: var(--size-element-border) solid var(--ds-border-input);
+    border: var(--border-default) solid var(--ds-border-input);
     border-radius: var(--radius-0625);
     background-color: var(--ds-background-input);
     color: var(--ds-text);
@@ -44,7 +44,7 @@
     // One height per spacing: the content centers in it, so nothing pads the
     // top and bottom.
     height: var(--height-250);
-    padding: 0 calc(var(--pad-x-md) - var(--size-element-border));
+    padding: 0 calc(var(--pad-x-md) - var(--border-default));
     font: var(--body-default);
 
     // Several lines (Text area): 80 at least, growing with its rows, and the
@@ -58,7 +58,7 @@
         align-items: flex-start;
         height: auto;
         min-height: var(--field-min-height-sm);
-        padding-block: calc(var(--pad-y-md) - var(--size-element-border));
+        padding-block: calc(var(--pad-y-md) - var(--border-default));
     }
 
     // Tags that wrap (Tag field, a multi Select): one row of tags is 32, and
@@ -66,11 +66,11 @@
     &--grow {
         height: auto;
         min-height: var(--height-250);
-        padding-block: calc((var(--height-250) - #{label.$tag-height}) / 2 - var(--size-element-border));
+        padding-block: calc((var(--height-250) - #{label.$tag-height}) / 2 - var(--border-default));
 
         &.plus-field--compact {
             min-height: var(--item-height-md);
-            padding-block: calc((var(--item-height-md) - #{label.$tag-height}) / 2 - var(--size-element-border));
+            padding-block: calc((var(--item-height-md) - #{label.$tag-height}) / 2 - var(--border-default));
         }
     }
 }
@@ -93,7 +93,7 @@
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     color: var(--ds-text-subtle);
     white-space: nowrap;
 

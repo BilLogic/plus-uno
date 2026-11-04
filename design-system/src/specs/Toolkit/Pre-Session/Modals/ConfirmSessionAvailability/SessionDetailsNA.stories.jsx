@@ -23,7 +23,7 @@ const TimeCardWithChange = () => (
         className="d-flex align-items-center"
         style={{
             gap: 'var(--size-modal-gap-md)',
-            padding: 'var(--size-modal-pad-y-lg) var(--size-element-pad-x-lg)',
+            padding: 'var(--size-modal-pad-y-lg) var(--pad-x-lg)',
         }}
     >
         {/* Icon Container */}
@@ -92,7 +92,7 @@ const SessionDetailsNAModalBody = () => (
             <h4 className="h4 m-0">Lincoln High School - 8/14/2025</h4>
             <div
                 className="d-flex align-items-center"
-                style={{ gap: 'var(--size-element-gap-md)' }}
+                style={{ gap: 'var(--space-0625)' }}
             >
                 <SupervisorControlsDropdown />
                 <i
@@ -138,11 +138,11 @@ const SessionDetailsNAModalBody = () => (
             {/* Session Info Grid */}
             <div
                 style={{
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-modal-radius-md)',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     overflow: 'hidden',
                 }}
             >

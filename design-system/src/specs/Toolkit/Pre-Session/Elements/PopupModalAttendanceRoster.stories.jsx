@@ -19,8 +19,8 @@ export default {
  * - tutor: Name + Lead Badge (optional) + Attendance Badge
  *
  * Tokens:
- * - Padding: --size-element-pad-y-lg
- * - Gap: --size-element-gap-sm
+ * - Padding: --pad-y-lg
+ * - Gap: --stack-md
  * - Typography: body2-txt (light weight)
  * - Color: --color-on-surface
  * - Border radius: --size-modal-radius-md (legacy radius-3)
@@ -36,8 +36,8 @@ export const AttendanceRosterRow = ({
     <div
         className="d-flex align-items-center w-100"
         style={{
-            padding: 'var(--size-element-pad-y-lg) 0',
-            gap: 'var(--size-element-gap-sm)',
+            padding: 'var(--pad-y-lg) 0',
+            gap: 'var(--stack-md)',
             borderRadius: 'var(--size-modal-radius-md)',
         }}
     >
@@ -46,7 +46,7 @@ export const AttendanceRosterRow = ({
             className="d-flex align-items-center"
             style={{
                 flex: '1 0 0',
-                gap: type === 'tutor' ? 'var(--size-element-gap-sm)' : '0',
+                gap: type === 'tutor' ? 'var(--stack-md)' : '0',
             }}
         >
             <span

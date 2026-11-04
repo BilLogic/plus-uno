@@ -185,7 +185,7 @@ export const FillInTableRow = ({
                     gridColumn: 'span 2',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
@@ -407,7 +407,7 @@ export const FillInModalRow = ({
                     gridColumn: 'span 1',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
@@ -435,7 +435,7 @@ export const Overview = () => (
             </p>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <FillInTableHeaderRow />
                 <FillInTableRow
                     date="Tue, Sep 9"
@@ -448,7 +448,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <FillInTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -460,7 +460,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State</h6>
                 <FillInTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -479,7 +479,7 @@ export const Overview = () => (
             </p>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State with Need Lead</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State with Need Lead</h6>
                 <FillInTableHeaderRow />
                 <FillInTableRow
                     date="Tue, Sep 9"
@@ -493,7 +493,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State with Need Lead</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State with Need Lead</h6>
                 <FillInTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -506,7 +506,7 @@ export const Overview = () => (
             </div>
 
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State with Need Lead</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State with Need Lead</h6>
                 <FillInTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -526,7 +526,7 @@ export const Overview = () => (
             </p>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State (Unchecked)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State (Unchecked)</h6>
                 <FillInModalHeaderRow />
                 <FillInModalRow
                     date="Tue, Sep 9"
@@ -540,7 +540,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State (Unchecked)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State (Unchecked)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -553,7 +553,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State (Unchecked)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State (Unchecked)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -566,7 +566,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State (Checked)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State (Checked)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -579,7 +579,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State (Need Lead)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State (Need Lead)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -593,7 +593,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State (Need Lead)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State (Need Lead)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -607,7 +607,7 @@ export const Overview = () => (
             </div>
 
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State (Need Lead)</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State (Need Lead)</h6>
                 <FillInModalRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"

@@ -60,7 +60,7 @@ export const Overview = () => (
                     <div style={{ 
                         padding: '16px', 
                         backgroundColor: 'var(--ds-surface)', 
-                        borderRadius: 'var(--size-element-radius-md, 8px)' 
+                        borderRadius: 'var(--radius-md, 8px)' 
                     }}>
                         <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsOverviewPage</h3>
                         <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
@@ -70,7 +70,7 @@ export const Overview = () => (
                     <div style={{ 
                         padding: '16px', 
                         backgroundColor: 'var(--ds-surface)', 
-                        borderRadius: 'var(--size-element-radius-md, 8px)' 
+                        borderRadius: 'var(--radius-md, 8px)' 
                     }}>
                         <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsDetailPage (5 variants)</h3>
                         <p className="body3-txt" style={{ marginBottom: '8px', color: 'var(--ds-text-subtle)' }}>

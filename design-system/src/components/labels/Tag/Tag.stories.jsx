@@ -1087,7 +1087,7 @@ const thumbnail = {
     width: '480px',
     maxWidth: '100%',
     height: '160px',
-    borderRadius: 'var(--size-element-radius-lg, 8px)',
+    borderRadius: 'var(--radius-lg, 8px)',
     overflow: 'hidden',
 };
 const picture = {
@@ -1114,7 +1114,7 @@ const stateLayer = (host, token) => {
 /** The 2px surface gap as a computed shadow: under a ×, or stacked on the overlay shadow under a tag. */
 const surfaceGap = (host, { onElevation = true } = {}) => computedShadow(
     host,
-    `0 0 0 var(--size-element-stroke-lg) var(--ds-surface-overlay)${onElevation ? ', var(--ds-shadow-overlay)' : ''}`,
+    `0 0 0 var(--stroke-2) var(--ds-surface-overlay)${onElevation ? ', var(--ds-shadow-overlay)' : ''}`,
 );
 
 /**
@@ -1403,7 +1403,7 @@ export const ElevatedRemoveFocus = () => (
 ElevatedRemoveFocus.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const gap = surfaceGap(canvasElement, { onElevation: false });
-    const spread = px(probe(canvasElement, 'width', 'var(--size-element-stroke-lg)'));
+    const spread = px(probe(canvasElement, 'width', 'var(--stroke-2)'));
 
     // Tab past the link to its ×, and check the ring and what sits under it.
     const focusRemove = async (name, what, shadow) => {

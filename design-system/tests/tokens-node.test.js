@@ -156,8 +156,8 @@ describe('the corpus — where tokens live, answered once and read through the o
 
   it('does not read `tokens/source/`, the Figma export the SCSS is generated from', () => {
     for (const source of tokenSources()) {
-      // The one directory read below the flat sheets is the generated color set.
-      expect(source.file).toMatch(/^(color\/)?[^/]+\.(scss|css)$/);
+      // The directories read below the flat sheets are the generated color set and the token ladder.
+      expect(source.file).toMatch(/^((color|ladder)\/)?[^/]+\.(scss|css)$/);
       expect(source.file.startsWith('source/')).toBe(false);
     }
   });

@@ -46,10 +46,10 @@ export const FoundationContents = () => {
     }, []);
     return (
         <nav aria-label="Contents" style={{ marginBlockEnd: 'var(--section-stack-lg)' }}>
-            <h2 style={{ margin: 0, marginBlockEnd: 'var(--element-stack-md)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+            <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
                 Contents
             </h2>
-            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--element-stack-md) var(--section-stack-md)' }}>
+            <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md) var(--section-stack-md)' }}>
                 {items.map((item) => (
                     <li key={item.id}>
                         <a href={`#${item.id}`} style={linkStyle}>{item.title}</a>
@@ -96,7 +96,7 @@ export const FoundationRelated = ({ items }) => (
             listStyle: 'none',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))',
-            gap: 'var(--layout-gutter)',
+            gap: 'var(--grid-gutter)',
         }}
     >
         {items.map((item) => (
@@ -127,7 +127,7 @@ export const FoundationRelated = ({ items }) => (
 
 /** A specimen frame: examples drawn from live tokens on the sunken ground. */
 export const FoundationExample = ({ caption, children }) => (
-    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div
             style={{
                 padding: 'var(--card-pad-spacious)',
@@ -163,18 +163,18 @@ export const TokenSwatches = ({ items, min = 'var(--card-min-width-sm)' }) => (
             listStyle: 'none',
             display: 'grid',
             gridTemplateColumns: `repeat(auto-fill, minmax(${min}, 1fr))`,
-            gap: 'var(--element-stack-md)',
+            gap: 'var(--stack-md)',
         }}
     >
         {items.map((item) => (
-            <li key={item.token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <li key={item.token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <span
                     style={{
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         minHeight: 'var(--item-height-md)',
-                        borderRadius: 'var(--element-radius-lg)',
+                        borderRadius: 'var(--radius-lg)',
                         background: `var(${item.token})`,
                         color: item.text ? `var(${item.text})` : 'var(--ds-text)',
                         font: 'var(--body-default)',

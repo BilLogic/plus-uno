@@ -77,7 +77,7 @@ export const SortingOptions = ({
     };
 
     return (
-        <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
+        <div className="d-flex align-items-center" style={{ gap: 'var(--stack-md)' }}>
             <Select
                 aria-label="Sort by"
                 clearable={false}
@@ -103,10 +103,10 @@ export const SortingOptions = ({
 };
 
 export const Overview = () => (
-    <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-lg)', paddingBottom: '240px' }}>
+    <div className="d-flex flex-column" style={{ gap: 'var(--stack-lg)', paddingBottom: '240px' }}>
         <section>
             <h6 className="h6 mb-4 text-muted">Closed states</h6>
-            <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
+            <div className="d-flex flex-column" style={{ gap: 'var(--space-0625)' }}>
                 <SortingOptions initialSort="name" />
                 <SortingOptions initialSort="status" />
                 <SortingOptions initialSort="bookmark" />
@@ -114,7 +114,7 @@ export const Overview = () => (
             </div>
         </section>
 
-        <section style={{ marginTop: 'var(--size-element-gap-lg)', paddingBottom: '200px' }}>
+        <section style={{ marginTop: 'var(--stack-lg)', paddingBottom: '200px' }}>
             <h6 className="h6 mb-4 text-muted">Sort by, open</h6>
             <SortingOptions initialSort="status" openSort />
         </section>

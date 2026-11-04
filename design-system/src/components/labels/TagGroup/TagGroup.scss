@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     /* 8 across and 8 down, as the Figma set binds both. */
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     /* The list markers a `role="list"` container would otherwise inherit from a
        `ul` reset are not wanted; this is a div, so only the box matters. */
     padding: 0;

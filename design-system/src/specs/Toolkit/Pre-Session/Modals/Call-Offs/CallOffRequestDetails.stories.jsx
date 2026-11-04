@@ -60,7 +60,7 @@ const CallOffAlert = ({ onClose }) => (
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)'
+                gap: 'var(--stack-md)'
             }}
         >
             <span className="body1-txt" style={{ color: 'var(--ds-text)' }}>
@@ -93,7 +93,7 @@ const CallOffAlert = ({ onClose }) => (
 /**
  * Reason Dropdown Component
  * Uses semantic tokens:
- * - Gap: --size-element-gap-xs (between label and select)
+ * - Gap: --stack-sm (between label and select)
  * - Typography: body3-txt for label
  */
 const ReasonDropdown = ({ value, onChange }) => (
@@ -101,7 +101,7 @@ const ReasonDropdown = ({ value, onChange }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             width: '100%'
         }}
     >
@@ -124,7 +124,7 @@ const ReasonDropdown = ({ value, onChange }) => (
 /**
  * Additional Details Textarea Component
  * Uses semantic tokens:
- * - Gap: --size-element-gap-xs (between label and textarea)
+ * - Gap: --stack-sm (between label and textarea)
  * - Typography: body3-txt for label
  */
 const AdditionalDetailsTextarea = ({ value, onChange }) => (
@@ -132,7 +132,7 @@ const AdditionalDetailsTextarea = ({ value, onChange }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             width: '100%'
         }}
     >
@@ -164,7 +164,7 @@ const WithdrawToggle = ({ checked, onChange }) => (
         <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
             Withdraw from all recurring sessions.
         </span>
-        <div style={{ marginRight: 'var(--size-element-gap-md)' }}>
+        <div style={{ marginRight: 'var(--space-0625)' }}>
             {/*
               * The text to the left is a `<span>` in its own column, not a
               * label, so it names nothing. `Toggle` passes `aria-label`

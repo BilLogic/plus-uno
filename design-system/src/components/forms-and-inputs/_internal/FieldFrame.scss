@@ -10,7 +10,7 @@
 .plus-field-stack {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
@@ -21,7 +21,7 @@
 .plus-field-label-row {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
 }
 
 .plus-field-label {
@@ -32,7 +32,7 @@
 
 .plus-field-required {
     color: var(--ds-text-danger);
-    margin-left: var(--size-element-gap-xs);
+    margin-left: var(--stack-sm);
 }
 
 // Hidden, not removed: the label still names the control.
@@ -60,8 +60,8 @@
 
     &:focus-visible {
         outline: var(--focus-ring-width) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-border);
-        border-radius: var(--size-element-radius-sm);
+        outline-offset: var(--border-default);
+        border-radius: var(--radius-md);
     }
 }
 
@@ -71,14 +71,14 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     font: var(--body-small);
 }
 
 .plus-field-caption__message {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     min-width: 0;
 
     i {
@@ -119,5 +119,5 @@
 .plus-field-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
 }

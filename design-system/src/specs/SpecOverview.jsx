@@ -21,7 +21,7 @@ export const SpecOverview = ({ title, description, categories }) => {
                             backgroundColor: 'var(--ds-surface-container)'
                         }}
                     >
-                        <h3 className="h4" style={{ marginBottom: 'var(--size-element-gap-sm)' }}>{category.name}</h3>
+                        <h3 className="h4" style={{ marginBottom: 'var(--stack-md)' }}>{category.name}</h3>
                         <p className="body2-txt">{category.description}</p>
                     </div>
                 ))}

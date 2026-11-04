@@ -557,7 +557,7 @@ export default function MonthlyReportContent() {
                 </div>
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
-                <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
+                <div style={{ marginTop: 'var(--stack-sm)' }}>
                     <SectionMessage appearance="tertiary" leadingVisual={<i className="fa-solid fa-lightbulb insight-alert-icon" />} dismissible={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <span>
                             We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
@@ -651,7 +651,7 @@ export default function MonthlyReportContent() {
                                                     <h4 className="growth-card-title">
                                                         {dim.title}
                                                         {dim.startHere && (
-                                                            <span style={{ marginLeft: 'var(--size-element-gap-sm)', display: 'inline-block' }}>
+                                                            <span style={{ marginLeft: 'var(--stack-md)', display: 'inline-block' }}>
                                                                 <StatusTag appearance="info">
                                                                     <i className="fa-solid fa-arrow-right" style={{ marginRight: '4px' }}></i>
                                                                     Start Here
@@ -719,7 +719,7 @@ export default function MonthlyReportContent() {
                                                     )}
                                                     {/* Feedback field for Negative Feedback */}
                                                     {(state === 'under_review' || (state === 'reviewed' && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate' || feedbackSelections[dim.id] === 'helpful'))) && (feedbackSelections[dim.id] === 'not_helpful' || feedbackSelections[dim.id] === 'inaccurate') && (
-                                                        <div className="feedback-input-container" style={{ marginTop: 'var(--size-element-gap-md)' }}>
+                                                        <div className="feedback-input-container" style={{ marginTop: 'var(--space-0625)' }}>
                                                             <TextField
                                                                 label={feedbackSelections[dim.id] === 'not_helpful' ? "What’s missing or off about this insight?" : "What feels inaccurate from this AI insight?"}
                                                                 value={feedbackText[dim.id] || ''}
@@ -732,7 +732,7 @@ export default function MonthlyReportContent() {
                                                                     : `${(feedbackText[dim.id] || '').length} characters`
                                                                 }
                                                             />
-                                                            <div style={{ marginTop: 'var(--size-element-gap-sm)', display: 'flex', justifyContent: 'flex-end' }}>
+                                                            <div style={{ marginTop: 'var(--stack-md)', display: 'flex', justifyContent: 'flex-end' }}>
                                                                 <Button
                                                                     spacing="compact"
                                                                     appearance="primary"
