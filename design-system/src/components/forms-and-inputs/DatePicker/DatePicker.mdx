@@ -1,7 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DatePickerStories from './DatePicker.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -48,9 +49,195 @@ Use a date picker when a user needs to select a date or a date range.
 
 <DocsTab tab="examples">
 
-<Canvas of={DatePickerStories.Overview} />
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DatePicker"
+/>
 
-<ArgTypes of={DatePickerStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A date field, closed.</>}>
+    <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
+    <DsCanvasQuiet of={DatePickerStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Invalid, valid, read-only and disabled.</>}>
+    <DsCanvasQuiet of={DatePickerStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Picking a date
+
+<DocsCanvasShell description={<>Typing MM/DD/YYYY and pressing Enter, or clicking a day, both commit a pick. A date outside `minDate`–`maxDate` or otherwise unreadable is kept as typed and marked invalid.</>}>
+    <DsCanvasQuiet of={DatePickerStories.PickDate} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Range
+
+<DocsCanvasShell description={<>With `range`, the first click sets the first day and the second sets the last; a click before the first day starts over. The field shows both ends joined by a dash.</>}>
+    <DsCanvasQuiet of={DatePickerStories.PickRange} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Bounds
+
+<DocsCanvasShell description={<>Days before `minDate` or after `maxDate` are disabled in the calendar and rejected if typed.</>}>
+    <DsCanvasQuiet of={DatePickerStories.Bounds} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DatePickerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>value</code></td><td>string or array</td><td>ISO <code>YYYY-MM-DD</code>; with <code>range</code>, <code>[start, end]</code>, either end may be <code>null</code>.</td></tr>
+        <tr><td><code>range</code></td><td>boolean</td><td>Picks a first and a last day instead of one.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td><code>(iso)</code>, or <code>([start, end])</code> with <code>range</code>; <code>''</code> or nulls when cleared.</td></tr>
+        <tr><td><code>minDate</code>, <code>maxDate</code></td><td>string or Date</td><td>The earliest and latest day that can be picked or typed.</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>Defaults to <code>MM/DD/YYYY</code>, or two of them for a range.</td></tr>
+        <tr><td><code>calendarAlign</code></td><td>enum</td><td><code>left</code> (default), <code>center</code> or <code>right</code> — which edge of the field the calendar lines up with.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
+        <tr><td><code>isDisabled</code>, <code>isReadOnly</code></td><td>—</td><td>—</td></tr>
+        <tr><td><code>isInvalid</code></td><td>boolean</td><td>Draws the field invalid; a typed date outside the allowed span does too.</td></tr>
+        <tr><td><code>isValid</code></td><td>boolean</td><td>Draws the field valid, as a form does once a date is accepted.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `DatePicker` for a single date or a date range typed or chosen from a
+calendar — a session date, a billing period. For a time alone, use
+`TimePicker`; for a date and a time together, use `DateTimePicker`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Typing is checked on Enter or on leaving the field.
+
+A real day inside `minDate`–`maxDate` is picked; anything else is kept exactly
+as typed and marked invalid, and `onChange` is not called until the text
+reads as a real date.
+
+```jsx
+<DatePicker
+    value={date}
+    onChange={setDate}
+    minDate="2026-01-01"
+    maxDate="2026-12-31"
+/>
+```
+
+### A range is two clicks, not a drag.
+
+The first click sets the first day, the second sets the last day, and
+`onChange` receives `[start, end]`. A click before the already-set first day
+starts the range again rather than erroring.
+
+### There is no `label` prop.
+
+Name the field with `aria-label` or `aria-labelledby` — props the component
+forwards straight to the input, same as `aria-describedby` and `data-*`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The input is the named control.** `aria-label`, `aria-labelledby` and
+  `aria-describedby` are read straight off the props and land on the text
+  input a screen reader focuses.
+- **The popup is a labeled dialog.** It opens as `role="dialog"` with an
+  `aria-label` of "Choose a date" or "Choose dates", not a bare list.
+- **`aria-expanded` and `aria-haspopup` track the calendar's open state** on
+  the input itself, which is `role="combobox"`.
+- **An invalid typed date keeps the typed text** rather than silently
+  reverting, so the person can see and correct what they entered.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a time alone, use `TimePicker`.
+- For a date and a time together, use `DateTimePicker`.
+- The month grid itself is the public `Calendar` component.
+
+</div>
+
+</div>
 
 </DocsTab>
 

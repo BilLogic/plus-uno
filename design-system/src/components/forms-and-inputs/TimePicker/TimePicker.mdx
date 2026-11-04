@@ -1,7 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TimePickerStories from './TimePicker.stories.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -28,9 +29,154 @@ Use a time picker when a user needs to set a time of day.
 
 <DocsTab tab="examples">
 
-<Canvas of={TimePickerStories.Overview} />
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TimePicker"
+/>
 
-<ArgTypes of={TimePickerStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A time field with an AM/PM toggle.</>}>
+    <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
+    <DsCanvasQuiet of={TimePickerStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Invalid, valid, read-only and disabled.</>}>
+    <DsCanvasQuiet of={TimePickerStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Picking a time
+
+<DocsCanvasShell description={<>Typing an hour and a minute, with or without a colon, and pressing Enter commits the time. Anything that isn't a real hour (1–12) and minute (0–59) is kept as typed and marked invalid. The AM/PM toggle reports immediately.</>}>
+    <DsCanvasQuiet of={TimePickerStories.PickTime} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## A 24-hour value is split on read
+
+<DocsCanvasShell description={<>`value` also accepts a 24-hour string ("14:30"); it is split into the hour this control shows and the period that says which half of the day it was.</>}>
+    <DsCanvasQuiet of={TimePickerStories.TwentyFourHourValueIsSplit} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>value</code></td><td>string</td><td>A 12-hour string ("02:30 PM") or a 24-hour one ("14:30"), split on read.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td><code>(value)</code> — a 12-hour string, or <code>null</code> once either half is cleared.</td></tr>
+        <tr><td><code>placeholder</code></td><td>string</td><td>Defaults to <code>__ : __</code>.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
+        <tr><td><code>isDisabled</code>, <code>isReadOnly</code></td><td>—</td><td>—</td></tr>
+        <tr><td><code>isInvalid</code></td><td>boolean</td><td>Draws the field invalid; a typed time outside 1–12 / 0–59 does too.</td></tr>
+        <tr><td><code>isValid</code></td><td>boolean</td><td>Draws the field valid.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `TimePicker` for a time of day alone — a reminder time, a recurring
+slot's start. For a date alone, use `DatePicker`; for a date and a time
+together, use `DateTimePicker`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The field always reports a 12-hour value.
+
+`onChange` fires with a string like `"02:30 PM"` regardless of how `value`
+was given. A 24-hour `value` passed in is accepted and split into the hour
+and period this control shows, but what it hands back is always 12-hour.
+
+```jsx
+<TimePicker value={time} onChange={setTime} />
+```
+
+### AM/PM is a separate control from the typed text.
+
+The field itself has no notion of which half of the day it is — typing sets
+the hour and minute, and the AM/PM toggle beside it sets the period
+independently, reporting immediately with whichever half of the time is
+already set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **There is no `label` prop.** Name the field with `aria-label` or
+  `aria-labelledby`, forwarded straight to the input a screen reader lands
+  on, same as `aria-describedby` and `data-*`.
+- **The AM/PM toggle is a real button inside a menu**, reachable and
+  operable by keyboard like any other PLUS dropdown.
+- **An invalid typed time keeps the typed text** rather than silently
+  reverting, so the person can see and correct what they entered.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a date alone, use `DatePicker`.
+- For a date and a time together, use `DateTimePicker`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
