@@ -57,15 +57,21 @@
 /*
  * The tooltip is a floating layer, so it takes the Popup pattern's surface,
  * overlay shadow, radius and padding (`design-system/src/components/
- * overlays-and-layering/Popup/Popup.scss`) and the shared popup z-index —
- * `chartTheme.js` sets `tooltip.useHTML` so this div, not an SVG shape, is
- * what actually renders.
+ * overlays-and-layering/Popup/Popup.scss`) and the shared popup z-index.
+ *
+ * `useHTML` only moves the tooltip TEXT into a foreignObject — the box
+ * Highcharts draws around it is always its own SVG `<path>`
+ * (`.highcharts-tooltip-box`), and `background`/`border-radius`/`box-shadow`
+ * are no-ops on an SVG element, so styling `.highcharts-tooltip` itself (as
+ * the comment here used to say) never painted anything. `chartTheme.js` sets
+ * `tooltip.outside: true` so Highcharts renders into
+ * `.highcharts-tooltip-container` — a real `<div>`, CSS-stylable — and
+ * `chartTheme.js` turns the SVG box fully transparent (`backgroundColor:
+ * 'transparent'`, `borderWidth: 0`, `shadow: false`) so this div's surface is
+ * the only thing a reader sees.
  */
 .highcharts-tooltip-container {
     z-index: var(--layer-popup);
-}
-
-.highcharts-tooltip {
     background: var(--ds-surface-overlay);
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);

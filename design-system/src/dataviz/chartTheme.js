@@ -180,11 +180,17 @@ const chartTheme = {
     },
     tooltip: {
         // The Popup pattern's surface, styled in `chartTheme.css` via
-        // `.highcharts-tooltip` — `useHTML` is what makes a real `box-shadow`
-        // and `border-radius` possible here; Highcharts' native SVG tooltip
-        // can only draw its own filter-based `shadow` option, which can't
-        // take `--ds-shadow-overlay`.
+        // `.highcharts-tooltip`. `useHTML` alone still draws the tooltip's
+        // box as an SVG `<path>` (only the text runs through a foreignObject),
+        // so a CSS `background`/`border-radius`/`box-shadow` on that class
+        // never paints — SVG ignores all three. `outside: true` is what moves
+        // the whole tooltip into `.highcharts-tooltip-container`, a real
+        // floating `<div>`, which is what makes a design-system shadow token
+        // reachable at all; Highcharts' native SVG tooltip can only draw its
+        // own filter-based `shadow` option, which can't take
+        // `--ds-shadow-overlay`.
         useHTML: true,
+        outside: true,
         backgroundColor: 'transparent',
         borderWidth: 0,
         shadow: false,
