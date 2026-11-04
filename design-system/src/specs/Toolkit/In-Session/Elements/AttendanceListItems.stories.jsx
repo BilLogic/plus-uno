@@ -1,10 +1,9 @@
 import React from 'react';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/In-Session/Elements/Attendance List Items',
-    component: Dropdown,
+    component: AttendanceListItems,
     parameters: {
         layout: 'centered',
         docs: {

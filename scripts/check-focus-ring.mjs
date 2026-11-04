@@ -69,7 +69,10 @@ const FOCUS_ROLES = [
 export const MIN_FILES = 150;
 // Lowered from 50 to 49: Collapse, Divider, NavPills, Navbar and Scrollspy
 // were retired, taking their own focus rules with them.
-export const MIN_RULES = 49;
+// Lowered from 49 to 48: Dropdown was retired for DropdownMenu, whose
+// trigger is a caller's own Button or IconButton — already counted there —
+// rather than a themed toggle with a focus rule of its own.
+export const MIN_RULES = 48;
 
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +

@@ -505,47 +505,6 @@
         ]
       }
     },
-    "Dropdown": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Dropdown",
-        "source": "design-system/src/components/forms-and-inputs/Dropdown/Dropdown.jsx",
-        "storybookId": "components-forms-and-inputs-dropdown-menu--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "dropdown-button",
-            "name": "Dropdown button",
-            "componentSetNodeId": "37:4513",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "dropdown-list",
-            "name": "Dropdown List",
-            "componentSetNodeId": "9109:14766",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9109-14766",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "dropdown",
-            "name": "Dropdown",
-            "componentSetNodeId": "4457:25458",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4457-25458",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=37-4513"
-      }
-    },
     "DynamicTable": {
       "code": {
         "import": "@/components/text-and-data-display",

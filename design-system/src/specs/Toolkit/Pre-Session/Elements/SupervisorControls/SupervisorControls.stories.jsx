@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import Button from '@/components/forms-and-inputs/Button/Button';
-import Dropdown from '@/components/forms-and-inputs/Dropdown/Dropdown';
+import { DropdownMenu, ButtonItem } from '@/components';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Controls',
@@ -10,56 +9,50 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
+const gearTrigger = (
+    <button type="button" className="plus-btn plus-btn--default" aria-label="Session actions" style={{ border: 'none', background: 'none' }}>
+        <i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-on-surface-variant)' }} />
+    </button>
+);
+
 /**
- * Supervisor Controls Dropdown Items
- * Reusable configuration for the dropdown menu
+ * Supervisor Controls Menu Rows
+ * Reusable rows for the supervisor actions menu. Cancel session is danger.
  */
-const supervisorControlItems = [
-    {
-        text: 'Join session',
-        leadingIcon: 'right-to-bracket',
-        onClick: () => console.log('Join session clicked')
-    },
-    {
-        text: 'Edit session',
-        leadingIcon: 'pen-to-square',
-        onClick: () => console.log('Edit session clicked')
-    },
-    {
-        text: 'Recruit tutors',
-        leadingIcon: 'users',
-        onClick: () => console.log('Recruit tutors clicked')
-    },
-    {
-        text: 'Cancel session',
-        leadingIcon: 'trash',
-        onClick: () => console.log('Cancel session clicked')
-    }
+const supervisorMenuRows = ({ onJoin, onEdit, onRecruit, onCancel } = {}) => [
+    <ButtonItem key="join" onClick={onJoin} elemBefore={<i className="fa-solid fa-right-to-bracket" aria-hidden="true" />}>
+        Join session
+    </ButtonItem>,
+    <ButtonItem key="edit" onClick={onEdit} elemBefore={<i className="fa-solid fa-pen-to-square" aria-hidden="true" />}>
+        Edit session
+    </ButtonItem>,
+    <ButtonItem key="recruit" onClick={onRecruit} elemBefore={<i className="fa-solid fa-users" aria-hidden="true" />}>
+        Recruit tutors
+    </ButtonItem>,
+    <ButtonItem
+        key="cancel"
+        onClick={onCancel}
+        elemBefore={<i className="fa-solid fa-trash" aria-hidden="true" style={{ color: 'var(--color-danger)' }} />}
+    >
+        <span style={{ color: 'var(--color-danger)' }}>Cancel session</span>
+    </ButtonItem>,
 ];
 
 /**
  * Supervisor Controls Component
- * A gear icon button that opens a dropdown with supervisor actions
- * Uses design system Dropdown component with:
- * - style="default" for neutral styling
- * - fill="ghost" for transparent background
- * - Custom dropdown items with icons
+ * A gear icon button that opens a menu with supervisor actions.
  */
 const SupervisorControlsComponent = ({ isOpen = false, onToggle }) => {
     return (
         <div style={{ position: 'relative', display: 'inline-block' }}>
-            <Dropdown
-                ariaLabel="Session actions"
-                buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-on-surface-variant)' }} />}
-                items={supervisorControlItems.map((item, index) => ({
-                    ...item,
-                    // Apply danger style to Cancel session
-                    className: index === 3 ? 'text-danger' : ''
-                }))}
-                style="default"
-                fill="ghost"
-                isOpen={isOpen}
-            />
+            <DropdownMenu trigger={gearTrigger} isOpen={isOpen} onOpenChange={onToggle}>
+                {supervisorMenuRows({
+                    onJoin: () => console.log('Join session clicked'),
+                    onEdit: () => console.log('Edit session clicked'),
+                    onRecruit: () => console.log('Recruit tutors clicked'),
+                    onCancel: () => console.log('Cancel session clicked'),
+                })}
+            </DropdownMenu>
         </div>
     );
 };
@@ -162,31 +155,9 @@ export const Overview = () => (
                 borderRadius: 'var(--size-card-radius-md)',
                 minHeight: 'var(--size-modal-min-height-sm)'
             }}>
-                <Dropdown
-                    ariaLabel="Session actions"
-                    buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
-                    items={[
-                        {
-                            text: 'Join session',
-                            leadingIcon: 'right-to-bracket'
-                        },
-                        {
-                            text: 'Edit session',
-                            leadingIcon: 'pen-to-square'
-                        },
-                        {
-                            text: 'Recruit tutors',
-                            leadingIcon: 'users'
-                        },
-                        {
-                            text: 'Cancel session',
-                            leadingIcon: 'trash'
-                        }
-                    ]}
-                    style="primary"
-                    fill="ghost"
-                    isOpen={true}
-                />
+                <DropdownMenu trigger={gearTrigger} isOpen>
+                    {supervisorMenuRows()}
+                </DropdownMenu>
             </div>
         </section>
 
@@ -290,34 +261,14 @@ export const Interactive = () => {
                     borderRadius: 'var(--size-card-radius-md)',
                     minHeight: 'var(--size-modal-min-height-md)'
                 }}>
-                    <Dropdown
-                        ariaLabel="Session actions"
-                        buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
-                        items={[
-                            {
-                                text: 'Join session',
-                                leadingIcon: 'right-to-bracket',
-                                onClick: () => handleItemClick('Join session')
-                            },
-                            {
-                                text: 'Edit session',
-                                leadingIcon: 'pen-to-square',
-                                onClick: () => handleItemClick('Edit session')
-                            },
-                            {
-                                text: 'Recruit tutors',
-                                leadingIcon: 'users',
-                                onClick: () => handleItemClick('Recruit tutors')
-                            },
-                            {
-                                text: 'Cancel session',
-                                leadingIcon: 'trash',
-                                onClick: () => handleItemClick('Cancel session')
-                            }
-                        ]}
-                        style="primary"
-                        fill="ghost"
-                    />
+                    <DropdownMenu trigger={gearTrigger} isOpen={isOpen} onOpenChange={setIsOpen}>
+                        {supervisorMenuRows({
+                            onJoin: () => handleItemClick('Join session'),
+                            onEdit: () => handleItemClick('Edit session'),
+                            onRecruit: () => handleItemClick('Recruit tutors'),
+                            onCancel: () => handleItemClick('Cancel session'),
+                        })}
+                    </DropdownMenu>
                 </div>
             </section>
         </div>
@@ -329,33 +280,12 @@ export const Interactive = () => {
  * For use in pages and other compositions
  */
 export const SupervisorControlsDropdown = ({ onJoinSession, onEditSession, onRecruitTutors, onCancelSession, ...props }) => (
-    <Dropdown
-        ariaLabel="Session actions"
-        buttonText={<i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-primary)' }} />}
-        items={[
-            {
-                text: 'Join session',
-                leadingIcon: 'right-to-bracket',
-                onClick: onJoinSession
-            },
-            {
-                text: 'Edit session',
-                leadingIcon: 'pen-to-square',
-                onClick: onEditSession
-            },
-            {
-                text: 'Recruit tutors',
-                leadingIcon: 'users',
-                onClick: onRecruitTutors
-            },
-            {
-                text: 'Cancel session',
-                leadingIcon: 'trash',
-                onClick: onCancelSession
-            }
-        ]}
-        style="primary"
-        fill="ghost"
-        {...props}
-    />
+    <DropdownMenu trigger={gearTrigger} {...props}>
+        {supervisorMenuRows({
+            onJoin: onJoinSession,
+            onEdit: onEditSession,
+            onRecruit: onRecruitTutors,
+            onCancel: onCancelSession,
+        })}
+    </DropdownMenu>
 );

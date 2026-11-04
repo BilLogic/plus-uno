@@ -13,7 +13,7 @@ export { default as CloseButton } from '@/components/forms-and-inputs/CloseButto
 export { default as Comment } from '@/components/forms-and-inputs/Comment';
 export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker';
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
-export { default as Dropdown, createDropdown } from '@/components/forms-and-inputs/Dropdown';
+export { default as DropdownMenu } from '@/components/forms-and-inputs/DropdownMenu';
 export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';

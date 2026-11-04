@@ -89,8 +89,9 @@ export const PeriodMenuOpensFourPixelsBelow = () => (
 PeriodMenuOpensFourPixelsBelow.play = async ({ canvasElement }) => {
     const toggle = canvasElement.querySelector('.plus-time-picker__period-toggle');
     await userEvent.click(toggle);
+    // The menu portals to the document body, not canvasElement.
     const menu = await waitFor(() => {
-        const found = canvasElement.querySelector('.dropdown-menu.show');
+        const found = canvasElement.ownerDocument.querySelector('.plus-dropdown-menu');
         expect(found).toBeVisible();
         return found;
     });
@@ -130,8 +131,9 @@ TimeZoneCaption.play = async ({ args, canvasElement }) => {
     await expect(other.getAttribute('aria-describedby')).toContain(caption.id);
 
     // The value is stored in UTC: 1:00 AM in Los Angeles is 08:00 UTC.
+    // The menu portals to the document body, not `other`.
     await userEvent.click(other.querySelector('.plus-time-picker__period-toggle'));
-    await userEvent.click(await within(other).findByRole('button', { name: 'AM' }));
+    await userEvent.click(await page.findByRole('menuitem', { name: 'AM' }));
     await waitFor(() => expect(args.onChange).toHaveBeenCalled());
     const last = args.onChange.mock.calls.at(-1)[0];
     await expect(last.utc).toBe('2026-10-21T08:00:00.000Z');
@@ -165,8 +167,9 @@ UnknownTimeZone.play = async ({ args, canvasElement }) => {
     await expect(field.getAttribute('aria-describedby') ?? '').not.toMatch(/time-zone/);
 
     // Stored in the viewer's own zone: 1:00 AM local on 21 Oct 2026.
+    // The menu portals to the document body, not `field`.
     await userEvent.click(field.querySelector('.plus-time-picker__period-toggle'));
-    await userEvent.click(await within(field).findByRole('button', { name: 'AM' }));
+    await userEvent.click(await page.findByRole('menuitem', { name: 'AM' }));
     await waitFor(() => expect(args.onChange).toHaveBeenCalled());
     const last = args.onChange.mock.calls.at(-1)[0];
     await expect(last.utc).toBe(new Date(2026, 9, 21, 1, 0).toISOString());

@@ -1,7 +1,8 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
-import Dropdown from '../../forms-and-inputs/Dropdown';
+import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
+import { ButtonItem, CustomItem } from '@/components/navigation/MenuGroup';
 import './TagGroup.scss';
 
 /**
@@ -63,46 +64,52 @@ const isSuggestion = (child) => {
 };
 
 /**
- * A hidden tag's line in the `+n` menu, keeping the tag's action. A selectable
- * tag is a toggle item led by the Dropdown's multi-select checkbox; it shows
- * selected and keeps the menu open, so the change is seen where it was made.
- * A link tag is a link item to the same address, with a trailing arrow for
- * "goes somewhere". A tag still saving, whatever its behavior, is a disabled,
- * busy row that cannot be pressed. Anything else is a static row that only
- * says the words: nothing to press, nothing to focus, and remove is not
- * offered here, only on the row.
+ * A hidden tag's row in the `+n` menu, keeping the tag's action. A selectable
+ * tag is a toggle row (`aria-pressed`) that stays open on a pick (`data-keep-
+ * open`), so the change is seen where it was made. A link tag is a link item
+ * to the same address, with a trailing arrow for "goes somewhere". A tag
+ * still saving, whatever its behavior, is a disabled, busy row that cannot be
+ * pressed. Anything else is a static row that only says the words: nothing to
+ * press, nothing to focus, and remove is not offered here, only on the row.
  */
-const menuItemOf = (child) => {
+const menuRowOf = (child) => {
     const props = child.props || {};
     const text = labelOf(child);
     const kind = resolveTagKind(props);
     // Saving, whatever the behavior: the disabled row, busy, not actionable.
     if (props.isLoading) {
-        return { text, disabled: true, isBusy: true };
+        return <ButtonItem key={child.key} isDisabled aria-busy="true">{text}</ButtonItem>;
     }
     switch (kind) {
         case 'selectable':
-            return {
-                text,
-                isToggle: true,
-                selected: Boolean(props.isSelected),
-                // The Dropdown's multi-select checkbox, as Figma draws the
-                // row: decorative, since `aria-pressed` carries the state.
-                multiSelectCheckbox: true,
-                multiSelectChecked: Boolean(props.isSelected),
-                keepOpen: true,
-                onClick: props.onClick,
-            };
+            // `menuitemcheckbox`, not `menuitem` + `aria-pressed`: `aria-pressed`
+            // is a toggle-button attribute, not one `menuitem` allows.
+            return (
+                <ButtonItem
+                    key={child.key}
+                    role="menuitemcheckbox"
+                    isSelected={Boolean(props.isSelected)}
+                    aria-checked={Boolean(props.isSelected)}
+                    data-keep-open="true"
+                    onClick={props.onClick}
+                >
+                    {text}
+                </ButtonItem>
+            );
         case 'link':
-            return {
-                text,
-                href: props.href,
-                linkComponent: props.linkComponent,
-                trailingIcon: 'arrow-right',
-                onClick: props.onClick,
-            };
+            return (
+                <CustomItem
+                    key={child.key}
+                    component={props.linkComponent || 'a'}
+                    href={props.href}
+                    elemAfter={<i className="fa-solid fa-arrow-right" aria-hidden="true" />}
+                    onClick={props.onClick}
+                >
+                    {text}
+                </CustomItem>
+            );
         default:
-            return { text, isStatic: true };
+            return <CustomItem key={child.key}>{text}</CustomItem>;
     }
 };
 
@@ -284,16 +291,16 @@ export const TagGroup = ({
             onClick: onOverflowClick,
         });
         overflowItem = onOverflowClick ? tag : (
-            // The menu is the library's Dropdown: the hidden tags are its items,
-            // so they are reached with Tab and chosen with Enter, and Escape
-            // closes it with focus back on `+n`.
-            <Dropdown
-                className="plus-tag-group__menu"
+            // The menu is the library's DropdownMenu: the hidden tags are its
+            // rows, so they are reached with Tab and chosen with Enter, and
+            // Escape closes it with focus back on `+n`.
+            <DropdownMenu
+                trigger={tag}
                 isOpen={menuIsOpen}
-                onToggle={(next) => setMenuOpen(next && !isDisabled)}
-                items={items.slice(shown).map(menuItemOf)}
-                toggle={tag}
-            />
+                onOpenChange={(next) => setMenuOpen(next && !isDisabled)}
+            >
+                {items.slice(shown).map(menuRowOf)}
+            </DropdownMenu>
         );
     }
 

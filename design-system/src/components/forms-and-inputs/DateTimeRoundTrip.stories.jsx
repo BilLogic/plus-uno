@@ -142,8 +142,10 @@ PeriodChangeIsReportedWithoutADate.play = async ({ args, canvasElement }) => {
     await waitFor(() => expect(timeField(canvas)).toHaveValue('09:15'));
     args.onChange.mockClear();
 
+    // The menu portals to the document body, not canvasElement.
+    const body = within(canvasElement.ownerDocument.body);
     await userEvent.click(canvasElement.querySelector('.plus-time-picker__period-toggle'));
-    await userEvent.click(await canvas.findByRole('button', { name: 'PM' }));
+    await userEvent.click(await body.findByRole('menuitem', { name: 'PM' }));
 
     /*
      * The date is deliberately absent. This used to be guarded by

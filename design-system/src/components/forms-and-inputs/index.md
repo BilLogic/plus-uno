@@ -17,7 +17,7 @@ authored half (#166), counted rather than assumed.
 | [Comment](Comment/index.md) | 14 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
-| [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
+| [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✕ | ✅ |
 | [Fieldset](Fieldset.md) | 8 | ✕ | ✕ | ✕ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
@@ -42,7 +42,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 13/34 (38%) · Correct/incorrect 7/34 (21%) · Accessibility 17/34 (50%)
+**Authored coverage:** When to use 13/34 (38%) · Correct/incorrect 6/34 (18%) · Accessibility 17/34 (50%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -561,7 +561,14 @@ const preview = {
 
     a11y: {
       // Fail story tests / CI on accessibility violations (addon-a11y + addon-vitest).
-      test: 'error'
+      test: 'error',
+      context: {
+        // Base UI's own focus-sentinel spans (Menu, Popover): inert,
+        // `aria-hidden`, briefly focusable on purpose to steer Tab around a
+        // floating layer. Not a component defect to fix — excluded from the
+        // scan the way any inert implementation detail would be.
+        exclude: ['[data-base-ui-focus-guard]'],
+      },
     }
   },
 

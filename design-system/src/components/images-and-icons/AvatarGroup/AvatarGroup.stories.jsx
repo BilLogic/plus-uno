@@ -64,7 +64,7 @@ Group.play = async ({ canvasElement }) => {
     const more = canvas.getByRole('button', { name: '+3, 3 more people' });
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     await userEvent.click(more);
-    await expect(more).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
     for (const name of PEOPLE.slice(4)) {
         await expect(await within(document.body).findByText(name)).toBeVisible();
     }

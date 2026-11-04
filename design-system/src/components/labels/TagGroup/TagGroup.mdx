@@ -242,11 +242,11 @@ component of your own must copy the marker
 (`MySuggestion.isSuggestion = Suggestion.isSuggestion`), or it is counted as a
 tag.
 
-In the menu, a hidden tag keeps what it does. A selectable tag toggles there,
-led by the Dropdown's multi-select checkbox: empty when off, checked and in the
-selected state when on, and the menu stays open so the change is seen. A link
-tag is a link there, to the same address, with a trailing arrow. A tag still
-saving is a disabled, busy row that cannot be pressed.
+In the menu, a hidden tag keeps what it does. A selectable tag toggles there
+(`aria-pressed`), in the selected state when on, and the menu stays open so
+the change is seen. A link tag is a link there, to the same address, with a
+trailing arrow. A tag still saving is a disabled, busy row that cannot be
+pressed.
 A read-only or removable tag is a static row that only says its words. Remove is only offered on the row, never from the
 menu.
 
