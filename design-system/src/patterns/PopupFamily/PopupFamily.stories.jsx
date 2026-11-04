@@ -10,13 +10,13 @@ const POPUP_WIDTHS = ['sm', 'md', 'lg'];
 const POPUP_PLACEMENTS = ['top', 'bottom', 'left', 'right', 'bottom-start', 'bottom-end'];
 
 /**
- * Stories for the Popover family page: Popup, Flag and Tooltip. They are
+ * Stories for the Popup family page: Popup, Flag and Tooltip. They are
  * docs-only, built from the real components. A Popup is never a form: its
  * body is text or a short list. Menu's own cover lives on `DropdownMenu`'s
  * stories (`Components/Forms and inputs/Dropdown menu`).
  */
 export default {
-    title: 'Foundations/Patterns/Popover family',
+    title: 'Foundations/Patterns/Popup family',
     tags: ['!dev', '!autodocs'],
     argTypes: {
         title: {

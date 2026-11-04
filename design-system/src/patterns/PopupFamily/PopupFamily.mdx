@@ -1,17 +1,17 @@
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
-import * as PopoverFamilyStories from './PopoverFamily.stories.jsx';
-import { PopupShortList, PopupForm, MenuShortLabels, MenuSentenceLabel } from './PopoverFamily.examples.jsx';
+import * as PopupFamilyStories from './PopupFamily.stories.jsx';
+import { PopupShortList, PopupForm, MenuShortLabels, MenuSentenceLabel } from './PopupFamily.examples.jsx';
 import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={PopoverFamilyStories} />
+<Meta of={PopupFamilyStories} />
 
 <Title />
-The Popover family is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no scrim. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. Each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
+The Popup family is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no scrim. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. Each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3043"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PopoverFamily"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PopupFamily"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -20,7 +20,7 @@ The Popover family is the set of floating layers that never block the page: Menu
 
 ### Purpose
 
-Popover names the pattern and the token collection for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popover` component and the Flag is the `Flag` component.
+The Popup family names the pattern for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popover` component and the Flag is the `Flag` component.
 
 </div>
 
@@ -32,7 +32,7 @@ Popover names the pattern and the token collection for four floating layers. A *
 - Use a Popup for a small aside anchored to a control, such as a definition, a preview or a short list. A Popup is never a form.
 - Use a Flag to report an outcome that does not need a decision.
 - Use a Tooltip for one line of help on a control.
-- For a decision that must be made before going on, use a [Modal](?path=/docs/foundations-patterns-modal--docs). It takes a [Blanket](?path=/docs/foundations-patterns-blanket--docs) and a scrim, and the Popover family never does.
+- For a decision that must be made before going on, use a [Modal](?path=/docs/foundations-patterns-modal--docs). It takes a [Blanket](?path=/docs/foundations-patterns-blanket--docs) and a scrim, and the Popup family never does.
 - For a task that needs the page in view, use a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
 
 </div>
@@ -42,7 +42,7 @@ Popover names the pattern and the token collection for four floating layers. A *
 ### Anatomy
 
 <DocsCanvasShell attachSourceBelow description={<>A Popup: the floating box, padded 16, with a title in Heading/xsmall and a body in Body/default. Menu's own anatomy lives on the [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) page.</>}>
-    <Canvas of={PopoverFamilyStories.Popups} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={PopupFamilyStories.Popups} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -59,7 +59,7 @@ The four layers are built from existing components. These are the main propertie
 </thead>
 <tbody>
 <tr><td>Menu</td><td><code>DropdownMenu</code></td><td><code>trigger</code>, <code>isOpen</code>/<code>onOpenChange</code>, <code>placement</code>, <code>shouldFlip</code>, <code>spacing</code> (<code>cozy</code> or <code>compact</code>), <code>testId</code>, children as the rows (<code>Section</code>, <code>ButtonItem</code>, <code>LinkItem</code>, <code>CustomItem</code>).</td></tr>
-<tr><td>Popup</td><td><code>Popover</code></td><td><code>width</code> (<code>sm</code>, <code>md</code> or <code>lg</code>, default <code>sm</code>), <code>title</code>, <code>placement</code>, <code>triggerType</code>, <code>trigger</code>, children as the body.</td></tr>
+<tr><td>Popup</td><td><code>Popup</code></td><td><code>width</code> (<code>sm</code>, <code>md</code> or <code>lg</code>, default <code>sm</code>), <code>title</code>, <code>placement</code>, <code>triggerType</code>, <code>trigger</code>, children as the body.</td></tr>
 <tr><td>Flag</td><td><code>Flag</code></td><td><code>appearance</code> (<code>normal</code>, <code>information</code>, <code>warning</code>, <code>error</code> or <code>success</code>), <code>title</code>, children as the description, <code>actions</code>, <code>bold</code>, <code>autohide</code>, <code>delay</code>. <code>FlagGroup</code> places the stack.</td></tr>
 <tr><td>Tooltip</td><td><code>Tooltip</code></td><td><code>text</code>, <code>placement</code> (<code>top</code>, <code>bottom</code>, <code>left</code> or <code>right</code>), <code>trigger</code>, <code>delayShow</code>, <code>delayHide</code>.</td></tr>
 </tbody>
@@ -107,7 +107,7 @@ A Menu opens the public Menu family (`Section`, `ButtonItem`, `LinkItem`, `Custo
 ### Popup
 
 <DocsCanvasShell description={<>A Popup pads 16 and rounds 12. Its width is a tier: <code>sm</code> 320, <code>md</code> 400 or <code>lg</code> 480. The title is Heading/xsmall 14/20 and the body is Body/default. Height hugs up to the room left on screen, then scrolls. The body is text or a short list.</>}>
-    <DsCanvasQuiet of={PopoverFamilyStories.Popups} />
+    <DsCanvasQuiet of={PopupFamilyStories.Popups} />
 </DocsCanvasShell>
 
 A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mounts in the Modal and takes layer 510. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
@@ -119,7 +119,7 @@ A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mount
 ### Flag
 
 <DocsCanvasShell description={<>A Flag is 400 wide, pads 16 and rounds 12. It carries a 16 icon in the appearance's icon color, a title in Heading/xsmall, a description in Body/default and a 32 Close button. Flags sit bottom-left and stack 16 apart, with the newest at the bottom.</>}>
-    <DsCanvasQuiet of={PopoverFamilyStories.Flags} />
+    <DsCanvasQuiet of={PopupFamilyStories.Flags} />
 </DocsCanvasShell>
 
 Normal, information and success close after 8 seconds. Warning and error stay until dismissed. A Flag sits on layer 600.
@@ -131,7 +131,7 @@ Normal, information and success close after 8 seconds. Warning and error stay un
 ### Tooltip
 
 <DocsCanvasShell description={<>A Tooltip is Body/small 12/16 in the inverse text color on the bold neutral background. It pads 4 above and below and 8 at the sides, so it is 24 tall on one line. It rounds 6 and wraps at 240. A Tooltip sits on layer 800.</>}>
-    <DsCanvasQuiet of={PopoverFamilyStories.Tooltips} />
+    <DsCanvasQuiet of={PopupFamilyStories.Tooltips} />
 </DocsCanvasShell>
 
 </div>
@@ -180,7 +180,7 @@ The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns
 ### Interactive playground
 
 <DocsInteractivePlayground
-    of={PopoverFamilyStories.Interactive}
+    of={PopupFamilyStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}
@@ -200,7 +200,7 @@ The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns
 - Stack Flags 16 apart, bottom-left.
 - The Popup body is text or a short list, never a form. Anything with inputs, steps or a long scroll belongs in a modal.
 - Give a Menu row a short label. When a row needs more, add a description line and let the row grow. Never put a sentence in the label.
-- A Popover layer never brings a scrim and never blocks the page. A Menu and a Popup close on an outside click or Escape.
+- A Popup-family layer never brings a scrim and never blocks the page. A Menu and a Popup close on an outside click or Escape.
 - Do not put required content in a Popup. Anything the person must read to finish the task belongs on the page.
 
 </div>
@@ -247,7 +247,7 @@ The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns
 - [Popup](?path=/docs/components-overlays-and-layering-popup--docs) is the component page for the Popup, with its triggers and dismissal.
 - [Tooltip](?path=/docs/components-overlays-and-layering-tooltip--docs) is the component page for the Tooltip.
 - [Flag](?path=/docs/components-messaging-flag--docs) is the component page for the Flag.
-- [Blanket](?path=/docs/foundations-patterns-blanket--docs) holds the scrim a Modal needs and a Popover layer never takes.
+- [Blanket](?path=/docs/foundations-patterns-blanket--docs) holds the scrim a Modal needs and a Popup-family layer never takes.
 - [Modal](?path=/docs/foundations-patterns-modal--docs) is the layer for a decision that blocks the page.
 
 </div>

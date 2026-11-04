@@ -219,7 +219,7 @@ const preview = {
               "Table",
               "Blanket",
               "Modal",
-              "Popover family",
+              "Popup family",
               "Drawer"
             ],
             "Imagery"

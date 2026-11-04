@@ -92,7 +92,7 @@ const gate = (repoRoot) => openRatchet({ file: BASELINE, set: 'files', repoRoot 
  * THE SECOND SET: state colors mixed by hand. Rule 2 of
  * `design-system/guidelines/foundations/color.md` — state layers for hover
  * and pressed, never a hand-mixed color — had no gate, and the 2026-10-24
- * audit of the patterns and the Popover family found eleven `color-mix(…,
+ * audit of the patterns and the Popup family found eleven `color-mix(…,
  * black N%)` and brightness filters in Button and Dropdown. They now lay
  * `--color-shadow-state-NN` over the fill, which composites to the same
  * color. The remainder is recorded under `mixedStates`, a reason each, and
