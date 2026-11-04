@@ -40,6 +40,6 @@ From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Overri
 
 ## Related
 
-Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
+Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
