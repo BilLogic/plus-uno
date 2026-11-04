@@ -35,7 +35,7 @@ From `design-system/src/components/images-and-icons/AiIcon/AiIcon.scss`. Overrid
 
 ## Related
 
-Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
+Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
