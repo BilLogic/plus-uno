@@ -1,0 +1,6 @@
+// A wrapping row of chips, same gap as a tag row.
+.plus-prompt-starters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--element-gap-default);
+}

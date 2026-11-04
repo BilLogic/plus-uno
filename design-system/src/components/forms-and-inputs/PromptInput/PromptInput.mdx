@@ -1,0 +1,20 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PromptInputStories from './PromptInput.stories.jsx';
+
+<Meta of={PromptInputStories} />
+
+<Title />
+
+Where a person writes to PLUS AI: a text area that grows from one line to five, then scrolls, with slots for an attach control, staged attachments and extra actions.
+
+<DocsTabs of={PromptInputStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={PromptInputStories.Default} />
+
+</DocsTab>
+
+</DocsTabs>
