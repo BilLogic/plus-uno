@@ -5,9 +5,8 @@ import { HeadingContextProvider } from '@/components/text-and-data-display/Headi
 import './Comment.scss';
 
 /**
- * Comment: one entry in a threaded discussion, with slots for every part the
- * benchmark documents. Props follow Atlassian's Comment
- * (https://atlassian.design/components/comment).
+ * Comment: one entry in a threaded discussion, with slots for the
+ * author, time, content, actions and replies.
  */
 export const Comment = ({
     avatar,

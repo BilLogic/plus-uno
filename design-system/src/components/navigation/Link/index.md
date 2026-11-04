@@ -3,7 +3,7 @@
 
 # Link
 
-(https://atlassian.design/components/link).
+Link: an inline navigation anchor.
 
 **Import:** `import { Link } from '@/components';`
 

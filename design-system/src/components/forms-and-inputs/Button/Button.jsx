@@ -38,8 +38,7 @@ ButtonContent.propTypes = {
 };
 
 /**
- * Button: triggers an action. Props follow Atlassian's Button
- * (https://atlassian.design/components/button).
+ * Button: triggers an action.
  */
 export const Button = ({
     // Content

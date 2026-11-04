@@ -14,7 +14,7 @@ export default {
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'changed', summary: 'Moves onto Base UI Checkbox, through FieldFrame for the label and description. Keyboard, ARIA and visuals are unchanged; props are unchanged.' },
-            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isChecked`, `isIndeterminate`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected box only.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props: `isChecked`, `isIndeterminate`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected box only.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, the disabled fill, edge and mark, and the focus ring in `border.focused`.' },
         ],
         docs: {

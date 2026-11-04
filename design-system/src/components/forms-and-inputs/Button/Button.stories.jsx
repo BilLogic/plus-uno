@@ -63,7 +63,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `appearance` (default, primary, subtle, warning, danger, discovery), `spacing` (default 32, compact 24), `isSelected`, `isDisabled`, `isLoading`, `shouldFitContainer`, `iconBefore` and `iconAfter`. Radius is 6 at default spacing and 4 at compact, the icon-to-label gap is 4, and hover and pressed take named tokens.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props: `appearance` (default, primary, subtle, warning, danger, discovery), `spacing` (default 32, compact 24), `isSelected`, `isDisabled`, `isLoading`, `shouldFitContainer`, `iconBefore` and `iconAfter`. Radius is 6 at default spacing and 4 at compact, the icon-to-label gap is 4, and hover and pressed take named tokens.' },
         ],
         docs: {
             toc: {

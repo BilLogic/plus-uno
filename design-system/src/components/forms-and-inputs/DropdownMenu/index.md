@@ -3,7 +3,7 @@
 
 # DropdownMenu
 
-floating popup. Props follow Atlassian's Dropdown menu (https://atlassian.design/components/dropdown-menu). Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.
+floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.
 
 **Import:** `import { DropdownMenu } from '@/components';`
 

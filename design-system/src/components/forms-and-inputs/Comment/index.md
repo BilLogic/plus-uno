@@ -3,7 +3,7 @@
 
 # Comment
 
-benchmark documents. Props follow Atlassian's Comment (https://atlassian.design/components/comment).
+author, time, content, actions and replies.
 
 **Import:** `import { Comment } from '@/components';`
 

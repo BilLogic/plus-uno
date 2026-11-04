@@ -3,7 +3,7 @@
 
 # PageHeader
 
-actions to its side, and a bottom bar below. Props follow Atlassian's Page header (https://atlassian.design/components/page-header).
+actions to its side, and a bottom bar below.
 
 **Import:** `import { PageHeader } from '@/components';`
 

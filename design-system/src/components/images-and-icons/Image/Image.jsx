@@ -7,8 +7,7 @@ export const IMAGE_SIZES = ['fixed', 'fluid'];
 
 /**
  * Image: a decorative or meaningful bitmap, with a dark-mode variant swapped
- * in by the browser rather than by script. Props follow Atlassian's Image
- * (https://atlassian.design/components/image).
+ * in by the browser rather than by script.
  */
 export const Image = ({
     src,

@@ -16,8 +16,7 @@ function useRoving() {
 }
 
 /**
- * MenuGroup: the scrollable list a menu's sections sit in. Props follow
- * Atlassian's Menu (https://atlassian.design/components/menu).
+ * MenuGroup: the scrollable list a menu's sections sit in.
  */
 export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
     const itemsRef = useRef([]);

@@ -12,7 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isChecked`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected radio only.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props: `isChecked`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected radio only.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, a dot drawn in `icon.inverse`, the disabled fill, edge and dot, and the focus ring in `border.focused`.' },
         ],
         docs: {

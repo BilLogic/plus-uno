@@ -19,7 +19,6 @@ export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075'
  * reduced motion the same segments hold still.
  *
  * Use it only while generating, one ring per piece of content. Do not nest two.
- * Adapts https://atlassian.design/rovo-ui/generative-border.
  */
 const GenerativeBorder = ({
     isActive = false,

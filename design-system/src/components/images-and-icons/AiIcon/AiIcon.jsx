@@ -22,7 +22,6 @@ export const AI_ICON_ALL_SIZES = [12, 16, 24];
  *
  * The shapes fill with `currentColor`, which starts at the icon color; set `color`
  * to change it. Pair every icon with a label unless its meaning is obvious.
- * Adapts https://atlassian.design/components/icon.
  */
 const AiIcon = ({ name = 'generate', size = 16, label, className = '', style, ...props }) => {
     const bySize = AI_ICON_SHAPES[name];

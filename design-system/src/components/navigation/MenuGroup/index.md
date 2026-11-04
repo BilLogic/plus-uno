@@ -3,7 +3,7 @@
 
 # MenuGroup
 
-Atlassian's Menu (https://atlassian.design/components/menu).
+MenuGroup: the scrollable list a menu's sections sit in.
 
 **Import:** `import { MenuGroup } from '@/components';`
 
