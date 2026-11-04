@@ -9,7 +9,7 @@ export default {
     title: 'Components/Messaging/Banner',
     component: Banner,
     /** Hide CSF stories from the sidebar; docs live on Banner.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Banner: a prominent top-of-page message. `appearance` (warning, danger, announcement), `icon`.' },

@@ -10,7 +10,7 @@ export default {
     title: 'Components/Forms and inputs/Button/Vertical button',
     component: VerticalButton,
     /** Hide CSF stories from the sidebar; docs live on VerticalButton.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Vertical button: an icon over a label at one size (60 by 60), with `appearance` (default, subtle, primary), `isSelected`, `isDisabled` and `isLoading`.' },

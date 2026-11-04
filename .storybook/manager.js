@@ -1,7 +1,9 @@
 import { addons } from 'storybook/manager-api';
 import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
 import { create } from 'storybook/theming/create';
+import React from 'react';
 import brandImage from './brand-image.js';
+import { COLLAPSED_ROOTS, badgeRules, lifecycleOfEntry } from './sidebar-lifecycle.js';
 
 // Storybook manager configuration (runs in the "manager" UI, not inside the preview iframe)
 
@@ -96,7 +98,8 @@ const paintSelected = (key) => {
   document.documentElement.dataset.plusManagerMode = key;
   style.textContent =
     `.sidebar-container [data-selected='true'] { background-color: ${bg} !important; color: ${fg} !important; }\n` +
-    `.sidebar-container [data-selected='true'] svg { color: ${fg} !important; opacity: 0.95; }`;
+    `.sidebar-container [data-selected='true'] svg { color: ${fg} !important; opacity: 0.95; }\n` +
+    badgeRules(vars);
 };
 
 addons.register('plus/manager-theme', (api) => {
@@ -120,7 +123,20 @@ addons.register('plus/manager-theme', (api) => {
   apply();
 });
 
+// A lifecycle tag on a component draws as a Tag-like badge after its name.
+const renderLabel = (item, api) => {
+  const lifecycle = lifecycleOfEntry(item, (id) => api?.getData?.(id));
+  if (!lifecycle) return item.name;
+  return React.createElement(
+    React.Fragment,
+    null,
+    item.name,
+    React.createElement('span', { className: 'plus-lifecycle-badge', 'data-lifecycle': lifecycle }, lifecycle),
+  );
+};
+
 addons.setConfig({
+  sidebar: { showRoots: true, collapsedRoots: COLLAPSED_ROOTS, renderLabel },
   // No `previewTabs`. The four tabs moved INTO the docs page (ADR-025), and
   // `previewTabs` was only ever here to rename Storybook's built-in canvas tab to
   // "Examples" so it would sit beside the three registered ones. With those gone,
