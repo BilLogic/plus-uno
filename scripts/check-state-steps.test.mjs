@@ -193,11 +193,11 @@ test('Button: selected takes the selected role with its own steps', () => {
 });
 
 test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill', () => {
-  expectRule(BUTTON, '.plus-btn.btn:focus-visible', {
+  expectRule(BUTTON, '.plus-btn:focus-visible', {
     outline: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)',
     'outline-offset': 'var(--size-element-stroke-lg)',
   });
-  expectNoFill(BUTTON, '.plus-btn.btn:focus-visible');
+  expectNoFill(BUTTON, '.plus-btn:focus-visible');
 });
 
 /* ─── Dropdown: menu items and toggles ───────────────────────────────────── */
@@ -360,7 +360,7 @@ test('FieldBox: hover turns the border border.focused, subtle hover the neutral 
 
 test('CloseButton: an Icon button, subtle — inverse repaints the named hovered, pressed and focus-ring steps', () => {
   const file = 'components/forms-and-inputs/CloseButton/CloseButton.scss';
-  const base = '.plus-close-btn.plus-close-btn--inverse.btn';
+  const base = '.plus-close-btn.plus-close-btn--inverse';
   expectRule(file, `${base}:hover`, { 'background-color': layer('--ds-interaction-inverse-hovered') });
   expectRule(file, `${base}:active`, { 'background-color': layer('--ds-interaction-inverse-pressed') });
   for (const focus of [`${base}:focus`, `${base}:focus-visible`]) {
@@ -413,7 +413,7 @@ test("Tag: the accent's hovered, pressed and selected steps; the × on the neutr
 
 test('RichTextEditor: toolbar buttons step neutral subtle and select; the block menu selects', () => {
   const file = 'components/forms-and-inputs/RichTextEditor/RichTextEditor.scss';
-  const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn.btn';
+  const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn';
   expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(file, `${btn}:active:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(file, `${btn}.active`, { 'background-color': layer('--ds-background-selected') });
