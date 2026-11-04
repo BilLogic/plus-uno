@@ -250,7 +250,6 @@ const RichTextEditor = ({
                 ) : (
                     <>
                         <DropdownMenu
-                            className="plus-rich-text-editor-block-menu"
                             spacing="compact"
                             minWidth="10rem"
                             trigger={(

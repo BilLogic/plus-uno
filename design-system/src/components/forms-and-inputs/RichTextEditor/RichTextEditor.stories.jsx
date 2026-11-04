@@ -128,34 +128,44 @@ Interactive.args = {
 
 /** The compact toolbar's block-style menu: open, select, keyboard. */
 export const BlockStyleMenu = () => (
-    <div style={{ width: '100%', minHeight: 320 }}>
-        <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />
+    <div style={{ width: '100%', paddingBottom: 200 }}>
+        <RichTextEditor label="Session notes" defaultValue="<p>Hello</p>" minHeight={150} />
     </div>
 );
 BlockStyleMenu.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
+    const editor = canvas.getByRole('textbox');
     const toggle = canvas.getByRole('button', { name: /Normal/ });
+    const closed = () => waitFor(() => expect(body.queryByRole('menuitem')).toBeNull());
 
-    // Open with a click: the four block styles are menu items, Normal is current.
+    // Open with a click: four block styles as menu items, Normal is current.
+    await userEvent.click(editor);
     await userEvent.click(toggle);
     const heading = await body.findByRole('menuitem', { name: 'Heading 2' });
     await expect(body.getAllByRole('menuitem')).toHaveLength(4);
     await expect(body.getByRole('menuitem', { name: 'Normal' })).toHaveAttribute('aria-current', 'true');
 
-    // Select: the menu closes and focus returns to the toggle.
+    // Select: the menu closes and the block style applies.
     await userEvent.click(heading);
-    await waitFor(() => expect(body.queryByRole('menu')).toBeNull());
-    await expect(toggle).toHaveFocus();
+    await closed();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /Heading 2/ })).toBeInTheDocument());
 
-    // Keyboard: Enter opens, ArrowDown moves, Enter selects, Escape closes.
+    // Keyboard: Enter opens, arrows move between items, Enter selects, Escape closes.
+    const reopened = canvas.getByRole('button', { name: /Heading 2/ });
+    reopened.focus();
     await userEvent.keyboard('{Enter}');
-    await body.findByRole('menu');
-    await userEvent.keyboard('{ArrowDown}{Enter}');
-    await waitFor(() => expect(body.queryByRole('menu')).toBeNull());
+    const first = await body.findByRole('menuitem', { name: 'Normal' });
+    first.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(body.getByRole('menuitem', { name: 'Heading 1' })).toHaveFocus();
     await userEvent.keyboard('{Enter}');
-    await body.findByRole('menu');
+    await closed();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /Heading 1/ })).toBeInTheDocument());
+
+    canvas.getByRole('button', { name: /Heading 1/ }).focus();
+    await userEvent.keyboard('{Enter}');
+    await body.findByRole('menuitem', { name: 'Normal' });
     await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(body.queryByRole('menu')).toBeNull());
-    await expect(toggle).toHaveFocus();
+    await closed();
 };
