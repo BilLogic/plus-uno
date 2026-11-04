@@ -79,3 +79,8 @@ test('the labels group holds no react-bootstrap import, and the live tree holds 
   const record = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8')).counts;
   assert.deepEqual(Object.keys(record).filter((k) => k.includes('/components/labels/')), []);
 });
+
+test('the component library holds no react-bootstrap import: the record has no entry under components', () => {
+  const record = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8')).counts;
+  assert.deepEqual(Object.keys(record).filter((k) => k.startsWith('design-system/src/components/')), []);
+});

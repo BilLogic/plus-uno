@@ -120,3 +120,8 @@
         opacity: var(--ds-opacity-disabled);
     }
 }
+
+// Loading: the spinner sits between the track and the label and does not shrink.
+.plus-toggle-spinner {
+    flex-shrink: 0;
+}
