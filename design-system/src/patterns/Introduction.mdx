@@ -122,11 +122,13 @@ Each layer has one fill and one elevation. A state such as hover or selected is 
 ### Usage
 
 1. **Start a page from its template.** The template frames the page. Section groups content under one heading, Card groups one object's content, Table holds records and Modal interrupts for a step that must happen first.
-2. **Swap slots, never restyle the pattern.** Content goes in through slots such as content, body, footer, header, actions, tabs, filters, bulk actions, image, cells, items and side. Leave fill, radius, border, padding and elevation as the pattern sets them, because they come from tokens.
+2. **Patterns own the frame, slots own the content.** Content goes in through slots such as content, body, footer, header, actions, tabs, filters, bulk actions, image, cells, items and side. Leave fill, radius, border, padding and elevation as the pattern sets them, because they come from tokens.
 3. **Add content straight into the slot.** Drop content into the slot itself and replace its placeholder. Do not detach the pattern. Inside a Page, Sections group whatever you place, and their spacing comes from the Page and Section stack tokens, so add padding only where the content itself needs it.
-4. **Draw states as overlays.** Hover, pressed and selected take their own token steps: <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code>, then <code>--ds-background-selected</code> and <code>-hovered</code>. Focus is the focus ring in <code>--ds-border-focused</code>, never a fill.
-5. **Keep filled versions as local components.** A spec that fills Frame keeps its own component built from the pattern, so usage traces back to the pattern.
-6. **Note every optical nudge.** Spacing tokens set the structure. Where the eye needs a nudge, such as an icon beside text, an all-caps label or a round shape, nudge for optical balance and note it where you make it. Never leave it as an unexplained hard-coded value.
+4. **Content picks the size.** Choose the smallest step of a sized pattern (Card, Modal, Drawer) that holds the content without clipping. Never pick a size to make the content look a certain way; pick it to fit what is there.
+5. **No card in a card, no modal over a modal.** A Card never holds a Card: group related cards in a Section instead. A Modal never opens a second Modal: a follow-up decision swaps the same Modal's content for an inline confirmation.
+6. **Draw states as overlays.** Hover, pressed and selected take their own token steps: <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code>, then <code>--ds-background-selected</code> and <code>-hovered</code>. Focus is the focus ring in <code>--ds-border-focused</code>, never a fill.
+7. **Keep filled versions as local components.** A spec that fills Frame keeps its own component built from the pattern, so usage traces back to the pattern.
+8. **Note every optical nudge.** Spacing tokens set the structure. Where the eye needs a nudge, such as an icon beside text, an all-caps label or a round shape, nudge for optical balance and note it where you make it. Never leave it as an unexplained hard-coded value.
 
 </div>
 

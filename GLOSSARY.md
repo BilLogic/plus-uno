@@ -118,12 +118,15 @@ _Avoid_: "table tree", "nested table"
 
 **Frame**:
 The pattern for the app's outer shell: the topbar and sidebar that stay put while the **Page** inside changes.
+_Avoid_: "surface container"
 
 **Page**:
 The pattern for the main content area inside a **Frame**: it carries the page title and a body. Distinct from **Page** the Context Level.
+_Avoid_: "surface" for the pattern
 
 **Blanket**:
 The pattern for the layer over the UI that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
+_Avoid_: "overlay" for the pattern, "scrim"
 
 **Modal**:
 The pattern for content that takes over the screen until it is closed. Built from a **Blanket** and a layer; **ModalDialog** is the component built on it.
