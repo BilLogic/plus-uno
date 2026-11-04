@@ -487,7 +487,11 @@ export const ConfirmViewEscape = {
     },
 };
 
-/** At most two overlays stack (B4): a second Modal opened independently is refused. */
+/**
+ * At most two overlays stack (B4): a modal and the confirm it raises. Each
+ * opens from inside the one below it, the only way in once a blanket covers
+ * the page, and a third raised from the confirm is refused.
+ */
 export const TwoOverlayLimit = {
     render: () => {
         const [firstOpen, setFirstOpen] = useState(false);
@@ -496,24 +500,43 @@ export const TwoOverlayLimit = {
         return (
             <>
                 <Button text="Open first" onClick={() => setFirstOpen(true)} />
-                <Button text="Open second" onClick={() => setSecondOpen(true)} />
-                <Button text="Open third" onClick={() => setThirdOpen(true)} />
-                <Modal show={firstOpen} width="6-col" title="First" body="One." onClose={() => setFirstOpen(false)} />
-                <Modal show={secondOpen} width="6-col" title="Second" body="Two." onClose={() => setSecondOpen(false)} />
+                <Modal
+                    show={firstOpen}
+                    width="6-col"
+                    title="First"
+                    body="One."
+                    primaryButton={{ text: 'Open second', onClick: () => setSecondOpen(true) }}
+                    onClose={() => setFirstOpen(false)}
+                />
+                <Modal
+                    show={secondOpen}
+                    width="6-col"
+                    title="Second"
+                    body="Two."
+                    primaryButton={{ text: 'Open third', onClick: () => setThirdOpen(true) }}
+                    onClose={() => setSecondOpen(false)}
+                />
                 <Modal show={thirdOpen} width="6-col" title="Third" body="At most two stack; this one is refused." onClose={() => setThirdOpen(false)} />
             </>
         );
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        const hiddenDialog = (name) => body.queryByRole('dialog', { name, hidden: true });
         await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
         await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
-        await userEvent.click(canvas.getByRole('button', { name: 'Open second' }));
+        await userEvent.click(body.getByRole('button', { name: 'Open second' }));
         await waitFor(() => expect(dialogNamed(canvasElement, 'Second')).not.toBeNull());
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Open third' }));
-        await expect(dialogNamed(canvasElement, 'Third'), 'a third overlay is refused').toBeNull();
-        await expect(dialogNamed(canvasElement, 'First'), 'the first dialog stays open').not.toBeNull();
-        await expect(dialogNamed(canvasElement, 'Second'), 'the second dialog stays open').not.toBeNull();
+        await userEvent.click(body.getByRole('button', { name: 'Open third' }));
+        await expect(hiddenDialog('Third'), 'a third overlay is refused').toBeNull();
+        await expect(dialogNamed(canvasElement, 'Second'), 'the second dialog stays open on top').not.toBeNull();
+        await expect(hiddenDialog('First'), 'the first dialog stays open underneath').not.toBeNull();
+
+        // Topmost Escape: the second closes, the first is back in front.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(hiddenDialog('Second')).toBeNull());
+        await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
     },
 };
