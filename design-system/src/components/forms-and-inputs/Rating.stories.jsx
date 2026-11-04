@@ -167,8 +167,6 @@ Interactive.args = {
     isDisabled: false,
 };
 
-
-
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, required mark. */
 export const PropsRender = () => (
     <div style={ratingCol}>
