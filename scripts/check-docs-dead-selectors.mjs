@@ -122,6 +122,8 @@ const VENDOR = new Map([
   ['is-collapsed', '@storybook/addon-docs/dist/blocks.js'],
   ['sb-main-padded', 'storybook/dist/_browser-chunks/ (preview runtime)'],
   ['docs-story', 'storybook/dist/csf/index.js'],
+  ['docblock-colorpalette', '@storybook/addon-docs/dist/blocks.js'],
+  ['docblock-typeset', '@storybook/addon-docs/dist/blocks.js'],
   ['docblock-argstable', 'storybook/dist/core-server/presets/common-manager.js'],
   ['docblock-argstable-head', 'storybook/dist/core-server/presets/common-manager.js'],
   ['innerZoomElementWrapper', 'storybook/dist/components/index.js'],
