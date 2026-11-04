@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import RichTextEditor from './RichTextEditor';
 
@@ -8,6 +9,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-04', kind: 'changed', summary: 'The block-style menu opens on the Dropdown menu and its rows are menu items, so it is keyboard-operable (Enter opens, arrows move, Escape closes) and the editor no longer imports react-bootstrap.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Toolbar buttons hover at secondary 08 and press at 12, the block toggle at on-surface 08 and 12; focus is the 2px focus ring. The block menu selects at primary 08 and shows keyboard focus as a ring.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The editing area became 120 high at least, growing with what is typed.' },
             { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
@@ -122,4 +124,48 @@ Interactive.args = {
     disabled: false,
     minHeight: 200,
     toolbarPreset: 'compact'
+};
+
+/** The compact toolbar's block-style menu: open, select, keyboard. */
+export const BlockStyleMenu = () => (
+    <div style={{ width: '100%', paddingBottom: 200 }}>
+        <RichTextEditor label="Session notes" defaultValue="<p>Hello</p>" minHeight={150} />
+    </div>
+);
+BlockStyleMenu.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    const editor = canvas.getByRole('textbox');
+    const toggle = canvas.getByRole('button', { name: /Normal/ });
+    const closed = () => waitFor(() => expect(body.queryByRole('menuitem')).toBeNull());
+
+    // Open with a click: four block styles as menu items, Normal is current.
+    await userEvent.click(editor);
+    await userEvent.click(toggle);
+    const heading = await body.findByRole('menuitem', { name: 'Heading 2' });
+    await expect(body.getAllByRole('menuitem')).toHaveLength(4);
+    await expect(body.getByRole('menuitem', { name: 'Normal' })).toHaveAttribute('aria-current', 'true');
+
+    // Select: the menu closes and the block style applies.
+    await userEvent.click(heading);
+    await closed();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /Heading 2/ })).toBeInTheDocument());
+
+    // Keyboard: Enter opens, arrows move between items, Enter selects, Escape closes.
+    const reopened = canvas.getByRole('button', { name: /Heading 2/ });
+    reopened.focus();
+    await userEvent.keyboard('{Enter}');
+    const first = await body.findByRole('menuitem', { name: 'Normal' });
+    first.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(body.getByRole('menuitem', { name: 'Heading 1' })).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+    await closed();
+    await waitFor(() => expect(canvas.getByRole('button', { name: /Heading 1/ })).toBeInTheDocument());
+
+    canvas.getByRole('button', { name: /Heading 1/ }).focus();
+    await userEvent.keyboard('{Enter}');
+    await body.findByRole('menuitem', { name: 'Normal' });
+    await userEvent.keyboard('{Escape}');
+    await closed();
 };

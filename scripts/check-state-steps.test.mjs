@@ -378,7 +378,7 @@ test("Tag: the accent's hovered, pressed and selected steps; the × on the neutr
 
 /* ─── RichTextEditor toolbar ─────────────────────────────────────────────── */
 
-test('RichTextEditor: toolbar buttons step neutral subtle and select; the block menu selects', () => {
+test('RichTextEditor: toolbar buttons and the block toggle step neutral subtle and select', () => {
   const file = 'components/forms-and-inputs/RichTextEditor/RichTextEditor.scss';
   const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn';
   expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
@@ -392,18 +392,6 @@ test('RichTextEditor: toolbar buttons step neutral subtle and select; the block 
   expectRule(file, `${toggle}:active:not(:disabled)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(file, `${toggle}:focus-visible`, RING_OUTSIDE);
   expectNoFill(file, `${toggle}:focus-visible`);
-
-  // The block menu is a dense list, so it selects on the selected fill.
-  const item = '.plus-rich-text-editor-block-menu .dropdown-item';
-  expectRule(file, `${item}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-  expectRule(file, `${item}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  expectRule(file, `${item}.active`, { 'background-color': layer('--ds-background-selected') });
-  expectRule(file, `${item}:focus-visible`, RING_INSIDE);
-  expectNoFill(file, `${item}:focus-visible`);
-  expectNoFill(file, `${item}:focus`);
-  // Bootstrap's own `.dropdown-item:focus` fills the item, so a rule here
-  // must clear it.
-  expectRule(file, `${item}:focus:not(:hover):not(:active):not(.active)`, { 'background-color': 'transparent' });
 });
 
 /* ─── PatternTable rows ──────────────────────────────────────────────────── */

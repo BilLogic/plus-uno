@@ -86,10 +86,6 @@
     color: var(--ds-icon-subtle);
 }
 
-.plus-rich-text-editor-block-dropdown .dropdown-toggle::after {
-    display: none;
-}
-
 /*
  * Compact icon row: Figma has no borders on individual icon hits — flat on
  * surface-container-high. Button's own transparent-edge default can still
@@ -145,49 +141,6 @@
     gap: var(--size-element-gap-sm);
 }
 
-.plus-rich-text-editor-block-menu {
-    min-width: 10rem;
-    padding: var(--size-element-pad-y-sm) 0;
-    margin-top: var(--size-element-gap-sm);
-    background-color: var(--ds-surface-overlay);
-    border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
-    border-radius: var(--size-element-radius-md);
-    box-shadow: var(--elevation-light-1);
-
-    .dropdown-item {
-        padding: var(--size-element-pad-y-sm) var(--element-pad-default);
-        color: var(--ds-text);
-
-        &:hover {
-            background-color: var(--ds-background-neutral-subtle-hovered);
-        }
-
-        &:active {
-            background-color: var(--ds-background-neutral-subtle-pressed);
-        }
-
-        // A menu is a dense list, so the current block is primary 08 (color.md).
-        // It holds the 08 under hover and press, as Dropdown's selected item does.
-        &.active {
-            background-color: var(--ds-background-selected);
-            color: var(--color-primary-text);
-        }
-
-        // Bootstrap fills a focused item; here focus is the ring alone.
-        &:focus:not(:hover):not(:active):not(.active) {
-            background-color: transparent;
-        }
-
-        &:focus {
-            @include plus-ring-reset;
-        }
-
-        &:focus-visible {
-            outline: var(--focus-ring-width) solid var(--color-focus-ring);
-            outline-offset: calc(-1 * var(--focus-ring-width));
-        }
-    }
-}
 
 .plus-rich-text-editor-ghost-tools {
     display: inline-flex;
@@ -250,8 +203,7 @@
     cursor: default;
 }
 
-/* The field's label, and the block menu's options: Body/default 14/20. */
-.plus-rich-text-editor-label,
-.plus-rich-text-editor-block-option {
+/* The field's label: Body/default 14/20. */
+.plus-rich-text-editor-label {
     font: var(--body-default);
 }
