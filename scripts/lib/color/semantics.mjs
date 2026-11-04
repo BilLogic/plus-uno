@@ -323,7 +323,8 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   // ---- charts: categorical order (option B, Bill 2026-11-04) ----
   // Brand leads (slot 1 = color.chart.brand's own hue, lagoon), and neighbors alternate light and dark steps so the
   // sequence reads in grayscale and for color-blind readers: lagoon-600, orange-800, blue-500, magenta-800,
-  // lime-500, purple-700, then orange-500, blue-800 as darker reprises for overflow past the limit of six. No
+  // lime-500, purple-700, then orange-500 and blue-800 as reprises of slots 2 and 3 for overflow past the limit of
+  // six. No
   // yellow (reads as warning), no red (reads as danger), no teal (too close to the brand); lime and purple-500
   // overlap success and discovery, so a chart never mixes categorical and status colors.
   const CH_WHY =
@@ -336,7 +337,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     'in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) ' +
     'steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No ' +
     'yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 ' +
-    'are darker reprises of 3 and 1 for overflow past the limit of six.';
+    'are reprises of 2 (orange) and 3 (blue) for overflow past the limit of six.';
   const CAT = { 1: ['lagoon', 600, 500], 2: ['orange', 800, 700], 3: ['blue', 500, 500], 4: ['magenta', 800, 700],
     5: ['lime', 500, 400], 6: ['purple', 700, 700], 7: ['orange', 500, 500], 8: ['blue', 800, 700] };
   const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];
