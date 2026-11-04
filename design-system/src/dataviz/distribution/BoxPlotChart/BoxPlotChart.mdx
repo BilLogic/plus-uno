@@ -1,90 +1,151 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BoxPlotChartStories from './BoxPlotChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={BoxPlotChartStories} />
 
 <Title />
+Summarizes each group's spread in five numbers: low, lower quartile, median,
+upper quartile and high. Groups sit side by side so their spreads compare.
 
-A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/BoxPlotChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A box plot shows **statistical distribution** with minimum, Q1, median, Q3, and maximum values.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Test scores for four classes, each as low, Q1, median, Q3 and high.</>}>
+    <Canvas of={BoxPlotChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Box** spans from Q1 (25th percentile) to Q3 (75th percentile)
-- **Line inside box** = median (50th percentile)
-- **Whiskers** extend to min and max values
-- **Box width** = interquartile range (IQR), represents middle 50% of data
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Comparing distributions</td><td>✅ Ideal</td></tr>
-    <tr><td>Statistical analysis</td><td>✅ Ideal</td></tr>
-    <tr><td>Identifying outliers</td><td>✅ Good</td></tr>
-    <tr><td>Showing exact values</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Time trends</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `BoxPlotChart` to compare how spread out a measure is across groups: test
+scores by class, session length by subject, tutor ratings by school. It shows
+whether groups differ in their middle and in how far they stretch, which an
+average alone hides.
 
-### PLUS Context
+For the full shape of one distribution, use `HistogramChart`. For a plain
+low-to-high span with no quartiles, use `ColumnRangeChart`. For one value per
+group, use `BarChart`; for change over time, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Test Score Distribution**</td><td>Compare score spreads across classes</td></tr>
-    <tr><td>**Session Duration**</td><td>Analyze tutoring session length patterns</td></tr>
-    <tr><td>**Response Times**</td><td>Compare platform performance metrics</td></tr>
-    <tr><td>**Assignment Grades**</td><td>Distribution by assignment type</td></tr>
-    <tr><td>**Tutor Ratings**</td><td>Rating distribution by subject</td></tr>
-  </tbody>
-</table>
+Box plots assume readers know what a quartile is. For a general audience, add
+a line of copy saying what the box and whiskers mean.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Label axes clearly with units
-✅ Show outliers as individual points
-✅ Use consistent scales when comparing
-✅ Include sample size in labels if relevant
+## Anatomy
 
-**Avoid:**
-❌ Small sample sizes (&lt;10 per group)
-❌ Non-numeric data
-❌ Comparing too many groups (>10)
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Box', 'Spans the lower to the upper quartile: the middle half of the group.'],
+        ['Median line', <>Crosses the box at the median, a step bolder than the outline, in <C>--ds-border-inverse</C>.</>],
+        ['Whiskers', 'Run from the box to the low and high values, capped at half the box width.'],
+        ['Category axis', <>Names each group from <C>categories</C>.</>],
+        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to "Value".</>],
+        ['Tooltip', "A group's five numbers."],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={BoxPlotChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of strings. `data` holds one array per category, in
+the same order: `[low, q1, median, q3, high]`. The chart draws the numbers it is
+given; compute them before passing them in. `height` defaults to 400.
+
+```jsx
+<BoxPlotChart
+    yAxisLabel="Session length (min)"
+    categories={['Math', 'Reading', 'Science']}
+    data={[
+        [20, 32, 41, 50, 62],
+        [18, 28, 35, 44, 55],
+        [25, 34, 40, 48, 58],
+    ]}
+/>
+```
+
+There is one series and no outlier points. If the low and high are trimmed
+(say, to the 5th and 95th percentiles), say so in the description.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color.** Box, stem and whiskers take `--ds-chart-categorical-1`; there is only one series, so color names nothing and the chart reads without hue.
+- **Position carries the values.** Every number is read off the value axis, and the median line contrasts with the box fill rather than relying on hue.
+- **Keep the groups few.** Past about ten boxes, the category labels crowd and comparison gets hard; split the chart or filter.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`BoxPlotChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a session is logged." />
+    : <BoxPlotChart categories={categories} data={data} yAxisLabel="Test score" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BoxPlotChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For the full shape of the distribution rather than its five-number summary, use `HistogramChart`.
+- For the full shape of a distribution rather than its five-number summary, use `HistogramChart`.
 - For every individual point, use `ScatterChart`.
-- For a plain min-max span with no quartiles, use `ColumnRangeChart`.
+- For a plain low-to-high span with no quartiles, use `ColumnRangeChart`.
+- For one value per group, use `BarChart`.
 
 </div>
 
 </div>
+
+

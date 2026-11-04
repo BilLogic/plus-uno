@@ -1,76 +1,130 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as VennDiagramStories from './VennDiagram.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={VennDiagramStories} />
 
 <Title />
+Draws each group as a circle and their shared members as the overlap, so a
+reader sees how much two or three groups have in common.
 
-Shows **overlapping sets** and their relationships.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/VennDiagram"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **overlapping sets** and their relationships.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Students enrolled in Math, Science and English, with every overlap between them.</>}>
+    <Canvas of={VennDiagramStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Circles** = distinct sets/groups
-- **Overlaps** = shared elements
-- **Size** = relative quantity
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Set relationships</td><td>✅ Ideal</td></tr>
-    <tr><td>Skill overlaps</td><td>✅ Good</td></tr>
-    <tr><td>Group comparisons</td><td>✅ Good</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `VennDiagram` when the question is about membership in more than one
+group: students tutored in both Math and Reading, tutors certified in more than
+one SMART competency, students who joined both the fall and spring cohorts.
 
-### PLUS Context
+Keep it to two or three sets; past that, the overlaps cannot all be drawn to
+scale. For the sizes of the groups rather than their overlap, use `PieChart`
+or `TreemapChart`. For membership across many groups, use `HeatmapChart`. For
+links between individual items, use `NetworkGraph`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Skill Overlap**</td><td>Math + Science students</td></tr>
-    <tr><td>**Feature Usage**</td><td>Users using multiple features</td></tr>
-    <tr><td>**Course Enrollment**</td><td>Multi-subject students</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the venn diagram setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Circles', <>One per single-set entry. Area tracks its <C>value</C>.</>],
+        ['Overlaps', <>One per multi-set entry, sized by its <C>value</C>: the members those sets share.</>],
+        ['Names', <>An entry's <C>name</C> labels its region. It is optional, but give every entry one.</>],
+        ['Tooltip', 'The region and its value, with no header line.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={VennDiagramStories.Interactive} />
+`data` is an array of `{ sets, value, name }`. `sets` and `value` are required:
+list each set alone, then every overlap you want drawn. `height` defaults to 400.
 
+```jsx
+<VennDiagram
+    data={[
+        { sets: ['Math'], value: 42, name: 'Math' },
+        { sets: ['Reading'], value: 35, name: 'Reading' },
+        { sets: ['Math', 'Reading'], value: 12, name: 'Math and Reading' },
+    ]}
+/>
+```
+
+A set's `value` is the whole circle, overlap included, not the "only" part.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned for you.** Each set's circle takes the next color in the categorical order, slot 1 first. Overlaps show where circles cross.
+- **Area carries the values, roughly.** Readers see that an overlap is small or large, not its exact size. Print the counts in the names or the surrounding copy when they matter.
+- **Name the regions.** Color alone does not say which circle is which; give every entry a `name` so the label and the tooltip carry it.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`VennDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No enrollment yet" description="Overlaps appear once students enroll in more than one subject." />
+    : <VennDiagram data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={VennDiagramStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -79,7 +133,10 @@ Shows **overlapping sets** and their relationships.
 - For the sizes of the groups rather than their overlap, use `PieChart` or `TreemapChart`.
 - For membership across many groups, use `HeatmapChart`.
 - For relationships between individual items rather than sets, use `NetworkGraph`.
+- For group sizes clustered without overlap, use `PackedBubbleChart`.
 
 </div>
 
 </div>
+
+
