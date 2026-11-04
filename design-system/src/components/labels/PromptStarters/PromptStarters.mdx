@@ -1,0 +1,20 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as PromptStartersStories from './PromptStarters.stories.jsx';
+
+<Meta of={PromptStartersStories} />
+
+<Title />
+
+A few things a person could ask PLUS AI, as a wrapping row of prompt Suggestion chips.
+
+<DocsTabs of={PromptStartersStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={PromptStartersStories.Default} />
+
+</DocsTab>
+
+</DocsTabs>
