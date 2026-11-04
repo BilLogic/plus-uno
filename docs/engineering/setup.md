@@ -385,7 +385,7 @@ enough that a break is expensive. Usage is #166's measurement, recorded in
 `design-system/guidelines/components/overview.md` and re-run on today's tree:
 files under `design-system/src/specs/` and `prototypes/` that import a component
 and render it. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
-`Pagination` (13) and `NavTabs` (11) — the four highest-usage components that
+`Pagination` (13) and `Tabs` (11) — the four highest-usage components that
 are pure state machines and had no interaction cover.
 
 The absences are as deliberate as the set. `Button` (138) and `Alert` (11) are

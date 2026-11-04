@@ -1,8 +1,8 @@
 {
   "measured": "2026-11-04",
   "suite": {
-    "storyFiles": 472,
-    "tests": 1813
+    "storyFiles": 474,
+    "tests": 1822
   },
   "violatingStories": 18,
   "rules": {

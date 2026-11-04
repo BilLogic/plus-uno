@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import NavTabs from '@/components/navigation/NavTabs';
+import Tabs from '@/components/navigation/Tabs';
 import Button from '@/components/forms-and-inputs/Button';
 import CountTag from '@/components/labels/CountTag';
 import { ButtonContainer } from '@/specs/Home/Elements/ButtonContainer';
@@ -54,32 +54,29 @@ const HomepageJumbotron = ({
         >
             {/* Tab Navigation */}
             <div className="plus-homepage-jumbotron-tabs-wrapper">
-                <NavTabs
+                <Tabs
                     activeKey={currentTab}
                     onSelect={handleTabChange}
                     className="plus-homepage-jumbotron-nav-tabs"
                 >
-                    <NavTabs.Item
+                    <Tabs.Tab
                         eventKey="sign-up"
-                        active={currentTab === 'sign-up'}
                     >
                         Sign up / Edit
-                    </NavTabs.Item>
-                    <NavTabs.Item
+                    </Tabs.Tab>
+                    <Tabs.Tab
                         eventKey="session"
-                        active={currentTab === 'session'}
                     >
                         Session links
                         {' '}
                         <CountTag value={sessionLinks.length} className="plus-homepage-jumbotron-tab-badge" />
-                    </NavTabs.Item>
-                    <NavTabs.Item
+                    </Tabs.Tab>
+                    <Tabs.Tab
                         eventKey="reflection"
-                        active={currentTab === 'reflection'}
                     >
                         Reflection
-                    </NavTabs.Item>
-                </NavTabs>
+                    </Tabs.Tab>
+                </Tabs>
                 <div className="plus-homepage-jumbotron-divider" role="separator" />
             </div>
 

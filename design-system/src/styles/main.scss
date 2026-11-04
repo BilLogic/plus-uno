@@ -93,7 +93,7 @@
 @include meta.load-css("../components/messaging/Flag/Flag");
 // @import "../components/forms-and-inputs/RichTextEditor/RichTextEditor"; // no RichTextEditor.scss in components/
 @include meta.load-css("../components/text-and-data-display/Table/Table");
-@include meta.load-css("../components/navigation/NavTabs/NavTabs");
+@include meta.load-css("../components/navigation/Tabs/Tabs");
 @include meta.load-css("../components/messaging/SectionMessage/SectionMessage");
 @include meta.load-css("../components/layout-and-structure/Accordion/Accordion");
 @include meta.load-css("../components/images-and-icons/UserAvatar/UserAvatar");

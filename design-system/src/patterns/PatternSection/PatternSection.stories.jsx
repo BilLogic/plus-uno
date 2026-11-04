@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect } from 'storybook/test';
-import { Button, TextField, NavTabs } from '@/components';
+import { Button, TextField, Tabs as TabsComponent } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -15,14 +15,14 @@ const Actions = () => (
     </>
 );
 
-const Tabs = ({ label = 'Views' }) => {
+const ViewTabs = ({ label = 'Views' }) => {
     const [active, setActive] = useState('all');
     return (
-        <NavTabs mode="tabs" activeKey={active} onSelect={setActive} aria-label={label}>
-            <NavTabs.Item eventKey="all">All students</NavTabs.Item>
-            <NavTabs.Item eventKey="active">Active</NavTabs.Item>
-            <NavTabs.Item eventKey="paused">Paused</NavTabs.Item>
-        </NavTabs>
+        <TabsComponent activeKey={active} onSelect={setActive} aria-label={label}>
+            <TabsComponent.Tab eventKey="all">All students</TabsComponent.Tab>
+            <TabsComponent.Tab eventKey="active">Active</TabsComponent.Tab>
+            <TabsComponent.Tab eventKey="paused">Paused</TabsComponent.Tab>
+        </TabsComponent>
     );
 };
 
@@ -73,7 +73,7 @@ function HeaderTypesDemo() {
             </div>
             <div>
                 <DemoLabel>type=tabs · onAddView</DemoLabel>
-                <PatternSection title="Students" description={description} actions={<Actions />} tabs={<Tabs />} onAddView={() => {}}>
+                <PatternSection title="Students" description={description} actions={<Actions />} tabs={<ViewTabs />} onAddView={() => {}}>
                     {slotContent('Content slot')}
                 </PatternSection>
             </div>
@@ -105,7 +105,7 @@ function HeaderTypesDemo() {
             </div>
             <div>
                 <DemoLabel>type=tabs-only · title visually hidden</DemoLabel>
-                <PatternSection type="tabs-only" title="Students" tabs={<Tabs label="Students" />}>
+                <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />}>
                     {slotContent('Content slot')}
                 </PatternSection>
             </div>
@@ -222,7 +222,7 @@ export const Anatomy = () => (
         title="Upcoming sessions"
         description={description}
         actions={<Actions />}
-        tabs={<Tabs />}
+        tabs={<ViewTabs />}
         layout="split"
         side={slotContent('Side · span 4')}
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
@@ -276,7 +276,7 @@ export const Loading = () => (
         </div>
         <div>
             <DemoLabel>type=tabs-only · loading</DemoLabel>
-            <PatternSection type="tabs-only" title="Students" tabs={<Tabs label="Students" />} loading>
+            <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />} loading>
                 {slotContent('Content slot')}
             </PatternSection>
         </div>
@@ -293,7 +293,7 @@ export const Interactive = {
     },
     render: (args) => {
         const bottom = args.type === 'toolbar' ? { toolbar: <DefaultToolbar /> }
-            : (args.type === 'tabs' || args.type === 'tabs-only') ? { tabs: <Tabs /> }
+            : (args.type === 'tabs' || args.type === 'tabs-only') ? { tabs: <ViewTabs /> }
             : args.type === 'custom' ? { header: slotContent('Custom header') }
             : {};
         return (
@@ -382,7 +382,7 @@ export const SplitLayout = {
 /** Header to body is Section/stack-md; the tabs row sits Section/stack-sm under the title row. */
 export const Spacing = {
     render: () => (
-        <PatternSection title="Students" description={description} tabs={<Tabs />}>
+        <PatternSection title="Students" description={description} tabs={<ViewTabs />}>
             {slotContent('Content slot')}
         </PatternSection>
     ),

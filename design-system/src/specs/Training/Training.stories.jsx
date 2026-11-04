@@ -112,7 +112,7 @@ export const Overview = () => (
                     Training pages are built using these core PLUS Design System components:
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                    {['PageLayout', 'NavTabs', 'Card', 'Table', 'StatusTag', 'Button', 'Progress', 'Pagination', 'Alert', 'Select', 'Input'].map(comp => (
+                    {['PageLayout', 'Tabs', 'Card', 'Table', 'StatusTag', 'Button', 'Progress', 'Pagination', 'Alert', 'Select', 'Input'].map(comp => (
                         <span 
                             key={comp} 
                             className="body3-txt"

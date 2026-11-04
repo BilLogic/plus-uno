@@ -202,8 +202,8 @@ const saveActions = (
 );
 
 /**
- * A tab group under the title, as `_Modal header` type=tabs: NavTabs in tabs
- * mode, in the header, so it stays put while only the body scrolls. The body is
+ * A tab group under the title, as `_Modal header` type=tabs: `Tabs` in the
+ * header, so it stays put while only the body scrolls. The body is
  * the selected tab's panel. Left and Right move between tabs, Home and End jump
  * to the ends.
  */

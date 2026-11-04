@@ -1,0 +1,216 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as TabsStories from './Tabs.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "nav-tabs",
+      "name": "Nav Tabs",
+      "componentSetNodeId": "69:16779",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779",
+      "source": "node-chart",
+      "status": "verified"
+    },
+    {
+      "id": "tab-item",
+      "name": "_Tab Item",
+      "componentSetNodeId": "4209:20411",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-20411",
+      "source": "designer-supplied",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "One tab in the strip: Tabs.Tab. state × selected, 9 variants. selected=true is the root's activeKey; state=disabled is isDisabled; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
+    }
+  ]
+};
+
+<Meta of={TabsStories} />
+
+<Title />
+
+<DocsTabs of={TabsStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock 
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Tabs"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Standard tabs.</>}>
+    <Canvas of={TabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>Default (underline), pill, and compact sizing.</>}>
+    <DsCanvasQuiet of={TabsStories.Appearance} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## With panels
+
+<DocsCanvasShell description={<>Each tab wired to a panel; a disabled tab is still reachable with the arrow keys.</>}>
+    <DsCanvasQuiet of={TabsStories.WithPanels} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Pseudo hover, focus, pressed and disabled.</>}>
+    <DsCanvasQuiet of={TabsStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout & composition
+
+<DocsCanvasShell description={<>Justified tab distribution.</>}>
+    <DsCanvasQuiet of={TabsStories.Layout} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TabsStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Tabs` for the tab bar that switches between sibling views of the same
+subject — a student's Overview / Sessions / Progress, or the sections of an
+admin page. Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel`
+alongside each one when the tab's content should be owned by the component
+rather than rendered separately.
+
+It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
+`onSelect`). `alignment` covers left, center, right and `justified`, which
+stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
+`pill` (a filled, rounded selected tab); `size` is `default` (32px) or
+`compact` (24px).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A controlled bar needs `onSelect`, or it will never move.
+
+```jsx
+// Incorrect — activeKey pins the bar and nothing updates it.
+<Tabs activeKey="overview">
+  <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+  <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
+</Tabs>
+
+// Correct.
+<Tabs activeKey={tab} onSelect={setTab}>
+  <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+  <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
+</Tabs>
+```
+
+### Every `Tabs.Tab` needs an `eventKey` — selection is keyed off it.
+
+```jsx
+// Incorrect — with no eventKey, there is no key to compare against activeKey,
+// so the tab never shows as selected and onSelect fires with nothing useful.
+<Tabs activeKey={tab} onSelect={setTab}>
+  <Tabs.Tab>Overview</Tabs.Tab>
+</Tabs>
+
+// Correct.
+<Tabs activeKey={tab} onSelect={setTab}>
+  <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+</Tabs>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real tab widget, always.** `role="tablist"` on the strip, `role="tab"`
+  and `aria-selected` on each tab, `aria-controls` pointing at the panel when
+  one is declared, and roving tabindex: one stop for the whole strip, with
+  Left, Right, Home and End moving selection and focus together. Tabs are real
+  `<button>` elements, so activating one pushes no history entry and moves no
+  scroll position.
+- **A disabled tab stays reachable by the arrow keys**, so its existence is
+  discoverable, but is never selected — `isDisabled` keeps it out of
+  `activeKey` contention without removing it from the strip's keyboard path.
+- **`aria-controls` is omitted rather than dangled.** A `Tabs.Tab` with no
+  matching `Tabs.Panel` gets no pointer at all — an id that is not in the
+  document sends assistive technology to nothing, which is worse than pointing
+  nowhere.
+- **The bar has no name.** Extra props are spread onto the root element, so
+  `aria-label` is the way to say what this set of tabs is for — especially
+  when a page carries more than one.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For navigating to a different page, use the Top bar pattern or `Breadcrumb` — tabs imply the content stays in place.
+- For more tabs than fit the width, use `Select` — the strip is `flex-wrap:
+  wrap`, so the overflow becomes a second row of tabs rather than a scroll or
+  an overflow menu, and the row the reader is on stops being obvious.
+- For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

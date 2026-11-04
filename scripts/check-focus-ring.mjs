@@ -72,7 +72,15 @@ export const MIN_FILES = 150;
 // Lowered from 49 to 48: Dropdown was retired for DropdownMenu, whose
 // trigger is a caller's own Button or IconButton — already counted there —
 // rather than a themed toggle with a focus rule of its own.
-export const MIN_RULES = 48;
+// Lowered from 48 to 44: NavTabs (5 hand-written focus-visible rules) was
+// retired for Tabs, which draws its ring through the state mixin
+// (`design-system/src/styles/_state.scss`'s `plus-state`/`plus-ring`) like
+// Accordion and Flag already do — a rule this scanner cannot see, since it
+// reads each component's own source text rather than compiled CSS. Only
+// Tabs.scss's one still-hand-written rule (the tab panel's own ring, a
+// different width/offset pair the mixin cannot express in one call) survives
+// the move and keeps counting.
+export const MIN_RULES = 44;
 
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +

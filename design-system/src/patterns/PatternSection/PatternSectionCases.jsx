@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, NavTabs } from '@/components';
+import { Button, Tabs } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
@@ -89,11 +89,11 @@ export const SectionFooterCommits = () => (
 const StudentTabs = () => {
     const [active, setActive] = useState('active');
     return (
-        <NavTabs mode="tabs" activeKey={active} onSelect={setActive} aria-label="Students">
-            <NavTabs.Item eventKey="active">Active</NavTabs.Item>
-            <NavTabs.Item eventKey="paused">Paused</NavTabs.Item>
-            <NavTabs.Item eventKey="alumni">Alumni</NavTabs.Item>
-        </NavTabs>
+        <Tabs activeKey={active} onSelect={setActive} aria-label="Students">
+            <Tabs.Tab eventKey="active">Active</Tabs.Tab>
+            <Tabs.Tab eventKey="paused">Paused</Tabs.Tab>
+            <Tabs.Tab eventKey="alumni">Alumni</Tabs.Tab>
+        </Tabs>
     );
 };
 

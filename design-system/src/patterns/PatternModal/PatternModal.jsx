@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { NavTabs, Skeleton } from '@/components';
+import { Tabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '../Blanket';
 import './PatternModal.scss';
@@ -22,7 +22,7 @@ import './PatternModal.scss';
  * section inside it opens at h2.
  *
  * `tabs` puts a tab group under the title, as Figma's `_Modal header`
- * type=tabs: NavTabs in tabs mode, in the header, so it stays put while only
+ * type=tabs: `Tabs` in the header, so it stays put while only
  * the body scrolls. The body becomes the tab panel, named by the selected tab,
  * and shows that tab's content in place of `children`.
  *
@@ -127,25 +127,24 @@ const PatternModal = ({
             {tabState ? (
                 <div className="plus-pattern-modal-header-group">
                     {headerRow}
-                    <NavTabs
-                        mode="tabs"
+                    <Tabs
                         className="plus-pattern-modal-tabs"
                         activeKey={tabState.current}
                         onSelect={tabState.select}
                         aria-labelledby={labelledBy}
                     >
                         {tabs.map((tab) => (
-                            <NavTabs.Item
+                            <Tabs.Tab
                                 key={tab.key}
                                 eventKey={tab.key}
-                                disabled={tab.disabled}
+                                isDisabled={tab.disabled}
                                 id={tabId(tab.key)}
                                 {...(tab.key === tabState.current ? { 'aria-controls': panelId } : {})}
                             >
                                 {tab.label}
-                            </NavTabs.Item>
+                            </Tabs.Tab>
                         ))}
-                    </NavTabs>
+                    </Tabs>
                 </div>
             ) : headerRow}
             {divider && <div className="plus-pattern-modal-divider" aria-hidden="true" />}

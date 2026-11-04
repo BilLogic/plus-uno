@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { OverviewCard } from '@/specs/Universal/Cards';
-import NavTabs from '@/components/navigation/NavTabs/NavTabs';
+import Tabs from '@/components/navigation/Tabs/Tabs';
 import { Select } from '@/components';
 import GroupTrainingProgressTable from '@/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable';
 import '@/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.scss';
@@ -102,18 +102,18 @@ const GroupTrainingProgressPage = ({
         >
             <div className="group-training-progress-page__content">
                 {/* Tab Navigation */}
-                <NavTabs
+                <Tabs
                     activeKey={activeTab}
                     onSelect={handleTabSelect}
                     className="group-training-progress-page__tabs"
                 >
-                    <NavTabs.Item eventKey="group-info" active={activeTab === 'group-info'}>
+                    <Tabs.Tab eventKey="group-info">
                         Group Info
-                    </NavTabs.Item>
-                    <NavTabs.Item eventKey="training-progress" active={activeTab === 'training-progress'}>
+                    </Tabs.Tab>
+                    <Tabs.Tab eventKey="training-progress">
                         Training Progress
-                    </NavTabs.Item>
-                </NavTabs>
+                    </Tabs.Tab>
+                </Tabs>
 
                 {/* Inner Container */}
                 <div className="group-training-progress-page__inner">
