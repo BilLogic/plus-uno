@@ -1,89 +1,151 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SmartBarChartStories from './SmartBarChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={SmartBarChartStories} />
 
 <Title />
+Shows a percentage per category as a pill-shaped column filling a full-height
+track. It drops the value axis, so it suits compact cards where the shape
+matters more than the exact number.
 
-A smart bar chart helps compare and communicate key patterns in the underlying data.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/SmartBarChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A smart bar chart helps compare and communicate key patterns in the underlying data.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A grade distribution on a one-hue ramp, and weekday activity in the brand color.</>}>
+    <Canvas of={SmartBarChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- Start with the primary axis and labels to understand the scale
-- Compare shapes, lengths, or positions to identify differences
-- Use legend and annotations to interpret series or categories
-- Look for outliers, clusters, or trend changes
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Communicating key comparisons</td><td>✅ Ideal</td></tr>
-    <tr><td>Highlighting notable patterns</td><td>✅ Ideal</td></tr>
-    <tr><td>Showing supporting context</td><td>✅ Good</td></tr>
-    <tr><td>Displaying exact raw tables</td><td>❌ Use data table</td></tr>
-    <tr><td>Dense exploratory analysis</td><td>❌ Use interactive analysis view</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `SmartBarChart` for a small set of percentages read at a glance: share of
+students at each grade, session attendance by weekday, completion by unit. The
+track behind each column shows how far it is from 100%, so the chart reads as
+"how full" rather than "how much".
 
-### PLUS Context
+For values that are not percentages, or that need an axis to read exactly, use
+`BarChart`. For a value against a target, use `BulletChart`. For parts of one
+total, use `StackedBarChart` or `DonutChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Learner Progress**</td><td>Compare progress metrics across cohorts</td></tr>
-    <tr><td>**Content Performance**</td><td>Highlight top and low performing modules</td></tr>
-    <tr><td>**Engagement Signals**</td><td>Surface usage patterns by period</td></tr>
-    <tr><td>**Program Outcomes**</td><td>Track outcomes across programs or terms</td></tr>
-  </tbody>
-</table>
+Keep category labels short. The axis is sized for a letter or a day initial,
+which is what the stories use.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Align the smart bar chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+## Anatomy
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Track', <>A full-height pill behind every column, in <C>--ds-background-neutral</C>. It marks 100% and takes no hover.</>],
+        ['Column', <>One per item in <C>data</C>, filled to its <C>height</C> on a fixed 0 to 100 scale, in the item's <C>color</C>. Fully rounded at both ends.</>],
+        ['Category labels', <>One per column, from each item's <C>letter</C>.</>],
+        ['Value axis', 'None. The scale is fixed at 0 to 100 and hidden, with no gridlines.'],
+        ['Tooltip', <>Shows the category and its value with a percent sign.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={SmartBarChartStories.Interactive} />
+## Data shape
 
+`data` is an array of `{ letter, height, color }`, all three required. `height`
+is a numeric string from 0 to 100; `letter` labels the column; `color` fills it.
+The chart's own `height` prop is its pixel height and defaults to 200.
+
+```jsx
+import { BRAND } from '@/dataviz/palette';
+
+<SmartBarChart
+    height={200}
+    data={[
+        { letter: 'M', height: '72', color: BRAND },
+        { letter: 'T', height: '85', color: BRAND },
+        { letter: 'W', height: '64', color: BRAND },
+        { letter: 'T', height: '90', color: BRAND },
+        { letter: 'F', height: '48', color: BRAND },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **You assign every color.** The chart has no default, so `color` is required on each item. For one measure across categories, give every column `--ds-chart-brand` (`BRAND`). For ordered groups such as grades, use one hue from `sequentialRamp`, the strongest step on the biggest value, as the Overview story does.
+- **Fill height carries the value.** Color adds nothing the height does not already say, so the chart reads without hue. Do not use color alone to flag a column as good or bad.
+- **No axis, no printed values.** The exact number is only in the tooltip. When readers need the number, put it in the surrounding text or use `BarChart`.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. Single letters make thin point labels, so say what each letter stands for nearby. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`SmartBarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={200} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Attendance could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No attendance yet" description="Attendance appears after a session is logged." />
+    : <SmartBarChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SmartBarChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For a plain bar chart with no automatic banding, use `BarChart`.
-- For parts of one total, use `StackedBarChart`.
+- For values that need an axis, or are not percentages, use `BarChart`.
 - For a value against an explicit target, use `BulletChart`.
+- For parts of one total, use `StackedBarChart`.
+- For a ranked list where the bar is a thin stem, use `LollipopChart`.
 
 </div>
 
 </div>
+
+

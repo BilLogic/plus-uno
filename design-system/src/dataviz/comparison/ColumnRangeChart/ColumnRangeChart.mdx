@@ -1,86 +1,147 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ColumnRangeChartStories from './ColumnRangeChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={ColumnRangeChartStories} />
 
 <Title />
+Shows a low-to-high span per category as a floating column. Where the column
+starts and ends is the data; its length is the spread.
 
-Shows **ranges between minimum and maximum values** for each category using bars.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/ColumnRangeChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **ranges between minimum and maximum values** for each category using bars.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Weekly availability: the first and last bookable hour for each day.</>}>
+    <Canvas of={ColumnRangeChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Bar extent** = range from low to high value
-- **Bar position** = category on axis
-- Compare ranges visually across categories
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Temperature ranges</td><td>✅ Ideal</td></tr>
-    <tr><td>Schedule duration</td><td>✅ Ideal</td></tr>
-    <tr><td>Salary bands</td><td>✅ Good</td></tr>
-    <tr><td>Single values</td><td>❌ Use Bar Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `ColumnRangeChart` for a minimum and a maximum per category: a tutor's
+available hours each day, the shortest and longest session per subject, the
+lowest and highest score per class.
 
-### PLUS Context
+For one value per category, use `BarChart`. For two distinct moments, such as
+before and after, use `DumbbellChart`. For spans placed on a timeline rather
+than across categories, use `XRangeChart`. For the full spread of a
+distribution, with quartiles and outliers, use `BoxPlotChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Session Durations**</td><td>Min/max lesson times</td></tr>
-    <tr><td>**Score Ranges**</td><td>Low/high by subject</td></tr>
-    <tr><td>**Availability Windows**</td><td>Tutor schedules</td></tr>
-  </tbody>
-</table>
+The chart is vertical by default. Set `horizontal` for long category labels.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Align the column range chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+## Anatomy
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Range column', <>One per item in <C>data</C>, from <C>low</C> to <C>high</C>, in categorical slot 1.</>],
+        ['End labels', 'Each column prints its low and high values at its two ends.'],
+        ['Category axis', <>Names each column, from <C>categories</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
+        ['Tooltip', 'Shows the hovered span.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={ColumnRangeChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of strings. `data` is an array of `{ low, high }`,
+both required, one per category in the same order. `height` defaults to 400;
+`horizontal` defaults to `false`.
+
+```jsx
+<ColumnRangeChart
+    yAxisLabel="Session length (min)"
+    categories={['Math', 'Science', 'Reading', 'Writing']}
+    data={[
+        { low: 25, high: 60 },
+        { low: 30, high: 55 },
+        { low: 20, high: 45 },
+        { low: 30, high: 50 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color for every column.** The chart draws a single series in categorical slot 1 and takes no per-column color.
+- **Position carries the values, and the labels repeat them.** Both ends sit on a shared axis and print their numbers, so the chart reads without hue.
+- **The ends carry no unit.** The labels print bare numbers. Put the unit in `yAxisLabel`, as in "Hour" or "Session length (min)".
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. There is no legend, and the series is named only "Range", so the axis title and the surrounding header have to say what is measured. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`ColumnRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Availability could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No availability set" description="Hours appear once a tutor sets their availability." />
+    : <ColumnRangeChart categories={categories} data={data} yAxisLabel="Hour" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ColumnRangeChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For a single value per category rather than a span, use `BarChart`.
-- For spans along a TIMELINE rather than across categories, use `XRangeChart`.
+- For two distinct moments per category, use `DumbbellChart`.
+- For spans along a timeline rather than across categories, use `XRangeChart`.
 - For the spread of a distribution rather than a plain min-max, use `BoxPlotChart`.
 
 </div>
 
 </div>
+
+

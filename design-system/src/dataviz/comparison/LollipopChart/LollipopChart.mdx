@@ -1,89 +1,141 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as LollipopChartStories from './LollipopChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={LollipopChartStories} />
 
 <Title />
+Compares one value across categories with a dot on a thin stem. It reads like
+a bar chart with less ink, which keeps a long ranking light.
 
-A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/LollipopChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A lollipop chart is a **cleaner alternative to bar charts**, using dots on stems instead of bars.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Student scores as a horizontal ranking, sorted from highest to lowest.</>}>
+    <Canvas of={LollipopChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Dot position** = value for that category
-- **Stem** = visual connection to axis
-- Compare dot positions to compare values
-- Easier to read with many categories
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Rankings with many items</td><td>✅ Ideal</td></tr>
-    <tr><td>Clean value comparison</td><td>✅ Ideal</td></tr>
-    <tr><td>Data with small differences</td><td>✅ Good</td></tr>
-    <tr><td>Part-to-whole</td><td>❌ Use Stacked Bar</td></tr>
-    <tr><td>Grouped comparisons</td><td>❌ Use Bar Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `LollipopChart` to rank many categories on one measure: scores by student,
+average rating by tutor, lesson views by lesson. Sort the data from most to
+least before passing it in; the chart keeps the order it is given.
 
-### PLUS Context
+For a few categories, or more than one series, use `BarChart`. For two values
+per category, such as before and after, use `DumbbellChart`. For a low-to-high
+span per category, use `ColumnRangeChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Student Rankings**</td><td>Scores by student</td></tr>
-    <tr><td>**Content Popularity**</td><td>Lesson views by lesson</td></tr>
-    <tr><td>**Tutor Ratings**</td><td>Average ratings by tutor</td></tr>
-    <tr><td>**Subject Performance**</td><td>Average scores by subject</td></tr>
-  </tbody>
-</table>
+The chart is horizontal by default, which suits long names. Set `horizontal` to
+`false` for short labels laid out as columns.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Sort by value for rankings
-✅ Use horizontally for long labels
-✅ Highlight key items with color
-✅ Add value labels at dots
+## Anatomy
 
-**Avoid:**
-❌ Grouped lollipops (confusing)
-❌ Missing axis labels
-❌ Inconsistent dot sizes
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Dot', <>One per value in <C>data</C>. Its position is the value.</>],
+        ['Stem', 'Joins each dot to the baseline, so the eye reads it as a length.'],
+        ['Category axis', <>Names each dot, from <C>categories</C>. Runs down the left when <C>horizontal</C> is on.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
+        ['Tooltip', 'Shows the hovered value.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={LollipopChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of strings. `data` is an array of numbers, one per
+category, in the same order. `height` defaults to 400; `horizontal` defaults to
+`true`.
+
+```jsx
+<LollipopChart
+    yAxisLabel="Average rating"
+    categories={['Maya', 'Jordan', 'Priya', 'Luis', 'Ana', 'Sam']}
+    data={[4.9, 4.7, 4.6, 4.4, 4.1, 3.8]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color for every dot.** The chart draws a single series in categorical slot 1 and takes no per-point color, so it cannot highlight one category. Call out the item that matters in the surrounding text.
+- **Position carries the value.** Dots read without hue; the stems make each one easy to trace back to its label.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. There is no legend, so the axis title from `yAxisLabel` is the only name for the measure. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`LollipopChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Ratings could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No ratings yet" description="Ratings appear after students review a session." />
+    : <LollipopChart categories={categories} data={data} yAxisLabel="Average rating" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={LollipopChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For the same data with a heavier visual weight, use `BarChart` — a lollipop is a bar with the ink removed.
+- For the same data with heavier marks, or more than one series, use `BarChart`.
 - For two values per category, use `DumbbellChart`.
-- For many categories where the labels matter more than the values, use `WordCloud`.
+- For a low-to-high span per category, use `ColumnRangeChart`.
+- For ranked causes with a running total, use `ParetoChart`.
 
 </div>
 
 </div>
+
+
