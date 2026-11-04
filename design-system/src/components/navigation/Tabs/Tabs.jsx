@@ -1,16 +1,14 @@
 /**
  * `Tabs` — a WAI-ARIA tab strip, built on Base UI's `Tabs`.
  *
- * Replaces `NavTabs`, which split into `mode="navigation"` (a react-bootstrap
- * `Nav` with no real tab semantics) and an opt-in `mode="tabs"` hand-rolled
- * WAI-ARIA implementation. There is one mode now: every strip is a real
- * `role="tablist"`, matching the accessible behavior `mode="tabs"` already
- * proved out (roving tabindex, arrow-key navigation, a labelled panel).
+ * There is one mode: every strip is a real `role="tablist"` (roving tabindex,
+ * arrow-key navigation, a labelled panel).
  *
- * The public vocabulary stays `eventKey` / `activeKey` / `defaultActiveKey` /
- * `onSelect` rather than Base UI's `value` / `defaultValue` / `onValueChange` —
- * the same choice `Accordion` made when it moved onto Base UI, so one old
- * prop name does not mean one thing here and another thing there.
+ * Selection lives on the root, so the vocabulary is `eventKey` /
+ * `activeKey` / `defaultActiveKey` / `onSelect` rather than a per-tab
+ * `isSelected` (a tab cannot select itself) or Base UI's `value` /
+ * `defaultValue` / `onValueChange`; `Accordion` makes the same choice.
+ * `isDisabled` is per tab.
  */
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -50,8 +48,8 @@ Tab.propTypes = {
 /**
  * The panel one tab controls.
  *
- * A thin wrapper over Base UI's `Tabs.Panel`, which already does the work
- * `NavTabs.Panel` had to do by hand: mounting only the active panel's
+ * A thin wrapper over Base UI's `Tabs.Panel`, which does the work itself:
+ * mounting only the active panel's
  * content (or hiding it, with `keepMounted`), and wiring `aria-labelledby`
  * to the matching tab.
  */
@@ -81,7 +79,7 @@ const Tabs = ({
     children,
     alignment = 'left',
     appearance = 'default',
-    size = 'default',
+    spacing = 'default',
     className = '',
     defaultActiveKey,
     activeKey,
@@ -105,7 +103,7 @@ const Tabs = ({
     const rootClasses = [
         'plus-tabs',
         `plus-tabs--${appearance}`,
-        `plus-tabs--${size}`,
+        `plus-tabs--${spacing}`,
         className
     ].filter(Boolean).join(' ');
 
@@ -120,8 +118,8 @@ const Tabs = ({
             className={rootClasses}
             {...props}
         >
-            {/* `activateOnFocus`: arrow keys move selection immediately, matching the
-                old hand-rolled strip; Base UI's own default waits for Enter/Space. */}
+            {/* `activateOnFocus`: arrow keys move selection immediately;
+                Base UI's own default waits for Enter/Space. */}
             <BaseTabs.List className={listClasses} activateOnFocus>
                 {tabs}
             </BaseTabs.List>
@@ -136,7 +134,7 @@ Tabs.propTypes = {
     /** Underline indicator (default) or a pill-shaped selected background. */
     appearance: PropTypes.oneOf(['default', 'pill']),
     /** `default` is 32px tabs; `compact` is 24px. */
-    size: PropTypes.oneOf(['default', 'compact']),
+    spacing: PropTypes.oneOf(['default', 'compact']),
     className: PropTypes.string,
     id: PropTypes.string,
     defaultActiveKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

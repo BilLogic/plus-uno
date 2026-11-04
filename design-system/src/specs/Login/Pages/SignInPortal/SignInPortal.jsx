@@ -42,7 +42,7 @@ export default function SignInPortal() {
                         padding: 'var(--size-spacing-medium-space-300)',
                     }}
                 >
-                    <Logo style="colored" size="S" text />
+                    <Logo appearance="colored" size={96} wordmark />
                 </div>
 
                 <LoginPortal type="official" step="1" showAlert />
