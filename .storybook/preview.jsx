@@ -188,14 +188,14 @@ const preview = {
             [
               "Introduction",
               "Page templates",
-              "Surface container",
-              "Surface",
+              "Frame",
+              "Page",
               "Topbar",
               "Sidebar",
               "Section",
               "Card",
               "Table",
-              "Overlay",
+              "Blanket",
               "Modal",
               "Popover family",
               "Drawer"

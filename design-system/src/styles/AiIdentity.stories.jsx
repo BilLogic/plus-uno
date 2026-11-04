@@ -143,8 +143,8 @@ const AgentChip = ({ hex }) => (
             padding: '6px 12px 6px 6px',
             borderRadius: 'var(--size-element-radius-full)',
             border: `1px solid ${hex}`,
-            background: 'var(--surface-overlay)',
-            boxShadow: 'var(--surface-overlay-shadow)',
+            background: 'var(--ds-surface-overlay)',
+            boxShadow: 'var(--ds-shadow-overlay)',
         }}
     >
         <span

@@ -30,7 +30,7 @@
         /* Page Container */
         .table-example-container {
             padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
-            background-color: var(--color-surface);
+            background-color: var(--ds-surface);
             min-height: 100vh;
         }
         
@@ -39,14 +39,14 @@
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            background-color: var(--color-surface-container);
+            background-color: var(--ds-surface-container);
             border-radius: var(--size-table-radius-md);
             overflow: hidden;
             border: 1px solid var(--color-outline-variant);
         }
 
         .plus-table thead {
-            background-color: var(--color-surface-container-high);
+            background-color: var(--ds-surface-container);
         }
 
         .plus-table th {
@@ -55,7 +55,7 @@
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-semibold-2);
             font-size: var(--font-size-body2);
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             border-bottom: 1px solid var(--color-outline-variant);
             border-right: 1px solid var(--color-outline-variant);
         }
@@ -69,7 +69,7 @@
             font-family: var(--font-family-body);
             font-weight: var(--font-weight-normal);
             font-size: var(--font-size-body2);
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             border-bottom: 1px solid var(--color-outline-variant);
             border-right: 1px solid var(--color-outline-variant);
         }
@@ -83,26 +83,26 @@
         }
 
         .plus-table tbody tr:hover {
-            background-color: var(--color-surface-container-high);
+            background-color: var(--ds-background-neutral-subtle-hovered);
             cursor: pointer;
         }
 
         /* Alternating Row Colors (Optional) */
         .plus-table.striped tbody tr:nth-child(even) {
-            background-color: var(--color-surface-container);
+            background-color: var(--ds-surface-container);
         }
 
         .plus-table.striped tbody tr:nth-child(odd) {
-            background-color: var(--color-surface-container-low);
+            background-color: var(--ds-background-neutral);
         }
 
         .plus-table.striped tbody tr:hover {
-            background-color: var(--color-surface-container-high);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         /* Table Container */
         .table-wrapper {
-            background-color: var(--color-surface-container);
+            background-color: var(--ds-surface-container);
             border-radius: var(--size-card-radius-md);
             padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
             box-shadow: var(--elevation-light-2);
@@ -243,14 +243,19 @@
                                 <td>Border color</td>
                             </tr>
                             <tr>
-                                <td><code>--color-surface-container</code></td>
+                                <td><code>--ds-surface-container</code></td>
                                 <td>Design token</td>
-                                <td>Table background</td>
+                                <td>Table background & header</td>
                             </tr>
                             <tr>
-                                <td><code>--color-surface-container-high</code></td>
+                                <td><code>--ds-background-neutral</code></td>
                                 <td>Design token</td>
-                                <td>Header background & hover</td>
+                                <td>Striped row (odd)</td>
+                            </tr>
+                            <tr>
+                                <td><code>--ds-background-neutral-subtle-hovered</code></td>
+                                <td>Design token</td>
+                                <td>Row hover</td>
                             </tr>
                         </tbody>
                     </table>

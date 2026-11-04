@@ -22,13 +22,13 @@
     <style>
         /* Custom styles for session management page */
         .session-page {
-            background-color: var(--color-surface-container);
+            background-color: var(--ds-surface-container);
             min-height: 100vh;
             padding: 0;
         }
         
         .top-bar {
-            background-color: var(--color-surface-container);
+            background-color: var(--ds-surface-container);
             padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
             display: flex;
             align-items: center;
@@ -54,7 +54,7 @@
             align-items: center;
             gap: var(--size-element-gap-sm);
             padding: var(--element-pad-default) var(--size-element-pad-y-md);
-            background-color: var(--color-surface-container-lowest);
+            background-color: var(--ds-surface-raised);
             border-radius: var(--size-element-radius-sm);
         }
         
@@ -87,7 +87,7 @@
         }
         
         .content-container {
-            background-color: var(--color-surface);
+            background-color: var(--ds-surface);
             border-radius: var(--size-surface-radius);
             padding: var(--size-section-pad-x-lg) var(--size-section-pad-y-lg);
             gap: var(--size-section-gap-lg);
@@ -116,7 +116,7 @@
             font-size: 16px;
             font-weight: 600;
             line-height: 1.5;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             margin-bottom: var(--size-element-gap-xs);
         }
         
@@ -125,13 +125,13 @@
             font-size: 14px;
             font-weight: 300;
             line-height: 1.571;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .alert-close {
             background: none;
             border: none;
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             cursor: pointer;
             padding: 4px;
             cursor: pointer;
@@ -149,7 +149,7 @@
             font-size: 28px;
             font-weight: 700;
             line-height: 1.429;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .summary-cards {
@@ -160,7 +160,7 @@
         }
         
         .summary-card {
-            background-color: var(--color-surface-container-lowest);
+            background-color: var(--ds-surface-raised);
             border-radius: var(--size-card-radius-sm);
             padding: var(--size-card-pad-x-lg) var(--size-card-pad-y-lg);
             display: flex;
@@ -180,7 +180,7 @@
             font-size: 16px;
             font-weight: 600;
             line-height: 1.5;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .summary-card-icon {
@@ -196,7 +196,7 @@
             font-size: 40px;
             font-weight: 700;
             line-height: 1.6;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .nav-tabs {
@@ -217,7 +217,7 @@
             gap: var(--size-element-gap-lg);
             font-family: var(--font-family-body);
             font-size: 16px;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             position: relative;
         }
         
@@ -257,7 +257,7 @@
             font-size: 24px;
             font-weight: 600;
             line-height: 1.333;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .filters {
@@ -280,7 +280,7 @@
             font-family: var(--font-family-body);
             font-size: 14px;
             font-weight: 400;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             border-bottom: 1px solid var(--color-outline-variant);
         }
         
@@ -289,14 +289,14 @@
         }
         
         .session-table-row:hover {
-            background-color: var(--color-surface-variant);
+            background-color: var(--ds-background-neutral);
         }
         
         .session-table-row td {
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
             font-family: var(--font-family-body);
             font-size: 14px;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .session-date-time {
@@ -429,7 +429,7 @@
             font-family: var(--font-family-body);
             font-size: 14px;
             font-weight: 400;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
         
         .form-label.required::after {
@@ -451,7 +451,7 @@
             font-family: var(--font-family-body);
             font-size: 12px;
             font-weight: 400;
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             margin-bottom: var(--size-element-gap-xs);
         }
         
@@ -459,7 +459,7 @@
             font-family: var(--font-family-body);
             font-size: 14px;
             font-weight: 400;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
     </style>
 </head>
@@ -475,14 +475,14 @@
                 </button>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb" style="background: none; padding: 0; margin: 0;">
-                        <li class="breadcrumb-item"><a href="#" style="color: var(--color-on-surface-variant);">Strategies</a></li>
+                        <li class="breadcrumb-item"><a href="#" style="color: var(--ds-text-subtle);">Strategies</a></li>
                     </ol>
                 </nav>
             </div>
             <div class="top-bar-right">
                 <div class="user-avatar">
                     <div class="avatar-initial">J</div>
-                    <span class="body2-txt" style="color: var(--color-on-surface);">John Doe</span>
+                    <span class="body2-txt" style="color: var(--ds-text);">John Doe</span>
                     <div class="notification-badge">2</div>
                 </div>
             </div>
