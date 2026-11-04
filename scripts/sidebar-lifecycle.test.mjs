@@ -11,6 +11,7 @@ import {
   LIFECYCLE_TAGS,
   COLLAPSED_ROOTS,
   lifecycleOf,
+  lifecycleOfEntry,
   badgeRules,
 } from '../.storybook/sidebar-lifecycle.js';
 import { BACKGROUND_OPTIONS } from '../.storybook/backgrounds.js';
@@ -29,6 +30,20 @@ test('an entry with no lifecycle tag has no badge', () => {
   assert.equal(lifecycleOf(undefined), null);
 });
 
+test('a component row shows its own tag, else what all its children share, worst first', () => {
+  const data = {
+    a: { tags: ['new'] }, b: { tags: ['beta'] }, c: { tags: ['autodocs'] },
+  };
+  const get = (id) => data[id];
+  assert.equal(lifecycleOfEntry({ type: 'docs', tags: ['new'] }, get), 'new');
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: ['beta'], children: ['a'] }, get), 'beta');
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: [], children: ['a'] }, get), 'new');
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: [], children: ['a', 'b'] }, get), 'beta');
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: [], children: ['a', 'c'] }, get), null);
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: [], children: [] }, get), null);
+  assert.equal(lifecycleOfEntry({ type: 'component', tags: [], children: ['a'] }), null);
+});
+
 test('the three lifecycle tags are the vocabulary', () => {
   assert.deepEqual([...LIFECYCLE_TAGS].sort(), ['beta', 'deprecated', 'new']);
 });
@@ -38,12 +53,11 @@ test('roots foundations, components, data-visualizations and specs start collaps
 });
 
 test('each badge is painted from tokens the manager theme resolves in every mode', () => {
-  const rules = badgeRules(resolveManagerThemes()['light-no-preference'].vars);
-  for (const tag of LIFECYCLE_TAGS) assert.match(rules, new RegExp(`data-lifecycle='${tag}'`));
-  assert.doesNotMatch(rules, /undefined/);
+  const themes = resolveManagerThemes();
   for (const mode of Object.keys(MANAGER_MODES)) {
-    const vars = resolveManagerThemes()[mode].vars;
-    for (const tag of LIFECYCLE_TAGS) assert.ok(vars[`--plus-manager-badge-${tag}-border`], `${mode} ${tag}`);
+    const rules = badgeRules(themes[mode].vars);
+    for (const tag of LIFECYCLE_TAGS) assert.match(rules, new RegExp(`data-lifecycle='${tag}'`));
+    assert.doesNotMatch(rules, /undefined/, mode);
   }
   assert.ok(MANAGER_TOKENS.vars['--plus-manager-badge-text']);
 });
@@ -63,7 +77,7 @@ test('a lifecycle tag written in a story is one of the three', () => {
   const stray = [];
   for (const file of documents('design-system/src', { ext: ['.stories.jsx'] })) {
     for (const [, body] of text(file).matchAll(/^\s*tags:\s*\[([^\]]*)\]/gm)) {
-      const tags = [...body.matchAll(/'([^']+)'/g)].map((m) => m[1]);
+      const tags = [...body.matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]);
       // Row data (a `tags` column of labels) is not story meta: meta lists dev/autodocs.
       if (!tags.some((t) => /^!?(dev|autodocs)$/.test(t))) continue;
       for (const tag of tags) {

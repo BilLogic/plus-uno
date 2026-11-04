@@ -23,7 +23,7 @@ export const lifecycleOfEntry = (item, getData) => {
   const own = lifecycleOf(item?.tags);
   if (own || item?.type !== 'component' || !getData) return own;
   const kids = (item.children ?? []).map((id) => lifecycleOf(getData(id)?.tags));
-  return kids.length && kids.every(Boolean) ? kids[0] : null;
+  return kids.length && kids.every(Boolean) ? lifecycleOf(kids) : null;
 };
 
 /**
@@ -37,6 +37,9 @@ export const COLLAPSED_ROOTS = ['foundations', 'components', 'data-visualization
  * could hold custom properties (same reason as the selected row). The look is the
  * Tag's: a hue on the border, neutral text, a transparent ground.
  */
+// The badge's colors are tokens. Its size (16px high, 10px type, 4px radius and padding)
+// is literal: the manager has no stylesheet of tokens, and the theme's own type and
+// radius stay literal for the same reason (manager.js).
 export const badgeRules = (vars = {}) =>
   [
     `.plus-lifecycle-badge { display: inline-flex; align-items: center; box-sizing: border-box; height: 16px; margin-left: 6px; padding: 0 4px; border: 1px solid; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: 0.02em; text-transform: lowercase; white-space: nowrap; color: ${vars['--plus-manager-badge-text']}; }`,
