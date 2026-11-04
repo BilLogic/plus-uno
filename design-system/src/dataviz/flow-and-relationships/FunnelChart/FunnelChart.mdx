@@ -1,90 +1,145 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FunnelChartStories from './FunnelChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={FunnelChartStories} />
 
 <Title />
+Shows how many people are left at each step of a process, from the widest
+stage at the top to the narrowest at the bottom.
 
-A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/FunnelChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A funnel chart displays **sequential stages in a process**, showing how values decrease at each step.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A five-stage pipeline and a five-stage enrollment funnel, each labeled with its stage name and count.</>}>
+    <Canvas of={FunnelChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Widest section** = starting point (most volume)
-- **Narrowing** = drop-off at each stage
-- **Width** = proportional to stage value
-- Compare adjacent sections for conversion rates
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Sales pipelines</td><td>✅ Ideal</td></tr>
-    <tr><td>Conversion funnels</td><td>✅ Ideal</td></tr>
-    <tr><td>Process efficiency</td><td>✅ Good</td></tr>
-    <tr><td>Non-sequential data</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Time-based trends</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `FunnelChart` for a sequence where each stage is a subset of the one before:
+tutor onboarding (applied, trained, matched, first session), student
+enrollment (referred, signed up, attended, active), or an assessment (started,
+submitted, passed).
 
-### PLUS Context
+For stages that do not have to shrink, use `BarChart`. For flow that splits
+into several destinations, use `SankeyDiagram`. For drop-off ranked by cause,
+use `ParetoChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Student Journey**</td><td>Interest → Trial → Enrollment → Active</td></tr>
-    <tr><td>**Learning Path**</td><td>Started → Engaged → Completed → Certified</td></tr>
-    <tr><td>**Onboarding**</td><td>Sign-up → Profile → First Session → Regular</td></tr>
-    <tr><td>**Assessment Flow**</td><td>Started → Submitted → Passed</td></tr>
-    <tr><td>**Referral Process**</td><td>Referred → Signed Up → Converted</td></tr>
-  </tbody>
-</table>
+Order stages from largest to smallest, in the order they happen. Keep to five
+to seven stages.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Order from largest to smallest
-✅ Show percentages with values
-✅ Use consistent colors/gradient
-✅ Label each stage clearly
+## Anatomy
 
-**Avoid:**
-❌ Non-sequential relationships
-❌ More than 5-7 stages
-❌ Stages that don't flow logically
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Stages', <>One per item in <C>data</C>, top to bottom in array order. Width follows <C>y</C> down the body of the funnel.</>],
+        ['Neck', 'The bottom quarter of the funnel keeps one width, so stages that land there no longer show their size by width.'],
+        ['Stage labels', <>Always on, beside each stage: the <C>name</C> and the count, joined to the stage by a connector line.</>],
+        ['Tooltip', <>The stage <C>name</C> and its count.</>],
+        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={FunnelChartStories.Interactive} />
+## Data shape
 
+`data` is an array of `{ name, y }`, one per stage, in process order. `name`
+and `y` are required. A stage may carry its own `color`.
+
+```jsx
+<FunnelChart
+    data={[
+        { name: 'Applied', y: 640 },
+        { name: 'Completed training', y: 410 },
+        { name: 'Matched with students', y: 300 },
+        { name: 'Led a first session', y: 260 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Each stage takes the next categorical color**, starting at `--ds-chart-categorical-1`, unless it carries its own `color`. The colors are not a ramp and say nothing about size; they only separate neighboring stages. Past eight stages the colors repeat.
+- **The label carries the value.** Every stage is labeled with its name and count, so the chart reads without hue. Width is only a rough guide: the neck holds the last stages at one width, so read the counts, not the shape, near the bottom.
+- **State the conversion yourself.** The chart shows counts, not percentages. If the drop between two stages is the point, say it in the surrounding text.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`FunnelChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Onboarding progress could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No applicants yet" description="Stages fill in as tutors apply and complete training." />
+    : <FunnelChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FunnelChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For stages that do not have to shrink, use `BarChart` — a funnel implies each step is a subset of the one before.
-- For the same drop-off ranked by cause, use `ParetoChart`.
+- For stages that do not have to shrink, use `BarChart`.
 - For flow that splits and rejoins rather than narrowing, use `SankeyDiagram`.
+- For the same drop-off ranked by cause, use `ParetoChart`.
+- For quantities ordered largest to smallest without a process behind them, use `PyramidChart`.
 
 </div>
 
 </div>
+
+

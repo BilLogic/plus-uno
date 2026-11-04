@@ -1,90 +1,148 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SankeyDiagramStories from './SankeyDiagram.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={SankeyDiagramStories} />
 
 <Title />
+Shows how a quantity moves from one stage to the next. Each link is as wide as
+the amount that flows along it.
 
-A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/SankeyDiagram"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A flow from sources into one hub and out to sectors, and a branching path between pages.</>}>
+    <Canvas of={SankeyDiagramStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = stages or entities
-- **Links** = flow between nodes
-- **Link width** = proportional to flow volume
-- Follow the flow from left to right (or source to destination)
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Showing flows/transfers</td><td>✅ Ideal</td></tr>
-    <tr><td>Energy/material flows</td><td>✅ Ideal</td></tr>
-    <tr><td>User journey paths</td><td>✅ Good</td></tr>
-    <tr><td>Simple comparisons</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Hierarchical data</td><td>❌ Use Treemap</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `SankeyDiagram` when an amount splits, merges and moves between stages:
+students moving from referral source to first session to a subject, session
+hours flowing from tutors into subjects, or where students go after a module.
 
-### PLUS Context
+For stages that only ever narrow, with nothing splitting off sideways, use
+`FunnelChart`. For connections that carry no amount, use `NetworkGraph` or
+`ArcDiagram`. For a plain comparison of totals, use `BarChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Learning Pathways**</td><td>How students progress through modules</td></tr>
-    <tr><td>**Student Flow**</td><td>Enrollment → Engagement → Completion</td></tr>
-    <tr><td>**Resource Distribution**</td><td>Budget allocation across programs</td></tr>
-    <tr><td>**Referral Sources**</td><td>How students find the platform</td></tr>
-    <tr><td>**User Journeys**</td><td>Navigation paths through the app</td></tr>
-  </tbody>
-</table>
+Keep the flow moving one way. A link that loops back to an earlier stage turns
+the diagram into a tangle; show that relationship with `DependencyWheel`
+instead. Five to seven stages is the readable range.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Order nodes logically (source → destination)
-✅ Use distinct colors for major flows
-✅ Include flow values in tooltips
-✅ Limit to 5-7 stages for clarity
+## Anatomy
 
-**Avoid:**
-❌ Circular flows (sankey is directional)
-❌ Too many nodes (becomes spaghetti)
-❌ Unrelated categories in same diagram
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Nodes', <>One per distinct name in <C>data</C>, generated for you. A node is as tall as the total flowing through it.</>],
+        ['Links', <>One per <C>[from, to, weight]</C> row. Width is the <C>weight</C>; each link takes the color of the node it leaves.</>],
+        ['Node labels', 'Name each node beside it.'],
+        ['Tooltip', <>On a node: its name and total. On a link: <C>from → to</C> and the weight.</>],
+        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default. Give a diagram with many nodes more room.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={SankeyDiagramStories.Interactive} />
+## Data shape
 
+`data` is an array of `[from, to, weight]` rows. `from` and `to` are node names;
+`weight` is the amount flowing between them. Nodes are created from the names,
+so spell a name the same way everywhere it appears.
+
+```jsx
+<SankeyDiagram
+    data={[
+        ['School referral', 'First session', 120],
+        ['Family referral', 'First session', 60],
+        ['First session', 'Math', 110],
+        ['First session', 'Reading', 50],
+        ['First session', 'No second session', 20],
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color tells nodes apart.** Nodes take the categorical colors in order, starting at `--ds-chart-categorical-1`, and each link takes its source node's color. There are eight categorical colors, so past eight nodes the colors repeat; keep the node count low or label every node.
+- **Width carries the amount.** Link width and node height are the reading; color only groups a link with where it came from. The tooltip gives the exact number.
+- **Labels carry identity.** Every node is named in place, so the diagram reads without hue.
+- **Thin links are hard to see and hard to hover.** Fold very small flows into an "Other" node rather than drawing slivers.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`SankeyDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Student flow could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="The flow appears after students book their first session." />
+    : <SankeyDiagram data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SankeyDiagramStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For stages that only ever narrow, use `FunnelChart`.
-- For relationships with no volume attached, use `NetworkGraph` or `ArcDiagram`.
-- For composition at one moment rather than flow between moments, use `TreemapChart`.
+- For relationships with no amount attached, use `NetworkGraph` or `ArcDiagram`.
+- For flows that run both ways between a set of items, use `DependencyWheel`.
+- For composition at one moment rather than flow between stages, use `TreemapChart`.
 
 </div>
 
 </div>
+
+

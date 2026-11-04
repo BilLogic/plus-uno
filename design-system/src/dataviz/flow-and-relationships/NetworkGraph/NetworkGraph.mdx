@@ -1,90 +1,147 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as NetworkGraphStories from './NetworkGraph.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={NetworkGraphStories} />
 
 <Title />
+Shows which things are connected to which. Nodes settle into place by a force
+layout, so clusters and well-connected nodes stand out on their own.
 
-A network graph shows **relationships and connections** between entities as nodes and links.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/NetworkGraph"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A network graph shows **relationships and connections** between entities as nodes and links.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A concept map of math topics, and a small network of people at a shorter height.</>}>
+    <Canvas of={NetworkGraphStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = entities (people, concepts, items)
-- **Links/edges** = relationships between entities
-- **Clusters** = groups of closely connected nodes
-- **Central nodes** = highly connected entities
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Showing relationships</td><td>✅ Ideal</td></tr>
-    <tr><td>Social networks</td><td>✅ Ideal</td></tr>
-    <tr><td>Concept maps</td><td>✅ Good</td></tr>
-    <tr><td>Hierarchical data</td><td>❌ Use Sunburst/Treemap</td></tr>
-    <tr><td>Sequential flows</td><td>❌ Use Sankey</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `NetworkGraph` to show connections with no fixed order or hierarchy: how
+topics in a subject connect, which students tutor each other, or which tutors
+share students.
 
-### PLUS Context
+For a strict hierarchy, use `OrganizationChart` or `TreegraphChart`. For a small
+set of items in a fixed order, use `ArcDiagram`. For connections that carry an
+amount, use `SankeyDiagram` or `DependencyWheel`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Concept Maps**</td><td>How learning topics connect</td></tr>
-    <tr><td>**Student Networks**</td><td>Peer tutoring relationships</td></tr>
-    <tr><td>**Skill Dependencies**</td><td>Prerequisites between skills</td></tr>
-    <tr><td>**Tutor-Student Matching**</td><td>Assignment relationships</td></tr>
-    <tr><td>**Content Relationships**</td><td>How lessons relate to each other</td></tr>
-  </tbody>
-</table>
+Past about 50 nodes the graph turns into a hairball; filter to the part of the
+network the question is about.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Use meaningful node labels
-✅ Color-code node types
-✅ Allow interactive exploration
-✅ Show edge weights when relevant
+## Anatomy
 
-**Avoid:**
-❌ Too many nodes (>50 becomes cluttered)
-❌ Missing labels
-❌ Overlapping node positions
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Nodes', <>One per distinct name in <C>data</C>, generated for you. Define them yourself in <C>nodes</C> to give one its own <C>color</C>.</>],
+        ['Links', <>One per <C>[from, to]</C> pair in <C>data</C>, drawn in <C>--ds-border-bold</C>. Links carry no weight.</>],
+        ['Node labels', 'Name each node. Links are not labeled.'],
+        ['Layout', 'A force simulation places the nodes and keeps adjusting them; position has no meaning beyond which nodes sit close together.'],
+        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={NetworkGraphStories.Interactive} />
+## Data shape
 
+`data` is an array of `[from, to]` pairs of node names. `nodes` is optional: an
+array of `{ id, color }`, where `id` matches a name used in `data`.
+
+```jsx
+<NetworkGraph
+    data={[
+        ['Fractions', 'Ratios'],
+        ['Ratios', 'Percentages'],
+        ['Fractions', 'Decimals'],
+        ['Decimals', 'Percentages'],
+        ['Ratios', 'Proportions'],
+    ]}
+    nodes={[{ id: 'Fractions', color: 'var(--ds-chart-categorical-2)' }]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color by default.** Every node takes the series color, `--ds-chart-categorical-1`, unless `nodes` gives it its own `color`. Use a categorical token for that, and only to mark a group that matters to the question.
+- **Labels and links carry the reading.** Each node is named and each connection is a line, so the graph reads without hue. If you color node groups, say what each color means in the surrounding text; the chart has no legend.
+- **The layout moves.** The simulation keeps nodes in motion as it settles, and the arrangement can differ between renders. Do not refer to a node by where it sits.
+- **Dense graphs fail.** Overlapping labels and crossing links are the main hazard; fewer nodes is the fix.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`NetworkGraph` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={500} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Topic map could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No connections yet" description="Topics connect once lessons reference each other." />
+    : <NetworkGraph data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={NetworkGraphStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For a strict hierarchy rather than a free graph, use `OrganizationChart` or `TreegraphChart`.
-- For relationships between a small fixed set, use `ArcDiagram` or `DependencyWheel`.
-- For flow volume along the edges, use `SankeyDiagram`.
+- For connections between a small set in a fixed order, use `ArcDiagram`.
+- For weighted connections around a circle, use `DependencyWheel`.
+- For an amount flowing along the links, use `SankeyDiagram`.
 
 </div>
 
 </div>
+
+

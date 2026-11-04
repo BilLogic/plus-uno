@@ -1,76 +1,133 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as OrganizationChartStories from './OrganizationChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={OrganizationChartStories} />
 
 <Title />
+Draws who reports to whom as a top-down tree of named boxes, one level per row.
 
-Shows **hierarchical organizational structures** with reporting lines.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/OrganizationChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **hierarchical organizational structures** with reporting lines.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A four-level team structure, from the top role down to individual teams.</>}>
+    <Canvas of={OrganizationChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = people/roles
-- **Lines** = reporting relationships
-- **Levels** = hierarchy depth
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Team structures</td><td>✅ Ideal</td></tr>
-    <tr><td>Reporting lines</td><td>✅ Ideal</td></tr>
-    <tr><td>Decision hierarchies</td><td>✅ Good</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `OrganizationChart` for reporting lines between people or roles: the
+program team, which lead tutors supervise which tutors, or who a support
+request escalates to.
 
-### PLUS Context
+For a hierarchy that is not people, like subject to topic to lesson, use
+`TreegraphChart`. For a hierarchy sized by a value, use `TreemapChart` or
+`SunburstChart`. For relationships that are not a tree, use `NetworkGraph`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Team Structure**</td><td>Tutor organization</td></tr>
-    <tr><td>**Course Hierarchy**</td><td>Subject → Topic → Lesson</td></tr>
-    <tr><td>**Support Escalation**</td><td>Support team structure</td></tr>
-  </tbody>
-</table>
+Each box shows a name only. When the reader needs titles, contact details or
+photos, build the structure from components instead.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Align the organization chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+## Anatomy
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Nodes', <>One box per distinct name in <C>data</C>, generated for you. The name is both the box's label and its identity.</>],
+        ['Levels', 'The top row, the row below it and the third row each take their own fill. Rows below the third get no fill of their own from this chart.'],
+        ['Links', <>The reporting lines, drawn in <C>--ds-border-bold</C>.</>],
+        ['Tooltip', 'Hover a box or a line for its details. It draws outside the chart, so it is not clipped at the edge.'],
+        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={OrganizationChartStories.Interactive} />
+## Data shape
 
+`data` is an array of `[from, to]` pairs: the manager first, then the person who
+reports to them. Boxes are created from the names, so every name must be unique.
+Two people with the same name merge into one box.
+
+```jsx
+<OrganizationChart
+    data={[
+        ['Program Director', 'Lead Tutor, Math'],
+        ['Program Director', 'Lead Tutor, Reading'],
+        ['Lead Tutor, Math', 'Priya S.'],
+        ['Lead Tutor, Math', 'Marcus T.'],
+        ['Lead Tutor, Reading', 'Dana K.'],
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color marks depth, not identity.** The top row is `--ds-chart-categorical-1` with `--ds-text-inverse` labels, the second row `--ds-chart-categorical-2`, the third `--ds-chart-categorical-3`. Every box is outlined in `--ds-chart-categorical-1`. There is no per-person color.
+- **Position carries the structure.** Rows and lines show the hierarchy, so the chart reads without hue; the level colors repeat what position already says.
+- **Wide trees overflow.** Many people on one row shrink the boxes until labels truncate. Split a large organization into one chart per team, or raise `height` for deep trees.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`OrganizationChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={500} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Team structure could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No team members yet" description="The structure appears once tutors are assigned to a lead." />
+    : <OrganizationChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={OrganizationChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -78,8 +135,10 @@ Shows **hierarchical organizational structures** with reporting lines.
 
 - For a hierarchy that is not people, use `TreegraphChart`.
 - For a hierarchy sized by a value, use `TreemapChart` or `SunburstChart`.
-- For reporting lines that are a graph rather than a tree, use `NetworkGraph`.
+- For relationships that form a graph rather than a tree, use `NetworkGraph`.
 
 </div>
 
 </div>
+
+
