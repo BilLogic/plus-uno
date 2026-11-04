@@ -205,3 +205,74 @@ export function measureScript(page) {
     };
   })()`;
 }
+
+/**
+ * The "On this page" rail. A heading clicked from the rail lands on the line
+ * Tocbot is told to use (`headingsOffset` in `.storybook/preview.jsx`, 96px);
+ * the band is that line with room either side, wide enough for sub-pixel layout
+ * and narrow enough that a heading left at 488px, or hidden under the toolbar,
+ * fails.
+ */
+export const TOC_LINE_BAND = [64, 160];
+
+/**
+ * The rail's state, as a string to evaluate in the docs document.
+ *
+ * @param {string} label the heading text whose position to report ('' for none)
+ * @returns {string}
+ */
+export function tocMeasureScript(label = '') {
+  return `(() => {
+    const links = [...document.querySelectorAll('.toc-wrapper a.toc-link')];
+    const shown = (a) => a.offsetParent !== null;
+    const nested = links.filter((a) => a.closest('ul').parentElement.closest('ul'));
+    const active = document.querySelector('.toc-wrapper .is-active-li > a');
+    const owner = (a) => a.closest('ul').parentElement.closest('li');
+    const activeOwner = active && (active.closest('ul').parentElement.closest('ul') ? owner(active) : active.parentElement);
+    const want = ${JSON.stringify(label)};
+    const heading = want && [...document.querySelectorAll('.sbdocs-content h2, .sbdocs-content h3')]
+      .find((h) => !h.closest('.docs-story') && h.textContent.trim() === want);
+    return {
+      entries: links.length,
+      untitled: links.filter((a) => a.title !== a.textContent).map((a) => a.textContent),
+      wrapped: links.filter(shown).filter((a) => a.getBoundingClientRect().height > parseFloat(getComputedStyle(a).lineHeight) * 1.5).map((a) => a.textContent),
+      strayNested: nested.filter(shown).filter((a) => owner(a) !== activeOwner).map((a) => a.textContent),
+      openNested: nested.filter(shown).length,
+      active: active ? active.textContent : null,
+      top: heading ? heading.getBoundingClientRect().top : null,
+    };
+  })()`;
+}
+
+/**
+ * What is wrong with one measured rail: a deep entry clicked, then the last one.
+ *
+ * @param {{page: string, entries: number, untitled: string[], wrapped: string[],
+ *   clicked: {label: string, top: number|null, active: string|null},
+ *   strayNested: string[], openNested: number,
+ *   last: {label: string, top: number|null, active: string|null}}} t
+ * @returns {string[]}
+ */
+export function tocFailures(t) {
+  const failures = [];
+  const where = `${t.page} rail`;
+  if (t.entries === 0) failures.push(`${where}: no entries were rendered, so nothing else was checked`);
+  for (const [name, c] of [['clicked', t.clicked], ['last', t.last]]) {
+    if (c.top === null || c.top < TOC_LINE_BAND[0] || c.top > TOC_LINE_BAND[1]) {
+      failures.push(
+        `${where}: clicking "${c.label}" left its heading ${c.top === null ? 'missing' : `${Math.round(c.top)}px from the top`}, ` +
+          `outside ${TOC_LINE_BAND[0]}-${TOC_LINE_BAND[1]}px (${name} entry)`,
+      );
+    }
+    if (c.active !== c.label) failures.push(`${where}: after clicking "${c.label}" the active entry was "${c.active}"`);
+  }
+  if (t.strayNested.length) {
+    failures.push(`${where}: h3 entries of other sections are showing: ${t.strayNested.join(', ')}`);
+  }
+  if (t.entries > 0 && t.openNested === 0) {
+    failures.push(`${where}: the reader's own h3 entries are hidden too — collapsing took the open section with it`);
+  }
+  if (t.untitled.length) failures.push(`${where}: entries without a full-heading title tooltip: ${t.untitled.join(', ')}`);
+  if (t.wrapped.length) failures.push(`${where}: entries wrapping past one line: ${t.wrapped.join(', ')}`);
+  return failures;
+}

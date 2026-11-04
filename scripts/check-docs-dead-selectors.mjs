@@ -115,6 +115,11 @@ const VENDOR = new Map([
   ['sbdocs-toc', '@storybook/addon-docs/dist/blocks.js'],
   ['sbdocs-a', 'storybook/dist/core-server/presets/common-manager.js'],
   ['toc-wrapper', '@storybook/addon-docs/dist/blocks.js'],
+  // Tocbot's own default class names, bundled into the same file (default-options.js).
+  ['toc-list-item', '@storybook/addon-docs/dist/blocks.js'],
+  ['toc-list', '@storybook/addon-docs/dist/blocks.js'],
+  ['is-collapsible', '@storybook/addon-docs/dist/blocks.js'],
+  ['is-collapsed', '@storybook/addon-docs/dist/blocks.js'],
   ['sb-main-padded', 'storybook/dist/_browser-chunks/ (preview runtime)'],
   ['docs-story', 'storybook/dist/csf/index.js'],
   ['docblock-argstable', 'storybook/dist/core-server/presets/common-manager.js'],

@@ -206,3 +206,60 @@ test('the measured shape is what the assertions read', () => {
   }
   assert.ok(src.includes('"x--docs"'));
 });
+
+/* ------------------------------------------- the "On this page" rail (#toc) */
+
+import { tocFailures, tocMeasureScript, TOC_LINE_BAND } from './docs-chrome.mjs';
+
+const toc = (over = {}) => ({
+  page: 'foundations-typography--docs',
+  entries: 30,
+  untitled: [],
+  wrapped: [],
+  clicked: { label: 'Next session', top: 96, active: 'Next session' },
+  strayNested: [],
+  openNested: 3,
+  last: { label: 'Related', top: 96, active: 'Related' },
+  ...over,
+});
+
+test('a healthy rail reports nothing', () => {
+  assert.deepEqual(tocFailures(toc()), []);
+});
+
+test('a click that leaves its heading below the toolbar band is reported', () => {
+  const f = tocFailures(toc({ clicked: { label: 'Next session', top: 488, active: 'Next session' } }));
+  assert.equal(f.length, 1);
+  assert.match(f[0], /Next session.*488/);
+});
+
+test('a heading scrolled up under the toolbar is reported too', () => {
+  assert.equal(tocFailures(toc({ clicked: { label: 'Next session', top: -40, active: 'Next session' } })).length, 1);
+  assert.ok(TOC_LINE_BAND[0] <= 0 + 96 && TOC_LINE_BAND[1] >= 96);
+});
+
+test('an entry that is not the active one after its click is reported', () => {
+  assert.equal(tocFailures(toc({ last: { label: 'Related', top: 96, active: 'Accessibility' } })).length, 1);
+});
+
+test('h3 entries of sections the reader is not in are reported', () => {
+  assert.match(tocFailures(toc({ strayNested: ['Weights in use'] }))[0], /Weights in use/);
+});
+
+test('an expanded section with no h3 shown means collapsing hid everything', () => {
+  assert.equal(tocFailures(toc({ openNested: 0 })).length, 1);
+});
+
+test('entries without a title tooltip or wrapping past one line are reported', () => {
+  assert.equal(tocFailures(toc({ untitled: ['A'] })).length, 1);
+  assert.equal(tocFailures(toc({ wrapped: ['A very long heading'] })).length, 1);
+});
+
+test('a rail with no entries is reported rather than passing empty', () => {
+  assert.equal(tocFailures(toc({ entries: 0 })).length, 1);
+});
+
+test('the rail measurement script is a self-contained expression', () => {
+  assert.equal(typeof tocMeasureScript(), 'string');
+  assert.doesNotThrow(() => new Function(`return ${tocMeasureScript()}`));
+});

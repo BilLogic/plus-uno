@@ -663,6 +663,38 @@ a.sbdocs-a {
   color: var(--color-on-surface-variant, #5c5c5c) !important;
 }
 
+/*
+ * TOC entries: one line each, ellipsis past the rail's width, the full heading in
+ * the link's native `title` (set by `.storybook/docs-toc.jsx`). `h3` lists nested
+ * under an `h2` entry are collapsed by `collapseDepth` in preview.jsx; Tocbot only
+ * toggles the classes, so the hiding is ours. The active entry's list loses
+ * `is-collapsed`, which is how the reader's own section expands.
+ */
+.toc-wrapper .toc-list-item > a {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toc-wrapper .toc-list.is-collapsible.is-collapsed {
+  display: none;
+}
+
+/*
+ * Room below the page's last heading so its entry can land on the line and become
+ * active; measured and set by `.storybook/docs-toc.jsx`, 0 when the page is long enough.
+ */
+:root {
+  --docs-toc-end-space: 0px;
+}
+
+.sbdocs-content::after {
+  content: '';
+  display: block;
+  height: var(--docs-toc-end-space);
+}
+
 /* Hide scrollbar while maintaining scroll functionality */
 .hide-scrollbar::-webkit-scrollbar {
     display: none;
