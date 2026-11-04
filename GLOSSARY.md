@@ -78,75 +78,116 @@ The PLUS training system.
 **Breakout Room**:
 A Zoom sub-room for one-on-one tutoring.
 
-### Design system
+### Design system: structure
 
-**Context Level**:
-The atomic hierarchy: Element → Card → Section → Page.
-
-**Spec**:
-A full page composition.
-
-**Prompt-spec**:
-The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0), the low/mid-fi lane's deliverable rather than what the tool returns. Not a **Spec** or the **PRD** it comes from.
-_Avoid_: bare "spec"
-
-**Component docs page**:
-The tabbed page a human reads for one component. Distinct from **Page** (a Context Level), from **Spec**, and from a page story.
-_Avoid_: bare "docs page"
-
-**Token**:
-A design value: color, spacing, typography, elevation, radius.
-
-**Foundation**:
-A fundamental design primitive (color palette, type scale, grid).
-
-**Figma replica**:
-A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
-_Avoid_: bare "replica", "screenshot"
-
-**Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Planned in code as `StaticTable`, built on today's `Table` primitive (`_internal/Table`); which type to use is `design-system/guidelines/composition/surfaces.md` § Choosing a table.
-_Avoid_: "basic table", bare "table" for this type
-
-**Dynamic table**:
-Any table people act on: sorting, filtering, selection, paging, row expansion or row actions. Planned in code as `DynamicTable`.
-_Avoid_: "data table", "interactive table"
-
-**Tree table**:
-A table whose rows nest under parent rows. Planned in code as `TreeTable`.
-_Avoid_: "table tree", "nested table"
+**Pattern**:
+A reusable layout of components with named slots: Page templates, Frame, Page, Section, Card, Table, Blanket, Modal, Popover, Drawer. A **Component** is one control in a **Category**; a pattern arranges components.
+_Avoid_: "template" for a pattern, "layout component"
 
 **Frame**:
-The pattern for the app's outer shell: the topbar and sidebar that stay put while the **Page** inside changes.
-_Avoid_: "surface container"
+The pattern for the app's outer shell: the Topbar and Sidebar that stay put while the **Page** inside changes.
+_Avoid_: "surface container", "shell"
+
+**Topbar**:
+The bar across the top of the **Frame**, one word like Sidebar.
+_Avoid_: "top bar", "navbar"
 
 **Page**:
-The pattern for the main content area inside a **Frame**: it carries the page title and a body. Distinct from **Page** the Context Level.
-_Avoid_: "surface" for the pattern
+The pattern for the main content area inside a **Frame**: it carries the page title and a body.
+_Avoid_: "surface"
+
+**Section**:
+The pattern for a span of the page grid that groups content under one heading, with a `_Section header`; a peer of **Card**. A bare "Section" always means this pattern.
+_Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu section**
+
+**Card**:
+The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
+_Avoid_: "tile" (Tile is its own component), "panel"
 
 **Blanket**:
-The pattern for the layer over the UI that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
+The pattern for the full-screen layer that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
 _Avoid_: "overlay" for the pattern, "scrim"
 
 **Modal**:
-The pattern for content that takes over the screen until it is closed. Built from a **Blanket** and a layer; **ModalDialog** is the component built on it.
-_Avoid_: bare "modal" for the component
-
-**ModalDialog**:
-The component built on the **Modal** pattern, with a title, body and actions.
-_Avoid_: "popup" for a blocking dialog
+The pattern for content that takes over the screen until it is closed: one at a time, so a follow-up decision swaps the same Modal's content for its confirm view. **Modal dialog** is the component built on it.
+_Avoid_: bare "modal" for the component, "stacked modals"
 
 **Drawer**:
 A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
 _Avoid_: "side panel", "slide-over"
 
+**Popover**:
+The pattern for any layer that floats above the page with no **Blanket**: Menu, **Popup**, Flag and Tooltip. It names the pattern only.
+_Avoid_: "popover" for the **Popup** component, "floating layer", "popover family"
+
+**Part**:
+A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.
+_Avoid_: "sub-component" for a part, "element"
+
+**Slot**:
+A named drop zone in a pattern or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
+_Avoid_: "children area", "placeholder" for the slot itself
+
+### Design system: components
+
+**Category**:
+The component group names, the same in Figma pages, Storybook and code folders: Forms and inputs, Images and icons, Labels, Layout and structure, Loading, Messaging, Navigation, Overlays and layering, Status indicators, Text and data display, plus AI.
+_Avoid_: "Actions", "group" for a category
+
+**Static table**:
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/guidelines/composition/surfaces.md` § Choosing a table.
+_Avoid_: "basic table", bare "table" for this type
+
+**Dynamic table**:
+Any table people act on: sorting, filtering, selection, paging, row expansion or row actions.
+_Avoid_: "data table", "interactive table"
+
+**Tree table**:
+A table whose rows nest under parent rows.
+_Avoid_: "table tree", "nested table"
+
+**Modal dialog**:
+The component built on the **Modal** pattern, with a title, body, actions and a `view` of default or confirm. Close is always shown.
+_Avoid_: "popup" for a blocking dialog, "ModalDialog" in prose
+
+**Popup**:
+A floating layer anchored to its trigger, closed by clicking outside: one member of the **Popover** pattern.
+_Avoid_: "popover", "inline dialog"
+
+**Menu**:
+The building blocks for a list of actions or links: a menu group, **Menu section**s and items, placed inline or inside a **Popup**.
+_Avoid_: "dropdown" for a menu, "list group"
+
+**Menu section**:
+A titled or separated group of items inside a **Menu**.
+_Avoid_: bare "section"
+
+**Dropdown menu**:
+A button trigger that opens a **Menu** of actions or options in a **Popup**. Picking a value in a form is **Select**.
+_Avoid_: bare "dropdown"
+
+**Close / Dismiss**:
+Close ends a blocking layer (**Modal dialog**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
+
+**Flag**:
+A short message that appears at the screen corner and leaves on its own or on Dismiss; rendered above everything.
+_Avoid_: "toast", "snackbar"
+
+**Section message**:
+A message that sits in the page flow inside a **Section** or form, colored by its meaning with no side stripe. Banner spans the top of a page; Inline message sits beside one field.
+_Avoid_: "alert", "callout"
+
+**Toggle**:
+An on/off control that applies at once.
+_Avoid_: "switch"
+
 **Status tag**:
 A label that shows the state of one thing, with a color for its meaning.
-_Avoid_: "pill"
+_Avoid_: "pill", "lozenge"
 
 **Count tag**:
 A label that shows a number.
-_Avoid_: "counter"
+_Avoid_: "counter", "badge"
 
 **Tag**:
 A label a person can attach, filter by or remove: it names a category rather than a state.
@@ -155,6 +196,14 @@ _Avoid_: "chip"
 **Tag group**:
 A set of **Tag**s laid out together.
 _Avoid_: "tag list"
+
+**Date tag**:
+A label that shows a date or due date, colored by how close it is.
+_Avoid_: "date pill"
+
+**SMART tag**:
+A label for one of the **SMART** competencies, in its curriculum color.
+_Avoid_: "skill tag"
 
 **Suggestion**:
 A label that offers something PLUS AI proposes, which a person accepts or dismisses.
@@ -165,25 +214,150 @@ A legend plus the fields it groups: one `fieldset` and `legend`, built on Base U
 _Avoid_: "field group"
 
 **Radio group**:
-One question and its radio answers: a `Fieldset` holding `Radio`s, pick one. Replaced `ChoiceGroup`.
+One question and its radio answers: a `Fieldset` holding `Radio`s, pick one.
 _Avoid_: "multiple choice", "radio list"
 
 **Choice grid**:
-A PLUS-only pattern: the same question asked of several rows, as a table — one `Radio group` per row, built from `Radio`.
+A PLUS-only pattern: the same question asked of several rows, as a table: one **Radio group** per row, built from `Radio`.
 _Avoid_: "matrix question"
 
 **Linear scale**:
-A PLUS pattern on `Radio group`: an inline row of options with a label at either end, used for a reflection form's five-point scale. Replaced the Scale page.
+A PLUS pattern on **Radio group**: an inline row of options with a label at either end, used for a reflection form's five-point scale.
 _Avoid_: "scale", bare "slider" for this pattern
 
 **appearance**:
 The prop that picks how a component looks within its role, such as `default`, `subtle` or `primary`.
+_Avoid_: `style`, `fill`, `variant` for this axis
 
 **spacing**:
-The prop that sets a component's density in words: `default`, `compact` or `spacious`. Pixel values belong to `size`.
+The prop that sets a component's density in words: `default`, `compact` or `spacious`.
+_Avoid_: "density", "small/medium/large"
+
+**size**:
+The prop that scales the whole component in pixels bound to a token, such as `size=32`.
+_Avoid_: "small", "medium", "large" as sizes
+
+**is… prop**:
+A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
+_Avoid_: bare `disabled`, `selected` or `loading` props
+
+**Base UI**:
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close); Bootstrap survives only as CSS until its cleanup. Decided in ADR-037.
+_Avoid_: "react-bootstrap" as a precedent
+
+**FieldBox / FieldFrame**:
+FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error on Base UI Field, and is the only piece choice controls share.
+_Avoid_: "input wrapper", "form group"
+
+**Overlay module**:
+The shared layer code for everything that floats: the portal, the `--layer-*` stacking order and the rules of one **Modal dialog** at a time with Flag on top.
+_Avoid_: "overlay" for the **Blanket**
+
+**State mixin**:
+The one SCSS source of hover, pressed, selected and focus styling, reading **Named state token**s.
+_Avoid_: "state layer"
+
+**Focus ring**:
+The 2px `--ds-border-focused` ring that shows keyboard focus, drawn as a ring rather than a fill.
+_Avoid_: "focus outline", "focus state color"
+
+### Design system: tokens
+
+**Token**:
+A design value: color, spacing, typography, elevation, radius.
+
+**Foundation**:
+A fundamental design primitive (color palette, type scale, grid), and the Figma and Storybook pages that document one.
+
+**Token tier**:
+The four levels every spacing, size and radius token sits on, the same in code and Figma: **Primitive** → **Semantic** → **Pattern token** → **Component token**. Pick the most specific that fits: a component token if one exists, else the pattern's (it would change if the pattern changed), else semantics.
+_Avoid_: "token layer", "level"
+
+**Primitive**:
+A raw value on the PLUS ×16 ladder, where `space-100` is 16px. Components and patterns read semantic, pattern or component tokens, which point at primitives.
+_Avoid_: "base token", "core token"
+
+**Semantic**:
+A token named by its job, the safety net every value falls back to: Pad, Stack, Inline, Radius, Size, Border, Focus and the grid, on steps (sm, md, lg).
+_Avoid_: "element token", "foundation token"
+
+**Pattern token**:
+A token one pattern owns, such as a Card's padding or a Modal's width, named for the pattern and keyed to `spacing` (default, compact, spacious) where the pattern has one.
+_Avoid_: "role token", "container token"
+
+**Component token**:
+A token only one component needs, such as Button's radius, used when no shared token fits.
+_Avoid_: "local variable"
+
+**Private variable**:
+A `--_<name>-*` custom property inside one component's SCSS that wires its states or sums and only points at tokens. It is not a token.
+_Avoid_: "component token" for it
 
 **Named state token**:
 A color token that names the state it paints, such as `--ds-background-brand-bold-hovered` or `--ds-background-selected`, so a hover, press or selection reads from its name. The mapping is `design-system/guidelines/foundations/color-migration.md`.
+_Avoid_: "state layer", "08/12/16"
+
+**Elevation**:
+The surface and shadow pair that lifts a layer: `--ds-surface-*` with its shadow. The only place the word "surface" belongs.
+_Avoid_: "surface" for a layout box
+
+### Design work
+
+**PRD**:
+The product requirements for one Roadmap **card**, written in Notion before any prototype.
+_Avoid_: "spec", "ticket"
+
+**Build spec**:
+The GitHub issue that turns a PRD into buildable work (user stories, decisions, tests), labeled `ready-for-agent`.
+_Avoid_: bare "spec", "PRD" for it
+
+**Build ticket**:
+A GitHub issue under a **Build spec**: one slice, one PR.
+_Avoid_: "ticket" for a Roadmap card, "task"
+
+**Flow spec**:
+One task's page in **Figma Flows**: lanes per user type and annotated 1024 screens built from current components. The source of truth for how that flow looks.
+_Avoid_: bare "spec", "wireframe"
+
+**Ticket draft**:
+Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow spec** when the ticket lands.
+_Avoid_: "spec" for a draft
+
+**Product screen**:
+A coded copy of one PLUS screen, built from design-system components under `design-system/src/specs`.
+_Avoid_: bare "spec", "page" for the coded screen
+
+**Prompt-spec**:
+The engineered prompt handed to an external generative tool (Stitch, Figma Make, v0), the low/mid-fi lane's deliverable rather than what the tool returns. Not a **Flow spec** or the **PRD** it comes from.
+_Avoid_: bare "spec"
+
+**Component docs page**:
+The tabbed page a human reads for one component. Distinct from **Page** the pattern and from a **Flow spec**.
+_Avoid_: bare "docs page"
+
+**Docs parts**:
+The shared building blocks every Figma docs page is made from, on Core's Docs parts page: every docs page uses instances of them.
+_Avoid_: "doc components", "templates" for the parts
+
+**Playground**:
+The Figma section of ready-made instances pushed to their extremes (long text, empty, overflow) to stress the spec.
+_Avoid_: "examples" for the Playground
+
+**Figma section**:
+A Figma section node; on a component page they are named Updated, Deprecated, Components, Docs and Playground.
+_Avoid_: "zone", bare "section"
+
+**Updated / Deprecated / Retired**:
+Figma Core only: Updated holds the one current set; Deprecated keeps a replaced set with its instances still linked; Retired holds a component with no successor. Code and Storybook carry none of these.
+_Avoid_: "legacy", "archive" for these
+
+**Archive**:
+The pre-revamp Storybook, reached from the single "Previous version" link: the only home of old code.
+_Avoid_: "legacy docs"
+
+**Figma replica**:
+A Figma frame a person makes to mirror a coded prototype: an optional link on its Marketplace row and in its share-out.
+_Avoid_: bare "replica", "screenshot"
 
 ### Estates
 
@@ -192,8 +366,24 @@ The product source of truth for the current service (Supabase), retrieved live. 
 _Avoid_: "the database"
 
 **uno-storybook**:
-The design-system source of truth (stories + MDX → /storybook).
+The design-system source of truth: documentation for the coded components and the **Product screen**s built from them (stories + MDX → /storybook). Not production code.
 _Avoid_: "the docs site"
+
+**Figma Core**:
+The Figma component library; it follows **uno-storybook** on conflict, and only Bill publishes it.
+_Avoid_: "BS4 Foundation", "the library file"
+
+**Figma Flows**:
+The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for product flows. The older Specs file is deprecated.
+_Avoid_: "Spec file", "SOT"
+
+**Vibe app**:
+The coded prototype of PLUS in this repo, built from **Product screen**s and served beside Storybook.
+_Avoid_: "live app", "the app"
+
+**Production app / QA app**:
+The real PLUS product and its QA build, outside this repo.
+_Avoid_: "the app" for either
 
 **Decisions DB**:
 The decision log under Design HQ, one row per decision.
