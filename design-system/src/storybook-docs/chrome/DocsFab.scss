@@ -1,0 +1,25 @@
+// The docs' floating link stack. Tokens only; light, dark and both contrast
+// modes come from the tokens the buttons already use.
+.plus-docs-fab {
+    position: fixed;
+    right: var(--space-150);
+    bottom: var(--space-150);
+    z-index: var(--layer-navigation);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stack-sm);
+
+    // A circle needs a lift to read over page content.
+    .plus-btn {
+        box-shadow: var(--ds-shadow-raised);
+    }
+}
+
+.plus-docs-fab__logo {
+    width: var(--icon-md);
+    height: var(--icon-md);
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
