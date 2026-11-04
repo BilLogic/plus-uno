@@ -9,6 +9,8 @@
 
     /* Elements Layer */
     --size-element-pad-x-lg: var(--size-spacing-medium-space-300);
+    --size-element-pad-x-md: var(--size-spacing-medium-space-200);
+    --size-element-pad-x-sm: var(--size-spacing-small-space-100);
     --size-element-pad-x-xs: var(--size-spacing-small-space-050);
     --size-element-pad-y-lg: var(--size-spacing-small-space-100);
     --size-element-pad-y-md: var(--size-spacing-small-space-075);
@@ -129,8 +131,10 @@
     --size-media-lg: var(--size-spacing-large-space-700);
     --size-media-xl: var(--size-spacing-large-space-800);
 
-    /* Loading Sizes */
+    /* Progress Bar Sizes */
     --size-progressbar-height: var(--size-spacing-small-space-100);
+
+    /* Spinner Sizes */
     --size-spinner-sm: var(--size-spacing-medium-space-300);
     --size-spinner-md: var(--size-spacing-medium-space-500);
     --size-spinner-lg: var(--size-spacing-large-space-800);
