@@ -49,7 +49,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--element-inline-sm` · `--element-pad-x-md` · `--element-pad-x-sm` · `--element-pad-x-xs` · `--element-pad-y-sm` · `--element-radius-item-sm` · `--element-radius-md` · `--icon-md` · `--item-height-md` · `--item-height-sm` · `--plus-btn-fg` · `--plus-btn-icon` · `--size-column-xs` · `--size-element-border` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--button-radius-compact` · `--button-radius-default` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-sm` · `--plus-btn-fg` · `--plus-btn-icon` · `--size-column-xs` · `--size-element-border` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

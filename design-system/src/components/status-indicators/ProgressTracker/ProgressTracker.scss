@@ -23,15 +23,15 @@
 }
 
 .plus-progress-tracker--comfortable .plus-progress-tracker__list {
-    gap: var(--element-stack-lg);
+    gap: var(--stack-lg);
 }
 
 .plus-progress-tracker--cozy .plus-progress-tracker__list {
-    gap: var(--element-stack-md);
+    gap: var(--stack-md);
 }
 
 .plus-progress-tracker--compact .plus-progress-tracker__list {
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 .plus-progress-tracker__item-wrap {
@@ -45,17 +45,17 @@
     width: var(--space-150);
     height: var(--size-element-stroke-sm);
     background-color: var(--ds-border);
-    margin-inline: var(--element-inline-sm);
+    margin-inline: var(--inline-sm);
 }
 
 .plus-progress-tracker__item {
     display: inline-flex;
     align-items: center;
-    gap: var(--element-inline-sm);
+    gap: var(--inline-sm);
     min-width: 0;
     height: var(--item-height-md);
-    padding: 0 var(--element-pad-x-md);
-    border-radius: var(--element-radius-item-md);
+    padding: 0 var(--pad-x-md);
+    border-radius: var(--radius-h32);
     background-color: transparent;
     border: none;
     color: var(--ds-text-subtle);

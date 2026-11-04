@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-text-subtlest` · `--element-inline-sm`
+`--ds-text-subtlest` · `--inline-sm`
 
 From `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.scss`. Override these through the token layer, never with a literal.
 

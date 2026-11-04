@@ -15,7 +15,7 @@
     border: var(--border-default) solid var(--ds-border);
     border-radius: var(--popover-radius-menu-md);
     box-shadow: var(--ds-shadow-overlay);
-    z-index: var(--layout-z-index-popup);
+    z-index: var(--layer-popup);
 
     .plus-menu-group {
         max-height: var(--popover-max-height-menu);

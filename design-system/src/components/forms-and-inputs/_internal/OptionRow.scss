@@ -11,15 +11,15 @@
 
     display: flex;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
     min-height: var(--item-height-md);
-    padding: var(--element-pad-y-md) var(--element-pad-x-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
     margin: 0;
     border: none;
-    border-radius: var(--element-radius-item-md);
+    border-radius: var(--radius-h32);
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);

@@ -76,20 +76,20 @@ $btn-appearances: (
     @include plus-state();
 
     // --- SPACING ---
-    // Height, padding, radius and icon-to-label gap come from element tokens:
-    // default 32 high with a 6 radius, compact 24 high with a 4 radius. The
-    // height is set, not summed from padding, so the 1px edge never makes a
-    // 26. Content centers in it.
+    // Height comes from the Size roles, padding and gap from Semantics, radius
+    // from the Button's own Components-tier tokens: default 32 high with a 6
+    // radius, compact 24 high with a 4 radius. The height is set, not summed
+    // from padding, so the 1px edge never makes a 26. Content centers in it.
     box-sizing: border-box;
     height: var(--item-height-md);
-    padding: 0 var(--element-pad-x-md);
-    border-radius: var(--element-radius-item-sm);
-    gap: var(--element-inline-sm);
+    padding: 0 var(--pad-x-md);
+    border-radius: var(--button-radius-default);
+    gap: var(--inline-sm);
 
     &.plus-btn--compact {
         height: var(--item-height-sm);
-        padding: 0 var(--element-pad-x-sm);
-        border-radius: var(--element-radius-md);
+        padding: 0 var(--pad-x-sm);
+        border-radius: var(--button-radius-compact);
     }
 
     // An icon-only button is square.
@@ -217,9 +217,9 @@ $btn-appearances: (
     &.plus-btn--vertical {
         width: var(--size-column-xs);
         height: var(--size-column-xs);
-        padding: var(--element-pad-y-sm) var(--element-pad-x-xs);
+        padding: var(--pad-y-sm) var(--pad-x-xs);
         flex-direction: column;
-        gap: var(--element-inline-sm);
+        gap: var(--inline-sm);
 
         .plus-btn-text {
             font: var(--body-small);

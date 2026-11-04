@@ -91,7 +91,7 @@ function ScreenFrame({ screen, sidebar, children }) {
             data-testid={`screen-${screen}-${sidebar ? 'sidebar' : 'nosidebar'}`}
             style={{ '--plus-modal-screen': `${screen}px`, display: 'flex', gap: 'var(--space-100)', width: '100%' }}
         >
-            {sidebar && <div data-sidebar style={{ flex: '0 0 var(--layout-width-sidebar)' }} />}
+            {sidebar && <div data-sidebar style={{ flex: '0 0 var(--frame-sidebar-width)' }} />}
             <div style={{ ...stack, flex: '1 1 0', minWidth: 0, overflow: 'hidden' }}>{children}</div>
         </div>
     );
@@ -169,7 +169,7 @@ function HeightCase({ height, body, title }) {
     );
 }
 
-const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--layout-max-height-modal');
+const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--blanket-max-height-modal');
 const dialogOf = async (canvasElement, title) => (await documentOf(canvasElement).findByText(title)).closest('.plus-modal');
 
 export const HugShort = () => <HeightCase height="hug" body={SHORT} title="Hug, short" />;

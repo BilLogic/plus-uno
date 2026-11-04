@@ -32,7 +32,7 @@
     height: var(--height-250);
     box-sizing: border-box;
     margin: 0;
-    padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
+    padding: 0 calc(var(--pad-x-md) - var(--size-element-border));
     border: var(--size-element-border) solid transparent;
     border-radius: var(--radius-0625);
     background-color: transparent;

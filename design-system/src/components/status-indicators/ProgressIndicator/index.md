@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral-bold` · `--ds-border-focused` · `--ds-icon-inverse` · `--element-inline-md` · `--element-inline-sm` · `--element-stack-sm` · `--plus-progress-indicator-dot-size` · `--size-element-stroke-lg` · `--space-050`
+`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral-bold` · `--ds-border-focused` · `--ds-icon-inverse` · `--inline-md` · `--inline-sm` · `--plus-progress-indicator-dot-size` · `--size-element-stroke-lg` · `--space-050` · `--stack-sm`
 
 From `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss`. Override these through the token layer, never with a literal.
 

@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-shadow-overlay` · `--ds-text-inverse` · `--element-pad-x-sm` · `--layout-z-index-popup` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
+`--body-small` · `--ds-background-neutral-bold` · `--ds-shadow-overlay` · `--ds-text-inverse` · `--layer-popup` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 
