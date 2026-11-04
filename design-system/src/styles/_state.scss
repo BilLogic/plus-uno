@@ -174,6 +174,21 @@
     outline-offset: $ring-offset;
 }
 
+// Resets the browser's own `:focus` outline with no ring of its own — for an
+// element whose ring is drawn elsewhere (Field draws the ring; its nested
+// input only needs the native outline gone) or on a descendant/pseudo-element
+// instead of the rule itself (Range's track, whose ring lives on the thumb).
+// Call on `&:focus` in place of hand-writing `outline: none;`, so the literal
+// text lives here instead of being retyped per component (#1698).
+@mixin plus-ring-reset($important: false) {
+    $bang: null;
+    @if $important {
+        $bang: '!important';
+    }
+    outline: none #{$bang};
+    box-shadow: none #{$bang};
+}
+
 /// Applies a map of CSS declarations as-is; the mixin's own helper, not meant
 /// to be called on its own.
 @mixin plus-state-apply($rules) {

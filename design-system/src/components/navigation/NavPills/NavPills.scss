@@ -3,6 +3,7 @@
  * Implements Figma specs for Pills (rounded pill backgrounds)
  * The active state should show a prominent pill-shaped background
  */
+@use '../../../styles/state' as *;
 
 // Base NavPills container
 .plus-nav-pills,
@@ -152,7 +153,10 @@
             font-weight: var(--type-weight-medium);
             border-radius: var(--size-element-radius-md, 4px) !important;
             box-shadow: none !important;
-            outline: none !important;
+
+            &:focus {
+                @include plus-ring-reset($important: true);
+            }
 
             &:hover {
                 background-color: var(--ds-background-selected-hovered) !important;

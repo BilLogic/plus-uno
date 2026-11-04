@@ -1,6 +1,7 @@
 /*
  * Rich text editor — Figma 10010:37927. Toolbar uses DS Button + ButtonGroup; field uses tokens + body3.
  */
+@use '../../../styles/state' as *;
 
 .plus-rich-text-editor {
     --rte-toolbar-height: calc(
@@ -177,7 +178,7 @@
         }
 
         &:focus {
-            outline: none;
+            @include plus-ring-reset;
         }
 
         &:focus-visible {
@@ -220,7 +221,6 @@
     // 120 at least, growing with what is typed.
     min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
-    outline: none;
     color: var(--color-on-surface);
     background-color: var(--color-surface);
     box-sizing: border-box;
@@ -228,7 +228,7 @@
     font-weight: var(--type-weight-regular);
 
     &:focus {
-        outline: none;
+        @include plus-ring-reset;
     }
 }
 

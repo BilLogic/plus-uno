@@ -5,6 +5,7 @@
  * disabled) are `_Field`'s. This file only lays out what Select puts in the
  * box: the chips, the combobox, the clear × and the caret.
  */
+@use '../../../styles/state' as *;
 
 .plus-select-wrapper {
     width: 100%;
@@ -29,7 +30,10 @@
 .plus-select-combobox {
     flex: 1 1 auto;
     min-width: 0;
-    outline: none;
+
+    &:focus {
+        @include plus-ring-reset;
+    }
 }
 
 // The typed text sits after the last chip, and takes the rest of the line.
