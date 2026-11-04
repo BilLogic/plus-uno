@@ -39,8 +39,14 @@ benchmark for every page, so a name that matches it needs no row.
 
 | Our name | ADS name | Why different |
 | :--- | :--- | :--- |
-| Frame (pattern) | none | The app's outer shell is a PLUS pattern; ADS ships its own layout primitives instead |
-| Page (pattern) | none | The content area inside the Frame, with the page title; PLUS composes it, ADS leaves it to the product |
+| Frame (pattern) | Root | The app's outer shell, the layout's root area that holds the rest |
+| Topbar (pattern) | Top nav | One word, like Sidebar |
+| Sidebar (pattern) | Side nav | One word, like Topbar |
+| Page (pattern) | Main | The content area inside the Frame, with the page title |
+| Right-hand panel | Panel | Planned, not yet built; no PLUS pattern exists for it |
+| Docked | Inline (side nav mode) | We say docked for a sidebar that sits beside the Page and moves it |
+| Peek | Flyout (side nav mode) | We say peek for a closed sidebar shown floating over the Page, which does not move |
+| Resize handle | Splitter | The draggable edge that resizes a side area |
 | Blanket (pattern) | Blanket | Same name; here it also sets the width of what sits on it, in screen-grid columns |
 | Modal (pattern) | none | The pattern is the blanket plus a layer; ADS has only the dialog component |
 | ModalDialog (component) | Modal dialog | Built on the Modal pattern |
