@@ -7,6 +7,7 @@ import '../design-system/src/styles/main.scss';
 // Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
+import { TocDocsContainer } from './docs-toc.jsx';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
@@ -131,6 +132,7 @@ const cleanupFunctions = {
 const preview = {
   parameters: {
     docs: {
+      container: TocDocsContainer,
       toc: {
         title: 'On this page',
         /**
@@ -146,8 +148,14 @@ const preview = {
          * That path ignores CSS `scroll-padding-top` (see storybook-overrides.css). Defaults (±40px)
          * are too small for the preview chrome, so “Layout” stops mid-viewport and scrollspy
          * still marks the previous section active. Match our scroll-padding (6rem ≥768px; 5rem below).
+         *
+         * `collapseDepth: 2` collapses every list nested under an `h2` entry, so `h3` entries show only
+         * under the `h2` the reader is in (Tocbot expands the active entry's list as the reader scrolls
+         * and storybook-overrides.css hides the collapsed ones). Entries that are `h3` at the top level
+         * on `###`-only pages are the root list, which is never collapsed.
          */
         unsafeTocbotOptions: {
+          collapseDepth: 2,
           headingsOffset: 96,
           scrollSmoothOffset: -96,
         },

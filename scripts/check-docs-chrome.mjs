@@ -39,7 +39,7 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chromeFailures, measureScript } from './docs-chrome.mjs';
+import { chromeFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -67,6 +67,12 @@ const PAGES = [
  * here so a fix that simply hides the table cannot pass.
  */
 const WIDTHS = [1140, 468];
+
+/**
+ * The long prose page the "On this page" rail is driven against: 15 h2 entries,
+ * 15 h3, and headings whose component puts no id on the heading itself.
+ */
+const TOC_PAGE = 'foundations-typography--docs';
 
 const args = process.argv.slice(2);
 const report = args.includes('--report');
@@ -146,6 +152,67 @@ process.on('SIGINT', () => {
   process.exit(130);
 });
 
+/**
+ * Clicks a deep h3 entry (opening its section first, as a reader must), then the
+ * last section's entry, and reads where each heading landed.
+ */
+async function measureToc(context, baseUrl) {
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${baseUrl}/iframe.html?viewMode=docs&id=${encodeURIComponent(TOC_PAGE)}`, {
+    waitUntil: 'load',
+  });
+  await page.waitForSelector('.toc-wrapper a.toc-link', { timeout: 60_000 });
+  await page.waitForLoadState('networkidle').catch(() => {});
+  // Tocbot builds the rail ~100ms after mount and the enhancer titles it a frame later.
+  await page.waitForTimeout(500);
+
+  const entry = (text) => page.locator('.toc-wrapper a.toc-link', { hasText: new RegExp(`^${text}$`) });
+  const settle = () => page.waitForTimeout(1800);
+  const read = (label) => page.evaluate(tocMeasureScript(label));
+
+  // A deep entry: the third h3 of the section with the most of them.
+  const plan = await page.evaluate(() => {
+    const tops = [...document.querySelectorAll('.toc-wrapper > ul > li')];
+    if (!tops.length) return null;
+    const best = tops.reduce((a, b) => (b.querySelectorAll('ul a').length > a.querySelectorAll('ul a').length ? b : a), tops[0]);
+    if (!best.querySelector('ul a')) return null;
+    const kids = [...best.querySelectorAll('ul a')];
+    const tops2 = [...document.querySelectorAll('.toc-wrapper > ul > li > a')];
+    return {
+      section: best.querySelector(':scope > a').textContent,
+      deep: (kids[2] ?? kids[kids.length - 1]).textContent,
+      last: tops2[tops2.length - 1].textContent,
+    };
+  });
+  if (!plan) {
+    await page.close();
+    return tocFailures({ page: TOC_PAGE, entries: 0, untitled: [], wrapped: [], clicked: { label: '', top: null, active: null }, strayNested: [], openNested: 0, last: { label: '', top: null, active: null } });
+  }
+  const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const entryOf = (t) => entry(esc(t));
+  await entryOf(plan.section).click();
+  await settle();
+  await entryOf(plan.deep).click();
+  await settle();
+  const clicked = await read(plan.deep);
+  await entryOf(plan.last).click();
+  await settle();
+  const last = await read(plan.last);
+  await page.close();
+
+  return tocFailures({
+    page: TOC_PAGE,
+    entries: clicked.entries,
+    untitled: clicked.untitled,
+    wrapped: clicked.wrapped,
+    clicked: { label: plan.deep, top: clicked.top, active: clicked.active },
+    strayNested: clicked.strayNested,
+    openNested: clicked.openNested,
+    last: { label: plan.last, top: last.top, active: last.active },
+  });
+}
+
 let exitCode = 0;
 const browser = await chromium.launch();
 try {
@@ -183,7 +250,9 @@ try {
 
   if (report) console.log(JSON.stringify(measurements, null, 2));
 
-  const failures = chromeFailures(measurements);
+  const tocProblems = missing.includes(TOC_PAGE) ? [] : await measureToc(context, base);
+
+  const failures = [...chromeFailures(measurements), ...tocProblems];
   if (failures.length) {
     console.error(`[docs-chrome] ${failures.length} problem(s):`);
     for (const f of failures) console.error(`  -> ${f}`);
