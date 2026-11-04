@@ -297,8 +297,10 @@ export const FAMILIES = [
   {
     family: 'surface',
     prefix: '--surface-',
-    what: 'a surface: its color and, separately, its shadow; the surface and surface container pad, stack and radius',
+    what: 'the pre-`--ds-` elevation bridge: a surface\'s color and, separately, its shadow',
   },
+  { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack and radius' },
+  { family: 'frame', prefix: '--frame-', what: 'the Frame: its pad and stack' },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
   { family: 'font-family', prefix: '--font-family-', what: 'font stacks' },
