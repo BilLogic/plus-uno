@@ -298,9 +298,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Checkbox.jsx",
+        "source": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx",
         "storybookId": "components-forms-and-inputs-checkbox--docs"
       },
       "figma": {
@@ -322,9 +322,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/ChoiceGrid.jsx",
+        "source": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx",
         "storybookId": "components-forms-and-inputs-radio-choice-grid--docs",
         "props": {
           "type": {
@@ -535,9 +535,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/FileUpload.jsx",
+        "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
         "storybookId": "components-forms-and-inputs-file-upload--docs"
       },
       "figma": {
@@ -1276,9 +1276,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Radio.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Radio/Radio.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Radio.jsx",
+        "source": "design-system/src/components/forms-and-inputs/Radio/Radio.jsx",
         "storybookId": "components-forms-and-inputs-radio--docs"
       },
       "figma": {
@@ -1300,9 +1300,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Range.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Range/Range.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Range.jsx",
+        "source": "design-system/src/components/forms-and-inputs/Range/Range.jsx",
         "storybookId": "components-forms-and-inputs-range--docs"
       },
       "figma": {
@@ -1324,9 +1324,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Rating.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Rating/Rating.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Rating.jsx",
+        "source": "design-system/src/components/forms-and-inputs/Rating/Rating.jsx",
         "storybookId": "components-forms-and-inputs-rating--docs"
       },
       "figma": {
@@ -1871,9 +1871,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/TagInput.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/TagInput.jsx",
+        "source": "design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx",
         "storybookId": "components-forms-and-inputs-tag-input--docs",
         "props": {
           "spacing": {
@@ -2050,9 +2050,9 @@
       "code": {
         "import": "@/components/forms-and-inputs",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/Toggle.mdx",
+        "mdxPath": "design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/Toggle.jsx",
+        "source": "design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx",
         "storybookId": "components-forms-and-inputs-toggle--docs"
       },
       "figma": {

@@ -13,24 +13,29 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-button-button--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Checkbox.",
+    "design-system/src/components/forms-and-inputs/Calendar/",
+    "Calendar",
+    "components-forms-and-inputs-calendar--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/Checkbox/",
     "Checkbox",
     "components-forms-and-inputs-checkbox--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/ChoiceGrid.",
+    "design-system/src/components/forms-and-inputs/ChoiceGrid/",
     "ChoiceGrid",
     "components-forms-and-inputs-radio-choice-grid--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/ChoiceGroup.",
-    "ChoiceGroup",
-    "components-forms-and-inputs-radio-radio-group--docs"
+    "design-system/src/components/forms-and-inputs/Comment/",
+    "Comment",
+    "components-forms-and-inputs-comment--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DatePicker/",
     "DatePicker",
-    "components-forms-and-inputs-date-picker--docs"
+    "components-forms-and-inputs-date-time-picker-date-picker--docs"
   ],
   [
     "design-system/src/components/forms-and-inputs/DateTimePicker/",
@@ -38,12 +43,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-date-time-picker--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Dropdown/",
-    "Dropdown",
-    "components-forms-and-inputs-dropdown-menu--docs"
-  ],
-  [
-    "design-system/src/components/forms-and-inputs/FileUpload.",
+    "design-system/src/components/forms-and-inputs/FileUpload/",
     "FileUpload",
     "components-forms-and-inputs-file-upload--docs"
   ],
@@ -73,17 +73,17 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-button-link-icon-button--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Radio.",
+    "design-system/src/components/forms-and-inputs/Radio/",
     "Radio",
     "components-forms-and-inputs-radio--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Range.",
+    "design-system/src/components/forms-and-inputs/Range/",
     "Range",
     "components-forms-and-inputs-range--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Rating.",
+    "design-system/src/components/forms-and-inputs/Rating/",
     "Rating",
     "components-forms-and-inputs-rating--docs"
   ],
@@ -93,7 +93,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-rich-text-editor--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/TagInput.",
+    "design-system/src/components/forms-and-inputs/TagInput/",
     "TagInput",
     "components-forms-and-inputs-tag-input--docs"
   ],
@@ -108,7 +108,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-text-field--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/Toggle.",
+    "design-system/src/components/forms-and-inputs/TimePicker/",
+    "TimePicker",
+    "components-forms-and-inputs-date-time-picker-time-picker--docs"
+  ],
+  [
+    "design-system/src/components/forms-and-inputs/Toggle/",
     "Toggle",
     "components-forms-and-inputs-toggle--docs"
   ],
@@ -126,6 +131,16 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/images-and-icons/Illustration/",
     "Illustration",
     "components-images-and-icons-illustrations--docs"
+  ],
+  [
+    "design-system/src/components/images-and-icons/Image/",
+    "Image",
+    "components-images-and-icons-image--docs"
+  ],
+  [
+    "design-system/src/components/images-and-icons/Object/",
+    "Object",
+    "components-images-and-icons-object--docs"
   ],
   [
     "design-system/src/components/images-and-icons/Tile/",
@@ -168,6 +183,16 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-layout-and-structure-carousel--docs"
   ],
   [
+    "design-system/src/components/layout-and-structure/PageHeader/",
+    "PageHeader",
+    "components-layout-and-structure-page-header--docs"
+  ],
+  [
+    "design-system/src/components/layout-and-structure/Panel/",
+    "Panel",
+    "components-layout-and-structure-panel--docs"
+  ],
+  [
     "design-system/src/components/layout-and-structure/ScrollBar/",
     "ScrollBar",
     "components-layout-and-structure-scrollbar--docs"
@@ -188,11 +213,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-loading-spinner--docs"
   ],
   [
-    "design-system/src/components/messaging/Alert/",
-    "Alert",
-    "components-messaging-section-message--docs"
-  ],
-  [
     "design-system/src/components/messaging/Flag/",
     "Flag",
     "components-messaging-flag--docs"
@@ -203,14 +223,29 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-messaging-modal-dialog--docs"
   ],
   [
+    "design-system/src/components/messaging/SectionMessage/",
+    "SectionMessage",
+    "components-messaging-section-message--docs"
+  ],
+  [
+    "design-system/src/components/messaging/Spotlight/",
+    "Spotlight",
+    "components-messaging-spotlight--docs"
+  ],
+  [
     "design-system/src/components/navigation/Breadcrumb/",
     "Breadcrumb",
     "components-navigation-breadcrumbs--docs"
   ],
   [
-    "design-system/src/components/navigation/NavTabs/",
-    "NavTabs",
-    "components-navigation-tabs--docs"
+    "design-system/src/components/navigation/Link/",
+    "Link",
+    "components-navigation-link--docs"
+  ],
+  [
+    "design-system/src/components/navigation/MenuGroup/",
+    "MenuGroup",
+    "components-navigation-menu-group--docs"
   ],
   [
     "design-system/src/components/navigation/Pagination/",
@@ -218,19 +253,24 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-navigation-pagination--docs"
   ],
   [
-    "design-system/src/components/navigation/SidebarTab/",
-    "SidebarTab",
-    "components-navigation-sidebar-tab--docs"
+    "design-system/src/components/navigation/Tabs/",
+    "Tabs",
+    "components-navigation-tabs--docs"
   ],
   [
-    "design-system/src/components/overlays-and-layering/Popover/",
-    "Popover",
+    "design-system/src/components/overlays-and-layering/Popup/",
+    "Popup",
     "components-overlays-and-layering-popup--docs"
   ],
   [
     "design-system/src/components/overlays-and-layering/Tooltip/",
     "Tooltip",
     "components-overlays-and-layering-tooltip--docs"
+  ],
+  [
+    "design-system/src/components/text-and-data-display/Heading/",
+    "Heading",
+    "components-text-and-data-display-heading--docs"
   ],
   [
     "design-system/src/components/text-and-data-display/Table/DynamicTable.stories.",

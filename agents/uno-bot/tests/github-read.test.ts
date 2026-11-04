@@ -146,8 +146,8 @@ test("a component folder listing carries its Storybook docs link too, and a flat
   const dir = (await run({ path: "design-system/src/components/forms-and-inputs/Button" }, deps)) as Result & { storybook?: { url: string } };
   assert.match(dir.storybook?.url ?? "", /components-forms-and-inputs-button-button--docs$/);
 
-  const flat = (await run({ path: "design-system/src/components/forms-and-inputs/Checkbox.stories.jsx" }, fakes())) as Result & { storybook?: { url: string } };
-  assert.match(flat.storybook?.url ?? "", /components-forms-and-inputs-checkbox--docs$/);
+  const flat = (await run({ path: "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.jsx" }, fakes())) as Result & { storybook?: { url: string } };
+  assert.match(flat.storybook?.url ?? "", /components-forms-and-inputs-form--docs$/);
 });
 
 test("no Storybook link for a path outside a component, or for the same path in another repo", async () => {

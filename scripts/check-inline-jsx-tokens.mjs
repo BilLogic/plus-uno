@@ -42,13 +42,11 @@
  *
  * and commit the regenerated file in the same PR. Never edit the JSON by hand.
  */
-import { execFileSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
 /** Repo-relative: this record's key in the shape table, and what the registry row declares. */
@@ -163,13 +161,7 @@ export function measure(sources) {
 
 /** Every tracked, searched file under the roots, read. */
 export function sourcesOf(repoRoot) {
-  return execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], {
-    encoding: 'utf8',
-    maxBuffer: 1 << 28,
-  })
-    .split('\0')
-    .filter((rel) => rel && SEARCHED.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
-    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
+  return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
 }
 
 /** The ratchet's side of a measurement: a plain `key -> count` object in key order. */

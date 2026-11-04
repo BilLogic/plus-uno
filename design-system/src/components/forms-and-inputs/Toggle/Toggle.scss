@@ -1,0 +1,127 @@
+/**
+ * Toggle — a track and a thumb, in a 24 row with the label. Built on Base
+ * UI's Switch: the track is the `role="switch"` span (`.plus-toggle`), and
+ * the thumb is its own span (`.plus-toggle-thumb`), not a pseudo-element.
+ * 16: track 32×16, thumb 12. 20: track 40×20, thumb 16. Pad 2 on both.
+ * Off: neutral bold track. On: selected bold track. The thumb is `icon.inverse`.
+ * Keyboard focus is the state mixin's 2px ring on `border.focused`, 2px off
+ * the track.
+ */
+@use '../../../styles/state' as *;
+
+.plus-toggle-wrapper {
+    --_toggle-track-h: var(--toggle-track-height-16);
+    --_toggle-track-w: var(--toggle-track-width-16);
+    --_toggle-pad: var(--toggle-pad);
+    --_toggle-thumb: calc(var(--_toggle-track-h) - 2 * var(--_toggle-pad));
+
+    display: flex;
+    // The row's text style, which the label and the line box both take.
+    font: var(--body-default);
+    align-items: center;
+    width: 100%;
+    gap: var(--stack-md, 8px);
+
+    // A choice row is 24 (`--item-height-sm`); a bare track with no label
+    // keeps its own, smaller height.
+    &.plus-toggle-row {
+        min-height: var(--item-height-sm);
+    }
+}
+
+.plus-toggle-20 {
+    --_toggle-track-h: var(--toggle-track-height-20);
+    --_toggle-track-w: var(--toggle-track-width-20);
+}
+
+.plus-toggle {
+    width: var(--_toggle-track-w);
+    height: var(--_toggle-track-h);
+    min-width: var(--_toggle-track-w);
+    min-height: var(--_toggle-track-h);
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: var(--radius-full, 999px);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: var(--ds-background-neutral-bold);
+
+    &[data-checked] {
+        background-color: var(--ds-background-selected-bold);
+    }
+
+    // Hover steps the track to its named hovered step — unchecked or
+    // checked, each its own call since the track reads a different token
+    // per position. Disabled keeps one fill for both positions; the thumb
+    // says which.
+    //
+    // Keyboard focus is the ring Checkbox and Radio draw, through the
+    // state mixin: 2px of `border.focused`, 2px off the track. A pointer
+    // focus draws none. The ring sits outside the track, on the page the
+    // track is laid on, not on the track's own fill.
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-bold-hovered)),
+            disabled: (background-color: var(--ds-background-disabled)),
+        ),
+        $hovered-selector: '&:hover:not([data-disabled]):not([data-checked])',
+        $disabled-selector: '&[data-disabled]'
+    );
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
+        ),
+        $ring: false,
+        $hovered-selector: '&[data-checked]:hover:not([data-disabled])'
+    );
+}
+
+.plus-toggle-thumb {
+    position: absolute;
+    top: var(--_toggle-pad);
+    left: var(--_toggle-pad);
+    width: var(--_toggle-thumb);
+    height: var(--_toggle-thumb);
+    border-radius: var(--radius-full, 999px);
+    background-color: var(--ds-icon-inverse);
+    transition: transform 0.2s ease;
+    display: block;
+    pointer-events: none;
+
+    .plus-toggle[data-checked] & {
+        transform: translateX(calc(var(--_toggle-track-w) - var(--_toggle-track-h)));
+    }
+
+    .plus-toggle[data-disabled] & {
+        background-color: var(--ds-icon-disabled);
+    }
+}
+
+.plus-toggle-label {
+    color: var(--ds-text);
+    cursor: pointer;
+    user-select: none;
+    flex: 1;
+    margin: 0;
+    font: var(--body-default);
+    display: flex;
+    align-items: center;
+}
+
+.plus-toggle-disabled {
+    .plus-toggle-label {
+        cursor: not-allowed;
+        opacity: var(--ds-opacity-disabled);
+    }
+}
+
+// Loading: the spinner sits between the track and the label and does not shrink.
+.plus-toggle-spinner {
+    flex-shrink: 0;
+}

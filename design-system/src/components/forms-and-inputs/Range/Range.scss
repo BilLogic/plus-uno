@@ -1,0 +1,130 @@
+/**
+ * Range Component Styles
+ * Implements range input component with all states and sizes
+ * using Design System tokens to match Figma specifications exactly.
+ */
+@use '../../../styles/state' as *;
+
+.plus-form-range-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    // `size`: the dot and bar in px, the track between them a step behind.
+    // Unset keeps the pre-`size` rendering (20 dot, 4 track).
+    &[data-size="8"] {
+        --_range-dot-size: var(--range-dot-size-8);
+        --_range-track-height: var(--range-track-height-4);
+    }
+
+    &[data-size="12"] {
+        --_range-dot-size: var(--range-dot-size-12);
+        --_range-track-height: var(--range-track-height-6);
+    }
+
+    &[data-size="16"] {
+        --_range-dot-size: var(--range-dot-size-16);
+        --_range-track-height: var(--range-track-height-8);
+    }
+}
+
+.plus-form-range-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.plus-form-range-label {
+    margin-bottom: var(--space-025, 4px);
+    color: var(--ds-text);
+    font: var(--body-default);
+}
+
+.plus-form-range {
+    width: 100%;
+}
+
+// The control is 32 (`--item-height-md`); the track draws inside it,
+// centered, so the thumb has room and the hit area is the row.
+.plus-form-range-control {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: var(--item-height-md);
+    cursor: pointer;
+    touch-action: none;
+
+    &[data-disabled] {
+        cursor: not-allowed;
+    }
+}
+
+// The full span, dimmed. The indicator fills the answered portion over it,
+// and the thumb (`position: absolute`, from Base UI) sits relative to this.
+.plus-form-range-track {
+    position: relative;
+    width: 100%;
+    height: var(--_range-track-height, var(--range-track-height-4));
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-neutral);
+
+    [data-disabled] & {
+        background-color: var(--ds-background-disabled);
+    }
+}
+
+// The filled portion, from the start to the thumb. Base UI positions and
+// sizes this inline as the value changes.
+.plus-form-range-indicator {
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-selected-bold);
+
+    [data-disabled] & {
+        background-color: var(--ds-background-disabled);
+    }
+}
+
+// The thumb, 20 across by default (`size` scales dot and track together),
+// centered on the track.
+.plus-form-range-thumb {
+    width: var(--_range-dot-size, var(--range-dot-size-default));
+    height: var(--_range-dot-size, var(--range-dot-size-default));
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-selected-bold);
+    box-shadow: var(--ds-shadow-raised);
+    cursor: pointer;
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
+            disabled: (background-color: var(--ds-icon-disabled), box-shadow: none, cursor: not-allowed),
+        ),
+        $hovered-selector: '&:hover:not([data-disabled])',
+        $disabled-selector: '&[data-disabled]'
+    );
+
+    // Dragging reads the same as hover: the thumb is actively being held.
+    // Keyboard focus is the state mixin's own 2px ring on `border.focused`,
+    // added by the call above (`$ring: true`, its default) — the same ring
+    // Checkbox and Radio draw.
+    &[data-dragging] {
+        background-color: var(--ds-background-selected-bold-hovered);
+    }
+
+    // The real, focusable, `role="slider"` element — Base UI's hidden native
+    // `input[type="range"]` — is the accessible and interactive control
+    // itself (unlike Checkbox and Radio, there is no separate span). Base UI
+    // sizes it inline at 100% of this small thumb box, so `!important`
+    // overrides that inline `width`/`height` to the full 32 control height
+    // instead: a bigger hit and focus target than the visible dot, the same
+    // row the native `<input type="range">` used to be before Base UI.
+    input[type="range"] {
+        width: var(--item-height-md) !important;
+        height: var(--item-height-md) !important;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        cursor: pointer;
+        transform: translate(-50%, -50%);
+    }
+}

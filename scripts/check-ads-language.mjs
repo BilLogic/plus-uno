@@ -16,7 +16,7 @@
  * `_Avoid_:` glossary lines are allowlisted: they record the old words on
  * purpose, as history or as what not to say. `tokens/_elevation.scss` and
  * `tokens/_color_roles.scss` are also allowlisted: they are the legacy
- * `--surface-*`/`--color-surface*` alias chain itself (#268's shadow-or-
+ * `--surface-*`/`--color-surface*` alias chain itself (the shadow-or-
  * lightness decision is still open), not a component using it.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
@@ -61,13 +61,11 @@
  * write is down, and a hand edit can write anything. The count in the diff is
  * the evidence the PR cleaned what it says it cleaned.
  */
-import { execFileSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
 /** Repo-relative: this record's key in the shape table, and what the registry row declares. */
@@ -78,10 +76,10 @@ export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
 /**
  * Files that record the old words on purpose: history, decisions, or — for the
  * two legacy token files below — the alias chain that keeps `--surface-*` and
- * `--color-surface*`/`--color-on-surface*` resolvable while #268's shadow-or-
+ * `--color-surface*`/`--color-on-surface*` resolvable while the shadow-or-
  * lightness decision is still open (`_elevation.scss` "THE ROLE LAYER"). The
  * surface-to-zero sweep (#1755) moved every component off these names; their
- * own definitions are not a component, so they stay until #268 lands.
+ * own definitions are not a component, so they stay while that decision is open.
  */
 const ALLOWED_PATHS = [
   /^docs\/knowledge\/archive\//,
@@ -212,13 +210,7 @@ export function measure(sources) {
 
 /** Every tracked, searched file under the roots, read. */
 export function sourcesOf(repoRoot) {
-  return execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], {
-    encoding: 'utf8',
-    maxBuffer: 1 << 28,
-  })
-    .split('\0')
-    .filter((rel) => rel && SEARCHED.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
-    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
+  return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
 }
 
 /** Rules that allow none: a hit is a finding, whatever the baseline says. */

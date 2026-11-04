@@ -15,11 +15,10 @@
  * default- and named-exports itself (`Button`) gets one `Button` binding, not
  * two.
  *
- * A FLAT `Name.jsx` SIBLING FILE COUNTS TOO, the folder shape's debt in
- * `forms-and-inputs` today (Checkbox, ChoiceGrid, ChoiceGroup, FileUpload,
- * Radio, Range, Rating, TagInput, Toggle) — this script does not sweep that
- * convergence (coding.md § Folder shape), but it cannot drop a real component
- * from the public barrel while it waits. A PascalCase `.jsx` file directly in
+ * A FLAT `Name.jsx` SIBLING FILE COUNTS TOO, the folder shape's debt where
+ * one remains (`Fieldset` in `forms-and-inputs` today) — this script does not
+ * sweep that convergence (coding.md § Folder shape), but it cannot drop a real
+ * component from the public barrel while it waits. A PascalCase `.jsx` file directly in
  * a group, with no folder of the same name, is read exactly like a folder's
  * `index.js` would be. A lowercase file (`choiceItem.jsx`, a private part) or
  * a compound suffix (`.stories.jsx`, `.test.jsx`) is not a component and is
