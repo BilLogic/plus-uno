@@ -3,7 +3,7 @@
 
 # Carousel
 
-Rotates through a set of slides, with controls, indicators, captions, and a pausable autoplay. Hand-rolled: ADS has no equivalent, and there is no Base UI part for it.
+Rotates through a set of slides, with controls, indicators, captions, and a pausable autoplay that stays off under reduced motion. Hand-built: Base UI has no carousel part.
 
 **Import:** `import { Carousel } from '@/components';`
 

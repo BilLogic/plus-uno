@@ -8,7 +8,7 @@
     "hand-hover design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss": 1,
     "hand-hover design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss": 1,
     "hand-hover design-system/src/components/forms-and-inputs/Rating.scss": 1,
-    "hand-hover design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 4,
+    "hand-hover design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 2,
     "hand-hover design-system/src/components/forms-and-inputs/Select/Select.scss": 2,
     "hand-hover design-system/src/components/forms-and-inputs/_internal/Calendar.scss": 2,
     "hand-hover design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": 2,
@@ -33,7 +33,7 @@
     "hand-hover design-system/src/patterns/Sidebar/Sidebar.scss": 2,
     "hand-hover design-system/src/patterns/Sidebar/SidebarTab.scss": 9,
     "hand-pressed design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss": 1,
-    "hand-pressed design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 4,
+    "hand-pressed design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 2,
     "hand-pressed design-system/src/components/forms-and-inputs/_internal/OptionRow.scss": 2,
     "hand-pressed design-system/src/components/labels/Suggestion/Suggestion.scss": 2,
     "hand-pressed design-system/src/components/labels/Tag/Tag.scss": 7,
@@ -50,7 +50,7 @@
     "highlight-ring design-system/src/components/forms-and-inputs/_internal/Listbox.scss": 1,
     "highlight-ring design-system/src/components/forms-and-inputs/_internal/OptionRow.scss": 1,
     "legacy-ring-token design-system/src/components/forms-and-inputs/FileUpload.scss": 1,
-    "legacy-ring-token design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 3,
+    "legacy-ring-token design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 2,
     "legacy-ring-token design-system/src/components/navigation/Pagination/Pagination.scss": 1
   }
 }
