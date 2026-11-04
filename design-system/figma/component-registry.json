@@ -610,7 +610,7 @@
         "import": "@/components/text-and-data-display",
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/Heading/Heading.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Heading",
         "source": "design-system/src/components/text-and-data-display/Heading/Heading.jsx",
         "storybookId": "components-text-and-data-display-heading--docs"
       },
@@ -806,7 +806,7 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/Link/Link.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Link",
         "source": "design-system/src/components/navigation/Link/Link.jsx",
         "storybookId": "components-navigation-link--docs"
       },
@@ -1016,7 +1016,7 @@
         "import": "@/components/navigation",
         "export": "default",
         "mdxPath": "design-system/src/components/navigation/MenuGroup/MenuGroup.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/MenuGroup",
         "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
         "storybookId": "components-navigation-menu-group--docs"
       },
@@ -1173,7 +1173,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/PageHeader",
         "source": "design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx",
         "storybookId": "components-layout-and-structure-page-header--docs"
       },
@@ -1247,7 +1247,7 @@
         "import": "@/components/layout-and-structure",
         "export": "default",
         "mdxPath": "design-system/src/components/layout-and-structure/Panel/Panel.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Panel",
         "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
         "storybookId": "components-layout-and-structure-panel--docs"
       },

@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as LinkStories from './Link.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -19,16 +20,123 @@ export const figmaMeta = {
 <Meta of={LinkStories} />
 
 <Title />
+An inline navigation anchor, for a word or phrase inside running text or a
+sentence of UI copy.
 
 <DocsTabs of={LinkStories}>
 
 <DocsTab tab="examples">
 
-An inline navigation anchor.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/Link"
+/>
 
-<Canvas of={LinkStories.Appearances} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={LinkStories} />
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>`default`, `subtle` and `inverse` appearances.</>}>
+    <Canvas of={LinkStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## New window
+
+<DocsCanvasShell description={<>`isOpenInNewWindow` adds the glyph, appends "(opens in a new tab)" to the accessible name, and defaults `target` to `_blank` with a safe `rel`.</>}>
+    <DsCanvasQuiet of={LinkStories.OpenInNewWindow} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={LinkStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Link` for navigation inside a sentence or a block of text — "see the
+session report," "read more." For a standalone action styled like a button,
+use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
+for a control that stands on its own.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick the appearance for the surface it sits on, not for emphasis.
+
+`default` is for a link on the page's own background, `subtle` for one on a
+muted surface where less contrast reads better, and `inverse` for a link on a
+dark or colored fill. None of the three changes the link's meaning.
+
+### Let `isOpenInNewWindow` manage `target` and `rel` together.
+
+Setting `isOpenInNewWindow` adds the external-link glyph, appends spoken text
+to the accessible name, and defaults `target="_blank"` with
+`rel="noopener noreferrer"` — pass `target`/`rel` directly only when the
+default pairing doesn't fit.
+
+```jsx
+<Link href="/report" isOpenInNewWindow>View the full report</Link>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real anchor.** `Link` renders an `<a>`, reachable with Tab and
+  activated with Enter, with no extra role needed.
+- **New-window links say so.** The glyph is decorative, but the accessible
+  name gains "(opens in a new tab)" through visually hidden text, so a screen
+  reader announces the behavior before it happens.
+- **`children` is required.** A link always needs visible or accessible text
+  — there is no icon-only mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a standalone action styled like a button, use `LinkButton`.
+- For a trail of links showing where a page sits, use `Breadcrumb`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
