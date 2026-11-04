@@ -254,7 +254,7 @@
 @media (forced-colors: active) {
     .plus-option-row.is-highlighted,
     .plus-option-row:focus-visible {
-        @include plus-ring(calc(-1 * var(--focus-ring-width)), Highlight, false, var(--focus-ring-width));
+        @include plus-ring($ring-offset: calc(-1 * var(--focus-ring-width)), $ring-token: Highlight, $ring-width: var(--focus-ring-width));
     }
 
     .plus-option-row.is-selected .plus-option-row-label {

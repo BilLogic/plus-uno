@@ -136,6 +136,6 @@
     }
 
     .plus-calendar-day--in-range {
-        @include plus-ring(0, Highlight, false, 1px, dashed);
+        @include plus-ring($ring-offset: 0, $ring-token: Highlight, $ring-width: 1px, $ring-style: dashed);
     }
 }

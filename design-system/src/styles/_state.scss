@@ -154,12 +154,18 @@
 
 // The ring's own declarations, with no selector of its own — for a control
 // whose ring has to be drawn on a descendant, not on the rule `plus-state` is
-// included in. Range's thumb is the one adopter: the track element itself
+// included in. Range's thumb is one adopter: the track element itself
 // stays un-ringed (`&:focus { @include plus-ring-reset; }`, since there is
 // nothing of its own to ring) and each `::-webkit-slider-thumb` /
-// `::-moz-range-thumb` under `&:focus-visible` includes this instead.
+// `::-moz-range-thumb` under `&:focus-visible` includes this instead. The
+// other is a standalone forced-colors ring (Calendar, Listbox, OptionRow).
+//
+// `$ring-offset` is the outline-offset, and the outline width too unless
+// `$ring-width` is given. Pass `$ring-width` for a ring drawn inside the edge
+// (a negative offset is not a valid width); `$ring-style` is `solid` unless a
+// dashed mark is wanted.
 @mixin plus-ring(
-    $ring-offset: var(--focus-ring-width), /* see plus-state's own $ring-offset, above */
+    $ring-offset: var(--focus-ring-width), /* outline-offset, and the width unless $ring-width is given */
     $ring-token: --ds-border-focused,
     $important: false,
     $ring-width: $ring-offset,
@@ -175,10 +181,6 @@
     outline: $ring-width $ring-style $color #{$bang};
     outline-offset: $ring-offset;
 }
-
-// `$ring-width` and `$ring-style` split the outline's thickness and line from
-// its offset, for a ring drawn inside the edge (a negative `$ring-offset`, which
-// is not a valid width) or a dashed range mark.
 
 // Resets the browser's own `:focus` outline with no ring of its own — for an
 // element whose ring is drawn elsewhere (Field draws the ring; its nested
