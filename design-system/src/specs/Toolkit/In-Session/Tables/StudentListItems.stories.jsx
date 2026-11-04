@@ -31,8 +31,8 @@ A 10-column grid table used to display student information with name, status, pr
 - **Cell padding**: \`--size-table-cell-x\`, \`--size-table-cell-y\`
 - **Cell gap**: \`--size-table-cell-gap\`
 - **Typography**: body3-txt (12px) for cell content, body3-txt semibold for headers
-- **Header text color**: \`--color-primary-text\` (Name column), \`--color-on-surface\` (other columns)
-- **Sort icon**: fa-arrow-up, \`--color-on-surface-variant\`
+- **Header text color**: \`--color-primary-text\` (Name column), \`--ds-text\` (other columns)
+- **Sort icon**: fa-arrow-up, \`--ds-text-subtle\`
                 `
             }
         }
@@ -81,7 +81,7 @@ const SortIcon = () => (
  * - Cell gap: --size-table-cell-gap
  * - Header text: body3-txt semibold
  * - Name header color: --color-primary-text
- * - Other header color: --color-on-surface
+ * - Other header color: --ds-text
  */
 export const ListItemHeaderRow = () => (
     <div
@@ -175,8 +175,8 @@ export const ListItemHeaderRow = () => (
  * - Row radius: --size-table-row-radius
  * - Cell padding: --size-table-cell-x, --size-table-cell-y
  * - Cell gap: --size-table-cell-gap
- * - Hover bg: --color-surface-container
- * - Name text: body3-txt, --color-on-surface
+ * - Hover bg: --ds-surface-container
+ * - Name text: body3-txt, --ds-text
  * - Status badge: danger style
  * - Tags: warning style badges with leading icons
  * - Action: text button (primary ghost) or disabled text

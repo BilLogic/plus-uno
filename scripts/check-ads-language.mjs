@@ -14,7 +14,10 @@
  * walk finds a second copy of the tree under `.claude/worktrees/`), the token
  * files included. `docs/knowledge/archive/`, `docs/adr/` and
  * `_Avoid_:` glossary lines are allowlisted: they record the old words on
- * purpose, as history or as what not to say.
+ * purpose, as history or as what not to say. `tokens/_elevation.scss` and
+ * `tokens/_color_roles.scss` are also allowlisted: they are the legacy
+ * `--surface-*`/`--color-surface*` alias chain itself (#268's shadow-or-
+ * lightness decision is still open), not a component using it.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
  *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
@@ -26,9 +29,17 @@
  *                    `size="small|medium|large|sm|md|lg"`.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
+ *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
+ *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
  *
- * ONE RULE IS NOT A RATCHET. `state-step` allows zero: any hit is a finding,
- * the baseline never holds it, and `--update` never records it.
+ * ONE RULE IS NOT A RATCHET. `state-step`, `token:surface-layout` and
+ * `token:color-surface` allow zero: any hit is a finding, the baseline never
+ * holds it, and `--update` never records it. The other `word:*` rules stay a
+ * ratchet — `surface container` and `scrim` still appear as a Figma-name
+ * citation or as the Blanket pattern's own anatomy ("the Blanket holds the
+ * scrim"), so a blanket ban on the word would rewrite correct prose. Only the
+ * `--surface-*`/`--color-surface*` custom properties have no legitimate
+ * remaining reader, which is what makes them safe to hold at zero.
  *
  * THE RATCHET. The count of a (rule, file) pair may fall and never rise, and a
  * pair the baseline does not hold is a finding. A pair that reaches zero leaves
@@ -60,8 +71,20 @@ export const BASELINE = 'scripts/baselines/ads-language.json';
 
 export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
-/** Files that record the old words on purpose: history, decisions. */
-const ALLOWED_PATHS = [/^docs\/knowledge\/archive\//, /^docs\/adr\//];
+/**
+ * Files that record the old words on purpose: history, decisions, or — for the
+ * two legacy token files below — the alias chain that keeps `--surface-*` and
+ * `--color-surface*`/`--color-on-surface*` resolvable while #268's shadow-or-
+ * lightness decision is still open (`_elevation.scss` "THE ROLE LAYER"). The
+ * surface-to-zero sweep (#1755) moved every component off these names; their
+ * own definitions are not a component, so they stay until #268 lands.
+ */
+const ALLOWED_PATHS = [
+  /^docs\/knowledge\/archive\//,
+  /^docs\/adr\//,
+  /^design-system\/src\/tokens\/_elevation\.scss$/,
+  /^design-system\/src\/tokens\/_color_roles\.scss$/,
+];
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;
 
@@ -87,6 +110,8 @@ const LINE_RULES = [
   ['word:surface-container', /surface container/i],
   ['word:scrim', /\bscrim/i],
   ['word:Rovo', /\bRovo\b/],
+  ['token:surface-layout', /var\(--surface-[a-z-]+\)/i],
+  ['token:color-surface', /var\(--color-(?:on-)?surface(?:-[a-z]+)*\)/i],
 ];
 
 /** An import statement that binds `name`; capture 1 is where it comes from. */
@@ -160,18 +185,26 @@ export function sourcesOf(repoRoot) {
 }
 
 /** Rules that allow none: a hit is a finding, whatever the baseline says. */
-const HARD_RULES = ['state-step'];
+const HARD_RULES = ['state-step', 'token:surface-layout', 'token:color-surface'];
 const isHard = (key) => {
   const rule = key.split(' ')[0];
   return HARD_RULES.includes(rule) || rule.startsWith('stale-name:');
 };
 /** Per-hard-rule reason, keyed by rule name. */
-const HARD_RULE_MESSAGE = new Map(
-  Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
+const HARD_RULE_MESSAGE = new Map([
+  ...Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
     `stale-name:${oldName}`,
     `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,
   ]),
-);
+  [
+    'token:surface-layout',
+    'the surface-to-zero sweep (#1755) moved every component off the legacy `--surface-*` layout tokens; use the `--ds-surface-*` family',
+  ],
+  [
+    'token:color-surface',
+    'the surface-to-zero sweep (#1755) moved every component off `--color-surface*`/`--color-on-surface*`; use `--ds-surface-*`, `--ds-text`/`--ds-text-subtle` or `--ds-icon`/`--ds-icon-subtle`',
+  ],
+]);
 
 /** The ratchet's side of a measurement: a plain `key -> count` object in key order, hard rules left out. */
 const asRecord = (found) =>
