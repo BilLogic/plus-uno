@@ -61,13 +61,11 @@
  * write is down, and a hand edit can write anything. The count in the diff is
  * the evidence the PR cleaned what it says it cleaned.
  */
-import { execFileSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
 /** Repo-relative: this record's key in the shape table, and what the registry row declares. */
@@ -81,7 +79,7 @@ export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
  * `--color-surface*`/`--color-on-surface*` resolvable while #268's shadow-or-
  * lightness decision is still open (`_elevation.scss` "THE ROLE LAYER"). The
  * surface-to-zero sweep (#1755) moved every component off these names; their
- * own definitions are not a component, so they stay until #268 lands.
+ * own definitions are not a component, so they stay for as long as the shadow-or-lightness decision is open.
  */
 const ALLOWED_PATHS = [
   /^docs\/knowledge\/archive\//,
@@ -212,13 +210,7 @@ export function measure(sources) {
 
 /** Every tracked, searched file under the roots, read. */
 export function sourcesOf(repoRoot) {
-  return execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], {
-    encoding: 'utf8',
-    maxBuffer: 1 << 28,
-  })
-    .split('\0')
-    .filter((rel) => rel && SEARCHED.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
-    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
+  return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
 }
 
 /** Rules that allow none: a hit is a finding, whatever the baseline says. */

@@ -24,7 +24,7 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
 ### Sidebar patterns in the current repo
 
 1. **Single entry, MDX-first**
-   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/components/forms-and-inputs/Checkbox.mdx).
+   Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx).
 
 2. **Single entry, merged subcomponent stories**
    Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Example: [`SectionMessage.mdx`](../../../design-system/src/components/messaging/SectionMessage/SectionMessage.mdx).

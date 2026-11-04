@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Modal from '@/components/messaging/Modal/Modal';
 import TextField from '../TextField/TextField';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import '../TagInput.scss';
+import '../TagInput/TagInput.scss';
 import Listbox from './Listbox';
 
 /**

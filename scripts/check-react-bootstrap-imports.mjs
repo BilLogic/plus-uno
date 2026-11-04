@@ -3,7 +3,8 @@
  * `npm run check:react-bootstrap-imports` — the guard on the behavior layer.
  *
  * Base UI is becoming the single behavior layer for every interactive PLUS
- * component (ADR superseding ADR-009, widening ADR-036; #1687). Each family's
+ * component (ADR-037, widening ADR-036 and superseding the Bootstrap-fallback
+ * half of ADR-009; #1687). Each family's
  * gated rebuild drops `react-bootstrap` in favor of Base UI parts or plain
  * markup, and this check holds the line while that migration runs family by
  * family: a file may stop importing `react-bootstrap`, never start.
@@ -29,18 +30,16 @@
  * and commits the regenerated file in the same PR. Never edit the JSON by
  * hand: `--update` refuses to record a rise or a new file.
  *
- * THE HARD BAN. Once the baseline reaches zero, the final sweep (#1646)
- * removes the `react-bootstrap` dependency and this check's ratchet becomes a
+ * THE HARD BAN. Once the baseline reaches zero, the final sweep removes the
+ * `react-bootstrap` dependency and this check's ratchet becomes a
  * floor of zero in every sense that matters: any import is a finding with
  * nothing in the record to excuse it.
  */
-import { execFileSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
 /** Repo-relative: this record's key in the shape table, and what the registry row declares. */
@@ -77,13 +76,7 @@ export function measure(sources) {
 
 /** Every tracked, searched file under the roots, read. */
 export function sourcesOf(repoRoot) {
-  return execFileSync('git', ['-C', repoRoot, 'ls-files', '-z', ...SEARCH_ROOTS], {
-    encoding: 'utf8',
-    maxBuffer: 1 << 28,
-  })
-    .split('\0')
-    .filter((rel) => rel && SEARCHED.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
-    .map((rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') }));
+  return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
 }
 
 /** The ratchet's side of a measurement: a plain `file -> count` object in path order. */
@@ -151,8 +144,8 @@ function record() {
   ratchet.update(found, {
     seed: {
       why:
-        'react-bootstrap import statements, per file, in design-system/src, prototypes and src. Base UI is becoming ' +
-        'the single behavior layer (#1687); a count may fall and never rise, a file that reaches zero leaves the ' +
+        'react-bootstrap import statements, per file, in design-system/src, prototypes and src. Base UI is the single ' +
+        'behavior layer (ADR-037, #1687); a count may fall and never rise, a file that reaches zero leaves the ' +
         'record, and a new file starts at zero. At a baseline of zero the final sweep removes the dependency and ' +
         'this check becomes a hard ban. Regenerate with `npm run check:react-bootstrap-imports -- --update`; never ' +
         'edit by hand.',

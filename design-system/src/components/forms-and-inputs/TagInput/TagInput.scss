@@ -1,0 +1,110 @@
+@use '../../labels/label-heights' as label;
+
+/**
+ * TagInput — the tags and the entry inside `_Field`'s Content slot.
+ *
+ * The box, its border, fill and states are `_Field`'s; the tags are Tag in a
+ * TagGroup, which owns their look. This file arranges the two: one line with
+ * "+n" while the field is at rest, and, with focus, tags that wrap with the
+ * entry inline after the last one, up to three rows before the content scrolls.
+ */
+
+.plus-tag-input {
+    /* Three rows of tags and the two gaps between them. */
+    --plus-tag-input-max-height: calc(3 * #{label.$tag-height} + 2 * var(--stack-md));
+}
+
+.plus-tag-input__anchor {
+    width: 100%;
+}
+
+.plus-tag-input__content {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--stack-md);
+    min-width: 0;
+    width: 100%;
+}
+
+/* At rest: one line. The group takes the room the entry leaves and counts what fits. */
+.plus-tag-input__content--collapsed {
+    flex-wrap: nowrap;
+
+    .plus-tag-input__tags {
+        flex: 1 1 0;
+    }
+
+    &.plus-tag-input__content--has-tags .plus-tag-input__entry {
+        flex: 0 0 auto;
+        width: var(--stack-md);
+    }
+}
+
+/*
+ * With focus: the tags join the content's own flow, so the entry sits after
+ * the last tag and wraps with them.
+ */
+.plus-tag-input__content--expanded {
+    flex-wrap: wrap;
+    max-height: var(--plus-tag-input-max-height);
+    overflow-y: auto;
+
+    .plus-tag-input__tags {
+        display: contents;
+    }
+
+    .plus-tag-input__entry {
+        flex: 1 0 8ch;
+    }
+}
+
+/* The entry's line is a tag's height, so a field with tags is as tall as one without. */
+.plus-tag-input__entry {
+    min-height: label.$tag-height;
+}
+
+/* The handle drawn on every option row while the list can be reordered. */
+.plus-tag-input__grip-mark {
+    color: var(--ds-icon-subtle);
+
+    /* Under the handle button, which draws the same mark. */
+    &.is-covered {
+        visibility: hidden;
+    }
+}
+
+/* The highlighted row's handle and "…", laid over the row by the Listbox. */
+.plus-tag-input__grip {
+    cursor: grab;
+    touch-action: none;
+}
+
+.plus-tag-input__more {
+    margin-left: auto;
+}
+
+/*
+ * The option menu (Figma _Option menu): 240 wide, and as tall as its rows —
+ * Delete and the ten colors fit without the list's scroll.
+ */
+.plus-listbox.plus-tag-input__menu {
+    --plus-listbox-max-height: none;
+
+    width: var(--option-menu-width);
+}
+
+/* The name field in the header, and Delete set off from the colors. */
+.plus-tag-input__rename {
+    padding: var(--space-025) var(--pad-x-sm);
+}
+
+.plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
+    border-top: var(--border-default) solid var(--ds-border);
+}
+
+.plus-tag-input__hint {
+    padding: var(--space-025) var(--pad-x-md);
+    color: var(--ds-text-subtle);
+    font: var(--body-small);
+}
