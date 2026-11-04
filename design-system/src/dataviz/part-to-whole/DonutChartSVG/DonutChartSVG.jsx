@@ -84,7 +84,7 @@ const DonutChartSVG = ({
                             fill={path.fill}
                             style={{
                                 cursor: hasTooltip ? 'pointer' : 'default',
-                                opacity: hoveredIndex !== null && hoveredIndex !== index ? 0.6 : 1,
+                                opacity: hoveredIndex !== null && hoveredIndex !== index ? 'var(--ds-opacity-disabled)' : 1,
                                 transition: 'opacity 0.2s ease'
                             }}
                             onMouseEnter={() => {
@@ -105,12 +105,12 @@ const DonutChartSVG = ({
                         transform: 'translate(-50%, -100%)',
                         backgroundColor: 'var(--ds-text)',
                         color: 'var(--ds-text-inverse)',
-                        padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-default, 8px)',
+                        padding: 'var(--size-element-pad-y-sm, 4px) var(--pad-x-sm, 8px)',
                         borderRadius: 'var(--size-element-radius-sm, 4px)',
                         fontSize: 'var(--font-size-body3, 12px)',
                         fontFamily: 'var(--font-family-body)',
                         pointerEvents: 'none',
-                        zIndex: 'var(--layout-z-index-tooltip)',
+                        zIndex: 'var(--layer-tooltip)',
                         whiteSpace: 'nowrap',
                         boxShadow: 'var(--ds-shadow-overlay)',
                         textAlign: 'center'
