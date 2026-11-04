@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { Card, Dropdown, Modal, Popup, Table, Flag } from '@/components';
-import { PatternCard, PatternSection, Surface } from '@/patterns';
+import { PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
@@ -41,13 +41,13 @@ const headingNamed = (canvas, level, name) => canvas.getByRole('heading', { leve
 
 /** A page, a section in it, and a subsection in that, each one size smaller. */
 export const PageSectionSubsection = () => (
-    <Surface title="Sessions">
+    <Page title="Sessions">
         <PatternSection title="This week" description="Every session you tutor from Monday to Sunday.">
             <PatternSection title="Monday">
                 <p>Two sessions.</p>
             </PatternSection>
         </PatternSection>
-    </Surface>
+    </Page>
 );
 
 PageSectionSubsection.play = async ({ canvasElement }) => {
@@ -64,7 +64,7 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
  * and PatternCard share the one card title type.
  */
 export const CardTitles = () => (
-    <Surface title="Sessions">
+    <Page title="Sessions">
         <PatternSection title="This week">
             <Card title="Algebra I" subtitle="Two students" body="Thursday at 4:00 PM." />
             <PatternSection title="Monday">
@@ -72,7 +72,7 @@ export const CardTitles = () => (
                 <PatternCard title="Chemistry" description="Three students" />
             </PatternSection>
         </PatternSection>
-    </Surface>
+    </Page>
 );
 
 CardTitles.play = async ({ canvasElement }) => {

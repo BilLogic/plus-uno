@@ -20,7 +20,7 @@ import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, TextField, TextArea } from '@/components';
 import { PatternDrawer, PatternSection } from '@/patterns';
-import { SURFACE_EDGE } from '@/patterns/Surface';
+import { PAGE_EDGE } from '@/patterns/Page';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { setTestViewport, withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -431,7 +431,7 @@ export const FocusedColorModes = {
         await inEveryColorMode(async (mode) => {
             await expect(getComputedStyle(frame).backgroundColor, `${mode}: the frame is sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
             await expect(getComputedStyle(surface).backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
-            await expect(getComputedStyle(surface).boxShadow, `${mode}: the surface edge`).toBe(computedShadow(canvasElement, SURFACE_EDGE));
+            await expect(getComputedStyle(surface).boxShadow, `${mode}: the surface edge`).toBe(computedShadow(canvasElement, PAGE_EDGE));
             await expect(getComputedStyle(title).color, `${mode}: the title`).toBe(tokenColor(canvasElement, '--ds-text'));
             if (mode.startsWith('dark')) {
                 await expect(getComputedStyle(frame).backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);

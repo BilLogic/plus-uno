@@ -274,11 +274,11 @@ Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal
 | `design-system/src/components/labels/CountTag/CountTag.scss` | 3 |
 | `design-system/src/components/labels/Tag/Tag.stories.jsx` | 3 |
 | `design-system/src/components/navigation/Navbar/Navbar.scss` | 3 |
+| `design-system/src/patterns/Page/Page.stories.jsx` | 3 |
 | `design-system/src/patterns/PatternDrawer/PatternDrawer.stories.jsx` | 3 |
 | `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` | 3 |
 | `design-system/src/patterns/PatternSection/PatternSectionCases.jsx` | 3 |
 | `design-system/src/patterns/Sidebar/Sidebar.scss` | 3 |
-| `design-system/src/patterns/Surface/Surface.stories.jsx` | 3 |
 | `design-system/src/specs/Admin/Session/Pages/SessionAdminPage/SessionAdminPage.scss` | 3 |
 | `design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.scss` | 3 |
 | `design-system/src/specs/Home/Cards/MetricsCard/MetricsCard.scss` | 3 |
@@ -338,8 +338,8 @@ Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal
 | `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss` | 2 |
 | `design-system/src/dataviz/part-to-whole/DonutChartSVG/DonutChartSVG.jsx` | 2 |
 | `design-system/src/patterns/HeadingOutline.stories.jsx` | 2 |
+| `design-system/src/patterns/Page/Page.scss` | 2 |
 | `design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx` | 2 |
-| `design-system/src/patterns/Surface/Surface.scss` | 2 |
 | `design-system/src/specs/Admin/Session/Modals/SessionModal/SessionModal.scss` | 2 |
 | `design-system/src/specs/Admin/Tutor/Pages/TutorPerformancePage/TutorPerformancePage.scss` | 2 |
 | `design-system/src/specs/Home/Elements/CardBadges/CardBadges.scss` | 2 |
