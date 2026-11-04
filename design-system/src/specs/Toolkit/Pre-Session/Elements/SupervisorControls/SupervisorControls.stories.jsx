@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu/DropdownMenu';
-import { ButtonItem } from '@/components/navigation/MenuGroup';
+import { DropdownMenu, ButtonItem } from '@/components';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Controls',

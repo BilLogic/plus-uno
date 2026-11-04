@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, DropdownMenu, TextField, Popup } from '@/components';
-import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
+import { Button, DropdownMenu, TextField, Popup, ButtonItem, Section } from '@/components';
+
 
 /**
  * Live compositions for the Popover family page's do and don't pairs. The

@@ -70,6 +70,11 @@ const DropdownMenu = ({
         // leaves `aria-expanded` to the caller, since it only knows this
         // trigger's open state as a `data-popup-open` attribute.
         'aria-expanded': open,
+        // A `Button` trigger (Atlassian's default pattern: Button + chevron)
+        // shows selected while the menu is open; `isSelected` is a custom
+        // prop a plain DOM element (`button`, `a`, ...) would warn on, so it
+        // is only passed to a component trigger.
+        ...(typeof trigger.type !== 'string' ? { isSelected: open } : {}),
         ref: (node) => {
             triggerNodeRef.current = node;
             if (typeof ownRef === 'function') ownRef(node);

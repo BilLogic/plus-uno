@@ -30,11 +30,23 @@ const basicMenu = (
 
 export const Overview = () => (
     <div style={{ padding: '100px 24px 160px' }}>
-        <DropdownMenu trigger={<Button>Dropdown</Button>}>
+        <DropdownMenu trigger={<Button text="Dropdown" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
             {basicMenu}
         </DropdownMenu>
     </div>
 );
+
+Overview.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: 'Dropdown' });
+
+    // The default pattern (Button + chevron) shows selected while open.
+    await expect(toggle).not.toHaveClass('plus-btn--selected');
+    await userEvent.click(toggle);
+    await waitFor(() => expect(toggle).toHaveClass('plus-btn--selected'));
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(toggle).not.toHaveClass('plus-btn--selected'));
+};
 
 export const Placements = () => (
     <div style={{ display: 'flex', gap: '48px', padding: '100px 24px 240px' }}>
@@ -60,6 +72,20 @@ export const Spacing = () => (
         </DropdownMenu>
     </div>
 );
+
+Spacing.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Cozy' }));
+    const cozyRow = await body.findByRole('menuitem', { name: 'Action' });
+    await expect(Math.round(cozyRow.getBoundingClientRect().height), 'cozy rows are 40').toBe(40);
+    await userEvent.keyboard('{Escape}');
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
+    const compactRow = await body.findByRole('menuitem', { name: 'Action' });
+    await expect(Math.round(compactRow.getBoundingClientRect().height), 'compact rows are 32').toBe(32);
+};
 
 export const WithSections = () => (
     <div style={{ padding: '24px 24px 280px' }}>

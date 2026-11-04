@@ -1,9 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Button, IconButton } from '@/components';
+import { Button, IconButton, DropdownMenu, ButtonItem } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
-import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
-import { ButtonItem } from '@/components/navigation/MenuGroup';
 import './SessionControlsConsolidated.scss';
 
 /**

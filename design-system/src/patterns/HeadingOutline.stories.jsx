@@ -1,8 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { DropdownMenu, Modal, Popup, Table, Flag } from '@/components';
-import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
+import { DropdownMenu, Modal, Popup, Table, Flag, ButtonItem, Section } from '@/components';
 import { PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
