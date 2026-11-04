@@ -24,8 +24,8 @@
           {
             "id": "accordion",
             "name": "accordion",
-            "componentSetNodeId": "13667:6004",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13667-6004",
+            "componentSetNodeId": "20095:6341",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6341",
             "source": "node-chart",
             "status": "verified"
           }
@@ -65,15 +65,15 @@
           {
             "id": "ai-label",
             "name": "AI label",
-            "componentSetNodeId": "17560:1166",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166",
+            "componentSetNodeId": "20094:1214",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
             "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214"
       }
     },
     "Avatar": {
@@ -168,8 +168,8 @@
           {
             "id": "breadcrumb",
             "name": "Breadcrumb",
-            "componentSetNodeId": "27:618",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=27-618",
+            "componentSetNodeId": "20095:11156",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11156",
             "source": "node-chart",
             "status": "verified"
           }
@@ -284,9 +284,9 @@
           {
             "id": "carousel",
             "name": "Carousel",
-            "componentSetNodeId": "34:7879",
+            "componentSetNodeId": "20095:6756",
             "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=34-7879",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6756",
             "source": "node-chart",
             "status": "verified"
           }
@@ -309,8 +309,8 @@
           {
             "id": "form-checkbox",
             "name": "Form Checkbox",
-            "componentSetNodeId": "42:5857",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5857",
+            "componentSetNodeId": "20328:63229",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-63229",
             "source": "node-chart",
             "status": "verified"
           }
@@ -342,8 +342,8 @@
           {
             "id": "choice-grid",
             "name": "Choice Grid",
-            "componentSetNodeId": "13541:9229",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13541-9229",
+            "componentSetNodeId": "20009:69129",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-69129",
             "source": "node-chart",
             "status": "verified",
             "verifiedAt": "2026-10-15",
@@ -424,8 +424,8 @@
           {
             "id": "count-tag",
             "name": "Count tag",
-            "componentSetNodeId": "17876:46653",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17876-46653",
+            "componentSetNodeId": "20095:199",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-199",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
@@ -570,8 +570,8 @@
           {
             "id": "flag",
             "name": "Flag",
-            "componentSetNodeId": "44:4803",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4803",
+            "componentSetNodeId": "20095:8275",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8275",
             "source": "node-chart",
             "status": "verified"
           }
@@ -784,16 +784,16 @@
           {
             "id": "label",
             "name": "Label",
-            "componentSetNodeId": "14851:17069",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14851-17069",
+            "componentSetNodeId": "20319:246",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20319-246",
             "source": "node-chart",
             "status": "verified"
           },
           {
             "id": "form-caption",
             "name": "_Form Caption",
-            "componentSetNodeId": "13726:9599",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13726-9599",
+            "componentSetNodeId": "20002:68",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20002-68",
             "source": "node-chart",
             "status": "verified"
           }
@@ -965,8 +965,8 @@
           {
             "id": "logo",
             "name": "Logo",
-            "componentSetNodeId": "1133:12915",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=1133-12915",
+            "componentSetNodeId": "20094:332",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-332",
             "variantProps": {
               "style": "style",
               "size": "size",
@@ -1191,8 +1191,8 @@
           {
             "id": "pagination",
             "name": "Pagination",
-            "componentSetNodeId": "53:19822",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-19822",
+            "componentSetNodeId": "20095:11283",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11283",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1263,13 +1263,13 @@
           {
             "id": "progress-bar",
             "name": "Progress Bar",
-            "componentSetNodeId": "49:6872",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872",
+            "componentSetNodeId": "20095:7725",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7725",
             "source": "node-chart",
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-6872"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7725"
       }
     },
     "Radio": {
@@ -1287,8 +1287,8 @@
           {
             "id": "form-radio-button",
             "name": "Form Radio Button",
-            "componentSetNodeId": "42:5858",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5858",
+            "componentSetNodeId": "20328:77556",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-77556",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1311,8 +1311,8 @@
           {
             "id": "form-range-input",
             "name": "Form Range Input",
-            "componentSetNodeId": "42:5756",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-5756",
+            "componentSetNodeId": "20003:1536",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-1536",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1335,20 +1335,10 @@
           {
             "id": "rating-system-disclosure",
             "name": "Rating System (disclosure)",
-            "componentSetNodeId": "13526:17774",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13526-17774",
+            "componentSetNodeId": "20003:2230",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20003-2230",
             "source": "node-chart",
             "status": "verified"
-          },
-          {
-            "id": "rating-system-with-text",
-            "name": "Rating System (with text)",
-            "componentSetNodeId": "13536:195",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13536-195",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Was 13536:196, which resolves to nothing in the file. A plain COMPONENT, not a set. Re-read from the Rating page 2026-08-29."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
@@ -1369,8 +1359,8 @@
           {
             "id": "rich-text-editor",
             "name": "Rich Text Editor",
-            "componentSetNodeId": "18729:36579",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18729-36579",
+            "componentSetNodeId": "20009:85516",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-85516",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1393,9 +1383,9 @@
           {
             "id": "scrollbar",
             "name": "Scrollbar",
-            "componentSetNodeId": "39:5070",
+            "componentSetNodeId": "20095:7615",
             "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=39-5070",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7615",
             "source": "designer-supplied",
             "status": "verified",
             "notes": "Single component, not a variant set — no variant props to map."
@@ -1419,8 +1409,8 @@
           {
             "id": "alert",
             "name": "alert",
-            "componentSetNodeId": "11:324",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
+            "componentSetNodeId": "20095:8471",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8471",
             "source": "node-chart",
             "status": "verified"
           }
@@ -1504,8 +1494,8 @@
           {
             "id": "skeleton",
             "name": "Skeleton",
-            "componentSetNodeId": "17878:1851",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1851",
+            "componentSetNodeId": "20095:8179",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8179",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
@@ -1578,37 +1568,37 @@
           {
             "id": "spinner-animation",
             "name": "Spinner",
-            "componentSetNodeId": "44:4872",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872",
+            "componentSetNodeId": "20095:7956",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7956",
             "source": "node-chart",
             "status": "verified"
           },
           {
             "id": "loading-animations-1-growing",
             "name": "Spinner Growing",
-            "componentSetNodeId": "9296:3061",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9296-3061",
+            "componentSetNodeId": "20095:7980",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7980",
             "source": "node-chart",
             "status": "verified"
           },
           {
             "id": "loading-animations-2-rotating",
             "name": "Spinner Rotating",
-            "componentSetNodeId": "9297:3104",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3104",
+            "componentSetNodeId": "20095:8020",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8020",
             "source": "node-chart",
             "status": "verified"
           },
           {
             "id": "loading-animations-3-stacking",
             "name": "Spinner Stacking",
-            "componentSetNodeId": "9297:3156",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9297-3156",
+            "componentSetNodeId": "20095:8078",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8078",
             "source": "node-chart",
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=44-4872"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7956"
       }
     },
     "Spotlight": {
@@ -1722,8 +1712,8 @@
           {
             "id": "suggestion",
             "name": "Suggestion",
-            "componentSetNodeId": "17878:1769",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1769",
+            "componentSetNodeId": "20094:1242",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1242",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
@@ -1817,8 +1807,8 @@
           {
             "id": "tag",
             "name": "Tag",
-            "componentSetNodeId": "17877:47506",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17877-47506",
+            "componentSetNodeId": "20095:299",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-299",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
@@ -1867,8 +1857,8 @@
           {
             "id": "tag-group",
             "name": "TagGroup",
-            "componentSetNodeId": "17878:1713",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1713",
+            "componentSetNodeId": "20095:1896",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-1896",
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
@@ -1908,8 +1898,8 @@
           {
             "id": "tag-input",
             "name": "TagInput",
-            "componentSetNodeId": "18233:48345",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345",
+            "componentSetNodeId": "20009:58780",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-58780",
             "source": "manual",
             "status": "unpublished",
             "isComponentSet": true,
@@ -1918,15 +1908,15 @@
           {
             "id": "option-menu",
             "name": "_Option menu",
-            "componentSetNodeId": "19150:44293",
+            "componentSetNodeId": "20009:58762",
             "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19150-44293",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-58762",
             "source": "manual",
             "status": "unpublished",
             "notes": "The menu a TagInput row's \"…\" opens: a `_Listbox` whose Header holds a small field for the name, the Figma Form (code: `TextField spacing=\"compact\"`, Enter renames, Esc cancels), and whose Body holds Dropdown list Item rows: Delete with a trash icon and a divider, then a Color heading and one row per Tag color showing the Tag, the current one `state=selected`. It opens 4px under the \"…\", right-aligned to it. Each part shows only when its handler is passed."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18233-48345"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-58780"
       }
     },
     "TextArea": {
@@ -2072,8 +2062,8 @@
           {
             "id": "form-switch-button",
             "name": "Form Switch Button",
-            "componentSetNodeId": "82:16570",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=82-16570",
+            "componentSetNodeId": "20328:89241",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-89241",
             "source": "node-chart",
             "status": "verified"
           }
