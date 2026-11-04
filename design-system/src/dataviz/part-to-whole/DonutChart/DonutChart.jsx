@@ -26,15 +26,15 @@ const DonutChart = ({
         name: segment.label || 'Segment'
     })), [segments]);
 
-    // Get font size value for the center text using Figma semantic tokens
+    // Get font size value for the center text using the type ladder
     const getFontSize = () => {
         const sizeMap = {
-            'h1': 'var(--font-size-title-l, 48px)',      // Title/L
-            'h2': 'var(--font-size-title-m1, 36px)',     // Title/M1
-            'h3': 'var(--font-size-title-m2, 32px)',     // Title/M2
-            'h4': 'var(--font-size-title-m4, 24px)',     // Title/M4 (Metric Cards)
-            'h5': 'var(--font-size-title-s, 20px)',      // Title/S
-            'body3': 'var(--font-size-body3)'      // Body3
+            'h1': 'var(--font-size-h1)',
+            'h2': 'var(--font-size-h2)',
+            'h3': 'var(--font-size-h3)',
+            'h4': 'var(--font-size-h4)',
+            'h5': 'var(--font-size-h5)',
+            'body3': 'var(--font-size-body3)'
         };
         return sizeMap[centerTextSize] || sizeMap['h4'];
     };
@@ -45,13 +45,12 @@ const DonutChart = ({
     };
 
     const getLineHeight = () => {
-        // Semantic line heights from Figma
         const lineHeightMap = {
-            'h1': 'var(--font-line-height-title, 1.2)',
-            'h2': 'var(--font-line-height-title, 1.2)',
-            'h3': 'var(--font-line-height-title, 1.2)',
-            'h4': 'var(--font-line-height-title, 1.2)',
-            'h5': 'var(--font-line-height-title, 1.2)',
+            'h1': 'var(--font-line-height-h1)',
+            'h2': 'var(--font-line-height-h2)',
+            'h3': 'var(--font-line-height-h3)',
+            'h4': 'var(--font-line-height-h4)',
+            'h5': 'var(--font-line-height-h5)',
             'body3': 'var(--font-line-height-body3)'
         };
         return lineHeightMap[centerTextSize] || lineHeightMap['h4'];

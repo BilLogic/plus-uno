@@ -23,7 +23,7 @@ const ParliamentChart = ({
         title: { text: null },
         legend: {
             enabled: true,
-            labelFormat: '{name} <span style="opacity: var(--ds-opacity-disabled)">{y}</span>'
+            labelFormat: '{name} <span style="color: var(--ds-text-subtle)">{y}</span>'
         },
         series: [{
             name: 'Representatives',
