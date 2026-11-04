@@ -124,7 +124,7 @@ const prose = (over = {}) => ({
   label: 'p 0: Buttons are interactive',
   fontFamily: '"Noto Sans", "Noto Sans Fallback", sans-serif',
   fontSize: '16px',
-  color: 'rgb(25, 28, 30)',
+  color: 'rgb(44, 44, 43)',
   measure: 74,
   ...over,
 });
