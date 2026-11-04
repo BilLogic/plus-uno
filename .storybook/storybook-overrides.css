@@ -155,11 +155,11 @@ body,
  * before that, unmeasured, because no story had rendered enough of them to be
  * noticed.
  *
- * `--color-secondary` measures 6.70:1 and carries no meaning that code should
- * not have. The near-hue alternative, `--color-relationship` (5.34:1), was
- * rejected on purpose: it is a curriculum-domain color, and painting literals
- * in it would say a code span IS that domain — the same borrowed-meaning
- * mistake #269 argues against for the AI palette.
+ * `--ds-text-subtle` is a neutral that clears AA on the docs ground in both color
+ * modes and carries no meaning that code should not have. A curriculum-domain
+ * color was rejected on purpose: painting code spans in one would say a code
+ * span IS that domain — the same borrowed-meaning mistake #269 argues against
+ * for the AI palette.
  */
 .sbdocs code,
 .sbdocs pre {
@@ -312,7 +312,7 @@ a.sbdocs-a {
 }
 
 .sbdocs a:hover {
-    color: var(--ds-link) !important;
+    color: var(--ds-link-pressed) !important;
 }
 
 /*
@@ -394,7 +394,7 @@ a.sbdocs-a {
 .sbdocs .sb-plus-intro-page .sb-ds-doc-section {
   margin-top: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
   margin-bottom: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
-  gap: 0.875rem;
+  gap: var(--space-0875);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
@@ -444,7 +444,7 @@ a.sbdocs-a {
   border: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
   border-radius: var(--card-radius-sm);
   background: color-mix(in srgb, var(--ds-surface-sunken) 28%, transparent);
-  padding: 0.875rem;
+  padding: var(--space-0875);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
@@ -597,7 +597,7 @@ a.sbdocs-a {
   width: 100%;
   margin: 0 !important;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13px; /* props-table code sits between --font-size-075 and --font-size-0875 */
   line-height: 1.45;
   color: var(--ds-text);
 }
@@ -1122,7 +1122,7 @@ a.sbdocs-a {
 
 .sb-ds-docs-tabs__tab--active {
     color: var(--ds-link);
-    border-bottom-color: var(--ds-link);
+    border-bottom-color: var(--ds-border-selected);
 }
 
 /* The panel is focusable so keyboard users land in the content they just chose;
@@ -1132,7 +1132,7 @@ a.sbdocs-a {
 }
 
 .sb-ds-docs-tabs__panel:focus-visible {
-    outline: var(--stroke-2) solid var(--ds-link);
+    outline: var(--stroke-2) solid var(--ds-border-focused);
     outline-offset: var(--stack-sm);
 }
 

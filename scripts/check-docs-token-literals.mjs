@@ -390,9 +390,10 @@ export function findings(source, index) {
 
 /** Retired names, as consumed through `var()`. Definitions (Tailwind's `@theme`) are not uses. */
 export const OLD_VOCABULARY =
-  /var\(\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-(?:size|family|weight|line-height)-(?:body\d|h\d|headline|header|code|title|normal|bold|medium|semibold-\d))/g;
+  /var\(\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-line-height-[a-z0-9-]+|--font-(?:size|family|weight)-(?:body\d|h\d|headline|header|code|title|normal|bold|medium|semibold-\d))/g;
 const CHROME_HEX_CSS = /#[0-9a-f]{3,8}\b/gi;
-const CHROME_HEX_STRING = /(['"`])#[0-9a-f]{3,8}\1/gi;
+/** In a component a hex is a literal anywhere in a string or class (`bg-[#fff]`, `1px solid #ccc`); `href="#add"` has no digit-or-hex run of 3+ ending at a word edge after a quote or space only. */
+const CHROME_HEX_STRING = /(?:['"`\s\[(])#(?=[0-9a-f]*\d)[0-9a-f]{3,8}\b/gi;
 
 /** Block comments and whole-line `//` comments, blanked to spaces so lines keep their numbers. */
 export function blankProse(source) {
@@ -420,7 +421,7 @@ const chromeFiles = (repoRoot) =>
   ['.storybook', 'design-system/src/storybook-docs']
     .flatMap((dir) => documents(dir, { root: repoRoot, ext: CHROME_EXT }))
     .filter((rel) => !/\.storybook\/(manager|preview)\.jsx?$/.test(rel))
-    .filter((rel) => !/storybook-docs\/lib\//.test(rel))
+    .filter((rel) => !/storybook-docs\/lib\/contrast\.js$/.test(rel))
     .map((rel) => path.join(repoRoot, rel));
 
 // ── the runner ──────────────────────────────────────────────────────────────
@@ -500,7 +501,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
   for (const file of chromeFiles(repoRoot)) {
     const isCss = file.endsWith('.css');
-    for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), { css: isCss })) {
+    // MDX prose says `#167`; its component styles are the .jsx beside it, where hex is scanned.
+    const skipHex = file.endsWith('.mdx');
+    for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), { css: isCss || file.endsWith('.html') })) {
+      if (skipHex && f.kind === 'hex') continue;
       found.push({
         file: path.relative(repoRoot, file),
         line: f.line,

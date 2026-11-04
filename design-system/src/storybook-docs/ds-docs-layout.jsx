@@ -40,18 +40,18 @@ export function ResourcesCard({ href, icon, title, description }) {
             href={href || '#'} 
             target={isExternalLink ? "_blank" : undefined}
             rel={isExternalLink ? "noreferrer noopener" : undefined}
-            className="group block p-4 border border-border bg-surface shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
+            className="group block p-4 border border-border bg-card shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
             style={{
                 width: '200px',
                 textDecoration: 'none',
                 borderRadius: 'var(--card-radius-sm)',
             }}
         >
-            <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-on-surface-variant opacity-50 text-sm group-hover:text-primary transition-colors"></i>
+            <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-muted-foreground opacity-50 text-sm group-hover:text-primary transition-colors"></i>
             <div className="mb-3 flex justify-start ml-[-2px]">
                 {icon}
             </div>
-            <strong className="text-[15px] leading-tight text-on-surface font-semibold m-0 p-0 block">{title}</strong>
+            <strong className="text-[15px] leading-tight text-foreground font-semibold m-0 p-0 block">{title}</strong>
         </a>
     );
 }
@@ -125,7 +125,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                 Figma nodes
             </div>
             <div
-                className="overflow-hidden bg-surface"
+                className="overflow-hidden bg-card"
                 style={{
                     borderRadius: 'var(--card-radius-sm)',
                     // The frame draws the same line as the cells inside it, so
@@ -139,7 +139,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                 }}
             >
                 <table
-                    className="text-on-surface"
+                    className="text-foreground"
                     style={{
                         margin: 0,
                         width: '100%',
@@ -170,11 +170,11 @@ export function FigmaNodesTable({ sets, fileKey }) {
                             const rowCell = isLast ? { ...cellStyle, borderBottom: 'none' } : cellStyle;
                             return (
                                 <tr key={set.id || nodeId || index}>
-                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-on-surface">
+                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-foreground">
                                         {set.name || set.id || '—'}
                                     </td>
                                     <td style={{ ...rowCell, ...dividerRight, whiteSpace: 'nowrap' }}>
-                                        <code style={{ fontSize: '12px' }} className="text-on-surface-variant">{nodeId}</code>
+                                        <code style={{ fontSize: '12px' }} className="text-muted-foreground">{nodeId}</code>
                                     </td>
                                     <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
                                         {href ? (
@@ -189,7 +189,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                                                 <i className="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                                             </a>
                                         ) : (
-                                            <span className="text-on-surface-variant">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </td>
                                 </tr>
@@ -350,7 +350,7 @@ export function DoDontCard({ tone, children, caption }) {
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                borderRadius: 'var(--card-radius, 16px)',
+                borderRadius: 'var(--card-radius)',
                 backgroundColor: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
             }}

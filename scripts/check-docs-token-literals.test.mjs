@@ -310,7 +310,7 @@ test('chrome 2b. green twin: the current vocabulary, and a definition that is no
 });
 
 test('chrome 3. a hex string in a component is caught; an anchor like "#top" is not', () => {
-  assert.deepEqual(chromeFindings("const c = '#0472a8';", { css: false }).map((f) => f.literal), ["'#0472a8'"]);
+  assert.deepEqual(chromeFindings("const c = '#0472a8';", { css: false }).map((f) => f.literal.trim()), ["'#0472a8"]);
   assert.deepEqual(chromeFindings('<a href="#top">x</a>', { css: false }), []);
 });
 
@@ -328,4 +328,11 @@ test('chrome 4. run() reports the planted hex and the retired token in the live 
   } finally {
     done();
   }
+});
+
+test('chrome 5. a hex inside a class or a shorthand string is caught, and so is a retired line-height', () => {
+  assert.deepEqual(chromeFindings('<i className="bg-[#fff0aa]" />', { css: false }).map((f) => f.literal.trim()), ['[#fff0aa']);
+  assert.deepEqual(chromeFindings("const b = '1px solid #ccc123';", { css: false }).map((f) => f.kind), ['hex']);
+  assert.deepEqual(chromeFindings('.a { line-height: var(--font-line-height-body1); }', { css: true }).map((f) => f.literal), ['--font-line-height-body1']);
+  assert.deepEqual(chromeFindings('<a href="#add">x</a>', { css: false }), []);
 });
