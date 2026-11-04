@@ -83,7 +83,7 @@
     "design-system/src/patterns/PatternCard/PatternCard.scss": 10,
     "design-system/src/patterns/PatternCard/PatternCard.stories.jsx": 9,
     "design-system/src/patterns/PatternCard/PatternCardCases.jsx": 6,
-    "design-system/src/patterns/PatternDrawer/PatternDrawer.scss": 4,
+    "design-system/src/patterns/PatternDrawer/PatternDrawer.scss": 2,
     "design-system/src/patterns/PatternDrawer/PatternDrawer.stories.jsx": 3,
     "design-system/src/patterns/PatternModal/PatternModal.examples.jsx": 6,
     "design-system/src/patterns/PatternModal/PatternModal.scss": 8,

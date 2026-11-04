@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CloseButton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import Blanket, { BLANKET_WIDTHS } from '../Blanket';
 import './PatternDrawer.scss';
@@ -28,7 +29,7 @@ const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
  * Drawer pattern for PLUS design system.
  * A full-height panel at the edge of the screen, for a task that needs the
  * page in view: the details of a row, a set of filters, a short edit. It
- * places itself in `Blanket` at that edge, over the same scrim a modal takes.
+ * places itself in `Blanket` at that edge, over the same blanket a modal takes.
  * Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus
  * the modal pad), the Modal width steps. The title, description and close
  * button follow the Modal rules.
@@ -37,7 +38,7 @@ const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
  * Mirrors "Pattern/Drawer" in the Figma design system file.
  *
  * It is a real dialog: opening it moves focus inside and Tab cycles there,
- * Escape, the close button and a click on the scrim call `onClose`, and
+ * Escape, the close button and a click on the blanket call `onClose`, and
  * closing returns focus to what had it. An `inline` drawer, drawn in the page
  * flow for docs, leaves focus where it is.
  */
@@ -151,16 +152,7 @@ const PatternDrawer = ({
                             {description && <p id={descriptionId} className="plus-pattern-drawer-description">{description}</p>}
                         </div>
                     )}
-                    {onClose && (
-                        <button
-                            type="button"
-                            className="plus-pattern-drawer-close"
-                            aria-label="Close"
-                            onClick={onClose}
-                        >
-                            <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                        </button>
-                    )}
+                    {onClose && <CloseButton onClick={onClose} />}
                 </div>
                 <HeadingLevelContext.Provider value={1}>
                     {/* A body that scrolls holds no focus of its own, so it becomes a tab stop. */}
@@ -197,7 +189,7 @@ PatternDrawer.propTypes = {
     title: PropTypes.node,
     /** One line under the title, in the subtle text color; it describes the dialog */
     description: PropTypes.node,
-    /** Called by the close button, Escape and a click on the scrim; renders the close button */
+    /** Called by the close button, Escape and a click on the blanket; renders the close button */
     onClose: PropTypes.func,
     /** Footer slot, pinned to the bottom edge (typically action buttons, the primary last) */
     footer: PropTypes.node,

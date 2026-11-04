@@ -273,7 +273,7 @@ const PageWithDrawer = () => {
     );
 };
 
-/** The `drawer` prop: a drawer open over the page. The scrim covers the frame and the drawer runs the full height at the end edge. */
+/** The `drawer` prop: a drawer open over the page. The blanket covers the frame and the drawer runs the full height at the end edge. */
 export const WithDrawer = {
     render: () => fullHeight(<PageWithDrawer />),
     play: async ({ canvasElement }) => {
