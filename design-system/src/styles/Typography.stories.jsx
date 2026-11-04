@@ -13,42 +13,7 @@ export default {
     tags: ['!dev', '!autodocs'],
 };
 
-const SCALE = [
-    ['Heading', 'xxlarge', '32/36', 'Tutors plan the week from here'],
-    ['Heading', 'xlarge', '28/32', 'Tutors plan the week from here'],
-    ['Heading', 'large', '24/28', 'Tutors plan the week from here'],
-    ['Heading', 'medium', '20/24', 'Tutors plan the week from here'],
-    ['Heading', 'small', '16/20', 'Tutors plan the week from here'],
-    ['Heading', 'xsmall', '14/20', 'Tutors plan the week from here'],
-    ['Heading', 'xxsmall', '12/16', 'Tutors plan the week from here'],
-    ['Body', 'large', '16/24', 'Tutors plan the week from here'],
-    ['Body', 'default', '14/20', 'Tutors plan the week from here'],
-    ['Body', 'small', '12/16', 'Tutors plan the week from here'],
-    ['Metric', 'large', '28/32', '1,284 sessions'],
-    ['Metric', 'medium', '24/28', '1,284 sessions'],
-    ['Metric', 'small', '16/20', '1,284 sessions'],
-];
-
 const meta = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
-const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
-
-/** The live scale: seven Heading, three Body and three Metric styles. */
-export const TypeScale = () => (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {SCALE.map(([family, size, metrics, sample]) => {
-            const token = `--${family.toLowerCase()}-${size}`;
-            return (
-                <div key={token} style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--field-width-md), 1fr) 3fr', gap: 'var(--grid-gutter)', alignItems: 'baseline', padding: 'var(--stack-lg) 0', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{family}/{size} · {metrics}</span>
-                        <span style={code}>var({token})</span>
-                    </div>
-                    <span style={{ font: `var(${token})`, letterSpacing: `var(${token}-tracking, normal)`, fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>{sample}</span>
-                </div>
-            );
-        })}
-    </div>
-);
 
 const LEVELS = [
     ['Page title', '--heading-large', 'Heading/large · 24 · the page’s one h1'],
