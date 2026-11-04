@@ -10,6 +10,26 @@
  * neutral and selected backgrounds. A chart option still wins where a chart
  * sets one.
  */
+:root {
+    /*
+     * Chart-only component tokens, aliasing the same stroke-width primitive
+     * `--focus-ring-width` reads (`_frame_layers.scss`'s `--card-radius`
+     * aliases the equivalent radius primitive). Bar/column marks round only
+     * the value end at `--chart-bar-radius` (`--radius-0125`, ~2px) —
+     * rounding both ends or a larger radius distorts length reading, the one
+     * thing a bar chart asks its reader to compare. Declared at `:root`, not
+     * `.highcharts-container` (unlike the `--highcharts-*` overrides below):
+     * nothing in this file consumes these via `var()` — `chartTheme.js`'s
+     * `tokenNumber()` reads them off `document.documentElement` for
+     * Highcharts' numeric options, and a custom property only resolves there
+     * if it's declared on an ancestor of that element, never a descendant
+     * like `.highcharts-container`.
+     */
+    --chart-bar-radius: var(--radius-0125);
+    --chart-line-width: var(--size-border-stroke-stroke-200);
+    --chart-grid-width: var(--size-border-stroke-stroke-100);
+}
+
 .highcharts-container {
     --highcharts-background-color: var(--ds-border-inverse);
     --highcharts-neutral-color: var(--ds-text);
@@ -32,4 +52,28 @@
     --highcharts-highlight-color-3: var(--ds-background-selected);
     --highcharts-positive-color: var(--ds-chart-success);
     --highcharts-negative-color: var(--ds-chart-danger);
+}
+
+/*
+ * The tooltip is a floating layer, so it takes the Popup pattern's surface,
+ * overlay shadow, radius and padding (`design-system/src/components/
+ * overlays-and-layering/Popup/Popup.scss`) and the shared popup z-index.
+ *
+ * `useHTML` only moves the tooltip TEXT into a foreignObject — the box
+ * Highcharts draws around it is always its own SVG `<path>`
+ * (`.highcharts-tooltip-box`), and `background`/`border-radius`/`box-shadow`
+ * are no-ops on an SVG element, so styling `.highcharts-tooltip` itself (as
+ * the comment here used to say) never painted anything. `chartTheme.js` sets
+ * `tooltip.outside: true` so Highcharts renders into
+ * `.highcharts-tooltip-container` — a real `<div>`, CSS-stylable — and
+ * `chartTheme.js` turns the SVG box fully transparent (`backgroundColor:
+ * 'transparent'`, `borderWidth: 0`, `shadow: false`) so this div's surface is
+ * the only thing a reader sees.
+ */
+.highcharts-tooltip-container {
+    z-index: var(--layer-popup);
+    background: var(--ds-surface-overlay);
+    border-radius: var(--popover-radius);
+    box-shadow: var(--ds-shadow-overlay);
+    padding: var(--popover-pad);
 }

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_ANIMATION_DURATION_MS, CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
 import { seriesColor } from '@/dataviz/palette';
 
 /**
@@ -27,7 +27,7 @@ const BarChart = ({
     fillOpacity,
     animate = false,
     animationDelay = 0,
-    animationDuration = 900
+    animationDuration = CHART_ANIMATION_DURATION_MS
 }) => {
     const seriesWithTheme = useMemo(() => series.map((s, i, all) => ({
         ...s,
@@ -82,11 +82,13 @@ const BarChart = ({
             column: {
                 pointPadding: columnPointPadding,
                 borderWidth: 0,
+                borderRadius: CHART_BAR_RADIUS,
                 ...(fillOpacity !== undefined && { fillOpacity })
             },
             bar: {
                 pointPadding: 0.1,
                 borderWidth: 0,
+                borderRadius: CHART_BAR_RADIUS,
                 ...(fillOpacity !== undefined && { fillOpacity })
             }
         },

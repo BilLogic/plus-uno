@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
 import { seriesColor } from '@/dataviz/palette';
 
 /**
@@ -35,7 +35,7 @@ const BubbleChart = ({
         xAxis: {
             ...chartTheme.xAxis,
             title: { text: xAxisLabel, style: chartTheme.xAxis.labels.style },
-            gridLineWidth: 1
+            gridLineWidth: CHART_GRID_WIDTH_NUMBER
         },
         yAxis: {
             ...chartTheme.yAxis,

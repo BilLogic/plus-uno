@@ -42,7 +42,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
             categories: categories,
             labels: {
                 style: {
-                    fontSize: 'var(--font-size-body3, 12px)',
+                    fontSize: 'var(--font-size-body3)',
                     color: 'var(--ds-text-subtle)'
                 }
             },
@@ -77,8 +77,9 @@ const SmartBarChart = ({ data, height = 200 }) => {
         legend: { enabled: false },
         credits: { enabled: false },
         tooltip: {
+            ...chartTheme.tooltip,
             enabled: true,
-            format: '<b>{x}</b>: {y}%'
+            pointFormat: '<b>{point.category}</b>: {point.y}%'
         },
         series: [
             {
