@@ -1,6 +1,5 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Toast as BootstrapToast, ToastContainer as BootstrapToastContainer } from 'react-bootstrap';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import './Flag.scss';
 
@@ -34,7 +33,7 @@ export const Flag = ({
     title,
     children, // Body text/content
     dismissible = true,
-    show,
+    show = true,
     onClose,
     delay = FLAG_AUTO_CLOSE_MS,
     autohide,
@@ -60,44 +59,33 @@ export const Flag = ({
     const livePoliteness = isUrgent ? 'assertive' : 'polite';
 
     /*
-     * And why this is an effect rather than three props.
-     *
-     * react-bootstrap's Toast writes `role="alert"`, `aria-live="assertive"` and
-     * `aria-atomic="true"` onto its `div` AFTER spreading `...props`:
-     *
-     *     const toast = jsx("div", { ...props, ref, className, role: "alert",
-     *                                "aria-live": "assertive", "aria-atomic": "true" });
-     *
-     * So passing them is silently ignored — which means the explicit
-     * `role="alert"` this component used to pass was never doing anything
-     * either; it only looked like the source of the behavior. Setting them on
-     * the node we are handed is the one place the value can actually change.
-     * Measured: the assertion in `FlagPoliteness.stories.jsx` fails without it.
-     */
-    const toastRef = useRef(null);
-
-    useLayoutEffect(() => {
-        const node = toastRef.current;
-        if (!node) return;
-        node.setAttribute('role', liveRole);
-        node.setAttribute('aria-live', livePoliteness);
-    }, [liveRole, livePoliteness]);
-
-    /*
      * Success and info close themselves after 8 seconds; warning and error
      * stay until they are dismissed. A caller's `autohide` or `delay` wins.
      */
     const closesItself = autohide ?? !isUrgent;
 
+    // Only the latest onClose fires; changing it mid-countdown does not
+    // restart the timer, matching the previous react-bootstrap Toast timing.
+    const onCloseRef = useRef(onClose);
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
+    useEffect(() => {
+        if (!show || !closesItself || !(delay > 0)) return undefined;
+        const timer = setTimeout(() => onCloseRef.current?.(), delay);
+        return () => clearTimeout(timer);
+    }, [show, closesItself, delay]);
+
+    if (!show) return null;
+
     return (
-        <BootstrapToast
-            ref={toastRef}
+        <div
             id={id}
             className={`plus-flag ${toastStyle} ${className}`}
-            show={show}
-            onClose={onClose}
-            delay={delay}
-            autohide={delay > 0 && closesItself}
+            role={liveRole}
+            aria-live={livePoliteness}
+            aria-atomic="true"
             {...props}
         >
             {/*
@@ -124,7 +112,7 @@ export const Flag = ({
             {/* The shared CloseButton, default tone on the flag's surface. Its
                 name stays "Close", the CloseButton default. */}
             {dismissible && <CloseButton onClick={onClose} />}
-        </BootstrapToast>
+        </div>
     );
 };
 
@@ -146,6 +134,14 @@ Flag.propTypes = {
     timestamp: PropTypes.node
 };
 
+// Legacy corner names, mapped onto the logical ones.
+const LEGACY_POSITIONS = {
+    'top-right': 'top-end',
+    'top-left': 'top-start',
+    'bottom-right': 'bottom-end',
+    'bottom-left': 'bottom-start',
+};
+
 /**
  * Where flags sit: bottom-left by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
@@ -156,27 +152,16 @@ export const FlagContainer = ({
     className = '',
     children,
     ...props
-}) => {
-    // Map legacy positions if needed
-    const mapPosition = (pos) => {
-        if (pos === 'top-right') return 'top-end';
-        if (pos === 'top-left') return 'top-start';
-        if (pos === 'bottom-right') return 'bottom-end';
-        if (pos === 'bottom-left') return 'bottom-start';
-        return pos;
-    };
-
-    return (
-        <BootstrapToastContainer
-            position={mapPosition(position)}
-            containerPosition={containerPosition}
-            className={`plus-flag-container ${className}`}
-            {...props}
-        >
-            {children}
-        </BootstrapToastContainer>
-    );
-};
+}) => (
+    <div
+        data-position={LEGACY_POSITIONS[position] ?? position}
+        data-container-position={containerPosition}
+        className={`plus-flag-container ${className}`}
+        {...props}
+    >
+        {children}
+    </div>
+);
 
 FlagContainer.propTypes = {
     position: PropTypes.string,
