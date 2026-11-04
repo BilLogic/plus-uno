@@ -1,6 +1,5 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { ThemeProvider } from 'react-bootstrap';
 import NavFab from './components/NavFab/NavFab';
 import { LiveAppRoutes } from '../prototypes/live-app/src/App';
 import './App.scss';
@@ -46,7 +45,7 @@ function App() {
   const isStorybook = location.pathname.startsWith('/storybook');
 
   return (
-    <ThemeProvider>
+    <>
       {!isStorybook && <NavFab />}
       <Routes>
         <Route path="/" element={<Navigate to="/storybook" replace />} />
@@ -59,7 +58,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/storybook" replace />} />
       </Routes>
-    </ThemeProvider>
+    </>
   );
 }
 

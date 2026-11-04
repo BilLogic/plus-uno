@@ -52,11 +52,9 @@
     "design-system/src/styles/Colors.stories.jsx": 1,
     "prototypes/home-redesign/src/main.demo.jsx": 1,
     "prototypes/home-redesign/src/main.jsx": 1,
-    "prototypes/live-app/src/main.jsx": 1,
     "prototypes/post-session-reflection/src/main.jsx": 1,
     "prototypes/research-assistant-chat/src/main.tsx": 1,
     "prototypes/starter/src/main.jsx": 1,
-    "prototypes/tutor-revamp/src/main.jsx": 1,
-    "src/App.jsx": 1
+    "prototypes/tutor-revamp/src/main.jsx": 1
   }
 }
