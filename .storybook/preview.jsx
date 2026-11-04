@@ -219,6 +219,7 @@ const preview = {
                 "Vertical button"
               ],
               "Checkbox",
+              "Comment",
               "Date time picker",
               "Date picker",
               "Dropdown menu",

@@ -11,6 +11,7 @@ export { default as Checkbox } from '@/components/forms-and-inputs/Checkbox';
 export { default as ChoiceGrid } from '@/components/forms-and-inputs/ChoiceGrid';
 export { default as ChoiceGroup } from '@/components/forms-and-inputs/ChoiceGroup';
 export { default as CloseButton } from '@/components/forms-and-inputs/CloseButton';
+export { default as Comment } from '@/components/forms-and-inputs/Comment';
 export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker';
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
 export { default as Dropdown, createDropdown } from '@/components/forms-and-inputs/Dropdown';
