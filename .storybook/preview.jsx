@@ -299,6 +299,7 @@ const preview = {
             [
               "Breadcrumbs",
               "Link",
+              "Menu group",
               "Pagination",
               "Sidebar tab",
               "Tabs"
