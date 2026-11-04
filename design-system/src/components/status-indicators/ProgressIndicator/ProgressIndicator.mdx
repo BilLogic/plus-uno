@@ -1,21 +1,144 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ProgressIndicatorStories from './ProgressIndicator.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressIndicatorStories} />
 
 <Title />
-
-Shows the user where they are along the steps of a journey.
+A row of dots showing where you are along the steps of a journey. Unlike
+`ProgressTracker`, each dot carries no label of its own — only a position.
 
 <DocsTabs of={ProgressIndicatorStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={ProgressIndicatorStories.Default} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/status-indicators/ProgressIndicator"
+/>
 
-<ArgTypes />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Four dots, the second one current.</>}>
+    <Canvas of={ProgressIndicatorStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>`default`, `primary` and `help` for light surfaces; `inverted` for a dark one.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Appearances} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and spacing
+
+<DocsCanvasShell description={<>`size` sets the dot diameter, 8 or 12.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Sizes} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`spacing` sets the gap between dots: `comfortable`, `cozy` or `compact`.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ProgressIndicatorStories.Interactive}
+    description={
+        <>
+            Click a dot to jump to that step. Use the table below to change props.
+            The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ProgressIndicator` for a short sequence where position matters more than
+the name of each step — a carousel, an onboarding flight, a slide deck. When
+each step has its own label people need to see, use `ProgressTracker` instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pass `onSelect` only when jumping ahead makes sense.
+
+Without `onSelect` the dots are decorative and only `aria-current` marks the
+active one. With it, every dot becomes a button a person can press to jump
+there directly — appropriate for a carousel, not for a linear flow someone
+must complete in order.
+
+```jsx
+<ProgressIndicator
+    values={slides}
+    selectedIndex={index}
+    onSelect={({ index }) => setIndex(index)}
+    ariaControls="carousel-panel"
+/>
+```
+
+### `values` only supplies a count and, when interactive, each dot's name.
+
+The array's content never renders — only its length becomes the number of
+dots, and each entry becomes a dot's accessible name when `onSelect` is set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named group.** The row has `role="group"` with a `label` ("Progress" by
+  default), so a screen reader announces it as one control.
+- **The current step is `aria-current="step"`.** This is the only state a
+  non-interactive indicator exposes.
+- **Interactive dots are real buttons**, each named from its `values` entry
+  and linked to the content it controls with `ariaControls`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For steps with their own visible labels, use `ProgressTracker`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

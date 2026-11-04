@@ -39,8 +39,6 @@ From `design-system/src/components/messaging/Banner/Banner.scss`. Override these
 
 Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Banner` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).
