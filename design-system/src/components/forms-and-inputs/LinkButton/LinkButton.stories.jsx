@@ -11,7 +11,7 @@ export default {
     title: 'Components/Forms and inputs/Button/Link button',
     component: LinkButton,
     /** Hide CSF stories from the sidebar; docs live on LinkButton.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Link button: an anchor drawn as a button, with `href`, `target`, `appearance` and `spacing` and no disabled or loading state.' },
