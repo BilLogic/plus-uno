@@ -279,12 +279,12 @@ test('NavTabs: neutral subtle hovered and pressed on every tab, focus a ring wit
  */
 test('Checkbox: unchecked hover is the input hovered fill; a checked box steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Checkbox.scss';
-  const input = '.plus-form-checkbox .form-check-input';
-  expectRule(file, `${input}:hover:not(:disabled):not(:indeterminate)`, {
+  const control = '.plus-form-checkbox';
+  expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked]):not([data-indeterminate])`, {
     'background-color': layer('--ds-background-input-hovered'),
   });
-  for (const checked of [':checked:hover:not(:disabled):not(:indeterminate)', ':indeterminate:hover:not(:disabled)']) {
-    const decls = declarations(sheet(file), `${input}${checked}`);
+  for (const checked of ['[data-checked]:hover:not([data-disabled])', '[data-indeterminate]:hover:not([data-disabled])']) {
+    const decls = declarations(sheet(file), `${control}${checked}`);
     assert.equal(decls['background-color'], layer('--ds-background-selected-bold-hovered'), `${checked} does not take the hovered step`);
     assert.equal(decls['box-shadow'], undefined, `${checked} still lays a layer over the fill`);
   }
@@ -292,13 +292,13 @@ test('Checkbox: unchecked hover is the input hovered fill; a checked box steps t
 
 test('Radio: unchecked hover is the input hovered fill; a checked radio steps to selected.bold.hovered', () => {
   const file = 'components/forms-and-inputs/Radio.scss';
-  const input = '.plus-form-radio .form-check-input';
-  expectRule(file, `${input}:hover:not(:disabled):not(:checked)`, {
+  const control = '.plus-form-radio';
+  expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked])`, {
     'background-color': layer('--ds-background-input-hovered'),
   });
-  const checked = declarations(sheet(file), `${input}:hover:not(:disabled):checked`);
+  const checked = declarations(sheet(file), `${control}[data-checked]:hover:not([data-disabled])`);
   assert.equal(checked['background-color'], layer('--ds-background-selected-bold-hovered'), 'a checked radio does not take the hovered step');
-  assert.equal(checked['background-image'], undefined, 'a checked radio redraws its dot on hover; the checked rule draws it');
+  assert.equal(checked['background-image'], undefined, 'a checked radio draws its dot with a separate indicator span, not background-image');
 });
 
 test('Toggle: hover steps the track, neutral bold off and selected bold on', () => {
@@ -320,8 +320,8 @@ test('Toggle: hover steps the track, neutral bold off and selected bold on', () 
  * DS_RING_OUTSIDE, defined with the shared rings above.
  */
 for (const [name, file, selector, ring] of [
-  ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
-  ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible', DS_RING_OUTSIDE],
+  ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox:focus-visible', DS_RING_OUTSIDE],
+  ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio:focus-visible', DS_RING_OUTSIDE],
   ['Toggle', 'components/forms-and-inputs/Toggle.scss', '.plus-toggle:focus-visible', DS_RING_OUTSIDE],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {

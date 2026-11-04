@@ -228,12 +228,12 @@ TwoGridsWithoutIds.play = async ({ canvasElement }) => {
     const radios = canvas.getAllByRole('radio', { name: 'Row 1 Column 1' });
     await expect(radios).toHaveLength(2);
     await expect(radios[0].id).not.toBe(radios[1].id);
-    await expect(radios[0].name).not.toBe(radios[1].name);
+    await expect(radios[0].nextElementSibling.name).not.toBe(radios[1].nextElementSibling.name);
 
     await userEvent.click(radios[0]);
     await userEvent.click(radios[1]);
-    await expect(radios[0].checked).toBe(true);
-    await expect(radios[1].checked).toBe(true);
+    await expect(radios[0].nextElementSibling.checked).toBe(true);
+    await expect(radios[1].nextElementSibling.checked).toBe(true);
 };
 
 /** Read-only: the answers show, and clicking a cell does not change them. */
@@ -257,7 +257,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     const cell = canvas.getByRole('checkbox', { name: 'Row 1 Column 2' });
     await expect(cell.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(cell);
-    await expect(cell.checked).toBe(false);
+    await expect(cell.nextElementSibling.checked).toBe(false);
 };
 
 export const Interactive = (args) => {

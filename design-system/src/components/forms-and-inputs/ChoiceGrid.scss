@@ -75,26 +75,22 @@
     background-color: var(--color-surface-container-low);
 }
 
-// Cells hold the real Checkbox and Radio, centered and without the label gap
-// they leave beside a visible label.
+// Cells hold the real Checkbox and Radio, centered. Cells have no visible
+// label (the row and column headers name the cell), so the row is one child.
 .plus-choice-grid-control {
     justify-content: center;
 
-    .form-check {
-        display: flex;
+    .plus-form-checkbox-row,
+    .plus-form-radio-row {
         justify-content: center;
     }
 
-    .form-check-input {
-        margin-right: 0;
-
-        &[type="checkbox"],
-        &[type="radio"] {
-            width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-            height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-            min-width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-            min-height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
-        }
+    .plus-form-checkbox,
+    .plus-form-radio {
+        width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+        height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+        min-width: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
+        min-height: var(--plus-choice-grid-control-size, var(--layout-control-checkbox));
     }
 }
 

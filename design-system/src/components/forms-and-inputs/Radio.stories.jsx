@@ -186,10 +186,10 @@ export const ReadOnly = () => (
 ReadOnly.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const online = canvas.getByRole('radio', { name: 'Online' });
-    await expect(online.disabled).toBe(false);
+    await expect(online.nextElementSibling.disabled).toBe(false);
     await userEvent.click(online);
-    await expect(online.checked).toBe(false);
-    await expect(canvas.getByRole('radio', { name: 'In person' }).checked).toBe(true);
+    await expect(online.nextElementSibling.checked).toBe(false);
+    await expect(canvas.getByRole('radio', { name: 'In person' }).nextElementSibling.checked).toBe(true);
 };
 
 /** A description under the label, and the card appearance. */
@@ -250,26 +250,27 @@ HoverStep.parameters = { docs: { disable: true } };
 HoverStep.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const radio = (name) => canvas.getByRole('radio', { name });
+    const dot = (el) => el.querySelector('.plus-form-radio-indicator');
     const paint = (el) => {
-        const { backgroundColor, backgroundImage, borderTopColor } = getComputedStyle(el);
-        return { backgroundColor, backgroundImage, borderTopColor };
+        const { backgroundColor, borderTopColor } = getComputedStyle(el);
+        return { backgroundColor, borderTopColor, dot: getComputedStyle(dot(el)).backgroundColor };
     };
     const hovered = (name) => withForcedPseudo(radio(name), ':hover', () => paint(radio(name)));
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         const checked = paint(radio('Checked'));
         await expect(checked.backgroundColor, `${mode}: checked fill`).toBe(token('--ds-background-selected-bold'));
         await expect(checked.borderTopColor, `${mode}: checked edge`).toBe(token('--ds-border-selected'));
-        await expect(checked.backgroundImage, `${mode}: the dot`).toContain(token('--ds-icon-inverse'));
+        await expect(checked.dot, `${mode}: the dot`).toBe(token('--ds-icon-inverse'));
         const unchecked = paint(radio('Unchecked'));
         await expect(unchecked.backgroundColor, `${mode}: unchecked fill`).toBe(token('--ds-background-input'));
         await expect(unchecked.borderTopColor, `${mode}: unchecked border`).toBe(token('--ds-border-input'));
         const disabled = paint(radio('Disabled'));
         await expect(disabled.backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
         await expect(disabled.borderTopColor, `${mode}: disabled edge`).toBe(token('--ds-border-disabled'));
-        await expect(disabled.backgroundImage, `${mode}: the disabled dot`).toContain(token('--ds-icon-disabled'));
+        await expect(disabled.dot, `${mode}: the disabled dot`).toBe(token('--ds-icon-disabled'));
         const checkedHover = hovered('Checked');
         await expect(checkedHover.backgroundColor, `${mode}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
-        await expect(checkedHover.backgroundImage, `${mode}: the dot stays`).toContain(token('--ds-icon-inverse'));
+        await expect(checkedHover.dot, `${mode}: the dot stays`).toBe(token('--ds-icon-inverse'));
         const uncheckedHover = hovered('Unchecked');
         await expect(uncheckedHover.backgroundColor, `${mode}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
         await expect(uncheckedHover.borderTopColor, `${mode}: unchecked hover edge`).toBe(token('--ds-border-brand'));

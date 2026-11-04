@@ -66,7 +66,7 @@ CheckboxGroup.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('group', { name: /Reason for request/ });
     await userEvent.click(within(group).getByRole('checkbox', { name: 'More students than expected' }));
-    await expect(within(group).getByRole('checkbox', { name: 'More students than expected' }).checked).toBe(true);
+    await expect(within(group).getByRole('checkbox', { name: 'More students than expected' }).nextElementSibling.checked).toBe(true);
 };
 
 export const WithRequiredAndError = () => (

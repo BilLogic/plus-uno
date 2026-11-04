@@ -23,9 +23,9 @@ export const RemembersAndAutofills = {
 
         const remember = canvas.getByRole('checkbox', { name: 'Remember me for 30 days' });
         await userEvent.click(remember);
-        await expect(remember.checked).toBe(true);
+        await expect(remember.nextElementSibling.checked).toBe(true);
         await userEvent.click(remember);
-        await expect(remember.checked).toBe(false);
+        await expect(remember.nextElementSibling.checked).toBe(false);
 
         await expect(canvas.getByLabelText('Email Address').getAttribute('autocomplete')).toBe('email');
         await expect(canvas.getByLabelText('Password').getAttribute('autocomplete')).toBe('current-password');

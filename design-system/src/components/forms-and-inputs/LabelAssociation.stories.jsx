@@ -158,7 +158,10 @@ RadioGroupWithoutIds.play = async ({ canvasElement }) => {
         ['Email', 'email'],
         ['Text message', 'sms'],
     ]) {
-        const radio = canvas.getByLabelText(text);
+        // Base UI points the label at the hidden native input AND names the
+        // accessible `role="radio"` span with it, so one label now resolves
+        // two elements; the native input is the one this loop wants.
+        const radio = canvas.getAllByLabelText(text).find((el) => el.tagName === 'INPUT');
         await expect(radio.getAttribute('type')).toBe('radio');
         await expect(radio.value).toBe(value);
     }

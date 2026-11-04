@@ -130,14 +130,14 @@ export const ChoiceRows = () => (
 
 ChoiceRows.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const [role, name] of [
-        ['checkbox', 'Checkbox'],
-        ['radio', 'Radio'],
+    for (const [role, name, rowClass, labelClass] of [
+        ['checkbox', 'Checkbox', '.plus-form-checkbox-row', '.plus-form-checkbox-label'],
+        ['radio', 'Radio', '.plus-form-radio-row', '.plus-form-radio-label'],
     ]) {
         const input = canvas.getByRole(role, { name });
-        const line = input.closest('.form-check');
+        const line = input.closest(rowClass);
         await expect(heightOf(line), `${name} row`).toBe(24);
-        await expectLabel(line.querySelector('.form-check-label'), name, '400');
+        await expectLabel(line.querySelector(labelClass), name, '400');
     }
     for (const name of ['Toggle 16', 'Toggle 20']) {
         const toggle = canvas.getByRole('switch', { name });

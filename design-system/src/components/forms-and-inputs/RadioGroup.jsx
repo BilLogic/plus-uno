@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import Fieldset from './Fieldset';
 import Radio from './Radio';
 import useFieldId from './useFieldId';
@@ -15,10 +16,14 @@ const normalize = (option) => (
 /**
  * RadioGroup — one question and its radio answers.
  *
- * A `Fieldset` (legend plus grouped fields) holding `Radio`s. Lays them out
- * stacked or inline, can put scale ends either side (`leadingText`,
- * `trailingText` — see the "Linear scale" story), and shows one error for the
- * group. `isDisabled` on the group overrides every `Radio`'s own.
+ * A `Fieldset` (legend plus grouped fields) holding one real Base UI
+ * `RadioGroup`, which carries the `role="radiogroup"`, the keyboard roving
+ * tabindex across options, and `aria-required`/`aria-readonly`; the Fieldset
+ * stays plain grouping and the legend, which the group inherits as its own
+ * accessible name. Lays them out stacked or inline, can put scale ends
+ * either side (`leadingText`, `trailingText` — see the "Linear scale"
+ * story), and shows one error for the group. `isDisabled` on the group
+ * overrides every `Radio`'s own.
  *
  * The value is the chosen option's value, or `null`/`undefined` while
  * unanswered — a radio group does not fall back to its first option, so a
@@ -70,20 +75,16 @@ const RadioGroup = ({
         return (
             <div key={optionId || `${optionValue}`} className="plus-radio-group-item">
                 <Radio
+                    grouped
                     id={optionId || `${fieldId}-option-${index}`}
-                    name={groupName}
                     value={optionValue}
                     label={label}
                     description={description}
                     appearance={appearance}
-                    isChecked={checked}
                     isDisabled={isDisabled || optionDisabled}
                     isReadOnly={isReadOnly}
                     isInvalid={invalid}
                     isRequired={isRequired}
-                    // The platform enforces "one of these" for a radio; the group
-                    // carries `required`, each Radio does not need its own.
-                    onChange={() => choose(optionValue)}
                 />
                 {reveal && checked && (
                     <div className="plus-radio-group-reveal">{reveal}</div>
@@ -92,7 +93,11 @@ const RadioGroup = ({
         );
     };
 
-    const describedBy = [leadingId, trailingId].filter(Boolean).join(' ') || undefined;
+    // Fieldset computes this same id internally for the error it renders;
+    // repeated here so the real `role="radiogroup"` — now the inner Base UI
+    // group, not the `<fieldset>` — points at it too.
+    const errorId = error ? `${fieldId}-error` : undefined;
+    const describedBy = [leadingId, trailingId, errorId].filter(Boolean).join(' ') || undefined;
 
     const classes = [
         'plus-radio-group',
@@ -117,24 +122,30 @@ const RadioGroup = ({
             className={classes}
             data-size={size}
             style={style}
-            role="radiogroup"
-            aria-describedby={describedBy}
-            aria-required={isRequired || undefined}
-            aria-readonly={isReadOnly || undefined}
-            aria-invalid={invalid || undefined}
             {...props}
         >
-            {leadingText || trailingText ? (
-                <div className="plus-radio-group-scale">
-                    {leadingText && (
-                        <span id={leadingId} className="plus-radio-group-scale-end">{leadingText}</span>
-                    )}
-                    {options_}
-                    {trailingText && (
-                        <span id={trailingId} className="plus-radio-group-scale-end">{trailingText}</span>
-                    )}
-                </div>
-            ) : options_}
+            <BaseRadioGroup
+                name={groupName}
+                value={answer}
+                onValueChange={choose}
+                disabled={isDisabled}
+                readOnly={isReadOnly}
+                required={isRequired}
+                aria-describedby={describedBy}
+                aria-invalid={invalid || undefined}
+            >
+                {leadingText || trailingText ? (
+                    <div className="plus-radio-group-scale">
+                        {leadingText && (
+                            <span id={leadingId} className="plus-radio-group-scale-end">{leadingText}</span>
+                        )}
+                        {options_}
+                        {trailingText && (
+                            <span id={trailingId} className="plus-radio-group-scale-end">{trailingText}</span>
+                        )}
+                    </div>
+                ) : options_}
+            </BaseRadioGroup>
         </Fieldset>
     );
 };
