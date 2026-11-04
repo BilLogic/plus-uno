@@ -45,10 +45,10 @@ export const webAppSourceSnippets = {
         '/>'
     ]),
     splitButton: snippet([
-        '<SplitButton',
-        '  text="Save"',
-        '  menuLabel="More save options"',
-        '/>'
+        '<SplitButton>',
+        '  <Button text="Save" appearance="primary" />',
+        '  <IconButton icon="chevron-down" label="More save options" aria-haspopup="menu" />',
+        '</SplitButton>'
     ]),
     filterButton: snippet([
         '<FilterButton',
@@ -268,7 +268,7 @@ export const webAppSourceSnippets = {
         '  placeholder="Placeholder"',
         '  value=""',
         '  isRequired',
-        '  elemAfter={<i className="fa-solid fa-icons" aria-hidden="true" />}',
+        '  elemAfterInput={<i className="fa-solid fa-icons" aria-hidden="true" />}',
         '/>'
     ]),
     formTextArea: snippet([
@@ -416,8 +416,8 @@ export const webAppSourceSnippets = {
         '  id="text-field-affix-overview"',
         '  label="Website"',
         '  placeholder="Placeholder"',
-        '  elemBefore="https://"',
-        '  elemAfter={<i className="fa-solid fa-link" aria-hidden="true" />}',
+        '  elemBeforeInput="https://"',
+        '  elemAfterInput={<i className="fa-solid fa-link" aria-hidden="true" />}',
         '  value={value}',
         '  onChange={(e) => setValue(e.target.value)}',
         '/>'

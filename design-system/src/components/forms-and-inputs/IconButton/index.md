@@ -28,6 +28,8 @@ Icon button: a button that is an icon and nothing else. `label` is required beca
 | `onClick` | func | — | — |
 | `className` | string | — | — |
 | `title` | string | — | — |
+| `tooltip` | node | — | Overrides the tooltip content shown on hover/focus; defaults to `label` when set. |
+| `isTooltipDisabled` | bool | `false` | Suppresses the tooltip and native title entirely. |
 
 ## Variants
 

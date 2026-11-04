@@ -38,7 +38,7 @@ const StudentsDropdown = ({
                 isRequired={isRequired}
                 caption={helper}
                 isMulti
-                searchable
+                isSearchable
                 options={options}
                 value={selectedIds}
                 onChange={onChange}

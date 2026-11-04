@@ -36,6 +36,7 @@ const Radio = ({
     onClick,
     className = '',
     style,
+    testId,
     ...props
 }) => {
     const isControlled = isChecked !== undefined;
@@ -90,6 +91,7 @@ const Radio = ({
                 className="plus-form-radio"
                 {...inputRest}
                 {...inputProps}
+                data-testid={testId}
             />
             <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
         </div>
@@ -114,7 +116,9 @@ Radio.propTypes = {
     onBlur: PropTypes.func,
     onClick: PropTypes.func,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    /** Maps to `data-testid`, for test queries. */
+    testId: PropTypes.string,
 };
 
 export default Radio;

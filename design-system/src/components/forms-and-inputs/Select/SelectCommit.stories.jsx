@@ -111,14 +111,14 @@ KeyboardOpensAndPicks.play = async ({ canvasElement }) => {
     await expect(field).toHaveFocus();
 };
 
-/* ------------------------------------------------------------- searchable */
+/* ------------------------------------------------------------- isSearchable */
 
 /** Searchable means typing in the field itself; there is no second search box. */
 export const TypingFiltersOptions = () => {
     const [value, setValue] = useState('');
     return (
         <div style={stack}>
-            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" searchable value={value} onChange={setValue} />
+            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" isSearchable value={value} onChange={setValue} />
             <p data-testid="chosen">{value}</p>
         </div>
     );
@@ -158,7 +158,7 @@ export const EnterCreatesWhenNoMatch = () => {
                 id="scommit-create"
                 label="School"
                 options={schools}
-                creatable
+                isCreatable
                 value={value}
                 onChange={setValue}
                 onCreate={setCreated}
@@ -276,7 +276,7 @@ export const SelectAllHiddenPast50 = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={stack}>
-            <Select id="scommit-all" label="Tutors" isMulti searchable selectAll options={manyOptions} value={value} onChange={setValue} />
+            <Select id="scommit-all" label="Tutors" isMulti isSearchable selectAll options={manyOptions} value={value} onChange={setValue} />
             <p data-testid="count">{value.length}</p>
         </div>
     );
@@ -481,7 +481,7 @@ DependentFieldClears.play = async ({ canvasElement }) => {
 /** While options load, the list shows a Message row. */
 export const LoadingShowsMessage = () => (
     <div style={stack}>
-        <Select id="scommit-loading" label="Teacher" options={[]} loading defaultOpen />
+        <Select id="scommit-loading" label="Teacher" options={[]} isLoading defaultOpen />
     </div>
 );
 

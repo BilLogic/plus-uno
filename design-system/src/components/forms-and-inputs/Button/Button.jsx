@@ -64,6 +64,7 @@ export const Button = ({
     iconAfter,
 
     id,
+    testId,
     ...props
 }) => {
     const iconOnly = !text && !children;
@@ -94,6 +95,7 @@ export const Button = ({
             aria-busy={isLoading || undefined}
             aria-pressed={isSelected}
             title={title}
+            data-testid={testId}
             {...props}
         >
             <ButtonContent text={text} iconBefore={iconBefore} iconAfter={iconAfter}>
@@ -129,6 +131,8 @@ Button.propTypes = {
     iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 
     id: PropTypes.string,
+    /** Maps to `data-testid`, for test queries. */
+    testId: PropTypes.string,
 };
 
 export default Button;

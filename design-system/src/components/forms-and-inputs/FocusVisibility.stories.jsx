@@ -131,7 +131,7 @@ export const ForcedColorsKeepFocusAndSelection = () => (
         <TextField id="fv-name" label="Name" />
         <TextArea id="fv-notes" label="Notes" />
         <TextField type="number" id="fv-hours" label="Hours" />
-        <TextField id="fv-amount" label="Amount" elemBefore="£" />
+        <TextField id="fv-amount" label="Amount" elemBeforeInput="£" />
         <DatePicker id="fv-date" aria-label="Date" />
         <Select aria-label="Subject" options={[{ value: 'maths', label: 'Maths' }]} />
         <Listbox aria-label="Day" options={['Monday', 'Tuesday']} defaultValue="Tuesday" />

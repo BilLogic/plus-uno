@@ -35,6 +35,7 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
+| `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
 

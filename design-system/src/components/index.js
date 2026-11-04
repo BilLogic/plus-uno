@@ -29,7 +29,7 @@ export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
 export { default as Select, SEARCH_FIRST_ABOVE, SELECT_SPACINGS } from '@/components/forms-and-inputs/Select';
-export { default as SplitButton, SPLIT_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/SplitButton';
+export { default as SplitButton } from '@/components/forms-and-inputs/SplitButton';
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
 export { default as TextArea } from '@/components/forms-and-inputs/TextArea';
 export { default as TextField } from '@/components/forms-and-inputs/TextField';

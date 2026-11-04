@@ -3,7 +3,7 @@
 
 # SplitButton
 
-Split button: a button that does one action, joined to a chevron that opens a menu of related actions. The menu itself belongs to the caller, which anchors it to the chevron through `onMenuClick` and `isMenuExpanded`.
+Split button: a primary action joined to a chevron that opens a menu of related actions. Composed from two children — a `Button` for the action and an `IconButton` (chevron) for the menu trigger — each carrying its own appearance, spacing and state; `SplitButton` only draws the seam between them and groups them for assistive tech.
 
 **Import:** `import { SplitButton } from '@/components';`
 
@@ -17,24 +17,9 @@ Split button: a button that does one action, joined to a chevron that opens a me
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | string (required) | — | The primary action's label. |
-| `onClick` | func | — | — |
-| `menuLabel` | string (required) | — | The chevron\'s accessible name |
-| `onMenuClick` | func | — | — |
-| `isMenuExpanded` | bool | `false` | Whether the caller's menu is open; published as `aria-expanded`. |
-| `appearance` | enum | `'default'` | — |
-| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
-| `isDisabled` | bool | `false` | — |
-| `isLoading` | bool | `false` | — |
+| `children` | node (required) | — | Two Button-family elements: the primary action and the menu trigger. |
 | `className` | string | — | — |
-
-## Variants
-
-**`appearance`** — `default` · `primary`
-
-**`spacing`** — `default` · `compact`
-
-Anything not listed is not a valid value.
+| `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Tokens touched
 

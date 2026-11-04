@@ -109,14 +109,14 @@ const FormingModalBody = () => (
                     <Select
                         options={schoolOptions}
                         placeholder="Select a school"
-                        searchable
+                        isSearchable
                     />
                 </FieldWrapper>
                 <FieldWrapper label="Teacher">
                     <Select
                         options={teacherOptions}
                         placeholder="Select a teacher"
-                        searchable
+                        isSearchable
                     />
                 </FieldWrapper>
                 <FieldWrapper label="Days">

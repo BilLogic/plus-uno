@@ -1,7 +1,7 @@
 /**
  * Profile - Elements - Math Level
  *
- * Multi-select searchable dropdown for selecting math topic expertise.
+ * Multi-select isSearchable dropdown for selecting math topic expertise.
  *
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4483-3723&m=dev
  */
@@ -51,8 +51,8 @@ export const MathLevel = ({ id = 'math-level', value, onChange, defaultValue, re
                 onChange={onChange}
                 defaultValue={defaultValue}
                 placeholder="Select Math Topics"
-                searchable={true}
-                creatable={false}
+                isSearchable={true}
+                isCreatable={false}
                 style={{ width: '100%' }}
                 {...props}
             />

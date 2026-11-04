@@ -33,4 +33,16 @@ describe('IconButton', () => {
         fireEvent.click(screen.getByRole('button', { name: 'Add' }));
         expect(onClick).toHaveBeenCalledTimes(1);
     });
+
+    it('wraps in a Tooltip when given tooltip content', () => {
+        render(<IconButton icon="trash" label="Delete session" tooltip="Remove this session" />);
+        const button = screen.getByRole('button', { name: 'Delete session' });
+        expect(button).not.toHaveAttribute('title');
+    });
+
+    it('suppresses the tooltip and title with isTooltipDisabled', () => {
+        render(<IconButton icon="trash" label="Delete session" isTooltipDisabled />);
+        const button = screen.getByRole('button', { name: 'Delete session' });
+        expect(button).not.toHaveAttribute('title');
+    });
 });

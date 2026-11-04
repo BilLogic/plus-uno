@@ -26,8 +26,8 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
 | `defaultValue` | arrayOf | — | — |
 | `placeholder` | string | `'Select...'` | — |
-| `searchable` | bool | `false` | Typing in the field filters the list. |
-| `creatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
+| `isSearchable` | bool | `false` | Typing in the field filters the list. |
+| `isCreatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
 | `open` | bool | — | Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`. |
 | `defaultOpen` | bool | `false` | — |
@@ -50,7 +50,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `selectAll` | bool | `false` | With `isMulti`: a "Select all" button over the list, hidden past 50 matches. |
 | `maxSelections` | number | — | With `isMulti`: the most values; past it the other rows are disabled and the list says why. |
 | `dependsOn` | shape or arrayOf or string | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
-| `loading` | bool | `false` | The options are on their way: the list shows a loading row. |
+| `isLoading` | bool | `false` | The options are on their way: the list shows a loading row. |
 | `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
 | `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |
 | `suggested` | arrayOf | — | Ids shown under "Suggested" before typing, in a list of more than 50. |

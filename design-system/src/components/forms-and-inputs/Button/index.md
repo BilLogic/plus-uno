@@ -33,6 +33,7 @@
 | `iconBefore` | string or node | — | Font Awesome glyph before the label |
 | `iconAfter` | string or node | — | Font Awesome glyph after the label |
 | `id` | string | — | — |
+| `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
 

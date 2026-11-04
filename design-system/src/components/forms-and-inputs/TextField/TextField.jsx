@@ -23,8 +23,8 @@ const decimals = (number) => {
  * `spacing="compact"`.
  *
  * Label, field and caption: the caption shows a message (or standing help) on
- * the left and, when `maxLength` is set, a count on the right. `elemBefore`
- * and `elemAfter` fill the slots on either side of the control; a string is a
+ * the left and, when `maxLength` is set, a count on the right. `elemBeforeInput`
+ * and `elemAfterInput` fill the slots on either side of the control; a string is a
  * text affix. With `appearance="subtle"`, the field reads as plain text until
  * it is hovered or edited, and saves on blur or Enter through `onSave`.
  *
@@ -58,8 +58,8 @@ const TextField = ({
     errorMessage,
     warningMessage,
     successMessage,
-    elemBefore,
-    elemAfter,
+    elemBeforeInput,
+    elemAfterInput,
     type = 'text',
     maxLength,
     min,
@@ -72,6 +72,7 @@ const TextField = ({
     onFocus,
     onBlur,
     onKeyDown,
+    testId,
     ...props
 }) => {
     /** One id for the label and the input — see `useFieldId`. */
@@ -203,7 +204,7 @@ const TextField = ({
 
     const after = edit.enabled && edit.saving
         ? <span className="plus-field-saving" role="status">saving…</span>
-        : renderFieldElem(elemAfter);
+        : renderFieldElem(elemAfterInput);
 
     const valueProps = isNumber
         ? { value: text }
@@ -221,7 +222,7 @@ const TextField = ({
                 readOnly={isReadOnly}
                 {...toneProps(tone).field}
                 busy={edit.enabled && edit.saving}
-                leading={renderFieldElem(elemBefore)}
+                leading={renderFieldElem(elemBeforeInput)}
                 trailing={(after || steppers) ? <>{after}{steppers}</> : null}
             >
                 <input
@@ -241,6 +242,7 @@ const TextField = ({
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
                     aria-required={isRequired || undefined}
+                    data-testid={testId}
                     {...props}
                     /* After the spread: this value already contains the
                      * caller's, so letting the spread win would drop ours. */
@@ -294,9 +296,9 @@ TextField.propTypes = {
     /** Draws the confirmation border. */
     successMessage: PropTypes.node,
     /** Before the control. A string is a text affix; a node is rendered as given. */
-    elemBefore: PropTypes.node,
+    elemBeforeInput: PropTypes.node,
     /** After the control. A string is a text affix; a node is rendered as given. */
-    elemAfter: PropTypes.node,
+    elemAfterInput: PropTypes.node,
     /** `number` shows steppers and holds the value as text. */
     type: PropTypes.string,
     /** Limits the length and shows a count on the right of the caption. */
@@ -316,7 +318,9 @@ TextField.propTypes = {
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
-    onKeyDown: PropTypes.func
+    onKeyDown: PropTypes.func,
+    /** Maps to `data-testid`, for test queries. */
+    testId: PropTypes.string,
 };
 
 export default TextField;
