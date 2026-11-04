@@ -17,25 +17,25 @@ Button: triggers an action.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | string | — | Button label text |
+| `text` | string | — | The label. Children work too. |
 | `children` | node | — | — |
 | `title` | string | — | — |
-| `appearance` | enum | `'default'` | — |
-| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24, for tables and tight toolbars. |
-| `shouldFitContainer` | bool | `false` | Stretch to the width of the container |
+| `appearance` | enum | `'default'` | The visual style. |
+| `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars. |
+| `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container. |
 | `className` | string | — | — |
 | `onClick` | func | — | — |
-| `isDisabled` | bool | `false` | — |
-| `isSelected` | bool | — | — |
-| `isLoading` | bool | `false` | Show a spinner in place of the label and block interaction |
+| `isDisabled` | bool | `false` | Prevents interaction. Avoid it; see Usage. |
+| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. |
+| `isLoading` | bool | `false` | Shows a spinner in place of the label and blocks interaction. |
 | `type` | string | `'button'` | — |
 | `as` | elementType | — | — |
 | `href` | string | — | Renders as an anchor when set (and no `as` overrides it). |
 | `target` | string | — | — |
 | `rel` | string | — | — |
 | `role` | string | — | Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). |
-| `iconBefore` | string or node | — | Font Awesome glyph before the label |
-| `iconAfter` | string or node | — | Font Awesome glyph after the label |
+| `iconBefore` | string or node | — | A Font Awesome Free glyph name, or a node, before the label. |
+| `iconAfter` | string or node | — | A Font Awesome Free glyph name, or a node, after the label. |
 | `id` | string | — | — |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
