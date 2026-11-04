@@ -3,7 +3,7 @@ import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
 import CountTag from '@/components/labels/CountTag';
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 
 // Import the reusable SessionInfoCard component
 import { SessionInfoCard } from '@/specs/Toolkit/Pre-Session/Cards/SessionInfoCard.stories';
@@ -146,7 +146,7 @@ export const RecurringSession_PreSignUp = () => (
  * Confirm Sign-up Modal
  * Shows confirmation before signing up for sessions
  * Features:
- * - Warning Alert with confirmation message
+ * - Warning SectionMessage with confirmation message
  * - Modal table showing sessions to sign up for
  * - Back and Confirm sign-up buttons
  */
@@ -177,17 +177,17 @@ export const ConfirmSignUp = () => (
                     />
                 </div>
 
-                {/* Alert and Table Container - with medium gap */}
+                {/* SectionMessage and Table Container - with medium gap */}
                 <div className="d-flex flex-column" style={{
                     gap: 'var(--size-modal-gap-md)'
                 }}>
-                    {/* Warning Alert */}
-                    <Alert
-                        style="warning"
+                    {/* Warning message */}
+                    <SectionMessage
+                        appearance="warning"
                         dismissible={false}
                     >
                         You're signing up for the following sessions. Please confirm before continuing.
-                    </Alert>
+                    </SectionMessage>
 
                     {/* Sessions Table */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -220,7 +220,7 @@ export const ConfirmSignUp = () => (
  * Success All Modal
  * Shows success confirmation after signing up for sessions
  * Features:
- * - Success Alert with confirmation message
+ * - Success SectionMessage with confirmation message
  * - Table showing sessions added to schedule (Date & time, School & teacher, Tutor Count)
  * - "Check my schedule" button
  */
@@ -251,17 +251,17 @@ export const SuccessAll = () => (
                     />
                 </div>
 
-                {/* Alert and Table Container - with medium gap */}
+                {/* SectionMessage and Table Container - with medium gap */}
                 <div className="d-flex flex-column" style={{
                     gap: 'var(--size-modal-gap-md)'
                 }}>
-                    {/* Success Alert */}
-                    <Alert
-                        style="success"
+                    {/* Success message */}
+                    <SectionMessage
+                        appearance="success"
                         dismissible={false}
                     >
                         The following sessions have been added to your schedule.
-                    </Alert>
+                    </SectionMessage>
 
                     {/* Sessions Table */}
                     <div style={{ display: 'flex', flexDirection: 'column' }}>

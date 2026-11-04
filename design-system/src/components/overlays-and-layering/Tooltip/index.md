@@ -3,7 +3,7 @@
 
 # Tooltip
 
-Design-system tooltip wrapper around Bootstrap OverlayTrigger.
+One line of help on hover or focus, built on Base UI.
 
 **Import:** `import { Tooltip } from '@/components';`
 
@@ -20,6 +20,7 @@ Design-system tooltip wrapper around Bootstrap OverlayTrigger.
 | `text` | node (required) | — | Tooltip text |
 | `placement` | enum | `'top'` | Tooltip placement |
 | `trigger` | string or arrayOf | `['hover'` | — |
+| `size` | enum | `'default'` | — |
 | `children` | node (required) | — | — |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -31,16 +32,18 @@ Design-system tooltip wrapper around Bootstrap OverlayTrigger.
 
 **`placement`** — `top` · `bottom` · `left` · `right`
 
+**`size`** — `small` · `default` · `large`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-shadow-overlay` · `--ds-text-inverse` · `--element-pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
+`--body-small` · `--ds-background-neutral-bold` · `--ds-shadow-overlay` · `--ds-text-inverse` · `--element-pad-x-sm` · `--layout-z-index-popup` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Popover`
+Same group: `Popup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

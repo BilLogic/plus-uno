@@ -76,30 +76,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17560-1166"
       }
     },
-    "Alert": {
-      "code": {
-        "import": "@/components/messaging",
-        "export": "default",
-        "mdxPath": "design-system/src/components/messaging/Alert/Alert.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Alert",
-        "source": "design-system/src/components/messaging/Alert/Alert.jsx",
-        "storybookId": "components-messaging-section-message--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "alert",
-            "name": "alert",
-            "componentSetNodeId": "11:324",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
-            "source": "node-chart",
-            "status": "verified"
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
-      }
-    },
     "Avatar": {
       "code": {
         "import": "@/components/images-and-icons",
@@ -1676,13 +1652,13 @@
         ]
       }
     },
-    "Popover": {
+    "Popup": {
       "code": {
         "import": "@/components/overlays-and-layering",
         "export": "default",
-        "mdxPath": "design-system/src/components/overlays-and-layering/Popover/Popover.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Popover",
-        "source": "design-system/src/components/overlays-and-layering/Popover/Popover.jsx",
+        "mdxPath": "design-system/src/components/overlays-and-layering/Popup/Popup.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/overlays-and-layering/Popup",
+        "source": "design-system/src/components/overlays-and-layering/Popup/Popup.jsx",
         "storybookId": "components-overlays-and-layering-popup--docs"
       },
       "figma": {
@@ -1878,6 +1854,30 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=72-16516"
+      }
+    },
+    "SectionMessage": {
+      "code": {
+        "import": "@/components/messaging",
+        "export": "default",
+        "mdxPath": "design-system/src/components/messaging/SectionMessage/SectionMessage.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/SectionMessage",
+        "source": "design-system/src/components/messaging/SectionMessage/SectionMessage.jsx",
+        "storybookId": "components-messaging-section-message--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "alert",
+            "name": "alert",
+            "componentSetNodeId": "11:324",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=11-324",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
     "Sidebar": {

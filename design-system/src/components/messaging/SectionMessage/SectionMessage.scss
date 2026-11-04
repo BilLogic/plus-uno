@@ -1,65 +1,82 @@
 /**
- * Alert Component Styles
+ * SectionMessage Component Styles
  * Matches Figma design system specifications
  */
 
-.plus-alert {
-    display: flex !important;
-    /* Override Bootstrap display: block    display: flex; */
+.plus-section-message {
+    display: flex;
     align-items: flex-start;
     border-radius: var(--size-modal-radius-sm);
     width: 100%;
-    /* Full width - responsive */
     max-width: 100%;
-    /* One border, on the left: Figma's `Element/stroke-xl` (3px). */
-    border: 0 solid;
-    border-left-width: var(--size-element-stroke-xl);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     box-sizing: border-box;
-    /* Figma: Padding on container (16px), Gap between content and dismiss (variable) */
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
     gap: var(--size-card-gap-sm);
 }
 
-/* Inner content wrapper - Padding applied here (wrapping subcomponent) */
-.plus-alert-content {
+/* Inner content wrapper */
+.plus-section-message-content {
     display: flex;
     flex: 1 0 0;
     flex-direction: column;
-    gap: var(--size-element-gap-sm);
-    /* 8px internal gap */
+    gap: var(--element-gap-default);
     align-items: flex-start;
     justify-content: center;
     min-height: 0;
     min-width: 0;
     padding: 0;
-    /* Padding moved to parent */
     position: relative;
 }
 
-
-
-/* Typography & Layout Resets */
-
-/* A section message's title: Heading/small 16/20, over Body/default 14/20. */
-.plus-alert-title {
+/* A section message's title: Heading/small 16/20, over Body/default 14/20.
+ * Color is set explicitly: the bare `h2` rule in _fonts.scss otherwise wins
+ * over this class with its own `--color-on-surface`, since neither selector
+ * declares a competing color and the class carries no color of its own. */
+.plus-section-message-title {
     margin: 0;
+    color: var(--ds-text);
     font: var(--heading-small);
     white-space: pre-wrap;
 }
 
-.plus-alert-text {
+.plus-section-message-text {
     font: var(--body-default);
     white-space: pre-wrap;
     margin: 0;
 
-    // Links inherit the alert's on-surface text color instead of Bootstrap's
-    // default link blue, which can fail contrast on the tinted ground.
+    // Links inherit the message's on-surface text color rather than the
+    // browser's default link blue, which can fail contrast on the tinted ground.
     a {
         color: inherit;
         text-decoration: underline;
         font-weight: var(--type-weight-medium);
     }
+}
+
+/* Link-button actions, after the body, with a divider between consecutive ones. */
+.plus-section-message-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--element-gap-default);
+}
+
+.plus-section-message-action {
+    padding: 0;
+    border: none;
+    background: none;
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.plus-section-message-actions-divider {
+    width: 1px;
+    align-self: stretch;
+    background-color: currentColor;
+    opacity: 0.3;
 }
 
 /*
@@ -69,14 +86,14 @@
  * the CloseButton are centered on it, and the CloseButton may overhang a line
  * shorter than its 32px box.
  */
-.plus-alert-leading,
-.plus-alert-dismiss {
+.plus-section-message-leading,
+.plus-section-message-dismiss {
     position: relative;
     display: flex;
     flex: none;
 }
 
-.plus-alert-strut {
+.plus-section-message-strut {
     display: block;
     width: 0;
     margin: 0;
@@ -84,16 +101,16 @@
     visibility: hidden;
 }
 
-.plus-alert-strut--title {
+.plus-section-message-strut--title {
     font: var(--heading-small);
 }
 
-.plus-alert-strut--text {
+.plus-section-message-strut--text {
     font: var(--body-default);
 }
 
-.plus-alert-leading-icon,
-.plus-alert-dismiss .plus-close-btn {
+.plus-section-message-leading-icon,
+.plus-section-message-dismiss .plus-close-btn {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -108,15 +125,15 @@
  * centered on the first line and fills the column, so it must be exactly the
  * 20px square the glyph is drawn in.
  */
-.plus-alert-leading {
+.plus-section-message-leading {
     width: var(--font-size-fa-h4-solid);
 }
 
 // Two classes deep, to beat the typography classes' `body .fa-solid` icon
-// sizing; a passed Font Awesome node gets the same 20px. Font Awesome 7 draws
+// sizing; a passed Font Awesome node gets the same 20px. Font Awesome draws
 // every icon 1.25em wide; `--fa-width: 1em` makes the box the 20px square the
 // column is, so it does not overhang it.
-.plus-alert-leading .plus-alert-leading-icon {
+.plus-section-message-leading .plus-section-message-leading-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -130,16 +147,16 @@
     }
 }
 
-.plus-alert-dismiss {
+.plus-section-message-dismiss {
     width: var(--item-height-md); /* the CloseButton's fixed box; also its max-width containing block */
 }
 
-/* Alert Style Variants */
+/* Style variants: the ground is the named background token of its role. No
+ * side stripe — meaning is carried by the fill and the icon, not a border. */
 
-$alert-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
+$section-message-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 
-// Each style's ground is the named background token of its role.
-$alert-grounds: (
+$section-message-grounds: (
     'primary': '--ds-background-brand-subtlest',
     'secondary': '--ds-background-neutral',
     'success': '--ds-background-success',
@@ -148,12 +165,11 @@ $alert-grounds: (
     'info': '--ds-background-information',
 );
 
-@each $theme in $alert-themes {
-    .plus-alert.#{$theme} {
-        background-color: var(#{map-get($alert-grounds, $theme)});
-        border-color: var(--color-#{$theme}-border);
+@each $theme in $section-message-themes {
+    .plus-section-message.#{$theme} {
+        background-color: var(#{map-get($section-message-grounds, $theme)});
 
-        .plus-alert-leading {
+        .plus-section-message-leading {
             color: var(--color-#{$theme}-icon);
         }
     }
