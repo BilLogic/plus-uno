@@ -33,8 +33,6 @@ From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Overr
 
 Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Panel` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).
