@@ -1,20 +1,149 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FieldsetStories from './Fieldset.stories.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FieldsetStories} />
 
 <Title />
-A fieldset groups a legend with the fields underneath it.
+A legend plus the fields it groups. `RadioGroup` is built on this same
+composition; a checkbox group is the same shape with `Checkbox` instead.
 
 <DocsTabs of={FieldsetStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={FieldsetStories.Default} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Fieldset"
+/>
 
-<ArgTypes of={FieldsetStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A legend over a set of fields.</>}>
+    <Canvas of={FieldsetStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>The same composition groups a set of checkboxes.</>}>
+    <DsCanvasQuiet of={FieldsetStories.CheckboxGroup} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>`isRequired` marks the legend; `error` renders one message for the whole group, announced when it appears.</>}>
+    <DsCanvasQuiet of={FieldsetStories.WithRequiredAndError} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>legend</code></td><td>node</td><td>Labels the fieldset's contents.</td></tr>
+        <tr><td><code>isDisabled</code></td><td>boolean</td><td>Disables the whole group.</td></tr>
+        <tr><td><code>isRequired</code></td><td>boolean</td><td>Marked on the legend.</td></tr>
+        <tr><td><code>error</code></td><td>node</td><td>One error for the group, announced with <code>role="alert"</code> when it appears.</td></tr>
+        <tr><td><code>children</code></td><td>node</td><td>The fields the legend labels.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Fieldset` wherever a set of fields shares one label and, often, one
+validation message — a group of radios, a group of checkboxes, related text
+fields asked together. For a single field with its own label, use the
+<a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a>{' '}
+convention instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### One `error` covers the whole group.
+
+Pass `error` on the `Fieldset`, not on each field inside it, when the
+validation applies to the set as a whole — "Choose at least one," for
+example, rather than a field-by-field message.
+
+```jsx
+<Fieldset legend="Notify me by" isRequired error={error}>
+    <Checkbox label="Email" />
+    <Checkbox label="Text" />
+</Fieldset>
+```
+
+### Build on `Fieldset` rather than reimplementing it.
+
+`RadioGroup` already composes `Fieldset` with `Radio` children. Reach for
+`RadioGroup` directly for radios, and use `Fieldset` on its own only for a
+shape it doesn't already cover, like a checkbox group.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real `fieldset`/`legend` pair.** The legend is tied to the group
+  through native HTML semantics, which every screen reader already
+  understands.
+- **The error is announced once.** `role="alert"` on the error message means
+  assistive technology hears it as soon as it appears, without needing focus
+  to move there.
+- **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a
+  visually hidden "(required)" is added to the legend's accessible name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the ready-made radio composition, use `RadioGroup`.
+- For a single field's label and help text, see the
+  <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a> convention.
+
+</div>
+
+</div>
 
 </DocsTab>
 

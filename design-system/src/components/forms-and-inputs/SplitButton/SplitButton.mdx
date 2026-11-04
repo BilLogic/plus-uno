@@ -1,20 +1,147 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SplitButtonStories from './SplitButton.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SplitButtonStories} />
 
 <Title />
-A split button does one action and opens a menu of related actions from its chevron.
+A primary action joined to a chevron that opens a menu of related actions.
 
 <DocsTabs of={SplitButtonStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={SplitButtonStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/SplitButton"
+/>
 
-<ArgTypes of={SplitButtonStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+A `SplitButton` composes two children it draws the seam between and groups
+for assistive technology: a `Button` for the primary action, and an
+`IconButton` with a chevron for the menu trigger. Each child keeps its own
+appearance, spacing and state.
+
+<DocsCanvasShell attachSourceBelow description={<>A primary action and its chevron, drawn as one connected control.</>}>
+    <Canvas of={SplitButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance and spacing
+
+<DocsCanvasShell description={<>The action's appearance carries the whole control's look — pass the same appearance to both children.</>}>
+    <DsCanvasQuiet of={SplitButtonStories.Appearances} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Both children share the same `spacing` for an even seam.</>}>
+    <DsCanvasQuiet of={SplitButtonStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>The chevron open state.</>}>
+    <DsCanvasQuiet of={SplitButtonStories.MenuState} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled and loading, set independently on each child.</>}>
+    <DsCanvasQuiet of={SplitButtonStories.States} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SplitButtonStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `SplitButton` when one action is clearly primary and a few related
+actions belong beside it in a menu — "Send" with "Send and close," "Save" as
+a draft. For actions with no clear primary, use `ButtonGroup` instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Match appearance and spacing on both children yourself.
+
+`SplitButton` draws the seam but sets no styling of its own — pass the same
+`appearance` and `spacing` to the `Button` and the chevron `IconButton` so
+the control reads as one piece.
+
+```jsx
+<SplitButton>
+    <Button text="Send" onClick={send} appearance="primary" />
+    <IconButton icon="chevron-down" label="More send options" appearance="primary" onClick={openMenu} />
+</SplitButton>
+```
+
+### Open the menu from the chevron's own click handler.
+
+`SplitButton` has no menu logic itself — wire the chevron's `onClick` to open
+a `Popup` or `MenuGroup` positioned under it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named group of two controls.** The wrapper is `role="group"`, so
+  assistive technology reads the action and its menu trigger as related.
+- **Each child keeps its own accessible name.** The primary action needs its
+  own label; the chevron's `IconButton` needs a label describing what its
+  menu holds, not a generic "more."
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For actions with no clear primary, use `ButtonGroup`.
+- For the menu the chevron opens, see `Popup` and `MenuGroup`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
