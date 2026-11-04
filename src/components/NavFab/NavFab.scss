@@ -38,7 +38,7 @@
     height: 40px;
     border-radius: var(--size-border-radius-radius-300, 50%);
     border: 1px solid var(--color-outline-variant, #c4c4c4);
-    background: var(--ds-surface-container);
+    background: var(--ds-background-neutral);
     color: var(--ds-text);
     display: flex;
     align-items: center;
@@ -49,7 +49,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 
     &:hover {
-      background: var(--ds-background-neutral-subtle-hovered);
+      background: var(--ds-background-neutral-hovered);
       color: var(--ds-text);
     }
 

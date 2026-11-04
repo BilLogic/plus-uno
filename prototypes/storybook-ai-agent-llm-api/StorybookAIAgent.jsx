@@ -754,7 +754,7 @@ const buildResponse = (actionId, pageContext) => {
             return (
                 <div>
                     <p style={{ fontWeight: 600, marginBottom: 8, fontSize: '14px' }}>🎒 New Starter Kit</p>
-                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--ds-background-neutral)', background: 'var(--ds-surface-container)', padding: '6px 10px', borderRadius: '6px' }}>
+                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--ds-text-subtle)', background: 'var(--ds-surface-container)', padding: '6px 10px', borderRadius: '6px' }}>
                         💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
                     </p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>

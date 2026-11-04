@@ -49,7 +49,7 @@ const App = () => {
                     <i className="fa-solid fa-rocket" style={{ marginRight: '8px', color: 'var(--color-primary)' }} />
                     Bryan's Prototype
                 </h3>
-                <p className="body1-txt" style={{ color: 'var(--ds-icon-subtle)', marginBottom: 'var(--size-section-gap-md, 16px)' }}>
+                <p className="body1-txt" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-section-gap-md, 16px)' }}>
                     Your prototypes is ready! Edit <code>src/App.jsx</code> to start building.
                 </p>
                 <div

@@ -144,7 +144,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                                             </li>
                                         ))}
                                         {tutor.students.length === 0 && (
-                                            <li className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>No students assigned</li>
+                                            <li className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>No students assigned</li>
                                         )}
                                     </ul>
                                 </div>
