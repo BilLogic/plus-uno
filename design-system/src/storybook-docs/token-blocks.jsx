@@ -18,7 +18,7 @@ const Palette = ({ groups }) => (
     </ColorPalette>
 );
 
-/** The ten accent hues, each with its four background fills. */
+/** The eleven accent hues, each with its four background fills. */
 export const AccentPalette = () => <Palette groups={accentGroups(semanticScss)} />;
 
 /** The chart tokens, one row per job. */
@@ -34,6 +34,9 @@ export const TypeScaleBlocks = () => (
                 <h4 style={{ font: 'var(--heading-xsmall)', margin: 0 }}>
                     {g.title} · {g.family} {g.weight}
                 </h4>
+                <p style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', margin: 0 }}>
+                    {g.styles.map((s) => `${s.token} ${s.size}/${s.lineHeight}`).join(' · ')}
+                </p>
                 <Typeset
                     fontFamily={`var(${g.familyToken})`}
                     fontWeight={`var(${g.weightToken})`}
