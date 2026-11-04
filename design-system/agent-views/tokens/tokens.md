@@ -34,6 +34,8 @@ Use for padding, margin, and gaps.
 --size-element-gap-sm
 --size-element-gap-xs
 --size-element-pad-x-lg
+--size-element-pad-x-md
+--size-element-pad-x-sm
 --size-element-pad-x-xs
 --size-element-pad-y-lg
 --size-element-pad-y-md
@@ -194,6 +196,9 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --card-min-width-lg
 --card-min-width-md
 --card-min-width-sm
+--card-pad-lg
+--card-pad-md
+--card-pad-sm
 --card-radius
 --card-radius-sm
 --card-stack-lg
@@ -240,6 +245,7 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --modal-inline-lg
 --modal-inline-md
 --modal-inline-sm
+--modal-pad
 --modal-radius
 --modal-stack-lg
 --modal-stack-md
