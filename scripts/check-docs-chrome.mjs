@@ -174,7 +174,9 @@ async function measureToc(context, baseUrl) {
   // A deep entry: the third h3 of the section with the most of them.
   const plan = await page.evaluate(() => {
     const tops = [...document.querySelectorAll('.toc-wrapper > ul > li')];
-    const best = tops.reduce((a, b) => (b.querySelectorAll('ul a').length > a.querySelectorAll('ul a').length ? b : a));
+    if (!tops.length) return null;
+    const best = tops.reduce((a, b) => (b.querySelectorAll('ul a').length > a.querySelectorAll('ul a').length ? b : a), tops[0]);
+    if (!best.querySelector('ul a')) return null;
     const kids = [...best.querySelectorAll('ul a')];
     const tops2 = [...document.querySelectorAll('.toc-wrapper > ul > li > a')];
     return {
@@ -183,6 +185,10 @@ async function measureToc(context, baseUrl) {
       last: tops2[tops2.length - 1].textContent,
     };
   });
+  if (!plan) {
+    await page.close();
+    return tocFailures({ page: TOC_PAGE, entries: 0, untitled: [], wrapped: [], clicked: { label: '', top: null, active: null }, strayNested: [], openNested: 0, last: { label: '', top: null, active: null } });
+  }
   const esc = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const entryOf = (t) => entry(esc(t));
   await entryOf(plan.section).click();

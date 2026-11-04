@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { DocsContainer } from '@storybook/addon-docs/blocks';
 
 /**
- * The "On this page" rail's two page-side fixes, applied from the docs container.
+ * The "On this page" rail's four page-side fixes, applied from the docs container.
  *
  * 1. Heading ids. Tocbot links each entry to `#<heading id>`. Many docs pages
  *    render their section headings through components (FoundationSection and
@@ -11,7 +11,6 @@ import { DocsContainer } from '@storybook/addon-docs/blocks';
  *    lists get a slug id here, unique on the page, before Tocbot reads them.
  * 2. Entry titles. Entries are one line with an ellipsis (storybook-overrides.css);
  *    the full heading is the native tooltip.
- *
  * 3. Landing. Tocbot measures the jump once, then animates; canvases and fonts
  *    settling mid-animation leave the heading short of the line (measured: 488px
  *    down instead of 96). After a click settles, the heading is nudged onto the
@@ -27,7 +26,8 @@ import { DocsContainer } from '@storybook/addon-docs/blocks';
 // Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx: the heading's line.
 const LINE = 96;
 const HEADINGS = '.sbdocs-content h2, .sbdocs-content h3';
-const SKIPPED = '.docs-story, .skip-toc';
+// Tocbot's ignoreSelector: `.docs-story *, .skip-toc` — inside a canvas, or marked itself.
+const isSkipped = (h) => h.matches('.skip-toc') || !!h.closest('.docs-story');
 
 const slug = (text) =>
   text
@@ -39,7 +39,7 @@ const slug = (text) =>
 export function stampHeadingIds(root = document) {
   const taken = new Set([...root.querySelectorAll('[id]')].map((el) => el.id));
   for (const heading of root.querySelectorAll(HEADINGS)) {
-    if (heading.id || heading.closest(SKIPPED)) continue;
+    if (heading.id || isSkipped(heading)) continue;
     const base = slug(heading.textContent ?? '');
     let id = base;
     for (let n = 2; taken.has(id); n += 1) id = `${base}-${n}`;
@@ -79,7 +79,7 @@ export function endSpaceFor(lastHeadingTop, contentBottom, viewport) {
 }
 
 function updateEndSpace() {
-  const headings = [...document.querySelectorAll(HEADINGS)].filter((h) => !h.closest(SKIPPED));
+  const headings = [...document.querySelectorAll(HEADINGS)].filter((h) => !isSkipped(h));
   const last = headings[headings.length - 1];
   const content = document.querySelector('.sbdocs-content');
   if (!last || !content) return;
@@ -99,7 +99,8 @@ function TocEnhancer() {
       updateEndSpace();
     };
     refresh();
-    // Late-rendering MDX and the rail itself (Tocbot builds it ~100ms after mount).
+    // Late-rendering MDX and the rail itself (Tocbot builds it ~100ms after mount). A heading that
+    // appears after that still links to `#`: the rail reads ids once, when it is built.
     let frame = 0;
     const schedule = () => {
       cancelAnimationFrame(frame);
@@ -119,13 +120,25 @@ function TocEnhancer() {
       // Tocbot's animation is 420ms; settle after it, then once more for late layout.
       for (const ms of [500, 1100]) {
         timers.push(setTimeout(() => {
-          const heading = document.getElementById(decodeURIComponent(id));
+          let key = id;
+          try {
+            key = decodeURIComponent(id);
+          } catch {
+            // a malformed escape: use the raw id
+          }
+          const heading = document.getElementById(key);
           if (heading) settleOnLine(heading);
         }, ms));
       }
     };
     document.addEventListener('click', onClick);
+    // A reader who takes over the scroll is not nudged back.
+    const cancel = () => timers.forEach(clearTimeout);
+    window.addEventListener('wheel', cancel, { passive: true });
+    window.addEventListener('touchstart', cancel, { passive: true });
     return () => {
+      window.removeEventListener('wheel', cancel);
+      window.removeEventListener('touchstart', cancel);
       cancelAnimationFrame(frame);
       timers.forEach(clearTimeout);
       mutations.disconnect();
