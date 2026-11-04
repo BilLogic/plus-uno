@@ -38,8 +38,8 @@
     height: 40px;
     border-radius: var(--size-border-radius-radius-300, 50%);
     border: 1px solid var(--color-outline-variant, #c4c4c4);
-    background: var(--color-surface-container, #f0f0f0);
-    color: var(--color-on-surface, #1a1a1a);
+    background: var(--ds-background-neutral);
+    color: var(--ds-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,8 +49,8 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 
     &:hover {
-      background: var(--color-surface-container-high, #e8e8e8);
-      color: var(--color-on-surface, #1a1a1a);
+      background: var(--ds-background-neutral-hovered);
+      color: var(--ds-text);
     }
 
     &:focus-visible {

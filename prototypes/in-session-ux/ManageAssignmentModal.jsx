@@ -20,7 +20,7 @@ const ManageAssignmentModal = ({ onClose }) => {
         border: 'none',
         borderBottom: activeTab === id ? '2px solid var(--color-primary)' : '2px solid transparent',
         backgroundColor: 'transparent',
-        color: activeTab === id ? 'var(--color-primary)' : 'var(--color-on-surface-variant)',
+        color: activeTab === id ? 'var(--color-primary)' : 'var(--ds-text-subtle)',
         fontWeight: 600,
         cursor: 'pointer',
         fontSize: '14px'
@@ -57,7 +57,7 @@ const ManageAssignmentModal = ({ onClose }) => {
             <div
                 onClick={(e) => e.stopPropagation()}
                 style={{
-                    backgroundColor: 'var(--color-surface-container-high, #fff)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: '16px',
                     width: 'min(900px, 95vw)',
                     maxHeight: '90vh',
@@ -77,7 +77,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                 }}>
                     <div>
                         <h2 id="manage-assignment-title" className="h5" style={{ margin: 0, marginBottom: '4px' }}>Manage Assignment</h2>
-                        <p className="body2-txt" style={{ margin: 0, color: 'var(--color-on-surface-variant)' }}>
+                        <p className="body2-txt" style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
                             Review and adjust how students are paired with tutors for optimal learning.
                         </p>
                     </div>
@@ -85,7 +85,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                         type="button"
                         onClick={onClose}
                         aria-label="Close"
-                        style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', padding: '4px', color: 'var(--color-on-surface-variant)' }}
+                        style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', padding: '4px', color: 'var(--ds-text-subtle)' }}
                     >
                         <i className="fas fa-xmark" />
                     </button>
@@ -125,12 +125,12 @@ const ManageAssignmentModal = ({ onClose }) => {
                                         border: '1px solid var(--color-outline-variant)',
                                         borderRadius: '12px',
                                         padding: '16px',
-                                        backgroundColor: 'var(--color-surface-container)'
+                                        backgroundColor: 'var(--ds-surface-container)'
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                                         <span className="body1-txt" style={{ fontWeight: 600 }}>{tutor.name}</span>
-                                        <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                        <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                             <i className="fas fa-users" style={{ marginRight: '6px' }} aria-hidden />
                                             {tutor.count}
                                         </span>
@@ -138,13 +138,13 @@ const ManageAssignmentModal = ({ onClose }) => {
                                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                                         {tutor.students.map((name, i) => (
                                             <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                                                <i className="fas fa-grip-vertical" style={{ color: 'var(--color-on-surface-variant)', cursor: 'grab' }} aria-hidden />
+                                                <i className="fas fa-grip-vertical" style={{ color: 'var(--ds-icon-subtle)', cursor: 'grab' }} aria-hidden />
                                                 <span className="body2-txt">{name}</span>
                                                 <StatusTag appearance="success">Joined</StatusTag>
                                             </li>
                                         ))}
                                         {tutor.students.length === 0 && (
-                                            <li className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>No students assigned</li>
+                                            <li className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>No students assigned</li>
                                         )}
                                     </ul>
                                 </div>

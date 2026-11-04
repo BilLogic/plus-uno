@@ -9,12 +9,12 @@ const DevIndexPage = () => {
             margin: '0 auto',
             fontFamily: 'var(--font-family-body, sans-serif)'
         }}>
-            <h1 style={{ marginBottom: '24px', color: 'var(--color-on-surface, #000)' }}>PLUS Application Prototypes</h1>
-            <p style={{ marginBottom: '32px', color: 'var(--color-on-surface-variant, #666)' }}>
+            <h1 style={{ marginBottom: '24px', color: 'var(--ds-text)' }}>PLUS Application Prototypes</h1>
+            <p style={{ marginBottom: '32px', color: 'var(--ds-text-subtle)' }}>
                 Select a prototype to view:
             </p>
 
-            <Link to="/market" style={{ ...linkStyle, marginBottom: '24px', borderColor: 'var(--color-primary)', backgroundColor: 'var(--color-surface-container-lowest, #f5f5f5)' }}>
+            <Link to="/market" style={{ ...linkStyle, marginBottom: '24px', borderColor: 'var(--color-primary)', backgroundColor: 'var(--ds-surface-raised)' }}>
                 <div style={{ fontWeight: 'bold', fontSize: '18px', color: 'var(--color-primary)' }}>Prototype Market</div>
                 <div style={{ fontSize: '14px', color: '#666' }}>Browse all prototypes with search, filters, and deployment links.</div>
             </Link>
@@ -62,11 +62,11 @@ const DevIndexPage = () => {
 const linkStyle = {
     display: 'block',
     padding: '24px',
-    backgroundColor: 'var(--color-surface, #fff)',
+    backgroundColor: 'var(--ds-surface)',
     border: '1px solid var(--color-outline-variant, #e0e0e0)',
     borderRadius: '8px',
     textDecoration: 'none',
-    color: 'var(--color-on-surface, #000)',
+    color: 'var(--ds-text)',
     transition: 'transform 0.2s, box-shadow 0.2s',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
 };

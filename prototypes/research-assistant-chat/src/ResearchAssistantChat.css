@@ -33,7 +33,7 @@
     display: block;
     background: linear-gradient(90deg,
             var(--color-outline-variant, #e0e0e0) 0%,
-            var(--color-surface-container-highest, #e8e8e8) 50%,
+            var(--ds-skeleton) 50%,
             var(--color-outline-variant, #e0e0e0) 100%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 2s ease-in-out infinite;

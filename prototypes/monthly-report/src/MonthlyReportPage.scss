@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-section-gap-lg);
-    background: var(--color-surface);
+    background: var(--ds-surface);
     min-height: 100vh;
     overflow: visible;
     padding-bottom: var(--size-section-gap-lg);
@@ -26,7 +26,7 @@
 .header-title {
     font-size: 28px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -36,7 +36,7 @@
     gap: var(--size-element-gap-sm);
     margin-top: var(--size-element-gap-xs);
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
 }
 
 .header-meta-dot {
@@ -47,7 +47,7 @@
 }
 
 .month-badge {
-    background: var(--color-surface-container);
+    background: var(--ds-surface-container);
     padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
     border-radius: var(--size-element-radius-full);
     font-weight: 600;
@@ -59,7 +59,7 @@
 .section-title {
     font-size: 20px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -84,7 +84,7 @@
 }
 
 .impact-hero-card {
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface-raised);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-card-radius-md);
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
@@ -133,7 +133,7 @@
 .impact-title {
     font-size: 14px;
     font-weight: 700;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: var(--size-card-gap-md);
@@ -197,14 +197,14 @@
 .metric-value-xl {
     font-size: 48px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     line-height: 1;
 }
 
 .metric-unit {
     font-size: 18px;
     font-weight: 500;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .delta-badge {
@@ -234,7 +234,7 @@
 
 .metric-label {
     font-size: 12px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin-top: 0;
 }
 
@@ -246,7 +246,7 @@
 }
 
 .stat-card {
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface-raised);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-card-radius-sm);
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
@@ -334,7 +334,7 @@
 .metric-value-lg {
     font-size: 32px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     line-height: 1;
     display: block;
     position: relative;
@@ -345,7 +345,7 @@
     display: block;
     font-size: 12px;
     font-weight: 600;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-top: var(--size-element-gap-xs);
@@ -363,7 +363,7 @@
    TIME ALLOCATION SECTION
    ============================================ */
 .time-allocation-section {
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface);
     border: none;
     border-radius: var(--size-card-radius-md);
     padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
@@ -375,7 +375,7 @@
 .time-allocation-title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -429,12 +429,12 @@
     font-size: 14px;
     font-weight: 500;
     line-height: 1.4;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .legend-value {
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .time-allocation-bar {
@@ -442,7 +442,7 @@
     height: 16px;
     border-radius: 10px;
     overflow: hidden;
-    background: var(--color-surface-container-high, #d6dbe0);
+    background: var(--ds-surface-container);
 }
 
 .time-allocation-segment {
@@ -498,7 +498,7 @@
 
 .time-allocation-subtitle {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
     margin: var(--size-element-gap-xs) 0 0;
     line-height: 1.4;
 }
@@ -510,10 +510,10 @@
     padding: 6px 14px;
     border-radius: var(--size-element-radius-full);
     border: 1px solid var(--color-outline-variant);
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface);
     font-size: 13px;
     font-weight: 500;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -541,16 +541,16 @@
 .time-allocation-bar-label {
     font-size: 14px;
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .time-allocation-bar-label--peer {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .time-allocation-bar-total {
     font-size: 12px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .segment-label {
@@ -573,7 +573,7 @@
     display: flex;
     align-items: flex-start;
     gap: var(--size-element-gap-md);
-    background: var(--color-surface-container);
+    background: var(--ds-surface-container);
     border-radius: var(--size-element-radius-md);
     padding: var(--element-pad-default);
 }
@@ -585,7 +585,7 @@
 
 .time-insight-text {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     margin: 0;
     flex: 1;
 }
@@ -613,12 +613,12 @@
 
 .review-progress {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .review-progress-count {
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* Timeline */
@@ -669,14 +669,14 @@
 }
 
 .timeline-node--locked {
-    background: var(--color-surface-container);
-    color: var(--color-on-surface-variant);
+    background: var(--ds-surface-container);
+    color: var(--ds-text-subtle);
     opacity: 0.6;
 }
 
 /* Growth Cards */
 .growth-card {
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface-raised);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-card-radius-sm);
     overflow: hidden;
@@ -727,13 +727,13 @@
 .growth-card-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
 .growth-card-subtitle {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
     margin: var(--size-element-gap-xs) 0 0;
 }
 
@@ -746,7 +746,7 @@
 
 .locked-hint {
     font-size: 12px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     display: flex;
     align-items: center;
     gap: var(--size-element-gap-xs);
@@ -763,14 +763,14 @@
 
 .growth-card-summary {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     line-height: 1.6;
     margin: 0;
     padding-block: var(--size-element-pad-y-sm);
 }
 
 .quote-block {
-    background: var(--color-surface-container);
+    background: var(--ds-surface-container);
     border-left: 3px solid var(--color-primary);
     border-radius: var(--size-element-radius-sm);
     padding: var(--element-pad-default);
@@ -779,7 +779,7 @@
 .quote-text {
     font-size: 14px;
     font-style: italic;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
     line-height: 1.6;
 }
@@ -792,7 +792,7 @@
 
 .session-info {
     font-size: 13px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .feedback-row {
@@ -806,7 +806,7 @@
 .feedback-prompt {
     font-size: 14px;
     font-weight: 500;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0;
 }
 
@@ -843,7 +843,7 @@
 
     thead th {
         text-align: left;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         font-size: 12px;
         font-weight: 500;
         padding: 8px 16px;
@@ -853,12 +853,12 @@
         transition: background-color 0.2s ease;
 
         &:hover {
-            background-color: var(--color-surface-container-highest);
+            background-color: var(--ds-surface-container);
         }
 
         td {
             padding: 14px 16px;
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             vertical-align: middle;
 
             &:first-child {
@@ -891,7 +891,7 @@
     font-size: 13px;
     font-weight: 700;
     flex-shrink: 0;
-    background: var(--color-surface-container-lowest, #fff);
+    background: var(--ds-surface);
 }
 
 .school-info {
@@ -903,12 +903,12 @@
 .school-name {
     font-size: 15px;
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .school-teacher {
     font-size: 13px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .students-cell {
@@ -926,7 +926,7 @@
     font-size: 10px;
     font-weight: 700;
     margin-left: -6px;
-    border: 2px solid var(--color-surface-container-lowest, #fff);
+    border: 2px solid var(--ds-surface);
     position: relative;
 
     &:first-child {
@@ -935,8 +935,8 @@
 }
 
 .student-avatar--extra {
-    background: var(--color-surface-container-high, #e0e0e0);
-    color: var(--color-on-surface-variant);
+    background: var(--ds-surface-container);
+    color: var(--ds-text-subtle);
     font-size: 11px;
     font-weight: 600;
 }
@@ -960,7 +960,7 @@
 .goal-value {
     font-size: 15px;
     font-weight: 700;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     min-width: 36px;
 }
 
@@ -982,14 +982,14 @@
 }
 
 .goal-delta--neutral {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 /* ============================================
    CTA SECTION
    ============================================ */
 .cta-section {
-    background: var(--color-surface-container-lowest, #fff);
+    background: var(--ds-surface);
     border-radius: var(--size-card-radius-md);
     border: 1px solid var(--color-outline-variant);
     padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
@@ -1010,13 +1010,13 @@
 .cta-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     margin: 0 0 4px;
 }
 
 .cta-subtitle {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
     margin: 0;
     line-height: 1.5;
 }
@@ -1036,7 +1036,7 @@
     padding-bottom: 80px;
     gap: var(--size-surface-gap-sm);
     font-family: var(--font-family-base, var(--font-family-body));
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .report-header {
@@ -1123,7 +1123,7 @@
 }
 
 .time-insight-box {
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface);
     border-radius: 8px;
 }
 
@@ -1162,7 +1162,7 @@
     height: 40px;
     background-color: #fff;
     border: 2px solid var(--color-outline-variant);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     box-shadow: 0 0 0 6px #fff;
 }
 
@@ -1305,7 +1305,7 @@
 
 .review-label {
     font-size: 14px;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     line-height: 1.2;
 }
 
@@ -1391,7 +1391,7 @@
     /* Use a solid background that matches the page to hide the line underneath */
     background-color: #f6f8fa !important;
     /* Explicit opaque color matching surface */
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     opacity: 1 !important;
     border-color: var(--color-outline-variant) !important;
     z-index: 10 !important;
@@ -1411,7 +1411,7 @@
 }
 
 .monthly-report .legend-label {
-    color: var(--color-on-surface) !important;
+    color: var(--ds-text) !important;
     font-weight: 500 !important;
     line-height: 1.4 !important;
 }
@@ -1419,7 +1419,7 @@
 .monthly-report .time-allocation-bar {
     border-radius: 10px !important;
     overflow: hidden !important;
-    background: var(--color-surface-container-high, #d6dbe0) !important;
+    background: var(--ds-surface-container) !important;
 }
 
 .monthly-report .time-allocation-segment:first-child {
@@ -1527,7 +1527,7 @@
     align-items: center !important;
     gap: var(--size-element-gap-xs) !important;
     margin-top: 2px !important;
-    color: var(--color-on-surface-variant) !important;
+    color: var(--ds-text-subtle) !important;
     font-size: var(--font-size-body2, 14px) !important;
     line-height: 1.25 !important;
 }
@@ -1565,7 +1565,7 @@
 
 .monthly-report .review-label {
     margin: 0 !important;
-    color: var(--color-on-surface-variant) !important;
+    color: var(--ds-text-subtle) !important;
     font-size: var(--font-size-body2, 14px) !important;
     font-weight: 500 !important;
     line-height: 1.2 !important;
@@ -1663,7 +1663,7 @@
     display: inline-flex !important;
     align-items: center !important;
     gap: 6px !important;
-    color: var(--color-on-surface-variant) !important;
+    color: var(--ds-text-subtle) !important;
     font-size: var(--font-size-body2, 14px) !important;
 }
 
@@ -1760,7 +1760,7 @@
     height: 40px !important;
     border-radius: 8px !important;
     overflow: hidden !important;
-    background: var(--color-surface-container-high, #d6dbe0) !important;
+    background: var(--ds-surface-container) !important;
 }
 
 .monthly-report .time-allocation-segment {

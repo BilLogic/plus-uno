@@ -19,9 +19,9 @@ body {
   overflow: hidden;
   font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
   font-size: var(--font-size-body2, 14px);
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
-  background-color: var(--color-surface-container, #f0f0f5);
+  background-color: var(--ds-surface-container);
 }
 
 #root {
@@ -34,7 +34,7 @@ body {
   overflow: hidden;
   border-radius: 0;
   box-shadow: none;
-  background-color: var(--color-surface-container, #f0f0f5);
+  background-color: var(--ds-surface-container);
 }
 
 #root > .live-app-shell {

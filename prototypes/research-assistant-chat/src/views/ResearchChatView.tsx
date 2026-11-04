@@ -21,7 +21,7 @@ export function ResearchChatView({
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: 'var(--color-surface, #f9f9fc)',
+        background: 'var(--ds-surface)',
       }}
     >
       <ResearchAssistantChat onBack={onBack} />

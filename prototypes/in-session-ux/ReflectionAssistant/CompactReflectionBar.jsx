@@ -137,7 +137,7 @@ export function CompactReflectionBar({
                                                 padding:
                                                     'var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px)',
                                                 background:
-                                                    'var(--color-surface-container-high, #f0f2f5)',
+                                                    'var(--ds-surface-container)',
                                                 border:
                                                     '1px solid var(--color-outline-variant, #bec8ca)',
                                                 borderRadius:
@@ -145,7 +145,7 @@ export function CompactReflectionBar({
                                                 cursor: 'pointer',
                                                 textAlign: 'left',
                                                 fontFamily: 'var(--font-family-body)',
-                                                color: 'var(--color-on-surface, #191c1e)',
+                                                color: 'var(--ds-text)',
                                             }}
                                         >
                                             <div
@@ -159,7 +159,7 @@ export function CompactReflectionBar({
                                             <div
                                                 style={{
                                                     fontSize: 'var(--font-size-body2, 14px)',
-                                                    color: 'var(--color-on-surface-variant)',
+                                                    color: 'var(--ds-text-subtle)',
                                                 }}
                                             >
                                                 {prompt.description}
@@ -194,7 +194,7 @@ export function CompactReflectionBar({
                                 padding: '0 16px',
                                 minHeight: FAB_SIZE,
                                 height: FAB_SIZE,
-                                background: 'var(--color-surface-container-lowest, #fff)',
+                                background: 'var(--ds-surface)',
                                 border: '1px solid var(--color-outline-variant, #bec8ca)',
                                 borderRadius: 'var(--size-border-radius-radius-300, 12px)',
                                 cursor: 'text',
@@ -210,7 +210,7 @@ export function CompactReflectionBar({
                                     flex: 1,
                                     fontFamily: 'var(--font-family-body)',
                                     fontSize: 'var(--font-size-body2, 14px)',
-                                    color: 'var(--color-on-surface-variant, #6b7280)',
+                                    color: 'var(--ds-text-subtle)',
                                 }}
                             >
                                 Reflect on this session...
@@ -230,7 +230,7 @@ function PaperclipIcon() {
             height="20"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--color-on-surface-variant, #6b7280)"
+            stroke="var(--ds-icon-subtle)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"

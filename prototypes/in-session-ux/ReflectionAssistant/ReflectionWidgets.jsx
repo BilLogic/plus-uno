@@ -21,7 +21,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
 
     return (
         <div className="reflection-widget question-flow" style={{
-            background: 'var(--color-surface, #fff)',
+            background: 'var(--ds-surface)',
             border: '1px solid var(--color-outline-variant, #bec8ca)',
             borderRadius: '16px',
             padding: '20px',
@@ -30,10 +30,10 @@ export const QuestionFlow = ({ steps, onComplete }) => {
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-on-surface-variant, #6b7280)', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ds-text-subtle)', textTransform: 'uppercase' }}>
                     Step {currentStep + 1} of {steps.length}
                 </span>
-                <div style={{ flex: 1, height: '4px', background: 'var(--color-surface-container, #f0f2f5)', margin: '0 12px', borderRadius: '2px', position: 'relative' }}>
+                <div style={{ flex: 1, height: '4px', background: 'var(--ds-surface-container)', margin: '0 12px', borderRadius: '2px', position: 'relative' }}>
                     <div style={{
                         position: 'absolute',
                         left: 0,
@@ -48,7 +48,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
             </div>
 
             <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600 }}>{step.title}</h3>
-            <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: 'var(--color-on-surface-variant, #6b7280)' }}>{step.description}</p>
+            <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: 'var(--ds-text-subtle)' }}>{step.description}</p>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
                 {step.options.map(option => (
@@ -122,7 +122,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
 
     return (
         <div className="reflection-widget parameter-slider" style={{
-            background: 'var(--color-surface, #fff)',
+            background: 'var(--ds-surface)',
             border: '1px solid var(--color-outline-variant, #bec8ca)',
             borderRadius: '16px',
             padding: '24px',
@@ -162,7 +162,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
                     style={{
                         padding: '8px 16px',
                         background: 'transparent',
-                        color: 'var(--color-on-surface-variant, #6b7280)',
+                        color: 'var(--ds-text-subtle)',
                         border: 'none',
                         fontWeight: 600,
                         cursor: 'pointer'

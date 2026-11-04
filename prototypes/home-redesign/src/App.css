@@ -13,7 +13,7 @@
 
 /* TopBar: breadcrumb and user from config; UserAvatar background for demo. */
 #home-redesign-page .plus-user-avatar {
-    background-color: var(--color-surface-container-lowest) !important;
+    background-color: var(--ds-surface) !important;
 }
 
 /* Sidebar: no overrides – match reference tutor-training-progress-page exactly. */
@@ -250,7 +250,7 @@
     display: flex;
     flex-direction: column;
     padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-raised);
     border-radius: var(--size-surface-radius, 16px);
     box-sizing: border-box;
     overflow: hidden;
@@ -320,7 +320,7 @@
     font-size: var(--font-size-h4);
     font-weight: var(--font-weight-bold);
     line-height: var(--font-line-height-h4);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .home-redesign-monthly-top {
@@ -343,7 +343,7 @@
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-h1);
     line-height: var(--font-line-height-h1);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     letter-spacing: 0;
     white-space: nowrap;
 }
@@ -354,7 +354,7 @@
     font-size: var(--font-size-body2);
     font-weight: var(--font-weight-body2-regular);
     line-height: var(--font-line-height-body2);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .home-redesign-donut-wrap {
@@ -394,7 +394,7 @@
     font-size: var(--font-size-body2);
     font-weight: var(--font-weight-body2-regular);
     line-height: var(--font-line-height-body2);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .home-redesign-breakdown-hrs {
@@ -404,7 +404,7 @@
     font-size: var(--font-size-body2);
     font-weight: var(--font-weight-body2-regular);
     line-height: var(--font-line-height-body2);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 /* Progress bar: design system ProgressBar, reveal animation on the fill */
@@ -489,7 +489,7 @@
 
 .home-redesign-momentum-name {
     font-weight: 500;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     flex-shrink: 0;
 }
 
@@ -526,7 +526,7 @@
     gap: var(--size-section-gap-md);
     width: 100%;
     padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-surface-radius, 16px);
     box-sizing: border-box;
 }

@@ -216,9 +216,9 @@ const InSessionPage = () => {
                             }
                             .skeleton-block {
                                 background: linear-gradient(90deg, 
-                                    var(--color-surface-container-highest) 0%, 
-                                    var(--color-surface-container) 50%, 
-                                    var(--color-surface-container-highest) 100%);
+                                    var(--ds-skeleton) 0%, 
+                                    var(--ds-skeleton-subtle) 50%, 
+                                    var(--ds-skeleton) 100%);
                                 background-size: 200% 100%;
                                 animation: skeleton-shimmer 1.5s ease-in-out infinite;
                                 border-radius: 4px;
@@ -233,7 +233,7 @@ const InSessionPage = () => {
                                 cursor: pointer;
                             }
                             .student-row:hover {
-                                background-color: var(--color-surface-container-highest) !important; 
+                                background-color: var(--ds-surface-container) !important; 
                             }
                         `}</style>
                         {!contentVisible ? (
@@ -266,7 +266,7 @@ const InSessionPage = () => {
                                 <div className="page-content-reveal table-reveal" style={{ width: '100%', animationDelay: '280ms' }}>
                                     <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
                                         <thead>
-                                            <tr style={{ textAlign: 'left', color: 'var(--color-on-surface-variant)', fontSize: '12px' }}>
+                                            <tr style={{ textAlign: 'left', color: 'var(--ds-text-subtle)', fontSize: '12px' }}>
                                                 <th style={{ padding: '8px 16px', fontWeight: 500 }}>Name <i className="fa-solid fa-arrow-up" style={{ fontSize: '10px', marginLeft: '4px' }} /></th>
                                                 <th style={{ padding: '8px 16px', fontWeight: 500 }}>Status <i className="fa-solid fa-arrow-up" style={{ fontSize: '10px', marginLeft: '4px' }} /></th>
                                                 <th style={{ padding: '8px 16px', fontWeight: 500 }}>Attendance</th>
@@ -288,7 +288,7 @@ const InSessionPage = () => {
                                                             padding: '12px 16px',
                                                             borderTopLeftRadius: '8px',
                                                             borderBottomLeftRadius: '8px',
-                                                            color: 'var(--color-on-surface)',
+                                                            color: 'var(--ds-text)',
                                                             textDecoration: hoveredStudentId === s.id ? 'underline' : 'none',
                                                             cursor: 'pointer'
                                                         }}
