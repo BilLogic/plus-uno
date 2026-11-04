@@ -119,6 +119,10 @@ function probeValue(name, meta) {
   // A string is a legal node everywhere except as a child of an overlay
   // trigger, which clones its child and needs a real element to clone.
   if (t === 'PropTypes.node') return name === 'children' ? sampleElement() : 'Sample';
+  // An empty array never fabricates an element shape, so it is safe even for
+  // `arrayOf(shape({...}))`: it satisfies a required array prop's `.map()`
+  // without inventing the shape inside it.
+  if (/^PropTypes\.(array|arrayOf\()/.test(t)) return [];
   return undefined;
 }
 
