@@ -1,0 +1,159 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as DropdownMenuStories from './DropdownMenu.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={DropdownMenuStories} />
+
+<Title />
+
+<DocsTabs of={DropdownMenuStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DropdownMenu"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A trigger that opens a menu of `ButtonItem` rows.</>}>
+    <Canvas of={DropdownMenuStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Placement
+
+<DocsCanvasShell description={<>`placement` picks the side and alignment; `shouldFlip` (on by default) swaps to the opposite side when there isn't room.</>}>
+    <DsCanvasQuiet of={DropdownMenuStories.Placements} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`cozy` draws 40px rows (the default); `compact` draws 32px.</>}>
+    <DsCanvasQuiet of={DropdownMenuStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sections
+
+<DocsCanvasShell description={<>`Section` groups rows under a title, with an optional separator above it.</>}>
+    <DsCanvasQuiet of={DropdownMenuStories.WithSections} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DropdownMenuStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `DropdownMenu` for a trigger that opens a list of actions or navigation
+links. Its rows are the public Menu family: `Section`, `ButtonItem`,
+`LinkItem` and `CustomItem` (also drawn by `MenuGroup` on its own, for a
+menu that does not float). For picking one value from a list of options, use
+`Select` instead — a dropdown menu is for actions, a select is for a value.
+
+`trigger` is the element that opens it, `children` are its rows. `isOpen` and
+`onOpenChange` make it controlled; left uncontrolled it opens and closes on
+its own. `placement` and `shouldFlip` govern where it opens and whether it
+flips when there isn't room. `spacing` is `cozy` (40px rows, the default) or
+`compact` (32px). `loading` swaps the rows for a spinner while its options are
+still being fetched.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### A row closes the menu unless it opts out.
+
+```jsx
+// Picking "Rename" closes the menu — the common case for an action list.
+<DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" />} />}>
+    <ButtonItem onClick={onRename}>Rename</ButtonItem>
+    <ButtonItem onClick={onArchive}>Archive</ButtonItem>
+</DropdownMenu>
+
+// A toggle row that should stay open across repeated picks carries
+// `data-keep-open`, as a multi-select tag or filter row does.
+<ButtonItem onClick={toggleStarred} isSelected={starred} data-keep-open="true">
+    Starred
+</ButtonItem>
+```
+
+### A static row never closes the menu.
+
+A `CustomItem` with no `component` override (its default, `div`) renders a row
+that only says its words: nothing to press, nothing to focus, and it leaves
+the menu open — the same contract `MenuGroup` itself uses for a row that is
+not a control.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The trigger announces the menu.** Base UI Menu's trigger carries
+  `aria-haspopup="menu"` and an `aria-expanded` that tracks the open state.
+- **Arrow keys move between rows**, Enter and Space pick the row at the
+  cursor, and Escape closes the menu and returns focus to the trigger.
+- **A disabled row is out of the tab order** and cannot be picked.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For picking one value from a list, use `Select`.
+- For the rows themselves, outside a floating menu, use `MenuGroup` directly.
+- For a page's title row with its own actions, see `PageHeader`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import Dropdown from './Dropdown/Dropdown';
+import Button from './Button';
+import DropdownMenu from './DropdownMenu/DropdownMenu';
+import { ButtonItem } from '@/components/navigation/MenuGroup';
 import Select from './Select';
 import Toggle from './Toggle';
 
@@ -33,10 +35,6 @@ const schoolOptions = [
     { value: 'school-b', label: 'School B' },
 ];
 
-const menuItems = [
-    { text: 'Rename' },
-    { text: 'Duplicate' },
-];
 
 export default {
     title: 'Components/Forms and inputs/Declared API',
@@ -143,13 +141,15 @@ export const DropdownControlledToggle = () => {
 
     return (
         <div style={stack}>
-            <Dropdown
+            <DropdownMenu
                 id="dapi-menu"
-                buttonText="Actions"
-                items={menuItems}
+                trigger={<Button>Actions</Button>}
                 isOpen={open}
-                onToggle={setOpen}
-            />
+                onOpenChange={setOpen}
+            >
+                <ButtonItem onClick={() => {}}>Rename</ButtonItem>
+                <ButtonItem onClick={() => {}}>Duplicate</ButtonItem>
+            </DropdownMenu>
             <p data-testid="open-state">{open ? 'open' : 'closed'}</p>
         </div>
     );
@@ -157,43 +157,54 @@ export const DropdownControlledToggle = () => {
 
 DropdownControlledToggle.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
     const state = canvas.getByTestId('open-state');
     const toggle = canvas.getByRole('button', { name: 'Actions' });
 
     await userEvent.click(toggle);
-    await expect(state).toHaveTextContent('open');
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(state).toHaveTextContent('open'));
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'true'));
+
+    // Base UI's own trigger swallows a second mousedown within 200ms of the
+    // first as a double-click guard, so the toggle-closed click below has to
+    // land after that window, not immediately back to back with the first.
+    await new Promise((resolve) => { setTimeout(resolve, 250); });
 
     // The defect: before #207 this click changed nothing at all.
     await userEvent.click(toggle);
-    await expect(state).toHaveTextContent('closed');
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(state).toHaveTextContent('closed'));
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'false'));
+    await new Promise((resolve) => { setTimeout(resolve, 250); });
 
     // An item click dismisses it too, which is the common case.
     await userEvent.click(toggle);
-    await userEvent.click(canvas.getByRole('button', { name: 'Rename' }));
-    await expect(state).toHaveTextContent('closed');
+    await userEvent.click(await body.findByRole('menuitem', { name: 'Rename' }));
+    await waitFor(() => expect(state).toHaveTextContent('closed'));
 };
 
 /**
  * The uncontrolled contract the fix must not disturb: no `isOpen`, no
- * `onToggle`, and the component still opens and closes on its own.
+ * `onOpenChange`, and the component still opens and closes on its own.
  */
 export const DropdownUncontrolled = () => (
     <div style={stack}>
-        <Dropdown id="dapi-uncontrolled" buttonText="Actions" items={menuItems} />
+        <DropdownMenu id="dapi-uncontrolled" trigger={<Button>Actions</Button>}>
+            <ButtonItem onClick={() => {}}>Rename</ButtonItem>
+            <ButtonItem onClick={() => {}}>Duplicate</ButtonItem>
+        </DropdownMenu>
     </div>
 );
 
 DropdownUncontrolled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
     const toggle = canvas.getByRole('button', { name: 'Actions' });
 
     await userEvent.click(toggle);
-    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'true'));
 
-    await userEvent.click(canvas.getByRole('button', { name: 'Duplicate' }));
-    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(await body.findByRole('menuitem', { name: 'Duplicate' }));
+    await waitFor(() => expect(toggle).toHaveAttribute('aria-expanded', 'false'));
 };
 
 /* ------------------------------------------------------------------ Toggle */

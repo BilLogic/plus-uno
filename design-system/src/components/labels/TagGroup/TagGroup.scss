@@ -66,16 +66,6 @@
     pointer-events: none;
 }
 
-/*
- * The Dropdown wraps a custom toggle in an inline-block (a Bootstrap utility,
- * so its display cannot be overridden without `!important`). Its line box
- * would add a fraction of a pixel under the 22 tag; with no line height of
- * its own it is exactly the tag. The tag sets its own text line height.
- */
-.plus-tag-group__menu > :first-child {
-    line-height: 0;
-}
-
 /* `+n` counts hidden tags; it names no category, so it has no swatch. */
 .plus-tag-group__overflow .plus-tag__swatch {
     display: none;

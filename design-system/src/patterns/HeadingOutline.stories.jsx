@@ -1,7 +1,8 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Dropdown, Modal, Popup, Table, Flag } from '@/components';
+import { DropdownMenu, Modal, Popup, Table, Flag } from '@/components';
+import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
 import { PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
@@ -131,25 +132,23 @@ PopupAndFlagTitles.play = async ({ canvasElement }) => {
 /** Group labels are 12 semibold: a menu group's label, and a table's column headers. */
 export const GroupLabels = () => (
     <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' }}>
-        <Dropdown
-            isOpen
-            buttonText="Sort"
-            items={[
-                { header: true, text: 'Order' },
-                { text: 'Newest' },
-                { text: 'Oldest' },
-            ]}
-        />
+        <DropdownMenu isOpen trigger={<button type="button">Sort</button>}>
+            <Section title="Order">
+                <ButtonItem onClick={() => {}}>Newest</ButtonItem>
+                <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
+            </Section>
+        </DropdownMenu>
         <Table headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
     </div>
 );
 
 GroupLabels.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
     await expect(canvas.queryAllByRole('heading')).toHaveLength(0);
-    const group = canvas.getByRole('group', { name: 'Order' });
-    await expectStyle(canvas.getByText('Order'), 'menu group label', HEADING_XXSMALL);
-    await expect(within(group).getAllByRole('button').map((b) => b.textContent)).toEqual(['Newest', 'Oldest']);
+    const group = await body.findByRole('group', { name: 'Order' });
+    await expectStyle(body.getByText('Order'), 'menu group label', HEADING_XXSMALL);
+    await expect(within(group).getAllByRole('menuitem').map((b) => b.textContent)).toEqual(['Newest', 'Oldest']);
     for (const header of canvas.getAllByRole('columnheader')) {
         await expectStyle(header, `column header ${header.textContent}`, HEADING_XXSMALL);
     }

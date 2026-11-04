@@ -107,9 +107,13 @@ export const Collapse = () => (
     </div>
 );
 
-/** The visible line for `words` in an open `+n` menu, whatever its role. */
-const menuRow = (list, words) => within(list).queryAllByText(words)
-    .find((el) => el.closest('[role="listitem"]')?.querySelector('[aria-expanded]')
+/**
+ * The visible line for `words` in an open `+n` menu, whatever its role. The
+ * menu portals to the document body, outside `list`, so it is found by
+ * scoping to the menu surface itself rather than to `list`.
+ */
+const menuRow = (list, words) => within(list.ownerDocument.body).queryAllByText(words)
+    .find((el) => el.closest('.plus-dropdown-menu')
         && el.checkVisibility({ visibilityProperty: true })) ?? null;
 
 /** How many tags a person can see, and what `+n` says is hidden. */
@@ -213,41 +217,43 @@ export const CollapseMenu = () => (
 );
 
 CollapseMenu.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
+    // The menu portals to the document body, so its rows are queried there.
+    const body = within(canvasElement.ownerDocument.body);
     const { shown, more } = readCollapse(canvasElement);
     const hidden = SUBJECTS.slice(shown.length);
 
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     for (const s of hidden) {
-        await expect(canvas.queryByRole('link', { name: s }), `${s} is not reachable while closed`).toBeNull();
+        await expect(body.queryByRole('link', { name: s }), `${s} is not reachable while closed`).toBeNull();
     }
 
     more.focus();
     await userEvent.keyboard('{Enter}');
-    await expect(more).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
 
     // The menu lists exactly the hidden tags, in order.
     for (const s of hidden) {
-        await expect(canvas.getByRole('link', { name: s })).toBeVisible();
+        await expect(body.getByRole('link', { name: s })).toBeVisible();
     }
     for (const s of shown) {
-        await expect(canvas.getAllByRole('link', { name: s }), `${s} is on the row, not also in the menu`).toHaveLength(1);
+        await expect(body.getAllByRole('link', { name: s }), `${s} is on the row, not also in the menu`).toHaveLength(1);
     }
 
-    await userEvent.tab();
-    await expect(canvas.getByRole('link', { name: hidden[0] }), 'Tab reaches the first hidden tag').toHaveFocus();
+    // Opening by keyboard moves focus straight to the first row, the
+    // standard WAI-ARIA menu pattern.
+    await waitFor(() => expect(body.getByRole('link', { name: hidden[0] }), 'opening focuses the first hidden tag').toHaveFocus());
 
     await userEvent.keyboard('{Escape}');
-    await expect(more).toHaveAttribute('aria-expanded', 'false');
-    await expect(more, 'Escape returns focus to +n').toHaveFocus();
-    await expect(canvas.queryByRole('link', { name: hidden[0] })).toBeNull();
+    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(more, 'Escape returns focus to +n').toHaveFocus());
+    await expect(body.queryByRole('link', { name: hidden[0] })).toBeNull();
 
     // Space opens it too, and choosing an item closes it.
     await userEvent.keyboard(' ');
-    await expect(more).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
     await userEvent.tab();
     await userEvent.keyboard('{Enter}');
-    await expect(more).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'false'));
 };
 
 /**
@@ -270,6 +276,8 @@ export const CollapseWithSuggestions = {
     ),
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
+        // The menu portals to the document body, so its rows are queried there.
+        const body = within(canvasElement.ownerDocument.body);
         const frame = canvas.getByTestId('frame');
         const list = canvas.getByRole('list', { name: 'Subjects' });
         const insert = () => within(list).getByRole('button', { name: 'Add Fractions, suggested' });
@@ -311,13 +319,13 @@ export const CollapseWithSuggestions = {
         // The menu lists the hidden tags only, never a suggestion.
         const { more, shown } = readCollapse(canvasElement);
         await userEvent.click(more);
-        await expect(more).toHaveAttribute('aria-expanded', 'true');
+        await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
         for (const s of SUBJECTS.slice(shown.length)) {
             await expect(menuRow(list, s), `${s} is in the menu`).not.toBeNull();
         }
         await expect(menuRow(list, 'Fractions')).toBeNull();
-        await expect(canvas.queryByRole('button', { name: 'Fractions' })).toBeNull();
-        await expect(canvas.queryByRole('button', { name: 'Summarize' })).toBeNull();
+        await expect(body.queryByRole('button', { name: 'Fractions' })).toBeNull();
+        await expect(body.queryByRole('button', { name: 'Summarize' })).toBeNull();
         await expect(canvas.getAllByRole('button', { name: /suggested$/ })).toHaveLength(2);
         await userEvent.keyboard('{Escape}');
 
@@ -361,44 +369,36 @@ export const MenuKeepsActions = {
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
+        // The menu portals to the document body, so its rows are queried there.
+        const body = within(canvasElement.ownerDocument.body);
         const more = await canvas.findByRole('button', { name: '+6 more tags' });
         await userEvent.click(more);
+        await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
 
-        // Selectable: a toggle, off, then on and still in the open menu. It
-        // leads with the Dropdown's multi-select checkbox, Figma's
-        // `_Form Checkbox Button`, decorative since aria-pressed carries the
-        // state: the input fill with the input stroke and no check, then a
-        // selected-bold (Lagoon) box with a check.
-        const checkboxOf = (item) => item.querySelector('.pdropdown-checkbox');
-        const toggle = canvas.getByRole('button', { name: 'Mathematics' });
-        await expect(toggle).toHaveAttribute('aria-pressed', 'false');
-        const offBox = checkboxOf(toggle);
-        await expect(offBox, 'a checkbox leads the row').not.toBeNull();
-        await expect(getComputedStyle(offBox).backgroundColor, 'unchecked fill')
-            .toBe(tokenColor(canvasElement, '--ds-background-input'));
-        await expect(getComputedStyle(offBox).borderTopColor, 'unchecked stroke')
-            .toBe(tokenColor(canvasElement, '--ds-border-input'));
-        await expect(offBox.querySelector('svg'), 'no check while off').toBeNull();
+        // Selectable: a toggle, off, then on and still in the open menu.
+        // `aria-checked` carries the state on `role="menuitemcheckbox"` — the
+        // one menu row role that allows a toggle state; `aria-pressed` is not
+        // an allowed attribute on a plain `menuitem`. `keepOpen` behavior
+        // holds the menu open across the pick, so the change is seen where
+        // it was made.
+        const toggle = await body.findByRole('menuitemcheckbox', { name: 'Mathematics' });
+        await expect(toggle).toHaveAttribute('aria-checked', 'false');
         await userEvent.click(toggle);
         await expect(canvas.getByText('Mathematics picked')).toBeInTheDocument();
-        await expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true');
-        await expect(canvas.getByRole('button', { name: 'Mathematics' })).toHaveAttribute('aria-pressed', 'true');
-        const onBox = checkboxOf(canvas.getByRole('button', { name: 'Mathematics' }));
-        await expect(getComputedStyle(onBox).backgroundColor, 'checked fill')
-            .toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
-        await expect(onBox.querySelector('svg'), 'a check is drawn').not.toBeNull();
+        await waitFor(() => expect(more, 'toggling keeps the menu open').toHaveAttribute('aria-expanded', 'true'));
+        await expect(body.getByRole('menuitemcheckbox', { name: 'Mathematics' })).toHaveAttribute('aria-checked', 'true');
         // Waited for: the item's background eases in. The token is read once,
         // outside the wait: its probe element would otherwise wake the wait's
         // own mutation observer on every read.
         const selectedGround = tokenColor(canvasElement, '--ds-background-selected');
         await waitFor(() => expect(
-            getComputedStyle(canvas.getByRole('button', { name: 'Mathematics' })).backgroundColor,
+            getComputedStyle(body.getByRole('menuitemcheckbox', { name: 'Mathematics' })).backgroundColor,
             'the item shows the menu\'s selected state',
         ).toBe(selectedGround));
 
         // Link: a real link to the tag's href, named by its words, with an
         // arrow that is not read out. The tag's own onClick still fires.
-        const link = canvas.getByRole('link', { name: 'History' });
+        const link = body.getByRole('link', { name: 'History' });
         await expect(link).toHaveAttribute('href', '#history');
         const arrow = link.querySelector('[aria-hidden="true"]:last-child');
         await expect(arrow, 'a trailing arrow').not.toBeNull();
@@ -410,22 +410,27 @@ export const MenuKeepsActions = {
         // Read-only and removable: rows that only say the words. Not buttons,
         // not focusable, never a ×, and pressing one leaves the menu open.
         await userEvent.click(more);
+        await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
         const list = canvas.getByRole('list', { name: 'Filters' });
         for (const s of ['Geography', 'Music']) {
-            await expect(canvas.queryByRole('button', { name: s }), `${s} is not a button`).toBeNull();
+            await expect(body.queryByRole('button', { name: s }), `${s} is not a button`).toBeNull();
             const row = menuRow(list, s);
             await expect(row, `${s} is listed`).not.toBeNull();
-            await expect(row.closest('button, a, [tabindex]'), `${s} is not focusable`).toBeNull();
+            // Scoped to the row's own `menuitem`, not `.closest()` all the way
+            // up: the popup itself carries `tabindex="-1"` as an ancestor of
+            // every row, focusable or not.
+            const owner = row.closest('[role="menuitem"]');
+            await expect(owner.matches('button, a, [tabindex]:not([tabindex="-1"])'), `${s} is not focusable`).toBe(false);
         }
         await userEvent.click(menuRow(list, 'Music'));
-        await expect(more, 'a plain row does not close the menu').toHaveAttribute('aria-expanded', 'true');
-        await expect(canvas.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
+        await waitFor(() => expect(more, 'a plain row does not close the menu').toHaveAttribute('aria-expanded', 'true'));
+        await expect(body.queryByRole('button', { name: /^Remove/ }), 'remove stays on the row').toBeNull();
         await expect(args.onRemove).not.toHaveBeenCalled();
 
         // Still saving, whatever the behavior: disabled and busy, not
         // pressable, and out of the tab order.
         for (const s of ['Art', 'Latin']) {
-            const saving = canvas.getByRole('button', { name: s });
+            const saving = body.getByRole('menuitem', { name: s });
             await expect(saving, `${s} is disabled`).toBeDisabled();
             await expect(saving, `${s} is busy`).toHaveAttribute('aria-busy', 'true');
             await userEvent.click(saving, { pointerEventsCheck: 0 });

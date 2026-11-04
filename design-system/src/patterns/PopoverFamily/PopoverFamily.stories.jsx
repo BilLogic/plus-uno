@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
-import { Button, Dropdown, Popup, Flag, FlagContainer, Tooltip } from '@/components';
+import { Button, Popup, Flag, FlagContainer, Tooltip } from '@/components';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 
 /** The popup widths, Popover/width-sm · md · lg. */
@@ -10,9 +10,10 @@ const POPUP_WIDTHS = ['sm', 'md', 'lg'];
 const POPUP_PLACEMENTS = ['top', 'bottom', 'left', 'right', 'bottom-start', 'bottom-end'];
 
 /**
- * Stories for the Popover family page: Menu, Popup, Flag and Tooltip. They
- * are docs-only, built from the real components. A Popup is never a form:
- * its body is text or a short list.
+ * Stories for the Popover family page: Popup, Flag and Tooltip. They are
+ * docs-only, built from the real components. A Popup is never a form: its
+ * body is text or a short list. Menu's own cover lives on `DropdownMenu`'s
+ * stories (`Components/Forms and inputs/Dropdown menu`).
  */
 export default {
     title: 'Foundations/Patterns/Popover family',
@@ -52,52 +53,6 @@ const Stage = ({ height = 160, children, style }) => {
             {children({ open })}
         </div>
     );
-};
-
-const menuRows = [
-    { text: 'Group heading', header: true },
-    { text: 'Edit', leadingIcon: 'pen' },
-    { text: 'Duplicate', leadingIcon: 'copy', selected: true },
-    { text: 'Move to…', leadingIcon: 'arrow-right' },
-    { text: 'Share', description: 'Anyone with the link can view', leadingIcon: 'share-nodes' },
-];
-
-const menuOf = (canvasElement) => canvasElement.querySelectorAll('.dropdown-menu.show');
-
-/** The menu in its two sizes: 32 rows on radius 12, and 24 rows on radius 10. */
-export const Menu = {
-    render: () => (
-        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap', alignItems: 'flex-end', minHeight: 296, padding: 'var(--space-100)' }}>
-            <Dropdown buttonText="Menu md" direction="dropup" isOpen items={menuRows} />
-            <Dropdown buttonText="Menu sm" size="small" direction="dropup" isOpen items={menuRows} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const [md, sm] = menuOf(canvasElement);
-        await expect(px(getComputedStyle(md).paddingTop), 'Popover/pad-menu').toBe(4);
-        await expect(px(getComputedStyle(md).borderTopLeftRadius), 'radius-menu-md').toBe(12);
-        await expect(px(getComputedStyle(sm).borderTopLeftRadius), 'radius-menu-sm').toBe(10);
-        const [edit] = within(md).getAllByRole('button');
-        await expect(edit.getBoundingClientRect().height, 'a row is 32').toBe(32);
-        const [smEdit] = within(sm).getAllByRole('button');
-        await expect(smEdit.getBoundingClientRect().height, 'a small row is 24').toBe(24);
-    },
-};
-
-const sessions = Array.from({ length: 14 }, (_, i) => ({ text: `Session ${i + 1}` }));
-
-/** A menu stops at 320 tall and scrolls; the cut row shows that there is more. */
-export const MenuScrolls = {
-    render: () => (
-        <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 400, padding: 'var(--space-100)' }}>
-            <Dropdown buttonText="Sessions" direction="dropup" isOpen items={sessions} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const [menu] = menuOf(canvasElement);
-        await expect(menu.getBoundingClientRect().height, 'max-height-menu').toBe(320);
-        await expect(menu.scrollHeight).toBeGreaterThan(menu.clientHeight);
-    },
 };
 
 const noteList = (

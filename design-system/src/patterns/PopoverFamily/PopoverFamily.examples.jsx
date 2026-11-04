@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button, Dropdown, TextField, Popup } from '@/components';
+import { Button, DropdownMenu, TextField, Popup } from '@/components';
+import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
 
 /**
  * Live compositions for the Popover family page's do and don't pairs. The
  * Popup is the real Popup component held open, and the Menu is a real
- * Dropdown held open. The heights and flex layouts below are stage geometry:
- * they reserve room for a layer that floats outside the flow.
+ * DropdownMenu held open. The heights and flex layouts below are stage
+ * geometry: they reserve room for a layer that floats outside the flow.
  */
 
 /** Keeps the docs page's heading and list styles off the examples. */
@@ -64,18 +65,14 @@ export const PopupForm = () => (
 export const MenuShortLabels = () => (
     <Plain height={248}>
         <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 248 }}>
-            <Dropdown
-                buttonText="Actions"
-                direction="dropup"
-                isOpen
-                items={[
-                    { text: 'Group heading', header: true },
-                    { text: 'Reschedule', description: 'Pick a new time and notify the tutor' },
-                    { text: 'Duplicate session' },
-                    { text: 'Cancel session', description: 'Students are told right away' },
-                    { text: 'Export notes' },
-                ]}
-            />
+            <DropdownMenu trigger={<Button text="Actions" spacing="compact" />} placement="top-start" isOpen>
+                <Section title="Group heading">
+                    <ButtonItem onClick={() => {}} description="Pick a new time and notify the tutor">Reschedule</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Duplicate session</ButtonItem>
+                    <ButtonItem onClick={() => {}} description="Students are told right away">Cancel session</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Export notes</ButtonItem>
+                </Section>
+            </DropdownMenu>
         </div>
     </Plain>
 );
@@ -84,18 +81,14 @@ export const MenuShortLabels = () => (
 export const MenuSentenceLabel = () => (
     <Plain height={248}>
         <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 248 }}>
-            <Dropdown
-                buttonText="Actions"
-                direction="dropup"
-                isOpen
-                items={[
-                    { text: 'Group heading', header: true },
-                    { text: 'Reschedule this session to a later date and tell the tutor lead why' },
-                    { text: 'Duplicate session' },
-                    { text: 'Cancel session' },
-                    { text: 'Export notes' },
-                ]}
-            />
+            <DropdownMenu trigger={<Button text="Actions" spacing="compact" />} placement="top-start" isOpen>
+                <Section title="Group heading">
+                    <ButtonItem onClick={() => {}}>Reschedule this session to a later date and tell the tutor lead why</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Duplicate session</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Cancel session</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Export notes</ButtonItem>
+                </Section>
+            </DropdownMenu>
         </div>
     </Plain>
 );

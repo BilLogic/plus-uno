@@ -3,7 +3,8 @@ import { describe, expect, it } from 'vitest';
 
 // Module paths rather than the barrels, so the rest stays light.
 import PatternCard from './PatternCard';
-import Dropdown from '@/components/forms-and-inputs/Dropdown';
+import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
+import { ButtonItem, Section } from '@/components/navigation/MenuGroup';
 import Modal from '@/components/messaging/Modal';
 import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
@@ -93,23 +94,21 @@ describe('a dialog', () => {
 describe('group labels', () => {
     it('name a menu group and are not headings', () => {
         render(
-            <Dropdown
-                isOpen
-                buttonText="Sort"
-                items={[
-                    { header: true, text: 'Order' },
-                    { text: 'Newest' },
-                    { text: 'Oldest' },
-                    { header: true, text: 'Group by' },
-                    { text: 'Tutor' },
-                ]}
-            />,
+            <DropdownMenu isOpen trigger={<button type="button">Sort</button>}>
+                <Section title="Order">
+                    <ButtonItem onClick={() => {}}>Newest</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
+                </Section>
+                <Section title="Group by">
+                    <ButtonItem onClick={() => {}}>Tutor</ButtonItem>
+                </Section>
+            </DropdownMenu>,
         );
         expect(screen.queryAllByRole('heading')).toEqual([]);
         const order = screen.getByRole('group', { name: 'Order' });
-        expect(within(order).getAllByRole('button').map((b) => b.textContent)).toEqual(['Newest', 'Oldest']);
+        expect(within(order).getAllByRole('menuitem').map((b) => b.textContent)).toEqual(['Newest', 'Oldest']);
         const groupBy = screen.getByRole('group', { name: 'Group by' });
-        expect(within(groupBy).getAllByRole('button').map((b) => b.textContent)).toEqual(['Tutor']);
+        expect(within(groupBy).getAllByRole('menuitem').map((b) => b.textContent)).toEqual(['Tutor']);
         // The label is a label, not a control.
         expect(screen.queryByRole('button', { name: 'Order' })).toBeNull();
     });

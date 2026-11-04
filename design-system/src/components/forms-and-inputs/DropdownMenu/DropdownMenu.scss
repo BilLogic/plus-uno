@@ -1,0 +1,30 @@
+/*
+ * DropdownMenu — the floating surface a `MenuGroup` sits in once a trigger
+ * opens it. Same floating-layer treatment as Listbox and Popup:
+ * `elevation.surface.overlay`, its shadow, a `color.border` edge and
+ * Popover/radius-menu-md, capped at Popover/max-height-menu and
+ * Popover/max-width-menu.
+ */
+
+.plus-dropdown-menu {
+    box-sizing: border-box;
+    max-height: var(--popover-max-height-menu);
+    max-width: var(--popover-max-width-menu);
+    overflow: hidden;
+    background-color: var(--ds-surface-overlay);
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--popover-radius-menu-md);
+    box-shadow: var(--ds-shadow-overlay);
+    z-index: var(--layout-z-index-popup);
+
+    .plus-menu-group {
+        max-height: var(--popover-max-height-menu);
+    }
+}
+
+.plus-dropdown-menu-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-200);
+}

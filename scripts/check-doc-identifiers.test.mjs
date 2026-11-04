@@ -201,13 +201,13 @@ test('a fabricated prop and a fabricated variant both fail the check', () => {
     '<StatusTag appearance="info" spacing="huge" />',
     '```',
     '',
-    'Written inline, `fill="translucent"` is the same claim.',
+    'Written inline, `placement="diagonal"` is the same claim.',
     '',
   ].join('\n');
   const output = findingsIn({ '__regression-props.md': page }).join('\n');
   assert.match(output, /emphasis is not a prop of Button/);
   assert.match(output, /StatusTag spacing="huge"/);
-  assert.match(output, /fill="translucent"/);
+  assert.match(output, /placement="diagonal"/);
 });
 
 test('the corpus as it stands is clean — the check exits 0 on main', () => {

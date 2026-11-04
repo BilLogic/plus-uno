@@ -200,44 +200,19 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
   expectNoFill(BUTTON, '.plus-btn:focus-visible');
 });
 
-/* ─── Dropdown: menu items and toggles ───────────────────────────────────── */
+/* ─── MenuGroup: DropdownMenu's rows ─────────────────────────────────────── */
 
-const DROPDOWN = 'components/forms-and-inputs/Dropdown/Dropdown.scss';
+// DropdownMenu has no toggle theme of its own (its trigger is a caller's own
+// Button or IconButton, which carries Button's steps); its rows are
+// MenuGroup's `plus-menu-item`, shared with every other menu in the system.
+const MENU_GROUP = 'components/navigation/MenuGroup/MenuGroup.scss';
 
-test('Dropdown items: neutral hovered and pressed, selected neutral ink with its own steps, focus ring only', () => {
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected', { 'background-color': layer('--ds-background-selected') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:hover', { 'background-color': layer('--ds-background-selected-hovered') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item.selected:active', { 'background-color': layer('--ds-background-selected-pressed') });
-  expectRule(DROPDOWN, '.pdropdown .dropdown-item:focus-visible', DS_RING_INSIDE);
-  expectNoFill(DROPDOWN, '.pdropdown .dropdown-item:focus-visible');
-});
-
-test('Dropdown toggles: the same steps as Button', () => {
-  const steps = {
-    primary: ['brand-bold', 'brand-subtlest'],
-    secondary: ['neutral-bold', 'neutral'],
-    tertiary: ['accent-teal-bolder', 'accent-teal-subtler'],
-    success: ['success-bold', 'success-subtler'],
-    danger: ['danger-bold', 'danger-subtler'],
-    warning: ['warning-bold', 'warning-subtler'],
-    info: ['information-bold', 'information-subtler'],
-  };
-  for (const [intent, [bold, subtle]] of Object.entries(steps)) {
-    const at = (fill) => `.pdropdown.pdropdown-${intent}${fill ? `.pdropdown-${fill}` : ''} .pdropdown-toggle`;
-    expectRule(DROPDOWN, `${at('')}:hover`, { '--plus-dropdown-state-layer': layer(`--ds-background-${bold}-hovered`) });
-    expectRule(DROPDOWN, `${at('')}:active`, { '--plus-dropdown-state-layer': layer(`--ds-background-${bold}-pressed`) });
-    expectRule(DROPDOWN, `${at('tonal')}:hover`, { '--plus-dropdown-state-layer': layer(`--ds-background-${subtle}-hovered`) });
-    expectRule(DROPDOWN, `${at('tonal')}:active`, { '--plus-dropdown-state-layer': layer(`--ds-background-${subtle}-pressed`) });
-    for (const fill of ['outline', 'ghost']) {
-      expectRule(DROPDOWN, `${at(fill)}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-      expectRule(DROPDOWN, `${at(fill)}:active`, {
-        'background-color': layer('--ds-background-neutral-subtle-pressed'),
-        '--plus-dropdown-state-layer': 'transparent',
-      });
-    }
-  }
+test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring only', () => {
+  expectRule(MENU_GROUP, '.plus-menu-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(MENU_GROUP, '.plus-menu-item:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
+  expectRule(MENU_GROUP, '.plus-menu-item[aria-current=true]', { 'background-color': layer('--ds-background-selected') });
+  expectRule(MENU_GROUP, '.plus-menu-item:focus-visible', DS_RING_OUTSIDE);
+  expectNoFill(MENU_GROUP, '.plus-menu-item:focus-visible');
 });
 
 /* ─── NavTabs ────────────────────────────────────────────────────────────── */
