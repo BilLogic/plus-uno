@@ -42,13 +42,13 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--element-pad-y-md` · `--line-height-125` · `--plus-prompt-input-max-height` · `--size-element-gap-sm` · `--size-element-gap-xs`
+`--element-gap-compact` · `--element-gap-default` · `--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

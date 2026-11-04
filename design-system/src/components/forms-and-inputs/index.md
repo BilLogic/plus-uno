@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-32 components. Each row links to the generated facts; the three columns after it are the
+33 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -41,7 +41,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 14/32 (44%) · Correct/incorrect 7/32 (22%) · Accessibility 18/32 (56%)
+**Authored coverage:** When to use 14/33 (42%) · Correct/incorrect 7/33 (21%) · Accessibility 18/33 (55%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

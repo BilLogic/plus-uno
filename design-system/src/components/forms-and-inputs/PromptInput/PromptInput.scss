@@ -8,7 +8,7 @@
  * they sit inside the field the same way a stepper does.
  */
 .plus-prompt-input {
-    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--element-pad-y-md) * 2);
+    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--space-0375) * 2);
 
     display: block;
     min-width: 0;
@@ -21,8 +21,8 @@
 .plus-prompt-input__attachments {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-element-gap-sm);
-    margin-block-end: var(--size-element-gap-sm);
+    gap: var(--element-gap-default);
+    margin-block-end: var(--element-gap-default);
 }
 
 .plus-prompt-input__control {
@@ -34,7 +34,7 @@
 .plus-prompt-input__trailing-group {
     display: inline-flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--element-gap-compact);
 }
 
 .plus-prompt-input__send.plus-btn--icon-only {

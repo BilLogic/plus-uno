@@ -32,7 +32,7 @@ export default {
     },
 };
 
-const wrap = { maxWidth: 'var(--section-min-width-main)' };
+const wrap = { maxWidth: 'var(--width-3000)' };
 
 /* ----------------------------------------------------------------- default */
 
