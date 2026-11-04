@@ -130,7 +130,6 @@
     "word:scrim prototypes/templates/admin/tutor-admin.html": 1,
     "word:scrim prototypes/templates/admin/tutor-admin.js": 1,
     "word:scrim src/pages/PrototypeMarket/PrototypeMarket.scss": 2,
-    "word:surface-container design-system/src/lib/tokens-node.mjs": 1,
     "word:surface-container design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx": 1,
     "word:surface-container design-system/src/specs/Training/Lessons/Sections/LessonWelcomeSection/LessonWelcomeSection.scss": 1,
     "word:surface-container design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx": 1,
