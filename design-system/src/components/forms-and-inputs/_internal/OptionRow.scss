@@ -123,9 +123,7 @@
             hovered: (background-color: transparent),
             pressed: (background-color: transparent),
         ),
-        $ring: false,
-        $hovered-selector: '&:hover',
-        $pressed-selector: '&:active'
+        $ring: false
     );
 }
 
