@@ -118,8 +118,8 @@ const Tabs = ({
             className={rootClasses}
             {...props}
         >
-            {/* `activateOnFocus`: arrow keys move selection immediately, matching the
-                old hand-rolled strip; Base UI's own default waits for Enter/Space. */}
+            {/* `activateOnFocus`: arrow keys move selection immediately;
+                Base UI's own default waits for Enter/Space. */}
             <BaseTabs.List className={listClasses} activateOnFocus>
                 {tabs}
             </BaseTabs.List>

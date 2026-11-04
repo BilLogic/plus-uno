@@ -12,7 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: 'Rebuilt on Base UI\'s Tabs: always a real `role="tablist"` (the old `mode="navigation"`/`mode="tabs"` split is gone), with `appearance` (default underline, or pill) and `size` (default, or compact) added.' },
+            { date: '2026-11-04', kind: 'changed', summary: 'Rebuilt on Base UI\'s Tabs: always a real `role="tablist"` (the old `mode="navigation"`/`mode="tabs"` split is gone), with `appearance` (default underline, or pill) and `spacing` (default, or compact) added.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the --ds- tokens: an unselected tab is `text.subtle`, the selected one `text.selected` over the `border.selected` bar (Lagoon), hover and press the neutral subtle steps on every tab, and disabled `text.disabled` instead of a faded opacity.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Pressed is the 12 state layer, not 16. Keyboard focus is a 2px focus ring inside the tab, with no fill.' },
             { date: '2026-10-23', kind: 'changed', summary: 'Tabs and dropdown tabs are 32, with Body/default labels at the medium weight.' },
@@ -33,7 +33,7 @@ export default {
             description: 'Underline indicator (default), or a pill-shaped selected fill.',
             table: { category: 'Design' }
         },
-        size: {
+        spacing: {
             control: 'inline-radio',
             options: ['default', 'compact'],
             description: '`default` is a 32px tab; `compact` is 24px.',
@@ -210,7 +210,7 @@ export const Interactive = (args) => {
     return (
         <Tabs
             appearance={args.appearance}
-            size={args.size}
+            spacing={args.spacing}
             alignment={args.alignment}
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
@@ -224,6 +224,6 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     appearance: 'default',
-    size: 'default',
+    spacing: 'default',
     alignment: 'left'
 };

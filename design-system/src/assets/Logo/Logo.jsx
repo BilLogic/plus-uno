@@ -157,12 +157,6 @@ Logo.propTypes = {
     className: PropTypes.string
 };
 
-Logo.defaultProps = {
-    appearance: 'colored',
-    size: 132,
-    wordmark: false,
-    className: ''
-};
 
 export default Logo;
 export { Logo };

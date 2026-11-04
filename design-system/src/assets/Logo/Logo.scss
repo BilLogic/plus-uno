@@ -73,7 +73,7 @@
 
 /* Size Variants - Refactored to match Figma Container Model (Padding included) */
 
-/* XS: 40px Icon + 10px Padding = 60px Total Height (Est) */
+/* 60: 40px Icon + 10px Padding = 60px Total Height (Est) */
 /* Re-evaluating based on codebase: Previous XS was 40px total. 
    If we follow the M pattern (Icon Only also has padding), the "Icon" size must be distinct.
    However, without explicit Figma checks for XS, I will follow the pattern:
@@ -104,7 +104,7 @@
     height: 40px;
 }
 
-/* S: 64px Icon + 16px Padding = 96px Total Height */
+/* 96: 64px Icon + 16px Padding = 96px Total Height */
 .plus-logo--96 {
     width: auto;
     height: auto;
@@ -127,7 +127,7 @@
     height: 64px;
 }
 
-/* M: 92px Icon + 20px Padding = 132px Total Height */
+/* 132: 92px Icon + 20px Padding = 132px Total Height */
 .plus-logo--132 {
     width: auto;
     height: auto;
@@ -150,7 +150,7 @@
     height: 92px;
 }
 
-/* L: 144px Icon + 24px Padding = 192px Total Height */
+/* 192: 144px Icon + 24px Padding = 192px Total Height */
 .plus-logo--192 {
     width: auto;
     height: auto;
@@ -173,7 +173,7 @@
     height: 144px;
 }
 
-/* XL: 160px Icon + 32px Padding = 224px Total Height */
+/* 224: 160px Icon + 32px Padding = 224px Total Height */
 .plus-logo--224 {
     width: auto;
     height: auto;
@@ -201,32 +201,32 @@
    The padding is handled by the base class, but we need to ensure the container grows.
 */
 
-/* XS */
+/* 60 */
 .plus-logo--60.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
-/* S */
+/* 96 */
 .plus-logo--96.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
-/* M */
+/* 132 */
 .plus-logo--132.plus-logo--with-wordmark {
     width: auto;
     height: auto;
     /* Ensure content+padding dictates height (92 + 20 + 20 = 132) */
 }
 
-/* L */
+/* 192 */
 .plus-logo--192.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
-/* XL */
+/* 224 */
 .plus-logo--224.plus-logo--with-wordmark {
     width: auto;
     height: auto;
