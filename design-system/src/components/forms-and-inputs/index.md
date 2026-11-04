@@ -26,6 +26,7 @@ authored half (#166), counted rather than assumed.
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
+| [PromptInput](PromptInput/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |

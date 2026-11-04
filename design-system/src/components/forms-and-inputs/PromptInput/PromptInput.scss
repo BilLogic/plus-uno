@@ -1,0 +1,42 @@
+/**
+ * PromptInput — a Field that grows with its text, wrapped in a
+ * GenerativeBorder while loading.
+ *
+ * The control starts at one line and grows to five (`--plus-prompt-input-max-height`,
+ * five lines of body text plus the box's own vertical padding), then scrolls.
+ * The send and attach buttons are the Button's compact (24) icon-only size, so
+ * they sit inside the field the same way a stepper does.
+ */
+.plus-prompt-input {
+    --plus-prompt-input-max-height: calc(var(--line-height-125) * 5 + var(--element-pad-y-md) * 2);
+
+    display: block;
+    min-width: 0;
+}
+
+.plus-prompt-input__frame {
+    display: block;
+}
+
+.plus-prompt-input__attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--size-element-gap-sm);
+    margin-block-end: var(--size-element-gap-sm);
+}
+
+.plus-prompt-input__control {
+    resize: none;
+    max-height: var(--plus-prompt-input-max-height);
+    overflow-y: auto;
+}
+
+.plus-prompt-input__trailing-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-element-gap-xs);
+}
+
+.plus-prompt-input__send.plus-btn--icon-only {
+    align-self: flex-end;
+}

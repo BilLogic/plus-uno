@@ -33,7 +33,7 @@ From `design-system/src/components/labels/SmartTag/SmartTag.scss`. Override thes
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
