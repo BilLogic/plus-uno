@@ -28,7 +28,7 @@ const Tabs = ({ label = 'Views' }) => {
 
 const DefaultToolbar = () => (
     <PatternSection.Toolbar
-        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBefore={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} type="search" />}
+        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} type="search" />}
         filters={(
             <>
                 <Button text="Status" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />

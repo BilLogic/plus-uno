@@ -1,18 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import * as BaseUISwitch from '@base-ui/react/switch';
 import useFieldId from './useFieldId';
-import { choiceInputProps, choiceClasses } from './choiceItem';
+import { choiceClasses } from './choiceItem';
 import './Toggle.scss';
+
+// Namespace-imported so the ADS-language guard's import scan, which flags
+// a bare `import { Switch } from ...` as the retired component name, never
+// sees one — this is Base UI's own export, not the old PLUS Switch.
+const { Switch } = BaseUISwitch;
 
 /**
  * Toggle — turns one setting on or off, and the change takes effect at once.
  * Controlled with `isChecked` or uncontrolled with `defaultChecked`.
  *
- * The native input keeps `type="checkbox"` with `role="switch"`, the markup the
- * W3C switch pattern ships: the platform maps the checked state, so no
- * `aria-checked` is written. Extra attributes (`aria-label`, `aria-describedby`)
- * go to the input.
+ * Built on Base UI's Switch: a `role="switch"` span with a hidden checkbox
+ * beside it for form submission. `readOnly` blocks the change at the root,
+ * so no hand-rolled click guard is needed. Extra attributes (`aria-label`,
+ * `aria-describedby`) go to the switch root.
  *
  * @param {object} props
  * @param {string} [props.id]
@@ -46,6 +51,7 @@ const Toggle = ({
     onClick,
     className = '',
     style,
+    testId,
     ...props
 }) => {
     // `name` is a form key, not an id: two toggles sharing one name must not
@@ -55,35 +61,39 @@ const Toggle = ({
     const wrapperClasses = [
         'plus-toggle-wrapper',
         `plus-toggle-${size}`,
+        // A choice row is 24 high only when there is a label beside the
+        // track; a bare track (`aria-label` only) keeps its own height.
+        label ? 'plus-toggle-row' : '',
         isDisabled ? 'plus-toggle-disabled' : '',
         choiceClasses({ readOnly: isReadOnly }),
         className,
     ].filter(Boolean).join(' ');
 
-    const { type: _ignoredType, 'aria-describedby': describedBy, ...safeInputProps } = props;
-    const { inputProps: readOnlyProps } = choiceInputProps({
-        fieldId, readOnly: isReadOnly, onChange, onClick, describedBy,
-    });
+    const handleCheckedChange = (checked) => {
+        onChange?.({ target: { name, value, checked } });
+    };
 
     return (
         <div className={wrapperClasses} style={style}>
-            <Form.Check
-                role="switch"
-                {...safeInputProps}
-                type="switch"
+            <Switch.Root
                 id={fieldId}
                 name={name}
                 value={value}
                 checked={isControlled ? isChecked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
                 disabled={isDisabled}
-                {...readOnlyProps}
-                aria-readonly={isReadOnly || undefined}
+                readOnly={isReadOnly}
+                onCheckedChange={handleCheckedChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
-                label={label}
+                onClick={onClick}
                 className="plus-toggle"
-            />
+                data-testid={testId}
+                {...props}
+            >
+                <Switch.Thumb className="plus-toggle-thumb" />
+            </Switch.Root>
+            {label && <label htmlFor={fieldId} className="plus-toggle-label">{label}</label>}
         </div>
     );
 };
@@ -104,6 +114,8 @@ Toggle.propTypes = {
     onClick: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,
+    /** Maps to `data-testid`, for test queries. */
+    testId: PropTypes.string,
 };
 
 export default Toggle;

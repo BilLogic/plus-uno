@@ -115,7 +115,7 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    searchable
+                    isSearchable
                     isRequired
                 />
             </FieldWrapper>
@@ -132,7 +132,7 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    searchable
+                    isSearchable
                     isRequired
                 />
             </FieldWrapper>
@@ -146,7 +146,7 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    searchable
+                    isSearchable
                     defaultValue="teacher-a"
                     isRequired
                 />
@@ -161,7 +161,7 @@ export const Overview = () => (
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    searchable
+                    isSearchable
                     isRequired
                     isInvalid
                     caption="Teacher is required"
@@ -203,7 +203,7 @@ export const Interactive = () => {
                 <Select
                     options={teacherOptions}
                     placeholder="Select a teacher"
-                    searchable
+                    isSearchable
                     isRequired
                     value={selectedTeacher}
                     onChange={(val) => {

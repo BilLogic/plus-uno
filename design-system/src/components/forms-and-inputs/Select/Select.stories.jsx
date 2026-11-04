@@ -6,7 +6,7 @@ import Select from './Select';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
- * and the list is the internal Listbox; searchable means typing in the field.
+ * and the list is the internal Listbox; isSearchable means typing in the field.
  */
 export default {
     title: 'Components/Forms and inputs/Select',
@@ -53,11 +53,11 @@ export default {
             control: 'text',
             table: { category: 'Content' }
         },
-        searchable: {
+        isSearchable: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        creatable: {
+        isCreatable: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
@@ -105,7 +105,7 @@ export default {
         dependsOn: { control: false, table: { disable: true, category: 'Development' } },
         recent: { control: false, table: { disable: true, category: 'Development' } },
         suggested: { control: false, table: { disable: true, category: 'Development' } },
-        loading: { table: { disable: true, category: 'Development' } },
+        isLoading: { table: { disable: true, category: 'Development' } },
         defaultOpen: { table: { disable: true, category: 'Development' } },
         defaultSearchTerm: { table: { disable: true, category: 'Development' } },
         lineWrap: { table: { disable: true, category: 'Development' } },
@@ -141,13 +141,13 @@ export const Content = {
     )
 };
 
-/** Modes — isMulti with Tags, searchable and creatable. */
+/** Modes — isMulti with Tags, isSearchable and isCreatable. */
 export const Modes = {
     render: () => (
         <div className="sb-select-interactive-override" style={grid}>
             <Select label="Multi (tags)" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
-            <Select label="Searchable" searchable options={sampleOptions} placeholder="Type to search" />
-            <Select label="Creatable" isMulti creatable options={sampleOptions} placeholder="Type to search or create" />
+            <Select label="Searchable" isSearchable options={sampleOptions} placeholder="Type to search" />
+            <Select label="Creatable" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" />
         </div>
     )
 };
@@ -276,8 +276,8 @@ export const Interactive = {
         label: 'Option',
         placeholder: 'Select...',
         caption: '',
-        searchable: false,
-        creatable: false,
+        isSearchable: false,
+        isCreatable: false,
         displayMode: 'tags',
         spacing: 'default',
         isInvalid: false,

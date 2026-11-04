@@ -105,7 +105,7 @@ export const AddTutor = () => (
                         <Select
                             options={tutorOptions}
                             placeholder="Enter tutor name"
-                            searchable
+                            isSearchable
                         />
                     </div>
                 </div>
@@ -199,8 +199,8 @@ export const AddStudent = () => (
                         <Select
                             options={studentOptions}
                             placeholder="Enter student name"
-                            searchable
-                            creatable
+                            isSearchable
+                            isCreatable
                         />
                     </div>
                 </div>

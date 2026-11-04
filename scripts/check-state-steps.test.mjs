@@ -303,11 +303,11 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
 
 test('Toggle: hover steps the track, neutral bold off and selected bold on', () => {
   const file = 'components/forms-and-inputs/Toggle.scss';
-  const input = '.plus-toggle .form-check-input[type=checkbox]';
-  expectRule(file, `${input}:hover:not(:disabled):not(:checked)`, {
+  const track = '.plus-toggle';
+  expectRule(file, `${track}:hover:not([data-disabled]):not([data-checked])`, {
     'background-color': layer('--ds-background-neutral-bold-hovered'),
   });
-  expectRule(file, `${input}:checked:hover:not(:disabled)`, {
+  expectRule(file, `${track}[data-checked]:hover:not([data-disabled])`, {
     'background-color': layer('--ds-background-selected-bold-hovered'),
   });
 });
@@ -322,7 +322,7 @@ test('Toggle: hover steps the track, neutral bold off and selected bold on', () 
 for (const [name, file, selector, ring] of [
   ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox .form-check-input:focus-visible', DS_RING_OUTSIDE],
   ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio .form-check-input:focus-visible', DS_RING_OUTSIDE],
-  ['Toggle', 'components/forms-and-inputs/Toggle.scss', '.plus-toggle .form-check-input[type=checkbox]:focus-visible', DS_RING_OUTSIDE],
+  ['Toggle', 'components/forms-and-inputs/Toggle.scss', '.plus-toggle:focus-visible', DS_RING_OUTSIDE],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {
     expectRule(file, selector, ring);

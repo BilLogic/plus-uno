@@ -80,7 +80,7 @@ const ExportSearchFilterBar = ({
                 <TextField
                     placeholder={searchPlaceholder}
                     onChange={(e) => onSearch && onSearch(e.target.value)}
-                    elemBefore={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
+                    elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
                     spacing="compact"
                     className="export-search-filter-bar__search-field"
                 />

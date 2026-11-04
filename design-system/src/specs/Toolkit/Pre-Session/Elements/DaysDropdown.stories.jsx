@@ -146,7 +146,7 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    searchable
+                    isSearchable
                     defaultValue="mondays"
                     isRequired
                 />
@@ -161,7 +161,7 @@ export const Overview = () => (
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    searchable
+                    isSearchable
                     isRequired
                     isInvalid
                     caption="Days is required"
@@ -203,7 +203,7 @@ export const Interactive = () => {
                 <Select
                     options={dayOptions}
                     placeholder="Select a day"
-                    searchable
+                    isSearchable
                     isRequired
                     value={selectedDay}
                     onChange={(val) => {

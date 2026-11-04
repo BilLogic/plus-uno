@@ -48,7 +48,7 @@ const SINGLE_LINE = [
     ['Date time picker', () => <DateTimePicker label="Date time picker" />],
     ['Cascader', () => <Cascader options={CASCADE} onChange={() => {}} />],
     ['Tree select', () => <TreeSelect options={TREE} onChange={() => {}} />],
-    ['Text field with affixes', () => <TextField label="Text field with affixes" elemBefore="$" elemAfter=".00" />],
+    ['Text field with affixes', () => <TextField label="Text field with affixes" elemBeforeInput="$" elemAfterInput=".00" />],
 ];
 
 /** Each single-line field is 40, its text centered, its side padding 12. */
@@ -101,7 +101,7 @@ export const ButtonInside = () => (
         <div data-field="Buttons">
             <TextField
                 label="Invite by email"
-                elemAfter={(
+                elemAfterInput={(
                     <>
                         <Button appearance="default" spacing="default" text="Copy" />
                         <Button appearance="default" spacing="default" text="Send" />
@@ -110,13 +110,13 @@ export const ButtonInside = () => (
             />
         </div>
         <div data-field="Before button">
-            <TextField label="Search tutors" elemBefore={<Button appearance="default" spacing="default" text="Filter" />} />
+            <TextField label="Search tutors" elemBeforeInput={<Button appearance="default" spacing="default" text="Filter" />} />
         </div>
         <div data-field="Compact buttons">
             <TextField
                 label="Invite by email, compact"
                 spacing="compact"
-                elemAfter={<Button appearance="default" spacing="compact" text="Send" />}
+                elemAfterInput={<Button appearance="default" spacing="compact" text="Send" />}
             />
         </div>
         <div data-field="Steppers">

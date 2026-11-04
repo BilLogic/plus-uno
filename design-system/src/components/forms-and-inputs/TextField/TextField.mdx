@@ -57,9 +57,9 @@ A text field is an input that allows a user to write or edit text.
     </thead>
     <tbody>
         <tr><td>Label</td><td>Names the field. A required marker and an info tooltip sit beside it; both stay outside the field's name.</td></tr>
-        <tr><td>Before</td><td>An icon, a text affix or a Button, before the control (<code>elemBefore</code>).</td></tr>
+        <tr><td>Before</td><td>An icon, a text affix or a Button, before the control (<code>elemBeforeInput</code>).</td></tr>
         <tr><td>Control</td><td>The native input. It draws nothing of its own; the box is the field.</td></tr>
-        <tr><td>After</td><td>An icon, a text affix, a Button or, with <code>type="number"</code>, the steppers (<code>elemAfter</code>).</td></tr>
+        <tr><td>After</td><td>An icon, a text affix, a Button or, with <code>type="number"</code>, the steppers (<code>elemAfterInput</code>).</td></tr>
         <tr><td>Caption</td><td>A message on the left and, with <code>maxLength</code>, a count on the right.</td></tr>
     </tbody>
 </DocsTable>
@@ -85,7 +85,7 @@ A text field is an input that allows a user to write or edit text.
         <tr><td><code>warningMessage</code></td><td>node</td><td>none</td><td>Draws the warning border. The value is accepted, so the control is not invalid.</td></tr>
         <tr><td><code>successMessage</code></td><td>node</td><td>none</td><td>Draws the confirmation border.</td></tr>
         <tr><td><code>caption</code></td><td>node</td><td>none</td><td>Standing help under the field. A message takes its place.</td></tr>
-        <tr><td><code>elemBefore</code>, <code>elemAfter</code></td><td>node</td><td>none</td><td>A string is a text affix. A node is rendered as given.</td></tr>
+        <tr><td><code>elemBeforeInput</code>, <code>elemAfterInput</code></td><td>node</td><td>none</td><td>A string is a text affix. A node is rendered as given.</td></tr>
         <tr><td><code>type</code></td><td>any input type</td><td><code>text</code></td><td><code>number</code> adds steppers and the <code>min</code>, <code>max</code> and <code>step</code> rules.</td></tr>
         <tr><td><code>maxLength</code></td><td>number</td><td>none</td><td>Limits the length and shows a count.</td></tr>
     </tbody>

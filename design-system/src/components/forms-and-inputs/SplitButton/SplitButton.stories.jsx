@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import SplitButton, { SPLIT_BUTTON_APPEARANCES } from './SplitButton';
+import Button from '../Button/Button';
+import IconButton from '../IconButton/IconButton';
+import SplitButton from './SplitButton';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -13,27 +15,24 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'added', summary: 'Split button: a button joined to a chevron that opens a menu, with `appearance` (default, primary), `spacing`, a required `menuLabel`, `onMenuClick` and `isMenuExpanded`.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Split button is now children-slot composition: two Button-family children (an action and a menu trigger), each carrying its own appearance, spacing and state. There is no flat-prop API.' },
         ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
-        text: { control: 'text', table: { category: 'Content' } },
-        menuLabel: { control: 'text', description: 'The chevron\'s accessible name', table: { category: 'Content' } },
-        appearance: { control: 'select', options: SPLIT_BUTTON_APPEARANCES, table: { category: 'Design' } },
-        spacing: { control: 'inline-radio', options: ['default', 'compact'], table: { category: 'Design' } },
-        isMenuExpanded: { control: 'boolean', table: { category: 'Behavior' } },
-        isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
-        isLoading: { control: 'boolean', table: { category: 'Behavior' } },
-        onClick: { table: { disable: true } },
-        onMenuClick: { table: { disable: true } },
+        children: { table: { disable: true } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
     },
-    args: { text: 'Save', menuLabel: 'More save options', appearance: 'default', spacing: 'default' },
 };
 
 export const Overview = {
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.splitButton } } },
-    render: (args) => <SplitButton {...args} />,
+    render: () => (
+        <SplitButton>
+            <Button text="Save" />
+            <IconButton icon="chevron-down" label="More save options" aria-haspopup="menu" aria-expanded={false} />
+        </SplitButton>
+    ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const action = canvas.getByRole('button', { name: 'Save' });
@@ -52,8 +51,11 @@ export const Overview = {
 export const Appearances = {
     render: () => (
         <div style={row}>
-            {SPLIT_BUTTON_APPEARANCES.map((appearance) => (
-                <SplitButton key={appearance} text={title(appearance)} menuLabel={`More ${appearance} options`} appearance={appearance} />
+            {['default', 'primary'].map((appearance) => (
+                <SplitButton key={appearance}>
+                    <Button text={title(appearance)} appearance={appearance} />
+                    <IconButton icon="chevron-down" label={`More ${appearance} options`} appearance={appearance} aria-haspopup="menu" />
+                </SplitButton>
             ))}
         </div>
     ),
@@ -67,8 +69,14 @@ export const Appearances = {
 export const Spacing = {
     render: () => (
         <div style={row}>
-            <SplitButton text="Default" menuLabel="More default options" />
-            <SplitButton text="Compact" menuLabel="More compact options" spacing="compact" />
+            <SplitButton>
+                <Button text="Default" />
+                <IconButton icon="chevron-down" label="More default options" aria-haspopup="menu" />
+            </SplitButton>
+            <SplitButton>
+                <Button text="Compact" spacing="compact" />
+                <IconButton icon="chevron-down" label="More compact options" spacing="compact" aria-haspopup="menu" />
+            </SplitButton>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -80,7 +88,18 @@ export const Spacing = {
 
 const WithMenuState = () => {
     const [open, setOpen] = useState(false);
-    return <SplitButton text="Publish" menuLabel="More publish options" isMenuExpanded={open} onMenuClick={() => setOpen(!open)} />;
+    return (
+        <SplitButton>
+            <Button text="Publish" />
+            <IconButton
+                icon="chevron-down"
+                label="More publish options"
+                aria-haspopup="menu"
+                aria-expanded={open}
+                onClick={() => setOpen(!open)}
+            />
+        </SplitButton>
+    );
 };
 
 export const MenuState = {
@@ -96,8 +115,14 @@ export const MenuState = {
 export const States = {
     render: () => (
         <div style={row}>
-            <SplitButton text="Disabled" menuLabel="More disabled options" isDisabled />
-            <SplitButton text="Loading" menuLabel="More loading options" isLoading />
+            <SplitButton>
+                <Button text="Disabled" isDisabled />
+                <IconButton icon="chevron-down" label="More disabled options" isDisabled aria-haspopup="menu" />
+            </SplitButton>
+            <SplitButton>
+                <Button text="Loading" isLoading />
+                <IconButton icon="chevron-down" label="More loading options" aria-haspopup="menu" />
+            </SplitButton>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -109,6 +134,11 @@ export const States = {
 };
 
 export const Interactive = {
-    render: (args) => <SplitButton {...args} />,
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.splitButton } } },
+    render: () => (
+        <SplitButton>
+            <Button text="Save" />
+            <IconButton icon="chevron-down" label="More save options" aria-haspopup="menu" />
+        </SplitButton>
+    ),
 };

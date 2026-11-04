@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Button } from '../Button/Button';
+import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 
 export const ICON_BUTTON_APPEARANCES = ['default', 'subtle', 'primary', 'discovery'];
 export const ICON_BUTTON_SHAPES = ['default', 'circle'];
@@ -18,18 +19,24 @@ export const IconButton = ({
     shape = 'default',
     className,
     title,
+    tooltip,
+    isTooltipDisabled = false,
     ...props
-}) => (
-    <Button
-        iconBefore={icon}
-        aria-label={label}
-        title={title ?? label}
-        appearance={appearance}
-        spacing={spacing}
-        className={classNames({ 'plus-btn--circle': shape === 'circle' }, className)}
-        {...props}
-    />
-);
+}) => {
+    const button = (
+        <Button
+            iconBefore={icon}
+            aria-label={label}
+            title={isTooltipDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
+            appearance={appearance}
+            spacing={spacing}
+            className={classNames({ 'plus-btn--circle': shape === 'circle' }, className)}
+            {...props}
+        />
+    );
+    if (isTooltipDisabled || !tooltip) return button;
+    return <Tooltip text={tooltip}>{button}</Tooltip>;
+};
 
 IconButton.propTypes = {
     /** A Font Awesome Free glyph name (`trash`) or a node. */
@@ -47,6 +54,10 @@ IconButton.propTypes = {
     onClick: PropTypes.func,
     className: PropTypes.string,
     title: PropTypes.string,
+    /** Overrides the tooltip content shown on hover/focus; defaults to `label` when set. */
+    tooltip: PropTypes.node,
+    /** Suppresses the tooltip and native title entirely. */
+    isTooltipDisabled: PropTypes.bool,
 };
 
 export default IconButton;

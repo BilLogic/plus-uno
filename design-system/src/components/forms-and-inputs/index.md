@@ -7,11 +7,11 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 16 | ✕ | ✕ | ✅ |
+| [Button](Button/index.md) | 17 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
-| [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
+| [Checkbox](Checkbox.md) | 20 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Comment](Comment/index.md) | 14 | ✕ | ✕ | ✕ |
@@ -21,24 +21,24 @@ authored half (#166), counted rather than assumed.
 | [Fieldset](Fieldset.md) | 8 | ✕ | ✕ | ✕ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
-| [IconButton](IconButton/index.md) | 11 | ✕ | ✕ | ✅ |
+| [IconButton](IconButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✕ | ✕ | ✕ |
-| [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
+| [Radio](Radio.md) | 19 | ✅ | ✕ | ✅ |
 | [RadioGroup](RadioGroup.md) | 19 | ✕ | ✕ | ✕ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 42 | ✕ | ✕ | ✕ |
-| [SplitButton](SplitButton/index.md) | 10 | ✕ | ✕ | ✕ |
+| [SplitButton](SplitButton/index.md) | 3 | ✕ | ✕ | ✕ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
-| [TextField](TextField/index.md) | 34 | ✅ | ✕ | ✅ |
+| [TextField](TextField/index.md) | 35 | ✅ | ✕ | ✅ |
 | [TimePicker](TimePicker/index.md) | 14 | ✕ | ✕ | ✕ |
-| [Toggle](Toggle.md) | 15 | ✅ | ✕ | ✅ |
+| [Toggle](Toggle.md) | 16 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 

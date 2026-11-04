@@ -133,17 +133,21 @@ ChoiceRows.play = async ({ canvasElement }) => {
     for (const [role, name] of [
         ['checkbox', 'Checkbox'],
         ['radio', 'Radio'],
-        ['switch', 'Toggle 16'],
-        ['switch', 'Toggle 20'],
     ]) {
         const input = canvas.getByRole(role, { name });
         const line = input.closest('.form-check');
         await expect(heightOf(line), `${name} row`).toBe(24);
         await expectLabel(line.querySelector('.form-check-label'), name, '400');
     }
+    for (const name of ['Toggle 16', 'Toggle 20']) {
+        const toggle = canvas.getByRole('switch', { name });
+        const line = toggle.closest('.plus-toggle-wrapper');
+        await expect(heightOf(line), `${name} row`).toBe(24);
+        await expectLabel(line.querySelector('.plus-toggle-label'), name, '400');
+    }
     // Without a label it is not a row: the bare track keeps its own height.
     const bare = canvas.getByRole('switch', { name: 'Bare toggle' });
-    await expect(heightOf(bare.parentElement)).toBeLessThan(24);
+    await expect(heightOf(bare.closest('.plus-toggle-wrapper'))).toBeLessThan(24);
 };
 
 /** Range is 32, label 14/20. */
