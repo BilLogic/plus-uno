@@ -1,90 +1,152 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadarChartStories from './RadarChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={RadarChartStories} />
 
 <Title />
+Plots several measures on spokes around a center and joins them into a shape.
+Use it when the profile's shape is the point, not the exact values.
 
-A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/RadarChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A radar chart (spider/web chart) displays multivariate data on axes radiating from a center point, ideal for **comparing profiles across multiple dimensions**.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A line radar comparing two series, and a filled radar where the first series is an area and the second a line.</>}>
+    <Canvas of={RadarChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- Each **axis** represents a different variable/dimension
-- **Distance from center** indicates value magnitude
-- **Shape** of the polygon reveals the overall profile
-- **Overlapping shapes** allow direct comparison between entities
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Comparing multivariate profiles</td><td>✅ Ideal</td></tr>
-    <tr><td>Skill/competency assessments</td><td>✅ Ideal</td></tr>
-    <tr><td>Product feature comparison</td><td>✅ Good</td></tr>
-    <tr><td>Time-series data</td><td>❌ Use Line Chart</td></tr>
-    <tr><td>Many variables (>8)</td><td>❌ Use parallel coordinates</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `RadarChart` to show a profile across a handful of measures on one scale: a
+tutor's five SMART competencies, a student's skills across subjects, one tutor
+against the cohort average. The shape shows balance and gaps at a glance.
 
-### PLUS Context
+Radars are hard to read precisely: values sit at different angles and the area
+grows faster than the numbers. When readers need the values, use `BarChart`.
+For two values per measure read as a gap, use `DumbbellChart`. For measures
+changing over time, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**SMART Competencies**</td><td>Visualize student's 5-factor SMART profile</td></tr>
-    <tr><td>**Skill Assessment**</td><td>Compare skills across learning areas</td></tr>
-    <tr><td>**Tutor Evaluation**</td><td>Rate tutors on multiple criteria</td></tr>
-    <tr><td>**Class Comparison**</td><td>Compare class averages across subjects</td></tr>
-    <tr><td>**Progress Tracking**</td><td>Before/after skill development</td></tr>
-  </tbody>
-</table>
+Keep it to roughly three to eight spokes and two or three series, all on the
+same scale. Mixed units on one radar make the shape meaningless.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Limit to 3-8 axes for readability
-✅ Use filled area to emphasize coverage
-✅ Ensure consistent scale across all axes
-✅ Use transparency for overlapping series
+## Anatomy
 
-**Avoid:**
-❌ Too many overlapping series (max 3)
-❌ Inconsistent scales between axes
-❌ Using for time-series data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Spokes', <>One per entry in <C>categories</C>. Labeled with the category name, a Font Awesome icon from <C>categoryIcons</C>, or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> sets the labels in the regular weight.</>],
+        ['Series', <>One closed shape per entry in <C>series</C>. With <C>filled</C> on, the first series is a filled area and the rest are lines; otherwise all are lines. A line series may set <C>dashStyle</C>.</>],
+        ['Grid', <>Polygon rings from zero out to <C>yAxisMax</C>. <C>showYAxisLabels</C> shows or hides the ring values.</>],
+        ['Data labels', <>Off by default. <C>showDataLabels</C> prints each value followed by a percent sign.</>],
+        ['Legend', <>Names each series, stacked top right. On by default; turn it off with <C>showLegend</C>.</>],
+        ['Tooltip', 'Shared: hovering a spoke lists every series’ value on it.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={RadarChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of strings, one per spoke. `series` is an array of
+`{ name, data }`, where `data` holds one number per category in the same order.
+A series may carry its own `color`. `height` takes a number of pixels, default
+400, or `'100%'` to fill its container. `chartSpacing` is
+`[top, right, bottom, left]`.
+
+```jsx
+<RadarChart
+    filled
+    yAxisMax={5}
+    categories={['Social-emotional', 'Mastering content', 'Advocacy', 'Relationships', 'Technology tools']}
+    series={[
+        { name: 'Maya', data: [4, 5, 3, 5, 4] },
+        { name: 'Cohort average', data: [3.5, 4, 3.5, 4, 3], dashStyle: 'Dash' },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first. A series' own `color` overrides that.
+- **Spoke labels can carry subject color.** `categoryColors` tints each label, as an array in category order or an object keyed by name. For the five SMART competencies, use the `--ds-chart-smart-*` tokens from `SMART` in the palette so each subject wears its own color.
+- **Distance from center carries the value.** Color tells series apart, so add a second cue when there are two: `filled` makes the first an area, and `dashStyle` can dash the comparison line.
+- **Icons need a nearby name.** With `categoryIcons`, the spoke shows only the icon. Name the categories in the surrounding text so the chart is not icon-only.
+- **Data labels always add a percent sign.** Turn on `showDataLabels` only when the values are percentages.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`RadarChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Competencies could not load.</SectionMessage>
+    : series.length === 0 ? <EmptyState size="compact" header="No ratings yet" description="Competencies appear after a session is reviewed." />
+    : <RadarChart categories={categories} series={series} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={RadarChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For the same dimensions read as values rather than as a shape, use `BarChart` — a radar is hard to read precisely, and it is the right choice only when the SHAPE is the point.
-- For two entities compared on one dimension each, use `DumbbellChart`.
-- For dimensions that change over time, use `LineChart`.
+- For the same measures read as values rather than as a shape, use `BarChart`.
+- For two values per measure read as a gap, use `DumbbellChart`.
+- For measures that change over time, use `LineChart`.
+- For one score against a target per measure, use `BulletChart`.
 
 </div>
 
 </div>
+
+
