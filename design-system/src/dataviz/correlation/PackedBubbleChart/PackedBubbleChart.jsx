@@ -48,7 +48,7 @@ const PackedBubbleChart = ({
                     style: {
                         color: 'black',
                         textOutline: 'none',
-                        fontWeight: 'normal'
+                        fontWeight: 'var(--font-weight-normal)'
                     }
                 }
             }

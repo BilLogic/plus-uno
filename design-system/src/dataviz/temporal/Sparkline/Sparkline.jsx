@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO } from '@/dataviz/chartTheme';
 import { BRAND, STATUS } from '@/dataviz/palette';
 
 /** What a sparkline's line may mean: the brand by default, or a status. */
@@ -51,8 +51,8 @@ const Sparkline = ({
             type: 'line',
             width,
             height,
-            spacing: [4, 4, 4, 4],
-            margin: [4, 4, 4, 4]
+            spacing: [CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO],
+            margin: [CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO]
         },
         title: { text: null },
         xAxis: {
@@ -74,14 +74,14 @@ const Sparkline = ({
         plotOptions: {
             series: {
                 animation: false,
-                lineWidth: 2,
+                lineWidth: CHART_LINE_WIDTH_NUMBER,
                 states: { hover: { lineWidthPlus: 0 } },
                 marker: {
                     enabled: true,
                     radius: 0,
                     states: { hover: { radius: 3, radiusPlus: 0 } },
                     symbol: 'circle',
-                    lineWidth: 2,
+                    lineWidth: CHART_LINE_WIDTH_NUMBER,
                     lineColor: 'var(--ds-border-inverse)'
                 }
             }

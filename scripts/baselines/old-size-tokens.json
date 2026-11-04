@@ -59,8 +59,6 @@
     "design-system/src/components/text-and-data-display/Code/Code.scss": 1,
     "design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss": 2,
     "design-system/src/components/text-and-data-display/Table/Table.scss": 5,
-    "design-system/src/dataviz/part-to-whole/DonutChartSVG/DonutChartSVG.jsx": 2,
-    "design-system/src/dataviz/temporal/Sparkline/Sparkline.stories.jsx": 5,
     "design-system/src/patterns/Blanket/Blanket.stories.jsx": 1,
     "design-system/src/patterns/Frame/Frame.scss": 4,
     "design-system/src/patterns/Frame/Frame.stories.jsx": 1,

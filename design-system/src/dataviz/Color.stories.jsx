@@ -16,12 +16,12 @@ export default {
 const grid = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))',
-    gap: 'var(--element-stack-md)',
+    gap: 'var(--stack-md)',
 };
 
 const swatchBox = (token, extraStyle = {}) => ({
     minHeight: 'var(--item-height-md)',
-    borderRadius: 'var(--element-radius-lg)',
+    borderRadius: 'var(--radius-lg)',
     background: `var(${token})`,
     boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
     ...extraStyle,
@@ -33,7 +33,7 @@ const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 export const CategoricalOrder = () => (
     <ul style={{ ...grid, margin: 0, padding: 0, listStyle: 'none' }}>
         {CATEGORICAL.map((token, i) => (
-            <li key={token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <li key={token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <div style={swatchBox(token.match(/var\((--ds-[\w-]+)\)/)[1])} />
                 <span style={label}>{i + 1}</span>
             </li>
@@ -47,8 +47,8 @@ export const CategoricalGrayscale = () => (
         {CATEGORICAL.map((token, i) => {
             const name = token.match(/var\((--ds-[\w-]+)\)/)[1];
             return (
-                <li key={token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--element-stack-sm)' }}>
+                <li key={token} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--stack-sm)' }}>
                         <div style={swatchBox(name)} />
                         <div style={swatchBox(name, { filter: 'grayscale(1)' })} />
                     </div>
@@ -60,7 +60,7 @@ export const CategoricalGrayscale = () => (
 );
 
 const bar = (segments) => (
-    <div style={{ display: 'flex', height: 'var(--item-height-md)', borderRadius: 'var(--element-radius-lg)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: 'var(--item-height-md)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         {segments.map(([token, flex], i) => (
             <span key={i} style={{ flex, background: `var(${token})`, ...(i > 0 ? { borderInlineStart: 'var(--border-default) solid var(--ds-border-inverse)' } : {}) }} />
         ))}
@@ -68,7 +68,7 @@ const bar = (segments) => (
 );
 
 const barNoSeparator = (segments) => (
-    <div style={{ display: 'flex', height: 'var(--item-height-md)', borderRadius: 'var(--element-radius-lg)', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', height: 'var(--item-height-md)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
         {segments.map(([token, flex], i) => (
             <span key={i} style={{ flex, background: `var(${token})` }} />
         ))}
@@ -77,12 +77,12 @@ const barNoSeparator = (segments) => (
 
 /** A stacked bar with and without the separator line between two close tones. */
 export const SeparatorCompare = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--layout-gutter)' }}>
-        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--grid-gutter)' }}>
+        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             {bar([['--ds-chart-categorical-3', 1], ['--ds-chart-categorical-3-hovered', 1]])}
             <figcaption style={label}>With the separator line, the seam between two close tones still reads.</figcaption>
         </figure>
-        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             {barNoSeparator([['--ds-chart-categorical-3', 1], ['--ds-chart-categorical-3-hovered', 1]])}
             <figcaption style={label}>Without it, the seam disappears for anyone who cannot tell the two tones apart.</figcaption>
         </figure>

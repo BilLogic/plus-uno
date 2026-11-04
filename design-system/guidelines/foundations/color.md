@@ -143,6 +143,11 @@ family. In code, never name a chart color by hand:
 `@/components`) says which token does which job, and the Highcharts theme in
 `chartTheme.js` applies it.
 
+Color is the one foundation Atlassian's chart guidance covers; a chart takes
+every other foundation — spacing, radius, elevation, stroke, type, layers,
+motion — from the same component tokens as the rest of the design system.
+See [Data visualization](data-visualization.md).
+
 | Job | What it encodes | Use |
 |---|---|---|
 | Identity | which series | `--ds-chart-categorical-1` through `-6` in order (`chartPalette.CATEGORICAL`), or `--ds-chart-smart-<subject>` for the five SMART subjects (`chartPalette.SMART`) |

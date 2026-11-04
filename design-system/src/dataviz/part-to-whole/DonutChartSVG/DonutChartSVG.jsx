@@ -22,8 +22,8 @@ const DonutChartSVG = ({
         if (centerTextSize === 'body3') {
             return {
                 fontFamily: 'var(--font-family-body)',
-                fontWeight: 'var(--font-weight-normal, 300)',
-                fontSize: '12px',
+                fontWeight: 'var(--font-weight-normal)',
+                fontSize: 'var(--font-size-body3)',
                 lineHeight: '1.4',
                 color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
@@ -32,7 +32,7 @@ const DonutChartSVG = ({
         // Default to header styles for other sizes
         return {
             fontFamily: 'var(--font-family-header)',
-            fontWeight: 'bold',
+            fontWeight: 'var(--font-weight-bold)',
             fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
             lineHeight: '1',
             color: 'var(--ds-text)'
@@ -85,7 +85,7 @@ const DonutChartSVG = ({
                             style={{
                                 cursor: hasTooltip ? 'pointer' : 'default',
                                 opacity: hoveredIndex !== null && hoveredIndex !== index ? 'var(--ds-opacity-disabled)' : 1,
-                                transition: 'opacity 0.2s ease'
+                                transition: 'opacity var(--motion-duration-medium) var(--motion-easing-standard)'
                             }}
                             onMouseEnter={() => {
                                 setHoveredIndex(index);
@@ -103,11 +103,11 @@ const DonutChartSVG = ({
                         left: `${tooltipPosition.x}px`,
                         top: `${tooltipPosition.y - 40}px`,
                         transform: 'translate(-50%, -100%)',
-                        backgroundColor: 'var(--ds-text)',
-                        color: 'var(--ds-text-inverse)',
-                        padding: 'var(--size-element-pad-y-sm, 4px) var(--pad-x-sm, 8px)',
-                        borderRadius: 'var(--size-element-radius-sm, 4px)',
-                        fontSize: 'var(--font-size-body3, 12px)',
+                        backgroundColor: 'var(--ds-surface-overlay)',
+                        color: 'var(--ds-text)',
+                        padding: 'var(--popover-pad-y-tooltip) var(--pad-x-sm)',
+                        borderRadius: 'var(--popover-radius-tooltip)',
+                        fontSize: 'var(--font-size-body3)',
                         fontFamily: 'var(--font-family-body)',
                         pointerEvents: 'none',
                         zIndex: 'var(--layer-tooltip)',
@@ -117,7 +117,7 @@ const DonutChartSVG = ({
                     }}
                 >
                     {paths[hoveredIndex].label && (
-                        <div style={{ fontWeight: 'bold', marginBottom: '2px' }}>
+                        <div style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--pad-x-xs)' }}>
                             {paths[hoveredIndex].label}
                         </div>
                     )}
@@ -156,7 +156,7 @@ const DonutChartSVG = ({
                         fontFamily: 'var(--font-family-body)',
                         fontSize: 'var(--font-size-body3)',
                         color: 'var(--ds-text-subtle)',
-                        marginTop: '4px'
+                        marginTop: 'var(--pad-x-xs)'
                     }}>
                         {label}
                     </span>

@@ -52,7 +52,7 @@ A sparkline is a word-sized line chart: the shape of a trend, beside the number 
 
 const sessions = ['Sep 1–5', 'Sep 8–12', 'Sep 15–19', 'Sep 22–26', 'Sep 29–Oct 3', 'Oct 6–10', 'Oct 13–17'];
 
-const row = { display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-lg)' };
+const row = { display: 'flex', alignItems: 'center', gap: 'var(--stack-lg)' };
 const value = { fontFamily: 'var(--font-family-headline)', fontSize: 'var(--font-size-h4)', fontWeight: 'var(--font-weight-headline)', color: 'var(--ds-text)' };
 const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--font-size-body3)' };
 
@@ -62,7 +62,7 @@ const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--font-size-bod
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
         <section>
-            <h3 style={{ marginBottom: 'var(--size-element-gap-lg)', color: 'var(--ds-text)' }}>Beside a stat</h3>
+            <h3 style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text)' }}>Beside a stat</h3>
             <div style={row}>
                 <span style={value}>82%</span>
                 <Sparkline label="Average score, last 7 weeks" data={[64, 70, 68, 74, 77, 79, 82]} categories={sessions} valueSuffix="%" />
@@ -70,8 +70,8 @@ export const Overview = () => (
             </div>
         </section>
         <section>
-            <h3 style={{ marginBottom: 'var(--size-element-gap-lg)', color: 'var(--ds-text)' }}>Status tones</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)' }}>
+            <h3 style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text)' }}>Status tones</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                 {[
                     ['success', 'Attendance, on track', [80, 84, 83, 88, 90, 91, 93]],
                     ['warning', 'Missed sessions, at risk', [2, 3, 2, 4, 5, 5, 6]],
@@ -106,7 +106,7 @@ export const Interactive = {
 /** In every color mode, the line is its tone's chart token, and the latest value is marked. */
 export const ColorModes = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             <Sparkline label="Brand" data={[1, 3, 2, 4]} />
             <Sparkline label="Danger" tone="danger" data={[1, 3, 2, 4]} />
         </div>

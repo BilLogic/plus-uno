@@ -67,6 +67,7 @@ const ScatterChart = ({
                     }
                 },
                 tooltip: {
+                    ...chartTheme.tooltip,
                     headerFormat: '<b>{series.name}</b><br>',
                     pointFormat: '{point.x}, {point.y}'
                 }

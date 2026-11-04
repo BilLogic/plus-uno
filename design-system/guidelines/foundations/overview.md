@@ -27,10 +27,15 @@ topic, which today only `content/` does.
 | [border.md](border.md) | ✕ | Border widths |
 | [radius.md](radius.md) | ✕ | Corner radius scale |
 
-One file sits outside the fourteen slots on purpose:
+Two files sit outside the fourteen slots on purpose:
 [color-migration.md](color-migration.md), the step-by-step guide for moving a
-component onto the `--ds-` color tokens. It lives only as long as the sweep
-does and is deleted when its generated list of components is empty.
+component onto the `--ds-` color tokens — it lives only as long as the sweep
+does and is deleted when its generated list of components is empty — and
+[data-visualization.md](data-visualization.md), which names which component
+token a chart's non-color foundations (spacing, radius, elevation, stroke,
+type, motion) take. It is cross-cutting by nature — Atlassian's own chart
+guidance is color-only, so there is no single slot above for "what a chart
+does with every other foundation" to live in instead.
 
 **8 of 14 authored, 1 partial, 5 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
