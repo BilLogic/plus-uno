@@ -1,90 +1,142 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as WordCloudStories from './WordCloud.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={WordCloudStories} />
 
 <Title />
+Sizes each word by how often it appears, so the most common themes in a body of
+text are the first thing you see.
 
-A word cloud displays **text frequency** with word size proportional to occurrence.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/WordCloud"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A word cloud displays **text frequency** with word size proportional to occurrence.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>The words students used most in session feedback, sized by count.</>}>
+    <Canvas of={WordCloudStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Larger words** = more frequent/important
-- **Smaller words** = less frequent
-- Position is typically random (no meaning)
-- Focus on the most prominent words first
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Text analysis overview</td><td>✅ Ideal</td></tr>
-    <tr><td>Survey response themes</td><td>✅ Ideal</td></tr>
-    <tr><td>Tag/keyword display</td><td>✅ Good</td></tr>
-    <tr><td>Precise frequency comparison</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Categorical analysis</td><td>❌ Use Treemap</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `WordCloud` for a quick, impressionistic read of open text: words students
+use in session feedback, themes in tutor session notes, or answers to an
+open-ended survey question.
 
-### PLUS Context
+It is a shape, not a measurement. When the counts matter, or two words need
+comparing, use `BarChart`. For terms grouped by category as well as sized, use
+`PackedBubbleChart`. For which terms appear together, use `NetworkGraph`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Feedback Analysis**</td><td>Common words in student feedback</td></tr>
-    <tr><td>**Topic Tagging**</td><td>Frequently discussed topics</td></tr>
-    <tr><td>**Learning Keywords**</td><td>Key terms in course content</td></tr>
-    <tr><td>**Survey Responses**</td><td>Open-ended question themes</td></tr>
-    <tr><td>**Session Notes**</td><td>Common themes in tutor notes</td></tr>
-  </tbody>
-</table>
+Filter out common words (the, and, of) before passing the data, and keep to
+the top 50 to 100 words.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Filter out common words (the, and, etc.)
-✅ Limit to top 50-100 words
-✅ Use readable fonts
-✅ Consider color by category
+## Anatomy
 
-**Avoid:**
-❌ Precise value comparisons
-❌ Too many words (illegible)
-❌ Very long words (layout issues)
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Words', <>One per item in <C>data</C>. Size follows <C>weight</C>; position means nothing.</>],
+        ['Tooltip', <>The word and its <C>weight</C>.</>],
+        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={WordCloudStories.Interactive} />
+## Data shape
 
+`data` is an array of `{ name, weight }`. Both are required: `name` is the word,
+`weight` its count.
+
+```jsx
+<WordCloud
+    data={[
+        { name: 'Patient', weight: 42 },
+        { name: 'Encouraging', weight: 35 },
+        { name: 'Clear', weight: 28 },
+        { name: 'Prepared', weight: 19 },
+        { name: 'Fun', weight: 12 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is decoration here.** Words take the categorical colors in order, starting at `--ds-chart-categorical-1`, and repeat past eight. The color says nothing about the word or its count; do not describe it as a category.
+- **Size is the only encoding, and a weak one.** Long words take up more space than short words of the same weight, so a long word looks more common than it is. Give the exact counts in the tooltip, a table or the surrounding text when they matter.
+- **Too many words become illegible.** The smallest words drop below a readable size first.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`WordCloud` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Feedback could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No feedback yet" description="Words appear after students rate a session." />
+    : <WordCloud data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={WordCloudStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For frequencies that must be compared precisely, use `BarChart` — a word cloud is a shape, not a measurement.
+- For frequencies that must be compared precisely, use `BarChart`.
 - For terms grouped by category as well as sized, use `PackedBubbleChart`.
-- For co-occurrence between terms, use `NetworkGraph`.
+- For which terms appear together, use `NetworkGraph`.
 
 </div>
 
 </div>
+
+

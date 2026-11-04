@@ -1,86 +1,145 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TreegraphChartStories from './TreegraphChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={TreegraphChartStories} />
 
 <Title />
+Draws a hierarchy as a tree of labeled boxes, each joined to its parent by a
+line.
 
-Shows **hierarchical structures** like family trees or decision trees.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/TreegraphChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **hierarchical structures** like family trees or decision trees.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A three-level tree: two roots, their children and one more level below.</>}>
+    <Canvas of={TreegraphChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = individual items
-- **Connections** = parent-child relationships
-- **Layout** = hierarchical tree structure
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Decision trees</td><td>✅ Ideal</td></tr>
-    <tr><td>Family trees</td><td>✅ Ideal</td></tr>
-    <tr><td>Process flows</td><td>✅ Good</td></tr>
-    <tr><td>Org charts</td><td>✅ Good (or use OrgChart)</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `TreegraphChart` for any parent-child structure that is not a reporting
+line: subject to topic to lesson, a prerequisite chain, or a decision path a
+tutor follows in a session.
 
-### PLUS Context
+For people and who they report to, use `OrganizationChart`. For the same tree
+sized by a value, use `TreemapChart` or `SunburstChart`. For a structure where a
+node has more than one parent, or links loop back, use `NetworkGraph`; a tree
+cannot draw either.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Prerequisite Chains**</td><td>Course dependencies</td></tr>
-    <tr><td>**Logic Flows**</td><td>Learning path decisions</td></tr>
-    <tr><td>**Categorization**</td><td>Topic hierarchy</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the treegraph chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Nodes', <>One rounded box per item in <C>data</C>, 30px tall, rounded by <C>--radius-0625</C>.</>],
+        ['Levels', 'The first three levels each take their own fill; deeper levels get no fill of their own from this chart.'],
+        ['Links', <>Join each node to its <C>parent</C>, drawn in <C>--ds-border-bold</C>.</>],
+        ['Labels', <>Always on: each node shows its <C>name</C> in <C>--ds-text</C>.</>],
+        ['Tooltip', <>The node's <C>name</C>.</>],
+        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={TreegraphChartStories.Interactive} />
+`data` is a flat array of `{ id, parent, name }`. `id` is required and unique;
+`parent` is the `id` of the node above it, left out for a root; `name` is the
+label.
 
+```jsx
+<TreegraphChart
+    data={[
+        { id: 'math', name: 'Math' },
+        { id: 'fractions', parent: 'math', name: 'Fractions' },
+        { id: 'ratios', parent: 'math', name: 'Ratios' },
+        { id: 'equivalent', parent: 'fractions', name: 'Equivalent fractions' },
+        { id: 'unit-rates', parent: 'ratios', name: 'Unit rates' },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color marks depth, not identity.** Level 0 takes `--ds-chart-categorical-1`, level 1 `--ds-chart-categorical-2`, level 2 `--ds-chart-categorical-3`. Nodes cannot be colored one by one.
+- **Position carries the structure.** Levels and links show the hierarchy and every node is named, so the tree reads without hue.
+- **Labels sit on colored boxes.** The label is `--ds-text` with no outline; check that it stays legible on each level's fill in both color modes.
+- **Wide trees crowd.** Many siblings at one level squeeze their labels. Collapse a branch into one node, or split the tree.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`TreegraphChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={500} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Topic tree could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No topics yet" description="Topics appear once a subject's lessons are added." />
+    : <TreegraphChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TreegraphChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For a people hierarchy with roles and photos, use `OrganizationChart`.
+- For people and reporting lines, use `OrganizationChart`.
 - For the same tree sized by a value, use `TreemapChart` or `SunburstChart`.
-- For a structure with cycles, use `NetworkGraph` — a tree cannot draw one.
+- For a structure with cycles or shared children, use `NetworkGraph`.
 
 </div>
 
 </div>
+
+

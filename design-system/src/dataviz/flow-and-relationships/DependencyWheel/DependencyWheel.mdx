@@ -1,89 +1,143 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DependencyWheelStories from './DependencyWheel.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={DependencyWheelStories} />
 
 <Title />
+Places items around a circle and joins related pairs with chords. Each chord is
+as wide as the connection's weight.
 
-A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/DependencyWheel"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A dependency wheel shows **circular relationships** between entities, with connection width representing magnitude.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>How reading, writing and math skills feed into each other, with chord width showing how strong each link is.</>}>
+    <Canvas of={DependencyWheelStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = entities around the circle
-- **Chords** = connections between entities
-- **Chord width** = strength of connection
-- Follow chords to trace relationships
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Mutual dependencies</td><td>✅ Ideal</td></tr>
-    <tr><td>Trade/flow relationships</td><td>✅ Ideal</td></tr>
-    <tr><td>Interconnected systems</td><td>✅ Good</td></tr>
-    <tr><td>Hierarchical data</td><td>❌ Use Sunburst</td></tr>
-    <tr><td>Directional flows</td><td>❌ Use Sankey</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `DependencyWheel` for weighted connections among a set of peers where no
+item comes first: how skills support each other, how often SMART competencies
+come up together in session notes, or how topics reference one another.
 
-### PLUS Context
+For an amount moving one way through stages, use `SankeyDiagram`. For the same
+connections on a straight line, use `ArcDiagram`. For connections with no
+weight, use `NetworkGraph`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Skill Dependencies**</td><td>How skills relate to each other</td></tr>
-    <tr><td>**Peer Learning**</td><td>Student collaboration patterns</td></tr>
-    <tr><td>**Content Links**</td><td>How topics reference each other</td></tr>
-    <tr><td>**Prerequisite Map**</td><td>Skill requirements visualization</td></tr>
-  </tbody>
-</table>
+Keep to 10 to 15 items. Past that, the chords get too thin to follow.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Limit to 10-15 nodes maximum
-✅ Use color to group categories
-✅ Show connection weights in tooltips
-✅ Order nodes logically
+## Anatomy
 
-**Avoid:**
-❌ Too many nodes (becomes unreadable)
-❌ Very weak connections (filter them out)
-❌ Unrelated entities
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Segments', <>One per distinct name in <C>data</C>, generated for you around the circle. A segment's length is the total weight of its connections.</>],
+        ['Chords', <>One per <C>[from, to, weight]</C> row. Width is the <C>weight</C>.</>],
+        ['Labels', <>Name each segment, following the curve just outside the ring, in <C>--ds-text</C>.</>],
+        ['Tooltip', 'Hover a segment or chord for its name and weight.'],
+        ['Height', <>The chart is <C>height</C> pixels tall, 500 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={DependencyWheelStories.Interactive} />
+## Data shape
 
+`data` is an array of `[from, to, weight]` rows. `from` and `to` are item
+names; `weight` sets the chord's width.
+
+```jsx
+<DependencyWheel
+    data={[
+        ['Social-emotional', 'Relationship', 18],
+        ['Social-emotional', 'Advocacy', 9],
+        ['Mastering content', 'Technology tools', 12],
+        ['Mastering content', 'Relationship', 7],
+        ['Advocacy', 'Relationship', 11],
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color tells items apart.** Segments take the categorical colors in order, starting at `--ds-chart-categorical-1`, and a chord takes the color of the item it leaves. There are eight, so past eight items the colors repeat; the labels keep them distinct.
+- **Width and labels carry the reading.** Segment length and chord width are the values, and every segment is named, so the wheel reads without hue.
+- **Angles are hard to compare.** Readers judge curved widths poorly. When exact amounts matter, give them in a table or the surrounding text, or use `BarChart`.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`DependencyWheel` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={500} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Competency links could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No competency links yet" description="Links appear once session notes are tagged." />
+    : <DependencyWheel data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DependencyWheelStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For the same relationships on a straight axis, use `ArcDiagram`.
-- For quantities flowing between stages, use `SankeyDiagram`.
-- For a free layout with no fixed ordering, use `NetworkGraph`.
+- For an amount flowing one way between stages, use `SankeyDiagram`.
+- For a free layout with no weight on the links, use `NetworkGraph`.
 
 </div>
 
 </div>
+
+
