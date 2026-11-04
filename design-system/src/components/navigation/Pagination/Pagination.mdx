@@ -57,10 +57,10 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Sizes
+## Spacing
 
-<DocsCanvasShell description={<>Small, default, and large sizes across icon and text types.</>}>
-    <DsCanvasQuiet of={PaginationStories.Sizes} />
+<DocsCanvasShell description={<>Default (32) and compact (24) spacing across icon and text navigators.</>}>
+    <DsCanvasQuiet of={PaginationStories.Spacing} />
 </DocsCanvasShell>
 
 </div>
@@ -108,7 +108,7 @@ move between them or jump to a known one — admin tables of sessions, students,
 tutors. It is fully controlled: `currentPage` and `totalPages` are required, and
 every click calls `onPageChange` with the target page. It holds no state.
 
-The window of numbers is computed for you. `maxVisible` (default 5) centers the
+The window of numbers is computed for you. `max` (default 5) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
 
@@ -135,34 +135,37 @@ whenever the window does not reach them.
 
 ## Accessibility
 
-- **The structure is right.** A `nav` labeled by `ariaLabel` (default "Page
-  navigation") wraps a `ul` of `li`s, and the active page carries
+- **The structure is right.** A `nav` labeled by `label` (default "Page
+  navigation") wraps a `ul` of `li`s, and the current page carries
   `aria-current="page"`.
-- **Page numbers announce as bare numbers.** Only the previous and next controls
-  get an `aria-label` — the numbered links get none, so they read as "3", "4",
-  "5". Naming the `nav` is what makes those numbers mean something.
-- **Disabled arrows stay in the DOM.** At the first or last page the arrow gets
-  `aria-disabled="true"` and `tabIndex={-1}`, and the click handler is skipped.
-  It is announced as disabled rather than disappearing, which keeps the control
-  row from reflowing.
-- **The ellipsis is literal.** It renders as three full stops in a span marked
-  `aria-disabled`, so some screen readers will read it out. It is decorative;
-  the pinned first and last pages beside it carry the meaning.
-- **Every control is an anchor with `href="#"`.** They are focusable and
-  activate with Enter, but they are not real destinations — if the page numbers
-  should be linkable or shareable, render your own anchors with real URLs.
+- **Every page has a name.** Each page button is labeled "Page 3", "Page 4", so
+  a screen reader never reads a bare number. Naming the `nav` says which list
+  the pages belong to.
+- **Parts are buttons.** `Pagination.Page` and `Pagination.Navigator` are
+  `button` elements: Tab reaches each, Enter and Space activate it, and none
+  follows a link.
+- **A disabled Navigator stays reachable.** At the first or last page the
+  Previous or Next control keeps its tab stop and carries `aria-disabled="true"`;
+  activating it does nothing. It is announced as unavailable rather than
+  disappearing, which keeps the row from reflowing.
+- **The ellipsis is hidden.** It is `aria-hidden`: the pinned first and last
+  pages beside it carry the meaning.
+- **Pages are not destinations.** If page numbers should be linkable or
+  shareable, render your own anchors with real URLs.
+- **Focus is a ring inside the segment** (`--focus-ring-width`), and the current page keeps an
+  outline in forced-colors mode.
 
 ### Text mode is the one that labels its arrows.
 
 ```jsx
-// Incorrect — in the default `icon` type, prevText and nextText are used only
-// as the arrows' aria-labels, so these strings are never visible.
+// Incorrect — in the default `icon` navigator, previousLabel and nextLabel are used only
+// as the arrows' accessible names, so these strings are never visible.
 <Pagination currentPage={page} totalPages={9} onPageChange={setPage}
-            prevText="Back a page" nextText="On a page" />
+            previousLabel="Back a page" nextLabel="On a page" />
 
-// Correct — type="text" renders the words; otherwise leave the defaults, which
+// Correct — navigator="text" renders the words; otherwise leave the defaults, which
 // already label the arrows "Previous" and "Next".
-<Pagination currentPage={page} totalPages={9} onPageChange={setPage} type="text" />
+<Pagination currentPage={page} totalPages={9} onPageChange={setPage} navigator="text" />
 ```
 
 ### Name the navigation when there is more than one on the page.
@@ -174,8 +177,8 @@ whenever the window does not reach them.
 <Pagination currentPage={p2} totalPages={7} onPageChange={setP2} />
 
 // Correct.
-<Pagination ariaLabel="Sessions pages" currentPage={p1} totalPages={4} onPageChange={setP1} />
-<Pagination ariaLabel="Students pages" currentPage={p2} totalPages={7} onPageChange={setP2} />
+<Pagination label="Sessions pages" currentPage={p1} totalPages={4} onPageChange={setP1} />
+<Pagination label="Students pages" currentPage={p2} totalPages={7} onPageChange={setP2} />
 ```
 
 </div>

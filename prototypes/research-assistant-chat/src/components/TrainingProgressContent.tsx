@@ -127,7 +127,7 @@ export function TrainingProgressContent(): React.ReactElement {
             <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
               Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
             </div>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={noop} type="icon" size="small" />
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={noop} navigator="icon" spacing="compact" />
           </div>
         </div>
       </div>

@@ -242,9 +242,9 @@ const StudentAdminPage = ({
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={onPageChange}
-                            type="icon"
-                            size="small"
-                            ariaLabel="Students table pagination"
+                            navigator="icon"
+                            spacing="compact"
+                            label="Students table pagination"
                         />
                     </div>
                 </div>

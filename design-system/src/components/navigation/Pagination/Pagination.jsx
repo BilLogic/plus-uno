@@ -2,179 +2,186 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './Pagination.scss';
 
+export const PAGINATION_SPACINGS = ['default', 'compact'];
+export const PAGINATION_NAVIGATORS = ['icon', 'text'];
+
+const cx = (...names) => names.filter(Boolean).join(' ');
+
+/**
+ * One page of the trail. A real button, so Enter and Space both work and the
+ * current page announces as `aria-current="page"`. A button needs no `href`,
+ * so a disabled one has nothing to navigate to by accident.
+ */
+const PaginationPage = ({ page, isCurrent = false, onSelect, label }) => (
+    <li className="plus-pagination__item">
+        <button
+            type="button"
+            className={cx('plus-pagination__page', isCurrent && 'plus-pagination__page--current')}
+            aria-current={isCurrent ? 'page' : undefined}
+            aria-label={label}
+            onClick={() => onSelect && onSelect(page)}
+        >
+            {page}
+        </button>
+    </li>
+);
+
+PaginationPage.propTypes = {
+    page: PropTypes.number.isRequired,
+    isCurrent: PropTypes.bool,
+    onSelect: PropTypes.func,
+    /** Accessible name; the number alone when omitted. */
+    label: PropTypes.string,
+};
+
+/**
+ * The Previous or Next control. `direction` picks the caret; `navigator`
+ * picks a caret alone (named by `label`) or the label as visible text. Disabled
+ * keeps the control in the tab order with `aria-disabled`, so a screen reader
+ * user finds it and hears why it does nothing.
+ */
+const PaginationNavigator = ({ direction, navigator = 'icon', label, isDisabled = false, onSelect }) => (
+    <li className="plus-pagination__item">
+        <button
+            type="button"
+            className={cx(
+                'plus-pagination__navigator',
+                navigator === 'icon' && 'plus-pagination__navigator--icon'
+            )}
+            aria-label={navigator === 'icon' ? label : undefined}
+            aria-disabled={isDisabled ? 'true' : undefined}
+            onClick={() => {
+                if (!isDisabled && onSelect) onSelect();
+            }}
+        >
+            {navigator === 'icon'
+                ? <i className={`fa-solid fa-caret-${direction === 'previous' ? 'left' : 'right'}`} aria-hidden="true"></i>
+                : label}
+        </button>
+    </li>
+);
+
+PaginationNavigator.propTypes = {
+    direction: PropTypes.oneOf(['previous', 'next']).isRequired,
+    navigator: PropTypes.oneOf(PAGINATION_NAVIGATORS),
+    label: PropTypes.string.isRequired,
+    isDisabled: PropTypes.bool,
+    onSelect: PropTypes.func,
+};
+
 const Pagination = ({
     currentPage,
     totalPages,
     onPageChange,
-    type = 'icon', // 'icon' or 'text'
-    size = 'default',
-    maxVisible = 5,
-    prevText = 'Previous',
-    nextText = 'Next',
-    ariaLabel = 'Page navigation',
+    navigator = 'icon',
+    spacing = 'default',
+    max = 5,
+    previousLabel = 'Previous',
+    nextLabel = 'Next',
+    label = 'Page navigation',
     id,
     className = ''
 }) => {
-    // Determine visible page numbers
-    // Logic: Show maxVisible pages centered around currentPage, but always include page 1 and last page when there are ellipses
+    // A window of `max` pages around the current one. Page 1 and the last page
+    // stay reachable when the window leaves them out.
     const getVisiblePages = () => {
-        if (totalPages <= maxVisible) {
+        if (totalPages <= max) {
             return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
 
-        const half = Math.floor(maxVisible / 2);
+        const half = Math.floor(max / 2);
         let start = Math.max(1, currentPage - half);
-        let end = Math.min(totalPages, start + maxVisible - 1);
+        const end = Math.min(totalPages, start + max - 1);
+        start = Math.max(1, end - max + 1);
 
-        // Adjust if we don't have enough pages
-        if (end - start < maxVisible - 1) {
-            start = Math.max(1, end - maxVisible + 1);
-        }
-
-        // Check if we need ellipses
-        const needsPrevEllipsis = start > 2;
-        const needsNextEllipsis = end < totalPages - 1;
-
-        // Build the page array, always including 1 and last page when ellipses are needed
         const pages = new Set();
+        if (start > 1) pages.add(1);
+        for (let i = start; i <= end; i++) pages.add(i);
+        if (end < totalPages) pages.add(totalPages);
 
-        // Always include page 1 if there's a previous ellipsis
-        if (needsPrevEllipsis) {
-            pages.add(1);
-        }
-
-        // Add the visible range
-        for (let i = start; i <= end; i++) {
-            pages.add(i);
-        }
-
-        // Always include last page if there's a next ellipsis
-        if (needsNextEllipsis) {
-            pages.add(totalPages);
-        }
-
-        // Convert to sorted array
         return Array.from(pages).sort((a, b) => a - b);
     };
 
     const visiblePages = getVisiblePages();
 
-    const handlePageChange = (page) => {
+    const goTo = (page) => {
         if (onPageChange && page >= 1 && page <= totalPages) {
             onPageChange(page);
         }
     };
 
-    const containerClasses = [
-        'pagination',
-        'plus-pagination',
-        size !== 'default' ? `plus-pagination-${size}` : '',
-        type !== 'icon' ? `plus-pagination-${type}` : '',
-        className
-    ].filter(Boolean).join(' ');
-
-    /**
-     * Every activation prevents the default, disabled included.
-     *
-     * `pointer-events: none` stops a mouse, but a keyboard Enter, a dispatched
-     * click and an assistive-technology activation all reach this handler — and
-     * one that returns without preventing the default follows `href="#"` and
-     * navigates the page. So the guard sits after `preventDefault`, not around it.
-     */
-    const handleLinkClick = (e, page, isDisabled) => {
-        e.preventDefault();
-        if (!isDisabled) {
-            handlePageChange(page);
-        }
-    };
-
-    // `key` is the item's identity; `page` is where it goes. Previous and Next
-    // target `currentPage -/+ 1`, the same number as a page item in the window,
-    // so keying by destination would give two children of the same `<ul>` the
-    // same key.
-    const renderPageItem = (key, page, isActive, isDisabled, content, isIconButton = false, accessibleLabel) => (
-        <li 
-            className={`page-item ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''} ${isIconButton ? 'page-item-icon' : ''}`} 
-            key={key}
-        >
-            <a
-                className="page-link"
-                href="#"
-                onClick={(e) => handleLinkClick(e, page, isDisabled)}
-                aria-current={isActive ? 'page' : undefined}
-                aria-disabled={isDisabled ? 'true' : undefined}
-                aria-label={isIconButton ? accessibleLabel : undefined}
-                tabIndex={isDisabled ? -1 : undefined}
-            >
-                {content}
-            </a>
-        </li>
-    );
-
     return (
-        <nav aria-label={ariaLabel} id={id}>
-            <ul className={containerClasses}>
-                {/* Previous Button */}
-                {renderPageItem(
-                    'prev',
-                    currentPage - 1,
-                    false,
-                    currentPage === 1,
-                    type === 'icon' ? <i className="fas fa-caret-left" aria-hidden="true"></i> : prevText,
-                    type === 'icon',
-                    prevText
+        <nav aria-label={label} id={id}>
+            <ul
+                className={cx(
+                    'plus-pagination',
+                    spacing === 'compact' && 'plus-pagination--compact',
+                    className
                 )}
+            >
+                <PaginationNavigator
+                    direction="previous"
+                    navigator={navigator}
+                    label={previousLabel}
+                    isDisabled={currentPage <= 1}
+                    onSelect={() => goTo(currentPage - 1)}
+                />
 
-                {/* Render pages with proper ellipsis placement */}
                 {visiblePages.map((pageNum, index) => {
                     const prevPage = index > 0 ? visiblePages[index - 1] : null;
-                    const gapBefore = prevPage && pageNum - prevPage > 1;
+                    const hasGap = prevPage !== null && pageNum - prevPage > 1;
 
                     return (
                         <React.Fragment key={pageNum}>
-                            {/* Show ellipsis before if there's a gap from previous page */}
-                            {gapBefore && (
-                                <li className="page-item disabled page-item-ellipsis" key={`ellipsis-before-${pageNum}`}>
-                                    <span className="page-link" aria-disabled="true">...</span>
+                            {hasGap && (
+                                <li className="plus-pagination__item" aria-hidden="true">
+                                    <span className="plus-pagination__gap">&hellip;</span>
                                 </li>
                             )}
-                            {/* Render the page */}
-                            {renderPageItem(
-                                `page-${pageNum}`,
-                                pageNum,
-                                pageNum === currentPage,
-                                false,
-                                pageNum
-                            )}
+                            <PaginationPage
+                                page={pageNum}
+                                isCurrent={pageNum === currentPage}
+                                label={`Page ${pageNum}`}
+                                onSelect={goTo}
+                            />
                         </React.Fragment>
                     );
                 })}
 
-                {/* Next Button */}
-                {renderPageItem(
-                    'next',
-                    currentPage + 1,
-                    false,
-                    currentPage === totalPages,
-                    type === 'icon' ? <i className="fas fa-caret-right" aria-hidden="true"></i> : nextText,
-                    type === 'icon',
-                    nextText
-                )}
+                <PaginationNavigator
+                    direction="next"
+                    navigator={navigator}
+                    label={nextLabel}
+                    isDisabled={currentPage >= totalPages}
+                    onSelect={() => goTo(currentPage + 1)}
+                />
             </ul>
         </nav>
     );
 };
 
+Pagination.Page = PaginationPage;
+Pagination.Navigator = PaginationNavigator;
+
 Pagination.propTypes = {
+    /** Current page, 1-based. */
     currentPage: PropTypes.number.isRequired,
+    /** Total number of pages. */
     totalPages: PropTypes.number.isRequired,
+    /** Called with the page number to move to. */
     onPageChange: PropTypes.func,
-    type: PropTypes.oneOf(['icon', 'text']),
-    size: PropTypes.oneOf(['small', 'default', 'large']),
-    maxVisible: PropTypes.number,
-    prevText: PropTypes.string,
-    nextText: PropTypes.string,
-    ariaLabel: PropTypes.string,
+    /** Previous and Next as a caret (`icon`) or as their labels (`text`). */
+    navigator: PropTypes.oneOf(PAGINATION_NAVIGATORS),
+    /** `default` is a 32 row, `compact` a 24 row. */
+    spacing: PropTypes.oneOf(PAGINATION_SPACINGS),
+    /** Most page numbers shown at once. */
+    max: PropTypes.number,
+    /** Accessible name of the Previous control. */
+    previousLabel: PropTypes.string,
+    /** Accessible name of the Next control. */
+    nextLabel: PropTypes.string,
+    /** Accessible label of the navigation region. */
+    label: PropTypes.string,
     id: PropTypes.string,
     className: PropTypes.string
 };
