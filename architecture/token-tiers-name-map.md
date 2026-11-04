@@ -203,6 +203,10 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Option menu | `--layout-width-option-menu` | `--option-menu-width` |  |
 | Tile | `--tile-radius-sm` | `--tile-radius-sm` (reclassified, unchanged) |  |
 | Tile | `--tile-radius-lg` | `--tile-radius-lg` (reclassified, unchanged) |  |
+| Spinner | *(new)* | `--spinner-size-sm` | matches the old --size-spinner-sm (16px) |
+| Spinner | *(new)* | `--spinner-size-md` | matches the old --size-spinner-md (24px) |
+| Spinner | *(new)* | `--spinner-size-lg` | matches the old --size-spinner-lg (48px) |
+| Progress bar | *(new)* | `--progress-bar-height` | matches the old --size-progressbar-height (8px) |
 
 ## Layers
 

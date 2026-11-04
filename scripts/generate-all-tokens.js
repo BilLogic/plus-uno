@@ -349,9 +349,6 @@ const SIZE_ROLES = [
             md: 'spacing-large-space-600', lg: 'spacing-large-space-700', xl: 'spacing-large-space-800',
         },
     },
-    // Figma has no Spinner/Progress Bar group; code-only, per Loading's own SCSS.
-    { prefix: 'progressbar', heading: 'Progress Bar Sizes', steps: { height: 'spacing-small-space-100' } },
-    { prefix: 'spinner', heading: 'Spinner Sizes', steps: { sm: 'spacing-medium-space-300', md: 'spacing-medium-space-500', lg: 'spacing-large-space-800' } },
 ];
 
 /** Semantic tokens the stylesheet declares that Figma does not have. */

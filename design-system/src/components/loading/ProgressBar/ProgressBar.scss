@@ -9,12 +9,12 @@
  * use for "elements on a bold background") and its pressed step for the
  * fill, which needs the extra contrast since it carries the value.
  *
- * THE HEIGHT. 8px (`--size-progressbar-height`), full pill radius.
+ * THE HEIGHT. 8px (`--progress-bar-height`), full pill radius.
  */
 
 .plus-progressbar {
     display: flex;
-    height: var(--size-progressbar-height);
+    height: var(--progress-bar-height);
     width: 100%;
     background-color: var(--ds-background-neutral);
     border-radius: var(--size-element-radius-full);

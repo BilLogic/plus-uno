@@ -13,7 +13,7 @@
  */
 
 .plus-spinner {
-    --plus-spinner-size: var(--size-spinner-md);
+    --plus-spinner-size: var(--spinner-size-md);
 
     display: inline-block;
     width: var(--plus-spinner-size);
@@ -26,11 +26,11 @@
 }
 
 .plus-spinner[data-size='16'] {
-    --plus-spinner-size: var(--size-spinner-sm);
+    --plus-spinner-size: var(--spinner-size-sm);
 }
 
 .plus-spinner[data-size='48'] {
-    --plus-spinner-size: var(--size-spinner-lg);
+    --plus-spinner-size: var(--spinner-size-lg);
 }
 
 .plus-spinner--invert {
