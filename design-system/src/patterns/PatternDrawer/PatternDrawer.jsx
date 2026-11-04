@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { CloseButton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { useOverlaySlot } from '@/lib/overlay';
 import Blanket, { BLANKET_WIDTHS } from '../Blanket';
 import './PatternDrawer.scss';
 
@@ -41,6 +42,11 @@ const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
  * Escape, the close button and a click on the blanket call `onClose`, and
  * closing returns focus to what had it. An `inline` drawer, drawn in the page
  * flow for docs, leaves focus where it is.
+ *
+ * It takes a stack slot from the shared overlay module (`@/lib/overlay`)
+ * alongside `Modal`: at most two stack (a drawer and the confirm it raises),
+ * a third stays closed and calls `onClose`, and opening either closes a
+ * floating sidebar. An `inline` drawer takes no slot.
  */
 const PatternDrawer = ({
     id,
@@ -63,12 +69,18 @@ const PatternDrawer = ({
     const reactId = React.useId();
     const panelRef = React.useRef(null);
     const bodyRef = React.useRef(null);
-    const overflows = useOverflows(bodyRef, open);
+
+    // A stack slot alongside Modal: a drawer and a confirm it raises are the
+    // same two-overlay limit, and opening either closes a floating sidebar.
+    // An inline drawer (a docs preview) is not a real overlay and takes none.
+    const [placed] = useOverlaySlot(open && !inline, onClose);
+    const visible = inline ? open : open && placed;
+    const overflows = useOverflows(bodyRef, visible);
 
     // Opening takes focus into the drawer; closing gives it back to what had
     // it, so a keyboard user lands where they were.
     React.useEffect(() => {
-        if (!open || inline) return undefined;
+        if (!visible || inline) return undefined;
         const opener = document.activeElement;
         const panel = panelRef.current;
         const [first] = focusablesIn(panel);
@@ -76,9 +88,9 @@ const PatternDrawer = ({
         return () => {
             if (opener && typeof opener.focus === 'function' && opener.isConnected) opener.focus();
         };
-    }, [open, inline]);
+    }, [visible, inline]);
 
-    if (!open) return null;
+    if (!visible) return null;
 
     const classes = [
         'plus-pattern-drawer',

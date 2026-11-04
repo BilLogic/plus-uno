@@ -4,7 +4,7 @@ import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { openOverlay, reportFocusLost } from '@/lib/overlayStack';
+import { useOverlaySlot, reportFocusLost, getOverlayPortalRoot } from '@/lib/overlay';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
@@ -48,44 +48,6 @@ const resolveModalWidth = (width) => {
  * under the first modal (510).
  */
 const OverlayContext = createContext(null);
-
-/**
- * Takes a place in the document's overlay stack while `active`.
- *
- * Opening one tells the app frame, which closes a floating sidebar. A third
- * overlay gets no place: it stays closed and calls `onRefused`, so its owner's
- * state says closed too and the trigger works again once there is room. The
- * element that had focus is kept, so a trigger that left the page with the
- * sidebar can be reported once the modal has closed.
- *
- * A layout effect, so the place is taken before the first paint and the modal
- * does not flash closed.
- *
- * @param {boolean} active
- * @param {() => void} [onRefused]
- * @returns {[boolean, React.MutableRefObject<Element | null>]} whether it has a place, and its trigger
- */
-function useOverlayPlace(active, onRefused) {
-    const [placed, setPlaced] = useState(false);
-    const trigger = useRef(null);
-    const refused = useRef(onRefused);
-    refused.current = onRefused;
-    useLayoutEffect(() => {
-        if (!active) return undefined;
-        trigger.current = typeof document === 'undefined' ? null : document.activeElement;
-        const handle = openOverlay();
-        if (!handle) {
-            refused.current?.();
-            return undefined;
-        }
-        setPlaced(true);
-        return () => {
-            handle.release();
-            setPlaced(false);
-        };
-    }, [active]);
-    return [placed, trigger];
-}
 
 /**
  * True while an element's content is taller than its box.
@@ -168,7 +130,7 @@ const Modal = ({
     const parent = useContext(OverlayContext);
     // A modal raised from a modal waits for that modal's place, so when both
     // mount open the outer one takes its place first.
-    const [placed, trigger] = useOverlayPlace(
+    const [placed, trigger] = useOverlaySlot(
         show && renderAs === 'modal' && (parent ? parent.placed : true),
         onClose,
     );
@@ -323,7 +285,7 @@ const Modal = ({
                 backdrop={backdrop}
                 keyboard={keyboard}
                 centered={centered}
-                container={container ?? (parent ? parent.element : undefined)}
+                container={container ?? (parent ? parent.element : getOverlayPortalRoot())}
                 manager={manager}
                 enforceFocus={enforceFocus}
                 autoFocus={autoFocus}
