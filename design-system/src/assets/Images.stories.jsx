@@ -45,7 +45,7 @@ export const AuthProviders = () => {
             }}>
                 {assets.map(asset => (
                     <div key={asset.name} style={{
-                        backgroundColor: 'var(--color-surface-container-lowest)',
+                        backgroundColor: 'var(--ds-surface-raised)',
                         borderRadius: '12px',
                         padding: '24px',
                         border: '1px solid var(--color-outline-variant)',
@@ -60,7 +60,7 @@ export const AuthProviders = () => {
                             justifyContent: 'center',
                             width: '80px',
                             height: '80px',
-                            backgroundColor: 'var(--color-surface)',
+                            backgroundColor: 'var(--ds-surface-container)',
                             borderRadius: '8px',
                             border: '1px solid var(--color-outline-variant)'
                         }}>
@@ -166,7 +166,7 @@ export const TutorBadges = () => {
                         }}>
                             {categoryAssets.map(asset => (
                                 <div key={asset.name} style={{
-                                    backgroundColor: 'var(--color-surface-container-lowest)',
+                                    backgroundColor: 'var(--ds-surface-raised)',
                                     borderRadius: '12px',
                                     padding: '24px',
                                     border: '1px solid var(--color-outline-variant)',
@@ -181,7 +181,7 @@ export const TutorBadges = () => {
                                         justifyContent: 'center',
                                         width: '100%',
                                         minHeight: '150px',
-                                        backgroundColor: 'var(--color-surface)',
+                                        backgroundColor: 'var(--ds-surface-container)',
                                         borderRadius: '8px',
                                         border: '1px solid var(--color-outline-variant)',
                                         padding: '16px'
@@ -196,7 +196,7 @@ export const TutorBadges = () => {
                                             }} 
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
-                                                e.target.parentElement.innerHTML = '<div style="color: var(--color-on-surface-variant); text-align: center;">Image not found</div>';
+                                                e.target.parentElement.innerHTML = '<div style="color: var(--ds-text-subtle); text-align: center;">Image not found</div>';
                                             }}
                                         />
                                     </div>

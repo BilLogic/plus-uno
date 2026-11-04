@@ -158,7 +158,7 @@ const AgentChip = ({ hex }) => (
             }}
         />
         <span className="body2-txt">PLUS agent</span>
-        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             can see this session
         </span>
     </div>
@@ -220,11 +220,11 @@ export const Candidates = () => (
                             }}
                             className="body3-txt"
                         >
-                            <dt style={{ color: 'var(--color-on-surface-variant)' }}>white on it</dt>
+                            <dt style={{ color: 'var(--ds-text-subtle)' }}>white on it</dt>
                             <dd style={{ margin: 0 }} data-metric="contrast">
                                 {white.toFixed(2)}:1
                             </dd>
-                            <dt style={{ color: 'var(--color-on-surface-variant)' }}>nearest existing</dt>
+                            <dt style={{ color: 'var(--ds-text-subtle)' }}>nearest existing</dt>
                             <dd style={{ margin: 0 }} data-metric="nearest">
                                 {near.token} &mdash; distance {Math.round(near.d)}
                             </dd>

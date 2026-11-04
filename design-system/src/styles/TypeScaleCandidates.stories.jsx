@@ -178,7 +178,7 @@ const Row = ({ sizes }) => {
                                 padding: '4px 10px',
                                 textAlign: 'right',
                                 fontVariantNumeric: 'tabular-nums',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-text-subtle)',
                             }}
                         >
                             {r.toFixed(3)}
@@ -207,7 +207,7 @@ const Specimen = ({ sizes }) => (
                 Sessions this week{' '}
                 {/* A real token rather than an opacity: a faded label is a
                     contrast failure that axe reports and a reader experiences. */}
-                <span style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--ds-text-subtle)' }}>
                     {size}px
                 </span>
             </div>

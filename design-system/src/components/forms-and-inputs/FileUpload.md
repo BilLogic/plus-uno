@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-danger` · `--color-focus-ring` · `--color-on-surface` · `--color-on-surface-variant` · `--color-success` · `--color-surface-variant` · `--ds-background-danger-subtler` · `--ds-background-success-subtler` · `--element-pad-default` · `--icon-sm` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-y-md` · `--size-element-radius-md`
+`--body-default` · `--body-small` · `--color-danger` · `--color-focus-ring` · `--color-success` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-text` · `--ds-text-subtle` · `--element-pad-default` · `--icon-sm` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-y-md` · `--size-element-radius-md`
 
 From `design-system/src/components/forms-and-inputs/FileUpload.scss`. Override these through the token layer, never with a literal.
 

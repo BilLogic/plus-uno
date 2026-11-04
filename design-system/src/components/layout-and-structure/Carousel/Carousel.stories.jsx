@@ -92,7 +92,7 @@ const createSlideContent = (text, bgColor) => (
         justifyContent: 'center',
         fontSize: '2rem',
         fontFamily: 'var(--font-family-header)',
-        color: 'var(--color-on-surface)'
+        color: 'var(--ds-text)'
     }}>
         {text}
     </div>
@@ -109,7 +109,7 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
         justifyContent: 'center',
         gap: '12px',
         padding: '24px 60px',
-        color: 'var(--color-on-surface)'
+        color: 'var(--ds-text)'
     }}>
         <div style={{
             flex: '1 0 auto',
@@ -142,7 +142,7 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
                 lineHeight: 'var(--font-line-height-body1)',
                 fontWeight: 'var(--font-weight-normal)',
                 fontFamily: 'var(--font-family-body)',
-                color: 'var(--color-on-surface-variant)'
+                color: 'var(--ds-text-subtle)'
             }}>
                 {description}
             </span>
@@ -151,9 +151,9 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
 );
 
 const slideColors = [
-    'var(--color-surface-container)',
-    'var(--color-surface-container-high)',
-    'var(--color-surface-container-highest)',
+    'var(--ds-background-neutral-subtle)',
+    'var(--ds-background-neutral)',
+    'var(--ds-background-neutral-bold)',
     'var(--ds-background-selected)',
     'var(--ds-background-neutral)',
     'var(--ds-background-accent-teal-subtler)'

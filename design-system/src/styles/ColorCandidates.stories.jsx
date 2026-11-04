@@ -187,14 +187,14 @@ const swatch = (background, color, text, extra = {}) => (
 
 const Metric = ({ label, value, pass }) => (
     <div style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
-        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>{label}</span>
+        <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>{label}</span>
         <span
             data-metric={label}
             className="body2-txt"
             style={{
                 fontVariantNumeric: 'tabular-nums',
                 color: pass === undefined
-                    ? 'var(--color-on-surface)'
+                    ? 'var(--ds-text)'
                     : pass ? 'var(--color-success)' : 'var(--color-danger)',
             }}
         >
@@ -266,7 +266,7 @@ export const WarningGround = () => {
                             </p>
                             <p
                                 className="body3-txt"
-                                style={{ margin: 0, maxWidth: '58ch', color: 'var(--color-on-surface-variant)' }}
+                                style={{ margin: 0, maxWidth: '58ch', color: 'var(--ds-text-subtle)' }}
                             >
                                 <strong>Costs:</strong> {candidate.cost}
                             </p>
@@ -415,11 +415,11 @@ export const InfoRegister = () => {
                     />
                 </div>
                 <div>
-                    {swatch('var(--color-surface)', INFO_CANDIDATE.text, 'info text')}
+                    {swatch('var(--ds-surface)', INFO_CANDIDATE.text, 'info text')}
                     <Metric label="text" value={INFO_CANDIDATE.text} />
                 </div>
             </div>
-            <p className="body3-txt" style={{ maxWidth: '62ch', marginTop: '12px', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body3-txt" style={{ maxWidth: '62ch', marginTop: '12px', color: 'var(--ds-text-subtle)' }}>
                 <strong>The other answer is subtraction.</strong> If nothing in the product needs a
                 register distinct from <code>tertiary</code>, the honest fix is to delete the
                 <code> info</code> alias rather than to give it a color — two names for one thing
