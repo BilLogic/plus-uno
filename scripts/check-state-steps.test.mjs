@@ -345,13 +345,13 @@ test('CloseButton: an Icon button, subtle — inverse repaints the named hovered
 
 test('Pagination: hovered, pressed, current page selected, focus a ring with no fill', () => {
   const file = 'components/navigation/Pagination/Pagination.scss';
-  const link = '.plus-pagination .page-item:not(.disabled):not(.active) .page-link';
+  const link = '.plus-pagination__page';
   expectRule(file, `${link}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(file, `${link}:active`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(file, `${link}:focus-visible`, RING_INSIDE);
   expectNoFill(file, `${link}:focus-visible`);
-  assert.equal(declarations(sheet(file), `${link}:focus`), null, 'a pointer focus draws a state of its own');
-  expectRule(file, '.plus-pagination .page-item.active .page-link', {
+  expectNoFill(file, `${link}:focus`);
+  expectRule(file, '.plus-pagination__page[aria-current=page]', {
     'background-color': layer('--ds-background-selected'),
   });
 });

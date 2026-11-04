@@ -273,9 +273,9 @@ const TutorModal = ({
                                     currentPage={currentPage}
                                     totalPages={Math.ceil(totalEntries / entriesPerPage)}
                                     onPageChange={setCurrentPage}
-                                    type="icon"
-                                    size="small"
-                                    ariaLabel="Tutor sessions pagination"
+                                    navigator="icon"
+                                    spacing="compact"
+                                    label="Tutor sessions pagination"
                                 />
                             </div>
                         </div>

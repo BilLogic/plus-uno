@@ -225,9 +225,9 @@ const SessionAdminPage = ({
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={onPageChange}
-                            type="icon"
-                            size="small"
-                            ariaLabel="Sessions table pagination"
+                            navigator="icon"
+                            spacing="compact"
+                            label="Sessions table pagination"
                         />
                     </div>
                 </div>

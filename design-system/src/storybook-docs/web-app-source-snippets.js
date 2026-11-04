@@ -195,9 +195,9 @@ export const webAppSourceSnippets = {
         '<Pagination',
         '  currentPage={5}',
         '  totalPages={10}',
-        '  type="icon"',
-        '  size="default"',
-        '  maxVisible={5}',
+        '  navigator="icon"',
+        '  spacing="default"',
+        '  max={5}',
         '  onPageChange={(page) => setPage(page)}',
         '/>'
     ]),

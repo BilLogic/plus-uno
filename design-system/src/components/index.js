@@ -82,7 +82,7 @@ export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightP
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
 export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
-export { default as Pagination, createPagination } from '@/components/navigation/Pagination';
+export { default as Pagination, createPagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';
 

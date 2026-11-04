@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
 
-**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Sizes, InteractionStates, Overview, Interactive
+**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 
@@ -17,29 +17,54 @@
 |------|------|---------|-------------|
 | `currentPage` | number (required) | — | Current active page |
 | `totalPages` | number (required) | — | Total number of pages |
-| `onPageChange` | func | — | — |
-| `type` | enum | `'icon'` | Pagination type: icon (chevrons) or text (Previous/Next) |
-| `size` | enum | `'default'` | Pagination size |
-| `maxVisible` | number | `5` | Maximum number of visible page numbers |
-| `prevText` | string | `'Previous'` | — |
-| `nextText` | string | `'Next'` | — |
-| `ariaLabel` | string | `'Page navigation'` | — |
+| `onPageChange` | func | — | Called with the page number to move to. |
+| `navigator` | enum | `'icon'` | Previous and Next as a caret (icon) or as their labels (text) |
+| `spacing` | enum | `'default'` | Row height: default is 32, compact is 24 |
+| `max` | number | `5` | Maximum number of visible page numbers |
+| `previousLabel` | string | `'Previous'` | Accessible name of the Previous control. |
+| `nextLabel` | string | `'Next'` | Accessible name of the Next control. |
+| `label` | string | `'Page navigation'` | Accessible label of the navigation region. |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
 
 ## Variants
 
-**`type`** — `icon` · `text`
+**`navigator`** — `icon` · `text`
 
-**`size`** — `small` · `default` · `large`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-outline-variant` · `--color-secondary` · `--color-secondary-text` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border-focused` · `--ds-surface` · `--focus-ring-width` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--size-border-radius-radius-1000` · `--size-border-stroke-stroke-100` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--border-default` · `--ds-background-disabled` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-surface` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--item-height-md` · `--item-height-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
+
+## Sub-components
+
+### `Pagination.Page`
+
+Implemented as `PaginationPage`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `page` | number (required) | — | — |
+| `isCurrent` | bool | — | — |
+| `onSelect` | func | — | — |
+| `label` | string | — | Accessible name; the number alone when omitted. |
+
+### `Pagination.Navigator`
+
+Implemented as `PaginationNavigator`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `direction` | enum | — | — |
+| `navigator` | enum | — | — |
+| `label` | string (required) | — | — |
+| `isDisabled` | bool | — | — |
+| `onSelect` | func | — | — |
 
 ## Related
 
