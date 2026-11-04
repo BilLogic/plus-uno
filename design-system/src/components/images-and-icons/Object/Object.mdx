@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as ObjectStories from './Object.stories.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -19,16 +20,137 @@ export const figmaMeta = {
 <Meta of={ObjectStories} />
 
 <Title />
+A small, typed glyph for a kind of thing — a task, a bug, an idea — beside its
+name in a list, a reference or a title.
 
 <DocsTabs of={ObjectStories}>
 
 <DocsTab tab="examples">
 
-A small, typed glyph for a kind of thing: a task, a bug, an idea.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Object"
+/>
 
-<Canvas of={ObjectStories.Kinds} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={ObjectStories} />
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Each kind is its own component — `TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon`, `PageIcon` — not a shared component taking a glyph name.</>}>
+    <Canvas of={ObjectStories.Kinds} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<DocsCanvasShell description={<>`small` (12px) for inline text; `medium` (16px, the default) beside a title.</>}>
+    <DsCanvasQuiet of={ObjectStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`label=""` marks the glyph decorative, for when the kind is already named beside it.</>}>
+    <DsCanvasQuiet of={ObjectStories.Decorative} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code> (12px) or <code>medium</code> (16px, default).</td></tr>
+        <tr><td><code>label</code></td><td>string</td><td>The accessible name, defaulted per kind (for example "Task"). An empty string marks it decorative.</td></tr>
+    </tbody>
+</DocsTable>
+
+Each kind is its own fixed Font Awesome glyph — there is no `icon` prop to
+swap it for another kind.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use an `Object` icon beside the name of the thing it represents — a task in a
+list, a bug in a reference, a page in a breadcrumb. For a larger picture of a
+thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick the component for the kind — there is no generic `Object`.
+
+`TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon` and
+`PageIcon` each draw a fixed glyph. Reach for the one that names the thing,
+rather than a generic component with a glyph prop.
+
+```jsx
+<TaskIcon /> Fix the broken sync
+```
+
+### Override `label` only when the default name does not fit.
+
+Each kind defaults its accessible name to its kind ("Task", "Bug", …). Set
+`label=""` when the kind is already stated in visible text beside it, so
+assistive technology does not hear it twice.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Named by default.** Each icon's default `label` makes it `role="img"`
+  with that name, read by assistive technology.
+- **Decorative with an empty label.** `label=""` sets `aria-hidden="true"`
+  and drops the accessible name, for use beside visible text that already
+  names the kind.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a larger, square picture of a thing, use `Tile`.
+- For a bitmap, use `Image`.
+- For a person or an agent, use `Avatar`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

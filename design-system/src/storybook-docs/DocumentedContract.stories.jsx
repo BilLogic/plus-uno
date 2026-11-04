@@ -70,11 +70,23 @@ const MODULES = import.meta.glob(
  * `_internal` is out — those components are not an import surface, and #166
  * scoped the authored half to the public groups.
  */
+/**
+ * `<Name>.mdx` beside `<Name>.jsx` assumes one renderable default per file.
+ * Object.jsx breaks that: its default export is `createObjectIcon`, a
+ * factory that builds named icon components (`TaskIcon`, `BugIcon`, ...) —
+ * there is no single `<Object />` to mount. `implSymbol` correctly resolves
+ * the factory's own propTypes for documentedSurface to scan, but `load()`
+ * would then try to render the factory itself as a component and crash on
+ * its string arguments.
+ */
+const NOT_A_SINGLE_COMPONENT = new Set(['Object']);
+
 function documentedComponents() {
   const out = [];
   for (const mdxPath of Object.keys(RAW)) {
     if (!mdxPath.endsWith('.mdx') || mdxPath.includes('/_internal/')) continue;
     const name = mdxPath.split('/').pop().replace(/\.mdx$/, '');
+    if (NOT_A_SINGLE_COMPONENT.has(name)) continue;
     const jsxPath = mdxPath.replace(/\.mdx$/, '.jsx');
     const source = RAW[jsxPath];
     if (!source) continue;
@@ -144,6 +156,7 @@ const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
  */
 const RENDERS_WITH = {
   CountTag: { value: 1 },
+  PromptStarters: { starters: [{ id: 'sample', label: 'Sample' }] },
 };
 
 function baseProps(props, componentName) {
@@ -295,7 +308,12 @@ export const DocumentedPropsAreAccepted = {
       const base = baseProps(subject.propTypes, subject.name);
 
       for (const prop of subject.documentedProps) {
-        const value = probeValue(prop, subject.propTypes.get(prop));
+        // A documented prop whose own empty value is a documented "renders
+        // nothing" contract (PromptStarters with no starters, same as
+        // CountTag with no value) needs the RENDERS_WITH override here too,
+        // not just in the base props — otherwise this loop's generic probe
+        // re-empties it.
+        const value = RENDERS_WITH[subject.name]?.[prop] ?? probeValue(prop, subject.propTypes.get(prop));
         if (value === undefined) continue; // shape cannot be fabricated; not a finding
         try {
           const { html, errors } = renderMarkup(Component, { ...base, [prop]: value }, canvasElement);

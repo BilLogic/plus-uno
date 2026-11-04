@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as ImageStories from './Image.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -19,16 +20,122 @@ export const figmaMeta = {
 <Meta of={ImageStories} />
 
 <Title />
+A bitmap, with a dark-mode variant the browser swaps in on its own, with no
+script watching for the change.
 
 <DocsTabs of={ImageStories}>
 
 <DocsTab tab="examples">
 
-A bitmap, with a dark-mode variant the browser swaps in.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Image"
+/>
 
-<Canvas of={ImageStories.Sizes} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={ImageStories} />
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>`fixed` keeps the image's natural size; `fluid` scales it to fill its container.</>}>
+    <Canvas of={ImageStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Dark mode
+
+<DocsCanvasShell description={<>`srcDark` swaps in a `source` element the OS picks at the media-query level — no re-render, no flash.</>}>
+    <DsCanvasQuiet of={ImageStories.DarkVariant} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ImageStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Image` for a bitmap — a photo, a screenshot, an illustration exported as
+a raster. For a square picture of a school, a tool or a lesson, use `Tile`
+instead. For a typed glyph standing in for a kind of thing, use `Object`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pass `srcDark` instead of swapping `src` yourself.
+
+The dark variant is a second `<source>` inside a `<picture>`, matched by
+`prefers-color-scheme`. The browser picks it before paint, so there is no
+flash of the light image on a dark system.
+
+```jsx
+<Image src="/hero-light.png" srcDark="/hero-dark.png" alt="" />
+```
+
+### `alt` defaults to empty, which marks the image decorative.
+
+Set `alt` to real text only when the image carries information nothing else
+on the page already states. A caption beside the image, or a heading above
+it, usually means `alt=""` is correct.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Decorative by default.** `alt=""` hides the image from assistive
+  technology — appropriate when a caption or heading nearby already says
+  what it shows.
+- **Meaningful images need real alt text.** Describe what the image
+  communicates, not what it depicts pixel for pixel.
+- **The dark swap has no accessibility impact.** It is a media query on the
+  `<picture>` element, not a state change a screen reader needs to track.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a square picture of a school, a tool or a lesson, use `Tile`.
+- For a typed glyph standing in for a kind of thing, use `Object`.
+- For a person or an agent's picture or initials, use `Avatar`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
