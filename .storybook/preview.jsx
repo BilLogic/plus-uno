@@ -9,6 +9,7 @@ import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
+import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
@@ -66,6 +67,9 @@ if (shouldMountGlobalAIAgent() && !window.__PLUS_AI_AGENT_ROOT__) {
     window.addEventListener('DOMContentLoaded', injectAgent);
   }
 }
+
+// ---- Docs floating links (Marketplace, Uno Blueprint) -----------------------
+mountDocsFab();
 
 // ---- Console noise filters (Storybook-only) ---------------------------------
 // Goal: keep the console clean for design review by hiding known, non-actionable
