@@ -116,7 +116,6 @@ const Pagination = ({
                 className={cx(
                     'plus-pagination',
                     spacing === 'compact' && 'plus-pagination--compact',
-                    navigator === 'text' && 'plus-pagination--text',
                     className
                 )}
             >

@@ -67,7 +67,7 @@
 .plus-pagination__navigator {
     position: relative;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard);
 
     &:focus {
         @include plus-ring-reset;
@@ -134,6 +134,10 @@
 }
 
 @media (forced-colors: active) {
+    .plus-pagination__navigator[aria-disabled='true'] {
+        color: GrayText;
+    }
+
     .plus-pagination__page[aria-current='page'] {
         @include plus-ring($ring-offset: calc(-1 * var(--border-default)), $ring-token: Highlight, $ring-width: var(--border-default));
     }
