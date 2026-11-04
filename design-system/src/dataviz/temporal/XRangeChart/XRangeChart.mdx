@@ -1,86 +1,148 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as XRangeChartStories from './XRangeChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={XRangeChartStories} />
 
 <Title />
+Shows spans of time as horizontal bars, one row per person or resource. Where a
+bar starts and ends is when something began and finished.
 
-Shows **ranges on an X-axis** (usually time). A simpler alternative to Gantt charts.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/XRangeChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **ranges on an X-axis** (usually time).
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A schedule for three tutors over the coming days, each session a bar on its tutor's row.</>}>
+    <Canvas of={XRangeChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Bars** = duration of task/event
-- **X-axis** = time
-- **Y-axis** = category/resource
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Simple project schedules</td><td>✅ Ideal</td></tr>
-    <tr><td>Resource booking</td><td>✅ Ideal</td></tr>
-    <tr><td>Shift schedules</td><td>✅ Ideal</td></tr>
-    <tr><td>Complex dependencies</td><td>❌ Use Gantt Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `XRangeChart` for who is busy when: tutors' sessions across a week,
+blocked-out availability, exam windows per class, or how long each unit of a
+lesson plan runs. Gaps between bars are free time; overlapping rows show
+clashes.
 
-### PLUS Context
+For milestones in order with no duration, use `TimelineChart`. For low-to-high
+ranges across categories with no time axis, use `ColumnRangeChart`. For how
+much capacity is used over time as a quantity, use `AreaChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Tutor Availability**</td><td>Time slots blocked out</td></tr>
-    <tr><td>**Exam Schedule**</td><td>Test durations</td></tr>
-    <tr><td>**Lesson Plan**</td><td>Topic duration estimates</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the x range chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Bars', <>One per item, from <C>start</C> to <C>end</C>, on the row its <C>y</C> picks.</>],
+        ['Bar labels', <>Each bar shows its <C>name</C>.</>],
+        ['Time axis', 'Along the bottom, as dates and times read from the timestamps.'],
+        ['Row axis', <>Names each row from <C>categories</C>, first row at the top.</>],
+        ['Tooltip', 'Shows the hovered item and its span.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={XRangeChartStories.Interactive} />
+`categories` names the rows, top to bottom. `data` is an array of items, each
+`{ start, end, y, name, color }`: `start` and `end` are timestamps in
+milliseconds, `y` is the row's index in `categories`, and `name` and `color`
+are optional.
 
+```jsx
+const day = 24 * 60 * 60 * 1000;
+const monday = Date.UTC(2026, 8, 7);
+
+<XRangeChart
+    categories={['Maya (Math)', 'Jordan (Reading)', 'Priya (Science)']}
+    data={[
+        { start: monday, end: monday + day, y: 0, name: 'Algebra group' },
+        { start: monday + day * 2, end: monday + day * 3, y: 0, name: 'Geometry 1:1' },
+        { start: monday, end: monday + day * 2, y: 1, name: 'Reading circle' },
+        { start: monday + day, end: monday + day * 4, y: 2, name: 'Lab prep' },
+    ]}
+/>
+```
+
+`height` defaults to 400.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color follows the row.** Each bar takes the categorical color for its row index, so every bar on a row matches. Rows past the eighth reuse colors. Pass `color` on an item to override it, for example a status color for a cancelled session, and say the status in its `name` too.
+- **Position and labels carry the meaning.** The row names who, the bar's ends say when, and the label says what. Row color repeats what the row axis already says, so the chart reads without hue.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`XRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>The schedule could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No sessions scheduled" description="Sessions appear here once tutors are booked." />
+    : <XRangeChart categories={categories} data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={XRangeChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For instants rather than spans, use `TimelineChart`.
-- For spans across categories with no time axis, use `ColumnRangeChart`.
-- For utilization over time as a quantity, use `AreaChart`.
+- For instants in order rather than spans, use `TimelineChart`.
+- For low-to-high ranges across categories with no time axis, use `ColumnRangeChart`.
+- For how much capacity is used over time as a quantity, use `AreaChart`.
 
 </div>
 
 </div>
+
+

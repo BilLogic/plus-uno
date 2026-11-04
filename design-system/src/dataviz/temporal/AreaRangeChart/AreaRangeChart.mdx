@@ -1,86 +1,147 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AreaRangeChartStories from './AreaRangeChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={AreaRangeChartStories} />
 
 <Title />
+Shows a range over time as a filled band between a low and a high value. The
+width of the band is the spread at each point.
 
-Shows a **range of values over time** with a filled area between min and max.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/AreaRangeChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows a **range of values over time** with a filled area between min and max.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A twelve-month band from each month's low to its high.</>}>
+    <Canvas of={AreaRangeChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Filled area** = range between low and high
-- **Width of band** = variability at that point
-- Wider band = more variation
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Confidence intervals</td><td>✅ Ideal</td></tr>
-    <tr><td>Min/max over time</td><td>✅ Ideal</td></tr>
-    <tr><td>Temperature ranges</td><td>✅ Good</td></tr>
-    <tr><td>Single values</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `AreaRangeChart` when the spread matters as much as the level: the lowest
+and highest session score each week, the expected score band across a term,
+the earliest and latest session start each day. A widening band says results
+are getting less consistent.
 
-### PLUS Context
+For a single value over time, use `LineChart`. For a fill down to zero, use
+`AreaChart`. For low-to-high ranges across categories rather than time, use
+`ColumnRangeChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Score Bands**</td><td>Expected score range</td></tr>
-    <tr><td>**Activity Windows**</td><td>Peak usage times</td></tr>
-    <tr><td>**Performance Range**</td><td>Min/max ratings</td></tr>
-  </tbody>
-</table>
+The chart draws one band and nothing else. It does not draw the midpoint or a
+second series, so if the reader needs the average too, say it in the text
+beside the chart.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Align the area range chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+## Anatomy
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Band', 'One filled range from each low to its high, in the brand chart color at partial opacity, with no outline and no markers.'],
+        ['X axis', <>Plots each point at its numeric <C>x</C>. <C>xAxisLabel</C> titles it; it is empty by default.</>],
+        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to <C>"Value"</C>.</>],
+        ['Tooltip', 'Shared, with a crosshair: hovering a point shows its low and high.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={AreaRangeChartStories.Interactive} />
+## Data shape
 
+`data` is an array of `[x, low, high]` triples, one per point, in x order.
+There is no `categories` prop, so the x axis shows numbers: index weeks or
+months from zero and name the unit in `xAxisLabel`.
+
+```jsx
+<AreaRangeChart
+    xAxisLabel="Week of term"
+    yAxisLabel="Session score (%)"
+    data={[
+        [1, 52, 78], [2, 55, 80], [3, 58, 84], [4, 61, 85], [5, 60, 88],
+    ]}
+/>
+```
+
+`height` defaults to 400. The legend is off, since there is only one series.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color, always.** The band takes `--ds-chart-brand`. There is no `color` prop and no second series to tell apart.
+- **Position carries the values.** The top and bottom edges are the high and low; the fill only shows the span between them. Without an outline, the edges are the fill's boundary alone, so read exact values from the tooltip.
+- **Name the range in words.** The chart has no legend, so the surrounding header or caption must say what the low and high are, such as "Lowest and highest score each week".
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`AreaRangeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Score ranges could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Ranges appear after a week of sessions is logged." />
+    : <AreaRangeChart data={data} yAxisLabel="Session score (%)" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AreaRangeChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For the midpoint alone, use `LineChart`.
+- For the level alone, as a line, use `LineChart`.
 - For a fill down to zero rather than between two bounds, use `AreaChart`.
-- For ranges across categories rather than time, use `ColumnRangeChart`.
+- For low-to-high ranges across categories rather than time, use `ColumnRangeChart`.
+- For the full spread of values in each group, with quartiles, use `BoxPlotChart`.
 
 </div>
 
 </div>
+
+
