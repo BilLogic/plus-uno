@@ -15,7 +15,7 @@ body {
   min-height: 100vh;
   font-family: var(--font-family-body);
   font-size: var(--font-size-body2, 14px);
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -23,7 +23,7 @@ body {
 code {
   font-family: "Fira Code", "Consolas", monospace;
   font-size: 0.9em;
-  background: var(--color-surface-container-high, #e8e8e8);
+  background: var(--ds-surface-container);
   padding: 2px 6px;
   border-radius: 4px;
 }

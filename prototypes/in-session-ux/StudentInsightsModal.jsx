@@ -173,7 +173,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 className={shouldPlayIntroAnimations ? 'play-intro-animations' : ''}
                 style={{
                     position: 'relative',
-                    backgroundColor: 'var(--color-surface-container-high, #fff)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: '16px',
                     width: 'min(1120px, calc(100% - 48px))',
                     height: '80%',
@@ -349,7 +349,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     height={180}
                                     color="var(--color-tertiary, #0e8175)"
                                 />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-12px', paddingLeft: '10%', paddingRight: '10%', fontSize: '12px', color: 'var(--color-on-surface-variant)' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-12px', paddingLeft: '10%', paddingRight: '10%', fontSize: '12px', color: 'var(--ds-text-subtle)' }}>
                                     <span>Low</span>
                                     <span>High</span>
                                 </div>
@@ -384,19 +384,19 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                         padding: '16px',
                                         borderRadius: '8px',
                                         border: '1px solid var(--color-outline-variant)',
-                                        backgroundColor: 'var(--color-surface-container)',
+                                        backgroundColor: 'var(--ds-surface-container)',
                                         flex: 1,
                                         display: 'flex',
                                         flexDirection: 'column',
                                         justifyContent: 'center',
                                         '--base-delay': '200ms'
                                     }}>
-                                        <div className="body2-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{obs.title}</div>
-                                        <div className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: '4px' }}>{obs.subtitle}</div>
+                                        <div className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{obs.title}</div>
+                                        <div className="body3-txt" style={{ color: 'var(--ds-text-subtlest)', marginTop: '4px' }}>{obs.subtitle}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
                                             <span className="body1-txt" style={{ fontWeight: 600 }}>{obs.value}</span>
                                             <StatusTag appearance={obs.badgeStyle}>{obs.badge}</StatusTag>
-                                            <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginLeft: 'auto' }}>{obs.comparison}</span>
+                                            <span className="body3-txt" style={{ color: 'var(--ds-text-subtlest)', marginLeft: 'auto' }}>{obs.comparison}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -414,15 +414,15 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     <Accordion
                                         items={talkingPoints.map((tp, i) => ({
                                             eventKey: String(i),
-                                            header: <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{tp.title}</span>,
-                                            body: <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>{tp.content}</span>
+                                            header: <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{tp.title}</span>,
+                                            body: <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>{tp.content}</span>
                                         }))}
                                         activeKey={activeAccordionKey}
                                         onSelect={(k) => setActiveAccordionKey(k === activeAccordionKey ? null : k)}
                                     />
                                 </div>
                                 <div className="animate-enter delay-inner-2" style={{ '--base-delay': '300ms' }}>
-                                    <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--color-on-surface-variant)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                    <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                                         <i className="fas fa-circle-info" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden />
                                         <span>LLM-synthesized insights from 38 rows of reflection form data across 6 tutors, Last updated in Jan 2026.</span>
                                     </p>
@@ -442,25 +442,25 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     padding: '16px',
                                     borderRadius: '8px',
                                     border: '1px solid var(--color-outline-variant)',
-                                    backgroundColor: 'var(--color-surface-container)',
+                                    backgroundColor: 'var(--ds-surface-container)',
                                     '--base-delay': '0ms'
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                                        <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{goal.title}</span>
+                                        <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.title}</span>
                                         <StatusTag appearance="neutral">{goal.due}</StatusTag>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
                                         <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--color-outline-variant)', overflow: 'hidden' }}>
                                             <div style={{ width: `${goal.progress}%`, height: '100%', borderRadius: '4px', backgroundColor: 'var(--color-tertiary, #0e8175)' }} />
                                         </div>
-                                        <span className="body3-txt" style={{ fontWeight: 600, color: 'var(--color-on-surface)' }}>{goal.progress}%</span>
+                                        <span className="body3-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.progress}%</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
                     {activeContentTab === 'notes' && (
-                        <div className="body1-txt" style={{ padding: '16px 0', color: 'var(--color-on-surface-variant)' }}>
+                        <div className="body1-txt" style={{ padding: '16px 0', color: 'var(--ds-text-subtle)' }}>
                             No notes have been added for this student yet.
                         </div>
                     )}

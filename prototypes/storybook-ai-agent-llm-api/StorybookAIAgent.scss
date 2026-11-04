@@ -33,7 +33,7 @@
   max-width: 1555px;
   min-height: 480px;
   max-height: 822px;
-  background: var(--color-surface-container-lowest);
+  background: var(--ds-surface);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--color-outline);
@@ -156,7 +156,7 @@
   font-size: 13.5px;
   line-height: 20px;
   letter-spacing: -0.35px;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 .sb-ai-agent__header-sub {
@@ -166,7 +166,7 @@
   line-height: 15px;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
 }
 
 .sb-ai-agent__header-actions {
@@ -185,11 +185,11 @@
   align-items: center;
   justify-content: center;
   transition: background 0.15s ease;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
 
   &:hover {
     background: var(--ds-background-neutral-subtle-hovered);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
   }
 
   svg {
@@ -240,7 +240,7 @@
 .sb-ai-agent__tip {
   font-size: 11px;
   line-height: 1.4;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
   margin: -16px 0 0 0;
   padding: 0;
   flex-shrink: 0;
@@ -261,7 +261,7 @@
   align-items: center;
   gap: var(--size-element-gap-md);
   padding: var(--size-element-pad-y-lg) var(--element-pad-default);
-  background: var(--color-surface-container-lowest);
+  background: var(--ds-surface);
   border: var(--size-element-border) solid var(--color-outline);
   border-radius: var(--size-element-radius-full);
   cursor: pointer;
@@ -289,7 +289,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 
   svg {
     /* 10 + 4 → 14px (gap-md + gap-xs) */
@@ -328,7 +328,7 @@
   font-size: var(--font-size-body3);
   line-height: var(--font-line-height-body3);
   font-weight: var(--font-weight-body3-bold);
-  color: var(--color-on-surface);
+  color: var(--ds-text);
   text-align: left;
   flex: 1;
 }
@@ -391,7 +391,7 @@
   font-weight: 700;
   font-size: 15px;
   line-height: 1.3;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 /* Match New Starter Kit tip: same padding, radius, font-size, and line-height as bot bubble (wrapped lines) */
@@ -403,13 +403,13 @@
   padding: 6px 10px;
   border-radius: 6px;
   border: none;
-  background: var(--color-surface-container-high);
+  background: var(--ds-surface-container);
   box-shadow: none;
   font-family: var(--font-family-body);
   font-size: 11px;
   /* Same as .sb-ai-agent__bubble line-height so multi-line tip matches New Starter Kit */
   line-height: 22.75px;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
   text-align: left;
   box-sizing: border-box;
 }
@@ -448,12 +448,12 @@
   padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
   border-radius: var(--size-element-radius-lg);
   border: none;
-  background: var(--color-surface-container-high);
+  background: var(--ds-surface-container);
   box-shadow: none;
   font-family: var(--font-family-body);
   font-size: 12px;
   line-height: 1.5;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
   text-align: left;
   box-sizing: border-box;
 }
@@ -462,7 +462,7 @@
   margin: 0 0 var(--size-element-gap-xs);
   font-weight: 600;
   font-size: 12px;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 .sb-ai-agent__skills-router-pipeline-flow {
@@ -484,7 +484,7 @@
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  background: var(--color-surface-container-lowest);
+  background: var(--ds-surface);
   border-radius: var(--size-card-radius-md);
   border: none;
   box-shadow: var(--elevation-light-1);
@@ -580,14 +580,14 @@
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 .sb-ai-agent__skill-card__name {
   font-weight: 700;
   font-size: 16px;
   line-height: 1.3;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 .sb-ai-agent__skill-card__path {
@@ -640,7 +640,7 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.3;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
 }
 
 .sb-ai-agent__skill-card__tags {
@@ -668,7 +668,7 @@
   font-family: var(--font-family-body);
   font-size: 12px;
   line-height: 1.45;
-  color: var(--color-on-surface-variant);
+  color: var(--ds-text-subtle);
 }
 
 /* ── Smart Navigation intro (subtle fade, respect reduced motion) ── */
@@ -724,7 +724,7 @@
 .sb-ai-agent__shortcuts-key {
   font-family: ui-monospace, monospace;
   font-size: 12px;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
   white-space: nowrap;
   width: 1%;
 }
@@ -739,7 +739,7 @@
     text-align: left;
     border: 1px solid var(--color-outline);
     border-radius: 8px;
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
 
@@ -748,7 +748,7 @@
     }
 
     &:hover {
-      background: var(--color-surface-container);
+      background: var(--ds-background-neutral-subtle-hovered);
       border-color: var(--color-outline);
     }
 
@@ -798,8 +798,8 @@
   flex-shrink: 1;
 
   &--bot {
-    background: var(--color-surface-container);
-    color: var(--color-on-surface);
+    background: var(--ds-surface-container);
+    color: var(--ds-text);
     border-radius: 0 16px 16px 16px;
   }
 
@@ -823,7 +823,7 @@
   }
 
   code {
-    background: var(--color-surface-container);
+    background: var(--ds-surface-container);
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 12px;
@@ -852,13 +852,13 @@
   display: flex;
   gap: 4px;
   padding: 14px;
-  background: var(--color-surface-container);
+  background: var(--ds-surface-container);
   border-radius: 0 16px 16px 16px;
 
   span {
     width: 6px;
     height: 6px;
-    background: var(--color-on-surface-variant);
+    background: var(--ds-background-neutral);
     border-radius: 9999px;
     animation: typingDot 1.2s infinite ease-in-out both;
 
@@ -891,7 +891,7 @@
   flex: 1;
   display: flex;
   align-items: center;
-  background: var(--color-surface-container);
+  background: var(--ds-surface-container);
   border: 1px solid var(--color-outline);
   border-radius: 16px;
   padding: 13.5px 17px;
@@ -907,12 +907,12 @@
   font-weight: 400;
   font-size: 13px;
   line-height: normal;
-  color: var(--color-on-surface);
+  color: var(--ds-text);
   padding: 0;
   padding-right: 49px;
 
   &::placeholder {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
   }
 
   &:focus {

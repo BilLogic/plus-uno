@@ -25,8 +25,8 @@ const CHART_THEMES = {
     axis: '#4b5563',
   },
   light: {
-    bg: 'var(--color-surface, #ffffff)',
-    text: 'var(--color-on-surface-variant, #49454f)',
+    bg: 'var(--ds-surface)',
+    text: 'var(--ds-text-subtle)',
     grid: 'var(--color-outline-variant, #e0e0e0)',
     axis: 'var(--color-outline, #79747e)',
   },

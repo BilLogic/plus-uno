@@ -317,7 +317,7 @@ export function ToolCarousel({ items, title, description }: { title?: string; de
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                             <div style={{
                                 width: '32px', height: '32px', borderRadius: '6px',
-                                background: 'var(--color-surface-container, #f3f4f6)',
+                                background: 'var(--ds-surface-container)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 fontSize: '18px'
                             }}>

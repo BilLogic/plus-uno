@@ -35,8 +35,8 @@ const QUOTE_DELAY = 0.8;
 const HEATMAP_THEMES = {
   dark: { text: '#E5E7EB', quoteBg: 'rgba(255, 255, 255, 0.05)', quoteBorder: 'rgba(255, 255, 255, 0.1)' },
   light: {
-    text: 'var(--color-on-surface-variant, #49454f)',
-    quoteBg: 'var(--color-surface-container, #f3f4f6)',
+    text: 'var(--ds-text-subtle)',
+    quoteBg: 'var(--ds-surface-container)',
     quoteBorder: 'var(--color-outline-variant, #e0e0e0)'
   },
 };
