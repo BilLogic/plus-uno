@@ -33,10 +33,10 @@
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
  *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
  *
- * ONE RULE IS NOT A RATCHET. `state-step`, `token:surface-layout` and
- * `token:color-surface` allow zero: any hit is a finding, the baseline never
- * holds it, and `--update` never records it. The other `word:*` rules stay a
- * ratchet — `surface container` and `scrim` still appear as a Figma-name
+ * ONE RULE IS NOT A RATCHET. `state-step`, `token:surface-layout`,
+ * `token:color-surface` and `word:Atlassian` allow zero: any hit is a finding, the baseline never
+ * holds it, and `--update` never records it. The other `word:*` rules
+ * (surface container, scrim, Rovo) stay a ratchet — `surface container` and `scrim` still appear as a Figma-name
  * citation or as the Blanket pattern's own anatomy ("the Blanket holds the
  * scrim"), so a blanket ban on the word would rewrite correct prose. Only the
  * `--surface-*`/`--color-surface*` custom properties have no legitimate

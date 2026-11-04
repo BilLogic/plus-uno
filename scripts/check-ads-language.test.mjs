@@ -115,7 +115,7 @@ test('a renamed-with-no-alias name outside component docs is not flagged', () =>
   assert.equal(measure([src('design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx', '<Toast />')]).get('stale-name:Toast design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx'), undefined);
 });
 
-test('the word Atlassian is zero allowed in MDX, in story doc strings and as a URL, never in a code comment', () => {
+test('the word Atlassian is zero allowed in MDX, in story doc strings and as a URL, a code comment is not shipped unless it carries a link', () => {
   const root = scratch({});
   const hit = (file, text) => run({ repoRoot: root, sources: [src(file, text)] }).filter((f) => /word:Atlassian/.test(f.message));
   assert.equal(hit('design-system/src/patterns/P/P.mdx', 'Atlassian is retiring it.\n')[0]?.line, 1);
@@ -128,6 +128,7 @@ test('the word Atlassian is zero allowed in MDX, in story doc strings and as a U
 test('the named decision records keep their Atlassian citations', () => {
   const root = scratch({});
   const text = "const a = { why: 'Atlassian’s own answer' }; // https://atlassian.design/x\n";
+  assert.equal(run({ repoRoot: root, sources: [src('design-system/src/styles/Other.stories.jsx', text)] }).length, 1, 'a sibling story is not exempt');
   for (const f of ['TypeScaleCandidates', 'ColorCandidates', 'AiIdentity']) {
     assert.deepEqual(run({ repoRoot: root, sources: [src(`design-system/src/styles/${f}.stories.jsx`, text)] }), []);
   }

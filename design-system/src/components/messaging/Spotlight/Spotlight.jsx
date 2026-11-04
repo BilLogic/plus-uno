@@ -73,7 +73,7 @@ SpotlightAction.propTypes = {
 
 /**
  * Spotlight: a one-step onboarding callout anchored to a `SpotlightTarget`,
- * drawn on `Popover.Positioner` from `@base-ui/react`. 
+ * drawn on `Popover.Positioner` from `@base-ui/react`.
  */
 export const Spotlight = ({
     target,
