@@ -1,0 +1,124 @@
+@use '../../../styles/state' as *;
+
+/**
+ * Rating Component Styles
+ * Implements rating component with circular star items
+ * using Design System tokens.
+ */
+
+.plus-rating-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--stack-md, 8px);
+}
+
+.plus-rating-label {
+    margin-bottom: var(--stack-sm, 4px);
+    color: var(--ds-text);
+    font-weight: var(--type-weight-regular);
+    
+    .plus-rating-required {
+        color: var(--color-danger);
+        margin-left: 2px;
+    }
+}
+
+.plus-rating-container {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-0625, 10px);
+}
+
+.plus-rating-star-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stack-sm, 4px);
+}
+
+.plus-rating-comments-label {
+    font: var(--body-default);
+    color: var(--ds-text);
+    text-align: left;
+}
+
+// Rating Item Wrapper (for numeric variant)
+.plus-rating-item-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--stack-sm, 4px);
+}
+
+.plus-rating-item-label {
+    font: var(--body-default);
+    color: var(--ds-text);
+    text-align: center;
+    min-width: 20px;
+}
+
+// Rating Item (Circular Background with Star): a 32 control (`--item-height-md`)
+// drawing a 16 icon (`--icon-md`).
+.plus-rating-item {
+    width: var(--item-height-md);
+    height: var(--item-height-md);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--ds-background-neutral);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    i {
+        font-size: var(--icon-md);
+        transition: all 0.2s ease;
+    }
+    
+    // Hover state (only when not disabled)
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-hovered)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:not(.plus-rating-item-disabled):hover'
+    );
+    
+    // Focus state
+    &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+    }
+}
+
+// Unselected state (outlined star)
+.plus-rating-item-unselected {
+    i {
+        color: var(--color-outline-variant, #bec8ca);
+    }
+}
+
+// Selected state (filled star)
+.plus-rating-item-selected {
+    i {
+        color: var(--color-primary, #0472a8);
+    }
+}
+
+// Disabled state
+.plus-rating-item-disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+// Disabled wrapper
+.plus-rating-disabled {
+    .plus-rating-item {
+        opacity: 0.38;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+}
+

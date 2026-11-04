@@ -4,7 +4,7 @@
     "component:ListGroup design-system/src/storybook-docs/web-app-source-snippets.js": 1,
     "component:NavPills design-system/src/storybook-docs/web-app-source-snippets.js": 1,
     "prop:size design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx": 1,
-    "prop:size design-system/src/components/forms-and-inputs/TagInput.stories.jsx": 1,
+    "prop:size design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx": 1,
     "prop:size design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx": 2,
     "prop:size design-system/src/components/navigation/Pagination/Pagination.stories.jsx": 4,
     "prop:size design-system/src/patterns/PatternTable/PatternTableCases.jsx": 1,

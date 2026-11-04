@@ -37,7 +37,7 @@ the scan entirely, so the public barrel only ever surfaces a component that
 lives in a group folder. A flat file still converging toward this shape
 stays that way until its own family PR touches it, rather than as a side
 effect of a neighboring line (#1702); a bare PascalCase `Name.jsx` sitting
-directly in a group (`forms-and-inputs` has several today) is read exactly
+directly in a group (`Fieldset` in `forms-and-inputs` today) is read exactly
 like a folder's `index.js` would be, so the generator does not drop a real
 component on its way to this shape.
 

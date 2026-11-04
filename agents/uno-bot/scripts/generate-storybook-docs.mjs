@@ -17,8 +17,8 @@
 //
 // THE KEYS. A component in a folder of its own (`…/Button/Button.jsx`) owns
 // every path in that folder, as `…/Button/`. A component filed flat in its
-// group's folder (`…/forms-and-inputs/Checkbox.jsx`) owns the files named for
-// it, as `…/forms-and-inputs/Checkbox.` — `Checkbox.mdx`, `Checkbox.stories.jsx`.
+// group's folder (`…/forms-and-inputs/Fieldset.jsx`) owns the files named for
+// it, as `…/forms-and-inputs/Fieldset.` — `Fieldset.mdx`, `Fieldset.stories.jsx`.
 //
 // Run: npm run generate:storybook-docs  (`-- --check` to compare only)
 

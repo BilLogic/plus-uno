@@ -18,12 +18,12 @@
 // unifying it needs someone to look at the rendered pages. Recording it keeps
 // the gate honest about what is already true while failing anything NEW — the
 // same shape as the a11y baseline and `check:negation`.
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { cdnPins, pinConflicts, unusedDeclared } from "./deps.mjs";
 import { byRoot, main } from "./lib/findings.mjs";
+import { trackedFiles } from "./lib/tracked-sources.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -91,12 +91,7 @@ const MANIFESTS = ["package.json", "agents/uno-bot/package.json"];
  * sweep twice is the whole cost of this check.
  */
 const inputs = byRoot((repoRoot) => {
-  const tracked = execFileSync("git", ["-C", repoRoot, "ls-files", "-z"], {
-    encoding: "utf8",
-    maxBuffer: 1 << 28,
-  })
-    .split("\0")
-    .filter(Boolean);
+  const tracked = trackedFiles(repoRoot);
 
   const read = (rel) => {
     try {

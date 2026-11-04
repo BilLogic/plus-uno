@@ -245,7 +245,7 @@ test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with n
  * named hovered step, keeping its mark, rather than laying a layer over it.
  */
 test('Checkbox: unchecked hover is the input hovered fill; a checked box steps to selected.bold.hovered', () => {
-  const file = 'components/forms-and-inputs/Checkbox.scss';
+  const file = 'components/forms-and-inputs/Checkbox/Checkbox.scss';
   const control = '.plus-form-checkbox';
   expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked]):not([data-indeterminate])`, {
     'background-color': layer('--ds-background-input-hovered'),
@@ -258,7 +258,7 @@ test('Checkbox: unchecked hover is the input hovered fill; a checked box steps t
 });
 
 test('Radio: unchecked hover is the input hovered fill; a checked radio steps to selected.bold.hovered', () => {
-  const file = 'components/forms-and-inputs/Radio.scss';
+  const file = 'components/forms-and-inputs/Radio/Radio.scss';
   const control = '.plus-form-radio';
   expectRule(file, `${control}:hover:not([data-disabled]):not([data-checked])`, {
     'background-color': layer('--ds-background-input-hovered'),
@@ -269,7 +269,7 @@ test('Radio: unchecked hover is the input hovered fill; a checked radio steps to
 });
 
 test('Toggle: hover steps the track, neutral bold off and selected bold on', () => {
-  const file = 'components/forms-and-inputs/Toggle.scss';
+  const file = 'components/forms-and-inputs/Toggle/Toggle.scss';
   const track = '.plus-toggle';
   expectRule(file, `${track}:hover:not([data-disabled]):not([data-checked])`, {
     'background-color': layer('--ds-background-neutral-bold-hovered'),
@@ -287,9 +287,9 @@ test('Toggle: hover steps the track, neutral bold off and selected bold on', () 
  * DS_RING_OUTSIDE, defined with the shared rings above.
  */
 for (const [name, file, selector, ring] of [
-  ['Checkbox', 'components/forms-and-inputs/Checkbox.scss', '.plus-form-checkbox:focus-visible', DS_RING_OUTSIDE],
-  ['Radio', 'components/forms-and-inputs/Radio.scss', '.plus-form-radio:focus-visible', DS_RING_OUTSIDE],
-  ['Toggle', 'components/forms-and-inputs/Toggle.scss', '.plus-toggle:focus-visible', DS_RING_OUTSIDE],
+  ['Checkbox', 'components/forms-and-inputs/Checkbox/Checkbox.scss', '.plus-form-checkbox:focus-visible', DS_RING_OUTSIDE],
+  ['Radio', 'components/forms-and-inputs/Radio/Radio.scss', '.plus-form-radio:focus-visible', DS_RING_OUTSIDE],
+  ['Toggle', 'components/forms-and-inputs/Toggle/Toggle.scss', '.plus-toggle:focus-visible', DS_RING_OUTSIDE],
 ]) {
   test(`${name}: keyboard focus is a 2px focus ring with a 2px gap`, () => {
     expectRule(file, selector, ring);
