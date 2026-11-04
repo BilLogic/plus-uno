@@ -91,11 +91,12 @@
 }
 
 /*
- * Compact icon row: Figma has no borders on individual icon hits — flat on surface-container-high.
- * Bootstrap .btn can still add borders; strip them here only inside this toolbar.
+ * Compact icon row: Figma has no borders on individual icon hits — flat on
+ * surface-container-high. Button's own transparent-edge default can still
+ * read as a border on some tokens; strip it here only inside this toolbar.
  */
 .plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar {
-    .plus-btn.btn {
+    .plus-btn {
         border: none;
         box-shadow: none;
         background-color: transparent;

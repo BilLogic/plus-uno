@@ -41,8 +41,8 @@ $btn-appearances: (
     border-color: #{btn-read(list.nth($config, 6))};
     color: var(--plus-btn-fg);
 
-    // The ring is drawn once, on `.plus-btn.btn`; each appearance only adds
-    // its own hovered/pressed fill, so the ring is not redrawn per appearance.
+    // The ring is drawn once, on `.plus-btn`; each appearance only adds its
+    // own hovered/pressed fill, so the ring is not redrawn per appearance.
     @include plus-state(
         $states: (
             hovered: (background-color: #{btn-read(list.nth($config, 4))}),
@@ -62,13 +62,6 @@ $btn-appearances: (
     max-width: 100%;
     position: relative;
 
-    // RBButton always adds `.btn` (Bootstrap uses display: inline-block). Keep flex layout.
-    &.btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
     // Every appearance draws a 1px edge, transparent unless the appearance
     // colors it, so the height is the same in all of them.
     border: var(--size-element-border) solid transparent;
@@ -79,52 +72,44 @@ $btn-appearances: (
     transition: background-color 0.2s, color 0.2s, border-color 0.2s;
 
     // Keyboard focus is the state mixin's ring alone: 2px wide, 2px off the
-    // edge, following the corner radius. `.btn` in the selector outranks
-    // Bootstrap's `.btn:focus-visible`, which drops the outline, so the mixin
-    // is included on `&.btn` rather than on the bare `&`.
-    &.btn {
-        @include plus-state();
-    }
+    // edge, following the corner radius.
+    @include plus-state();
 
     // --- SPACING ---
     // Height, padding, radius and icon-to-label gap come from element tokens:
     // default 32 high with a 6 radius, compact 24 high with a 4 radius. The
     // height is set, not summed from padding, so the 1px edge never makes a
     // 26. Content centers in it.
-    &.btn {
-        box-sizing: border-box;
-        height: var(--item-height-md);
-        padding: 0 var(--element-pad-x-md);
-        border-radius: var(--element-radius-item-sm);
-        gap: var(--element-inline-sm);
-    }
+    box-sizing: border-box;
+    height: var(--item-height-md);
+    padding: 0 var(--element-pad-x-md);
+    border-radius: var(--element-radius-item-sm);
+    gap: var(--element-inline-sm);
 
-    &.plus-btn--compact.btn {
+    &.plus-btn--compact {
         height: var(--item-height-sm);
         padding: 0 var(--element-pad-x-sm);
         border-radius: var(--element-radius-md);
     }
 
     // An icon-only button is square.
-    &.plus-btn--icon-only.btn {
+    &.plus-btn--icon-only {
         width: var(--item-height-md);
         padding: 0;
     }
 
-    &.plus-btn--icon-only.plus-btn--compact.btn {
+    &.plus-btn--icon-only.plus-btn--compact {
         width: var(--item-height-sm);
     }
 
     // Icon button `shape="circle"`: a round icon button for top navigation.
-    &.plus-btn--circle.btn {
+    &.plus-btn--circle {
         border-radius: 50%;
     }
 
-    // The label is Body/default at the medium weight; icons draw at 16. The
-    // `.btn` in the selector beats the typography classes' `.h3 .fa-solid`
-    // icon sizing, so a button inside a heading keeps its 16 icon. A label
-    // that does not fit ends in an ellipsis.
-    &.btn .plus-btn-text {
+    // The label is Body/default at the medium weight; icons draw at 16. A
+    // label that does not fit ends in an ellipsis.
+    .plus-btn-text {
         font: var(--body-default);
         font-weight: var(--type-weight-medium);
         color: inherit;
@@ -133,7 +118,7 @@ $btn-appearances: (
         min-width: 0;
     }
 
-    &.btn .plus-btn-visual {
+    .plus-btn-visual {
         font-size: var(--icon-md);
         color: var(--plus-btn-icon);
         display: inline-flex;
@@ -173,9 +158,9 @@ $btn-appearances: (
         @include btn-paint(map.get($btn-appearances, 'selected'));
     }
 
-    // Bootstrap dims a disabled `.btn`; Button changes color instead.
-    &.btn:disabled,
-    &.btn.disabled {
+    // A disabled button changes color rather than dimming.
+    &:disabled,
+    &.disabled {
         opacity: 1;
     }
 
@@ -229,7 +214,7 @@ $btn-appearances: (
 
     // --- VERTICAL LAYOUT ---
     // Vertical button: one size, 60 by 60, the icon stacked over the label.
-    &.plus-btn--vertical.btn {
+    &.plus-btn--vertical {
         width: var(--size-column-xs);
         height: var(--size-column-xs);
         padding: var(--element-pad-y-sm) var(--element-pad-x-xs);

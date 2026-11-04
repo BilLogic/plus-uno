@@ -7,7 +7,7 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Button](Button/index.md) | 17 | ✕ | ✕ | ✅ |
+| [Button](Button/index.md) | 21 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |

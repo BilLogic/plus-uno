@@ -30,6 +30,10 @@
 | `isLoading` | bool | `false` | Show a spinner in place of the label and block interaction |
 | `type` | string | `'button'` | — |
 | `as` | elementType | — | — |
+| `href` | string | — | Renders as an anchor when set (and no `as` overrides it). |
+| `target` | string | — | — |
+| `rel` | string | — | — |
+| `role` | string | — | Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). |
 | `iconBefore` | string or node | — | Font Awesome glyph before the label |
 | `iconAfter` | string or node | — | Font Awesome glyph after the label |
 | `id` | string | — | — |
