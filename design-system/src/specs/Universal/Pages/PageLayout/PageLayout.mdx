@@ -86,8 +86,8 @@ App outer layout — wraps every page with Sidebar, TopBar and the content slot,
 </DocsCanvasShell>
 
 - **Frame** — the `Frame` with no sidebar: three rows, `--focused-page-stack-sm` 8 apart, inside `--focused-page-pad-y` · `--focused-page-pad-x` 8 on `--ds-surface-sunken`.
-- **Topbar** — a `header`, the page's banner, `--layout-height-topbar` 32: Back (`onBack` or `backHref`), the `title` as the page's one visible `h1` at Heading/xsmall, truncated on one line, and Close (`onClose`), `--focused-page-inline-md` 12 apart. Without a handler, that control is not drawn.
-- **Surface** — the page's `main`, at reading width: content capped at `--layout-max-width-reading` 864, centered, never under 720. A long task scrolls inside it.
+- **Topbar** — a `header`, the page's banner, `--frame-topbar-height` 32: Back (`onBack` or `backHref`), the `title` as the page's one visible `h1` at Heading/xsmall, truncated on one line, and Close (`onClose`), `--focused-page-inline-md` 12 apart. Without a handler, that control is not drawn.
+- **Surface** — the page's `main`, at reading width: content capped at `--content-max-width-reading` 864, centered, never under 720. A long task scrolls inside it.
 - **Footer** — a `footer` named by `actionsLabel` ("Page actions"): the `actions`, end-aligned, `--focused-page-inline-sm` 8 apart, in a column lined up with the content. It stays put while the surface scrolls; without `actions` there is no footer.
 - **Focus order** — Back, Close, the content, then the actions.
 

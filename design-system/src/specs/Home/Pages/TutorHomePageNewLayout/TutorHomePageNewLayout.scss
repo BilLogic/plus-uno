@@ -23,12 +23,12 @@
 .plus-home-new__inline {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     min-width: 0;
 }
 
 .plus-home-new__inline--tight {
-    gap: var(--element-inline-sm);
+    gap: var(--inline-sm);
 }
 
 // A decorative glyph beside text (the tab info marks): the 16 icon box,
@@ -91,7 +91,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     padding: var(--space-075) var(--space-100);
     border-radius: var(--radius-050);
     background-color: var(--ds-surface-container);
@@ -194,10 +194,10 @@
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: calc(
-        (100% - (var(--plus-home-new-cards-per-view) - 1) * var(--layout-gutter))
+        (100% - (var(--plus-home-new-cards-per-view) - 1) * var(--grid-gutter))
         / var(--plus-home-new-cards-per-view)
     );
-    column-gap: var(--layout-gutter);
+    column-gap: var(--grid-gutter);
     // A scroller clips at its padding box. The padding gives each card room for
     // its raised shadow, and the equal negative margin keeps the cards on the
     // grid's columns.

@@ -72,7 +72,7 @@ const NavigationButtons = ({
     if (footerEl) return createPortal(actions, footerEl);
 
     return (
-        <div style={{ display: 'flex', gap: 'var(--element-inline-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--inline-sm)', flexWrap: 'wrap', alignItems: 'center' }}>
             {actions}
         </div>
     );

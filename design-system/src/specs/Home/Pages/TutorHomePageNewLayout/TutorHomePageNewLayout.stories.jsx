@@ -257,10 +257,10 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
     await waitFor(() => expect(canvas.getByRole('heading', { level: 1 })).toBeTruthy());
     const box = rect(content(canvasElement));
     const grid = {
-        gutter: tokenLength(canvasElement, '--layout-gutter'),
-        columns: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--layout-columns'), 10),
+        gutter: tokenLength(canvasElement, '--grid-gutter'),
+        columns: parseInt(getComputedStyle(document.documentElement).getPropertyValue('--grid-columns'), 10),
     };
-    await expect(box.width, 'content width').toBeCloseTo(tokenLength(canvasElement, '--layout-width-content'), 0);
+    await expect(box.width, 'content width').toBeCloseTo(tokenLength(canvasElement, '--content-width'), 0);
     await expect(columnWidth(box.width, grid), 'a column').toBeGreaterThan(0);
 
     const list = blocks(canvasElement);

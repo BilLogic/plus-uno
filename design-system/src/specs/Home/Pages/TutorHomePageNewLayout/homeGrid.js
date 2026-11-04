@@ -69,8 +69,8 @@ export const readGrid = (el) => {
     const doc = el.ownerDocument;
     const root = getComputedStyle(doc.documentElement);
     return {
-        columns: parseInt(root.getPropertyValue('--layout-columns'), 10),
-        gutter: readLength(doc, '--layout-gutter'),
+        columns: parseInt(root.getPropertyValue('--grid-columns'), 10),
+        gutter: readLength(doc, '--grid-gutter'),
         cardMin: readLength(doc, '--card-min-width-md'),
     };
 };

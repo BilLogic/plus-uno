@@ -54,7 +54,7 @@ const PAGE_TITLE_STYLE = {
  *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
  *   12 apart.
  * - Surface (the `main`): the frame's surface at reading width, content capped
- *   at `--layout-max-width-reading` 864, centered, never under 720. It scrolls
+ *   at `--content-max-width-reading` 864, centered, never under 720. It scrolls
  *   on its own.
  * - Footer (a `footer` named by `actionsLabel`): the actions, end-aligned,
  *   `--focused-page-inline-sm` 8 apart, in a column as wide as the content and
@@ -299,7 +299,7 @@ const PageLayout = ({
                         position: 'absolute',
                         bottom: 'var(--space-200)',
                         right: 'var(--space-300)',
-                        zIndex: 'var(--layout-z-index-navigation)',
+                        zIndex: 'var(--layer-navigation)',
                         pointerEvents: 'auto',
                     }}
                 >
