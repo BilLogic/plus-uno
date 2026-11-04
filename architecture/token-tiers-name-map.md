@@ -47,7 +47,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Border | `--border-selected` | `--border-selected` (reclassified, unchanged) |  |
 | Border | `--border-focused` | `--border-focused` (reclassified, unchanged) |  |
 | Focus | `--size-element-stroke-lg` | `--focus-ring-width` | matches the outline width already repeated across Tag, DateTag, Suggestion, NavTabs; reads the stroke primitive --size-element-stroke-lg itself resolves to, so this stays off the old-size-token ratchet |
-| Focus | `--size-element-stroke-lg` | `--focus-ring-offset` | matches the outline-offset magnitude at Tag/DateTag/Suggestion (outset); NavTabs negates it for an inset ring |
+| Focus | `--size-element-stroke-lg` | `--focus-ring-offset` | defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both (outline and outline-offset are the same value everywhere today, including the plus-state mixin, which takes one shared $ring-offset param) |
 | Focus | *(new)* | `--focus-ring-radius` | first pass, no existing source; a family PR refines it |
 | Grid | `--layout-gutter` | `--grid-gutter` |  |
 | Grid | `--layout-columns` | `--grid-columns` |  |

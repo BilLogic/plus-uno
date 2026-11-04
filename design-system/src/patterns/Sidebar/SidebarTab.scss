@@ -42,8 +42,8 @@
     // The ring sits 2px inside the row's edge, so the sidebar's edge or a
     // scroller never clips it.
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 }
 
@@ -136,8 +136,8 @@
 }
 
 .plus-sidebar-tab--focus {
-    outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-    outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: calc(-1 * var(--focus-ring-width));
 }
 
 // The disabled text and icon colors; a disabled row is announced as such

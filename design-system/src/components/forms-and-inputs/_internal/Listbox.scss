@@ -136,8 +136,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 }
 
@@ -161,7 +161,7 @@
 
 @media (forced-colors: active) {
     .plus-listbox-options:focus-visible {
-        outline: var(--size-element-stroke-lg) solid Highlight;
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid Highlight;
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 }
