@@ -43,6 +43,6 @@ From `design-system/src/components/navigation/Pagination/Pagination.scss`. Overr
 
 ## Related
 
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `NavPills` · `NavTabs` · `Sidebar`
+Same group: `Breadcrumb` · `Link` · `MenuGroup` · `NavTabs` · `Sidebar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

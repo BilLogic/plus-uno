@@ -9,12 +9,12 @@ export { default as Calendar } from '@/components/forms-and-inputs/Calendar';
 export { default as Cascader, CASCADER_SPACINGS } from '@/components/forms-and-inputs/Cascader';
 export { default as Checkbox } from '@/components/forms-and-inputs/Checkbox';
 export { default as ChoiceGrid } from '@/components/forms-and-inputs/ChoiceGrid';
-export { default as ChoiceGroup } from '@/components/forms-and-inputs/ChoiceGroup';
 export { default as CloseButton } from '@/components/forms-and-inputs/CloseButton';
 export { default as Comment } from '@/components/forms-and-inputs/Comment';
 export { default as DatePicker } from '@/components/forms-and-inputs/DatePicker';
 export { default as DateTimePicker } from '@/components/forms-and-inputs/DateTimePicker';
 export { default as Dropdown, createDropdown } from '@/components/forms-and-inputs/Dropdown';
+export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
 export { default as IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '@/components/forms-and-inputs/IconButton';
@@ -24,6 +24,7 @@ export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton'
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
 export { default as PromptInput } from '@/components/forms-and-inputs/PromptInput';
 export { default as Radio } from '@/components/forms-and-inputs/Radio';
+export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup';
 export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
 export { default as RichTextEditor } from '@/components/forms-and-inputs/RichTextEditor';
@@ -58,14 +59,8 @@ export { default as Tag, AVATAR_TAG_TYPES, resolveTagKind, TAG_COLOR_OF_CURRICUL
 export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '@/components/labels/TagGroup';
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
-export { default as Card } from '@/components/layout-and-structure/Card';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
-export { default as Collapse } from '@/components/layout-and-structure/Collapse';
-export { default as Divider } from '@/components/layout-and-structure/Divider';
 export { default as Footer } from '@/components/layout-and-structure/Footer';
-export { default as Jumbotron, resetJumbotronDeprecationWarnings } from '@/components/layout-and-structure/Jumbotron';
-export { default as ListGroup, ListGroupItem } from '@/components/layout-and-structure/ListGroup';
-export { default as MediaObject } from '@/components/layout-and-structure/MediaObject';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
 export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
@@ -87,7 +82,6 @@ export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightP
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
 export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
-export { default as NavPills } from '@/components/navigation/NavPills';
 export { default as NavTabs } from '@/components/navigation/NavTabs';
 export { default as Pagination, createPagination } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
