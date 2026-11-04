@@ -156,8 +156,8 @@ describe('the corpus — where tokens live, answered once and read through the o
 
   it('does not read `tokens/source/`, the Figma export the SCSS is generated from', () => {
     for (const source of tokenSources()) {
-      // The one directory read below the flat sheets is the generated color set.
-      expect(source.file).toMatch(/^(color\/)?[^/]+\.(scss|css)$/);
+      // The directories read below the flat sheets are the generated color set and `deep/`.
+      expect(source.file).toMatch(/^((color|deep)\/)?[^/]+\.(scss|css)$/);
       expect(source.file.startsWith('source/')).toBe(false);
     }
   });
@@ -176,6 +176,20 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(corpus.has('--color-primary')).toBe(true);
     expect([...corpus.keys()].some((name) => name.startsWith('--bs-'))).toBe(false);
     expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
+  });
+
+  it('reads the deep ladder (ADR-038, #1756), after the flat sheets so a first-definition lookup still lands on the flat one', () => {
+    const files = tokenSources().map((s) => s.file);
+    for (const file of ['deep/_semantics.scss', 'deep/_patterns.scss', 'deep/_components.scss', 'deep/_layers.scss', 'deep/_roles.scss']) {
+      expect(files).toContain(file);
+    }
+    expect(files.indexOf('deep/_semantics.scss')).toBeGreaterThan(files.indexOf('_scales.scss'));
+
+    const corpus = tokenCorpus();
+    expect(corpus.get('--grid-gutter').file).toBe('deep/_semantics.scss');
+    expect(corpus.get('--modal-pad-x-default').file).toBe('deep/_roles.scss');
+    // `--radius-full` is declared in both; first wins, so the flat primitive keeps it.
+    expect(corpus.get('--radius-full').file).toBe('_scales.scss');
   });
 
   it('reads the color directory from the root it is given', () => {
@@ -199,17 +213,20 @@ describe('the corpus — where tokens live, answered once and read through the o
     const root = mkdtempSync(join(tmpdir(), 'tokens-node-'));
     mkdirSync(join(root, TOKEN_DIR), { recursive: true });
     mkdirSync(join(root, TOKEN_DIR, 'source'), { recursive: true });
+    mkdirSync(join(root, TOKEN_DIR, 'deep'), { recursive: true });
     writeFileSync(
       join(root, TOKEN_DIR, '_fixture.scss'),
       ':root { --color-fixture: #abc; --color-alias: var(--color-fixture); }',
     );
     writeFileSync(join(root, TOKEN_DIR, 'source', 'colors.json'), '{"not":"read"}');
+    writeFileSync(join(root, TOKEN_DIR, 'deep', '_fixture.scss'), ':root { --deep-fixture: var(--color-fixture); }');
 
     const sources = tokenSources({ root });
-    expect(sources.map((s) => s.file)).toEqual(['_fixture.scss']);
+    expect(sources.map((s) => s.file)).toEqual(['_fixture.scss', 'deep/_fixture.scss']);
 
     const corpus = tokenCorpus({ root });
-    expect([...corpus.keys()]).toEqual(['--color-fixture', '--color-alias']);
+    expect([...corpus.keys()]).toEqual(['--color-fixture', '--color-alias', '--deep-fixture']);
+    expect(corpus.get('--deep-fixture').value).toBe('#abc');
     expect(corpus.get('--color-alias').value).toBe('#abc');
   });
 
@@ -387,7 +404,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * either fallback check makes can reach one. What is counted is the legacy
    * set, which is the set the exposure is about.
    */
-  it('differs from the normalizer on 19 live token pairs', () => {
+   * (The twentieth is `--blanket-fill`, the ladder's literal copy of `--overlay-scrim`; it leaves with the old name.)
+  it('differs from the normalizer on 20 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .filter((entry) => !entry.file.startsWith('color/'))
       .map((entry) => entry.value)
@@ -401,7 +419,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(19);
+    expect(pairs).toBe(20);
   });
 
   /*

@@ -135,6 +135,13 @@ export const TOKEN_DIR = 'design-system/src/tokens';
 export const COLOR_TOKEN_DIR = `${TOKEN_DIR}/color`;
 
 /**
+ * Where the generated token ladder lives (ADR-038, #1756): the semantics,
+ * patterns, components, layers, roles and motion tiers, all written by
+ * `npm run generate:design-tokens`.
+ */
+export const DEEP_TOKEN_DIR = `${TOKEN_DIR}/deep`;
+
+/**
  * The stylesheets in `COLOR_TOKEN_DIR` that DEFINE tokens. The Bootstrap bridge
  * is not one: it points Bootstrap's own `--bs-*` properties at `--ds-*`, which
  * makes it a consumer of the tokens, and reading it as a definition would mint
@@ -180,11 +187,13 @@ const PRIMITIVE_FILES = new Set(['_primitives.scss', `color/${COLOR_PALETTE_FILE
  *
  * FLAT, and the glob is what makes it flat: `tokens/*` matches one segment, so
  * `tokens/source/` — the Figma exports the SCSS is GENERATED from — is not
- * read, and reading both would count every token twice. The one directory
- * read below it is `tokens/color/`, by name and only its `COLOR_TOKEN_FILES`:
- * the generated color tokens live there because a generator owns the whole
- * directory, and a token the corpus cannot see is a token no check can.
- * They come after the flat sheets, so `file` reads `color/_semantic.scss`.
+ * read, and reading both would count every token twice. The directories read
+ * below it are `tokens/color/`, by name and only its `COLOR_TOKEN_FILES`, and
+ * `tokens/deep/` (`DEEP_TOKEN_DIR`), every stylesheet in it: a generator owns
+ * each whole directory, and a token the corpus cannot see is a token no check
+ * can. They come after the flat sheets, so `file` reads `color/_semantic.scss`
+ * or `deep/_semantics.scss`, and a first-definition lookup of a name both
+ * declare (`--radius-full`) still lands on the flat sheet.
  *
  * FORGIVING, not `strict`. A token directory that is not there comes back
  * empty rather than throwing: every check over this corpus already has a floor
@@ -199,7 +208,8 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
   const color = documents(`${COLOR_TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }).filter((rel) =>
     COLOR_TOKEN_FILES.includes(rel.slice(COLOR_TOKEN_DIR.length + 1)),
   );
-  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color].map((rel) => ({
+  const deep = documents(`${DEEP_TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] });
+  return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color, ...deep].map((rel) => ({
     path: rel,
     file: rel.slice(TOKEN_DIR.length + 1),
     text: text(rel, { root }),
@@ -345,6 +355,26 @@ export const FAMILIES = [
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
+  { family: 'pad', prefix: '--pad-', what: 'the semantic pad steps, by axis (`--pad-x-md`, `--pad-y-sm`)' },
+  { family: 'stack', prefix: '--stack-', what: 'the semantic vertical gaps' },
+  { family: 'inline', prefix: '--inline-', what: 'the semantic horizontal gaps' },
+  { family: 'focus-ring', prefix: '--focus-ring-', what: 'the focus ring: width, offset and radius' },
+  { family: 'grid', prefix: '--grid-', what: 'the screen grid: gutter, columns and column widths' },
+  { family: 'screen', prefix: '--screen-', what: 'the screen: its width range and pad' },
+  { family: 'content', prefix: '--content-', what: 'the content column: its widths' },
+  { family: 'control', prefix: '--control-', what: 'control heights, by size role' },
+  { family: 'layer', prefix: '--layer-', what: 'the z-index ladder, card to tooltip' },
+  { family: 'blanket', prefix: '--blanket-', what: 'the full-screen Blanket under a modal: its pad, fill and maximum height' },
+  { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
+  { family: 'button', prefix: '--button-', what: 'Button radii by height' },
+  { family: 'calendar', prefix: '--calendar-', what: 'Calendar day and navigation sizes' },
+  { family: 'checkbox', prefix: '--checkbox-', what: 'the Checkbox control size' },
+  { family: 'radio', prefix: '--radio-', what: 'the Radio control size' },
+  { family: 'listbox', prefix: '--listbox-', what: 'Listbox width and height limits' },
+  { family: 'join-row', prefix: '--join-row-', what: 'the Join row width' },
+  { family: 'option-menu', prefix: '--option-menu-', what: 'the Option menu width' },
+  { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
+  { family: 'progress-bar', prefix: '--progress-bar-', what: 'the Progress bar height' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
 ];
