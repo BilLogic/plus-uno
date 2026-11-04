@@ -3,32 +3,31 @@ import { expect, userEvent, within } from 'storybook/test';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import Alert, { ALERT_ICONS, ALERT_STYLES } from './Alert';
+import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 
 export default {
     title: 'Components/Messaging/Section message',
-    component: Alert,
+    component: SectionMessage,
     tags: ['!dev', '!autodocs'],
     parameters: {
         layout: 'padded',
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'The ground is each style\'s named background token (`--ds-background-success`, `--ds-background-brand-subtlest` for primary, and so on), so it follows light, dark and contrast modes.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s container tint instead of its base-color tint, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them. The left border reads `--size-element-stroke-xl`, which is now 3px.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Renamed from `Alert` to `SectionMessage`. No left border: meaning is carried by the ground and the icon, never a side stripe. Added `actions` (link buttons after the body) and `headingLevel`.' },
+            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s container tint instead of its base-color tint, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them.' },
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'The border is one 3px line on the left edge, in each style\'s Border color (`--color-<style>-border`), instead of 1px on all four sides in the base color. Warning\'s border moves to its darker Border role, which holds 3:1 on every surface step.' },
             { date: '2026-09-29', kind: 'changed', summary: 'Title and body text are `--color-on-surface` in every style, instead of the style\'s on-container color. Links in the body inherit it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton: it stays 24×24 with a 16px icon and centers on the first line of text instead of growing with the title or body.' },
         ],
         docs: {
             description: {
                 component: `
-Universal element component for displaying alert messages, notifications, or feedback.
-Six styles, an optional title, and a leading icon that each style picks by default.
+A message that belongs to the page and stays there until it is resolved or
+dismissed. Six styles, an optional title, and a leading icon that each style
+picks by default.
 
-**Uses React children pattern for content** (matching React Bootstrap convention):
 \`\`\`jsx
-<Alert style="warning">Warning message here</Alert>
-<Alert style="info" title="Info">This is an info alert.</Alert>
+<SectionMessage appearance="warning">Warning message here</SectionMessage>
+<SectionMessage appearance="info" title="Info">This is an info message.</SectionMessage>
 \`\`\`
                 `,
             },
@@ -37,10 +36,10 @@ Six styles, an optional title, and a leading icon that each style picks by defau
     argTypes: {
         children: { table: { disable: true } },
         onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        appearance: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Optional alert title/heading',
+            description: 'Optional message title/heading',
             table: { category: 'Content' },
         },
         leadingVisual: {
@@ -51,7 +50,7 @@ Six styles, an optional title, and a leading icon that each style picks by defau
         },
         dismissible: {
             control: 'boolean',
-            description: 'Whether the alert can be dismissed',
+            description: 'Whether the message can be dismissed',
             table: { category: 'Behavior' },
         },
         id: {
@@ -77,108 +76,119 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const alertCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
 const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
-const contentVariantCard = {
-    padding: '12px',
-    border: '1px solid var(--color-outline-variant)',
-    borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
-};
 
-function AlertVariantsDemos() {
+function SectionMessageVariantsDemos() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL STYLES (WITH TITLE, DISMISSIBLE)</span>
-            {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(style => (
-                <Alert key={style} style={style} title="Title" dismissible>
+            {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(appearance => (
+                <SectionMessage key={appearance} appearance={appearance} title="Title" dismissible>
                     You have a message here — come check it out!
-                </Alert>
+                </SectionMessage>
             ))}
         </div>
     );
 }
 
-function AlertContentDemos() {
+function SectionMessageContentDemos() {
     return (
         <div style={contentVariantCol}>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTENT VARIANTS (PRIMARY STYLE)</span>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH TITLE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
-                <Alert style="primary" title="With Title" dismissible>
-                    Alert with title and message text.
-                </Alert>
+                <SectionMessage appearance="primary" title="With Title" dismissible>
+                    Message with title and body text.
+                </SectionMessage>
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BODY ONLY</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when concise copy does not require a heading.
                 </p>
-                <Alert style="primary" dismissible>
-                    Alert without title — message only. The dismiss button centers on the first body line.
-                </Alert>
+                <SectionMessage appearance="primary" dismissible>
+                    Message without title — body only. The dismiss button centers on the first body line.
+                </SectionMessage>
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NON-DISMISSIBLE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
-                <Alert style="primary" title="Non-dismissible Alert" dismissible={false}>
-                    This alert cannot be dismissed.
-                </Alert>
+                <SectionMessage appearance="primary" title="Non-dismissible message" dismissible={false}>
+                    This message cannot be dismissed.
+                </SectionMessage>
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RICH CONTENT</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
-                    Supports inline emphasis and links inside the alert body.
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                    Supports inline emphasis and links inside the body.
                 </p>
-                <Alert style="info" title="Rich Content">
+                <SectionMessage appearance="info" title="Rich Content">
                     <strong>Note:</strong> You can include <em>rich HTML content</em> and even{' '}
-                    <a href="#">links</a> inside alerts.
-                </Alert>
+                    <a href="#">links</a> inside a message.
+                </SectionMessage>
+            </section>
+            <section>
+                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ACTIONS</span>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                    Up to two link-button actions after the body.
+                </p>
+                <SectionMessage
+                    appearance="warning"
+                    title="This term's schedule is provisional"
+                    dismissible={false}
+                    actions={[
+                        { text: 'Reschedule', onClick: () => {} },
+                        { text: 'Learn more', href: '#' },
+                    ]}
+                >
+                    Dates may still change before the term starts.
+                </SectionMessage>
             </section>
         </div>
     );
 }
 
 export const Styles = () => (
-    <div style={alertCol}>
-        <AlertVariantsDemos />
+    <div style={sectionMessageCol}>
+        <SectionMessageVariantsDemos />
     </div>
 );
 
 export const Content = () => (
-    <div style={alertCol}>
-        <AlertContentDemos />
+    <div style={sectionMessageCol}>
+        <SectionMessageContentDemos />
     </div>
 );
 
 export const Overview = () => (
-    <Alert style="primary" title="With Title" dismissible>
-        Alert with title and message text.
-    </Alert>
+    <SectionMessage appearance="primary" title="With Title" dismissible>
+        Message with title and body text.
+    </SectionMessage>
 );
 Overview.parameters = {
     docs: {
-        source: { language: 'jsx', code: webAppSourceSnippets.alert }
+        source: { language: 'jsx', code: webAppSourceSnippets.sectionMessage }
     }
 };
 
 /**
- * Interactive Alert
- * Interactive playground for testing alert variations.
+ * Interactive Section message
+ * Interactive playground for testing message variations.
  */
 export const Interactive = (args) => (
-    <Alert {...args}>
-        This is an interactive alert. Use the controls below to customize it.
-    </Alert>
+    <SectionMessage {...args}>
+        This is an interactive message. Use the controls below to customize it.
+    </SectionMessage>
 );
 Interactive.args = {
-    title: 'Interactive Alert',
-    style: 'info',
+    title: 'Interactive message',
+    appearance: 'info',
     leadingVisual: true,
     dismissible: true,
 };
@@ -192,16 +202,16 @@ Interactive.args = {
  */
 export const DismissPlacement = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
-        <Alert style="primary" title="With a title" data-testid="placement-title">
-            The × centers on the title line, not on the alert.
-        </Alert>
-        <Alert style="warning" data-testid="placement-body">
+        <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
+            The × centers on the title line, not on the message.
+        </SectionMessage>
+        <SectionMessage appearance="warning" data-testid="placement-body">
             Without a title the × centers on the first body line, even when the message runs on
-            long enough to wrap onto a second and a third line inside a narrow alert.
-        </Alert>
-        <Alert style="info" title="A title long enough to wrap onto a second line" data-testid="placement-wrap">
+            long enough to wrap onto a second and a third line inside a narrow message.
+        </SectionMessage>
+        <SectionMessage appearance="info" title="A title long enough to wrap onto a second line" data-testid="placement-wrap">
             Short body.
-        </Alert>
+        </SectionMessage>
     </div>
 );
 
@@ -216,28 +226,28 @@ function firstLine(element) {
 DismissPlacement.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const cases = [
-        ['placement-title', '.plus-alert-title'],
-        ['placement-body', '.plus-alert-text'],
-        ['placement-wrap', '.plus-alert-title'],
+        ['placement-title', '.plus-section-message-title'],
+        ['placement-body', '.plus-section-message-text'],
+        ['placement-wrap', '.plus-section-message-title'],
     ];
     for (const [id, lineOwner] of cases) {
-        const alert = canvas.getByTestId(id);
-        const button = within(alert).getByRole('button', { name: 'Close alert' });
+        const message = canvas.getByTestId(id);
+        const button = within(message).getByRole('button', { name: 'Close message' });
         const rect = button.getBoundingClientRect();
         await expect(Math.round(rect.width), `${id}: width`).toBe(32);
         await expect(Math.round(rect.height), `${id}: height`).toBe(32);
         await expect(getComputedStyle(button.querySelector('i')).fontSize, `${id}: icon`).toBe('16px');
 
-        const line = firstLine(alert.querySelector(lineOwner));
+        const line = firstLine(message.querySelector(lineOwner));
         const center = rect.top + rect.height / 2;
         await expect(center, `${id}: × center is inside the first line box`).toBeGreaterThanOrEqual(line.top);
         await expect(center, `${id}: × center is inside the first line box`).toBeLessThanOrEqual(line.bottom);
         await expect(Math.abs(center - line.center), `${id}: × is centered on the first line`).toBeLessThanOrEqual(1);
     }
 
-    // Dismissal is unchanged: the button removes its alert.
+    // Dismissal is unchanged: the button removes its message.
     const body = canvas.getByTestId('placement-body');
-    await userEvent.click(within(body).getByRole('button', { name: 'Close alert' }));
+    await userEvent.click(within(body).getByRole('button', { name: 'Close message' }));
     await expect(canvas.queryByTestId('placement-body')).toBeNull();
 };
 
@@ -247,31 +257,31 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * like the ×: success circle-check, danger circle-exclamation, warning
  * triangle-exclamation, and circle-info for primary, secondary and info. A
  * passed `leadingVisual` replaces it and `false` removes it. The icon is
- * decorative: the alert's role and its text already say what it is.
+ * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
-        {ALERT_STYLES.map((style) => (
-            <Alert key={style} style={style} title="Title" data-testid={`icon-${style}`}>
-                You have an alert message here — come check it out!
-            </Alert>
+        {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
+            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`icon-${appearance}`}>
+                You have a message here — come check it out!
+            </SectionMessage>
         ))}
-        <Alert style="warning" data-testid="icon-body">
+        <SectionMessage appearance="warning" data-testid="icon-body">
             Without a title the icon centers on the first body line, even when the message runs on
-            long enough to wrap onto a second and a third line inside a narrow alert.
-        </Alert>
-        <Alert style="success" title="A title long enough to wrap onto a second line" data-testid="icon-wrap">
+            long enough to wrap onto a second and a third line inside a narrow message.
+        </SectionMessage>
+        <SectionMessage appearance="success" title="A title long enough to wrap onto a second line" data-testid="icon-wrap">
             Short body.
-        </Alert>
-        <Alert style="info" title="Replaced by name" leadingVisual="bell" data-testid="icon-named">
+        </SectionMessage>
+        <SectionMessage appearance="info" title="Replaced by name" leadingVisual="bell" data-testid="icon-named">
             A Font Awesome solid name replaces the default icon.
-        </Alert>
-        <Alert style="info" leadingVisual={<i className="fa-solid fa-star" />} data-testid="icon-node">
+        </SectionMessage>
+        <SectionMessage appearance="info" leadingVisual={<i className="fa-solid fa-star" />} data-testid="icon-node">
             A node replaces it too.
-        </Alert>
-        <Alert style="warning" leadingVisual={false} data-testid="icon-none">
+        </SectionMessage>
+        <SectionMessage appearance="warning" leadingVisual={false} data-testid="icon-none">
             Sign-in didn&apos;t complete. Please try again.
-        </Alert>
+        </SectionMessage>
     </div>
 );
 
@@ -285,8 +295,8 @@ const glyphOf = (host, iconClass) => {
     return glyph;
 };
 
-/** The leading icon of an alert: its one icon that is not inside the × button. */
-const leadingIconOf = (alert) => [...alert.querySelectorAll('i')].find((i) => !i.closest('button')) ?? null;
+/** The leading icon of a message: its one icon that is not inside the × button. */
+const leadingIconOf = (message) => [...message.querySelectorAll('i')].find((i) => !i.closest('button')) ?? null;
 
 LeadingIcon.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -297,14 +307,14 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(Math.abs(center - line.center), `${id}: icon is centered on the first line`).toBeLessThanOrEqual(1);
     };
 
-    for (const style of ALERT_STYLES) {
-        const id = `icon-${style}`;
-        const alert = canvas.getByTestId(id);
-        const icon = leadingIconOf(alert);
+    for (const appearance of SECTION_MESSAGE_APPEARANCES) {
+        const id = `icon-${appearance}`;
+        const message = canvas.getByTestId(id);
+        const icon = leadingIconOf(message);
         await expect(icon, `${id} has a leading icon`).not.toBeNull();
-        await expect(getComputedStyle(icon, '::before').content, `${id} icon is ${ALERT_ICONS[style]}`)
-            .toBe(glyphOf(canvasElement, `fa-${ALERT_ICONS[style]}`));
-        await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, `--color-${style}-icon`));
+        await expect(getComputedStyle(icon, '::before').content, `${id} icon is ${SECTION_MESSAGE_ICONS[appearance]}`)
+            .toBe(glyphOf(canvasElement, `fa-${SECTION_MESSAGE_ICONS[appearance]}`));
+        await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, `--color-${appearance}-icon`));
         await expect(px(getComputedStyle(icon).fontSize), `${id} icon size`).toBe(20);
         const box = icon.getBoundingClientRect();
         await expect(Math.round(box.width), `${id} icon box is 20 wide, the column's width`).toBe(20);
@@ -313,7 +323,7 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(icon.closest('[aria-hidden="true"]'), `${id} icon is decorative`).not.toBeNull();
 
         // The icon comes before the message, the × after it.
-        const title = within(alert).getByText('Title');
+        const title = within(message).getByText('Title');
         await expect(icon.getBoundingClientRect().right, `${id}: icon leads the text`).toBeLessThanOrEqual(title.getBoundingClientRect().left);
         await expectOnFirstLine(id, icon, title);
     }
@@ -338,68 +348,58 @@ LeadingIcon.play = async ({ canvasElement }) => {
     await expect(Math.round(node.getBoundingClientRect().width), 'a passed node is a 20-wide box').toBe(20);
     await expect(canvas.getByTestId('icon-node').querySelectorAll('i:not(button i)').length, 'the node is the only leading icon').toBe(1);
 
-    // `false` removes it: the text starts at the alert's padding edge.
+    // `false` removes it: the text starts at the message's padding edge.
     const none = canvas.getByTestId('icon-none');
     await expect(leadingIconOf(none)).toBeNull();
     const text = within(none).getByText(/Sign-in didn/);
     const s = getComputedStyle(none);
-    const contentLeft = none.getBoundingClientRect().left + px(s.borderLeftWidth) + px(s.paddingLeft);
+    const contentLeft = none.getBoundingClientRect().left + px(s.paddingLeft);
     await expect(Math.round(text.getBoundingClientRect().left), 'text starts at the padding edge').toBe(Math.round(contentLeft));
 
-    // The × is unchanged beside the icon: it still dismisses its alert.
-    await userEvent.click(within(none).getByRole('button', { name: 'Close alert' }));
+    // The × is unchanged beside the icon: it still dismisses its message.
+    await userEvent.click(within(none).getByRole('button', { name: 'Close message' }));
     await expect(canvas.queryByTestId('icon-none')).toBeNull();
 };
 
 /**
- * The border, the ground and the text. Each style draws one 3px border on the
- * left (`--size-element-stroke-xl`), in its Border color, and nothing on the
- * other three sides. The ground is the style's Container 08 state layer and
- * the corners are 4px. The title, the body and any link in it are on-surface,
- * whatever the style: the style is carried by the border, the icon and the
- * ground. Shown on the darkest surface step, the hardest ground for a border
- * to hold 3:1 on.
+ * The ground and the text. Each style's ground is its named background
+ * token and the corners are 4px. No side stripe: meaning is carried by the
+ * fill and the icon alone. The title, the body and any link in it are
+ * on-surface, whatever the style. Shown on the darkest surface step.
  */
-export const BorderAndText = () => (
+export const GroundAndText = () => (
     <div
-        data-testid="border-ground"
+        data-testid="ground"
         style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-lg)',
             padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
-            background: 'var(--color-surface-container-highest)',
+            background: 'var(--ds-surface-sunken)',
         }}
     >
-        {ALERT_STYLES.map((style) => (
-            <Alert key={style} style={style} title="Title" data-testid={`border-${style}`}>
+        {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
+            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`ground-${appearance}`}>
                 You have a message here, with <a href="#">a link</a> in it.
-            </Alert>
+            </SectionMessage>
         ))}
     </div>
 );
 
-BorderAndText.play = async ({ canvasElement }) => {
+GroundAndText.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const ground = getComputedStyle(canvas.getByTestId('border-ground')).backgroundColor;
-    const onSurface = tokenColor(canvasElement, '--color-on-surface');
+    const ground = getComputedStyle(canvas.getByTestId('ground')).backgroundColor;
+    const onSurface = tokenColor(canvasElement, '--ds-text');
 
-    for (const style of ALERT_STYLES) {
-        const id = `border-${style}`;
-        const alert = canvas.getByTestId(id);
-        const s = getComputedStyle(alert);
+    for (const appearance of SECTION_MESSAGE_APPEARANCES) {
+        const id = `ground-${appearance}`;
+        const message = canvas.getByTestId(id);
+        const s = getComputedStyle(message);
 
-        // Left only, 3px (Element/stroke-xl), the style's Border role.
-        await expect(s.borderLeftStyle, `${id}: left border is drawn`).toBe('solid');
-        await expect(px(s.borderLeftWidth), `${id}: left border is 3px, as Figma draws it`).toBe(3);
-        await expect(px(s.borderLeftWidth), `${id}: left border is the stroke-xl token`)
-            .toBe(tokenLength(canvasElement, '--size-element-stroke-xl'));
-        for (const side of ['Top', 'Right', 'Bottom']) {
+        // No side stripe: nothing drawn on any edge.
+        for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
             await expect(px(s[`border${side}Width`]), `${id}: no ${side.toLowerCase()} border`).toBe(0);
         }
-        await expect(s.borderLeftColor, `${id}: border color`).toBe(tokenColor(canvasElement, `--color-${style}-border`));
-        await expect(contrastRatio(s.borderLeftColor, ground), `${id}: border holds 3:1 on the darkest surface`)
-            .toBeGreaterThanOrEqual(3);
 
         // 4px corners (--size-modal-radius-sm) and the role's named background ground.
         const radius = tokenLength(canvasElement, '--size-modal-radius-sm');
@@ -408,16 +408,39 @@ BorderAndText.play = async ({ canvasElement }) => {
             await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the modal-radius-sm token`).toBe(radius);
         }
         await expect(s.backgroundColor, `${id}: ground is the role's named background token`)
-            .toBe(tokenColor(canvasElement, GROUND_TOKEN[style]));
-        await expect(contrastRatio(s.borderLeftColor, paintedOver(s.backgroundColor, ground)), `${id}: border holds 3:1 on its own ground`)
-            .toBeGreaterThanOrEqual(3);
+            .toBe(tokenColor(canvasElement, GROUND_TOKEN[appearance]));
+        await expect(contrastRatio(onSurface, paintedOver(s.backgroundColor, ground)), `${id}: text holds contrast on its own ground`)
+            .toBeGreaterThanOrEqual(4.5);
 
         // Title, body and link are on-surface.
-        const title = within(alert).getByText('Title');
-        const body = within(alert).getByText(/You have a message here/);
-        const link = within(alert).getByRole('link', { name: 'a link' });
+        const title = within(message).getByText('Title');
+        const body = within(message).getByText(/You have a message here/);
+        const link = within(message).getByRole('link', { name: 'a link' });
         await expect(getComputedStyle(title).color, `${id}: title color`).toBe(onSurface);
         await expect(getComputedStyle(body).color, `${id}: body color`).toBe(onSurface);
         await expect(getComputedStyle(link).color, `${id}: link inherits the text color`).toBe(onSurface);
     }
+};
+
+/** Up to two link-button actions after the body, with a divider between them. */
+export const Actions = () => (
+    <SectionMessage
+        appearance="warning"
+        title="This term's schedule is provisional"
+        dismissible={false}
+        actions={[
+            { text: 'Reschedule', onClick: () => {} },
+            { text: 'Learn more', href: '#' },
+        ]}
+        data-testid="actions"
+    >
+        Dates may still change before the term starts.
+    </SectionMessage>
+);
+
+Actions.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const message = canvas.getByTestId('actions');
+    await expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible();
+    await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
 };

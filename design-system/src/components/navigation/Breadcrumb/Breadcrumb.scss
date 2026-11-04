@@ -1,34 +1,31 @@
-@use "sass:map";
-
-/* breadcrumb override */
+/* breadcrumb trail */
 .plus-breadcrumb {
     // Body/default, 14/20, in a 32 row (`--item-height-md`), like every other control.
     font: var(--body-default);
 
-    .breadcrumb {
+    .plus-breadcrumb-list {
+        list-style: none;
         min-height: var(--item-height-md);
-        margin-bottom: 0; // Remove default bootstrap margin if any
-        background-color: transparent; // Ensure transparent background
-        padding: 0; // Removing default bootstrap padding to let container handle it or being flush
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
 
         display: flex;
         align-items: center;
         gap: var(--size-element-gap-sm); // Figma: 8px gap
+        flex-wrap: wrap;
     }
 
-    .breadcrumb-item {
+    .plus-breadcrumb-item {
         display: flex;
         align-items: center;
 
         // Separator Style
-        &+.breadcrumb-item {
-            padding-left: 0; // Reset bootstrap padding since we use gap
-
+        & + .plus-breadcrumb-item {
             &::before {
-                float: none; // Reset bootstrap float
-                padding-right: var(--size-element-gap-sm); // Visual spacing for separator
+                padding-right: var(--size-element-gap-sm);
                 color: var(--color-on-surface-variant); // Figma: #3f484a
-                content: var(--bs-breadcrumb-divider); // Allow overriding via CSS var or default /
+                content: var(--plus-breadcrumb-divider, '/');
             }
         }
 
@@ -43,8 +40,8 @@
             }
         }
 
-        // Active Item Style (Current Page)
-        &.active {
+        // Current page item
+        &.plus-breadcrumb-current span {
             color: var(--color-on-surface-variant); // Figma: #3f484a
         }
     }

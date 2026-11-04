@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import RBBreadcrumb from 'react-bootstrap/Breadcrumb';
 import './Breadcrumb.scss';
 
 /**
  * Breadcrumb component for PLUS design system.
  * Universal element component for navigation breadcrumbs.
- * Uses React Bootstrap Breadcrumb as base.
  */
 /*
  * `items` defaults to `[]` even though its prop type is `isRequired`. A required
@@ -19,43 +17,45 @@ import './Breadcrumb.scss';
  * `separator` is what first rendered a Breadcrumb with no items, and the crash
  * had been reachable by any caller all along.
  */
-const Breadcrumb = ({ items = [], id, separator = '/', className = '', style }) => {
-    // React Bootstrap uses --bs-breadcrumb-divider CSS variable for separator
-    // We set it inline if a custom separator is provided
-    const breadcrumbStyle = {
-        ...style,
-        '--bs-breadcrumb-divider': typeof separator === 'string' ? `'${separator}'` : separator
-    };
-
-    return (
-        <RBBreadcrumb
-            className={`plus-breadcrumb ${className}`}
-            style={breadcrumbStyle}
-        >
+const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', className = '', style }) => (
+    <nav
+        aria-label={label}
+        className={`plus-breadcrumb ${className}`}
+        style={{ ...style, '--plus-breadcrumb-divider': typeof separator === 'string' ? `'${separator}'` : separator }}
+    >
+        <ol className="plus-breadcrumb-list">
             {items.map((item, index) => {
                 const isLast = index === items.length - 1;
-                return (
-                    <RBBreadcrumb.Item
+                // Active if there's no href, or it's the last item.
+                const isCurrent = !item.href || isLast;
+                return isCurrent ? (
+                    <li
                         key={index}
-                        href={item.href}
-                        active={!item.href || isLast} // If no href, or it's the last item, it's active
-                        onClick={(e) => {
-                            if (item.onClick) {
-                                e.preventDefault();
-                                item.onClick(e);
-                            }
-                        }}
                         id={isLast && id ? id : undefined}
-                        className={isLast ? 'plus-breadcrumb-current' : 'plus-breadcrumb-link'}
-                    // Note: RB adds 'active' class automatically if active prop is true.
+                        aria-current={isLast ? 'page' : undefined}
+                        className="plus-breadcrumb-item plus-breadcrumb-current"
                     >
                         {item.text}
-                    </RBBreadcrumb.Item>
+                    </li>
+                ) : (
+                    <li key={index} className="plus-breadcrumb-item plus-breadcrumb-link">
+                        <a
+                            href={item.href}
+                            onClick={(e) => {
+                                if (item.onClick) {
+                                    e.preventDefault();
+                                    item.onClick(e);
+                                }
+                            }}
+                        >
+                            {item.text}
+                        </a>
+                    </li>
                 );
             })}
-        </RBBreadcrumb>
-    );
-};
+        </ol>
+    </nav>
+);
 
 Breadcrumb.propTypes = {
     items: PropTypes.arrayOf(
@@ -67,6 +67,8 @@ Breadcrumb.propTypes = {
     ).isRequired,
     id: PropTypes.string,
     separator: PropTypes.node,
+    /** Accessible label for the nav region that wraps the breadcrumbs. */
+    label: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,
 };

@@ -16,14 +16,14 @@ export const webAppSourceSnippets = {
         '  defaultActiveKey="0"',
         '/>'
     ]),
-    alert: snippet([
-        '<Alert',
-        '  style="primary"',
+    sectionMessage: snippet([
+        '<SectionMessage',
+        '  appearance="primary"',
         '  title="With Title"',
         '  dismissible',
         '>',
-        '  Alert with title and message text.',
-        '</Alert>'
+        '  Message with title and body text.',
+        '</SectionMessage>'
     ]),
     badge: snippet([
         '<StatusTag appearance="info">Primary</StatusTag>'
@@ -201,15 +201,15 @@ export const webAppSourceSnippets = {
         '  onPageChange={(page) => setPage(page)}',
         '/>'
     ]),
-    popover: snippet([
-        '<div className="plus-popover-overview-static">',
-        '  <Button type="button" text="Toggle popover" appearance="primary" />',
-        '  <RBPopover className="plus-popover" placement="right">',
-        '    <RBPopover.Header className="plus-popover-title">Popover title</RBPopover.Header>',
-        '    <RBPopover.Body className="plus-popover-body">',
+    popup: snippet([
+        '<div className="plus-popup-overview-static">',
+        '  <Button type="button" text="Toggle popup" appearance="primary" />',
+        '  <div className="plus-popup">',
+        '    <div className="plus-popup-title">Popup title</div>',
+        '    <div className="plus-popup-body">',
         '      Body content appears below the title.',
-        '    </RBPopover.Body>',
-        '  </RBPopover>',
+        '    </div>',
+        '  </div>',
         '</div>'
     ]),
     progressBar: snippet([

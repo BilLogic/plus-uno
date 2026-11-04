@@ -111,7 +111,7 @@ stack of them.
 </Flag>
 
 // Correct — a failure that needs a decision stays on the page.
-<Alert style="danger" title="Upload failed">The file was larger than 10 MB.</Alert>
+<SectionMessage appearance="danger" title="Upload failed">The file was larger than 10 MB.</SectionMessage>
 ```
 
 ### Turn off `autohide` for anything the user might need to re-read.
@@ -164,9 +164,9 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
 
 ## Related
 
-- For something the user must read or act on, use `Alert`.
+- For something the user must read or act on, use `SectionMessage`.
 - For a decision that blocks the task, use `Modal`.
-- For help attached to a specific control, use `Tooltip` or `Popover`.
+- For help attached to a specific control, use `Tooltip` or `Popup`.
 
 </div>
 

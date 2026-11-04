@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
-import Alert from '@/components/messaging/Alert/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage/SectionMessage';
 import ProgressBar from '@/components/loading/ProgressBar/ProgressBar';
 import Accordion from '@/components/layout-and-structure/Accordion/Accordion';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
@@ -495,9 +495,9 @@ export default function MonthlyReportContent() {
                                     </div>
                                 </div>
                                 {reportData.keyInsight && (
-                                    <Alert style="tertiary" leadingVisual={<i className="fa-solid fa-trophy insight-alert-icon" />} dismissible={false} className="insight-alert">
+                                    <SectionMessage appearance="tertiary" leadingVisual={<i className="fa-solid fa-trophy insight-alert-icon" />} dismissible={false} className="insight-alert">
                                         {reportData.keyInsight}
-                                    </Alert>
+                                    </SectionMessage>
                                 )}
                             </div>
                         </div>
@@ -558,12 +558,12 @@ export default function MonthlyReportContent() {
                 {/* Peer Average */}
                 {/* Recommended Range Nudge */}
                 <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
-                    <Alert style="tertiary" leadingVisual={<i className="fa-solid fa-lightbulb insight-alert-icon" />} dismissible={false} className="insight-alert data-anim-enter data-anim-enter--insight">
+                    <SectionMessage appearance="tertiary" leadingVisual={<i className="fa-solid fa-lightbulb insight-alert-icon" />} dismissible={false} className="insight-alert data-anim-enter data-anim-enter--insight">
                         <span>
                             We noticed you spent <strong>18%</strong> of your session time Observing, which is above our recommended range (8-12%).
                             Consider transitioning into guided questioning earlier to keep students actively reasoning.
                         </span>
-                    </Alert>
+                    </SectionMessage>
                 </div>
             </section>
 
@@ -598,20 +598,20 @@ export default function MonthlyReportContent() {
 
                     {/* November Growth Banner - appears between title and insights */}
                     {reportData.isHighImprovement && (
-                        <Alert style="success" leadingVisual="seedling" dismissible={false} className="insight-alert">
+                        <SectionMessage appearance="success" leadingVisual="seedling" dismissible={false} className="insight-alert">
                             <div style={{ marginBottom: 0 }}>
                                 This month has several areas for development. Remember, growth takes time and practice—let's focus on one skill at a time. Start with the insight marked "Start Here" below.
                             </div>
-                        </Alert>
+                        </SectionMessage>
                     )}
 
                     {/* December Empty State */}
                     {reportData.isLowData ? (
-                        <Alert style="tertiary" leadingVisual="circle-info" dismissible={false}>
+                        <SectionMessage appearance="tertiary" leadingVisual="circle-info" dismissible={false}>
                             <div>
                                 <strong>Limited data this month.</strong> We need at least 5 recorded sessions to generate personalized growth insights. Keep up the great work, and we'll have more detailed feedback for you next month!
                             </div>
-                        </Alert>
+                        </SectionMessage>
                     ) : (
 
                         <div className="timeline-container">

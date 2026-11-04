@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import './MonthlyReportPage.scss';
 
@@ -236,10 +236,10 @@ export default function MonthlyReportPage() {
                     </div>
                 </div>
 
-                {/* Key Insight using Alert component */}
-                <Alert style="warning" leadingVisual="trophy" dismissible={false} className="insight-alert">
+                {/* Key Insight using SectionMessage component */}
+                <SectionMessage appearance="warning" leadingVisual="trophy" dismissible={false} className="insight-alert">
                     {REPORT_DATA.keyInsight}
-                </Alert>
+                </SectionMessage>
             </section>
 
             {/* ============================================

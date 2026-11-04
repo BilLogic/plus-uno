@@ -1,0 +1,88 @@
+/*
+ * Popup Component Styles: the Popover family's Popup.
+ *
+ * STRUCTURE:
+ * .plus-popup (one surface: fill, border, radius, shadow, pad)
+ *   ├── .plus-popup-title (heading.xsmall)
+ *   └── .plus-popup-body (body 14/20)
+ */
+
+// Storybook Overview: inline panel next to trigger (not positioned by Base UI)
+.plus-popup-overview-static {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    // The popup sits Popover/offset 4 from its trigger.
+    gap: var(--popover-offset);
+    padding: var(--size-spacing-medium-space-400);
+
+    .plus-popup {
+        position: relative;
+    }
+}
+
+// ===== MAIN CONTAINER =====
+// The Popover family's Popup (Figma Pattern/Popup): one surface, no overlay
+// backdrop and no arrow. Pad Popover/pad 16, radius Popover/radius 12, and a fixed width
+// tier, Popover/width-sm · md · lg (320 · 400 · 480). The title and body stack
+// Element/stack-md 8 apart on the popup's own fill.
+.plus-popup {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-stack-md);
+    width: var(--popover-width-sm);
+    max-width: none;
+    padding: var(--popover-pad);
+    box-sizing: border-box;
+    z-index: var(--layout-z-index-popup);
+
+    // The overlay pair. Its shadow carries the 1px edge ring (firmer under
+    // increased contrast), so the popup draws no border of its own.
+    background-color: var(--ds-surface-overlay);
+    border: none;
+    border-radius: var(--popover-radius);
+    box-shadow: var(--ds-shadow-overlay);
+
+    &.plus-popup--md {
+        width: var(--popover-width-md);
+    }
+
+    &.plus-popup--lg {
+        width: var(--popover-width-lg);
+    }
+
+    // ===== TITLE: heading.xsmall 14/20, on the popup's surface =====
+    .plus-popup-title {
+        color: var(--ds-text);
+        font: var(--heading-xsmall);
+    }
+
+    // ===== BODY: body 14/20 =====
+    .plus-popup-body {
+        color: var(--ds-text);
+        font: var(--body-default);
+    }
+}
+
+/*
+ * #321. The button a TEXT trigger becomes.
+ *
+ * `<Popup trigger="Learn more">` renders a real `button` — it carries the
+ * role, its own text as the accessible name, and Enter/Space. This rule makes
+ * that button look like the text it replaced: no chrome, the surrounding
+ * type, and the pointer of something you click.
+ *
+ * The focus ring is NOT reset. That is the one piece of browser chrome worth
+ * keeping, and it is the reason a keyboard user can see where they are.
+ */
+.plus-popup-trigger {
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: inherit;
+    cursor: pointer;
+}

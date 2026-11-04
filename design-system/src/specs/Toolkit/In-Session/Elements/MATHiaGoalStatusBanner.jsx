@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Alert from '@/components/messaging/Alert/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage/SectionMessage';
 
 /**
  * MATHia Goal Status Banner
@@ -44,7 +44,7 @@ const MATHiaGoalStatusBanner = ({
     const { title, body } = contentConfig[sessionType];
 
     // For dashboard alerts, we need to structure content properly
-    // The Alert component wraps children in .plus-alert-text body2-txt
+    // The SectionMessage component wraps children in .plus-section-message-text body2-txt
     // But we need h5 for title, so we'll use CSS to override
     // For modal alerts, just render body text
     const alertContent = isDashboard && title ? (
@@ -63,14 +63,14 @@ const MATHiaGoalStatusBanner = ({
     );
 
     return (
-        <Alert
-            style="primary"
+        <SectionMessage
+            appearance="primary"
             dismissible={isDismissable}
             onDismiss={onDismiss}
             className={className}
         >
             {alertContent}
-        </Alert>
+        </SectionMessage>
     );
 };
 
