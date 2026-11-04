@@ -249,6 +249,7 @@ const preview = {
             [
               "Avatar",
               "Logo",
+              "Object",
               "Tile",
               "AI icon",
               "Illustrations",
