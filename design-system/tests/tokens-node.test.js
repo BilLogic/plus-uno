@@ -556,7 +556,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 201: Flag moved off react-bootstrap's Toast (#1627), and the deleted
     // `specs/Training/Lessons/Elements/Toast/Toast.scss` took its four color
     // fallbacks with it.
-    expect(comparable).toBe(201);
+    // 164: the Storybook docs chrome stylesheet moved onto --ds- tokens, and its 37
+    // color fallbacks went (the ladder migration of the chrome).
+    expect(comparable).toBe(164);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

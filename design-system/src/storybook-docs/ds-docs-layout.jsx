@@ -40,18 +40,18 @@ export function ResourcesCard({ href, icon, title, description }) {
             href={href || '#'} 
             target={isExternalLink ? "_blank" : undefined}
             rel={isExternalLink ? "noreferrer noopener" : undefined}
-            className="group block p-4 border border-border bg-surface shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
+            className="group block p-4 border border-border bg-card shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
             style={{
                 width: '200px',
                 textDecoration: 'none',
-                borderRadius: 'var(--size-card-radius-sm)',
+                borderRadius: 'var(--card-radius-sm)',
             }}
         >
-            <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-on-surface-variant opacity-50 text-sm group-hover:text-primary transition-colors"></i>
+            <i className="fa-solid fa-arrow-up-right-from-square absolute top-4 right-4 text-muted-foreground opacity-50 text-sm group-hover:text-primary transition-colors"></i>
             <div className="mb-3 flex justify-start ml-[-2px]">
                 {icon}
             </div>
-            <strong className="text-[15px] leading-tight text-on-surface font-semibold m-0 p-0 block">{title}</strong>
+            <strong className="text-[15px] leading-tight text-foreground font-semibold m-0 p-0 block">{title}</strong>
         </a>
     );
 }
@@ -87,19 +87,15 @@ export function FigmaNodesTable({ sets, fileKey }) {
     if (rows.length === 0) return null;
 
     // One palette for every line in this table AND for the frame around it:
-    // --color-outline-variant, the design system's inner-divider Token
-    // (design-system/src/tokens/_colors.scss), which is what the canvas cards
-    // and the collapsed-canvas rules in .storybook/storybook-overrides.css
-    // already draw with. NOT --color-border and NOT --bs-border-color: the
-    // first is the docs chrome's own shadcn variable (storybook-tailwind.css
-    // aliases it to --border, a zinc), the second is Bootstrap's, and neither
-    // is a design-system Token. Storybook injects its own borders on ALL FOUR
+    // --ds-border, which is what the canvas cards and the collapsed-canvas rules
+    // in .storybook/storybook-overrides.css already draw with. NOT --bs-border-color
+    // (Bootstrap's, not a design-system Token). Storybook injects its own borders on ALL FOUR
     // sides of th/td (its text color at 15%); under border-collapse those
     // merged away, but this table is border-separate (see below), where they
     // stack — doubled inner lines, and a thickened top/left frame edge.
     // Inline 'none' on every side Storybook draws zeroes them; the row line and
     // the two column dividers are added back explicitly.
-    const lineColor = 'var(--color-outline-variant)';
+    const lineColor = 'var(--ds-border)';
     const cellStyle = {
         padding: '8px 12px',
         borderTop: 'none',
@@ -129,9 +125,9 @@ export function FigmaNodesTable({ sets, fileKey }) {
                 Figma nodes
             </div>
             <div
-                className="overflow-hidden bg-surface"
+                className="overflow-hidden bg-card"
                 style={{
-                    borderRadius: 'var(--size-card-radius-sm)',
+                    borderRadius: 'var(--card-radius-sm)',
                     // The frame draws the same line as the cells inside it, so
                     // the table is one palette and moves with the Token. (The
                     // Token has no dark value today — one gray, both themes —
@@ -143,7 +139,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                 }}
             >
                 <table
-                    className="text-on-surface"
+                    className="text-foreground"
                     style={{
                         margin: 0,
                         width: '100%',
@@ -174,11 +170,11 @@ export function FigmaNodesTable({ sets, fileKey }) {
                             const rowCell = isLast ? { ...cellStyle, borderBottom: 'none' } : cellStyle;
                             return (
                                 <tr key={set.id || nodeId || index}>
-                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-on-surface">
+                                    <td style={{ ...rowCell, ...dividerRight }} className="font-medium text-foreground">
                                         {set.name || set.id || '—'}
                                     </td>
                                     <td style={{ ...rowCell, ...dividerRight, whiteSpace: 'nowrap' }}>
-                                        <code style={{ fontSize: '12px' }} className="text-on-surface-variant">{nodeId}</code>
+                                        <code style={{ fontSize: '12px' }} className="text-muted-foreground">{nodeId}</code>
                                     </td>
                                     <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
                                         {href ? (
@@ -187,13 +183,13 @@ export function FigmaNodesTable({ sets, fileKey }) {
                                                 target="_blank"
                                                 rel="noreferrer noopener"
                                                 className="text-primary no-underline hover:underline"
-                                                style={{ color: 'var(--color-primary)' }}
+                                                style={{ color: 'var(--ds-link)' }}
                                             >
                                                 Open in Figma{' '}
                                                 <i className="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                                             </a>
                                         ) : (
-                                            <span className="text-on-surface-variant">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </td>
                                 </tr>
@@ -240,14 +236,14 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
                 {figmaLink && (
                     <ResourcesCard 
                         href={figmaLink}
-                        icon={<i className="fa-brands fa-figma text-3xl" style={{ color: 'var(--color-primary)' }}></i>}
+                        icon={<i className="fa-brands fa-figma text-3xl" style={{ color: 'var(--ds-link)' }}></i>}
                         title="Figma"
                     />
                 )}
                 {githubLink && (
                     <ResourcesCard 
                         href={githubLink}
-                        icon={<i className="fa-brands fa-github text-3xl" style={{ color: 'var(--color-primary)' }}></i>}
+                        icon={<i className="fa-brands fa-github text-3xl" style={{ color: 'var(--ds-link)' }}></i>}
                         title="GitHub"
                     />
                 )}
@@ -264,9 +260,9 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
         <div
             className="sb-ds-docs-preview-well overflow-visible"
             style={{
-                borderRadius: 'var(--size-card-radius-sm)',
+                borderRadius: 'var(--card-radius-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
-                border: '1px solid var(--color-outline-variant)',
+                border: '1px solid var(--ds-border)',
             }}
         >
             <div
@@ -354,7 +350,7 @@ export function DoDontCard({ tone, children, caption }) {
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
-                borderRadius: 'var(--card-radius, 16px)',
+                borderRadius: 'var(--card-radius)',
                 backgroundColor: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
             }}
@@ -498,9 +494,9 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
             <div
                 className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible"
                 style={{
-                    borderRadius: 'var(--size-card-radius-sm)',
+                    borderRadius: 'var(--card-radius-sm)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: '1px solid var(--color-outline-variant)',
+                    border: '1px solid var(--ds-border)',
                 }}
             >
                 <div
@@ -522,13 +518,13 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 <div
                     className="sb-ds-docs-interactive-panel__controls border-t px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14"
                     style={{
-                        borderColor: 'var(--color-outline-variant)',
+                        borderColor: 'var(--ds-border)',
                         backgroundColor: 'var(--ds-surface-container)',
                         // The panel is overflow-visible (Controls popovers), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.
-                        borderBottomLeftRadius: 'calc(var(--size-card-radius-sm) - 1px)',
-                        borderBottomRightRadius: 'calc(var(--size-card-radius-sm) - 1px)',
+                        borderBottomLeftRadius: 'calc(var(--card-radius-sm) - 1px)',
+                        borderBottomRightRadius: 'calc(var(--card-radius-sm) - 1px)',
                     }}
                 >
                     <Controls of={ofStory} />

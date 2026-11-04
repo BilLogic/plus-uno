@@ -9,8 +9,18 @@ body,
 .docs-story,
 .sbdocs,
 .sbdocs-wrapper {
-    font-family: var(--font-family-body, 'Noto Sans', sans-serif) !important;
-    color: var(--color-on-surface, #191c1e) !important;
+    font-family: var(--type-family-body) !important;
+    color: var(--ds-text) !important;
+}
+
+/*
+ * The docs ground. The text tokens above switch with the Color mode, so the ground
+ * they sit on has to as well: Storybook paints its own white here, which left
+ * light text on white once dark was selected.
+ */
+body,
+.sbdocs-wrapper {
+    background-color: var(--ds-surface) !important;
 }
 
 /*
@@ -43,28 +53,28 @@ body,
  */
 .sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
-    font-family: var(--font-family-headline, 'Noto Serif', serif) !important;
-    font-size: var(--font-size-display4, 56px) !important;
-    font-weight: var(--font-weight-headline, 500) !important;
-    color: var(--color-on-surface, #191c1e) !important;
+    font-family: var(--type-family-heading-serif) !important;
+    font-size: var(--font-size-display4) !important;
+    font-weight: var(--type-weight-medium) !important;
+    color: var(--ds-text) !important;
 }
 
 .sbdocs h2:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-headline, 'Noto Serif', serif) !important;
-    font-size: var(--font-size-h2, 32px) !important;
-    font-weight: var(--font-weight-headline, 500) !important;
-    color: var(--color-on-surface, #191c1e) !important;
-    margin-top: var(--size-section-gap-md) !important;
+    font-family: var(--type-family-heading-serif) !important;
+    font-size: var(--font-size-200) !important;
+    font-weight: var(--type-weight-medium) !important;
+    color: var(--ds-text) !important;
+    margin-top: var(--section-stack-md) !important;
 }
 
 .sbdocs h3:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs h4:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs h5:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs h6:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-headline, 'Noto Serif', serif) !important;
-    font-size: var(--font-size-h3, 28px) !important;
-    font-weight: var(--font-weight-headline, 500) !important;
-    color: var(--color-on-surface, #191c1e) !important;
+    font-family: var(--type-family-heading-serif) !important;
+    font-size: var(--font-size-175) !important;
+    font-weight: var(--type-weight-medium) !important;
+    color: var(--ds-text) !important;
     margin-top: var(--space-0625) !important;
 }
 
@@ -105,11 +115,11 @@ body,
  */
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--font-family-body, 'Noto Sans', sans-serif);
-    font-size: var(--font-size-body1, 16px);
-    line-height: var(--font-line-height-body1, 150%);
-    font-weight: var(--font-weight-normal, 300);
-    color: var(--color-on-surface, #191c1e);
+    font-family: var(--type-family-body);
+    font-size: var(--font-size-100);
+    line-height: var(--line-height-150);
+    font-weight: var(--type-weight-regular);
+    color: var(--ds-text);
     max-width: 55ch;
 }
 
@@ -138,26 +148,26 @@ body,
  * Code blocks.
  *
  * The COLOR is not cosmetic. Bootstrap's default `code` color is `#d63384`,
- * which measures 4.28:1 against this docs ground (`--color-surface`, #f9f9fc) —
+ * which measures 4.28:1 against this docs ground (`--ds-surface`) —
  * under AA's 4.5:1 for body text, on every inline `<code>` in every docs page.
  * It surfaced when a new Foundations story put ten `<code>` labels on one page
  * and `check:storybook`'s a11y pass failed it; the defect was on all 48 pages
  * before that, unmeasured, because no story had rendered enough of them to be
  * noticed.
  *
- * `--color-secondary` measures 6.70:1 and carries no meaning that code should
- * not have. The near-hue alternative, `--color-relationship` (5.34:1), was
- * rejected on purpose: it is a curriculum-domain color, and painting literals
- * in it would say a code span IS that domain — the same borrowed-meaning
- * mistake #269 argues against for the AI palette.
+ * `--ds-text-subtle` is a neutral that clears AA on the docs ground in both color
+ * modes and carries no meaning that code should not have. A curriculum-domain
+ * color was rejected on purpose: painting code spans in one would say a code
+ * span IS that domain — the same borrowed-meaning mistake #269 argues against
+ * for the AI palette.
  */
 .sbdocs code,
 .sbdocs pre {
-    font-family: var(--font-family-code, 'Noto Sans Mono', monospace) !important;
+    font-family: var(--type-family-code) !important;
 }
 
 .sbdocs code {
-    color: var(--color-secondary);
+    color: var(--ds-text-subtle);
 }
 
 /*
@@ -202,8 +212,8 @@ html {
     max-width: 82rem;
     margin-left: auto;
     margin-right: auto;
-    padding-left: clamp(var(--size-section-pad-x-md), 3vw, 2.75rem) !important;
-    padding-right: clamp(var(--size-section-pad-x-md), 3vw, 2.75rem) !important;
+    padding-left: clamp(var(--section-pad-x-default), 3vw, 2.75rem) !important;
+    padding-right: clamp(var(--section-pad-x-default), 3vw, 2.75rem) !important;
 }
 
 /*
@@ -240,7 +250,7 @@ html {
     max-width: 100vw;
     max-height: 100vh;
     box-sizing: border-box;
-    background: var(--color-surface-container, #edeef0);
+    background: var(--ds-surface-container);
 }
 
 /*
@@ -284,7 +294,7 @@ html {
     padding: 0 !important;
     background: transparent !important;
     border: none !important;
-    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+    border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
 }
 
 @media (min-width: 768px) {
@@ -298,11 +308,11 @@ html {
 /* Links - using primary-text for accessibility */
 .sbdocs a,
 a.sbdocs-a {
-    color: var(--color-primary-text, #00547e) !important;
+    color: var(--ds-link) !important;
 }
 
 .sbdocs a:hover {
-    color: var(--color-primary, #0472a8) !important;
+    color: var(--ds-link-pressed) !important;
 }
 
 /*
@@ -331,19 +341,19 @@ a.sbdocs-a {
  * paragraphs sit from each other, which is the trade of having one authority.
  */
 .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-  margin-top: var(--size-spacing-large-space-900);
+  margin-top: var(--space-400);
 }
 
 @media (min-width: 768px) {
   .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-    margin-top: var(--size-spacing-large-space-1200);
+    margin-top: calc(var(--space-400) * 1.5);
   }
 }
 
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section {
   display: flex;
   flex-direction: column;
-  gap: var(--size-section-gap-md, 16px);
+  gap: var(--section-stack-md);
 }
 
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section > * {
@@ -361,8 +371,8 @@ a.sbdocs-a {
  * above were unreachable, and are deleted rather than reinstated.
  */
 .sbdocs .sb-ds-doc-section {
-  margin-top: clamp(var(--size-spacing-large-space-700), 5vw, var(--size-spacing-large-space-900)) !important;
-  margin-bottom: clamp(var(--size-spacing-large-space-700), 5vw, var(--size-spacing-large-space-900)) !important;
+  margin-top: clamp(var(--space-250), 5vw, var(--space-400)) !important;
+  margin-bottom: clamp(var(--space-250), 5vw, var(--space-400)) !important;
 }
 
 /*
@@ -378,22 +388,22 @@ a.sbdocs-a {
  * PLUS Docs Introduction: tighter narrative rhythm than component API docs.
  */
 .sbdocs .sb-plus-intro-page {
-  margin-top: clamp(var(--size-spacing-large-space-700), 4vw, var(--size-spacing-large-space-900)) !important;
+  margin-top: clamp(var(--space-250), 4vw, var(--space-400)) !important;
 }
 
 .sbdocs .sb-plus-intro-page .sb-ds-doc-section {
-  margin-top: clamp(var(--size-section-pad-y-lg), 4vw, 3.25rem) !important;
-  margin-bottom: clamp(var(--size-section-pad-y-lg), 4vw, 3.25rem) !important;
-  gap: 0.875rem;
+  margin-top: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
+  margin-bottom: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
+  gap: var(--space-0875);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
-  font-family: var(--font-family-headline, 'Noto Serif', serif);
-  font-size: var(--font-size-display4, 56px);
-  font-weight: var(--font-weight-headline, 500);
+  font-family: var(--type-family-heading-serif);
+  font-size: var(--font-size-display4);
+  font-weight: var(--type-weight-medium);
   line-height: 1.1;
   margin: 0 0 var(--stack-lg);
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
 }
 
 .sbdocs .sb-plus-intro-page .sb-ds-doc-section:first-child {
@@ -413,15 +423,15 @@ a.sbdocs-a {
  */
 .sbdocs .sb-plus-intro-page .sb-plus-intro-token-grid {
   display: grid;
-  gap: var(--size-section-gap-md);
-  margin-top: var(--size-card-gap-lg);
+  gap: var(--section-stack-md);
+  margin-top: var(--space-125);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-sections-stack {
   display: flex;
   flex-direction: column;
-  gap: var(--size-section-gap-md);
-  margin-top: var(--size-card-gap-lg);
+  gap: var(--section-stack-md);
+  margin-top: var(--space-125);
 }
 
 @media (min-width: 900px) {
@@ -431,22 +441,22 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
-  border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 70%, transparent);
-  border-radius: var(--size-card-radius-sm);
-  background: color-mix(in srgb, var(--color-muted, #e0e3e7) 28%, transparent);
-  padding: 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
+  border-radius: var(--card-radius-sm);
+  background: color-mix(in srgb, var(--ds-surface-sunken) 28%, transparent);
+  padding: var(--space-0875);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
   margin: 0;
   font-weight: 600;
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-copy {
   margin: var(--stack-sm) 0 var(--stack-lg);
-  font-size: var(--font-size-body2, 14px);
-  color: var(--color-on-surface-variant, #5c5c5c);
+  font-size: var(--font-size-0875);
+  color: var(--ds-text-subtle);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-canvas .sbdocs.sbdocs-preview {
@@ -565,7 +575,7 @@ a.sbdocs-a {
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4) {
   /* The h3 step, whatever the tag: the promotion was for the outline, and it is
      not allowed to change what the page looks like. */
-  font-size: var(--font-size-h3, 28px) !important;
+  font-size: var(--font-size-175) !important;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
@@ -578,28 +588,28 @@ a.sbdocs-a {
   overflow: hidden;
   width: 100%;
   margin: var(--stack-md) 0 0;
-  border: 1px solid var(--color-border, #e5e7eb);
-  border-radius: var(--size-card-radius-sm);
-  background: var(--color-surface, #fff);
+  border: 1px solid var(--ds-border);
+  border-radius: var(--card-radius-sm);
+  background: var(--ds-surface);
 }
 
 .sbdocs .sb-ds-doc-table {
   width: 100%;
   margin: 0 !important;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 13px; /* props-table code sits between --font-size-075 and --font-size-0875 */
   line-height: 1.45;
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
 }
 
 .sbdocs .sb-ds-doc-table thead tr {
-  background: color-mix(in srgb, var(--color-muted, #e0e3e7) 40%, transparent);
+  background: color-mix(in srgb, var(--ds-surface-sunken) 40%, transparent);
 }
 
 .sbdocs .sb-ds-doc-table th,
 .sbdocs .sb-ds-doc-table td {
   padding: var(--pad-y-lg) var(--pad-x-md);
-  border-bottom: 1px solid var(--color-border, #e5e7eb);
+  border-bottom: 1px solid var(--ds-border);
   text-align: left;
   vertical-align: top;
 }
@@ -615,7 +625,7 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-ds-doc-table a {
-  color: var(--color-primary);
+  color: var(--ds-link);
   text-decoration: none;
 }
 
@@ -629,8 +639,8 @@ a.sbdocs-a {
  */
 .sbdocs-title + p {
   opacity: 0.92;
-  margin-top: var(--size-section-gap-lg) !important;
-  margin-bottom: var(--size-spacing-large-space-900) !important;
+  margin-top: var(--section-stack-lg) !important;
+  margin-bottom: var(--space-400) !important;
 }
 
 /* Add margin under the main Title. Fenced out of story canvases for the same
@@ -638,7 +648,7 @@ a.sbdocs-a {
    P5 canvas renders `<h1>`s of its own. */
 .sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
-  margin-bottom: var(--size-section-gap-md) !important;
+  margin-bottom: var(--section-stack-md) !important;
 }
 
 /*
@@ -654,13 +664,13 @@ a.sbdocs-a {
 .sbdocs .sbdocs-toc h2,
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
-  font-size: var(--font-size-body2, 14px) !important;
+  font-size: var(--font-size-0875) !important;
   font-weight: 700 !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
   margin-top: 0 !important;
-  margin-bottom: var(--size-section-gap-lg) !important;
-  color: var(--color-on-surface-variant, #5c5c5c) !important;
+  margin-bottom: var(--section-stack-lg) !important;
+  color: var(--ds-text-subtle) !important;
 }
 
 /*
@@ -744,10 +754,10 @@ a.sbdocs-a {
 .docs-story section > h6,
 .docs-story section > .h5,
 .docs-story section > .h6 {
-    font-family: var(--font-family-body, 'Noto Sans', sans-serif) !important;
-    font-size: var(--font-size-body2, 14px) !important;
+    font-family: var(--type-family-body) !important;
+    font-size: var(--font-size-0875) !important;
     font-weight: 600 !important;
-    color: var(--color-neutral-text, var(--color-on-surface-variant, #5c5c5c)) !important;
+    color: var(--ds-text-subtle) !important;
     text-transform: uppercase !important;
     letter-spacing: 0.05em !important;
     margin-bottom: var(--stack-lg) !important;
@@ -813,17 +823,12 @@ a.sbdocs-a {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    padding: var(--size-spacing-large-space-700) clamp(var(--size-section-pad-x-md), 4vw, 3.5rem) !important;
-    border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
-    background: var(--color-surface-container-lowest, #f8f9fa) !important;
-    border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+    padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
+    border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
+    background: var(--ds-surface-raised) !important;
+    border: 1px solid var(--ds-border) !important;
     border-bottom: none !important;
     box-shadow: none !important;
-}
-
-.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:first-child {
-    background: var(--color-surface-container-lowest, #191c1e) !important;
-    border-color: var(--color-outline-variant, #3f4847) !important;
 }
 
 /* Drop Storybook’s default preview chrome (border/shadow) inside attached canvases */
@@ -864,9 +869,9 @@ a.sbdocs-a {
     width: 100% !important;
     margin: 0 !important;
     padding: var(--pad-y-md) var(--pad-x-sm) !important;
-    background: var(--color-surface, #fffbfe) !important;
+    background: var(--ds-surface) !important;
     border: none !important;
-    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 50%, transparent) !important;
+    border-top: 1px solid color-mix(in srgb, var(--ds-border) 50%, transparent) !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     z-index: 1;
@@ -880,10 +885,10 @@ a.sbdocs-a {
 
 /* ActionBar strip under attached previews: match card sides + bottom radius when code collapsed */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
-    border-left: 1px solid var(--color-outline-variant, #bec8ca) !important;
-    border-right: 1px solid var(--color-outline-variant, #bec8ca) !important;
-    border-top: 1px solid var(--color-outline-variant, #bec8ca) !important;
-    background: var(--color-surface-container-lowest, #f8f9fa) !important;
+    border-left: 1px solid var(--ds-border) !important;
+    border-right: 1px solid var(--ds-border) !important;
+    border-top: 1px solid var(--ds-border) !important;
+    background: var(--ds-surface-raised) !important;
 }
 
 /* Code collapsed: round the bottom of the toolbar to mirror the preview’s top radius */
@@ -893,7 +898,7 @@ a.sbdocs-a {
     .sbdocs.sbdocs-preview:not(:has(pre))
     .docs-story
     > *:last-child:not(:only-child) {
-    border-radius: 0 0 var(--size-card-radius-sm) var(--size-card-radius-sm) !important;
+    border-radius: 0 0 var(--card-radius-sm) var(--card-radius-sm) !important;
     border-bottom: none !important;
 }
 
@@ -902,22 +907,17 @@ a.sbdocs-a {
     margin: 0 !important;
     margin-left: 0 !important;
     border-radius: var(--radius-md) !important;
-    border: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
-    border-top: 1px solid color-mix(in srgb, var(--color-border, #c4c7c5) 55%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--ds-border) 55%, transparent) !important;
+    border-top: 1px solid color-mix(in srgb, var(--ds-border) 55%, transparent) !important;
     box-shadow: none !important;
-}
-
-.sbdocs.dark .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
-    background: var(--color-surface, #191c1e) !important;
-    border-top-color: color-mix(in srgb, var(--color-border, #8e918f) 40%, transparent) !important;
 }
 
 /* Code expanded: toolbar stays square-bottom; syntax block gets the bottom radius */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview pre {
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
-    border-bottom-left-radius: var(--size-card-radius-sm) !important;
-    border-bottom-right-radius: var(--size-card-radius-sm) !important;
+    border-bottom-left-radius: var(--card-radius-sm) !important;
+    border-bottom-right-radius: var(--card-radius-sm) !important;
     margin-top: 0 !important;
     box-shadow: none !important;
 }
@@ -934,7 +934,7 @@ a.sbdocs-a {
 
 /* Default Storybook canvas padding for unscoped docs stories. */
 .sbdocs .docs-story > div[scale="1"] {
-  padding: var(--size-spacing-large-space-700) clamp(var(--size-section-pad-x-md), 4vw, 3.5rem) !important;
+  padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
 }
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
@@ -949,11 +949,11 @@ a.sbdocs-a {
  * Page frames stay flush via the :has(.responsive-frame-root) rules.
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story:not(:has(.responsive-frame-root)) > div[scale="1"] {
-  padding: var(--size-spacing-large-space-700) clamp(var(--size-section-pad-x-md), 4vw, 3.5rem) !important;
-  background: var(--color-surface-container-lowest, #f8f9fa) !important;
-  border: 1px solid var(--color-outline-variant, #bec8ca) !important;
+  padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
+  background: var(--ds-surface-raised) !important;
+  border: 1px solid var(--ds-border) !important;
   border-bottom: none !important;
-  border-radius: var(--size-card-radius-sm) var(--size-card-radius-sm) 0 0;
+  border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
   box-sizing: border-box !important;
 }
 
@@ -1028,18 +1028,8 @@ a.sbdocs-a {
   > div[scale="1"] {
   border-bottom-width: 1px !important;
   border-bottom-style: solid !important;
-  border-bottom-color: var(--color-outline-variant, #bec8ca) !important;
-  border-radius: var(--size-card-radius-sm);
-}
-
-/* Dark carries only the fallback, exactly as the sibling rules above do: this is
-   what applies if the token is ever unset. */
-.sbdocs.dark
-  .sb-ds-docs-canvas-shell--source-attached
-  .sb-ds-docs-canvas-attached-root:not(:has(.docblock-code-toggle--expanded))
-  .docs-story:not(:has(.responsive-frame-root))
-  > div[scale="1"] {
-  border-bottom-color: var(--color-outline-variant, #3f4847) !important;
+  border-bottom-color: var(--ds-border) !important;
+  border-radius: var(--card-radius-sm);
 }
 
 /*
@@ -1052,7 +1042,7 @@ a.sbdocs-a {
   .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions)
   .docs-story:not(:has(.responsive-frame-root))
   > div[scale="1"] {
-  padding-bottom: calc(var(--size-spacing-large-space-700) * 2) !important;
+  padding-bottom: calc(var(--space-250) * 2) !important;
 }
 
 /*
@@ -1095,10 +1085,10 @@ a.sbdocs-a {
  */
 .sb-ds-docs-tabs__strip {
     display: flex;
-    gap: var(--size-section-gap-lg);
+    gap: var(--section-stack-lg);
     align-items: stretch;
-    box-shadow: inset 0 -1px 0 var(--color-outline-variant, #e4e4e7);
-    margin: 0 0 var(--size-surface-gap-lg);
+    box-shadow: inset 0 -1px 0 var(--ds-border);
+    margin: 0 0 var(--space-200);
     overflow-x: auto;
     /* Explicit, because `overflow-x: auto` would otherwise compute it to `auto`.
        Belt and braces: nothing overflows vertically any more, but the next
@@ -1116,23 +1106,23 @@ a.sbdocs-a {
        border already is. See the strip rule above for what the negative margin
        used to cost. */
     border-bottom: 2px solid transparent;
-    padding: var(--size-surface-container-pad-y) 0;
-    color: var(--color-on-surface-variant, #43474e);
-    font-family: var(--font-family-header, 'Noto Sans', sans-serif);
-    font-size: var(--font-size-body1, 16px);
-    font-weight: var(--font-weight-medium, 500);
+    padding: var(--stack-lg) 0;
+    color: var(--ds-text-subtle);
+    font-family: var(--type-family-heading);
+    font-size: var(--font-size-100);
+    font-weight: var(--type-weight-medium);
     line-height: 1.5;
     white-space: nowrap;
     cursor: pointer;
 }
 
 .sb-ds-docs-tabs__tab:hover {
-    color: var(--color-on-surface, #191c1e);
+    color: var(--ds-text);
 }
 
 .sb-ds-docs-tabs__tab--active {
-    color: var(--color-primary, #0472a8);
-    border-bottom-color: var(--color-primary, #0472a8);
+    color: var(--ds-link);
+    border-bottom-color: var(--ds-border-selected);
 }
 
 /* The panel is focusable so keyboard users land in the content they just chose;
@@ -1142,15 +1132,15 @@ a.sbdocs-a {
 }
 
 .sb-ds-docs-tabs__panel:focus-visible {
-    outline: var(--stroke-2) solid var(--color-primary, #0472a8);
+    outline: var(--stroke-2) solid var(--ds-border-focused);
     outline-offset: var(--stack-sm);
 }
 
 .sb-ds-changelog {
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
-    gap: var(--stack-md) var(--size-section-gap-lg);
-    margin: 0 0 var(--size-section-gap-lg);
+    gap: var(--stack-md) var(--section-stack-lg);
+    margin: 0 0 var(--section-stack-lg);
 }
 
 .sb-ds-changelog dt {
@@ -1158,7 +1148,7 @@ a.sbdocs-a {
     gap: var(--stack-md);
     align-items: baseline;
     white-space: nowrap;
-    color: var(--color-on-surface-variant, #43474e);
+    color: var(--ds-text-subtle);
 }
 
 .sb-ds-changelog dd {
@@ -1167,14 +1157,14 @@ a.sbdocs-a {
 }
 
 .sb-ds-changelog__kind {
-    font-size: var(--font-size-body3, 12px);
+    font-size: var(--font-size-075);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
 
 .sb-ds-changelog__adopted {
-    color: var(--color-on-surface-variant, #43474e);
-    font-size: var(--font-size-body2, 14px);
+    color: var(--ds-text-subtle);
+    font-size: var(--font-size-0875);
 }
 
 /*

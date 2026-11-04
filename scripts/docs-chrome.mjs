@@ -18,14 +18,14 @@ const EPSILON = 1;
 
 /**
  * What docs prose must be, from the design system's own tokens: `body1-txt`
- * reads `--font-size-body1` (16px) and `--font-family-body`, and
- * `--color-on-surface` is `#191c1e`. They are literals here because this file is
+ * reads `--font-size-100` (16px) and `--type-family-body`, and
+ * `--ds-text` in light mode is `#2c2c2b`. They are literals here because this file is
  * asserting the rendered result, and reading the token to compare against the
  * token would assert nothing.
  */
 const PROSE_FAMILY = 'Noto Sans';
 const PROSE_SIZE = '16px';
-const PROSE_COLOR = 'rgb(25, 28, 30)';
+const PROSE_COLOR = 'rgb(44, 44, 43)';
 /**
  * 45–75 characters is the comfortable range; the ticket asks for at most 80.
  * The corpus sample's longest paragraph ran 134 before the cap.

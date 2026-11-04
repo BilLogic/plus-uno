@@ -5,11 +5,11 @@
 /* Ensure classes used in MDX (e.g. Button.mdx) are scanned — Vite graph alone can miss co-located MDX. */
 @source "../**/*.{mdx,jsx,tsx}";
 
-@custom-variant dark (&:is(.dark *));
+/* Dark follows the Color mode switch (`data-color-mode` on <html>), never a `.dark` class. */
+@custom-variant dark (&:is([data-color-mode="dark"] *));
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-    "Segoe UI Symbol";
+  --font-sans: var(--type-family-body);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -33,23 +33,28 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.705 0.015 286.067);
+  /*
+   * The shadcn names the `ui/` kit reads, aliased onto the design system. Nothing
+   * here is a color of its own: the tokens already switch with `data-color-mode`,
+   * so there is no second dark block to keep in step.
+   */
+  --radius: var(--radius-0625);
+  --background: var(--ds-surface);
+  --foreground: var(--ds-text);
+  --card: var(--ds-surface-raised);
+  --card-foreground: var(--ds-text);
+  --primary: var(--ds-background-brand-bold);
+  --primary-foreground: var(--ds-text-inverse);
+  --secondary: var(--ds-surface-container);
+  --secondary-foreground: var(--ds-text);
+  --muted: var(--ds-surface-sunken);
+  --muted-foreground: var(--ds-text-subtle);
+  --accent: var(--ds-surface-container);
+  --accent-foreground: var(--ds-text);
+  --destructive: var(--ds-background-danger-bold);
+  --border: var(--ds-border);
+  --input: var(--ds-border-input);
+  --ring: var(--ds-border-focused);
 
   /*
    * The docs cards' hairline lift. ONE definition, because ResourcesCard and the
@@ -60,23 +65,4 @@
    * this file is for.
    */
   --shadow-docs-card: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.92 0.004 286.32);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.552 0.016 285.938);
 }
