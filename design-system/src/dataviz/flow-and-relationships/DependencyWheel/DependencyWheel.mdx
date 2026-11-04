@@ -106,7 +106,7 @@ names; `weight` sets the chord's width.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Competency links could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No competency links yet" description="Links appear once session notes are tagged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No competency links yet" description="Links appear once session notes are tagged." />
     : <DependencyWheel data={data} />}
 ```
 

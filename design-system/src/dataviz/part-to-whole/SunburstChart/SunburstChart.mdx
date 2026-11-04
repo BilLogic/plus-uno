@@ -113,7 +113,7 @@ hierarchy to that depth.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Session hours could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No session hours yet" description="Hours appear after a session is logged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No session hours yet" description="Hours appear after a session is logged." />
     : <SunburstChart data={data} />}
 ```
 

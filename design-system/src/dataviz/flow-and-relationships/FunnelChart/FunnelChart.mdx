@@ -107,7 +107,7 @@ and `y` are required. A stage may carry its own `color`.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Onboarding progress could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No applicants yet" description="Stages fill in as tutors apply and complete training." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No applicants yet" description="Stages fill in as tutors apply and complete training." />
     : <FunnelChart data={data} />}
 ```
 

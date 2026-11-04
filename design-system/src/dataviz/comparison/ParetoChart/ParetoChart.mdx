@@ -108,7 +108,7 @@ computes the cumulative line itself. `height` defaults to 400.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Missed sessions could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No missed sessions" description="Reasons appear when a session is marked missed." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No missed sessions" description="Reasons appear when a session is marked missed." />
     : <ParetoChart categories={categories} data={data} yAxisLabel="Missed sessions" />}
 ```
 

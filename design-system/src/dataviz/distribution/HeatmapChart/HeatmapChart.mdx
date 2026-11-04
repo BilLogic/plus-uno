@@ -116,7 +116,7 @@ defaults to 400.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Session activity could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Activity appears after the first week of sessions." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No sessions yet" description="Activity appears after the first week of sessions." />
     : <HeatmapChart xCategories={days} yCategories={hours} data={data} />}
 ```
 

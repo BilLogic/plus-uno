@@ -109,7 +109,7 @@ array of `{ id, color }`, where `id` matches a name used in `data`.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Topic map could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No connections yet" description="Topics connect once lessons reference each other." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No connections yet" description="Topics connect once lessons reference each other." />
     : <NetworkGraph data={data} />}
 ```
 

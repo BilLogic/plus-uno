@@ -115,7 +115,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Sessions could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Sessions appear here once they are logged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No sessions yet" description="Sessions appear here once they are logged." />
     : <AreaChart data={data} stacking="normal" />}
 ```
 

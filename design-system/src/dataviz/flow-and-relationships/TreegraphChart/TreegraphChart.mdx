@@ -108,7 +108,7 @@ label.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Topic tree could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No topics yet" description="Topics appear once a subject's lessons are added." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No topics yet" description="Topics appear once a subject's lessons are added." />
     : <TreegraphChart data={data} />}
 ```
 
