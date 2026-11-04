@@ -4,7 +4,6 @@
     "design-system/src/App.jsx": 1,
     "design-system/src/components/_internal/layout/DashboardLayout.jsx": 1,
     "design-system/src/components/_internal/training/OnboardingModuleCard.jsx": 1,
-    "design-system/src/components/forms-and-inputs/FileUpload.jsx": 1,
     "design-system/src/components/forms-and-inputs/Rating.jsx": 1,
     "design-system/src/components/forms-and-inputs/Rating.stories.jsx": 1,
     "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx": 1,
