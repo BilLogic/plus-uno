@@ -4,7 +4,7 @@ import { overlayMountOf } from '@/lib/overlay';
 
 /**
  * Where a popup opens against the field that opened it — the placement rule
- * every field popup shares with `_Listbox`, and the one the Popover family
+ * every field popup shares with `_Listbox`, and the one the Popup family
  * (menu, popup, tooltip, flag) follows.
  *
  * - **Offset:** `--popover-offset` (4px) between the field's edge and the
