@@ -118,7 +118,7 @@ export const Overview = {
         await expect(rect(toggle()).height, 'toggle is a 32 item').toBeCloseTo(token('--item-height-md'), 0);
         await expect(rect(toggle()).width, 'toggle is square').toBeCloseTo(rect(toggle()).height, 0);
         await expect(rect(toggle()).left - rect(bar).left, 'toggle sits at the container pad')
-            .toBeCloseTo(token('--surface-container-pad'), 0);
+            .toBeCloseTo(token('--frame-pad'), 0);
         await expect(rect(breadcrumb()).left - rect(bar).left, 'docked: the breadcrumb starts at the sidebar width')
             .toBeCloseTo(token('--layout-width-sidebar'), 0);
         await expect(rect(avatar()).height, 'avatar at 32').toBeCloseTo(token('--item-height-md'), 0);

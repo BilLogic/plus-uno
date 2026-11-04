@@ -49,7 +49,7 @@ export const Menu = ({ rowRadius }) => (
 
 Radius tokens keep corners consistent across the tutor and student apps. A control's radius is a quarter of its height, so a 24 high control takes 6, a 32 high one takes 8 and a 40 high one takes 10. Buttons are the exception: 6 default and 4 compact. Containers take the step their pattern names, and pair every radius with a focus ring that is 2 larger.
 
-Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--element-radius-*`, `--card-radius`, `--modal-radius`, `--popover-radius-*`, `--tile-radius-*` and `--surface-radius` as semantic tokens. Figma holds the primitives in `spacing / primitives`, and the semantic tokens in `spacing / foundations`, `spacing / layout` (Page/radius) and `spacing / patterns`.
+Code reads `--radius-0125` to `--radius-100` and `--radius-full` as primitives, and `--element-radius-*`, `--card-radius`, `--modal-radius`, `--popover-radius-*`, `--tile-radius-*` and `--page-radius` as semantic tokens. Figma holds the primitives in `spacing / primitives`, and the semantic tokens in `spacing / foundations`, `spacing / layout` (Page/radius) and `spacing / patterns`.
 
 </FoundationSection>
 
@@ -94,7 +94,7 @@ Every button rounds the same way: 6 at the default height of 32 and 4 compact at
 <TokenTable
     rows={[
         { token: '--card-radius', figma: 'Card/radius', use: 'Large page elements: cards.' },
-        { token: '--surface-radius', figma: 'Page/radius', use: 'Large page elements: the Page.' },
+        { token: '--page-radius', figma: 'Page/radius', use: 'Large page elements: the Page.' },
         { token: '--card-radius-sm', figma: 'Card/radius-sm', use: 'Compact cards.' },
         { token: '--modal-radius', figma: 'Modal/radius', use: 'Modals.' },
         { token: '--popover-radius', figma: 'Popup and flag/radius', use: 'Popups and flags.' },
@@ -161,7 +161,7 @@ Components bind the semantic token, never the primitive. This is what the code a
 <RefTable
     head={['Pattern', 'Code token']}
     rows={[
-        ['Page (content box)', <C>--surface-radius</C>],
+        ['Page (content box)', <C>--page-radius</C>],
         ['Card', <C>--card-radius</C>],
         ['Card, small', <C>--card-radius-sm</C>],
         ['Modal', <C>--modal-radius</C>],

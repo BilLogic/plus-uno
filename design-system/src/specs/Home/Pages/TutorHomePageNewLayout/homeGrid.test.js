@@ -21,7 +21,7 @@ const grid = {
 const width = {
     md: px('--layout-width-content'),
     // Large's content: the screen less the docked sidebar, the frame's right pad and two surface pads.
-    lg: px('--breakpoint-lg-min') - px('--layout-width-sidebar') - px('--surface-container-pad') - 2 * px('--surface-pad'),
+    lg: px('--breakpoint-lg-min') - px('--layout-width-sidebar') - px('--frame-pad') - 2 * px('--page-pad'),
     xl: px('--layout-width-content', last),
 };
 

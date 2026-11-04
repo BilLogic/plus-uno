@@ -8,7 +8,7 @@
 
 // Rhythm: generous space between the sections, and no boxes around them.
 .plus-home-new .plus-frame__content {
-    row-gap: var(--surface-stack-lg);
+    row-gap: var(--page-stack-lg);
 }
 
 // Page header: the actions sit right of the title, and under it below 1024.
@@ -57,7 +57,7 @@
 }
 
 .plus-home-new__stack--section {
-    gap: var(--surface-stack-lg);
+    gap: var(--page-stack-lg);
 }
 
 // Plain text in a slot, on the type styles. A caption is meta text only, such

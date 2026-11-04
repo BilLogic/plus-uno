@@ -28,7 +28,7 @@ const viewportWide = () => typeof window !== 'undefined' && window.matchMedia?.(
 
 /**
  * Whether the frame is at Large or wider. Follows the viewport, because the
- * tokens it pairs with (`--layout-pad-left-container`, `--surface-pad`) switch
+ * tokens it pairs with (`--layout-pad-left-container`, `--page-pad`) switch
  * on the viewport.
  * @param {React.RefObject<HTMLElement>} ref
  * @returns {boolean}
@@ -72,10 +72,10 @@ const useWide = (ref) => {
  * - Clicking the toggle docks a closed or peeking sidebar, at any width, and
  *   closes a docked one. Docked below 1024, the page is narrower than the
  *   content minimum (720), so the page scrolls sideways.
- * - A `footer` is a third row under the page, `--surface-container-stack`
+ * - A `footer` is a third row under the page, `--frame-stack`
  *   below it and padded on the left like the page row, so it lines up with
  *   the page. The page takes what the topbar and the footer leave.
- * - The page pads `--surface-pad` (16 · 16 · 24) and caps its content at
+ * - The page pads `--page-pad` (16 · 16 · 24) and caps its content at
  *   `--layout-max-width-content` (1232), centered, on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
  */

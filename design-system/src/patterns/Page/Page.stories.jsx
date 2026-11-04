@@ -26,7 +26,7 @@ const pairLabel = (level) => {
 /** Every elevation level, lowest to highest, on the frame's sunken backdrop — docs section only */
 function PageLevelsDemo() {
     return (
-        <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+        <div style={{ ...col, padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
             {PAGE_LEVELS.map((level) => (
                 <div key={level}>
                     <DemoLabel>{level}</DemoLabel>
@@ -92,7 +92,7 @@ export const Levels = () => <PageLevelsDemo />;
 
 /** The padding and radius scales, each step on a bordered default page. */
 export const Scales = () => (
-    <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+    <div style={{ ...col, padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
         {['sm', 'md', 'lg'].map((step) => (
             <div key={step}>
                 <DemoLabel>{`padding ${step}, radius ${step}`}</DemoLabel>
@@ -122,7 +122,7 @@ export const ColorModes = {
     },
 };
 
-/** A Page used alone pads as the content box inside the frame does: the frame's `--surface-pad`, on every side. */
+/** A Page used alone pads as the content box inside the frame does: the frame's `--page-pad`, on every side. */
 export const MediumPad = {
     render: () => (
         <Page padding="md">
@@ -132,7 +132,7 @@ export const MediumPad = {
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         const style = getComputedStyle(canvasElement.querySelector('.plus-pattern-page'));
-        const pad = px(probe(canvasElement, 'paddingTop', 'var(--surface-pad)', { display: 'block' }));
+        const pad = px(probe(canvasElement, 'paddingTop', 'var(--page-pad)', { display: 'block' }));
         for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
             await expect(px(style[`padding${side}`]), `pad ${side.toLowerCase()}`).toBe(pad);
         }

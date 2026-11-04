@@ -213,6 +213,8 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --focused-page-stack-lg
 --focused-page-stack-md
 --focused-page-stack-sm
+--frame-pad
+--frame-stack
 --layout-columns
 --layout-gutter
 --layout-height-topbar
@@ -245,6 +247,11 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --overlay-pad-x
 --overlay-pad-y
 --overlay-scrim
+--page-pad
+--page-radius
+--page-stack-lg
+--page-stack-md
+--page-stack-sm
 --popover-gap-screen
 --popover-max-height-menu
 --popover-max-width-menu
@@ -268,13 +275,6 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --section-stack-lg
 --section-stack-md
 --section-stack-sm
---surface-container-pad
---surface-container-stack
---surface-pad
---surface-radius
---surface-stack-lg
---surface-stack-md
---surface-stack-sm
 --table-indent
 --table-min-width-title
 --table-pad-x-cell

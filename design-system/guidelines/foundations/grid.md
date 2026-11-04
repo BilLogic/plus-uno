@@ -116,8 +116,8 @@ The `Frame` pattern draws, from the same file:
 | `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
 | `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
 | `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-Page row: 8 while the sidebar is closed, 0 once it docks |
-| `--surface-container-pad` / `--surface-container-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
-| `--surface-pad` | 16 · 16 · 24 | Page pad, the content grid's margin |
+| `--frame-pad` / `--frame-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
+| `--page-pad` | 16 · 16 · 24 | Page pad, the content grid's margin |
 
 ## Ownership layering
 

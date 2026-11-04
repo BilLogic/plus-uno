@@ -7,8 +7,8 @@
  *
  * - `spacing / layout`: what changes by breakpoint, in modes Medium (768px) ·
  *   Large (1024px) · X-Large (1440px), named as `size / layout` names them.
- *   Folders Topbar · Sidebar · Grid · Content · Modal, and Surface.
- * - `spacing / patterns`: one folder per pattern (Surface container, Section,
+ *   Folders Topbar · Sidebar · Grid · Content · Modal, and Page.
+ * - `spacing / patterns`: one folder per pattern (Frame, Section,
  *   Card, Table, Overlay, Modal, Popover), one mode.
  * - `color / patterns`: pattern colors, starting with `Overlay/scrim`.
  *
@@ -19,8 +19,8 @@
  * family prefix: Patterns > `Card/pad-sm` is `--card-pad-sm`, Patterns >
  * `Popover/Menu/pad-menu` is `--popover-pad-menu`, Color > `Overlay/scrim` is
  * `--overlay-scrim`. In `spacing / layout` every folder is `--layout-*`
- * (`Topbar/height-topbar` is `--layout-height-topbar`) except Surface, which
- * keeps its own name (`Surface/pad` is `--surface-pad`).
+ * (`Topbar/height-topbar` is `--layout-height-topbar`) except Page, which
+ * keeps its own name (`Page/pad` is `--page-pad`).
  *
  * The generator, the token registry and the Figma sync all read this list, so
  * a new set is one row here.
@@ -52,7 +52,7 @@ export function frameLayerToken(collection, variable) {
   const parts = variable.split('/').map((p) => p.trim());
   if (parts.length < 2) throw new Error(`${collection} > ${variable} sits in no folder; its folder names it.`);
   const folder = parts[0].toLowerCase().replace(/\s+/g, '-');
-  const head = c.layout && folder !== 'surface' ? 'layout' : folder;
+  const head = c.layout && folder !== 'page' ? 'layout' : folder;
   return `${head}-${parts[parts.length - 1]}`;
 }
 

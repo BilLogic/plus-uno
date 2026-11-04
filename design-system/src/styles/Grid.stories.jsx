@@ -28,7 +28,7 @@ const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 /** Twelve columns with a 16 gutter, inside the surface pad. */
 export const GridAnatomy = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
-        <div style={{ padding: 'var(--surface-pad)', borderRadius: 'var(--surface-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+        <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--page-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
             <div style={grid12}>
                 {Array.from({ length: 12 }, (_, i) => (
                     <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--element-pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
@@ -37,13 +37,13 @@ export const GridAnatomy = () => (
                 ))}
             </div>
         </div>
-        <span style={caption}>12 columns · <C>--layout-gutter</C> 16 between them · <C>--surface-pad</C> around them, 16 below 1440 and 24 from 1440.</span>
+        <span style={caption}>12 columns · <C>--layout-gutter</C> 16 between them · <C>--page-pad</C> around them, 16 below 1440 and 24 from 1440.</span>
     </div>
 );
 
 /** Regions span whole columns. */
 export const ColumnSpans = () => (
-    <div style={{ ...grid12, padding: 'var(--surface-pad)', borderRadius: 'var(--surface-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
+    <div style={{ ...grid12, padding: 'var(--page-pad)', borderRadius: 'var(--page-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
         <div style={{ gridColumn: 'span 12' }}><PatternCard title="span 12" description="A table or a full-width chart" /></div>
         <div style={{ gridColumn: 'span 8' }}><PatternCard title="span 8" description="The main column" /></div>
         <div style={{ gridColumn: 'span 4' }}><PatternCard title="span 4" description="A side column" /></div>
