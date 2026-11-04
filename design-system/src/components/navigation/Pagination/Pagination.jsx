@@ -95,9 +95,9 @@ const Pagination = ({
         start = Math.max(1, end - max + 1);
 
         const pages = new Set();
-        if (start > 2) pages.add(1);
+        if (start > 1) pages.add(1);
         for (let i = start; i <= end; i++) pages.add(i);
-        if (end < totalPages - 1) pages.add(totalPages);
+        if (end < totalPages) pages.add(totalPages);
 
         return Array.from(pages).sort((a, b) => a - b);
     };

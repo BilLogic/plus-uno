@@ -351,6 +351,9 @@ test('Pagination: hovered, pressed, current page selected, focus a ring with no 
   expectRule(file, `${link}:focus-visible`, RING_INSIDE);
   expectNoFill(file, `${link}:focus-visible`);
   expectNoFill(file, `${link}:focus`);
+  const nav = '.plus-pagination__navigator';
+  expectRule(file, `${nav}:hover`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
+  expectRule(file, `${nav}[aria-disabled=true]`, { 'background-color': layer('--ds-background-disabled') });
   expectRule(file, '.plus-pagination__page[aria-current=page]', {
     'background-color': layer('--ds-background-selected'),
   });

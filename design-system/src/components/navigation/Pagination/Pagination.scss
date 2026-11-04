@@ -110,6 +110,7 @@
         disabled: (
             background-color: var(--ds-background-disabled),
             color: var(--ds-text-disabled),
+            cursor: not-allowed,
         ),
     ), $ring: false);
 
