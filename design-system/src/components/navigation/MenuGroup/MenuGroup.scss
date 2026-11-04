@@ -8,7 +8,8 @@
     padding: var(--space-050) 0;
 
     &--compact .plus-menu-item {
-        padding-block: var(--space-050);
+        // 20px of body-default line-height + 6px top and bottom = a 32px row.
+        padding-block: var(--space-0375);
     }
 }
 
@@ -21,7 +22,7 @@
 }
 
 .plus-menu-section-title {
-    font: var(--body-small);
+    font: var(--heading-xxsmall);
     color: var(--ds-text-subtlest);
     text-transform: uppercase;
     padding: var(--space-075) var(--space-150) var(--space-025);
@@ -32,7 +33,8 @@
     align-items: center;
     width: 100%;
     gap: var(--space-100);
-    padding: var(--space-100) var(--space-150);
+    // 20px of body-default line-height + 10px top and bottom = a 40px row.
+    padding: var(--space-0625) var(--space-150);
     border: none;
     background: none;
     border-radius: var(--radius-050);

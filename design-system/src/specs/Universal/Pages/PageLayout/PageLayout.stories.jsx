@@ -18,7 +18,7 @@ import PageLayout from './PageLayout';
 import PatternCard from '@/patterns/PatternCard';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import { Button, TextField, TextArea } from '@/components';
+import { Button, TextField, TextArea, PageHeader } from '@/components';
 import { PatternDrawer, PatternSection } from '@/patterns';
 import { PAGE_EDGE } from '@/patterns/Page';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -222,7 +222,7 @@ export const Interactive = {
             }}
         >
             <div style={{ padding: '24px' }}>
-                <h1 className="h2">Page Title</h1>
+                <PageHeader title="Page Title" />
                 <p className="body1-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
                     Use the MD / LG / XL toolbar above to simulate viewport width. The sidebar docks from
                     1024px; below that, hover the menu control to peek it over the page and click to dock it.
