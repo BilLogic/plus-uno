@@ -91,9 +91,11 @@ Use `Flag` to confirm something that has already happened and needs no reply —
 saved, sent, copied. It appears over the page, times out, and takes nothing with
 it when it goes.
 
-`show` and `onClose` are yours; the component holds no state. `delay` is the
-timeout in milliseconds and `autohide` turns it off. `FlagContainer` positions a
-stack of them.
+`show` and `onDismiss` are yours; the component holds no state. `appearance` is
+`normal`, `information`, `warning`, `error` or `success`; `title` is required and
+the description is optional. `actions` adds link buttons, and `bold` expands the
+flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
+`autohide` turns it off. `FlagGroup` positions a stack of them.
 
 </div>
 
@@ -106,7 +108,7 @@ stack of them.
 ```jsx
 // Incorrect — five seconds, then gone, and it took the only copy of the error
 // with it. An error the user must act on is not a flag.
-<Flag style="danger" title="Upload failed" show={failed} onClose={dismiss}>
+<Flag appearance="error" title="Upload failed" show={failed} onDismiss={dismiss}>
     The file was larger than 10 MB.
 </Flag>
 
@@ -119,7 +121,7 @@ stack of them.
 ```jsx
 // delay is ignored when autohide is false, and setting delay={0} also disables
 // the timer — the flag then waits for its close button.
-<Flag title="Report ready" show={ready} onClose={dismiss} autohide={false}>
+<Flag title="Report ready" show={ready} onDismiss={dismiss} autohide={false}>
     Your export is on the downloads page.
 </Flag>
 ```
@@ -135,28 +137,28 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
 
 ## Accessibility
 
-- **Only danger and warning interrupt.** Those two styles are `role="alert"`
-  with `aria-live="assertive"`. Every other style is `role="status"` with
+- **Only warning and error interrupt.** Those two appearances are `role="alert"`
+  with `aria-live="assertive"`. Every other appearance is `role="status"` with
   `aria-live="polite"`, so a success flag waits for the screen reader to finish
-  what it is saying. Every style is `aria-atomic`, so the flag is read as one
+  what it is saying. Every appearance is `aria-atomic`, so the flag is read as one
   message.
-- **An eight-second timeout is a timing limit.** Success and info flags close
-  after 8 seconds; warning and danger stay until they are dismissed, because
+- **An eight-second timeout is a timing limit.** Normal, information and success flags
+  close after 8 seconds; warning and error stay until they are dismissed, because
   they ask for something to be done. Content that disappears on its own has to
   be dismissible or extendable to satisfy WCAG's timing rule. The close button
   is what does that here, which is why it is on by default.
 - **Announcement needs the region to already exist.** A flag mounted at the same
-  moment as its container may not be announced at all. Render `FlagContainer`
+  moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The close button is named "Close".** It is the shared `CloseButton` in its
+- **The dismiss button is named "Dismiss".** It is the shared `CloseButton` in its
   default tone on the flag's surface, with an `aria-hidden` ×. The × and its
   focus ring are at least 3:1 on that surface.
-- **The style icon is decorative.** It is `aria-hidden`, so the title beside it
+- **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
-- **Every flag is one surface.** The style shows in the 16 icon's color
+- **Every flag is one surface.** The appearance shows in the 16 icon's color
   alone; the flag is `--ds-surface-overlay` with `--ds-shadow-overlay`, the
-  title `--ds-text` and the message `--ds-text-subtle` on every style, so no
-  style needs a contrast exception.
+  title `--ds-text` and the message `--ds-text-subtle` on every appearance, so no
+  appearance needs a contrast exception.
 
 </div>
 

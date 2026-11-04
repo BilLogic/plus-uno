@@ -10,7 +10,7 @@ import Blanket from '@/patterns/Blanket';
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
 
 /** The widths from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
-const GRID_WIDTHS = ['sm', 'md', 'lg'];
+const GRID_WIDTHS = ['6-col', '8-col', '10-col'];
 
 /** What can take focus inside the dialog, in DOM order. */
 const FOCUSABLE = [
@@ -49,7 +49,7 @@ const resolveModalWidth = (width) => {
         if (SAFE_WIDTH_RE.test(trimmed)) return fixed(trimmed);
         if (process.env.NODE_ENV !== 'production') {
             // eslint-disable-next-line no-console
-            console.warn(`[Modal] Rejected unsafe width "${trimmed}"; falling back to the sm width.`);
+            console.warn(`[Modal] Rejected unsafe width "${trimmed}"; falling back to the 6-col width.`);
         }
     }
 
@@ -110,10 +110,7 @@ const Modal = ({
     backdrop = true,
     keyboard = true,
     renderAs = 'modal',
-    paddingSize,
-    gapSize,
-    radiusSize,
-    width = 'sm',
+    width = '6-col',
     className = '',
     style,
     children,
@@ -207,9 +204,6 @@ const Modal = ({
         scrollable ? 'plus-modal-scrollable' : 'plus-modal-default',
         GRID_WIDTHS.includes(width) ? `plus-modal-width-${width}` : '',
         `plus-modal-height-${height}`,
-        paddingSize ? `plus-modal-pad-${paddingSize}` : '',
-        gapSize ? `plus-modal-gap-${gapSize}` : '',
-        radiusSize ? `plus-modal-radius-${radiusSize}` : '',
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
         bodyOnly ? 'plus-modal-body-only' : '',
         className,
@@ -394,14 +388,8 @@ Modal.propTypes = {
     primaryButton: buttonShape,
     secondaryButton: buttonShape,
     onClose: PropTypes.func,
-    /** Deprecated: the old Modal/pad-* tokens. The modal pads Modal/pad 16. */
-    paddingSize: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: the old Modal/gap-* tokens. The modal stacks Modal/stack-md 16. */
-    gapSize: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** Deprecated: the old Modal/radius-* tokens. The modal's radius is Modal/radius 12. */
-    radiusSize: PropTypes.oneOf(['sm', 'md', 'lg']),
     /**
-     * `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with
+     * `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with
      * the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept
      * for the callers that still pass one.
      */

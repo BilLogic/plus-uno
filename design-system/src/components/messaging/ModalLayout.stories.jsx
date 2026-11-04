@@ -136,7 +136,7 @@ WidthPerScreen.play = async ({ canvasElement }) => {
 export const WidthFromTheBrowser = () => {
     const [open, setOpen] = useState(true);
     return (
-        <Modal show={open} width="md" title="Read from the screen" body={SHORT} showBottomButtons={false} onClose={() => setOpen(false)} />
+        <Modal show={open} width="8-col" title="Read from the screen" body={SHORT} showBottomButtons={false} onClose={() => setOpen(false)} />
     );
 };
 

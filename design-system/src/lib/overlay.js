@@ -17,7 +17,7 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   children to find a portaled node) depends on. `Flag` is the one adapter
  *   with no portal or stack entry: it draws from `--layer-flag`, the
  *   top of the scale in `design-system/src/tokens/_layout.scss`, so it layers
- *   above a modal wherever its `FlagContainer` is placed.
+ *   above a modal wherever its `FlagGroup` is placed.
  * - **At most two overlays stack**: a modal (or drawer) and the confirm it
  *   raises. A third is refused by `useOverlaySlot`: it does not open,
  *   development builds warn, and the caller's `onRefused` runs so its owner's

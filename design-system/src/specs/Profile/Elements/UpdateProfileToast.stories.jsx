@@ -27,8 +27,7 @@ const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
         <div style={{ width: 'var(--columns-col-8, 445.33px)' }}>
             <Flag
                 show={show}
-                onClose={onClose}
-                style="primary"
+                onDismiss={onClose}
                 title="Update Your Profile"
                 dismissible={true}
                 autohide={false}

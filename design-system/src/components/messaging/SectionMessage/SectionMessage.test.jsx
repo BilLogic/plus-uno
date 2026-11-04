@@ -25,7 +25,7 @@ describe('SectionMessage Component', () => {
         const handleDismiss = vi.fn();
         render(<SectionMessage onDismiss={handleDismiss} dismissible={true}>Dismiss Me</SectionMessage>);
 
-        const closeButton = screen.getByRole('button', { name: /close message/i });
+        const closeButton = screen.getByRole('button', { name: /dismiss/i });
         fireEvent.click(closeButton);
 
         expect(handleDismiss).toHaveBeenCalledTimes(1);
@@ -33,7 +33,7 @@ describe('SectionMessage Component', () => {
 
     it('does not render close button when dismissible is false', () => {
         render(<SectionMessage dismissible={false}>Cannot Dismiss</SectionMessage>);
-        expect(screen.queryByRole('button', { name: /close message/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /dismiss/i })).not.toBeInTheDocument();
     });
 
     it('renders actions after the body', () => {

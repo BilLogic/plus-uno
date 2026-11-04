@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Popup from '../../overlays-and-layering/Popup/Popup';
 import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
+import { messageIcon } from '../messageAppearance';
 import './InlineMessage.scss';
 
 /**
@@ -11,12 +12,12 @@ import './InlineMessage.scss';
  */
 export const INLINE_MESSAGE_APPEARANCES = ['info', 'warning', 'danger', 'success'];
 
-/** Each appearance's glyph (Font Awesome solid name) and icon role token. */
+/** Each appearance's glyph (the shared one) and icon role token. */
 const INLINE_MESSAGE_ICONS = {
-    info: { glyph: 'circle-info', token: '--ds-icon-information' },
-    warning: { glyph: 'triangle-exclamation', token: '--ds-icon-warning' },
-    danger: { glyph: 'circle-exclamation', token: '--ds-icon-danger' },
-    success: { glyph: 'circle-check', token: '--ds-icon-success' },
+    info: { glyph: messageIcon('info'), token: '--ds-icon-information' },
+    warning: { glyph: messageIcon('warning'), token: '--ds-icon-warning' },
+    danger: { glyph: messageIcon('danger'), token: '--ds-icon-danger' },
+    success: { glyph: messageIcon('success'), token: '--ds-icon-success' },
 };
 
 /**

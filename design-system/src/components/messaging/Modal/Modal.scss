@@ -51,11 +51,11 @@
     max-height: var(--blanket-max-height-modal);
 }
 
-.plus-modal-width-md {
+.plus-modal-width-8-col {
     --plus-modal-span: 8;
 }
 
-.plus-modal-width-lg {
+.plus-modal-width-10-col {
     --plus-modal-span: 10;
 }
 
@@ -63,17 +63,6 @@
 .plus-modal-height-fill {
     height: var(--blanket-max-height-modal);
 }
-
-/* Deprecated sizing props: the old Modal/* tokens, for the callers that still pass them. */
-.plus-modal.plus-modal-pad-sm { padding: var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm); }
-.plus-modal.plus-modal-pad-md { padding: var(--size-modal-pad-y-md) var(--size-modal-pad-x-md); }
-.plus-modal.plus-modal-pad-lg { padding: var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg); }
-.plus-modal.plus-modal-gap-sm { gap: var(--size-modal-gap-sm); }
-.plus-modal.plus-modal-gap-md { gap: var(--size-modal-gap-md); }
-.plus-modal.plus-modal-gap-lg { gap: var(--size-modal-gap-lg); }
-.plus-modal.plus-modal-radius-sm { border-radius: var(--size-modal-radius-sm); }
-.plus-modal.plus-modal-radius-md { border-radius: var(--size-modal-radius-md); }
-.plus-modal.plus-modal-radius-lg { border-radius: var(--size-modal-radius-lg); }
 
 .plus-modal.plus-modal-body-only {
     background-color: transparent;

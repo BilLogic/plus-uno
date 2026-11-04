@@ -2,20 +2,16 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import { headingTag } from '@/lib/headingLevel';
+import { messageIcon } from '../messageAppearance';
 import './SectionMessage.scss';
 
 /** The six styles, as the Figma Section message set names them. */
 export const SECTION_MESSAGE_APPEARANCES = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
 
-/** The default leading icon of each style (Font Awesome solid names). */
-export const SECTION_MESSAGE_ICONS = {
-    primary: 'circle-info',
-    secondary: 'circle-info',
-    success: 'circle-check',
-    danger: 'circle-exclamation',
-    warning: 'triangle-exclamation',
-    info: 'circle-info',
-};
+/** The default leading icon of each style: the shared glyph for its role. */
+export const SECTION_MESSAGE_ICONS = Object.fromEntries(
+    SECTION_MESSAGE_APPEARANCES.map((appearance) => [appearance, messageIcon(appearance)]),
+);
 
 /**
  * SectionMessage: a message that belongs to the page and stays there until
@@ -124,7 +120,7 @@ const SectionMessage = ({
             {dismissible && (
                 <div className="plus-section-message-dismiss">
                     {strut}
-                    <CloseButton label="Close message" onClick={handleClose} />
+                    <CloseButton label="Dismiss" onClick={handleClose} />
                 </div>
             )}
         </div>

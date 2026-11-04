@@ -59,7 +59,7 @@ export default {
         },
         width: {
             control: 'select',
-            options: ['sm', 'md', 'lg'],
+            options: ['6-col', '8-col', '10-col'],
             description: '6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width',
             table: { category: 'Layout' },
         },
@@ -285,14 +285,14 @@ function ModalScrollableDemo() {
 function ModalSizeDemos() {
     return (
         <div style={{ ...col, '--plus-modal-screen': '1024px', width: '100%' }}>
-            {['sm', 'md', 'lg'].map((size) => (
+            {['6-col', '8-col', '10-col'].map((size) => (
                 <Modal
                     key={size}
                     show
                     renderAs="inline"
                     width={size}
                     title={`width="${size}"`}
-                    description={`${{ sm: 6, md: 8, lg: 10 }[size]} columns of the screen grid plus the modal pad.`}
+                    description={`${parseInt(size, 10)} columns of the screen grid plus the modal pad.`}
                     body="Modal body text goes here."
                     secondaryButton={{ text: 'Cancel' }}
                     primaryButton={{ text: 'Save' }}
@@ -373,7 +373,7 @@ export const Interactive = {
         show: true,
         title: 'Modal title',
         body: 'Modal body text goes here.',
-        width: 'sm',
+        width: '6-col',
         height: 'hug',
         showBottomButtons: true,
     },
@@ -433,7 +433,7 @@ const ConfirmViewDemo = () => {
             <Button text="Open settings" onClick={() => setOpen(true)} />
             <Modal
                 show={open}
-                width="sm"
+                width="6-col"
                 title={confirming ? 'Delete account?' : 'Settings'}
                 body={confirming ? 'This cannot be undone.' : 'Closing asks you to confirm.'}
                 secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : undefined}
@@ -498,9 +498,9 @@ export const TwoOverlayLimit = {
                 <Button text="Open first" onClick={() => setFirstOpen(true)} />
                 <Button text="Open second" onClick={() => setSecondOpen(true)} />
                 <Button text="Open third" onClick={() => setThirdOpen(true)} />
-                <Modal show={firstOpen} width="sm" title="First" body="One." onClose={() => setFirstOpen(false)} />
-                <Modal show={secondOpen} width="sm" title="Second" body="Two." onClose={() => setSecondOpen(false)} />
-                <Modal show={thirdOpen} width="sm" title="Third" body="At most two stack; this one is refused." onClose={() => setThirdOpen(false)} />
+                <Modal show={firstOpen} width="6-col" title="First" body="One." onClose={() => setFirstOpen(false)} />
+                <Modal show={secondOpen} width="6-col" title="Second" body="Two." onClose={() => setSecondOpen(false)} />
+                <Modal show={thirdOpen} width="6-col" title="Third" body="At most two stack; this one is refused." onClose={() => setThirdOpen(false)} />
             </>
         );
     },

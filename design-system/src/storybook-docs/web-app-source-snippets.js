@@ -169,7 +169,7 @@ export const webAppSourceSnippets = {
         '  renderAs="inline"',
         '  title="Modal title"',
         '  body="Modal body text goes here."',
-        '  width="sm"',
+        '  width="6-col"',
         '  height="hug"',
         '  showBottomButtons',
         '  primaryButton={{ text: "Primary", appearance: "primary" }}',
@@ -225,11 +225,11 @@ export const webAppSourceSnippets = {
         '<Spinner />'
     ]),
     flag: snippet([
-        '<FlagContainer className="p-3" style={{ position: "static" }}>',
-        '  <Flag title="Secondary Flag" style="secondary" timestamp="Just now">',
-        '    This is a secondary flag (default).',
+        '<FlagGroup className="p-3" containerPosition="static">',
+        '  <Flag title="Normal flag" timestamp="Just now">',
+        '    This is a normal flag (default).',
         '  </Flag>',
-        '</FlagContainer>'
+        '</FlagGroup>'
     ]),
     tooltip: snippet([
         '<Tooltip',

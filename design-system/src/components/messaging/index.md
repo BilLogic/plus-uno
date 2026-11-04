@@ -9,9 +9,9 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Banner](Banner/index.md) | 5 | ✅ | ✕ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
-| [Flag](Flag/index.md) | 13 | ✅ | ✅ | ✅ |
+| [Flag](Flag/index.md) | 15 | ✅ | ✅ | ✅ |
 | [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✕ | ✅ |
-| [Modal](Modal/index.md) | 27 | ✅ | ✅ | ✅ |
+| [Modal](Modal/index.md) | 24 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Spotlight](Spotlight/index.md) | 12 | ✅ | ✕ | ✅ |
 

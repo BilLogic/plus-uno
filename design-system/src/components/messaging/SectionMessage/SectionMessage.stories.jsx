@@ -232,7 +232,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
     ];
     for (const [id, lineOwner] of cases) {
         const message = canvas.getByTestId(id);
-        const button = within(message).getByRole('button', { name: 'Close message' });
+        const button = within(message).getByRole('button', { name: 'Dismiss' });
         const rect = button.getBoundingClientRect();
         await expect(Math.round(rect.width), `${id}: width`).toBe(32);
         await expect(Math.round(rect.height), `${id}: height`).toBe(32);
@@ -247,7 +247,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
 
     // Dismissal is unchanged: the button removes its message.
     const body = canvas.getByTestId('placement-body');
-    await userEvent.click(within(body).getByRole('button', { name: 'Close message' }));
+    await userEvent.click(within(body).getByRole('button', { name: 'Dismiss' }));
     await expect(canvas.queryByTestId('placement-body')).toBeNull();
 };
 
@@ -357,7 +357,7 @@ LeadingIcon.play = async ({ canvasElement }) => {
     await expect(Math.round(text.getBoundingClientRect().left), 'text starts at the padding edge').toBe(Math.round(contentLeft));
 
     // The × is unchanged beside the icon: it still dismisses its message.
-    await userEvent.click(within(none).getByRole('button', { name: 'Close message' }));
+    await userEvent.click(within(none).getByRole('button', { name: 'Dismiss' }));
     await expect(canvas.queryByTestId('icon-none')).toBeNull();
 };
 
