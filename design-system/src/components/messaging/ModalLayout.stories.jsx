@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
 import { Select } from '@/components';
@@ -24,7 +24,7 @@ import NavFab from '../../../../src/components/NavFab/NavFab';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', alignItems: 'flex-start' };
 
-/** The dialog is a portal; `within(canvasElement)` cannot see it. */
+/** Blanket positions fixed over the page rather than canvas-local; query from the document. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
 /** Rounded to a whole pixel, as Figma's modes hold the widths. */
@@ -63,8 +63,8 @@ export default {
             description: {
                 component:
                     'Interaction cover for the modal grid: width per layout mode with the sidebar '
-                    + 'open and closed, Hug and Fill with short and long content, the scrim, the '
-                    + 'layer a menu takes inside a modal, and a nested confirm.',
+                    + 'open and closed, Hug and Fill with short and long content, the scrim, and the '
+                    + 'layer a menu takes inside a modal.',
             },
         },
     },
@@ -216,14 +216,15 @@ export const Scrim = () => <HeightCase height="hug" body={SHORT} title="Over the
 Scrim.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
     const dialog = await dialogOf(canvasElement, 'Over the scrim');
-    const scrim = doc.querySelector('.modal-backdrop');
+    const scrim = dialog.closest('.plus-pattern-blanket');
     await expect(scrim).not.toBeNull();
-    await waitFor(() => expect(getComputedStyle(scrim).opacity).toBe('1'));
     // The scrim is the blanket (color.blanket), in whichever mode is in force, and nothing else tints it.
     await expect(getComputedStyle(scrim).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
-    // Atlassian's layers: scrim 500, modal 510.
+    // Atlassian's layers: scrim 500, modal 510. The dialog is the blanket's
+    // direct child, so it takes the modal layer straight from Blanket's own
+    // `> *` rule, with no intermediate wrapper.
     await expect(getComputedStyle(scrim).zIndex).toBe('500');
-    await expect(getComputedStyle(dialog.closest('.modal')).zIndex).toBe('510');
+    await expect(getComputedStyle(dialog).zIndex).toBe('510');
 };
 
 const OPTIONS = ['Algebra', 'Geometry', 'Statistics', 'Calculus'].map((label) => ({ value: label.toLowerCase(), label }));
@@ -241,10 +242,10 @@ MenuInsideModal.play = async ({ canvasElement }) => {
     const listbox = await doc.findByRole('listbox');
     const option = within(listbox).getByRole('option', { name: 'Statistics' });
     // A menu is on the popup layer (400), under a modal (510). Opened from a
-    // field inside one, it takes the modal's layer: it mounts in the modal's
-    // overlay, after the dialog.
-    const overlay = doc.getByText('Pick a subject').closest('.modal');
-    await expect(listbox.closest('.modal')).toBe(overlay);
+    // field inside one, it takes the modal's blanket: it mounts in the
+    // modal's overlay, after the dialog.
+    const overlay = doc.getByText('Pick a subject').closest('.plus-pattern-blanket');
+    await expect(listbox.closest('.plus-pattern-blanket')).toBe(overlay);
     await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('400');
     // The menu is drawn above the modal it opened from: the topmost element
     // at the option's center is the option, not the dialog under it.
@@ -278,8 +279,8 @@ export const ChromeUnderTheScrim = () => (
 
 ChromeUnderTheScrim.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
-    await dialogOf(canvasElement, 'Over the page chrome');
-    const scrim = doc.querySelector('.modal-backdrop');
+    const dialog = await dialogOf(canvasElement, 'Over the page chrome');
+    const scrim = dialog.closest('.plus-pattern-blanket');
     const scrimLayer = Number(getComputedStyle(scrim).zIndex);
     const head = within(canvasElement).getByTestId('sticky-head');
     const fab = doc.querySelector('.nav-fab');
@@ -291,135 +292,16 @@ ChromeUnderTheScrim.play = async ({ canvasElement }) => {
         const box = el.getBoundingClientRect();
         const hit = doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
         await expect(el.contains(hit)).toBe(false);
-        await expect(Boolean(hit.closest('.modal, .modal-backdrop'))).toBe(true);
+        await expect(Boolean(hit.closest('.plus-pattern-blanket'))).toBe(true);
     }
-};
-
-/* -------------------------------------------------------------------------- */
-/* Nested confirm                                                              */
-/* -------------------------------------------------------------------------- */
-
-export const NestedConfirm = () => {
-    const [confirming, setConfirming] = useState(false);
-    const [closed, setClosed] = useState(false);
-    return (
-        <>
-            <Modal
-                show={!closed}
-                width="md"
-                title="Edit session"
-                body="Discarding loses your changes."
-                secondaryButton={{ text: 'Discard', onClick: () => setConfirming(true) }}
-                primaryButton={{ text: 'Save', onClick: () => setClosed(true) }}
-                onClose={() => setClosed(true)}
-            >
-                <Modal
-                    show={confirming}
-                    width="sm"
-                    title="Discard changes?"
-                    body="This cannot be undone."
-                    secondaryButton={{ text: 'Keep editing', onClick: () => setConfirming(false) }}
-                    primaryButton={{ text: 'Discard', style: 'danger', onClick: () => { setConfirming(false); setClosed(true); } }}
-                    onClose={() => setConfirming(false)}
-                />
-            </Modal>
-        </>
-    );
-};
-
-NestedConfirm.play = async ({ canvasElement }) => {
-    const doc = documentOf(canvasElement);
-    const outer = await dialogOf(canvasElement, 'Edit session');
-    await userEvent.click(within(outer).getByRole('button', { name: 'Discard' }));
-    const inner = await dialogOf(canvasElement, 'Discard changes?');
-    const scrims = canvasElement.ownerDocument.querySelectorAll('.modal-backdrop');
-    await expect(scrims).toHaveLength(2);
-    // The second overlay covers the first modal: the top element over its Save
-    // button belongs to the confirm's overlay, so the first modal cannot be
-    // used underneath, and the second scrim lies inside the first modal's layer.
-    const save = within(outer).getByRole('button', { name: 'Save' }).getBoundingClientRect();
-    const confirmOverlay = inner.closest('.modal');
-    await waitFor(() => {
-        const hit = canvasElement.ownerDocument.elementFromPoint(save.left + 2, save.top + 2);
-        expect(confirmOverlay.contains(hit) || hit === scrims[1]).toBe(true);
-    });
-    await expect(outer.closest('.modal').contains(scrims[1])).toBe(true);
-    // Escape closes only the top one.
-    await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(doc.queryByText('Discard changes?')).toBeNull());
-    await expect(doc.getByText('Edit session')).toBeInTheDocument();
-    await expect(inner.isConnected).toBe(false);
 };
 
 /**
- * At most two overlays stack. A third is refused rather than replacing the
- * top one: it does not open, development builds warn, it calls its `onClose`,
- * and the two below keep working.
+ * A follow-up that needs confirming does not stack a second Modal: `view`
+ * swaps this same dialog's content and footer in place. See the Modal dialog
+ * stories (`ConfirmView`, `ConfirmViewEscape`, `TwoOverlayLimit`) for the
+ * confirm view and the overlay stack limit.
  */
-export const ThirdOverlayStaysClosed = () => {
-    const [confirming, setConfirming] = useState(false);
-    const [third, setThird] = useState(false);
-    return (
-        <Modal
-            show
-            width="md"
-            title="Edit session"
-            body="Discarding loses your changes."
-            secondaryButton={{ text: 'Discard', onClick: () => setConfirming(true) }}
-            primaryButton={{ text: 'Save' }}
-            onClose={() => {}}
-        >
-            <Modal
-                show={confirming}
-                width="sm"
-                title="Discard changes?"
-                body="This cannot be undone."
-                secondaryButton={{ text: 'Why?', onClick: () => setThird(true) }}
-                primaryButton={{ text: 'Keep editing', onClick: () => setConfirming(false) }}
-                onClose={() => setConfirming(false)}
-            >
-                <Modal
-                    show={third}
-                    width="sm"
-                    title="A third overlay"
-                    body="This should never show."
-                    showBottomButtons={false}
-                    onClose={() => setThird(false)}
-                />
-            </Modal>
-        </Modal>
-    );
-};
-
-ThirdOverlayStaysClosed.play = async ({ canvasElement }) => {
-    const doc = documentOf(canvasElement);
-    const warn = spyOn(console, 'warn').mockImplementation(() => {});
-    try {
-        const outer = await dialogOf(canvasElement, 'Edit session');
-        await userEvent.click(within(outer).getByRole('button', { name: 'Discard' }));
-        const inner = await dialogOf(canvasElement, 'Discard changes?');
-        await userEvent.click(within(inner).getByRole('button', { name: 'Why?' }));
-
-        await waitFor(() => expect(warn).toHaveBeenCalledWith(expect.stringMatching(/At most 2 overlays stack/)));
-        await expect(doc.queryByText('A third overlay'), 'the third does not open').toBeNull();
-        await expect(canvasElement.ownerDocument.querySelectorAll('.modal-backdrop')).toHaveLength(2);
-        await expect(inner.contains(canvasElement.ownerDocument.activeElement), 'focus stays in the confirm').toBe(true);
-
-        // The refused modal called its onClose, so its owner says closed and a
-        // second press tries again rather than doing nothing.
-        await userEvent.click(within(inner).getByRole('button', { name: 'Why?' }));
-        await waitFor(() => expect(warn).toHaveBeenCalledTimes(2));
-        await expect(doc.queryByText('A third overlay')).toBeNull();
-
-        // The confirm still works: Escape closes it and leaves the first modal.
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(doc.queryByText('Discard changes?')).toBeNull());
-        await expect(doc.getByText('Edit session')).toBeInTheDocument();
-        await expect(canvasElement.ownerDocument.querySelectorAll('.modal-backdrop')).toHaveLength(1);
-    } finally {
-        warn.mockRestore();
-    }
-};
 
 /* -------------------------------------------------------------------------- */
 /* Header, dividers, loading                                                   */

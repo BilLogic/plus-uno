@@ -252,10 +252,10 @@ dialog's title, body and footer in place. It does not open a second dialog.
   `scrollable-region-focusable` rule. `type="scrollable"` sets it always.
 - **Loading is announced as busy.** `loading` sets `aria-busy` on the body while
   the skeleton bars stand in for it.
-- **Focus handling comes from the underlying dialog.** `enforceFocus`,
-  `autoFocus` and `restoreFocus` are forwarded untouched; leave them alone unless
-  you have a specific reason, because the defaults are what trap focus inside the
-  dialog and return it to the trigger on close.
+- **Opening traps focus inside the dialog and closing returns it to the
+  trigger.** Tab cycles within the dialog rather than escaping it; a view
+  change (the confirm view swapping in) moves focus into the dialog again,
+  since the control that raised it is gone from the footer.
 - **Dismiss is Close, Escape, a Blanket click, or an optional Cancel.** An
   inline confirmation of a destructive action turns off the Blanket click, so a
   stray click outside the dialog cannot destroy something by accident — Close,

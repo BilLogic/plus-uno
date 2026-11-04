@@ -328,8 +328,8 @@ InsideAModal.play = async ({ canvasElement }) => {
     await userEvent.click(input);
     const listbox = await body.findByRole('listbox', { name: 'School options' });
     // Outside the dialog's panel, which clips, and inside its overlay.
-    await expect(dialog.querySelector('.plus-modal').contains(listbox)).toBe(false);
-    await expect(listbox.closest('.modal')).toBe(dialog.closest('.modal'));
+    await expect(dialog.contains(listbox)).toBe(false);
+    await expect(listbox.closest('.plus-pattern-blanket')).toBe(dialog.closest('.plus-pattern-blanket'));
 
     const field = input.getBoundingClientRect();
     const surface = listbox.closest('.plus-listbox').getBoundingClientRect();

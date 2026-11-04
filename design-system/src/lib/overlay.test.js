@@ -94,14 +94,14 @@ describe('getOverlayPortalRoot', () => {
 });
 
 describe('overlayMountOf', () => {
-    it('mounts in the nearest .modal ancestor, when there is one', () => {
-        const modal = document.createElement('div');
-        modal.className = 'modal';
+    it('mounts in the nearest .plus-pattern-blanket ancestor, when there is one', () => {
+        const blanket = document.createElement('div');
+        blanket.className = 'plus-pattern-blanket';
         const trigger = document.createElement('button');
-        modal.appendChild(trigger);
-        document.body.appendChild(modal);
-        expect(overlayMountOf(trigger)).toBe(modal);
-        modal.remove();
+        blanket.appendChild(trigger);
+        document.body.appendChild(blanket);
+        expect(overlayMountOf(trigger)).toBe(blanket);
+        blanket.remove();
     });
 
     it('falls back to the shared portal root outside a modal', () => {

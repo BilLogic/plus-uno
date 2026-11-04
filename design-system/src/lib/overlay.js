@@ -104,16 +104,17 @@ export function getOverlayPortalRoot() {
 }
 
 /**
- * Where a trigger's floating surface mounts: the modal it sits in, or the
- * shared portal root. The one rule `popupMountOf` (Popup) and `popupLayerOf`
- * (the field-anchored popups) both resolve through, so there is one spelling
- * of it rather than two copies of `.closest('.modal') ?? document.body`.
+ * Where a trigger's floating surface mounts: the Blanket a Modal or
+ * PatternDrawer placed it in, or the shared portal root. The one rule
+ * `popupMountOf` (Popup) and `popupLayerOf` (the field-anchored popups) both
+ * resolve through, so there is one spelling of it rather than two copies of
+ * `.closest('.plus-pattern-blanket') ?? document.body`.
  *
  * @param {Element | null | undefined} fromNode a node inside the trigger
  * @returns {Element | null} `null` only without a `document` (SSR)
  */
 export function overlayMountOf(fromNode) {
-    return fromNode?.closest?.('.modal') ?? getOverlayPortalRoot();
+    return fromNode?.closest?.('.plus-pattern-blanket') ?? getOverlayPortalRoot();
 }
 
 /**
