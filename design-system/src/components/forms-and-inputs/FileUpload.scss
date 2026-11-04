@@ -42,14 +42,14 @@
 
     // Read-only: the field box reads as a fixed value, like the Input read-only state.
     &.plus-file-upload-readonly {
-        background-color: var(--color-surface-variant);
+        background-color: var(--ds-background-neutral);
         cursor: default;
     }
 }
 
 .plus-file-upload-label {
     margin-bottom: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-default);
     
     .plus-file-upload-required {
@@ -59,17 +59,17 @@
 }
 
 .plus-file-upload-label-disabled {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-file-upload-description {
     margin: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-default);
 }
 
 .plus-file-upload-disabled .plus-file-upload-description {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
 }
 
 .plus-file-upload-button-container {

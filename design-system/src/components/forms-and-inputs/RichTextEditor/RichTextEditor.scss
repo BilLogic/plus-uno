@@ -15,7 +15,7 @@
     width: 100%;
     max-width: 56rem;
     align-items: stretch;
-    background-color: var(--color-surface);
+    background-color: var(--ds-background-input);
     border-radius: var(--size-border-radius-radius-50);
     overflow: hidden;
     box-sizing: border-box;
@@ -42,7 +42,7 @@
     gap: var(--size-element-gap-sm);
     padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
     box-sizing: border-box;
-    background-color: var(--color-surface-container-high);
+    background-color: var(--ds-surface-container);
 }
 
 /* Block style: flat “text” control (no button chrome) — Figma Normal + arrows-up-down */
@@ -57,7 +57,7 @@
     background-color: transparent;
     box-shadow: none;
     cursor: pointer;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font: var(--body-small);
     border-radius: var(--size-element-radius-md);
 
@@ -83,7 +83,7 @@
 .plus-rich-text-editor-block-toggle-caret .fa-solid {
     font-size: var(--font-size-fa-body3-solid);
     line-height: var(--font-line-height-fa-body3);
-    color: var(--color-on-surface-variant);
+    color: var(--ds-icon-subtle);
 }
 
 .plus-rich-text-editor-block-dropdown .dropdown-toggle::after {
@@ -149,14 +149,14 @@
     min-width: 10rem;
     padding: var(--size-element-pad-y-sm) 0;
     margin-top: var(--size-element-gap-sm);
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface-overlay);
     border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
     border-radius: var(--size-element-radius-md);
     box-shadow: var(--elevation-light-1);
 
     .dropdown-item {
         padding: var(--size-element-pad-y-sm) var(--element-pad-default);
-        color: var(--color-on-surface);
+        color: var(--ds-text);
 
         &:hover {
             background-color: var(--ds-background-neutral-subtle-hovered);
@@ -222,8 +222,8 @@
     // 120 at least, growing with what is typed.
     min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
-    color: var(--color-on-surface);
-    background-color: var(--color-surface);
+    color: var(--ds-text);
+    background-color: var(--ds-background-input);
     box-sizing: border-box;
     border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
     font-weight: var(--type-weight-regular);
@@ -238,15 +238,15 @@
     display: block;
     width: 100%;
     text-align: center;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtlest);
     pointer-events: none;
     font-weight: var(--type-weight-regular);
 }
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-content {
-    background-color: var(--color-surface-container-low);
-    color: var(--color-on-surface-variant);
+    background-color: var(--ds-background-neutral);
+    color: var(--ds-text-subtle);
     cursor: default;
 }
 

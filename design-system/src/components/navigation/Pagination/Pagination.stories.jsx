@@ -68,12 +68,12 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px', backgroundColor: 'var(--color-surface-container-lowest, #f8f9fa)' };
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px', backgroundColor: 'var(--ds-surface)' };
 const contentVariantCard = {
     padding: '12px',
     border: '1px solid var(--color-outline-variant)',
     borderRadius: '12px',
-    background: 'var(--color-surface-container-low)',
+    background: 'var(--ds-surface-container)',
 };
 
 function PaginationContentDemos() {
@@ -114,7 +114,7 @@ function PaginationSizesDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON TYPE SIZES</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Small, default, and large icon pagination.
                 </p>
                 <div style={contentVariantCard}>
@@ -127,7 +127,7 @@ function PaginationSizesDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT TYPE SIZES</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Small, default, and large text pagination with Previous/Next labels.
                 </p>
                 <div style={contentVariantCard}>
@@ -147,7 +147,7 @@ function PaginationInteractionStatesDemos() {
         <>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Previous control is disabled at the first page.
                 </p>
                 <div style={contentVariantCard}>
@@ -163,7 +163,7 @@ function PaginationInteractionStatesDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Next control is disabled at the last page.
                 </p>
                 <div style={contentVariantCard}>
@@ -179,7 +179,7 @@ function PaginationInteractionStatesDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Both previous and next controls are enabled.
                 </p>
                 <div style={contentVariantCard}>

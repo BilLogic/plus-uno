@@ -122,7 +122,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-text-subtle)',
                     margin: '0 0 8px',
                 }}
             >
@@ -257,7 +257,7 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
     );
 }
 
-/** Filled + bordered padded inner well (surface-container-lowest, the lowest layer) —
+/** Filled + bordered padded inner well (`--ds-surface-container`) —
  *  shared by DocsDemoBlock and DocsCanvasShell so every display block is distinguishable. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
@@ -265,7 +265,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
             className="sb-ds-docs-preview-well overflow-visible"
             style={{
                 borderRadius: 'var(--size-card-radius-sm)',
-                backgroundColor: 'var(--color-surface-container-lowest)',
+                backgroundColor: 'var(--ds-surface-container)',
                 border: '1px solid var(--color-outline-variant)',
             }}
         >
@@ -499,7 +499,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel overflow-visible"
                 style={{
                     borderRadius: 'var(--size-card-radius-sm)',
-                    backgroundColor: 'var(--color-surface-container-lowest)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: '1px solid var(--color-outline-variant)',
                 }}
             >
@@ -523,7 +523,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     className="sb-ds-docs-interactive-panel__controls border-t px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14"
                     style={{
                         borderColor: 'var(--color-outline-variant)',
-                        backgroundColor: 'var(--color-surface-container-lowest)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         // The panel is overflow-visible (Controls popovers), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.

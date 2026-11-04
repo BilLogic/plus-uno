@@ -31,14 +31,13 @@ const Footer = ({
                 className="m-0"
                 style={{
                     font: 'var(--body-small)',
-                    color: 'var(--color-on-surface)'
+                    color: 'var(--ds-text)'
                 }}
             >
                 {version} | {copyright} | <a
                     href={termsUrl}
                     style={{
-                        color: 'var(--color-on-surface)',
-                        textDecoration: 'none'
+                        color: 'var(--ds-link)'
                     }}
                 >{termsText}</a>
             </p>
