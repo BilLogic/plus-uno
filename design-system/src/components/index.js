@@ -85,7 +85,6 @@ export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from 
 export { default as NavTabs } from '@/components/navigation/NavTabs';
 export { default as Pagination, createPagination } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
-export { default as SidebarTab } from '@/components/navigation/SidebarTab';
 
 export { default as Popup, acceptsExpandedState } from '@/components/overlays-and-layering/Popup';
 export { default as Tooltip } from '@/components/overlays-and-layering/Tooltip';

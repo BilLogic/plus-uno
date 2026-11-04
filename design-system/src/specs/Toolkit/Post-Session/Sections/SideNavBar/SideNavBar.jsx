@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, ProgressTracker, SidebarTab } from '@/components';
+import { Button, ProgressTracker } from '@/components';
+import { SidebarTab } from '@/patterns/Sidebar';
 
 /**
  * Step menu for the reflection flow: the list of steps, with Submit under it.

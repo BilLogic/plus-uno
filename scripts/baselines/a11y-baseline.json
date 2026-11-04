@@ -1,34 +1,19 @@
 {
-  "measured": "2026-10-24",
+  "measured": "2026-11-04",
   "suite": {
-    "storyFiles": 439,
-    "tests": 1577
+    "storyFiles": 473,
+    "tests": 1822
   },
-  "violatingStories": 41,
+  "violatingStories": 33,
   "rules": {
-    "color-contrast": 37,
+    "color-contrast": 29,
     "scrollable-region-focusable": 2,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
     "select-name": 1
   },
   "stories": {
-    "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Info Variant": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Admin/Student/Pages/StudentAdminPage/StudentAdminPage.stories.jsx::With Modal Sessions Variant": [
-      "color-contrast"
-    ],
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Default": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.stories.jsx::Variant 2": [
       "color-contrast"
     ],
     "design-system/src/specs/Login/Modals/LoginNotificationsModal/LoginNotificationsModal.stories.jsx::Overview": [
@@ -60,15 +45,6 @@
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Elements/FileListItem/FileListItem.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Elements/UploadFiles/UploadFiles.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Post-Session/Pages/SessionInfo/SessionInfo.stories.jsx::Default": [
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [

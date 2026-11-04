@@ -221,27 +221,6 @@ export const webAppSourceSnippets = {
         '  minHeight={150}',
         '/>'
     ]),
-    scrollspy: snippet([
-        '<Scrollspy',
-        '  id="scrollspy-docs-overview-nav"',
-        '  brand="Navbar"',
-        '  items={[{ text: "@fat", href: "#scrollspy-docs-overview-fat" }]}',
-        '  contentId="scrollspy-docs-overview-content"',
-        '  offset={10}',
-        '/>',
-        '<ScrollspyContent id="scrollspy-docs-overview-content" height="500px">',
-        '  <section id="scrollspy-docs-overview-fat">',
-        '    <h4 className="h4">@fat</h4>',
-        '  </section>',
-        '</ScrollspyContent>'
-    ]),
-    sidebarTab: snippet([
-        '<SidebarTab',
-        '  text="Dashboard"',
-        '  icon="home"',
-        '  state="enabled"',
-        '/>'
-    ]),
     spinner: snippet([
         '<Spinner />'
     ]),
