@@ -84,10 +84,15 @@ function updateEndSpace() {
   const content = document.querySelector('.sbdocs-content');
   if (!last || !content) return;
   const root = document.documentElement;
+  // Below 768px Storybook hides the rail, so there is nothing to land on.
+  const rail = document.querySelector('.toc-wrapper')?.closest('aside');
+  const railShown = !rail || getComputedStyle(rail).display !== 'none';
   const current = parseFloat(root.style.getPropertyValue('--docs-toc-end-space')) || 0;
   const rect = content.getBoundingClientRect();
   // `content` ends where its spacer begins, so the spacer is not counted twice.
-  const next = endSpaceFor(last.getBoundingClientRect().top, rect.bottom - current, window.innerHeight);
+  const next = railShown
+    ? endSpaceFor(last.getBoundingClientRect().top, rect.bottom - current, window.innerHeight)
+    : 0;
   if (next !== current) root.style.setProperty('--docs-toc-end-space', `${next}px`);
 }
 
