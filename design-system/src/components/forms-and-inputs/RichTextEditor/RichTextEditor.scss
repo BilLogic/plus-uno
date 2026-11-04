@@ -20,8 +20,11 @@
     overflow: hidden;
     box-sizing: border-box;
 
-    // `small` and `large` are deprecated and draw like `medium`; their classes
-    // stay so call sites that target them keep matching.
+    // `spacing="compact"` tightens the writing area's padding and minimum height.
+    &.plus-rich-text-editor--compact {
+        --rte-content-pad-x: var(--pad-x-xs);
+        --rte-content-pad-y: var(--space-0125);
+    }
 
     &.plus-rich-text-editor--full {
         max-width: none;

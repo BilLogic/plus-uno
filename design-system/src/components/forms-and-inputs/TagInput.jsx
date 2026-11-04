@@ -107,7 +107,7 @@ const TagInput = ({
     options = [],
     tags,
     defaultTags = [],
-    size = 'medium',
+    spacing = 'default',
     disabled = false,
     readOnly = false,
     validation = 'none',
@@ -681,7 +681,7 @@ const TagInput = ({
                 onBlur={handleBlur}
             >
                 <FieldBox
-                    spacing={size === 'small' ? 'compact' : 'default'}
+                    spacing={spacing}
                     grow
                     disabled={disabled}
                     readOnly={readOnly}
@@ -880,7 +880,8 @@ TagInput.propTypes = {
     tags: PropTypes.arrayOf(tagShape),
     /** The picked tags at first, uncontrolled. */
     defaultTags: PropTypes.arrayOf(tagShape),
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    /** `default` draws a 40 field and `compact` a 32 one. */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     /** Disables every tag and the entry. */
     disabled: PropTypes.bool,
     /** Shows the tags with no × and no entry, on the read-only fill. */

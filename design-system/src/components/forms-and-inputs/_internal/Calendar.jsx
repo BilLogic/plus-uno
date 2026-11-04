@@ -15,7 +15,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  *   the picked day, or both ends of a range; `data-in-range` marks the days
  *   between; `aria-current="date"` marks today.
  * - **Bounds:** days before `minDate` or after `maxDate` are disabled.
- * - **Size:** small, medium and large draw 28, 36 and 44px days.
+ * - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
  *
  * @param {object} props
  * @returns {JSX.Element}
@@ -28,7 +28,7 @@ const Calendar = ({
     rangeEnd,
     minDate,
     maxDate,
-    size = 'medium',
+    size = 36,
     onPick,
     className = '',
     ...props
@@ -88,7 +88,11 @@ const Calendar = ({
     const turn = (step) => onViewDateChange(new Date(year, month + step, 1));
 
     return (
-        <div className={['plus-calendar', `plus-calendar--${size}`, className].filter(Boolean).join(' ')} {...props}>
+        <div
+            className={['plus-calendar', className].filter(Boolean).join(' ')}
+            data-size={size}
+            {...props}
+        >
             <div className="plus-calendar-header">
                 <button type="button" className="plus-calendar-nav" onClick={() => turn(-1)} aria-label="Previous month">
                     <i className="fa-solid fa-chevron-left" aria-hidden="true" />
@@ -118,7 +122,8 @@ Calendar.propTypes = {
     rangeEnd: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    /** Day width in pixels: 28, 36 or 44. */
+    size: PropTypes.oneOf([28, 36, 44]),
     /** `(date)` when an enabled day is pressed. */
     onPick: PropTypes.func.isRequired,
     className: PropTypes.string,
