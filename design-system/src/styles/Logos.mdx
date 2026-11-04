@@ -11,7 +11,7 @@ import {
 
 import { Logo } from '@/components';
 
-export const Mark = ({ color = 'colored', size = 132, text = false }) => <Logo appearance={color} size={size} wordmark={text} />;
+export const Mark = ({ color = 'colored', size = 132, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
 export const Ground = ({ token, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
@@ -56,7 +56,7 @@ PLUS has one logo. In product, use the Logo component; do not redraw or export t
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-lg)' }}>
     <Mark color="colored" size={132} />
-    <Mark color="colored" size={132} text />
+    <Mark color="colored" size={132} wordmark />
 </div>
 </FoundationExample>
 
@@ -85,9 +85,9 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 Logos are available in three color options to suit different grounds. Choose by the ground the logo sits on.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-    <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size={132} text /></Ground>
-    <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size={132} text /></Ground>
-    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined" size={132} text /></Ground>
+    <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size={132} wordmark /></Ground>
+    <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size={132} wordmark /></Ground>
+    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined" size={132} wordmark /></Ground>
 </div>
 
 <RefTable
@@ -152,7 +152,7 @@ Use the color options as drawn, on the ground each belongs on.
 Pick a size step. Do not stretch, crop or rotate the logomark.
 
 <DoDont>
-<Do caption="A size step, wordmark included."><Mark color="colored" size={132} text /></Do>
+<Do caption="A size step, wordmark included."><Mark color="colored" size={132} wordmark /></Do>
 <Dont caption="A stretched logomark."><span style={{ display: 'inline-block', transform: 'scaleX(1.8)', transformOrigin: 'left center', marginInlineEnd: 'var(--card-pad-spacious)' }}><Mark color="colored" size={132} /></span></Dont>
 </DoDont>
 

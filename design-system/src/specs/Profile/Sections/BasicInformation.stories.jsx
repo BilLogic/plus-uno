@@ -254,7 +254,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                         <Tooltip
                             text="Get notifications sent to an alternate email address"
                             placement="right"
-                            size="small"
+                           
                             id="tooltip-additional-email-section"
                         >
                             <span

@@ -137,7 +137,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                     <Tooltip
                         text={<InfoTooltipContent />}
                         placement="right"
-                        size="small"
+                       
                         id="tooltip-bg-matching-info"
                     >
                         <span

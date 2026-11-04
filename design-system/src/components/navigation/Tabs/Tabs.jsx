@@ -48,8 +48,8 @@ Tab.propTypes = {
 /**
  * The panel one tab controls.
  *
- * A thin wrapper over Base UI's `Tabs.Panel`, which already does the work
- * `NavTabs.Panel` had to do by hand: mounting only the active panel's
+ * A thin wrapper over Base UI's `Tabs.Panel`, which does the work itself:
+ * mounting only the active panel's
  * content (or hiding it, with `keepMounted`), and wiring `aria-labelledby`
  * to the matching tab.
  */
