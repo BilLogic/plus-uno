@@ -44,7 +44,7 @@ From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override
 
 ## Related
 
-Same group: `Alert` · `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

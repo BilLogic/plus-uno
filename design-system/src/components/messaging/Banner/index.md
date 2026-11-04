@@ -37,7 +37,7 @@ From `design-system/src/components/messaging/Banner/Banner.scss`. Override these
 
 ## Related
 
-Same group: `Alert` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
+Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
