@@ -1,0 +1,85 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ColorStories from './Color.stories.jsx';
+
+<Meta of={ColorStories} />
+
+<FoundationHero
+    title="Chart color"
+    summary="Each chart color does one job — which series, how much, which side, or which state — and the categorical order is built so it still reads without hue."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="The categorical order">
+
+Series get assigned a color in this order, numbered 1 through 8 (7 and 8 only come into play once a chart has grown past six series, which it should usually avoid — see below).
+
+<Canvas of={ColorStories.CategoricalOrder} sourceState="none" />
+
+Three things decided this order:
+
+- **The brand leads.** Slot 1 is the same hue as the single-series chart color, so a chart that grows from one series to several keeps its first series looking the same.
+- **Light and dark alternate.** Slot 2 is a dark step, slot 3 is a light step, slot 4 is dark again, and so on. Two adjacent series never sit at the same lightness — that's what makes the sequence still tell apart in grayscale, and for anyone who can't distinguish hue.
+- **The hues are spread out**, not sitting next to each other on the color wheel, so neighboring series read as clearly different colors.
+
+Yellow, red and teal are never used in the categorical order — yellow and red already mean warning and danger elsewhere, and teal is the brand's own accent hue.
+
+</FoundationSection>
+
+<FoundationSection title="Reads the same without hue">
+
+Desaturate the sequence and the order above still holds — that's the alternation at work, not an accident of this particular hue choice.
+
+<Canvas of={ColorStories.CategoricalGrayscale} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="Separators">
+
+A separator — a gap, or a line between two touching marks — and the lightness alternation solve two different problems. The alternation says *which series this is*; the separator says *where one mark ends and the next begins*. A chart needs both: someone who can't tell two close tones apart at the seam still needs the separator, and someone who can't see hue at all still needs the alternation.
+
+<Canvas of={ColorStories.SeparatorCompare} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="Other jobs a chart color does">
+
+<RefTable
+    head={['Job', 'What it encodes', 'Use']}
+    rows={[
+        ['Identity', 'Which series', <>The categorical order above, or one of the five SMART subject colors</>],
+        ['Magnitude', 'How much', 'One hue, light to strong'],
+        ['Polarity', 'Which side of a baseline', 'Two hues around a neutral midpoint'],
+        ['State', 'On track, at risk, off track', <>Success, warning, danger, information or discovery, each with a bolder step for the more extreme case</>],
+    ]}
+/>
+
+A chart never mixes the categorical order with the state colors in the same chart — two of the categorical hues double as state colors, so mixing them reads as a contradiction.
+
+</FoundationSection>
+
+<FoundationSection title="Defaults and limits">
+
+- **One color by default.** A single-series chart stays on the brand chart color — it does not borrow from the categorical order.
+- **Five or six series, then group the rest.** Past that, fold the smallest categories into "Other" rather than reaching for slots 7 and 8.
+- **Never color alone.** Every series or state also carries a shape, a pattern, a direct label, or a table a reader can check.
+- **No text on a chart color.** A label sits beside its mark, never inside or on top of it.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'Every token, role and mode in the system — see the color guideline for the full chart-color protocol.', href: '?path=/docs/foundations-color--docs' },
+    ]}
+/>
+
+</FoundationSection>
