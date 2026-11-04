@@ -67,7 +67,7 @@ function WideContent({ count = 12 }) {
                     style={{
                         ...demoBox,
                         minWidth: '160px',
-                        backgroundColor: 'var(--ds-surface-raised)'
+                        backgroundColor: 'var(--ds-surface-container)'
                     }}
                 >
                     <p className="plus-body-2" style={{ margin: 0, color: 'var(--ds-text)' }}>Card {i + 1}</p>

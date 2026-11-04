@@ -151,9 +151,9 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
 );
 
 const slideColors = [
-    'var(--ds-background-neutral-subtle)',
-    'var(--ds-background-neutral)',
-    'var(--ds-background-neutral-bold)',
+    'var(--ds-surface-container)',
+    'var(--ds-background-neutral-hovered)',
+    'var(--ds-background-neutral-pressed)',
     'var(--ds-background-selected)',
     'var(--ds-background-neutral)',
     'var(--ds-background-accent-teal-subtler)'

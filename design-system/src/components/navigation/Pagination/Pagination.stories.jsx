@@ -73,7 +73,7 @@ const contentVariantCard = {
     padding: '12px',
     border: '1px solid var(--color-outline-variant)',
     borderRadius: '12px',
-    background: 'var(--ds-surface-raised)',
+    background: 'var(--ds-surface-container)',
 };
 
 function PaginationContentDemos() {

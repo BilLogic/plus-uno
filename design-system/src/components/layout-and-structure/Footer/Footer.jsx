@@ -37,8 +37,7 @@ const Footer = ({
                 {version} | {copyright} | <a
                     href={termsUrl}
                     style={{
-                        color: 'var(--ds-text)',
-                        textDecoration: 'none'
+                        color: 'var(--ds-link)'
                     }}
                 >{termsText}</a>
             </p>
