@@ -11,7 +11,7 @@ export default {
     title: 'Components/Forms and inputs/Button/Icon button',
     component: IconButton,
     /** Hide CSF stories from the sidebar; docs live on IconButton.mdx (Canvas still embeds them). */
-    tags: ['!dev', '!autodocs'],
+    tags: ['!dev', '!autodocs', 'new'],
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'added', summary: 'Icon button: `icon`, a required `label`, `appearance` (default, subtle, primary, discovery), `spacing` (default 32, compact 24) and `shape` (default, circle).' },

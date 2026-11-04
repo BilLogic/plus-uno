@@ -43,10 +43,15 @@ export const MANAGER_TOKENS = {
     booleanBg: '--ds-background-neutral',
     booleanSelectedBg: '--ds-background-brand-bold',
   },
-  // The selected sidebar row's pair; manager.js writes it as a rule.
+  // The selected sidebar row's pair and the lifecycle badge's colors; manager.js writes them as rules.
   vars: {
     '--plus-manager-selected-bg': '--ds-background-brand-bold',
     '--plus-manager-selected-fg': '--ds-text-inverse',
+    // The lifecycle badge, drawn like a Tag: a hue on the border, neutral text.
+    '--plus-manager-badge-text': '--ds-text',
+    '--plus-manager-badge-new-border': '--ds-border-accent-green-subtle',
+    '--plus-manager-badge-beta-border': '--ds-border-accent-orange-subtle',
+    '--plus-manager-badge-deprecated-border': '--ds-border-accent-gray-subtle',
   },
 };
 

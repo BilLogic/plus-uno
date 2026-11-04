@@ -18,6 +18,7 @@ import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storyb
  */
 
 import { createRoot } from 'react-dom/client';
+import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 
 // ---- Global AI Agent Setup ---------------------------------
 // Inject only on local Storybook so Netlify static builds never ship the
@@ -534,24 +535,7 @@ const preview = {
     },
 
     backgrounds: {
-      options: {
-        light: {
-          name: 'light',
-          value: '#ffffff',
-        },
-        dark: {
-          name: 'dark',
-          value: '#1a1a1a',
-        },
-        surface: {
-          name: 'surface',
-          value: 'var(--ds-surface)',
-        },
-        "surface-container": {
-          name: 'surface-container',
-          value: 'var(--ds-surface-container)',
-        }
-      }
+      options: BACKGROUND_OPTIONS,
     },
 
     viewport: {
@@ -714,7 +698,7 @@ const preview = {
 
   initialGlobals: {
     backgrounds: {
-      value: 'light'
+      value: DEFAULT_BACKGROUND
     },
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
