@@ -72,7 +72,7 @@ const RadarChart = ({
             style: {
                 ...chartTheme.xAxis.labels.style,
                 ...(categoryLabelBody3Regular && {
-                    fontWeight: 'var(--font-weight-body3-regular, 400)'
+                    fontWeight: 'var(--font-weight-body3-regular)'
                 })
             }
         }
@@ -179,8 +179,8 @@ const RadarChart = ({
                     enabled: showDataLabels && filled,
                     format: '{y}%',
                     style: {
-                        fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
-                        fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
+                        fontSize: 'var(--font-size-body3)',
+                        fontWeight: 'var(--font-weight-body3-semibold)',
                         fontFamily: 'var(--font-family-body)',
                         color: 'var(--ds-text)',
                         textOutline: 'none'
@@ -194,8 +194,8 @@ const RadarChart = ({
                     enabled: showDataLabels && !filled,
                     format: '{y}%',
                     style: {
-                        fontSize: 'var(--font-size-body3, 0.75rem)', // 12px
-                        fontWeight: 'var(--font-weight-body3-semibold, 400)', // Semibold
+                        fontSize: 'var(--font-size-body3)',
+                        fontWeight: 'var(--font-weight-body3-semibold)',
                         fontFamily: 'var(--font-family-body)',
                         color: 'var(--ds-text)',
                         textOutline: 'none'

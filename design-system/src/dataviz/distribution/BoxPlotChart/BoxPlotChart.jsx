@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
 
 /**
  * BoxPlotChart Component
@@ -37,11 +37,11 @@ const BoxPlotChart = ({
         plotOptions: {
             boxplot: {
                 fillColor: chartTheme.colors[0],
-                lineWidth: 2,
+                lineWidth: CHART_LINE_WIDTH_NUMBER,
                 medianColor: 'var(--ds-border-inverse)',
                 medianWidth: 3,
                 stemColor: chartTheme.colors[0],
-                stemWidth: 1,
+                stemWidth: CHART_GRID_WIDTH_NUMBER,
                 whiskerColor: chartTheme.colors[0],
                 whiskerLength: '50%',
                 whiskerWidth: 2

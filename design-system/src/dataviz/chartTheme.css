@@ -10,6 +10,26 @@
  * neutral and selected backgrounds. A chart option still wins where a chart
  * sets one.
  */
+:root {
+    /*
+     * Chart-only component tokens: no shared primitive aliases these (there is
+     * no stroke-primitive tier in the system yet), so they're declared flat,
+     * the same way `--card-radius` aliases a radius primitive in
+     * `_frame_layers.scss`. Bar/column marks round only the value end at
+     * `--chart-bar-radius` (`--radius-0125`, ~2px) — rounding both ends or a
+     * larger radius distorts length reading, the one thing a bar chart asks
+     * its reader to compare. Declared at `:root`, not `.highcharts-container`
+     * (unlike the `--highcharts-*` overrides below): nothing in this file
+     * consumes these via `var()` — `chartTheme.js`'s `tokenNumber()` reads
+     * them off `document.documentElement` for Highcharts' numeric options,
+     * and a custom property only resolves there if it's declared on an
+     * ancestor of that element, never a descendant like `.highcharts-container`.
+     */
+    --chart-bar-radius: var(--radius-0125);
+    --chart-line-width: 2px;
+    --chart-grid-width: 1px;
+}
+
 .highcharts-container {
     --highcharts-background-color: var(--ds-border-inverse);
     --highcharts-neutral-color: var(--ds-text);
@@ -32,4 +52,22 @@
     --highcharts-highlight-color-3: var(--ds-background-selected);
     --highcharts-positive-color: var(--ds-chart-success);
     --highcharts-negative-color: var(--ds-chart-danger);
+}
+
+/*
+ * The tooltip is a floating layer, so it takes the Popup pattern's surface,
+ * overlay shadow, radius and padding (`design-system/src/components/
+ * overlays-and-layering/Popup/Popup.scss`) and the shared popup z-index —
+ * `chartTheme.js` sets `tooltip.useHTML` so this div, not an SVG shape, is
+ * what actually renders.
+ */
+.highcharts-tooltip-container {
+    z-index: var(--layer-popup);
+}
+
+.highcharts-tooltip {
+    background: var(--ds-surface-overlay);
+    border-radius: var(--popover-radius);
+    box-shadow: var(--ds-shadow-overlay);
+    padding: var(--popover-pad);
 }

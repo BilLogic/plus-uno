@@ -7,7 +7,7 @@ import HighchartsReact from 'highcharts-react-official';
  * DonutChart Component
  * Displays a donut chart using Highcharts with centered text overlay.
  */
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_ANIMATION_DURATION_MS } from '@/dataviz/chartTheme';
 
 const DonutChart = ({
     size = 228,
@@ -17,7 +17,7 @@ const DonutChart = ({
     centerTextSize = 'h1',
     animate = false,
     animationDelay = 0,
-    animationDuration = 900
+    animationDuration = CHART_ANIMATION_DURATION_MS
 }) => {
     // Transform segments into Highcharts series data
     const chartData = useMemo(() => segments.map(segment => ({
@@ -34,14 +34,14 @@ const DonutChart = ({
             'h3': 'var(--font-size-title-m2, 32px)',     // Title/M2
             'h4': 'var(--font-size-title-m4, 24px)',     // Title/M4 (Metric Cards)
             'h5': 'var(--font-size-title-s, 20px)',      // Title/S
-            'body3': 'var(--font-size-body3, 12px)'      // Body3
+            'body3': 'var(--font-size-body3)'      // Body3
         };
         return sizeMap[centerTextSize] || sizeMap['h4'];
     };
 
     const getFontWeight = () => {
         // Title tokens use bold weight, body uses normal
-        return centerTextSize === 'body3' ? 'var(--font-weight-normal, 400)' : 'var(--font-weight-bold, 700)';
+        return centerTextSize === 'body3' ? 'var(--font-weight-normal)' : 'var(--font-weight-bold)';
     };
 
     const getLineHeight = () => {
@@ -52,7 +52,7 @@ const DonutChart = ({
             'h3': 'var(--font-line-height-title, 1.2)',
             'h4': 'var(--font-line-height-title, 1.2)',
             'h5': 'var(--font-line-height-title, 1.2)',
-            'body3': 'var(--font-line-height-body3, 1.667)'
+            'body3': 'var(--font-line-height-body3)'
         };
         return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
     };
@@ -92,6 +92,7 @@ const DonutChart = ({
             }
         },
         tooltip: {
+            ...chartTheme.tooltip,
             enabled: true,
             pointFormat: '<b>{point.name}</b>: {point.y}'
         },
@@ -137,7 +138,7 @@ const DonutChart = ({
                 {label && (
                     <div style={{
                         fontFamily: 'var(--font-family-body)',
-                        fontSize: 'var(--font-size-body3, 12px)',
+                        fontSize: 'var(--font-size-body3)',
                         lineHeight: '1.667',
                         color: 'var(--ds-text-subtle)',
                         marginTop: '4px'

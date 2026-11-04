@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_GRID_WIDTH_NUMBER, CHART_LINE_WIDTH_NUMBER, CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
@@ -87,28 +87,28 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             categories: dates,
             labels: {
                 style: {
-                    fontSize: 'var(--font-size-body3, 12px)',
+                    fontSize: 'var(--font-size-body3)',
                     color: 'var(--ds-text-subtle)'
                 }
             },
             lineColor: 'var(--ds-border)',
-            lineWidth: 1,
+            lineWidth: CHART_GRID_WIDTH_NUMBER,
             tickWidth: 0
         },
         yAxis: {
             min: 0,
             max: calculatedMax, // Set max dynamically based on data
             reversedStacks: false, // Ensure first series (Green) is at the bottom
-            lineWidth: 1,
+            lineWidth: CHART_GRID_WIDTH_NUMBER,
             lineColor: 'var(--ds-border)',
             tickPositions: tickPositions, // Dynamic ticks based on calculated max
             title: { text: null },
-            gridLineWidth: 1,
+            gridLineWidth: CHART_GRID_WIDTH_NUMBER,
             gridLineDashStyle: 'Dot', // Dotted lines as per screenshot
             gridLineColor: 'var(--ds-border)',
             labels: {
                 style: {
-                    fontSize: '12px',
+                    fontSize: 'var(--font-size-body3)',
                     fontFamily: 'var(--font-family-body)',
                     color: 'var(--ds-text-subtle)'
                 }
@@ -130,17 +130,19 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
                     style: {
                         textOutline: 'none',
                         fontWeight: '300',
-                        fontSize: '12px',
+                        fontSize: 'var(--font-size-body3)',
                         fontFamily: 'var(--font-family-body)'
                     }
                 },
                 // A gap between stacked segments, as Atlassian separates adjacent chart colors.
-                borderWidth: 2,
+                borderWidth: CHART_LINE_WIDTH_NUMBER,
                 borderColor: CHROME.separator,
+                borderRadius: CHART_BAR_RADIUS,
                 pointWidth: 48 // Match 48px from visual analysis
             }
         },
         tooltip: {
+            ...chartTheme.tooltip,
             enabled: true
         },
         legend: { enabled: false },
