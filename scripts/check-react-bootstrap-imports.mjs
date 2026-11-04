@@ -2,7 +2,7 @@
 /**
  * `npm run check:react-bootstrap-imports` — the guard on the behavior layer.
  *
- * Base UI is becoming the single behavior layer for every interactive PLUS
+ * Base UI is the single behavior layer for every interactive PLUS
  * component (ADR-037, widening ADR-036 and superseding the Bootstrap-fallback
  * half of ADR-009; #1687). Each family's
  * gated rebuild drops `react-bootstrap` in favor of Base UI parts or plain
