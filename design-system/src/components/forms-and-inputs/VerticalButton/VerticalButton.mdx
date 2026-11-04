@@ -1,20 +1,132 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as VerticalButtonStories from './VerticalButton.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={VerticalButtonStories} />
 
 <Title />
-A vertical button stacks an icon over a short label at one size, 60 by 60.
+An icon stacked over a short label, at one fixed size, 60 by 60 — for
+choosing between a few large options, such as a role.
 
 <DocsTabs of={VerticalButtonStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={VerticalButtonStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/VerticalButton"
+/>
 
-<ArgTypes of={VerticalButtonStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>An icon over a one- or two-word label.</>}>
+    <Canvas of={VerticalButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>`default`, `subtle` and `primary` — the same three appearances `Button` uses.</>}>
+    <DsCanvasQuiet of={VerticalButtonStories.Appearances} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Selected, disabled and loading, all passed straight through to the underlying `Button`.</>}>
+    <DsCanvasQuiet of={VerticalButtonStories.States} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={VerticalButtonStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `VerticalButton` for a small set of large, equally weighted choices
+picked at a glance — a role at sign-up, a mode at the start of a flow. For a
+longer list or for actions that read better in a row, use `Button` or
+`ButtonGroup` instead; the fixed 60×60 size only suits a few options.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Keep the label to one or two words.
+
+The button is a fixed size, so a longer label wraps awkwardly or clips. Pick
+a short noun or verb phrase in sentence case, matching the icon's meaning.
+
+```jsx
+<VerticalButton icon="user-gear" label="Admin" onClick={selectRole} />
+```
+
+### `icon` is required — there is no text-only variant.
+
+`VerticalButton` always stacks an icon over the label; a text-only choice
+reads better as a plain `Button`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real button, unchanged.** `VerticalButton` renders a `Button`
+  underneath, so focus, activation and disabled/loading states all follow
+  `Button`'s own contract.
+- **The label is the accessible name.** The icon is decorative; the visible
+  label beneath it is what a screen reader announces.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single action in a row, use `Button`.
+- For a connected row of related actions, use `ButtonGroup`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

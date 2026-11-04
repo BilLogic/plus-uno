@@ -8,19 +8,19 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 21 | ✕ | ✕ | ✅ |
-| [ButtonGroup](ButtonGroup/index.md) | 5 | ✕ | ✕ | ✕ |
+| [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✕ | ✅ |
 | [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 20 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
-| [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
+| [CloseButton](CloseButton/index.md) | 5 | ✅ | ✕ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
 | [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✕ | ✅ |
-| [Fieldset](Fieldset.md) | 8 | ✕ | ✕ | ✕ |
+| [Fieldset](Fieldset.md) | 8 | ✅ | ✕ | ✅ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
-| [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
+| [FilterButton](FilterButton/index.md) | 10 | ✅ | ✕ | ✅ |
 | [IconButton](IconButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
@@ -33,16 +33,16 @@ authored half (#166), counted rather than assumed.
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Select](Select/index.md) | 42 | ✕ | ✕ | ✕ |
-| [SplitButton](SplitButton/index.md) | 3 | ✕ | ✕ | ✕ |
+| [SplitButton](SplitButton/index.md) | 3 | ✅ | ✕ | ✅ |
 | [TagInput](TagInput.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✕ | ✅ |
 | [TimePicker](TimePicker/index.md) | 14 | ✕ | ✕ | ✕ |
 | [Toggle](Toggle.md) | 16 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
-| [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
+| [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 13/34 (38%) · Correct/incorrect 6/34 (18%) · Accessibility 17/34 (50%)
+**Authored coverage:** When to use 19/34 (56%) · Correct/incorrect 6/34 (18%) · Accessibility 23/34 (68%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
