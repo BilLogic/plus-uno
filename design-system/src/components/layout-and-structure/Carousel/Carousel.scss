@@ -206,3 +206,11 @@
         }
     }
 }
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-carousel .plus-carousel-track,
+    .plus-carousel .plus-carousel-control,
+    .plus-carousel .plus-carousel-indicator {
+        transition: none;
+    }
+}
