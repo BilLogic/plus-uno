@@ -30,7 +30,7 @@ const slot = (label, minHeight = 'var(--height-500)') => (
             justifyContent: 'center',
             minHeight,
             border: 'var(--size-element-border) dashed var(--ds-border-bold)',
-            borderRadius: 'var(--element-radius-md)',
+            borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
             font: 'var(--body-default)',
         }}
@@ -122,7 +122,7 @@ const expectToggleHome = async (frame, toggle) => {
 
 const expectTopbar = async (frame) => {
     const topbar = frame.querySelector('.plus-frame__topbar');
-    await expect(rect(topbar).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);
+    await expect(rect(topbar).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
 };
 
 /** A peeked sidebar floats: shadow, over the page, and no scrim under it. */
@@ -130,7 +130,7 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
-    await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
+    await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
     // No scrim: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);
@@ -288,7 +288,7 @@ export const Medium768 = {
         await expect(offset(frame, surface).x, 'surface starts after the container pad').toBeCloseTo(pad, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
-        await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
+        await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectRowStack(frame, surface);
 
         // Hover the toggle: the sidebar peeks, floating.
@@ -317,9 +317,9 @@ export const Medium768 = {
         await expect(getComputedStyle(sidebar()).position).toBe('static');
         await expect(toggle).toHaveAttribute('aria-expanded', 'true');
         await expect(offset(frame, surface).x, 'docked: the surface starts after the sidebar')
-            .toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
+            .toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(rect(content).width, 'content never goes under its minimum')
-            .toBeCloseTo(tokenLength(frame, '--layout-min-width-content'), 0);
+            .toBeCloseTo(tokenLength(frame, '--content-min-width'), 0);
         await expect(surface.scrollWidth, 'the surface scrolls sideways').toBeGreaterThan(surface.clientWidth);
         // Scrolled sideways, the topbar stays put.
         const topbarLeft = rect(frame.querySelector('.plus-frame__topbar')).left;
@@ -342,10 +342,10 @@ export const Large1024 = {
         await expectToggleHome(frame, toggle);
         await waitFor(() => expect(sidebar(), 'docked from 1024').not.toBeNull());
         await expect(getComputedStyle(sidebar()).position).toBe('static');
-        await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
+        await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
-        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
+        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectRowStack(frame, surface);
 
         // The sidebar's rows are the 32 item height.
@@ -374,7 +374,7 @@ export const XLarge1440 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--space-150'), 0);
-        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
+        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
     }),
 };
 
@@ -383,7 +383,7 @@ export const Wide1600 = {
     play: async ({ canvasElement }) => atViewport(1600, async () => {
         const { frame, toggle, surface, content } = parts(canvasElement);
         await expectToggleHome(frame, toggle);
-        const max = tokenLength(frame, '--layout-max-width-content');
+        const max = tokenLength(frame, '--content-max-width');
         await expect(rect(content).width, 'content caps').toBeCloseTo(max, 0);
         const pad = surfacePad(surface);
         const left = rect(content).left - (rect(surface).left + pad);
@@ -398,7 +398,7 @@ export const ReadingAt1440 = {
     args: { width: 'reading' },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, content } = parts(canvasElement);
-        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-max-width-reading'), 0);
+        await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-max-width-reading'), 0);
     }),
 };
 
@@ -417,11 +417,11 @@ export const ContentGrid = {
         const { frame, content } = parts(canvasElement);
         const style = getComputedStyle(content);
         await expect(style.gridTemplateColumns.split(' ')).toHaveLength(12);
-        await expect(px(style.columnGap), 'gutter').toBeCloseTo(tokenLength(frame, '--layout-gutter'), 0);
+        await expect(px(style.columnGap), 'gutter').toBeCloseTo(tokenLength(frame, '--grid-gutter'), 0);
         const [full, four, eight] = content.children;
         await expect(rect(full).width).toBeCloseTo(rect(content).width, 0);
-        const column = tokenLength(frame, '--layout-width-column');
-        const gutter = tokenLength(frame, '--layout-gutter');
+        const column = tokenLength(frame, '--grid-width-column');
+        const gutter = tokenLength(frame, '--grid-gutter');
         await expect(rect(four).width, 'four columns and three gutters').toBeCloseTo(4 * column + 3 * gutter, 0);
         await expect(rect(eight).left - rect(four).right, 'one gutter between').toBeCloseTo(gutter, 0);
     }),

@@ -286,30 +286,30 @@ time {
 // from a modal mounts inside it and so takes the modal's layer (510).
 // Bootstrap's modal and backdrop are set by the Modal component itself.
 .dropdown-menu {
-    --bs-dropdown-zindex: var(--layout-z-index-popup);
+    --bs-dropdown-zindex: var(--layer-popup);
 }
 
 .toast-container {
-    --bs-toast-zindex: var(--layout-z-index-flag);
+    --bs-toast-zindex: var(--layer-flag);
 }
 
 .popover {
-    --bs-popover-zindex: var(--layout-z-index-popup);
+    --bs-popover-zindex: var(--layer-popup);
 }
 
 .tooltip {
-    --bs-tooltip-zindex: var(--layout-z-index-tooltip);
+    --bs-tooltip-zindex: var(--layer-tooltip);
 }
 
 // A sticky header is a card (100); a fixed bar is navigation (200).
 .sticky-top,
 .sticky-bottom {
-    z-index: var(--layout-z-index-card);
+    z-index: var(--layer-card);
 }
 
 .fixed-top,
 .fixed-bottom {
-    z-index: var(--layout-z-index-navigation);
+    z-index: var(--layer-navigation);
 }
 
 // Modal Boundary Utility

@@ -13,7 +13,7 @@ const SCREEN = { width: 1024, height: 520 };
 const WIDTHS_AT_1024 = { sm: 512, md: 677, lg: 843 };
 
 const details = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>Ana Ruiz · Algebra I · Grade 9</p>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday, 4:00–5:00 PM · Room 204 with Jordan Lee</p>
         <p style={{ margin: 0, font: 'var(--body-default)' }}>
@@ -23,7 +23,7 @@ const details = (
 );
 
 const longBody = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {Array.from({ length: 30 }, (_, i) => (
             <p key={i} style={{ margin: 0, font: 'var(--body-default)' }}>
                 {`${i + 1}. Session note: reviewed linear equations, checked homework, and set a goal for next week.`}

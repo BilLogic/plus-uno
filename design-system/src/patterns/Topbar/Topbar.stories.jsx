@@ -94,7 +94,7 @@ const expectIcon = async (toggle, name) => {
 };
 
 const expectHeight = async (bar) => {
-    await expect(rect(bar).height, 'topbar height').toBeCloseTo(token('--layout-height-topbar'), 0);
+    await expect(rect(bar).height, 'topbar height').toBeCloseTo(token('--frame-topbar-height'), 0);
 };
 
 /** The end controls are inside the bar, whole, and nothing overlaps them. */
@@ -120,9 +120,9 @@ export const Overview = {
         await expect(rect(toggle()).left - rect(bar).left, 'toggle sits at the container pad')
             .toBeCloseTo(token('--frame-pad'), 0);
         await expect(rect(breadcrumb()).left - rect(bar).left, 'docked: the breadcrumb starts at the sidebar width')
-            .toBeCloseTo(token('--layout-width-sidebar'), 0);
+            .toBeCloseTo(token('--frame-sidebar-width'), 0);
         await expect(rect(avatar()).height, 'avatar at 32').toBeCloseTo(token('--item-height-md'), 0);
-        await expect(rect(avatar()).left - rect(help()).right, 'end gap').toBeCloseTo(token('--element-inline-lg'), 0);
+        await expect(rect(avatar()).left - rect(help()).right, 'end gap').toBeCloseTo(token('--inline-lg'), 0);
         await expect(within(avatar()).getByText('Lead')).toBeVisible();
 
         await userEvent.click(toggle());
@@ -142,7 +142,7 @@ export const Closed = {
         await expect(toggle()).toHaveAccessibleName('Open sidebar');
         await expect(toggle()).toHaveAttribute('aria-expanded', 'false');
         await expect(rect(breadcrumb()).left - rect(toggle()).right, 'the breadcrumb follows the toggle')
-            .toBeCloseTo(token('--element-inline-lg'), 0);
+            .toBeCloseTo(token('--inline-lg'), 0);
     },
 };
 
@@ -154,7 +154,7 @@ export const Floating = {
         await expectIcon(toggle(), 'angles-left');
         await expect(toggle()).toHaveAttribute('aria-expanded', 'true');
         await expect(rect(breadcrumb()).left - rect(toggle()).right)
-            .toBeCloseTo(token('--element-inline-lg'), 0);
+            .toBeCloseTo(token('--inline-lg'), 0);
     },
 };
 
@@ -276,7 +276,7 @@ export const InFrame = {
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
         await expect(toggle).toHaveAccessibleName('Open sidebar');
         await expect(rect(breadcrumb()).left - rect(toggle).right)
-            .toBeCloseTo(token('--element-inline-lg'), 0);
+            .toBeCloseTo(token('--inline-lg'), 0);
 
         // A peek floats the sidebar open: angles-left, and the breadcrumb does not move.
         const left = rect(breadcrumb()).left;

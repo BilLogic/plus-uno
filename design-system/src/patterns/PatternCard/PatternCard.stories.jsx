@@ -84,7 +84,7 @@ const DemoCaption = ({ children }) => (
     <span
         style={{
             display: 'block',
-            marginBottom: 'var(--element-stack-md)',
+            marginBottom: 'var(--stack-md)',
             font: 'var(--heading-xxsmall)',
             color: 'var(--ds-text-subtle)',
         }}
@@ -93,7 +93,7 @@ const DemoCaption = ({ children }) => (
     </span>
 );
 
-const wrapRow = { display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' };
+const wrapRow = { display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' };
 
 const sessionBody = (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
@@ -130,7 +130,7 @@ const imagePlaceholder = (ratio) => (
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--element-inline-md)',
+            gap: 'var(--inline-md)',
             backgroundColor: 'var(--ds-background-neutral)',
             color: 'var(--ds-text-subtle)',
             font: 'var(--body-default)',
@@ -205,7 +205,7 @@ function PatternCardRowsDemo() {
                         style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-md), 1fr))',
-                            gap: 'var(--layout-gutter)',
+                            gap: 'var(--grid-gutter)',
                             width,
                         }}
                     >
@@ -389,7 +389,7 @@ export const Elevation = {
 
 /** A static card, a clickable card and a dragged card, for the docs page. */
 export const ElevationStates = () => (
-    <div style={{ display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
         <PatternCard title="Static" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
         <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
         <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" dragging>{bodyCopy}</PatternCard>
