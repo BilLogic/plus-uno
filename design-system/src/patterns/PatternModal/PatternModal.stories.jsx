@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternModal from '@/patterns/PatternModal';
-import Overlay, { OVERLAY_HEIGHTS, OVERLAY_WIDTHS } from '@/patterns/Overlay';
+import Blanket, { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '@/patterns/Blanket';
 import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -35,11 +35,11 @@ const footerActions = (
     </>
 );
 
-/** An inline Overlay at the stand-in screen, holding one modal. */
-const InOverlay = ({ children, height = SCREEN.height }) => (
-    <Overlay inline screenWidth={SCREEN.width} screenHeight={height}>
+/** An inline Blanket at the stand-in screen, holding one modal. */
+const InBlanket = ({ children, height = SCREEN.height }) => (
+    <Blanket inline screenWidth={SCREEN.width} screenHeight={height}>
         {children}
-    </Overlay>
+    </Blanket>
 );
 
 const dialogs = (canvasElement) => within(canvasElement).getAllByRole('dialog');
@@ -60,13 +60,13 @@ export default {
         },
         width: {
             control: 'inline-radio',
-            options: OVERLAY_WIDTHS,
+            options: BLANKET_WIDTHS,
             description: 'Screen-grid columns: 6 · 8 · 10 plus the modal pad',
             table: { category: 'Design' },
         },
         height: {
             control: 'inline-radio',
-            options: OVERLAY_HEIGHTS,
+            options: BLANKET_HEIGHTS,
             description: 'Hug the content to the screen less 128, or fill to it',
             table: { category: 'Design' },
         },
@@ -81,17 +81,17 @@ export default {
     },
 };
 
-/** A sm, hug modal in its Overlay: the scrim, the pads and the modal centered. */
+/** A sm, hug modal in its Blanket: the blanket, the pads and the modal centered. */
 export const Overview = {
     render: () => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal title="Move session" onClose={() => {}} footer={footerActions}>
                 {bodyCopy}
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
     play: async ({ canvasElement }) => {
-        const overlay = canvasElement.querySelector('.plus-pattern-overlay');
+        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
         const [modal] = dialogs(canvasElement);
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
@@ -112,18 +112,18 @@ export const Overview = {
 export const Widths = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            {OVERLAY_WIDTHS.map((width) => (
-                <InOverlay key={width} height={320}>
+            {BLANKET_WIDTHS.map((width) => (
+                <InBlanket key={width} height={320}>
                     <PatternModal title={`width="${width}"`} width={width} onClose={() => {}} footer={footerActions}>
                         {bodyCopy}
                     </PatternModal>
-                </InOverlay>
+                </InBlanket>
             ))}
         </div>
     ),
     play: async ({ canvasElement }) => {
         const modals = dialogs(canvasElement);
-        for (const [i, width] of OVERLAY_WIDTHS.entries()) {
+        for (const [i, width] of BLANKET_WIDTHS.entries()) {
             await expect(modals[i].getBoundingClientRect().width, `width ${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
     },
@@ -136,21 +136,21 @@ export const Widths = {
 export const Heights = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <InOverlay>
+            <InBlanket>
                 <PatternModal title='height="hug", short' onClose={() => {}} footer={footerActions}>
                     {bodyCopy}
                 </PatternModal>
-            </InOverlay>
-            <InOverlay>
+            </InBlanket>
+            <InBlanket>
                 <PatternModal title='height="hug", long' onClose={() => {}} footer={footerActions}>
                     {longBody}
                 </PatternModal>
-            </InOverlay>
-            <InOverlay>
+            </InBlanket>
+            <InBlanket>
                 <PatternModal title='height="fill"' height="fill" onClose={() => {}} footer={footerActions}>
                     {bodyCopy}
                 </PatternModal>
-            </InOverlay>
+            </InBlanket>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -210,10 +210,10 @@ const saveActions = (
 export const Tabs = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <InOverlay>
+            <InBlanket>
                 <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
-            </InOverlay>
-            <InOverlay>
+            </InBlanket>
+            <InBlanket>
                 <PatternModal
                     title="Session settings"
                     width="md"
@@ -223,7 +223,7 @@ export const Tabs = {
                     onClose={() => {}}
                     footer={saveActions}
                 />
-            </InOverlay>
+            </InBlanket>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -293,11 +293,11 @@ export const Tabs = {
  */
 export const BodyMinHeight = {
     render: () => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal title="Move session" onClose={() => {}} footer={footerActions}>
                 <span>Short.</span>
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
     play: async ({ canvasElement }) => {
         const [modal] = dialogs(canvasElement);
@@ -310,7 +310,7 @@ export const BodyMinHeight = {
 /** `header` replaces the title row, as `_Modal header` type=custom; the caller names the dialog. */
 export const CustomHeader = {
     render: () => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal
                 aria-label="Reschedule"
                 header={(
@@ -323,7 +323,7 @@ export const CustomHeader = {
             >
                 {bodyCopy}
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
     play: async ({ canvasElement }) => {
         const [modal] = dialogs(canvasElement);
@@ -338,11 +338,11 @@ export const CustomHeader = {
 /** `divider` draws a rule under the header and above the footer, as Figma's `divider?`. */
 export const Divider = {
     render: () => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal title="Move session" divider onClose={() => {}} footer={footerActions}>
                 {bodyCopy}
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
     play: async ({ canvasElement }) => {
         const [modal] = dialogs(canvasElement);
@@ -360,11 +360,11 @@ export const Divider = {
 /** `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. */
 export const Loading = {
     render: () => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal title="Move session" loading onClose={() => {}} footer={footerActions}>
                 {bodyCopy}
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
     play: async ({ canvasElement }) => {
         const [modal] = dialogs(canvasElement);
@@ -383,7 +383,7 @@ export const Interactive = {
         height: 'hug',
     },
     render: (args) => (
-        <InOverlay>
+        <InBlanket>
             <PatternModal
                 title={args.title}
                 width={args.width}
@@ -393,6 +393,6 @@ export const Interactive = {
             >
                 {longBody}
             </PatternModal>
-        </InOverlay>
+        </InBlanket>
     ),
 };

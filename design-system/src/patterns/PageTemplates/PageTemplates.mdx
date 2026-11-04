@@ -89,7 +89,7 @@ The focused frame has four parts.
 The page carries two grids, and the modal guide marks where a modal sits.
 
 - **Content grid** (blue in Figma). It belongs to the page and has 12 columns with a 16 gutter.
-- **Screen grid** (red in Figma). It lives on Overlay only, so turning the overlay off hides it. A page frame carries only the content grid.
+- **Screen grid** (red in Figma). It lives on Blanket only, so turning the blanket off hides it. A page frame carries only the content grid.
 - **Modal guide** (purple in Figma). It belongs to Modal and shows the modal's width within the screen grid.
 
 The sidebar toggle stays at (8, 8) at every width and in every sidebar state.
@@ -157,7 +157,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     </thead>
     <tbody>
         <tr><td><code>--layout-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
-        <tr><td><code>--layout-pad-x-screen</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Overlay, not the page grid.</td></tr>
+        <tr><td><code>--layout-pad-x-screen</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
         <tr><td><code>--layout-min-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
         <tr><td><code>--layout-max-width-screen</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
     </tbody>
@@ -424,7 +424,7 @@ The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and 
 - [**Section**](?path=/docs/foundations-patterns-section--docs). The page header and the regions that fill the page.
 - [**Modal**](?path=/docs/foundations-patterns-modal--docs). A short decision over the page, instead of the focused frame.
 - [**Drawer**](?path=/docs/foundations-patterns-drawer--docs). A panel over the page that keeps it in view.
-- [**Overlay**](?path=/docs/foundations-patterns-overlay--docs). The screen grid and the scrim a drawer or a modal sits in.
+- [**Blanket**](?path=/docs/foundations-patterns-blanket--docs). The screen grid and the scrim a drawer or a modal sits in.
 
 </div>
 
