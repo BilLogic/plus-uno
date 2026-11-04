@@ -303,3 +303,43 @@ Interactive.args = {
     columnCount: columns.length,
     isDisabled: false,
 };
+
+/** A radio row shares one real Base UI group, so the arrow keys roam the whole row, same as the native `name`-grouped inputs it replaces. */
+export const Keyboard = () => {
+    const [radioValues, setRadioValues] = useState({ 'row-1': 'col-1' });
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <ChoiceGrid
+                id="choice-grid-keyboard"
+                name="choice-grid-keyboard"
+                type="radio"
+                rows={singleRow}
+                columns={overviewColumns}
+                values={radioValues}
+                onChange={(rowId, columnId) => {
+                    setRadioValues({ ...radioValues, [rowId]: columnId });
+                }}
+            />
+        </div>
+    );
+};
+Keyboard.parameters = { docs: { disable: true } };
+Keyboard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const radios = canvas.getAllByRole('radio');
+
+    radios[0].focus();
+    await expect(radios[0]).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(radios[1]).toHaveFocus();
+    await expect(radios[1]).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(radios[2]).toHaveFocus();
+    await expect(radios[2]).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(radios[1]).toHaveFocus();
+};
