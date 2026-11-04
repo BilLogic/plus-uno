@@ -16,7 +16,7 @@ export const Control = ({ height, radius, children, ring }) => (
             display: 'inline-flex',
             alignItems: 'center',
             height: `var(${height})`,
-            padding: '0 var(--element-pad-x-md)',
+            padding: '0 var(--pad-x-md)',
             borderRadius: radius.startsWith('calc') ? radius : `var(${radius})`,
             background: 'var(--ds-background-neutral)',
             color: 'var(--ds-text)',
@@ -31,7 +31,7 @@ export const Control = ({ height, radius, children, ring }) => (
 export const Menu = ({ rowRadius }) => (
     <div style={{ display: 'flex', flexDirection: 'column', width: 'var(--popover-min-width-menu)', padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popover-radius-menu-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
         {['Rename', 'Duplicate', 'Move to…'].map((t, i) => (
-            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: 'var(--item-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: rowRadius, background: i === 0 ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{t}</span>
+            <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: rowRadius, background: i === 0 ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{t}</span>
         ))}
     </div>
 );
@@ -72,12 +72,12 @@ Controls round at a quarter of their height, so a 32 high field takes 8 and a 40
 
 <TokenTable
     rows={[
-        { token: '--element-radius-sm', figma: 'Element/radius-sm', use: 'Small detail elements: checkboxes, Count tags, keyboard shortcuts.' },
-        { token: '--element-radius-md', figma: 'Element/radius-md', use: 'Supporting elements: Status tags, Tags, session-time chips, 16 high controls.' },
-        { token: '--element-radius-item-sm', figma: 'Element/radius-item-sm', use: '24 high controls and items: filter chips, table-row actions.' },
-        { token: '--element-radius-lg', figma: 'Element/radius-lg', use: 'Interactive elements, 32 high: tabs, navigation items, and fields in the compact density.' },
-        { token: '--element-radius-item-md', figma: 'Element/radius-item-md', use: 'Items, 32 high: the same 8 as radius-lg.' },
-        { token: '--element-radius-full', figma: 'Element/radius-full', use: 'Circular, people-related elements: avatars, pills, toggles.' },
+        { token: '--radius-sm', figma: 'Element/radius-sm', use: 'Small detail elements: checkboxes, Count tags, keyboard shortcuts.' },
+        { token: '--radius-md', figma: 'Element/radius-md', use: 'Supporting elements: Status tags, Tags, session-time chips, 16 high controls.' },
+        { token: '--radius-h24', figma: 'Element/radius-item-sm', use: '24 high controls and items: filter chips, table-row actions.' },
+        { token: '--radius-lg', figma: 'Element/radius-lg', use: 'Interactive elements, 32 high: tabs, navigation items, and fields in the compact density.' },
+        { token: '--radius-h32', figma: 'Element/radius-item-md', use: 'Items, 32 high: the same 8 as radius-lg.' },
+        { token: '--radius-full', figma: 'Element/radius-full', use: 'Circular, people-related elements: avatars, pills, toggles.' },
     ]}
 />
 
@@ -117,27 +117,27 @@ Every control except a button takes a radius of its height ÷ 4. The same quarte
 
 <FoundationExample caption="Each control takes the radius of its height divided by four. Buttons are the exception: 6 default, 4 compact.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)' }}>
-    <Control height="--item-height-sm" radius="--element-radius-item-sm">24 · radius 6</Control>
-    <Control height="--item-height-md" radius="--element-radius-lg">32 · radius 8</Control>
+    <Control height="--item-height-sm" radius="--radius-h24">24 · radius 6</Control>
+    <Control height="--item-height-md" radius="--radius-lg">32 · radius 8</Control>
     <Control height="--row-height-md" radius="calc(var(--row-height-md) / 4)">40 · radius 10</Control>
-    <Control height="--item-height-md" radius="--element-radius-item-sm">Button 32 · radius 6</Control>
-    <Control height="--item-height-sm" radius="--element-radius-md">Compact button 24 · radius 4</Control>
+    <Control height="--item-height-md" radius="--radius-h24">Button 32 · radius 6</Control>
+    <Control height="--item-height-sm" radius="--radius-md">Compact button 24 · radius 4</Control>
 </div>
 </FoundationExample>
 
 <RefTable
     head={['Control height', 'Radius', 'Token']}
     rows={[
-        ['8', '2', <C>--element-radius-sm</C>],
-        ['16', '4', <C>--element-radius-md</C>],
-        ['24', '6', <C>--element-radius-item-sm</C>],
-        ['32', '8', <><C>--element-radius-lg</C> · <C>--element-radius-item-md</C></>],
+        ['8', '2', <C>--radius-sm</C>],
+        ['16', '4', <C>--radius-md</C>],
+        ['24', '6', <C>--radius-h24</C>],
+        ['32', '8', <><C>--radius-lg</C> · <C>--radius-h32</C></>],
         ['40', '10', <>the 0625 step, <C>--radius-0625</C></>],
         ['Menu with 24 or 32 high rows', '10 or 12', <><C>--popover-radius-menu-sm</C> · <C>--popover-radius-menu-md</C></>],
     ]}
 />
 
-A menu's radius is its item radius plus its padding: 24 high rows round at 6 and the menu at 10, 32 high rows at 8 and the menu at 12, 40 high rows at 10 and the menu at 14. Pills and avatars use `--element-radius-full`.
+A menu's radius is its item radius plus its padding: 24 high rows round at 6 and the menu at 10, 32 high rows at 8 and the menu at 12, 40 high rows at 10 and the menu at 14. Pills and avatars use `--radius-full`.
 
 Flush parts are clipped, not rounded: a part that touches its parent's edge, such as a table's head row or a card's image, takes no radius of its own. The parent's radius clips it.
 
@@ -170,7 +170,7 @@ Components bind the semantic token, never the primitive. This is what the code a
         ['Tooltip', <C>--popover-radius-tooltip</C>],
         ['Table', <C>--table-radius</C>],
         ['Tile, small and large', <><C>--tile-radius-sm</C> · <C>--tile-radius-lg</C></>],
-        ['Controls', <><C>--element-radius-sm</C> · <C>-md</C> · <C>-item-sm</C> · <C>-lg</C> · <C>-item-md</C></>],
+        ['Controls', <><C>--radius-sm</C> · <C>-md</C> · <C>-item-sm</C> · <C>-lg</C> · <C>-item-md</C></>],
     ]}
 />
 
@@ -198,9 +198,9 @@ A component's focus state is critical for accessibility. The corner radius of th
 />
 
 <FoundationExample caption="The ring is drawn 2 outside each control and rounds to its radius plus 2.">
-<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--element-pad-x-md)' }}>
-    <Control height="--item-height-md" radius="--element-radius-lg" ring>32 · ring 10</Control>
-    <Control height="--item-height-sm" radius="--element-radius-item-sm" ring>24 · ring 8</Control>
+<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
+    <Control height="--item-height-md" radius="--radius-lg" ring>32 · ring 10</Control>
+    <Control height="--item-height-sm" radius="--radius-h24" ring>24 · ring 8</Control>
 </div>
 </FoundationExample>
 
@@ -212,8 +212,8 @@ A Tile rounds at 25% of its size. Every part keeps the radius of its own compone
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)' }}>
-    {[['20', 20, '--tile-radius-sm', 5], ['24', 24, '--element-radius-item-sm', 6], ['32', 32, '--element-radius-lg', 8], ['40', 40, '--tile-radius-lg', 10], ['48', 48, '--card-radius-sm', 12]].map(([label, size, token, r]) => (
-        <span key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', alignItems: 'center', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+    {[['20', 20, '--tile-radius-sm', 5], ['24', 24, '--radius-h24', 6], ['32', 32, '--radius-lg', 8], ['40', 40, '--tile-radius-lg', 10], ['48', 48, '--card-radius-sm', 12]].map(([label, size, token, r]) => (
+        <span key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', alignItems: 'center', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
             <span aria-hidden="true" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, borderRadius: `var(${token})`, background: 'var(--ds-background-accent-blue-subtler)', color: 'var(--ds-icon-accent-blue)' }}><i className="fa-solid fa-book-open" /></span>
             {label} · radius {r}
         </span>
@@ -228,10 +228,10 @@ A Tile rounds at 25% of its size. Every part keeps the radius of its own compone
 
 <DoDont>
 <Do caption="The same tag, the same corner, in both places.">
-<span style={{ display: 'inline-block', padding: '0 var(--element-pad-x-xs)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
+<span style={{ display: 'inline-block', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
 </Do>
 <Dont caption="The card gives its tag a pill corner, so one component now has two shapes.">
-<span style={{ display: 'inline-block', padding: '0 var(--element-pad-x-sm)', borderRadius: 'var(--element-radius-full)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
+<span style={{ display: 'inline-block', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-warning-subtler)', color: 'var(--ds-text-warning)', font: 'var(--body-small)' }}>Needs a note</span>
 </Dont>
 </DoDont>
 
@@ -251,7 +251,7 @@ An inner shape inside a padded container rounds at the container's radius minus 
 
 <DoDont>
 <Do caption="Rows inset 4 inside a 12 menu take 8, so the gap between the two curves stays even.">
-<Menu rowRadius="var(--element-radius-item-md)" />
+<Menu rowRadius="var(--radius-h32)" />
 </Do>
 <Dont caption="Rows at the menu's own 12. Their corners bulge toward the menu's edge, and the inset looks uneven.">
 <Menu rowRadius="var(--popover-radius-menu-md)" />
@@ -266,10 +266,10 @@ Take the radius from the height of the control, not from the nearest look.
 
 <DoDont>
 <Do caption="24 high takes 6.">
-<Control height="--item-height-sm" radius="--element-radius-item-sm">24 high, radius 6</Control>
+<Control height="--item-height-sm" radius="--radius-h24">24 high, radius 6</Control>
 </Do>
 <Dont caption="8 belongs to a 32 high control; on a 24 high one it looks inconsistent beside its siblings.">
-<Control height="--item-height-sm" radius="--element-radius-lg">24 high, radius 8</Control>
+<Control height="--item-height-sm" radius="--radius-lg">24 high, radius 8</Control>
 </Dont>
 </DoDont>
 

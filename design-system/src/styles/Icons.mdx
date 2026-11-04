@@ -121,9 +121,9 @@ Before a glyph joins the product, check four things. Does a similar icon already
 Use the same glyph for the same job everywhere. These cover most of what a tutor sees.
 
 <FoundationExample>
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--element-stack-lg)' }}>
+<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--stack-lg)' }}>
     {[['Add', 'plus'], ['Remove', 'minus'], ['Confirm', 'check'], ['Close', 'xmark'], ['Delete', 'trash'], ['Edit', 'pen'], ['Search', 'magnifying-glass'], ['Settings', 'gear'], ['Session or schedule', 'calendar-days'], ['Person', 'user'], ['Session note', 'clipboard'], ['Notification', 'bell'], ['Information', 'circle-info']].map(([job, name]) => (
-        <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}>
+        <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
             <Glyph name={name} />
             <span>{job}</span>
             <C>{name}</C>
@@ -146,7 +146,7 @@ Solid, regular and brands are licensed here, including brand glyphs.
 
 <DoDont>
 <Do caption="Free families render everywhere.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
     <Glyph name="figma" family="fa-brands" /><Glyph name="calendar-days" family="fa-regular" />
     <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
 </span>
@@ -164,10 +164,10 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 
 <DoDont>
 <Do caption="A 16 icon leads the label; the chevron is 12.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size="--icon-sm" /></span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size="--icon-sm" /></span>
 </Do>
 <Dont caption="A 12 icon as the main way-finding mark is too small to read beside the label.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" size="--icon-sm" />Add tutor</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" size="--icon-sm" />Add tutor</span>
 </Dont>
 </DoDont>
 
@@ -177,10 +177,10 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 
 <DoDont>
 <Do caption="A bell for notifications.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="bell" />Notifications</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="bell" />Notifications</span>
 </Do>
 <Dont caption="A gear reads as settings, so it misleads here.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}><Glyph name="gear" />Notifications</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="gear" />Notifications</span>
 </Dont>
 </DoDont>
 

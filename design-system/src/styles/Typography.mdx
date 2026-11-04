@@ -132,10 +132,10 @@ A label uses Body/default/medium (Noto Sans 500). There is no separate button st
 
 <DoDont>
 <Do caption="Body/default/medium on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
 </Do>
 <Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
 </Dont>
 </DoDont>
 
@@ -176,7 +176,7 @@ Page title Heading/large 24 (h1), section Heading/medium 20 (h2), subsection Hea
 
 <DoDont>
 <Do caption="Page 24, section 20, subsection 16: one step per level.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
 <Sample font="--heading-large">Sessions</Sample>
 <Sample font="--heading-medium">This week</Sample>
 <Sample font="--heading-small">Upcoming</Sample>
@@ -184,7 +184,7 @@ Page title Heading/large 24 (h1), section Heading/medium 20 (h2), subsection Hea
 </div>
 </Do>
 <Dont caption="Sizes picked by feel: a hero size for the page, a section smaller than its subsection.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
 <Sample font="--heading-xxlarge">Sessions</Sample>
 <Sample font="--heading-xsmall">This week</Sample>
 <Sample font="--heading-medium">Upcoming</Sample>
@@ -242,13 +242,13 @@ A student name in a roster row.
 
 <DoDont>
 <Do caption="One line with an ellipsis. The Status keeps its place.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
 <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
 </Do>
 <Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
 <span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Algebra 1</span>
 <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
 </div>
@@ -297,14 +297,14 @@ Headings step down one level at a time.
 
 <DoDont>
 <Do caption="h1, then h2, then h3.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
 <span><C>h1</C> <Sample font="--heading-large">Tutor dashboard</Sample></span>
 <span><C>h2</C> <Sample font="--heading-medium">Upcoming sessions</Sample></span>
 <span><C>h3</C> <Sample font="--heading-small">Grade 6 math</Sample></span>
 </div>
 </Do>
 <Dont caption="An h3 straight after the h1 skips the h2.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
 <span><C>h1</C> <Sample font="--heading-large">Tutor dashboard</Sample></span>
 <span><C>h3</C> <Sample font="--heading-small">Grade 6 math</Sample></span>
 </div>

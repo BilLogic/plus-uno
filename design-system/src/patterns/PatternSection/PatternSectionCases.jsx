@@ -19,7 +19,7 @@ const InDocs = ({ children }) => (
 );
 
 const Row = ({ children }) => (
-    <div style={{ display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap' }}>{children}</div>
+    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>{children}</div>
 );
 
 const Stat = ({ title, body }) => (

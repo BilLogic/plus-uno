@@ -8,7 +8,7 @@
     align-items: center;
     width: 100%;
     min-width: 0;
-    height: var(--layout-height-topbar);
+    height: var(--frame-topbar-height);
     box-sizing: border-box;
 }
 
@@ -22,13 +22,13 @@
     flex-shrink: 0;
     box-sizing: border-box;
     padding-left: var(--frame-pad);
-    padding-right: var(--element-inline-lg);
+    padding-right: var(--inline-lg);
 }
 
 // Docked, the start area is the sidebar's width, so the breadcrumb starts where
 // the page does.
 .plus-topbar--docked .plus-topbar__start {
-    width: var(--layout-width-sidebar);
+    width: var(--frame-sidebar-width);
 }
 
 /* ------------------------------------------------------------- middle */
@@ -73,6 +73,6 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    gap: var(--element-inline-lg);
-    padding-left: var(--element-inline-lg);
+    gap: var(--inline-lg);
+    padding-left: var(--inline-lg);
 }

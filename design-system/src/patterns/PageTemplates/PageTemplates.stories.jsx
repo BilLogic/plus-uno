@@ -39,7 +39,7 @@ const Metric = ({ title, value, note }) => (
 const cardRow = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))',
-    gap: 'var(--layout-gutter)',
+    gap: 'var(--grid-gutter)',
 };
 
 /** The dashboard template's content: a page header, a row of metric cards, a section. */
@@ -183,7 +183,7 @@ export const SidebarOverPage = {
             const aside = canvas.getByRole('complementary', { name: 'Sidebar' });
             const frame = canvasElement.querySelector('.plus-frame');
             await expect(getComputedStyle(aside).position, 'the sidebar floats over the page').toBe('absolute');
-            await expect(aside.getBoundingClientRect().width).toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
+            await expect(aside.getBoundingClientRect().width).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         });
     },
 };

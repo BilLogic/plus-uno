@@ -68,7 +68,7 @@ export const Inline = {
         await expect(box.width, 'the stand-in screen').toBeCloseTo(Math.min(768, canvasElement.clientWidth), 0);
         await expect(box.height, 'the stand-in screen').toBeCloseTo(520, 0);
         await expect(inner.width, 'width-modal-sm at 768').toBeCloseTo(384, 0);
-        await expect(getComputedStyle(overlay).paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--overlay-pad-y')}px`);
+        await expect(getComputedStyle(overlay).paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `the blanket (${mode})`).toBe(token('--ds-blanket'));
         });
@@ -121,8 +121,8 @@ export const Layers = {
         const modal = within(canvasElement).getByRole('dialog');
         const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
         await expect(getComputedStyle(overlay).position).toBe('fixed');
-        await expect(getComputedStyle(overlay).zIndex, 'blanket layer').toBe(z('--layout-z-index-scrim'));
-        await expect(getComputedStyle(modal).zIndex, 'modal layer').toBe(z('--layout-z-index-modal'));
+        await expect(getComputedStyle(overlay).zIndex, 'blanket layer').toBe(z('--layer-blanket'));
+        await expect(getComputedStyle(modal).zIndex, 'modal layer').toBe(z('--layer-modal'));
         const box = overlay.getBoundingClientRect();
         await expect(box.width, 'covers the viewport').toBeCloseTo(window.innerWidth, 0);
         await expect(box.height, 'covers the viewport').toBeCloseTo(window.innerHeight, 0);
@@ -160,19 +160,19 @@ export const Pads = {
                     {body}
                 </PatternModal>
             </Blanket>
-            <div data-guide="pad-y" style={bandStyle({ top: 0, left: 0, right: 0, height: 'var(--overlay-pad-y)' })}>pad-y 64</div>
-            <div data-guide="pad-y" style={bandStyle({ bottom: 0, left: 0, right: 0, height: 'var(--overlay-pad-y)' })}>pad-y 64</div>
-            <div data-guide="pad-x" style={bandStyle({ top: 'var(--overlay-pad-y)', bottom: 'var(--overlay-pad-y)', left: 0, width: 'var(--overlay-pad-x)' })} />
-            <div data-guide="pad-x" style={bandStyle({ top: 'var(--overlay-pad-y)', bottom: 'var(--overlay-pad-y)', right: 0, width: 'var(--overlay-pad-x)' })} />
+            <div data-guide="pad-y" style={bandStyle({ top: 0, left: 0, right: 0, height: 'var(--blanket-pad-y)' })}>pad-y 64</div>
+            <div data-guide="pad-y" style={bandStyle({ bottom: 0, left: 0, right: 0, height: 'var(--blanket-pad-y)' })}>pad-y 64</div>
+            <div data-guide="pad-x" style={bandStyle({ top: 'var(--blanket-pad-y)', bottom: 'var(--blanket-pad-y)', left: 0, width: 'var(--blanket-pad-x)' })} />
+            <div data-guide="pad-x" style={bandStyle({ top: 'var(--blanket-pad-y)', bottom: 'var(--blanket-pad-y)', right: 0, width: 'var(--blanket-pad-x)' })} />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const overlay = canvasElement.querySelector('.plus-pattern-blanket');
         const style = getComputedStyle(overlay);
-        await expect(style.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--overlay-pad-x')}px`);
-        await expect(style.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--overlay-pad-y')}px`);
+        await expect(style.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
+        await expect(style.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         const [top] = canvasElement.querySelectorAll('[data-guide="pad-y"]');
-        await expect(top.getBoundingClientRect().height, 'the shaded band is the pad').toBeCloseTo(tokenLength(canvasElement, '--overlay-pad-y'), 0);
+        await expect(top.getBoundingClientRect().height, 'the shaded band is the pad').toBeCloseTo(tokenLength(canvasElement, '--blanket-pad-y'), 0);
     },
 };
 
@@ -196,7 +196,7 @@ export const ScreenGrid = {
                         transform: 'translateX(-50%)',
                         display: 'grid',
                         gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
-                        columnGap: 'var(--layout-gutter)',
+                        columnGap: 'var(--grid-gutter)',
                         pointerEvents: 'none',
                     }}
                 >

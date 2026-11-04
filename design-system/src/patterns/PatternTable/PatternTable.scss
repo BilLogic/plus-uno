@@ -15,7 +15,7 @@
     // Sticky cells stack only inside the scroll region (which isolates), so
     // these are local orders on the card layer: a sticky row or column rides
     // over the body, and the corner cell over both.
-    --pattern-table-z-sticky: var(--layout-z-index-card);
+    --pattern-table-z-sticky: var(--layer-card);
     --pattern-table-z-corner: calc(var(--pattern-table-z-sticky) + 1);
 
     display: flex;
@@ -163,7 +163,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 .plus-pattern-table-pagination {

@@ -31,10 +31,10 @@ const SIZES = [
 
 /** The three icon sizes. */
 export const Sizes = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
         {SIZES.map(([token, value, name, use]) => (
-            <div key={token} style={col('var(--element-stack-md)')}>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-surface-sunken)' }}>
+            <div key={token} style={col('var(--stack-md)')}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface-sunken)' }}>
                     <Glyph name={name} size={token} color="--ds-icon" />
                 </span>
                 <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{value} · <span style={code}>{token}</span></span>
@@ -52,8 +52,8 @@ export const Families = () => (
             ['fa-regular', ['calendar-days', 'bell', 'user', 'circle-check', 'file']],
             ['fa-brands', ['figma', 'github', 'google', 'slack', 'notion']],
         ].map(([family, names]) => (
-            <div key={family} style={col('var(--element-stack-md)')}>
-                <span style={{ display: 'flex', gap: 'var(--element-inline-lg)' }}>
+            <div key={family} style={col('var(--stack-md)')}>
+                <span style={{ display: 'flex', gap: 'var(--inline-lg)' }}>
                     {names.map((n) => <Glyph key={n} name={n} family={family} size="--icon-lg" color="--ds-icon" />)}
                 </span>
                 <span style={code}>{family}</span>
@@ -75,11 +75,11 @@ const COLORS = [
 
 /** Icons take an icon color token. */
 export const Colors = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--field-width-md), 1fr))', gap: 'var(--element-stack-lg)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--field-width-md), 1fr))', gap: 'var(--stack-lg)' }}>
         {COLORS.map(([token, use]) => (
-            <div key={token} style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}>
+            <div key={token} style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}>
                 <Glyph name="circle-info" size="--icon-lg" color={token} />
-                <span style={col('var(--element-stack-sm)')}>
+                <span style={col('var(--stack-sm)')}>
                     <span style={code}>{token}</span>
                     <span style={caption}>{use}</span>
                 </span>
@@ -92,13 +92,13 @@ export const Colors = () => (
 export const PairWithLabels = () => (
     <DoDont>
         <Do caption="An icon beside its label. The label says what it does, and a screen reader reads the label.">
-            <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+            <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                 <Button text="Reschedule" iconBefore="calendar-days" />
                 <Button text="Message" iconBefore="comment" />
             </span>
         </Do>
         <Dont caption="Icons alone for actions people use rarely. Each one costs the reader a guess.">
-            <span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}>
+            <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                 <IconButton icon="calendar-days" label="Reschedule" />
                 <IconButton icon="comment" label="Message" />
             </span>
@@ -110,18 +110,18 @@ export const PairWithLabels = () => (
 export const OneGlyphOneMeaning = () => (
     <DoDont>
         <Do caption="Every date in the product takes the same calendar glyph.">
-            <span style={col('var(--element-stack-md)')}>
+            <span style={col('var(--stack-md)')}>
                 {['Tuesday, June 3', 'Due Friday', 'Started May 12'].map((t) => (
-                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                         <Glyph name="calendar-days" />{t}
                     </span>
                 ))}
             </span>
         </Do>
         <Dont caption="Three different glyphs for a date. People read them as three different things.">
-            <span style={col('var(--element-stack-md)')}>
+            <span style={col('var(--stack-md)')}>
                 {[['Tuesday, June 3', 'calendar-days'], ['Due Friday', 'clock'], ['Started May 12', 'flag']].map(([t, g]) => (
-                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                         <Glyph name={g} />{t}
                     </span>
                 ))}
@@ -133,11 +133,11 @@ export const OneGlyphOneMeaning = () => (
 /** 24 is the largest icon; a larger mark goes in a Tile. */
 export const LargerMeansTile = () => (
     <div style={{ display: 'flex', gap: 'var(--page-stack-md)', alignItems: 'flex-end' }}>
-        <span style={col('var(--element-stack-md)')}>
+        <span style={col('var(--stack-md)')}>
             <Glyph name="folder" size="--icon-lg" color="--ds-icon" />
             <span style={caption}>24: the largest icon</span>
         </span>
-        <span style={col('var(--element-stack-md)')}>
+        <span style={col('var(--stack-md)')}>
             <Tile content="icon" icon="book-open" size={48} color="teal" />
             <span style={caption}>Larger: a Tile</span>
         </span>

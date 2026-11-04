@@ -15,29 +15,29 @@ export default {
 
 const grid12 = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(var(--layout-columns), minmax(0, 1fr))',
-    gap: 'var(--layout-gutter)',
+    gridTemplateColumns: 'repeat(var(--grid-columns), minmax(0, 1fr))',
+    gap: 'var(--grid-gutter)',
 };
 const columnFill = {
     height: 'var(--size-500)',
-    borderRadius: 'var(--element-radius-md)',
+    borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-accent-blue-subtler)',
 };
 const caption = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 
 /** Twelve columns with a 16 gutter, inside the surface pad. */
 export const GridAnatomy = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div style={{ padding: 'var(--page-pad)', borderRadius: 'var(--page-radius)', background: 'var(--ds-surface)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)' }}>
             <div style={grid12}>
                 {Array.from({ length: 12 }, (_, i) => (
-                    <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--element-pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
+                    <div key={i} style={{ ...columnFill, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 'var(--pad-y-md)', font: 'var(--body-small)', color: 'var(--ds-text-accent-blue)' }}>
                         {i + 1}
                     </div>
                 ))}
             </div>
         </div>
-        <span style={caption}>12 columns · <C>--layout-gutter</C> 16 between them · <C>--page-pad</C> around them, 16 below 1440 and 24 from 1440.</span>
+        <span style={caption}>12 columns · <C>--grid-gutter</C> 16 between them · <C>--page-pad</C> around them, 16 below 1440 and 24 from 1440.</span>
     </div>
 );
 
@@ -56,7 +56,7 @@ const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-r
 /** Keep the gutter 16 at every width. */
 export const Gutter = () => (
     <DoDont>
-        <Do caption={<><C>--layout-gutter</C> 16 between all 12 columns, at every breakpoint.</>}>
+        <Do caption={<><C>--grid-gutter</C> 16 between all 12 columns, at every breakpoint.</>}>
             <div style={{ ...ground, ...grid12 }}>{Array.from({ length: 12 }, (_, i) => <div key={i} style={columnFill} />)}</div>
         </Do>
         <Dont caption="An 8 gutter from the older grid. It does not match code, and cards side by side lose the rhythm of the page.">
@@ -94,8 +94,8 @@ const ModalBox = ({ width }) => (
 /** Size modals from the screen grid. */
 export const ModalFromScreenGrid = () => (
     <DoDont>
-        <Do caption={<>Modal <C>md</C>: <C>--layout-width-modal-md</C>, 8 screen-grid columns plus 16 a side, centered.</>}>
-            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--layout-width-modal-md)" /></div>
+        <Do caption={<>Modal <C>md</C>: <C>--modal-width-md</C>, 8 screen-grid columns plus 16 a side, centered.</>}>
+            <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--modal-width-md)" /></div>
         </Do>
         <Dont caption="A fixed pixel width. It ignores the screen grid, so it sits off the page columns and does not grow with the screen.">
             <div style={{ ...ground, background: 'var(--ds-blanket)' }}><ModalBox width="var(--width-1900)" /></div>
@@ -108,7 +108,7 @@ const LESSON = 'Start each session by asking what the student worked on since yo
 /** Cap reading text at 864. */
 export const ReadingCap = () => (
     <DoDont>
-        <Do caption={<>Reading content capped at <C>--layout-max-width-reading</C> 864 and centered.</>}>
+        <Do caption={<>Reading content capped at <C>--content-max-width-reading</C> 864 and centered.</>}>
             <div style={ground}><p style={{ maxWidth: 'calc(100% * 864 / 1232)', margin: '0 auto', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{LESSON}</p></div>
         </Do>
         <Dont caption="A paragraph stretched across the full 1232. Lines get too long to follow from one to the next.">
@@ -120,10 +120,10 @@ export const ReadingCap = () => (
 /** Align containers to columns, not their parts. */
 export const AlignContainers = () => (
     <DoDont>
-        <Do caption={<>The card spans six columns; its buttons hug their labels, 8 apart (<C>--element-inline-md</C>).</>}>
+        <Do caption={<>The card spans six columns; its buttons hug their labels, 8 apart (<C>--inline-md</C>).</>}>
             <div style={{ ...ground, ...grid12 }}>
                 <div style={{ gridColumn: 'span 12' }}>
-                    <PatternCard title="Weekly report" footer={<span style={{ display: 'flex', gap: 'var(--element-inline-md)' }}><Button text="Cancel" /><Button text="Save" appearance="primary" /></span>} />
+                    <PatternCard title="Weekly report" footer={<span style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button text="Cancel" /><Button text="Save" appearance="primary" /></span>} />
                 </div>
             </div>
         </Do>

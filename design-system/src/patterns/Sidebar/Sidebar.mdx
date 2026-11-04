@@ -31,12 +31,12 @@ export const itemProps = [
 ];
 
 export const tokens = [
-    ['--layout-width-sidebar', '240', 'The sidebar width, set by Frame.'],
+    ['--frame-sidebar-width', '240', 'The sidebar width, set by Frame.'],
     ['--frame-pad', '8', 'The sidebar pads 8 at the sides.'],
-    ['--layout-pad-left-container', '8 at Medium, 0 from Large', 'The Page row\'s left pad: 8 while the sidebar floats, 0 once it docks.'],
-    ['--element-stack-sm', '4', 'The gap between rows, between sections, and between a section\'s items.'],
-    ['--element-pad-y-md, --element-pad-x-sm', '6, 8', 'The header around the logo.'],
-    ['--element-pad-y-md, --element-pad-x-md', '6, 12', 'The section group label.'],
+    ['--grid-pad-left-container', '8 at Medium, 0 from Large', 'The Page row\'s left pad: 8 while the sidebar floats, 0 once it docks.'],
+    ['--stack-sm', '4', 'The gap between rows, between sections, and between a section\'s items.'],
+    ['--pad-y-md, --pad-x-sm', '6, 8', 'The header around the logo.'],
+    ['--pad-y-md, --pad-x-md', '6, 12', 'The section group label.'],
     ['--heading-xxsmall', '12 semibold', 'The group label type style.'],
     ['--ds-text-subtlest', 'color', 'The group label color.'],
     ['--item-height-md', '32', 'The row height. A row with a description is 40.'],
@@ -45,22 +45,22 @@ export const tokens = [
 ];
 
 export const tabTokens = [
-    ['--element-pad-x-md + --icon-md', '12 + 16 = 28', 'The thread column. There is no token for the sum.'],
+    ['--pad-x-md + --icon-md', '12 + 16 = 28', 'The thread column. There is no token for the sum.'],
     ['--item-height-md', '32', 'The tab surface height.'],
-    ['--element-pad-x-sm', '8', 'The tab surface pad, so its label lines up with the parent\'s at 36.'],
-    ['--element-radius-item-md', '8', 'The tab surface radius.'],
+    ['--pad-x-sm', '8', 'The tab surface pad, so its label lines up with the parent\'s at 36.'],
+    ['--radius-h32', '8', 'The tab surface radius.'],
     ['--ds-background-neutral-subtle-hovered', 'color', 'Hover.'],
     ['--ds-background-neutral-subtle-pressed', 'color', 'Pressed.'],
     ['--ds-background-selected', 'color', 'Selected, with --ds-text-selected and a label in --type-weight-medium. There is no leading bar.'],
     ['--ds-background-selected-hovered', 'color', 'Selected and hovered.'],
     ['--ds-border-focused', 'color', 'The focus ring: 2px, drawn 2px inside the surface.'],
-    ['--element-stack-sm', '4', 'The gap between tab rows.'],
+    ['--stack-sm', '4', 'The gap between tab rows.'],
     ['--ds-text-subtlest', 'color', 'The "Show N more" label.'],
     ['Thread position', 'x 20', 'The thread runs under the parent icon\'s center.'],
     ['Thread stub', 'ends at 24', 'The elbow\'s stub stops 4 before the surface, clear of a focused row\'s ring.'],
     ['--ds-border', 'color', 'The thread line.'],
     ['--size-element-stroke-sm', '1', 'The thread line width.'],
-    ['--element-radius-item-sm', '6', 'The thread elbow.'],
+    ['--radius-h24', '6', 'The thread elbow.'],
 ];
 
 <Title>Sidebar</Title>

@@ -38,7 +38,7 @@ export const MetricInLarge = () => (
 
 /** The same card shell serves a metric tile, a progress display and a session summary. */
 export const CardJobs = () => (
-    <div style={{ display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
         <PatternCard padding="sm" minWidth="var(--card-min-width-sm)">
             {metric}
         </PatternCard>

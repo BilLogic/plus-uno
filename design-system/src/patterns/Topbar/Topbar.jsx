@@ -5,12 +5,12 @@ import { useSidebarControl } from '../Frame/SidebarControl';
 import './Topbar.scss';
 
 /**
- * Topbar pattern: the app frame's top row, 32 high (`--layout-height-topbar`).
+ * Topbar pattern: the app frame's top row, 32 high (`--frame-topbar-height`).
  * Mirrors the Figma `_Topbar` and the Specs Top Bar (111-227859).
  *
  * - **Start:** the sidebar toggle, a primary tonal 32 icon button. It shows
  *   `angles-left` while the sidebar is open (docked or floating) and `bars`
- *   while it is closed. Docked, the start area is `--layout-width-sidebar`
+ *   while it is closed. Docked, the start area is `--frame-sidebar-width`
  *   wide, so the breadcrumb lines up with the surface; otherwise the breadcrumb
  *   follows the toggle.
  * - **Middle:** a Breadcrumb that stays on one line and truncates.

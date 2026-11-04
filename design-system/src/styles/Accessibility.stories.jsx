@@ -26,7 +26,7 @@ export const ContrastPairings = () => (
 export const FocusRing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the button. The fill is unchanged.</>}>
-            <span style={{ display: 'inline-flex', borderRadius: 'var(--element-radius-item-md)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)' }}>
+            <span style={{ display: 'inline-flex', borderRadius: 'var(--radius-h32)', outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)' }}>
                 <Button text="Save changes" appearance="primary" />
             </span>
         </Do>

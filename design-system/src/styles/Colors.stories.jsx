@@ -26,14 +26,14 @@ const label = { font: 'var(--body-small)', color: 'var(--ds-text-subtle)' };
 const grid = () => ({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: 'var(--element-stack-lg)',
+    gap: 'var(--stack-lg)',
 });
 
 /** One token drawn as what it paints: a fill, a line, a glyph or a word. */
 const Swatch = ({ token, kind = 'background', on }) => {
     const box = {
         height: 'var(--row-height-md)',
-        borderRadius: 'var(--element-radius-lg)',
+        borderRadius: 'var(--radius-lg)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -55,7 +55,7 @@ const Swatch = ({ token, kind = 'background', on }) => {
         box.boxShadow = `inset 0 0 0 var(--border-selected) var(${token})`;
     }
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', minWidth: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
             <div style={box}>{sample}</div>
             <span style={name}>{token}</span>
         </div>
@@ -74,8 +74,8 @@ const action = {
     display: 'inline-flex',
     alignItems: 'center',
     height: 'var(--item-height-md)',
-    padding: '0 var(--element-pad-x-md)',
-    borderRadius: 'var(--element-radius-item-md)',
+    padding: '0 var(--pad-x-md)',
+    borderRadius: 'var(--radius-h32)',
     font: 'var(--body-default)',
     fontWeight: 'var(--type-weight-medium)',
 };
@@ -96,12 +96,12 @@ export const Overview = () => (
         >
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Session with Maya</span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Tuesday, June 3 · 11:00 am</span>
-            <span style={{ display: 'inline-flex', gap: 'var(--element-inline-md)', flexWrap: 'wrap' }}>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--element-pad-x-xs)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
-                <span style={{ font: 'var(--body-small)', padding: '0 var(--element-pad-x-xs)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
+            <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
+                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-success)', color: 'var(--ds-text-success)' }}>Confirmed</span>
+                <span style={{ font: 'var(--body-small)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-warning)', color: 'var(--ds-text-warning)' }}>Reflection due</span>
             </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-link)', textDecoration: 'underline' }}>View the lesson plan</span>
-            <span style={{ display: 'inline-flex', gap: 'var(--element-inline-md)' }}>
+            <span style={{ display: 'inline-flex', gap: 'var(--inline-md)' }}>
                 <span style={{ ...action, background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Join session</span>
                 <span style={{ ...action, background: 'var(--ds-background-neutral)', color: 'var(--ds-text)' }}>Reschedule</span>
             </span>
@@ -137,17 +137,17 @@ const STATUSES = ['danger', 'warning', 'success', 'information', 'discovery'];
 /** Each status role at its four emphasis levels, each with its partner text. */
 export const StatusRoles = () => (
     <ModeCompare>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {STATUSES.map((role) => (
-                <div key={role} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--element-inline-md)' }}>
+                <div key={role} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>
                     {[
                         [`--ds-background-${role}`, `--ds-text-${role}`, 'default'],
                         [`--ds-background-${role}-subtler`, `--ds-text-${role}-bolder`, 'subtler'],
                         [`--ds-background-${role}-subtle`, `--ds-text-${role}-bolder`, 'subtle'],
                         [`--ds-background-${role}-bold`, role === 'warning' ? '--ds-text-warning-inverse' : '--ds-text-inverse', 'bold'],
                     ].map(([bg, fg, step]) => (
-                        <div key={bg} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', minWidth: 0 }}>
-                            <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--element-pad-x-sm)', borderRadius: 'var(--element-radius-lg)', background: `var(${bg})`, color: `var(${fg})`, font: 'var(--body-default)' }}>
+                        <div key={bg} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
+                            <div style={{ height: 'var(--row-height-md)', display: 'flex', alignItems: 'center', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: `var(${fg})`, font: 'var(--body-default)' }}>
                                 {role}
                             </div>
                             <span style={label}>{step}</span>
@@ -170,17 +170,17 @@ const SMART = [
 /** The five SMART subjects: chip fill, illustration body, bold fill, text and edge. */
 export const SmartSubjects = () => (
     <ModeCompare>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {SMART.map(([key, title]) => (
-                <div key={key} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--element-inline-md)', alignItems: 'center' }}>
-                    <span style={{ font: 'var(--body-default)', padding: '0 var(--element-pad-x-xs)', borderRadius: 'var(--element-radius-md)', background: `var(--ds-background-smart-${key})`, color: `var(--ds-text-smart-${key})`, boxShadow: `inset 0 0 0 var(--border-default) var(--ds-border-smart-${key})`, justifySelf: 'start' }}>
+                <div key={key} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)', alignItems: 'center' }}>
+                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-smart-${key})`, color: `var(--ds-text-smart-${key})`, boxShadow: `inset 0 0 0 var(--border-default) var(--ds-border-smart-${key})`, justifySelf: 'start' }}>
                         {title}
                     </span>
-                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--element-radius-full)', background: `var(--ds-background-smart-${key}-subtle)` }} />
-                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--element-radius-lg)', background: `var(--ds-background-smart-${key}-bold)` }} />
+                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-full)', background: `var(--ds-background-smart-${key}-subtle)` }} />
+                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-lg)', background: `var(--ds-background-smart-${key}-bold)` }} />
                 </div>
             ))}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--element-inline-md)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>
                 <span style={label}>chip: background, text, border</span>
                 <span style={label}>illustration body: subtle</span>
                 <span style={label}>bold fill</span>
@@ -218,9 +218,9 @@ const MeasuredPair = ({ fg, bg, bar }) => {
         return () => observer.disconnect();
     }, []);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', minWidth: 0 }}>
-            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-selected) var(${fg})` : 'none', font: 'var(--body-default)' }}>
-                <span ref={ref} aria-hidden="true" style={{ display: 'inline-flex', width: 'var(--icon-md)', height: 'var(--icon-md)', borderRadius: 'var(--element-radius-full)', background: `var(${fg})` }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', minWidth: 0 }}>
+            <div style={{ height: 'var(--row-height-lg)', display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: `var(${bg})`, color: isLine ? 'var(--ds-text)' : `var(${fg})`, boxShadow: isLine ? `inset 0 0 0 var(--border-selected) var(${fg})` : 'none', font: 'var(--body-default)' }}>
+                <span ref={ref} aria-hidden="true" style={{ display: 'inline-flex', width: 'var(--icon-md)', height: 'var(--icon-md)', borderRadius: 'var(--radius-full)', background: `var(${fg})` }} />
                 <span>{ratio ? `${ratio.toFixed(2)}:1` : ' '}</span>
             </div>
             <span style={name}>{fg}</span>
@@ -272,7 +272,7 @@ export const TextTokenForWords = () => (
     <DoDont>
         <Do caption={<>A warning written in <C>--ds-text-warning</C> on <C>--ds-background-warning</C>.</>}>
             <div style={{ ...sample, boxShadow: 'none', background: 'var(--ds-background-warning)' }}>
-                <span style={{ display: 'inline-flex', gap: 'var(--element-inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
+                <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
                     <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
                     Two reflections are due today.
                 </span>
@@ -295,12 +295,12 @@ TextTokenForWords.parameters = { a11y: { config: { rules: [{ id: 'color-contrast
 export const FocusIsARing = () => (
     <DoDont>
         <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field. The fill stays as it was.</>}>
-            <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--element-radius-item-md)' }}>
+            <div style={{ outline: 'var(--border-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-focused)', borderRadius: 'var(--radius-h32)' }}>
                 <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Do>
         <Dont caption="Focus shown by tinting the field. A fill reads as selected or hovered, and keyboard users lose their place.">
-            <div style={{ borderRadius: 'var(--element-radius-item-md)', background: 'var(--ds-background-selected)' }}>
+            <div style={{ borderRadius: 'var(--radius-h32)', background: 'var(--ds-background-selected)' }}>
                 <TextField id="color-focus-dont" label="Student name" isLabelHidden placeholder="Search students" />
             </div>
         </Dont>

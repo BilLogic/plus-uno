@@ -25,7 +25,7 @@ const icon = (name) => <i className={`fa-solid fa-${name}`} aria-hidden="true" s
 
 const SortHead = ({ children, sort, align }) => (
     <th aria-sort={sort === 'up' ? 'ascending' : undefined} style={align}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
             {children}
             {icon(sort === 'up' ? 'arrow-up' : 'sort')}
         </span>
@@ -189,7 +189,7 @@ const RosterAsStaticCase = () => (
 const TreeRow = ({ level, open, name, count, type, sessions }) => (
     <tr>
         <td>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)', paddingInlineStart: `calc(${level} * var(--table-indent))` }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', paddingInlineStart: `calc(${level} * var(--table-indent))` }}>
                 <span style={{ display: 'inline-flex', width: 'var(--icon-sm)', justifyContent: 'center' }}>
                     {open === undefined ? null : icon(open ? 'chevron-down' : 'chevron-right')}
                 </span>
@@ -228,7 +228,7 @@ const TreeAsExpandableCase = () => (
         <tbody>
             <tr>
                 <td>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                         {icon('chevron-down')}Lincoln Middle
                     </span>
                 </td>
@@ -244,7 +244,7 @@ const TreeAsExpandableCase = () => (
             </tr>
             <tr>
                 <td>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                         {icon('chevron-right')}Roosevelt K-8
                     </span>
                 </td>

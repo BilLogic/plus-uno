@@ -38,8 +38,8 @@ export const TypeScale = () => (
         {SCALE.map(([family, size, metrics, sample]) => {
             const token = `--${family.toLowerCase()}-${size}`;
             return (
-                <div key={token} style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--field-width-md), 1fr) 3fr', gap: 'var(--layout-gutter)', alignItems: 'baseline', padding: 'var(--element-stack-lg) 0', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+                <div key={token} style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--field-width-md), 1fr) 3fr', gap: 'var(--grid-gutter)', alignItems: 'baseline', padding: 'var(--stack-lg) 0', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{family}/{size} · {metrics}</span>
                         <span style={code}>var({token})</span>
                     </div>
@@ -61,9 +61,9 @@ const LEVELS = [
 
 /** Which style each kind of title takes. */
 export const HeadingLevels = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         {LEVELS.map(([name, token, note]) => (
-            <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div key={name} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <span style={{ font: `var(${token})`, color: 'var(--ds-text)' }}>{name}</span>
                 <span style={meta}>{note}</span>
             </div>

@@ -19,7 +19,7 @@ const bodyCopy = (
 );
 
 const longBody = (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {Array.from({ length: 12 }, (_, i) => (
             <p key={i} style={{ margin: 0, font: 'var(--body-default)' }}>
                 {`Paragraph ${i + 1}: long body content, so the body scrolls once the modal reaches its cap.`}
@@ -98,8 +98,8 @@ export const Overview = {
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         await expect(style.borderTopLeftRadius, 'Modal/radius').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         const overlayStyle = getComputedStyle(overlay);
-        await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--overlay-pad-x')}px`);
-        await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--overlay-pad-y')}px`);
+        await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
+        await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `scrim is the blanket (${mode})`).toBe(token('--ds-blanket'));
             await expect(getComputedStyle(modal).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
@@ -155,7 +155,7 @@ export const Heights = {
     ),
     play: async ({ canvasElement }) => {
         const [short, long, fill] = dialogs(canvasElement);
-        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--overlay-pad-y');
+        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         await expect(short.getBoundingClientRect().height, 'a short hug modal hugs').toBeLessThan(cap);
         await expect(long.getBoundingClientRect().height, 'a long hug modal stops at the cap').toBeCloseTo(cap, 0);
         await expect(fill.getBoundingClientRect().height, 'fill sits at the cap').toBeCloseTo(cap, 0);
@@ -167,9 +167,9 @@ export const Heights = {
 };
 
 const fields = (rows) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         {rows.map(([label, value]) => (
-            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div key={label} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{label}</span>
                 <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{value}</span>
             </div>
@@ -228,7 +228,7 @@ export const Tabs = {
     ),
     play: async ({ canvasElement }) => {
         const [hug, fill] = dialogs(canvasElement);
-        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--overlay-pad-y');
+        const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         const tabsOf = (modal) => within(modal).getAllByRole('tab');
         const panelOf = (modal) => within(modal).getByRole('tabpanel');
         const selectedOf = (modal) => tabsOf(modal).find((tab) => tab.getAttribute('aria-selected') === 'true');
