@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--radius-050` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--radius-050` · `--space-025` · `--space-0375` · `--space-050` · `--space-0625` · `--space-075` · `--space-100` · `--space-150`
 
 From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Override these through the token layer, never with a literal.
 
