@@ -2,7 +2,7 @@
 
 # Labels
 
-8 components. Each row links to the generated facts; the three columns after it are the
+9 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -10,13 +10,14 @@ authored half (#166), counted rather than assumed.
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✕ | ✕ | ✕ |
+| [PromptStarters](PromptStarters/index.md) | 4 | ✕ | ✕ | ✕ |
 | [SmartTag](SmartTag/index.md) | 3 | ✕ | ✕ | ✕ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/8 (75%) · Correct/incorrect 6/8 (75%) · Accessibility 6/8 (75%)
+**Authored coverage:** When to use 6/9 (67%) · Correct/incorrect 6/9 (67%) · Accessibility 6/9 (67%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

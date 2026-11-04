@@ -22,6 +22,7 @@ export { default as InlineEdit } from '@/components/forms-and-inputs/InlineEdit'
 export { default as InlineEditableTextfield } from '@/components/forms-and-inputs/InlineEditableTextfield';
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
+export { default as PromptInput } from '@/components/forms-and-inputs/PromptInput';
 export { default as Radio } from '@/components/forms-and-inputs/Radio';
 export { default as Range } from '@/components/forms-and-inputs/Range';
 export { default as Rating } from '@/components/forms-and-inputs/Rating';
@@ -49,6 +50,7 @@ export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar'
 export { default as AiLabel } from '@/components/labels/AiLabel';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
+export { default as PromptStarters } from '@/components/labels/PromptStarters';
 export { default as SmartTag, SMART_TAG_SUBJECTS } from '@/components/labels/SmartTag';
 export { default as StatusTag, STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from '@/components/labels/StatusTag';
 export { default as Suggestion, SUGGESTION_TYPES } from '@/components/labels/Suggestion';
@@ -74,6 +76,7 @@ export { default as Flag, FLAG_AUTO_CLOSE_MS, FlagContainer } from '@/components
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, createModal } from '@/components/messaging/Modal';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
+export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';

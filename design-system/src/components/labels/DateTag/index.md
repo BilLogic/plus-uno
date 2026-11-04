@@ -38,7 +38,7 @@ From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these 
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

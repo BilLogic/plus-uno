@@ -2,7 +2,7 @@
 
 # Messaging
 
-6 components. Each row links to the generated facts; the three columns after it are the
+7 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -13,8 +13,9 @@ authored half (#166), counted rather than assumed.
 | [InlineMessage](InlineMessage/index.md) | 8 | ✕ | ✕ | ✕ |
 | [Modal](Modal/index.md) | 33 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Spotlight](Spotlight/index.md) | 12 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 4/6 (67%) · Correct/incorrect 4/6 (67%) · Accessibility 4/6 (67%)
+**Authored coverage:** When to use 4/7 (57%) · Correct/incorrect 4/7 (57%) · Accessibility 4/7 (57%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

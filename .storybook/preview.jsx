@@ -296,7 +296,8 @@ const preview = {
               "Flag",
               "Inline message",
               "Modal dialog",
-              "Section message"
+              "Section message",
+              "Spotlight"
             ],
             "Navigation",
             [
