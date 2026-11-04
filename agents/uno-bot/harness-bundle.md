@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **114,735 chars from 9 files**, against an assembled budget of 175,500 (60,765 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 94,351 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **114,631 chars from 9 files**, against an assembled budget of 175,500 (60,869 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 94,247 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,715 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 26,825 | 37,218 | 20,000 (constitution) ⚠️ **over by 6,825** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 58,686 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 60,332 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 61,580 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 67,274 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 79,060 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 98,880 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 102,348 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 108,906 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 113,879 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 114,735 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 26,721 | 37,114 | 20,000 (constitution) ⚠️ **over by 6,721** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 58,582 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 60,228 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 61,476 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 67,170 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 78,956 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 98,776 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 102,244 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 108,802 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 113,775 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 114,631 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -86,7 +86,7 @@ Users remember six skills; agents point at the conventions they enforce and neve
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **live app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **Vibe app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
@@ -237,8 +237,8 @@ A Zoom sub-room for one-on-one tutoring.
 ### Design system: structure
 
 **Pattern**:
-A reusable layout of components with named slots: Page templates, Frame, Page, Section, Card, Table, Blanket, Modal, Popover, Drawer. A **Component** is one control in a **Category**; a pattern arranges components.
-_Avoid_: "template" for a pattern, "layout component"
+A reusable layout of components with named slots, which the patterns overview in Storybook lists. A component is one control in a **Category**; a pattern arranges components.
+_Avoid_: "layout component"
 
 **Frame**:
 The pattern for the app's outer shell: the Topbar and Sidebar that stay put while the **Page** inside changes.
@@ -253,7 +253,7 @@ The pattern for the main content area inside a **Frame**: it carries the page ti
 _Avoid_: "surface"
 
 **Section**:
-The pattern for a span of the page grid that groups content under one heading, with a `_Section header`; a peer of **Card**. A bare "Section" always means this pattern.
+The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. A bare "Section" always means this pattern.
 _Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
@@ -273,7 +273,7 @@ A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for w
 _Avoid_: "side panel", "slide-over"
 
 **Popover**:
-The pattern for any layer that floats above the page with no **Blanket**: Menu, **Popup**, Flag and Tooltip. It names the pattern only.
+The pattern for any layer that floats above the page with no **Blanket**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
 _Avoid_: "popover" for the **Popup** component, "floating layer", "popover family"
 
 **Part**:
@@ -287,7 +287,7 @@ _Avoid_: "children area", "placeholder" for the slot itself
 ### Design system: components
 
 **Category**:
-The component group names, the same in Figma pages, Storybook and code folders: Forms and inputs, Images and icons, Labels, Layout and structure, Loading, Messaging, Navigation, Overlays and layering, Status indicators, Text and data display, plus AI.
+A component group name, identical in Figma pages, Storybook and code folders, such as Forms and inputs or Text and data display; the component index lists them.
 _Avoid_: "Actions", "group" for a category
 
 **Static table**:
@@ -303,7 +303,7 @@ A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
 **Modal dialog**:
-The component built on the **Modal** pattern, with a title, body, actions and a `view` of default or confirm. Close is always shown.
+The component built on the **Modal** pattern, with a title, body, actions and a `view` of default or confirm. Its Close button is always shown.
 _Avoid_: "popup" for a blocking dialog, "ModalDialog" in prose
 
 **Popup**:
@@ -319,18 +319,22 @@ A titled or separated group of items inside a **Menu**.
 _Avoid_: bare "section"
 
 **Dropdown menu**:
-A button trigger that opens a **Menu** of actions or options in a **Popup**. Picking a value in a form is **Select**.
+A button trigger that opens a **Menu** of actions or options in a **Popup**.
 _Avoid_: bare "dropdown"
+
+**Select**:
+A form field for picking a value from a list of options.
+_Avoid_: "dropdown", "Dropdown menu" for a value picker
 
 **Close / Dismiss**:
 Close ends a blocking layer (**Modal dialog**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
 
 **Flag**:
-A short message that appears at the screen corner and leaves on its own or on Dismiss; rendered above everything.
+A short message that appears at the screen corner and leaves on its own or on Dismiss.
 _Avoid_: "toast", "snackbar"
 
 **Section message**:
-A message that sits in the page flow inside a **Section** or form, colored by its meaning with no side stripe. Banner spans the top of a page; Inline message sits beside one field.
+A message that sits in the page flow inside a **Section** or form, colored by its meaning.
 _Avoid_: "alert", "callout"
 
 **Toggle**:
@@ -398,23 +402,23 @@ A boolean state prop such as `isDisabled`, `isSelected` or `isLoading`.
 _Avoid_: bare `disabled`, `selected` or `loading` props
 
 **Base UI**:
-The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close); Bootstrap survives only as CSS until its cleanup. Decided in ADR-037.
+The one behavior layer every interactive component wraps (focus, keyboard, ARIA, open and close), decided in ADR-037; Bootstrap stays the CSS framework for non-interactive markup.
 _Avoid_: "react-bootstrap" as a precedent
 
 **FieldBox / FieldFrame**:
-FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error on Base UI Field, and is the only piece choice controls share.
+FieldBox is an input's box (leading and trailing slots, density, radius); FieldFrame carries its label, caption and error, and is the only piece choice controls share.
 _Avoid_: "input wrapper", "form group"
 
 **Overlay module**:
-The shared layer code for everything that floats: the portal, the `--layer-*` stacking order and the rules of one **Modal dialog** at a time with Flag on top.
+The shared layer code for everything that floats: the portal, the z-index scale and the stacking rules.
 _Avoid_: "overlay" for the **Blanket**
 
 **State mixin**:
-The one SCSS source of hover, pressed, selected and focus styling, reading **Named state token**s.
+The one shared source of hover, pressed, selected and focus styling, reading **Named state token**s.
 _Avoid_: "state layer"
 
 **Focus ring**:
-The 2px `--ds-border-focused` ring that shows keyboard focus, drawn as a ring rather than a fill.
+The ring that shows keyboard focus, drawn in the focused border color rather than as a fill.
 _Avoid_: "focus outline", "focus state color"
 
 ### Design system: tokens
@@ -423,18 +427,18 @@ _Avoid_: "focus outline", "focus state color"
 A design value: color, spacing, typography, elevation, radius.
 
 **Foundation**:
-A fundamental design primitive (color palette, type scale, grid), and the Figma and Storybook pages that document one.
+A fundamental design primitive (color palette, type scale, grid), and the Figma and Storybook pages that document one. A docs word: the token collections say semantics.
 
 **Token tier**:
-The four levels every spacing, size and radius token sits on, the same in code and Figma: **Primitive** → **Semantic** → **Pattern token** → **Component token**. Pick the most specific that fits: a component token if one exists, else the pattern's (it would change if the pattern changed), else semantics.
-_Avoid_: "token layer", "level"
+The four levels every spacing token sits on, one Figma collection each and the same in code: `spacing / primitives` → `spacing / semantics` → `spacing / patterns` → `spacing / components`, read as **Primitive** → **Semantic** → **Pattern token** → **Component token**. Color mirrors it with `color / primitives`, `color / semantics` and `color / opacity`; the fallback rule for picking a tier is in `tokens.md`.
+_Avoid_: "token layer", "level", "foundations" for a collection
 
 **Primitive**:
-A raw value on the PLUS ×16 ladder, where `space-100` is 16px. Components and patterns read semantic, pattern or component tokens, which point at primitives.
+A raw value on the PLUS ×16 ladder, where `space-100` is 16px.
 _Avoid_: "base token", "core token"
 
 **Semantic**:
-A token named by its job, the safety net every value falls back to: Pad, Stack, Inline, Radius, Size, Border, Focus and the grid, on steps (sm, md, lg).
+A token named by its job, the safety net every value falls back to: Pad, Stack, Inline and Radius sit directly in `spacing / semantics`, named by steps (xs to lg, plus full) with no density words.
 _Avoid_: "element token", "foundation token"
 
 **Pattern token**:
@@ -442,7 +446,7 @@ A token one pattern owns, such as a Card's padding or a Modal's width, named for
 _Avoid_: "role token", "container token"
 
 **Component token**:
-A token only one component needs, such as Button's radius, used when no shared token fits.
+A token only one component needs, such as Button's radius, used when no shared token fits and keyed to `spacing` (default, compact, spacious) where the component has one.
 _Avoid_: "local variable"
 
 **Private variable**:
@@ -460,7 +464,7 @@ _Avoid_: "surface" for a layout box
 ### Design work
 
 **PRD**:
-The product requirements for one Roadmap **card**, written in Notion before any prototype.
+The product requirements for one Roadmap card, written in Notion before any prototype.
 _Avoid_: "spec", "ticket"
 
 **Build spec**:
@@ -472,7 +476,7 @@ A GitHub issue under a **Build spec**: one slice, one PR.
 _Avoid_: "ticket" for a Roadmap card, "task"
 
 **Flow spec**:
-One task's page in **Figma Flows**: lanes per user type and annotated 1024 screens built from current components. The source of truth for how that flow looks.
+One task's page in **Figma Flows**: lanes per user type and annotated screens built from current components. The source of truth for how that flow looks.
 _Avoid_: bare "spec", "wireframe"
 
 **Ticket draft**:
@@ -480,7 +484,7 @@ Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow 
 _Avoid_: "spec" for a draft
 
 **Product screen**:
-A coded copy of one PLUS screen, built from design-system components under `design-system/src/specs`.
+A coded copy of one PLUS screen, built from design-system components, shown in Storybook's Specs section.
 _Avoid_: bare "spec", "page" for the coded screen
 
 **Prompt-spec**:
@@ -526,12 +530,12 @@ The design-system source of truth: documentation for the coded components and th
 _Avoid_: "the docs site"
 
 **Figma Core**:
-The Figma component library; it follows **uno-storybook** on conflict, and only Bill publishes it.
-_Avoid_: "BS4 Foundation", "the library file"
+The Figma component library; it follows **uno-storybook** on conflict.
+_Avoid_: "the library file"
 
 **Figma Flows**:
-The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for product flows. The older Specs file is deprecated.
-_Avoid_: "Spec file", "SOT"
+The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for product flows.
+_Avoid_: "Spec file"
 
 **Vibe app**:
 The coded prototype of PLUS in this repo, built from **Product screen**s and served beside Storybook.
