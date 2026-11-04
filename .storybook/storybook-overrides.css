@@ -14,6 +14,16 @@ body,
 }
 
 /*
+ * The docs ground. The text tokens above switch with the Color mode, so the ground
+ * they sit on has to as well: Storybook paints its own white here, which left
+ * light text on white once dark was selected.
+ */
+body,
+.sbdocs-wrapper {
+    background-color: var(--ds-surface) !important;
+}
+
+/*
  * Headers in MDX prose only.
  * Do NOT let these reach inside a story canvas — that is what
  * `:not(:where(.docs-story *, .sb-ds-dodont-card *))` is fencing off, and it is the same lesson the
