@@ -39,10 +39,28 @@ describe('Flag timing', () => {
     });
 });
 
+describe('Flag visibility', () => {
+    it('renders nothing when show is false', () => {
+        render(<Flag title="Saved" show={false} onClose={() => {}}>Done.</Flag>);
+        expect(screen.queryByText('Done.')).not.toBeInTheDocument();
+    });
+
+    it('shows by default even without an explicit show prop', () => {
+        render(<Flag title="Saved" onClose={() => {}}>Done.</Flag>);
+        expect(screen.getByText('Done.')).toBeInTheDocument();
+    });
+});
+
 describe('FlagContainer', () => {
     it('sits bottom-left by default', () => {
         render(<FlagContainer data-testid="flags"><span>flag</span></FlagContainer>);
         const container = screen.getByTestId('flags');
-        expect(container).toHaveClass('bottom-0', 'start-0');
+        expect(container).toHaveAttribute('data-position', 'bottom-start');
+        expect(container).toHaveAttribute('data-container-position', 'fixed');
+    });
+
+    it('maps legacy corner names to their logical position', () => {
+        render(<FlagContainer data-testid="flags" position="top-right"><span>flag</span></FlagContainer>);
+        expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
     });
 });

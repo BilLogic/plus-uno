@@ -22,7 +22,7 @@ The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 | `title` | node (required) | — | — |
 | `children` | node (required) | — | — |
 | `dismissible` | bool | `true` | — |
-| `show` | bool | — | — |
+| `show` | bool | `true` | — |
 | `onClose` | func | — | — |
 | `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default. |
 | `autohide` | bool | — | Close itself after `delay`. Defaults to true for success, info, primary and secondary, false for warning and danger. |

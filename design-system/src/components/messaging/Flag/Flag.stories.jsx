@@ -18,7 +18,7 @@ export default {
         ],
         docs: {
             description: {
-                component: 'Flag component for displaying notifications. Based on react-bootstrap Toast.'
+                component: 'Flag component for displaying notifications.'
             }
         }
     },
