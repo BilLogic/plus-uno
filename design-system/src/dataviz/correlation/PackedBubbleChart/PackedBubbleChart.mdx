@@ -107,7 +107,7 @@ largest size and values far below it draw small. Keep the data inside that range
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No enrollment yet" description="Courses appear once students enroll." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No enrollment yet" description="Courses appear once students enroll." />
     : <PackedBubbleChart data={data} />}
 ```
 

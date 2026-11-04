@@ -24,7 +24,7 @@ line on what goes here, and the one action that fills it.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Page size: an illustration, a header on Heading/medium 20, one line and two actions.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Default spacing: an illustration, a header on Heading/medium 20, one line and two actions.</>}>
     <Canvas of={EmptyStateStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -66,7 +66,7 @@ line on what goes here, and the one action that fills it.
 
 <DocsInteractivePlayground
     of={EmptyStateStories.Interactive}
-    description={<>Change the copy, icon and size in the table below.</>}
+    description={<>Change the copy, icon and spacing in the table below.</>}
 />
 
 </div>
@@ -98,11 +98,11 @@ and one primary action.
         <tr><td><code>icon</code></td><td>string</td><td>A Font Awesome Free solid name, used when there is no image.</td></tr>
         <tr><td><code>primaryAction</code></td><td>node</td><td>One filled Button.</td></tr>
         <tr><td><code>secondaryAction</code></td><td>node</td><td>An optional outlined Button.</td></tr>
-        <tr><td><code>size</code></td><td>page | compact</td><td>A view or panel, or a table body or card.</td></tr>
+        <tr><td><code>spacing</code></td><td>default | compact</td><td>A view or panel, or a table body or card.</td></tr>
     </tbody>
 </DocsTable>
 
-Use `page` for a view or panel and `compact` inside a Table or Card. Use an
+Use `default` for a view or panel and `compact` inside a Table or Card. Use an
 SectionMessage, not an EmptyState, for a failure.
 
 </div>
@@ -142,7 +142,7 @@ SectionMessage, not an EmptyState, for a failure.
 <Table headers={headers} rows={[]} emptyState="No students" />
 
 // Correct: the header stays and the EmptyState takes the body.
-<Table headers={headers} rows={[]} emptyState={<EmptyState size="compact" header="No students yet" />} />
+<Table headers={headers} rows={[]} emptyState={<EmptyState spacing="compact" header="No students yet" />} />
 ```
 
 </div>

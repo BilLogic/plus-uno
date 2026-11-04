@@ -110,7 +110,7 @@ so spell a name the same way everywhere it appears.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Student flow could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="The flow appears after students book their first session." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No sessions yet" description="The flow appears after students book their first session." />
     : <SankeyDiagram data={data} />}
 ```
 

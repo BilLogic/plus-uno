@@ -107,7 +107,7 @@ Two people with the same name merge into one box.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={500} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Team structure could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No team members yet" description="The structure appears once tutors are assigned to a lead." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No team members yet" description="The structure appears once tutors are assigned to a lead." />
     : <OrganizationChart data={data} />}
 ```
 

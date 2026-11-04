@@ -113,7 +113,7 @@ import { BRAND } from '@/dataviz/palette';
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={200} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Attendance could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No attendance yet" description="Attendance appears after a session is logged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No attendance yet" description="Attendance appears after a session is logged." />
     : <SmartBarChart data={data} />}
 ```
 

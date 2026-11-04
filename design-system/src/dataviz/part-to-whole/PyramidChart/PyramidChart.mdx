@@ -106,7 +106,7 @@ Values print with thousands separators and no decimals.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No students yet" description="Levels appear after the first referral." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No students yet" description="Levels appear after the first referral." />
     : <PyramidChart data={data} />}
 ```
 

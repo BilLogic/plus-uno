@@ -114,7 +114,7 @@ A series may carry its own `color`. `height` takes a number of pixels, default
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Competencies could not load.</SectionMessage>
-    : series.length === 0 ? <EmptyState size="compact" header="No ratings yet" description="Competencies appear after a session is reviewed." />
+    : series.length === 0 ? <EmptyState spacing="compact" header="No ratings yet" description="Competencies appear after a session is reviewed." />
     : <RadarChart categories={categories} series={series} />}
 ```
 

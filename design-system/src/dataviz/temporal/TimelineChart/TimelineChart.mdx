@@ -107,7 +107,7 @@ between, use `FunnelChart`.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Milestones could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No milestones yet" description="Milestones appear as the student moves through the program." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No milestones yet" description="Milestones appear as the student moves through the program." />
     : <TimelineChart data={data} />}
 ```
 

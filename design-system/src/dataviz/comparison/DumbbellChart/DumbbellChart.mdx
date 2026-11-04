@@ -116,7 +116,7 @@ two ends. `height` defaults to 400; `horizontal` defaults to `true`.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a post-test is logged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No scores yet" description="Scores appear after a post-test is logged." />
     : <DumbbellChart categories={categories} data={data} lowLabel="Pre-test" highLabel="Post-test" />}
 ```
 

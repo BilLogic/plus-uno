@@ -109,7 +109,7 @@ both required, one per category in the same order. `height` defaults to 400;
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Availability could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No availability set" description="Hours appear once a tutor sets their availability." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No availability set" description="Hours appear once a tutor sets their availability." />
     : <ColumnRangeChart categories={categories} data={data} yAxisLabel="Hour" />}
 ```
 

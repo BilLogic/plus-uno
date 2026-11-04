@@ -12,7 +12,7 @@ import EmptyState from './EmptyState';
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
  * in a real browser. The component is asserted as what a person gets: the
  * heading with its level, the actions in order, the decorative picture hidden
- * from assistive technology, the heading typeface per size, and the text and
+ * from assistive technology, the heading typeface per spacing, and the text and
  * icon colors resolved from tokens in every color mode.
  */
 
@@ -25,7 +25,7 @@ export default {
             description: {
                 component:
                     'A picture, a short header, one line on what goes here, and the action that fills the view. '
-                    + 'Page size for a view or panel, compact for a table body or a card.',
+                    + 'Default spacing for a view or panel, compact for a table body or a card.',
             },
         },
     },
@@ -33,7 +33,7 @@ export default {
         header: { control: 'text' },
         description: { control: 'text' },
         icon: { control: 'text' },
-        size: { control: 'inline-radio', options: ['page', 'compact'] },
+        spacing: { control: 'inline-radio', options: ['default', 'compact'] },
         image: { control: false },
         primaryAction: { control: false },
         secondaryAction: { control: false },
@@ -101,7 +101,7 @@ WithIcon.play = async ({ canvasElement }) => {
 
 export const Compact = () => (
     <EmptyState
-        size="compact"
+        spacing="compact"
         icon="user-group"
         header="No students yet"
         description="Add a student to see them here."
@@ -124,7 +124,7 @@ export const InATable = () => (
         rows={[]}
         emptyState={(
             <EmptyState
-                size="compact"
+                spacing="compact"
                 icon="user-group"
                 header="No students yet"
                 description="Add a student to see them here."
@@ -149,5 +149,5 @@ Interactive.args = {
     header: 'No students yet',
     description: 'Add a student to start planning sessions.',
     icon: 'user-group',
-    size: 'page',
+    spacing: 'default',
 };

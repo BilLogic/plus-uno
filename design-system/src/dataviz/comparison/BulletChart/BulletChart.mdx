@@ -111,7 +111,7 @@ roughly 60 to 80 px.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={250} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Goals could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No goals set" description="Progress appears once a target is set." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No goals set" description="Progress appears once a target is set." />
     : <BulletChart categories={categories} data={data} height={250} />}
 ```
 

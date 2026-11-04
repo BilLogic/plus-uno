@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './EmptyState.scss';
 
-/** The two sizes: a whole page or panel, or the room inside a table or card. */
-export const EMPTY_STATE_SIZES = ['page', 'compact'];
+/** The two spacings: roomy for a whole page or panel, or compact for the room inside a table or card. */
+export const EMPTY_STATE_SPACINGS = ['default', 'compact'];
 
 /**
  * What a view shows when it has nothing to show yet: a picture, a short
@@ -17,7 +17,7 @@ export const EMPTY_STATE_SIZES = ['page', 'compact'];
  *   EmptyState, so it joins the page's outline.
  * - **primaryAction** is one filled Button; **secondaryAction** an optional
  *   outlined one after it.
- * - **size** `page` centers in a view on Heading/medium 20; `compact` fits a
+ * - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a
  *   table body or a card on Heading/small 16 with a smaller picture.
  *
  * Pass it to a Table's `emptyState` slot.
@@ -29,16 +29,16 @@ const EmptyState = ({
     icon,
     primaryAction,
     secondaryAction,
-    size = 'page',
+    spacing = 'default',
     className = '',
     ...props
 }) => {
-    const resolvedSize = size === 'compact' ? 'compact' : 'page';
+    const resolvedSpacing = spacing === 'compact' ? 'compact' : 'default';
     const Heading = headingTag(useHeadingLevel() + 1);
     const actions = primaryAction || secondaryAction;
 
     return (
-        <div className={['plus-empty-state', `plus-empty-state--${resolvedSize}`, className].filter(Boolean).join(' ')} {...props}>
+        <div className={['plus-empty-state', `plus-empty-state--${resolvedSpacing}`, className].filter(Boolean).join(' ')} {...props}>
             {image ? (
                 <div className="plus-empty-state__image" aria-hidden="true">{image}</div>
             ) : icon ? (
@@ -73,8 +73,8 @@ EmptyState.propTypes = {
     primaryAction: PropTypes.node,
     /** An optional second action: an outlined Button. */
     secondaryAction: PropTypes.node,
-    /** `page` for a view or panel; `compact` for a table body or a card. */
-    size: PropTypes.oneOf(EMPTY_STATE_SIZES),
+    /** `default` for a view or panel; `compact` for a table body or a card. */
+    spacing: PropTypes.oneOf(EMPTY_STATE_SPACINGS),
     className: PropTypes.string,
 };
 

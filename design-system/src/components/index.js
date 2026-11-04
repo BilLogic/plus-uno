@@ -72,7 +72,7 @@ export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/components/loading/Spinner';
 
 export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/components/messaging/Banner';
-export { default as EmptyState, EMPTY_STATE_SIZES } from '@/components/messaging/EmptyState';
+export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
 export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, createModal } from '@/components/messaging/Modal';

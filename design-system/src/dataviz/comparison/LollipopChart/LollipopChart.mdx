@@ -103,7 +103,7 @@ category, in the same order. `height` defaults to 400; `horizontal` defaults to
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Ratings could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No ratings yet" description="Ratings appear after students review a session." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No ratings yet" description="Ratings appear after students review a session." />
     : <LollipopChart categories={categories} data={data} yAxisLabel="Average rating" />}
 ```
 

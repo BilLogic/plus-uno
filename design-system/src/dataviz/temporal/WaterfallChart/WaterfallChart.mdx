@@ -117,7 +117,7 @@ computes it.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment changes could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No changes yet" description="Sign-ups and withdrawals appear here as they happen." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No changes yet" description="Sign-ups and withdrawals appear here as they happen." />
     : <WaterfallChart categories={categories} data={data} yAxisLabel="Enrolled students" />}
 ```
 

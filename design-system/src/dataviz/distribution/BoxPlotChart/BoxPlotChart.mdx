@@ -113,7 +113,7 @@ There is one series and no outlier points. If the low and high are trimmed
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a session is logged." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No scores yet" description="Scores appear after a session is logged." />
     : <BoxPlotChart categories={categories} data={data} yAxisLabel="Test score" />}
 ```
 
