@@ -11,7 +11,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Text field replaces Input, Number input and Input group. It is 40 high, or 32 with `spacing="compact"`; `elemBefore` and `elemAfter` take what the group addons did; `type="number"` adds the steppers.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Text field replaces Input, Number input and Input group. It is 40 high, or 32 with `spacing="compact"`; `elemBeforeInput` and `elemAfterInput` take what the group addons did; `type="number"` adds the steppers.' },
             { date: '2026-11-03', kind: 'added', summary: 'A warning message, with `border.warning` on the field.' },
         ],
         docs: {
@@ -47,8 +47,8 @@ export default {
         label: { control: 'text', table: { category: 'Content' } },
         isRequired: { control: 'boolean', table: { category: 'Content' } },
         placeholder: { control: 'text', table: { category: 'Content' } },
-        elemBefore: { control: false, table: { category: 'Content' } },
-        elemAfter: { control: false, table: { category: 'Content' } },
+        elemBeforeInput: { control: false, table: { category: 'Content' } },
+        elemAfterInput: { control: false, table: { category: 'Content' } },
         type: { table: { disable: true } },
         id: { control: false, table: { disable: true } },
         name: { control: false, table: { disable: true } },
@@ -74,7 +74,7 @@ export const Overview = () => (
             label="Label"
             placeholder="Placeholder"
             isRequired
-            elemAfter={icon('icons')}
+            elemAfterInput={icon('icons')}
         />
     </div>
 );
@@ -98,11 +98,11 @@ export const Content = () => (
             </div>
             <div>
                 <span className={caption}>ELEMENT BEFORE</span>
-                <TextField label="Search" isLabelHidden placeholder="Search" elemBefore={icon('magnifying-glass')} />
+                <TextField label="Search" isLabelHidden placeholder="Search" elemBeforeInput={icon('magnifying-glass')} />
             </div>
             <div>
                 <span className={caption}>TEXT AFFIX</span>
-                <TextField label="Amount" isLabelHidden elemBefore="$" elemAfter=".00" defaultValue="12" />
+                <TextField label="Amount" isLabelHidden elemBeforeInput="$" elemAfterInput=".00" defaultValue="12" />
             </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 260 }}>
@@ -156,7 +156,7 @@ export const Spacing = () => (
                     isLabelHidden
                     placeholder="Placeholder"
                     spacing={spacing}
-                    elemAfter={icon('icons')}
+                    elemAfterInput={icon('icons')}
                 />
             </div>
         ))}
@@ -267,8 +267,8 @@ export const Anatomy = () => (
             info="As it appears on your school ID."
             caption="Your first and last name."
             placeholder="Your name"
-            elemBefore={icon('user')}
-            elemAfter={icon('circle-check')}
+            elemBeforeInput={icon('user')}
+            elemAfterInput={icon('circle-check')}
             maxLength={40}
             defaultValue="Bill"
         />
@@ -376,8 +376,8 @@ Autofill.play = async ({ canvasElement }) => {
 /** Search: the magnifier before the control and a visually hidden label. */
 export const Search = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
-        <TextField id="text-field-search-compact" label="Search tutors" isLabelHidden type="search" spacing="compact" placeholder="Search tutors" elemBefore={icon('magnifying-glass')} />
-        <TextField id="text-field-search" label="Search tutors" isLabelHidden type="search" placeholder="Search tutors" elemBefore={icon('magnifying-glass')} />
+        <TextField id="text-field-search-compact" label="Search tutors" isLabelHidden type="search" spacing="compact" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
+        <TextField id="text-field-search" label="Search tutors" isLabelHidden type="search" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
     </div>
 );
 
@@ -393,14 +393,14 @@ export const ButtonsInside = () => (
         <div data-field="default">
             <TextField
                 label="Invite by email"
-                elemAfter={<Button appearance="default" spacing="default" text="Send" />}
+                elemAfterInput={<Button appearance="default" spacing="default" text="Send" />}
             />
         </div>
         <div data-field="compact">
             <TextField
                 label="Invite by email, compact"
                 spacing="compact"
-                elemAfter={<Button appearance="default" spacing="compact" text="Send" />}
+                elemAfterInput={<Button appearance="default" spacing="compact" text="Send" />}
             />
         </div>
     </div>
@@ -439,7 +439,7 @@ export const Subtle = (args) => {
                 label="Grade level"
                 appearance="subtle"
                 value={saved}
-                elemAfter={icon('caret-down')}
+                elemAfterInput={icon('caret-down')}
                 onSave={async (next) => {
                     if (args.onSave) args.onSave(next);
                     await slowSave(next);

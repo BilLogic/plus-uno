@@ -39,7 +39,7 @@ export function LoginAccessCodeField({
                 isLabelHidden
                 autoComplete="one-time-code"
                 placeholder="e.g., funny-walrus"
-                elemAfter={<i className="fa-solid fa-circle-info" aria-hidden="true" />}
+                elemAfterInput={<i className="fa-solid fa-circle-info" aria-hidden="true" />}
                 value={value}
                 isInvalid={validation === 'invalid'}
                 errorMessage={validationMessage}

@@ -20,8 +20,8 @@
         z-index: 1;
     }
 
-    // Primary has no edge, so the seam is drawn.
-    &--primary > .plus-btn.btn:last-child {
+    // Primary has no edge of its own, so a primary menu trigger draws the seam.
+    > .plus-btn--primary.btn:last-child {
         border-inline-start: var(--size-element-border) solid var(--ds-border-inverse);
         margin-inline-start: 0;
     }

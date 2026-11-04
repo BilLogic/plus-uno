@@ -52,7 +52,7 @@ export default {
 
 export const EveryFieldCanBeNamed = () => (
     <div style={stack}>
-        <TextField id="nf-amount" label="Amount" elemBefore="£" />
+        <TextField id="nf-amount" label="Amount" elemBeforeInput="£" />
         <RichTextEditor id="nf-notes" label="Session notes" />
         <RadioGroup
             name="level"
@@ -94,7 +94,7 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
  */
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
-        <TextField id="nf-hidden" label="Search" isLabelHidden elemAfter={<i className="fa-solid fa-plus" aria-hidden="true" />} />
+        <TextField id="nf-hidden" label="Search" isLabelHidden elemAfterInput={<i className="fa-solid fa-plus" aria-hidden="true" />} />
         <RadioGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );

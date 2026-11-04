@@ -42,8 +42,8 @@ const Select = ({
     value,
     defaultValue,
     placeholder = 'Select...',
-    searchable = false,
-    creatable = false,
+    isSearchable = false,
+    isCreatable = false,
     onCreate,
     open,
     defaultOpen = false,
@@ -66,7 +66,7 @@ const Select = ({
     selectAll = false,
     maxSelections,
     dependsOn,
-    loading = false,
+    isLoading = false,
     loadOptions,
     recent,
     suggested,
@@ -134,7 +134,7 @@ const Select = ({
         selectAll,
         live,
     });
-    const typeable = searchable || creatable || searchFirst || Boolean(loadOptions);
+    const typeable = isSearchable || isCreatable || searchFirst || Boolean(loadOptions);
 
     const controlRef = useRef(null);
     const fieldRef = useRef(null);
@@ -397,7 +397,7 @@ const Select = ({
         );
     }
 
-    const listLoading = loading || paging.firstPage;
+    const listLoading = isLoading || paging.firstPage;
 
     const wrapperClasses = [
         'plus-select-wrapper',
@@ -446,7 +446,7 @@ const Select = ({
                     onChange={(next) => choose(next)}
                     filter={listFilter}
                     onFilterChange={(text) => setQuery(text || null)}
-                    onCreate={creatable ? create : undefined}
+                    onCreate={isCreatable ? create : undefined}
                     onClose={(reason) => {
                         closeList();
                         if (reason === 'escape') controlRef.current?.focus();
@@ -493,9 +493,9 @@ Select.propTypes = {
     defaultValue: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     placeholder: PropTypes.string,
     /** Typing in the field filters the list. */
-    searchable: PropTypes.bool,
+    isSearchable: PropTypes.bool,
     /** Offers "Create *text*" when nothing matches exactly, ignoring case. Implies typing. */
-    creatable: PropTypes.bool,
+    isCreatable: PropTypes.bool,
     /** Called with the text of a created option, which is then picked. */
     onCreate: PropTypes.func,
     /**
@@ -551,7 +551,7 @@ Select.propTypes = {
         label: PropTypes.string,
     }),
     /** The options are on their way: the list shows a loading row. */
-    loading: PropTypes.bool,
+    isLoading: PropTypes.bool,
     /**
      * `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load
      * as the list opens, as you type and as you scroll, 50 at a time.

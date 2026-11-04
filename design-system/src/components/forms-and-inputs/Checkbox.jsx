@@ -36,6 +36,7 @@ const Checkbox = ({
     onClick,
     className = '',
     style,
+    testId,
     ...props
 }) => {
     const wrapperRef = useRef(null);
@@ -109,6 +110,7 @@ const Checkbox = ({
                     {...inputProps}
                     aria-readonly={isReadOnly || undefined}
                     aria-invalid={isInvalid || undefined}
+                    data-testid={testId}
                 />
             </div>
             <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
@@ -135,7 +137,9 @@ Checkbox.propTypes = {
     onBlur: PropTypes.func,
     onClick: PropTypes.func,
     className: PropTypes.string,
-    style: PropTypes.object
+    style: PropTypes.object,
+    /** Maps to `data-testid`, for test queries. */
+    testId: PropTypes.string,
 };
 
 export default Checkbox;

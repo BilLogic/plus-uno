@@ -17,7 +17,7 @@ const field = {
     'aria-label': 'Select your institution',
     options: INSTITUTION_OPTIONS,
     placeholder: 'Type or select your institution',
-    searchable: true,
+    isSearchable: true,
     size: 'medium',
 };
 

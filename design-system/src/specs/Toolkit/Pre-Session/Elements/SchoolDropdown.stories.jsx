@@ -115,7 +115,7 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    searchable
+                    isSearchable
                     isRequired
                 />
             </FieldWrapper>
@@ -132,7 +132,7 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    searchable
+                    isSearchable
                     isRequired
                 />
             </FieldWrapper>
@@ -146,7 +146,7 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    searchable
+                    isSearchable
                     defaultValue="school-a"
                     isRequired
                 />
@@ -161,7 +161,7 @@ export const Overview = () => (
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    searchable
+                    isSearchable
                     isRequired
                     isInvalid
                     caption="School is required"
@@ -203,7 +203,7 @@ export const Interactive = () => {
                 <Select
                     options={schoolOptions}
                     placeholder="Select a school"
-                    searchable
+                    isSearchable
                     isRequired
                     value={selectedSchool}
                     onChange={(val) => {

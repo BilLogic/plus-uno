@@ -97,7 +97,7 @@ export const SelectFocusAndBlur = () => {
                 id="dapi-focus"
                 options={schoolOptions}
                 placeholder="Select a school"
-                searchable
+                isSearchable
                 onFocus={() => setLog((prev) => [...prev, 'focus'])}
                 onBlur={() => setLog((prev) => [...prev, 'blur'])}
             />
@@ -204,8 +204,8 @@ DropdownUncontrolled.play = async ({ canvasElement }) => {
  * The decision and its reasoning are recorded in `Toggle.jsx` and in the
  * accessibility section of `Toggle.mdx`. What this asserts is only the part a
  * test can hold: the role is there by default, a `role` prop can still take it
- * away, and the native checkbox underneath is untouched — same `type`, same
- * `checked`, same `name`/`value` in a form.
+ * away, and the hidden native checkbox beside it still submits — same `type`,
+ * same `checked`, same `name`/`value` in a form.
  */
 export const ToggleRole = () => {
     const [checked, setChecked] = useState(false);
@@ -231,11 +231,12 @@ ToggleRole.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     const wifi = canvas.getByRole('switch', { name: 'Wi-Fi' });
-    await expect(wifi).toHaveAttribute('type', 'checkbox');
-    await expect(wifi).not.toBeChecked();
+    const wifiInput = canvasElement.querySelector('#dapi-wifi');
+    await expect(wifiInput).toHaveAttribute('type', 'checkbox');
+    await expect(wifiInput).not.toBeChecked();
 
     await userEvent.click(wifi);
-    await expect(wifi).toBeChecked();
+    await expect(wifiInput).toBeChecked();
 
     // The escape hatch keeps working in both directions.
     canvas.getByRole('checkbox', { name: 'Announce me as a checkbox' });

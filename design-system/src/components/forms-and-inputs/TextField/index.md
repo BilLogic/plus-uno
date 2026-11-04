@@ -3,7 +3,7 @@
 
 # TextField
 
-Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spacing="compact"`. Label, field and caption: the caption shows a message (or standing help) on the left and, when `maxLength` is set, a count on the right. `elemBefore` and `elemAfter` fill the slots on either side of the control; a string is a text affix. With `appearance="subtle"`, the field reads as plain text until it is hovered or edited, and saves on blur or Enter through `onSave`. `type="number"` adds steppers after the control. Empty is not 0: an empty field stays empty, and stepping from it starts at 0 (or the nearest bound). A typed value outside `min`/`max` is clamped when the field loses focus, not while it is typed. The field is a text input, so the scroll wheel never changes the value.
+Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spacing="compact"`. Label, field and caption: the caption shows a message (or standing help) on the left and, when `maxLength` is set, a count on the right. `elemBeforeInput` and `elemAfterInput` fill the slots on either side of the control; a string is a text affix. With `appearance="subtle"`, the field reads as plain text until it is hovered or edited, and saves on blur or Enter through `onSave`. `type="number"` adds steppers after the control. Empty is not 0: an empty field stays empty, and stepping from it starts at 0 (or the nearest bound). A typed value outside `min`/`max` is clamped when the field loses focus, not while it is typed. The field is a text input, so the scroll wheel never changes the value.
 
 **Import:** `import { TextField } from '@/components';`
 
@@ -36,8 +36,8 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 | `errorMessage` | node | — | — |
 | `warningMessage` | node | — | Draws the warning border. Does not set `aria-invalid`: the value is accepted. |
 | `successMessage` | node | — | Draws the confirmation border. |
-| `elemBefore` | node | — | Before the control. A string is a text affix; a node is rendered as given. |
-| `elemAfter` | node | — | After the control. A string is a text affix; a node is rendered as given. |
+| `elemBeforeInput` | node | — | Before the control. A string is a text affix; a node is rendered as given. |
+| `elemAfterInput` | node | — | After the control. A string is a text affix; a node is rendered as given. |
 | `type` | string | `'text'` | `number` shows steppers and holds the value as text. |
 | `maxLength` | number | — | Limits the length and shows a count on the right of the caption. |
 | `min` | number | — | `type="number"`: lower bound. A typed value below it is raised to it when the field loses focus. |
@@ -51,6 +51,7 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
 | `onKeyDown` | func | — | — |
+| `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
 

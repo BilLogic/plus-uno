@@ -38,7 +38,7 @@ export function LoginInstitutionField({
                 isRequired={required}
                 isLabelHidden
                 placeholder={placeholder}
-                elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                elemAfterInput={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 isReadOnly
             />
 
@@ -95,7 +95,7 @@ export default function InstitutionFormSpec() {
                     label="Register With Your Institution"
                     isLabelHidden
                     placeholder="Select your institution from the list"
-                    elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                    elemAfterInput={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 />
                 <div
                     className="body3-txt"
@@ -128,7 +128,7 @@ export default function InstitutionFormSpec() {
                     label="Institution Name"
                     isLabelHidden
                     placeholder="Add your institution name..."
-                    elemAfter={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
+                    elemAfterInput={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
                 />
                 <div
                     className="body3-txt"

@@ -132,14 +132,14 @@ const FormingModalBody = () => (
                     <Select
                         options={schoolOptions}
                         defaultValue="hogwarts"
-                        searchable
+                        isSearchable
                     />
                 </FieldWrapper>
                 <FieldWrapper label="Teacher">
                     <Select
                         options={teacherOptions}
                         defaultValue="dumbledore"
-                        searchable
+                        isSearchable
                     />
                 </FieldWrapper>
                 <FieldWrapper label="Teacher">

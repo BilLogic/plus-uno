@@ -140,7 +140,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     const control = canvas.getByRole('switch', { name: 'Auto-assign substitutes' });
     await expect(control.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(control);
-    await expect(control.checked).toBe(true);
+    await expect(control.getAttribute('aria-checked')).toBe('true');
 };
 
 /** Keyboard focus: the focus-ring role, 2px wide and 2px off the track, as on Checkbox and Radio. */
@@ -185,10 +185,11 @@ TrackColors.play = async ({ canvasElement }) => {
         await expect(fill(control('On')), `${mode}: on track`).toBe(token('--ds-background-selected-bold'));
         await expect(hovered(control('Off')), `${mode}: off hovered`).toBe(token('--ds-background-neutral-bold-hovered'));
         await expect(hovered(control('On')), `${mode}: on hovered`).toBe(token('--ds-background-selected-bold-hovered'));
-        await expect(getComputedStyle(control('On'), '::after').backgroundColor, `${mode}: thumb`).toBe(token('--ds-icon-inverse'));
+        const thumb = (el) => el.querySelector('.plus-toggle-thumb');
+        await expect(getComputedStyle(thumb(control('On'))).backgroundColor, `${mode}: thumb`).toBe(token('--ds-icon-inverse'));
         for (const name of ['Disabled off', 'Disabled on']) {
             await expect(fill(control(name)), `${mode}: ${name} track`).toBe(token('--ds-background-disabled'));
-            await expect(getComputedStyle(control(name), '::after').backgroundColor, `${mode}: ${name} thumb`).toBe(token('--ds-icon-disabled'));
+            await expect(getComputedStyle(thumb(control(name))).backgroundColor, `${mode}: ${name} thumb`).toBe(token('--ds-icon-disabled'));
         }
     });
 };

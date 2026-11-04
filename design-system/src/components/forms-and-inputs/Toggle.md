@@ -3,7 +3,7 @@
 
 # Toggle
 
-Controlled with `isChecked` or uncontrolled with `defaultChecked`. The native input keeps `type="checkbox"` with `role="switch"`, the markup the W3C switch pattern ships: the platform maps the checked state, so no `aria-checked` is written. Extra attributes (`aria-label`, `aria-describedby`) go to the input.
+Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base UI's Switch: a `role="switch"` span with a hidden checkbox beside it for form submission. `readOnly` blocks the change at the root, so no hand-rolled click guard is needed. Extra attributes (`aria-label`, `aria-describedby`) go to the switch root.
 
 **Import:** `import { Toggle } from '@/components';`
 
@@ -32,6 +32,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. The native in
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
+| `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
 

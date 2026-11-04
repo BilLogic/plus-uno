@@ -51,8 +51,8 @@ const Stepper = ({
                 placeholder={value}
                 value={value}
                 isReadOnly
-                elemBefore={<Button appearance="default" spacing="compact" text="−" isDisabled={isMinusDisabled} />}
-                elemAfter={<Button appearance="default" spacing="compact" text="+" isDisabled={isPlusDisabled} />}
+                elemBeforeInput={<Button appearance="default" spacing="compact" text="−" isDisabled={isMinusDisabled} />}
+                elemAfterInput={<Button appearance="default" spacing="compact" text="+" isDisabled={isPlusDisabled} />}
                 className="stepper-field"
             />
             <style>{`
