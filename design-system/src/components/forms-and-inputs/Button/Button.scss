@@ -35,11 +35,11 @@ $btn-appearances: (
 }
 
 @mixin btn-paint($config) {
-    --plus-btn-fg: #{btn-read(list.nth($config, 2))};
-    --plus-btn-icon: #{btn-read(list.nth($config, 3))};
+    --_button-fg: #{btn-read(list.nth($config, 2))};
+    --_button-icon: #{btn-read(list.nth($config, 3))};
     background-color: #{btn-read(list.nth($config, 1))};
     border-color: #{btn-read(list.nth($config, 6))};
-    color: var(--plus-btn-fg);
+    color: var(--_button-fg);
 
     // The ring is drawn once, on `.plus-btn`; each appearance only adds its
     // own hovered/pressed fill, so the ring is not redrawn per appearance.
@@ -120,7 +120,7 @@ $btn-appearances: (
 
     .plus-btn-visual {
         font-size: var(--icon-md);
-        color: var(--plus-btn-icon);
+        color: var(--_button-icon);
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -170,11 +170,11 @@ $btn-appearances: (
     // spinner draws on the color it was designed against.
     &:disabled:not(.plus-btn--loading),
     &.disabled:not(.plus-btn--loading) {
-        --plus-btn-fg: var(--ds-text-disabled);
-        --plus-btn-icon: var(--ds-icon-disabled);
+        --_button-fg: var(--ds-text-disabled);
+        --_button-icon: var(--ds-icon-disabled);
         background-color: var(--ds-background-disabled);
         border-color: transparent;
-        color: var(--plus-btn-fg);
+        color: var(--_button-fg);
         pointer-events: none;
         cursor: not-allowed;
 
@@ -205,7 +205,7 @@ $btn-appearances: (
             height: 1em;
             top: calc(50% - 0.5em);
             left: calc(50% - 0.5em);
-            border: 2px solid var(--plus-btn-fg);
+            border: 2px solid var(--_button-fg);
             border-right-color: transparent;
             border-radius: 50%;
             animation: spin 0.75s linear infinite;

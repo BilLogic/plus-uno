@@ -552,6 +552,16 @@ export const CHECKS = [
       'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
+    name: 'check:no-primitive-reads',
+    script: 'node scripts/check-no-primitive-reads.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-no-primitive-reads.mjs',
+    baseline: 'scripts/baselines/no-primitive-reads.json',
+    guards:
+      'components and patterns reading a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) instead of a tier token, counted per file in design-system/src/components and design-system/src/patterns (ADR-038). The record holds the residue and only falls; a file that rises or is new fails, and `npm run check:no-primitive-reads -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
+  },
+  {
     name: 'check:old-size-token-list',
     script: 'node scripts/generate-old-size-token-list.mjs --check',
     pkg: 'root',

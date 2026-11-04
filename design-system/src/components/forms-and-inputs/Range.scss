@@ -13,18 +13,18 @@
     // `size`: the dot and bar in px, the track between them a step behind.
     // Unset keeps the pre-`size` rendering (20 dot, 4 track).
     &[data-size="8"] {
-        --plus-range-dot-size: 8px;
-        --plus-range-track-height: 4px;
+        --_range-dot-size: var(--range-dot-size-8);
+        --_range-track-height: var(--range-track-height-4);
     }
 
     &[data-size="12"] {
-        --plus-range-dot-size: 12px;
-        --plus-range-track-height: 6px;
+        --_range-dot-size: var(--range-dot-size-12);
+        --_range-track-height: var(--range-track-height-6);
     }
 
     &[data-size="16"] {
-        --plus-range-dot-size: 16px;
-        --plus-range-track-height: 8px;
+        --_range-dot-size: var(--range-dot-size-16);
+        --_range-track-height: var(--range-track-height-8);
     }
 }
 
@@ -64,7 +64,7 @@
 .plus-form-range-track {
     position: relative;
     width: 100%;
-    height: var(--plus-range-track-height, 4px);
+    height: var(--_range-track-height, var(--range-track-height-4));
     border-radius: var(--radius-full, 9999px);
     background-color: var(--ds-background-neutral);
 
@@ -87,8 +87,8 @@
 // The thumb, 20 across by default (`size` scales dot and track together),
 // centered on the track.
 .plus-form-range-thumb {
-    width: var(--plus-range-dot-size, 20px);
-    height: var(--plus-range-dot-size, 20px);
+    width: var(--_range-dot-size, var(--range-dot-size-default));
+    height: var(--_range-dot-size, var(--range-dot-size-default));
     border-radius: var(--radius-full, 9999px);
     background-color: var(--ds-background-selected-bold);
     box-shadow: var(--ds-shadow-raised);
