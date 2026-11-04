@@ -15,7 +15,7 @@ export default {
 
 const grid = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-sm), 1fr))',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(224px, 1fr))',
     gap: 'var(--element-stack-md)',
 };
 
@@ -77,7 +77,7 @@ const barNoSeparator = (segments) => (
 
 /** A stacked bar with and without the separator line between two close tones. */
 export const SeparatorCompare = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--layout-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--layout-gutter)' }}>
         <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
             {bar([['--ds-chart-categorical-3', 1], ['--ds-chart-categorical-3-hovered', 1]])}
             <figcaption style={label}>With the separator line, the seam between two close tones still reads.</figcaption>
