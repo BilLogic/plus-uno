@@ -1,20 +1,183 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TreeSelectStories from './TreeSelect.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={TreeSelectStories} />
 
 <Title />
-A tree select picks one or several nodes from a hierarchy.
+Picks one or several nodes from a hierarchy, expanding and collapsing
+branches in place rather than drilling down one level at a time.
 
 <DocsTabs of={TreeSelectStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={TreeSelectStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/TreeSelect"
+/>
 
-<ArgTypes of={TreeSelectStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A multi-select tree, closed.</>}>
+    <Canvas of={TreeSelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Single select closes on any pick. Multi-select cascades a parent's check to its children, and shows an indeterminate state for a partially-checked branch.</>}>
+    <DsCanvasQuiet of={TreeSelectStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
+    <DsCanvasQuiet of={TreeSelectStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Disabled and invalid.</>}>
+    <DsCanvasQuiet of={TreeSelectStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TreeSelectStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>Nested nodes: a string, or an object with <code>value</code>, <code>label</code> or <code>text</code>, <code>children</code> and <code>disabled</code>.</td></tr>
+        <tr><td><code>value</code>, <code>onChange</code></td><td>—</td><td>One value, or an array of values with <code>isMulti</code>.</td></tr>
+        <tr><td><code>isMulti</code></td><td>boolean</td><td>Shows a checkbox beside each node's toggle; checking a parent cascades to every descendant.</td></tr>
+        <tr><td><code>label</code>, <code>caption</code>, <code>info</code></td><td>—</td><td>Without a visible <code>label</code>, pass <code>aria-label</code> or <code>aria-labelledby</code>.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
+        <tr><td><code>isDisabled</code>, <code>isRequired</code>, <code>isInvalid</code>, <code>errorMessage</code></td><td>—</td><td>—</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `TreeSelect` when the options genuinely nest and someone may need to see
+or pick at more than one level — a curriculum with units and lessons, a
+category tree. For options that nest but are chosen one level at a time in
+sequence, use `Cascader` instead. For a flat list, use `Select`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Checking a parent is shorthand for checking every descendant.
+
+With `isMulti`, picking a parent node cascades the check to its whole
+subtree, and a branch with only some descendants checked shows an
+indeterminate mark rather than fully checked or unchecked. `value` always
+reflects the actual set of checked nodes, parents included once their
+subtree is complete.
+
+```jsx
+<TreeSelect
+    label="Topics"
+    isMulti
+    value={topics}
+    onChange={setTopics}
+    options={[
+        { value: 'geometry', label: 'Geometry', children: [
+            { value: 'triangles', label: 'Triangles' },
+            { value: 'circles', label: 'Circles' },
+        ] },
+    ]}
+/>
+```
+
+### Arrow keys move through visible rows only.
+
+A collapsed branch's children are in the data but not on screen, and the
+keyboard never jumps to a row that isn't visible — expand a branch first to
+reach what's inside it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Keyboard matches what's visible.** Up/Down move between the currently
+  expanded rows only, never into a collapsed branch's hidden children.
+- **Checked state is explicit, including partial.** A parent with some but
+  not all descendants checked is marked indeterminate, not silently rounded
+  up or down to a checked or unchecked state.
+- **Without a visible label, name the field explicitly** with `aria-label`
+  or `aria-labelledby` — `label` is optional, but an accessible name isn't.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For options chosen one level at a time in sequence, use `Cascader`.
+- For a flat list with no hierarchy, use `Select`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

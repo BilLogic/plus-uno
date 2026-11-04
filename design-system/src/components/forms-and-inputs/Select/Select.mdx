@@ -1,20 +1,226 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SelectStories} />
 
 <Title />
-A select picks one value, or several, from a list.
+Picks one value, or several, from a list. The field itself is the combobox:
+focus stays in it, and a searchable field is a text input that filters the
+list as you type.
 
 <DocsTabs of={SelectStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={SelectStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Select"
+/>
 
-<ArgTypes of={SelectStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A single-select field, closed.</>}>
+    <Canvas of={SelectStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Empty and filled.</>}>
+    <DsCanvasQuiet of={SelectStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Modes
+
+<DocsCanvasShell description={<>`isMulti` shows picks as Tags that collapse into "+n"; `isSearchable` filters by typing; `isCreatable` (implies searchable) offers "Create <em>text</em>" when nothing matches.</>}>
+    <DsCanvasQuiet of={SelectStories.Modes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
+    <DsCanvasQuiet of={SelectStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Enabled, invalid, read-only and disabled.</>}>
+    <DsCanvasQuiet of={SelectStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Dependent fields
+
+<DocsCanvasShell description={<>The child field is disabled with "Choose {'{label}'} first" until its parent is answered, and clears when the parent's value changes.</>}>
+    <DsCanvasQuiet of={SelectStories.DependentFields} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Long lists
+
+<DocsCanvasShell description={<>Past 50 options, Recent and Suggested surface first; typing searches the rest.</>}>
+    <DsCanvasQuiet of={SelectStories.LongList} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SelectStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>Each: <code>value</code> (required), <code>label</code> or <code>text</code>, <code>description</code>, <code>disabled</code>, <code>group</code> (groups consecutive options under a heading).</td></tr>
+        <tr><td><code>value</code>, <code>defaultValue</code>, <code>onChange</code></td><td>—</td><td>An id, or an array of ids with <code>isMulti</code>.</td></tr>
+        <tr><td><code>isMulti</code></td><td>boolean</td><td>Shows picks as Tags; the list shows checkboxes.</td></tr>
+        <tr><td><code>isSearchable</code>, <code>isCreatable</code>, <code>onCreate</code></td><td>—</td><td><code>isCreatable</code> implies typing and offers a "Create" row when nothing matches.</td></tr>
+        <tr><td><code>displayMode</code></td><td>enum</td><td><code>tags</code> (default) or <code>text</code> — <code>isMulti</code> only.</td></tr>
+        <tr><td><code>commitOnClose</code></td><td>boolean</td><td><code>isMulti</code> only: <code>onChange</code> fires once on close rather than per pick, for a filter bar.</td></tr>
+        <tr><td><code>clearable</code></td><td>boolean</td><td>Defaults to <code>true</code> with <code>isMulti</code>, <code>!isRequired</code> otherwise.</td></tr>
+        <tr><td><code>selectAll</code>, <code>maxSelections</code></td><td>—</td><td><code>isMulti</code> only: a "Select all" row, and a pick limit past which other rows disable.</td></tr>
+        <tr><td><code>dependsOn</code></td><td><code>{'{ value, label }'}</code></td><td>Disables the field with "Choose {'{label}'} first" until <code>value</code> is set; clears this field when the parent's value changes.</td></tr>
+        <tr><td><code>loadOptions</code>, <code>isLoading</code>, <code>recent</code>, <code>suggested</code></td><td>—</td><td>Async loading as the list opens, as you type and as you scroll, 50 at a time.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
+        <tr><td><code>isDisabled</code>, <code>isReadOnly</code>, <code>isRequired</code></td><td>—</td><td>—</td></tr>
+        <tr><td><code>isInvalid</code>, <code>errorMessage</code>, <code>isValid</code>, <code>successMessage</code>, <code>caption</code></td><td>—</td><td>The caption's content and tone follow validation state.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Select` for a list too long to show all at once, or when typing to
+filter helps more than scanning — a tutor roster, a list of schools. For a
+handful of options visible all at once, use `RadioGroup` instead. For
+options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Chain `dependsOn` for fields that filter each other.
+
+Pass the parent's `{ value, label }` as `dependsOn` on the child. The child
+disables itself and explains why until the parent has a value, and clears
+itself the moment the parent's value changes — no manual wiring needed beyond
+passing the parent's current state down.
+
+```jsx
+<Select label="School" options={schools} value={school} onChange={setSchool} />
+<Select
+    label="Teacher"
+    options={teachersFor(school)}
+    value={teacher}
+    onChange={setTeacher}
+    dependsOn={{ value: school, label: 'a school' }}
+/>
+```
+
+### Use `commitOnClose` for a filter bar, not a form field.
+
+A form's multi-select should fire `onChange` on every pick, so other UI can
+react immediately. `commitOnClose` is for the opposite case — a filter panel
+where firing once, on close, avoids re-querying on every checkbox click.
+
+### Reach for `loadOptions` once a list is genuinely large or server-backed.
+
+`recent` and `suggested` only change the order past 50 static options;
+`loadOptions` is for a list too large to ship as a static array at all.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real combobox.** The field is `role="combobox"` with
+  `aria-expanded`/`aria-controls`/`aria-activedescendant` tracking the open
+  list and its highlighted row.
+- **The label is linked, or named explicitly.** Pass `label` for a visible
+  one, or `aria-label`/`aria-labelledby` when there isn't a visible label.
+- **Keyboard parity with a native select.** Arrow keys, Enter and Escape
+  open, move through and close the list; Backspace removes the last Tag in a
+  multi-select with an empty filter; Delete clears the field when
+  `clearable`.
+- **A waiting dependent field says why.** `dependsOn`'s disabled state pairs
+  with a caption ("Choose a school first"), not silence.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a handful of options visible all at once, use `RadioGroup`.
+- For hierarchical options, use `TreeSelect` or `Cascader`.
+- For free-form tags rather than a fixed option list, use `TagInput`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
