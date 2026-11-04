@@ -1,0 +1,65 @@
+.plus-comment {
+    padding: var(--space-100);
+    border-radius: var(--radius-050);
+
+    &--highlighted {
+        background: var(--ds-background-selected);
+    }
+}
+
+.plus-comment-row {
+    display: flex;
+    gap: var(--space-100);
+}
+
+.plus-comment-avatar {
+    flex: none;
+}
+
+.plus-comment-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.plus-comment-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-075);
+    flex-wrap: wrap;
+}
+
+.plus-comment-author {
+    font: var(--body-default);
+    font-weight: var(--type-weight-semibold);
+}
+
+.plus-comment-time,
+.plus-comment-edited,
+.plus-comment-restricted {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.plus-comment-content {
+    font: var(--body-default);
+    margin-top: var(--space-025);
+}
+
+.plus-comment-actions {
+    display: flex;
+    gap: var(--space-100);
+    margin-top: var(--space-050);
+}
+
+.plus-comment-saving {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    margin-top: var(--space-050);
+}
+
+.plus-comment-replies {
+    margin-top: var(--space-100);
+    margin-inline-start: var(--space-150);
+    padding-inline-start: var(--space-150);
+    border-inline-start: var(--border-default) solid var(--ds-border);
+}
