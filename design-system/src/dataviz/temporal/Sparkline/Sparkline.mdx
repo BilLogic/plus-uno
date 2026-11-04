@@ -1,69 +1,145 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SparklineStories from './Sparkline.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={SparklineStories} />
 
 <Title />
+A word-sized line chart: the shape of a trend, set beside the number it belongs
+to. It has no axes, grid or legend.
 
-A sparkline is a word-sized line chart: the **shape of a trend**, set beside the number it belongs to.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/Sparkline"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A sparkline draws one 2px line with no axes, grid or legend, and marks the latest value. It uses the same theme as the line chart, so it follows every color mode.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A sparkline beside an average score, then one in each status tone with its meaning written out beside it.</>}>
+    <Canvas of={SparklineStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### When to Use
+</div>
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>A trend beside a KPI or stat</td><td>✅ Ideal</td></tr>
-    <tr><td>Many small trends in a table row</td><td>✅ Good</td></tr>
-    <tr><td>Reading exact values</td><td>❌ Use Line Chart</td></tr>
-    <tr><td>Comparing several series</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
 
----
+<div className="sb-ds-doc-section">
 
-### Color
+## When to use
 
-The line takes `--ds-chart-brand`, the color for a chart with one series. When the trend itself means a status, set `tone` to `success`, `warning`, `danger` or `information`, and say the status in the text beside it too: color alone never carries it. The marker on the latest value is ringed in `--ds-border-inverse`, so it stands off the line in light and dark.
+Use `Sparkline` for a trend beside a stat or in a table row: a student's
+average score over the last seven weeks next to today's score, attendance per
+week in a tutor's roster row. The number says where things are; the line says
+which way they are heading.
 
----
+For values someone reads off an axis, or more than one series, use
+`LineChart`. For a single headline number with no trend, show the number alone,
+not a chart.
 
-### How to Use
+Always put the current value beside it in text. The line carries only the
+shape.
 
-**Best Practices:**
-✅ Put the current value beside it, in text
-✅ Name it with `label` for screen readers
-✅ Keep the brand tone unless the trend means a status
+</div>
 
-**Avoid:**
-❌ More than one line
-❌ Axes, grids or legends: use a line chart instead
+<div className="sb-ds-doc-section">
 
----
+## Anatomy
 
-### Interactive playground
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Line', <>One line at the chart line width, in the color <C>tone</C> picks.</>],
+        ['Latest-value marker', <>A small circle on the last point, ringed in <C>--ds-border-inverse</C>. <C>showLastPoint</C> turns it off.</>],
+        ['Point markers', 'Every other point has a marker of size zero at rest, so hover and keyboard focus can still land on it; it appears on hover.'],
+        ['Tooltip', <>Shows the hovered value with <C>valueSuffix</C> after it, under its <C>categories</C> label when there is one.</>],
+        ['Frame', <><C>width</C> and <C>height</C> in pixels, 120 by 32 by default, with micro spacing around the line.</>],
+    ]}
+/>
 
-<DocsInteractivePlayground of={SparklineStories.Interactive} />
+</div>
 
+<div className="sb-ds-doc-section">
+
+## Data shape
+
+`data` is an array of numbers, oldest first. `label` is required: it names the
+line for screen readers and the tooltip. `categories` is an optional label per
+value, shown in the tooltip.
+
+```jsx
+<span>82%</span>
+<Sparkline
+    label="Average score, last 7 weeks"
+    data={[64, 70, 68, 74, 77, 79, 82]}
+    categories={['Sep 1–5', 'Sep 8–12', 'Sep 15–19', 'Sep 22–26', 'Sep 29–Oct 3', 'Oct 6–10', 'Oct 13–17']}
+    valueSuffix="%"
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Brand by default, a status when the trend means one.** The line takes `--ds-chart-brand`. Set `tone` to `success`, `warning`, `danger` or `information` only when the trend itself is on track or at risk, and say the status in the text beside it too, as the Overview story does. Color alone never carries it.
+- **The marker stands off the line.** The latest-value marker is ringed in `--ds-border-inverse`, so it reads against the line in light and dark.
+- **Checked in every color mode.** The `ColorModes` story is a test, hidden from this page: in every color mode it checks that a brand line strokes in `--ds-chart-brand` and a danger line in `--ds-chart-danger`, that only the latest value draws a marker at rest, and that no axis labels render.
+- **Name it with `label`.** The chart's screen-reader description and series name come from `label`, since there is no axis or title to describe it. Write what the line shows and over what span.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary, per-point labels, and arrow-key navigation through the values. The chart takes no title of its own, so the stat or row around it must name it.
+- **Contrast.** The line follows the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`Sparkline` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the size of the sparkline.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" width={120} height={32} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="A trend appears after a few sessions." />
+    : <Sparkline label="Average score, last 7 weeks" data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SparklineStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For values someone reads off an axis, or several series, use `LineChart`.
-- For a single headline number with no trend, use a stat, not a chart.
+- For a value against a target in a small space, use `BulletChart`.
+- For a single value on a scale, use `GaugeChart`.
 
 </div>
 
 </div>
+
+

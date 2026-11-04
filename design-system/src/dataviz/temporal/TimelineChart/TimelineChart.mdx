@@ -1,86 +1,144 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TimelineChartStories from './TimelineChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={TimelineChartStories} />
 
 <Title />
+Lays out a sequence of events in order along a line, each with a short label
+and description. It shows what happened in what order, not how long anything
+took.
 
-Shows **events or milestones** along a horizontal timeline.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/TimelineChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **events or milestones** along a horizontal timeline.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A student's journey from application to course completion, five milestones in order.</>}>
+    <Canvas of={TimelineChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Points** = events/milestones
-- **Position** = chronological order
-- **Labels** = event names and descriptions
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Project milestones</td><td>✅ Ideal</td></tr>
-    <tr><td>Historical events</td><td>✅ Ideal</td></tr>
-    <tr><td>Progress tracking</td><td>✅ Good</td></tr>
-    <tr><td>Quantitative data</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `TimelineChart` for a handful of milestones in order: a student's path from
+application through assessment, enrollment and midterm review to completion; a
+tutor's onboarding steps; the phases of a program term.
 
-### PLUS Context
+Events sit at even spacing, in array order, with no time scale. When the gaps
+between events or the length of each one matter, use `XRangeChart`. For a
+measured value over time, use `LineChart`. For stages people drop out of
+between, use `FunnelChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Student Journey**</td><td>Enrollment → Completion</td></tr>
-    <tr><td>**Course Milestones**</td><td>Module completion dates</td></tr>
-    <tr><td>**Project Timeline**</td><td>Development phases</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the timeline chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Line', 'The path the events sit on, in array order. There is no axis or time scale.'],
+        ['Event markers', 'One point per event, each in its own color.'],
+        ['Event labels', <>A bold <C>label</C> (falling back to <C>name</C>) above its <C>description</C>. Labels that would overlap are hidden.</>],
+        ['Tooltip', 'Shows the hovered event.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={TimelineChartStories.Interactive} />
+`data` is an array of events in the order they happened, each
+`{ name, label, description }`. Only `name` is required; `label` defaults to
+`name` and `description` to empty.
 
+```jsx
+<TimelineChart
+    data={[
+        { name: 'Matched', label: 'Matched with tutor', description: 'Placed in a Math group' },
+        { name: 'First session', label: 'First session', description: 'Baseline SMART check-in' },
+        { name: 'Midpoint', label: 'Midpoint review', description: 'Goals revisited with the tutor' },
+        { name: 'Wrap-up', label: 'Term wrap-up', description: 'Final progress report shared' },
+    ]}
+/>
+```
+
+`height` defaults to 400.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color follows event order and means nothing.** Each event takes the next categorical color, slot 1 first, and the order wraps after the eighth. There is no `color` field, so color cannot mark a status or a type of event.
+- **Position and text carry the meaning.** Order along the line is the sequence, and each label and description says what the event is. The chart reads the same without hue.
+- **Keep labels short.** Labels that would collide are hidden rather than moved, so a long description or a crowded timeline loses text. Keep to a handful of events, or raise `height`.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the events. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`TimelineChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Milestones could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No milestones yet" description="Milestones appear as the student moves through the program." />
+    : <TimelineChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={TimelineChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For events with duration rather than instants, use `XRangeChart`.
+- For events with a start and end on a real time scale, use `XRangeChart`.
 - For a measured value over time, use `LineChart`.
-- For stages that follow one another, use `FunnelChart`.
+- For stages people drop out of between, use `FunnelChart`.
 
 </div>
 
 </div>
+
+
