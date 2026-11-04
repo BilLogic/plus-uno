@@ -1,0 +1,23 @@
+.plus-object {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    color: var(--ds-icon-subtle);
+
+    &--small {
+        width: var(--icon-sm);
+        height: var(--icon-sm);
+        font-size: var(--icon-sm);
+    }
+
+    &--medium {
+        width: var(--icon-md);
+        height: var(--icon-md);
+        font-size: var(--icon-md);
+    }
+
+    i {
+        font-size: inherit;
+    }
+}

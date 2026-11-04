@@ -341,7 +341,8 @@ describe("only registry components", () => {
     // 73: Link is a new component with its own figmaMeta (+1).
     // 74: Menu group gained its own component and figmaMeta (+1 net).
     // 75: Image is a new component with its own figmaMeta (+1).
-    assert.equal(names.length, 75);
+    // 76: Object is a new component with its own figmaMeta (+1).
+    assert.equal(names.length, 76);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
