@@ -20,7 +20,6 @@ One line of help on hover or focus, built on Base UI.
 | `text` | node (required) | — | Tooltip text |
 | `placement` | enum | `'top'` | Tooltip placement |
 | `trigger` | string or arrayOf | `['hover'` | — |
-| `size` | enum | `'default'` | — |
 | `children` | node (required) | — | — |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -31,8 +30,6 @@ One line of help on hover or focus, built on Base UI.
 ## Variants
 
 **`placement`** — `top` · `bottom` · `left` · `right`
-
-**`size`** — `small` · `default` · `large`
 
 Anything not listed is not a valid value.
 

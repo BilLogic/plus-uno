@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Popup](Popup/index.md) | 15 | ✅ | ✕ | ✅ |
-| [Tooltip](Tooltip/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Tooltip](Tooltip/index.md) | 9 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 2/2 (100%) · Correct/incorrect 1/2 (50%) · Accessibility 2/2 (100%)
 

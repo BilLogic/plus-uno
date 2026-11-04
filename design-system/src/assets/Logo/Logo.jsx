@@ -5,19 +5,19 @@ import './Logo.scss';
 /**
  * Logo Component
  * 
- * PLUS brand logo component with multiple styles, sizes, and optional text wordmark.
+ * PLUS brand logo: three appearances, five pixel sizes, and an optional wordmark.
  * Matches Figma design system specifications.
  */
-const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...props }) => {
-    // Normalize size to lowercase for CSS classes
-    const sizeClass = size.toLowerCase();
+const Logo = ({ appearance = 'colored', size = 132, wordmark = false, className = '', ...props }) => {
+    const style = appearance;
+    const sizeClass = String(size);
 
     // Build class names
     const classNames = [
         'plus-logo',
         `plus-logo--${sizeClass}`,
         `plus-logo--${style}`,
-        text && 'plus-logo--with-text',
+        wordmark && 'plus-logo--with-wordmark',
         className
     ].filter(Boolean).join(' ');
 
@@ -138,7 +138,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
                     <LogoIcon />
                 </div>
             </div>
-            {text && (
+            {wordmark && (
                 <div className="plus-logo__text">
                     <LogoText />
                 </div>
@@ -148,20 +148,20 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
 };
 
 Logo.propTypes = {
-    /** Visual style of the logo */
-    style: PropTypes.oneOf(['colored', 'filled', 'outlined']),
-    /** Size variant */
-    size: PropTypes.oneOf(['XS', 'S', 'M', 'L', 'XL']),
-    /** Whether to show text wordmark */
-    text: PropTypes.bool,
+    /** Colorway of the logo */
+    appearance: PropTypes.oneOf(['colored', 'filled', 'outlined']),
+    /** Frame height in pixels */
+    size: PropTypes.oneOf([60, 96, 132, 192, 224]),
+    /** Show the PLUS wordmark beside the logomark */
+    wordmark: PropTypes.bool,
     /** Additional CSS classes */
     className: PropTypes.string
 };
 
 Logo.defaultProps = {
-    style: 'colored',
-    size: 'M',
-    text: false,
+    appearance: 'colored',
+    size: 132,
+    wordmark: false,
     className: ''
 };
 

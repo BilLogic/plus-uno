@@ -22,7 +22,7 @@ const LoginPage = () => {
                     <Col md={8} lg={6} xl={5}>
                         <div className="text-center mb-5">
                             <div className="mb-3 d-flex justify-content-center">
-                                <Logo style="default" size="medium" />
+                                <Logo />
                             </div>
                             <h2 className="h2">PLUS Design System</h2>
                         </div>

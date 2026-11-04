@@ -7,21 +7,21 @@ export default {
     tags: ['!dev', '!autodocs'],
     argTypes: {
         // Appearance Group
-        style: {
+        appearance: {
             control: 'select',
             options: ['colored', 'filled', 'outlined'],
-            description: 'Visual style of the logo',
+            description: 'Colorway of the logo',
             table: { category: 'Appearance' }
         },
         size: {
             control: 'select',
-            options: ['XS', 'S', 'M', 'L', 'XL'],
-            description: 'Size variant',
+            options: [60, 96, 132, 192, 224],
+            description: 'Frame height in pixels',
             table: { category: 'Appearance' }
         },
-        text: {
+        wordmark: {
             control: 'boolean',
-            description: 'Whether to show text wordmark',
+            description: 'Show the PLUS wordmark beside the logomark',
             table: { category: 'Appearance' }
         },
         // Development Group
@@ -65,9 +65,9 @@ export const Overview = () => (
                             borderRadius: '12px',
                             border: '1px solid var(--color-outline-variant)'
                         }}>
-                            {['XS', 'S', 'M', 'L', 'XL'].map(size => (
+                            {[60, 96, 132, 192, 224].map(size => (
                                 <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-                                    <Logo style={style} size={size} />
+                                    <Logo appearance={style} size={size} />
                                     <span style={{
                                         fontFamily: 'monospace',
                                         fontSize: '12px',
@@ -87,7 +87,7 @@ export const Overview = () => (
         <section>
             <h6 className="h6" style={{ marginBottom: '24px' }}>With Wordmark</h6>
             <p className="body-2" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
-                The text prop adds the "PLUS" wordmark. Available in all sizes.
+                The wordmark prop adds the "PLUS" wordmark. Available in all sizes.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 {['colored', 'filled', 'outlined'].map(style => (
@@ -111,9 +111,9 @@ export const Overview = () => (
                             borderRadius: '12px',
                             border: '1px solid var(--color-outline-variant)'
                         }}>
-                            {['XS', 'S', 'M'].map(size => (
+                            {[60, 96, 132].map(size => (
                                 <div key={size} style={{ display: 'flex', flexDirection: 'column', alignItems: 'start', gap: '12px' }}>
-                                    <Logo style={style} size={size} text={true} />
+                                    <Logo appearance={style} size={size} wordmark />
                                     <span style={{
                                         fontFamily: 'monospace',
                                         fontSize: '12px',

@@ -936,7 +936,7 @@
         "source": "design-system/src/assets/Logo/Logo.jsx",
         "storybookId": "components-images-and-icons-logo--docs",
         "props": {
-          "style": {
+          "appearance": {
             "type": "enum",
             "values": [
               "colored",
@@ -947,14 +947,14 @@
           "size": {
             "type": "enum",
             "values": [
-              "XS",
-              "S",
-              "M",
-              "L",
-              "XL"
+              60,
+              96,
+              132,
+              192,
+              224
             ]
           },
-          "text": {
+          "wordmark": {
             "type": "boolean"
           }
         }
@@ -968,19 +968,19 @@
             "componentSetNodeId": "20094:332",
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-332",
             "variantProps": {
-              "style": "style",
+              "appearance": "style",
               "size": "size",
-              "text?": "text"
+              "wordmark": "text?"
             },
             "variantValueMap": {
-              "text?": {
+              "wordmark": {
                 "true": true,
                 "false": false
               }
             },
             "source": "designer-supplied",
             "status": "verified",
-            "notes": "style and size map one-to-one by name. The Figma variant group is `text?` (with the question mark) and its values are the STRINGS \"true\"/\"false\", while the code prop `text` is a real boolean — convert, do not pass the string through."
+            "notes": "appearance is the Figma `style` group; size is the pixel step (Figma XS/S/M/L/XL = 60/96/132/192/224); wordmark is the Figma `text?` group (with the question mark), whose values are the STRINGS \"true\"/\"false\", while the code prop is a real boolean — convert, do not pass the string through."
           }
         ]
       }

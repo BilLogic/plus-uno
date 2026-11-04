@@ -139,7 +139,7 @@ export const Appearance = () => (
         </section>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT</span>
-            <Tabs size="compact" defaultActiveKey="1">
+            <Tabs spacing="compact" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
                 <Tabs.Tab eventKey="3">Reports</Tabs.Tab>

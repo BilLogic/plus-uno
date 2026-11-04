@@ -19,7 +19,7 @@
 }
 
 /* Apply gap and padding when text is present - size-dependent based on Figma */
-.plus-logo--with-text {
+.plus-logo--with-wordmark {
     /* When text is included, the container expands horizontally */
     width: auto;
     height: auto;
@@ -82,7 +82,7 @@
    XS Icon: 40px (existing). 
    New Total: 60px.
 */
-.plus-logo--xs {
+.plus-logo--60 {
     width: auto;
     height: auto;
     padding: var(--size-spacing-small-space-150);
@@ -90,22 +90,22 @@
     gap: var(--size-spacing-small-space-150);
 }
 
-.plus-logo--xs .plus-logo__container {
+.plus-logo--60 .plus-logo__container {
     width: 40px;
     height: 40px;
 }
 
-.plus-logo--xs .plus-logo__icon svg {
+.plus-logo--60 .plus-logo__icon svg {
     width: 40px;
     height: 40px;
 }
 
-.plus-logo--xs .plus-logo__text svg {
+.plus-logo--60 .plus-logo__text svg {
     height: 40px;
 }
 
 /* S: 64px Icon + 16px Padding = 96px Total Height */
-.plus-logo--s {
+.plus-logo--96 {
     width: auto;
     height: auto;
     padding: var(--size-spacing-medium-space-300);
@@ -113,22 +113,22 @@
     gap: var(--size-spacing-medium-space-300);
 }
 
-.plus-logo--s .plus-logo__container {
+.plus-logo--96 .plus-logo__container {
     width: 64px;
     height: 64px;
 }
 
-.plus-logo--s .plus-logo__icon svg {
+.plus-logo--96 .plus-logo__icon svg {
     width: 64px;
     height: 64px;
 }
 
-.plus-logo--s .plus-logo__text svg {
+.plus-logo--96 .plus-logo__text svg {
     height: 64px;
 }
 
 /* M: 92px Icon + 20px Padding = 132px Total Height */
-.plus-logo--m {
+.plus-logo--132 {
     width: auto;
     height: auto;
     padding: var(--size-spacing-medium-space-400);
@@ -136,22 +136,22 @@
     gap: var(--size-spacing-medium-space-400);
 }
 
-.plus-logo--m .plus-logo__container {
+.plus-logo--132 .plus-logo__container {
     width: 92px;
     height: 92px;
 }
 
-.plus-logo--m .plus-logo__icon svg {
+.plus-logo--132 .plus-logo__icon svg {
     width: 92px;
     height: 92px;
 }
 
-.plus-logo--m .plus-logo__text svg {
+.plus-logo--132 .plus-logo__text svg {
     height: 92px;
 }
 
 /* L: 144px Icon + 24px Padding = 192px Total Height */
-.plus-logo--l {
+.plus-logo--192 {
     width: auto;
     height: auto;
     padding: var(--size-spacing-medium-space-500);
@@ -159,22 +159,22 @@
     gap: var(--size-spacing-medium-space-500);
 }
 
-.plus-logo--l .plus-logo__container {
+.plus-logo--192 .plus-logo__container {
     width: 144px;
     height: 144px;
 }
 
-.plus-logo--l .plus-logo__icon svg {
+.plus-logo--192 .plus-logo__icon svg {
     width: 144px;
     height: 144px;
 }
 
-.plus-logo--l .plus-logo__text svg {
+.plus-logo--192 .plus-logo__text svg {
     height: 144px;
 }
 
 /* XL: 160px Icon + 32px Padding = 224px Total Height */
-.plus-logo--xl {
+.plus-logo--224 {
     width: auto;
     height: auto;
     padding: var(--size-spacing-large-space-600);
@@ -182,17 +182,17 @@
     gap: var(--size-spacing-large-space-600);
 }
 
-.plus-logo--xl .plus-logo__container {
+.plus-logo--224 .plus-logo__container {
     width: 160px;
     height: 160px;
 }
 
-.plus-logo--xl .plus-logo__icon svg {
+.plus-logo--224 .plus-logo__icon svg {
     width: 160px;
     height: 160px;
 }
 
-.plus-logo--xl .plus-logo__text svg {
+.plus-logo--224 .plus-logo__text svg {
     height: 160px;
 }
 
@@ -202,36 +202,36 @@
 */
 
 /* XS */
-.plus-logo--xs.plus-logo--with-text {
+.plus-logo--60.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
 /* S */
-.plus-logo--s.plus-logo--with-text {
+.plus-logo--96.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
 /* M */
-.plus-logo--m.plus-logo--with-text {
+.plus-logo--132.plus-logo--with-wordmark {
     width: auto;
     height: auto;
     /* Ensure content+padding dictates height (92 + 20 + 20 = 132) */
 }
 
 /* L */
-.plus-logo--l.plus-logo--with-text {
+.plus-logo--192.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
 /* XL */
-.plus-logo--xl.plus-logo--with-text {
+.plus-logo--224.plus-logo--with-wordmark {
     width: auto;
     height: auto;
 }
 
-.plus-logo--with-text {
+.plus-logo--with-wordmark {
     /* Base modifier fallback */
 }
