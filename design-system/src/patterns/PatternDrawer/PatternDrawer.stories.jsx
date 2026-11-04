@@ -95,7 +95,7 @@ export default {
     },
 };
 
-/** A sm drawer at the end edge of the 1024 screen: the scrim, no pad, the drawer full height. */
+/** A sm drawer at the end edge of the 1024 screen: the blanket, no pad, the drawer full height. */
 export const Overview = {
     render: () => <Inline>{details}</Inline>,
     play: async ({ canvasElement }) => {
@@ -114,7 +114,7 @@ export const Overview = {
         const title = getComputedStyle(within(drawer).getByRole('heading', { level: 1 }));
         await expect(title.font, 'Heading/medium').toBe(probe(canvasElement, 'font', 'var(--heading-medium)'));
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            await expect(getComputedStyle(overlay).backgroundColor, `scrim is the blanket (${mode})`).toBe(token('--ds-blanket'));
+            await expect(getComputedStyle(overlay).backgroundColor, `blanket fill (${mode})`).toBe(token('--ds-blanket'));
             await expect(getComputedStyle(drawer).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
             await expect(getComputedStyle(drawer).boxShadow, `shadow overlay (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-overlay)'));
             await expect(getComputedStyle(drawer.querySelector('.plus-pattern-drawer-description')).color, `description is subtle (${mode})`).toBe(token('--ds-text-subtle'));
@@ -221,7 +221,7 @@ const WithTrigger = (args) => {
 
 /**
  * Keyboard and focus: opening moves focus to the first control, Tab and
- * Shift+Tab cycle inside, Escape and the scrim close it, and focus returns to
+ * Shift+Tab cycle inside, Escape and the blanket close it, and focus returns to
  * the button that opened it.
  */
 export const KeyboardAndFocus = {
@@ -258,7 +258,7 @@ export const KeyboardAndFocus = {
         const box = overlay.getBoundingClientRect();
         await userEvent.click(overlay, { clientX: box.left + 8, clientY: box.top + 8 });
         await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
-        await expect(opener, 'a scrim click returns focus too').toHaveFocus();
+        await expect(opener, 'a blanket click returns focus too').toHaveFocus();
     },
 };
 
