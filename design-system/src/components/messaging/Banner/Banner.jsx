@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { messageIcon } from '../messageAppearance';
 import './Banner.scss';
 
 /** The three appearances. Announcement carries no icon. */
@@ -7,8 +8,8 @@ export const BANNER_APPEARANCES = ['warning', 'danger', 'announcement'];
 
 /** Each appearance's default leading icon (Font Awesome solid names). Announcement has none. */
 export const BANNER_ICONS = {
-    warning: 'triangle-exclamation',
-    danger: 'circle-exclamation',
+    warning: messageIcon('warning'),
+    danger: messageIcon('danger'),
 };
 
 /**

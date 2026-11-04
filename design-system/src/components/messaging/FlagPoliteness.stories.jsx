@@ -40,10 +40,10 @@ const stack = { display: 'flex', flexDirection: 'column', gap: '16px', alignItem
 
 export const PolitenessFollowsTheMessage = () => (
     <div style={stack}>
-        <Flag style="success" title="Saved" show autohide={false} data-testid="tp-success">
+        <Flag appearance="success" title="Saved" show autohide={false} data-testid="tp-success">
             Your changes are saved.
         </Flag>
-        <Flag style="danger" title="Upload failed" show autohide={false} data-testid="tp-danger">
+        <Flag appearance="error" title="Upload failed" show autohide={false} data-testid="tp-danger">
             The file was larger than 10 MB.
         </Flag>
     </div>

@@ -93,9 +93,9 @@ plus its own pad of 16 (`--modal-pad-x-default`) on each side:
 
 | Width | Columns | Medium | Large | X-Large | Token |
 |:---|---:|---:|---:|---:|:---|
-| `sm` | 6 | 384 | 512 | 640 | `--modal-width-sm` |
-| `md` | 8 | 507 | 677 | 848 | `--modal-width-md` |
-| `lg` | 10 | 629 | 843 | 1056 | `--modal-width-lg` |
+| `6-col` | 6 | 384 | 512 | 640 | `--modal-width-sm` |
+| `8-col` | 8 | 507 | 677 | 848 | `--modal-width-md` |
+| `10-col` | 10 | 629 | 843 | 1056 | `--modal-width-lg` |
 
 The tokens are rounded to a whole pixel. `Modal.scss` works the same formula
 out continuously from the screen width, so a modal grows with the screen
@@ -103,7 +103,7 @@ between breakpoints, stops growing past a 1280 screen, never shrinks below its
 Medium width and ignores the sidebar. The frame and layer token test pins the
 formula to `--grid-width-column-screen` at 768, 1024 and 1440.
 
-Pass `width="sm" | "md" | "lg"` to `<Modal>`; a fixed pixel width ignores the
+Pass `width="6-col" | "8-col" | "10-col"` to `<Modal>`; a fixed pixel width ignores the
 screen grid. The modal itself, its Blanket and its pads: the Modal component
 docs.
 

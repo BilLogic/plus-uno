@@ -18,12 +18,11 @@ export default {
 export const ForLeads = () => (
     <div style={{ width: '672px' }}>
         <Flag
-            style="secondary"
             title="Review Assignments"
             timestamp="11 mins ago"
             show={true}
             autohide={false}
-            onClose={() => {}}
+            onDismiss={() => {}}
             className="w-100"
         >
             <span
@@ -56,12 +55,11 @@ export const ForLeads = () => (
 export const ForAll = () => (
     <div style={{ width: '672px' }}>
         <Flag
-            style="secondary"
             title="Review Assignments"
             timestamp="11 mins ago"
             show={true}
             autohide={false}
-            onClose={() => {}}
+            onDismiss={() => {}}
             className="w-100"
         >
             <span
@@ -83,11 +81,11 @@ export const ForAll = () => (
 export const WarmupPhase = () => (
     <div style={{ width: '672px' }}>
         <Flag
-            style="info"
+            appearance="information"
             title="Warmup phase in progress."
             show={true}
             autohide={false}
-            onClose={() => {}}
+            onDismiss={() => {}}
             className="w-100"
         >
             <span

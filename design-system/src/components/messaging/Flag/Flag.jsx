@@ -1,40 +1,39 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
+import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
+import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import './Flag.scss';
 
 /**
- * How long a success or info flag stays before it closes itself. Warning and
+ * How long a normal, information or success flag stays before it closes itself. Warning and
  * error flags stay until they are dismissed: they ask for something to be done.
  */
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
-/**
- * Each style's icon, as Pattern/Flag draws it, and whether it is urgent:
- * an urgent flag interrupts a screen reader and stays until it is dismissed.
- */
-const FLAG_STYLES = {
-    danger: { icon: 'fa-circle-exclamation', urgent: true },
-    warning: { icon: 'fa-triangle-exclamation', urgent: true },
-    success: { icon: 'fa-circle-check', urgent: false },
-    info: { icon: 'fa-circle-info', urgent: false },
-    primary: { icon: 'fa-circle-info', urgent: false },
-    secondary: { icon: 'fa-circle-info', urgent: false },
-};
+/** The five appearances, as the Figma Flag set names them. */
+export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
+
+/** Warning and error are urgent: they interrupt a screen reader and stay until dismissed. */
+const URGENT_APPEARANCES = ['warning', 'error'];
 
 /**
  * The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide,
- * padded 16: a 16 icon in the style's icon color on the title's first line,
- * the title and its message, and the close button.
+ * padded 16: a 16 icon in the appearance's icon color on the title's first
+ * line, the title and its optional description, actions, and the dismiss
+ * button. `bold` expands the surface to the appearance's bold fill.
  */
 export const Flag = ({
     id,
-    style = 'secondary', // 'secondary' (default), 'success', 'danger', 'warning', 'info', 'primary'
+    appearance = 'normal', // 'normal' (default), 'information', 'warning', 'error', 'success'
     title,
-    children, // Body text/content
+    children, // Description
+    actions,
+    bold = false,
+    defaultExpanded = false,
     dismissible = true,
     show = true,
-    onClose,
+    onDismiss,
     delay = FLAG_AUTO_CLOSE_MS,
     autohide,
     className = '',
@@ -43,9 +42,10 @@ export const Flag = ({
     timestamp, // '11 mins ago' etc
     ...props
 }) => {
-    // A style outside the list falls back to the default, secondary.
-    const toastStyle = Object.hasOwn(FLAG_STYLES, style) ? style : 'secondary';
-    const { icon: iconClass, urgent: isUrgent } = FLAG_STYLES[toastStyle];
+    // An appearance outside the list falls back to the default, normal.
+    const flagAppearance = FLAG_APPEARANCES.includes(appearance) ? appearance : 'normal';
+    const iconClass = `fa-${MESSAGE_APPEARANCE_ICONS[flagAppearance]}`;
+    const isUrgent = URGENT_APPEARANCES.includes(flagAppearance);
 
     /*
      * #325. Politeness follows the message. Every toast used to be
@@ -59,21 +59,26 @@ export const Flag = ({
     const livePoliteness = isUrgent ? 'assertive' : 'polite';
 
     /*
-     * Success and info close themselves after 8 seconds; warning and error
-     * stay until they are dismissed. A caller's `autohide` or `delay` wins.
+     * Normal, information and success close themselves after 8 seconds;
+     * warning and error stay until they are dismissed. A caller's `autohide`
+     * or `delay` wins.
      */
     const closesItself = autohide ?? !isUrgent;
 
-    // Only the latest onClose fires; changing it mid-countdown does not
+    // A bold flag collapses to its title and expands to the description and actions.
+    const [expanded, setExpanded] = useState(defaultExpanded);
+    const showDetails = !bold || expanded;
+
+    // Only the latest onDismiss fires; changing it mid-countdown does not
     // restart the timer, matching the previous react-bootstrap Toast timing.
-    const onCloseRef = useRef(onClose);
+    const onDismissRef = useRef(onDismiss);
     useEffect(() => {
-        onCloseRef.current = onClose;
-    }, [onClose]);
+        onDismissRef.current = onDismiss;
+    }, [onDismiss]);
 
     useEffect(() => {
         if (!show || !closesItself || !(delay > 0)) return undefined;
-        const timer = setTimeout(() => onCloseRef.current?.(), delay);
+        const timer = setTimeout(() => onDismissRef.current?.(), delay);
         return () => clearTimeout(timer);
     }, [show, closesItself, delay]);
 
@@ -82,7 +87,7 @@ export const Flag = ({
     return (
         <div
             id={id}
-            className={`plus-flag ${toastStyle} ${className}`}
+            className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
             role={liveRole}
             aria-live={livePoliteness}
             aria-atomic="true"
@@ -98,35 +103,80 @@ export const Flag = ({
                   * these components is `aria-hidden`. The title beside it
                   * carries the meaning.
                   */}
-                <i className={`fas ${iconClass}`} aria-hidden="true"></i>
+                <i className={`fa-solid ${iconClass}`} aria-hidden="true"></i>
             </div>
             <div className="plus-flag-content">
                 <div className={`plus-flag-header ${headerClass}`}>
                     <strong className="plus-flag-title">{title}</strong>
                     {timestamp && <small className="plus-flag-timestamp">{timestamp}</small>}
                 </div>
-                <div className={`plus-flag-body ${bodyClass}`}>
-                    {children}
-                </div>
+                {showDetails && children && (
+                    <div className={`plus-flag-body ${bodyClass}`}>
+                        {children}
+                    </div>
+                )}
+                {showDetails && actions && actions.length > 0 && (
+                    <div className="plus-flag-actions">
+                        {actions.map((action) => {
+                            const ActionTag = action.href ? 'a' : 'button';
+                            return (
+                                <ActionTag
+                                    key={action.text}
+                                    type={action.href ? undefined : 'button'}
+                                    className="plus-flag-action"
+                                    href={action.href}
+                                    target={action.target}
+                                    onClick={action.onClick}
+                                >
+                                    {action.text}
+                                </ActionTag>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
-            {/* The shared CloseButton, default tone on the flag's surface. Its
-                name stays "Close", the CloseButton default. */}
-            {dismissible && <CloseButton onClick={onClose} />}
+            {bold && (
+                <IconButton
+                    icon={expanded ? 'chevron-up' : 'chevron-down'}
+                    label={expanded ? 'Collapse' : 'Expand'}
+                    appearance="subtle"
+                    className="plus-flag-expand"
+                    aria-expanded={expanded}
+                    onClick={() => setExpanded((open) => !open)}
+                />
+            )}
+            {/* The shared CloseButton, default tone on the flag's surface, or
+                inverse on a bold one. A message is dismissed, not closed. */}
+            {dismissible && <CloseButton label="Dismiss flag" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
         </div>
     );
 };
 
 Flag.propTypes = {
     id: PropTypes.string,
-    style: PropTypes.oneOf(['secondary', 'success', 'danger', 'warning', 'info', 'primary']),
+    /** `normal` (default), `information`, `warning`, `error` or `success`. */
+    appearance: PropTypes.oneOf(FLAG_APPEARANCES),
+    /** What happened, in a few words. */
     title: PropTypes.node.isRequired,
-    children: PropTypes.node.isRequired,
+    /** An optional description under the title. */
+    children: PropTypes.node,
+    /** Link-button actions under the description, in the order given. Avoid more than two. */
+    actions: PropTypes.arrayOf(PropTypes.shape({
+        text: PropTypes.string.isRequired,
+        href: PropTypes.string,
+        target: PropTypes.string,
+        onClick: PropTypes.func,
+    })),
+    /** The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions. */
+    bold: PropTypes.bool,
+    /** Whether a bold flag starts expanded. */
+    defaultExpanded: PropTypes.bool,
     dismissible: PropTypes.bool,
     show: PropTypes.bool,
-    onClose: PropTypes.func,
+    onDismiss: PropTypes.func,
     /** How long it stays before closing itself, in ms. 8000 by default. */
     delay: PropTypes.number,
-    /** Close itself after `delay`. Defaults to true for success, info, primary and secondary, false for warning and danger. */
+    /** Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. */
     autohide: PropTypes.bool,
     className: PropTypes.string,
     headerClass: PropTypes.string,
@@ -134,19 +184,11 @@ Flag.propTypes = {
     timestamp: PropTypes.node
 };
 
-// Legacy corner names, mapped onto the logical ones.
-const LEGACY_POSITIONS = {
-    'top-right': 'top-end',
-    'top-left': 'top-start',
-    'bottom-right': 'bottom-end',
-    'bottom-left': 'bottom-start',
-};
-
 /**
- * Where flags sit: bottom-left by default, fixed to the screen,
+ * FlagGroup: where flags sit: bottom-left by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
  */
-export const FlagContainer = ({
+export const FlagGroup = ({
     position = 'bottom-start', // 'top-start', 'top-center', 'top-end', 'middle-start', etc.
     containerPosition = 'fixed',
     className = '',
@@ -154,7 +196,7 @@ export const FlagContainer = ({
     ...props
 }) => (
     <div
-        data-position={LEGACY_POSITIONS[position] ?? position}
+        data-position={position}
         data-container-position={containerPosition}
         className={`plus-flag-container ${className}`}
         {...props}
@@ -163,7 +205,7 @@ export const FlagContainer = ({
     </div>
 );
 
-FlagContainer.propTypes = {
+FlagGroup.propTypes = {
     position: PropTypes.string,
     /** `fixed` (default) holds the stack to the screen; `absolute` or `static` to a parent. */
     containerPosition: PropTypes.string,

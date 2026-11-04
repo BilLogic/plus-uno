@@ -143,8 +143,8 @@ The footer is built in: pass `primaryButton` and `secondaryButton` as objects an
 the component renders the `Button` pair for you, aligned right. Pass `footer` for
 other actions, such as a Delete on the left or a single primary.
 
-Pick a grid `width` for the content rather than a number: `sm` for a confirm, `md` for a
-short form, `lg` for a table or an editor. A dialog never opens another dialog.
+Pick a grid `width` for the content rather than a number: `6-col` for a confirm, `8-col` for a
+short form, `10-col` for a table or an editor. A dialog never opens another dialog.
 When a follow-up decision comes up inside one — confirming a delete, for
 example — swap its content for an inline confirmation in the same dialog
 rather than opening a second one. Opening a modal closes a floating sidebar; a
@@ -164,7 +164,7 @@ docked one stays.
 <Modal width={480} title="Reschedule" show={open} onClose={close} />
 
 // Correct — a width from the screen grid, which grows with the screen.
-<Modal width="md" title="Reschedule" show={open} onClose={close} />
+<Modal width="8-col" title="Reschedule" show={open} onClose={close} />
 ```
 
 ### The footer only appears when you give it a button.

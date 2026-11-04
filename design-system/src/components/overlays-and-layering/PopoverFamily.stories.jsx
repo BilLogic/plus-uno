@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { probe, px } from '@/storybook-docs/lib/style-probes.js';
-import { Flag, FlagContainer } from '@/components';
+import { Flag, FlagGroup } from '@/components';
 import Popup from './Popup/Popup';
 import Tooltip from './Tooltip/Tooltip';
 
@@ -233,14 +233,14 @@ TooltipSize.play = async ({ canvasElement }) => {
 // ---------------------------------------------------------------------------
 
 export const FlagsStack = () => (
-    <FlagContainer data-testid="pf-flags">
-        <Flag style="success" title="Changes saved" show autohide={false} data-testid="pf-flag-1">
+    <FlagGroup data-testid="pf-flags">
+        <Flag appearance="success" title="Changes saved" show autohide={false} data-testid="pf-flag-1">
             Your session notes are saved.
         </Flag>
-        <Flag style="danger" title="Upload failed" show data-testid="pf-flag-2">
+        <Flag appearance="error" title="Upload failed" show data-testid="pf-flag-2">
             The file was larger than 10 MB.
         </Flag>
-    </FlagContainer>
+    </FlagGroup>
 );
 
 FlagsStack.play = async ({ canvasElement }) => {
