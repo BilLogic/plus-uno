@@ -43,7 +43,7 @@ export const MANAGER_TOKENS = {
     booleanBg: '--ds-background-neutral',
     booleanSelectedBg: '--ds-background-brand-bold',
   },
-  // Custom properties on the manager's <html>, read by manager-head.html.
+  // The selected sidebar row's pair; manager.js writes it as a rule.
   vars: {
     '--plus-manager-selected-bg': '--ds-background-brand-bold',
     '--plus-manager-selected-fg': '--ds-text-inverse',

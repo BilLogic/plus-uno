@@ -80,11 +80,22 @@ const buildTheme = (key) =>
     inputBorderRadius: 8,
   });
 
-const paintVars = (key) => {
-  document.documentElement.dataset.plusManagerMode = key;
-  for (const [name, value] of Object.entries(THEMES[key]?.vars ?? {})) {
-    document.documentElement.style.setProperty(name, value);
+// The selected row's brand pair is written as a rule, not custom properties: the
+// manager has no stylesheet that could define them (see manager-head.html for the rest).
+const paintSelected = (key) => {
+  const { vars = {} } = THEMES[key] ?? {};
+  const bg = vars['--plus-manager-selected-bg'];
+  const fg = vars['--plus-manager-selected-fg'];
+  let style = document.getElementById('plus-manager-selected');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'plus-manager-selected';
+    document.head.appendChild(style);
   }
+  document.documentElement.dataset.plusManagerMode = key;
+  style.textContent =
+    `.sidebar-container [data-selected='true'] { background-color: ${bg} !important; color: ${fg} !important; }\n` +
+    `.sidebar-container [data-selected='true'] svg { color: ${fg} !important; opacity: 0.95; }`;
 };
 
 addons.register('plus/manager-theme', (api) => {
@@ -96,7 +107,7 @@ addons.register('plus/manager-theme', (api) => {
     const key = modeKey(globals);
     if (key === shown) return;
     shown = key;
-    paintVars(key);
+    paintSelected(key);
     api.setOptions({ theme: buildTheme(key) });
   };
   api.on(SET_GLOBALS, apply);
@@ -115,5 +126,5 @@ addons.setConfig({
   // Storybook draws no tab strip at all for a single view — measured: both a docs
   // entry and a story entry report `tabStrip: false, tabs: []` — so the toolbar is
   // left holding only its tools, which is the point.
-  theme: (paintVars('light-no-preference'), buildTheme('light-no-preference')),
+  theme: (paintSelected('light-no-preference'), buildTheme('light-no-preference')),
 });
