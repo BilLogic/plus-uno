@@ -1,0 +1,138 @@
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
+import { RefTable, C, DoDont, Do, Dont } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as OverviewStories from './Overview.stories.jsx';
+import * as ColorStories from './Color.stories.jsx';
+
+<Meta of={OverviewStories} />
+
+<FoundationHero
+    title="Data visualizations"
+    summary="Forty-one charts in six groups, one color system and the same spacing, type and motion tokens as the rest of PLUS. Pick the chart for the question, then let the palette do its one job per color."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Pick a chart by the question">
+
+Start from what the viewer needs to know. Each group in the sidebar answers one kind of question.
+
+<RefTable
+    head={['Question', 'Group', 'Start with']}
+    rows={[
+        ['Which is bigger?', 'Comparison', <><C>BarChart</C>, or <C>BulletChart</C> against a target</>],
+        ['How does it change over time?', 'Temporal', <><C>LineChart</C>, or <C>Sparkline</C> inside a table row</>],
+        ['What share of the whole?', 'Part-to-whole', <><C>DonutChart</C> for a few parts, <C>TreemapChart</C> for many</>],
+        ['How is it spread?', 'Distribution', <><C>HistogramChart</C>, or <C>HeatmapChart</C> across two categories</>],
+        ['Do two measures move together?', 'Correlation', <C>ScatterChart</C>],
+        ['Where does it go, or what connects?', 'Flow and relationships', <><C>SankeyDiagram</C>, <C>FunnelChart</C>, <C>NetworkGraph</C></>],
+    ]}
+/>
+
+Every chart page shows the chart, then covers when to use it and which chart to use instead, its anatomy, the data it takes, how it colors and what it relies on besides color, and what to show while it has no data. It ends with a live playground and the sibling charts to consider.
+
+</FoundationSection>
+
+<FoundationSection title="Chart color">
+
+A chart color does one of four jobs, and each job has one token family. Name a color by its job, never by its hue.
+
+<RefTable
+    head={['Job', 'What it encodes', 'Tokens']}
+    rows={[
+        ['Identity', 'Which series', <><C>--ds-chart-categorical-1</C> through <C>-6</C> in order, or <C>--ds-chart-smart-*</C> for the five SMART subjects</>],
+        ['Magnitude', 'How much', <>One hue's sequential ramp: <C>--ds-background-accent-&lt;hue&gt;-subtler</C>, then <C>--ds-chart-&lt;hue&gt;-bold</C>, <C>-bolder</C> and <C>-boldest</C></>],
+        ['Polarity', 'Which side of a baseline', <>Two hues' ramps meeting at <C>--ds-background-accent-gray-subtler</C>, orange and blue by default. Never pair red with green.</>],
+        ['State', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, <C>-information</C>, <C>-discovery</C>, each with a <C>-bold</C> step, plus a neutral for to-do</>],
+    ]}
+/>
+
+A single-series chart takes <C>--ds-chart-brand</C>, and a de-emphasized comparison or reference line takes <C>--ds-chart-neutral</C>.
+
+Every family below is live: the swatches follow the toolbar's color mode and contrast.
+
+<FoundationSubsection title="Brand and neutral">
+<Canvas of={ColorStories.BrandAndNeutral} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Categorical order">
+<Canvas of={ColorStories.CategoricalOrder} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="State">
+<Canvas of={ColorStories.StatusColors} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="Hue ramps">
+<Canvas of={ColorStories.HueRamps} sourceState="none" />
+</FoundationSubsection>
+
+<FoundationSubsection title="SMART subjects">
+<Canvas of={ColorStories.SmartColors} sourceState="none" />
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Color do and don't">
+
+<DoDont>
+    <Do caption="Stay within five or six series. Each keeps its slot in the categorical order, and the legend can name every one.">
+        <Story of={OverviewStories.WithinTheLimit} />
+    </Do>
+    <Dont caption="Past six series the sequence reaches its overflow slots and neighbors blur. Group the smallest categories into Other.">
+        <Story of={OverviewStories.PastTheLimit} />
+    </Dont>
+</DoDont>
+
+<DoDont>
+    <Do caption="Use categorical colors to tell categories apart, and keep state colors for values that mean a state.">
+        <Story of={OverviewStories.CategoriesOnly} />
+    </Do>
+    <Dont caption="Mixing a categorical color with a state color reads wrong: one series now reads as success and the other as nothing.">
+        <Story of={OverviewStories.CategoryAndStateMixed} />
+    </Dont>
+</DoDont>
+
+More rules that hold for every chart:
+
+- **Never color alone.** Pair every series or state with a label, a shape, a pattern or a table the reader can check. Some chart pages name where the chart itself leans on color, so add the label there.
+- **No text on a chart color.** A label sits beside its mark. Where it must sit on a fill, such as a heatmap cell, it takes <C>--ds-text</C> or <C>--ds-text-inverse</C>, whichever reads.
+- **Sort categories from most to least.** An ordered set such as grades or stages takes one hue's ramp, with the strongest tone on the biggest value.
+
+</FoundationSection>
+
+<FoundationSection title="Spacing and type">
+
+A chart takes spacing and type from the same tokens as every other component. Charts are still being brought onto tokens, so a few older ones keep a literal size.
+
+<RefTable
+    head={['Role', 'Token']}
+    rows={[
+        ['Padding around the plot', <C>--card-pad-compact</C>],
+        ['Tick labels, legend, data labels, tooltip text', 'The current text tokens'],
+        ['Gridlines and axis lines', <C>--chart-grid-width</C>],
+        ['Series lines, whiskers, marker rings, segment separators', <C>--chart-line-width</C>],
+        ['Bar and column value-end radius', <C>--chart-bar-radius</C>],
+    ]}
+/>
+
+A chart has no title of its own: name it in the header of the Section or Card around it. Take text sizes from tokens, not literal pixel values.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Color', description: 'Every chart color, with its categorical order and ramps resolved in the current mode.', href: '?path=/docs/data-visualizations-color--docs' },
+        { title: 'Foundations', description: 'The container, tooltip, radius, stroke, type and motion tokens a chart takes.', href: '?path=/docs/data-visualizations-foundations--docs' },
+    ]}
+/>
+
+</FoundationSection>
