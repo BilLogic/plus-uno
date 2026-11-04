@@ -8,7 +8,7 @@ import '../design-system/src/styles/main.scss';
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
-import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.jsx';
+import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
