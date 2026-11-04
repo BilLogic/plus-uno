@@ -1,20 +1,156 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SmartTagStories from './SmartTag.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SmartTagStories} />
 
 <Title />
-A SMART competency area, as a Tag whose color and icon the subject fixes.
+A SMART competency area — one of the five areas tutor training is organized
+around. It is a thin wrapper on `Tag`: `subject` fixes the color and the
+leading icon, and every other `Tag` prop passes straight through.
 
 <DocsTabs of={SmartTagStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={SmartTagStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/SmartTag"
+/>
 
-<ArgTypes of={SmartTagStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>All five SMART subjects, each with its own color and icon.</>}>
+    <Canvas of={SmartTagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Subjects
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Icon</th>
+            <th>Default label</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>social-emotional</code></td><td>heart</td><td>Social-emotional</td></tr>
+        <tr><td><code>mastering-content</code></td><td>book</td><td>Mastering content</td></tr>
+        <tr><td><code>advocacy</code></td><td>bullhorn</td><td>Advocacy</td></tr>
+        <tr><td><code>relationship</code></td><td>handshake</td><td>Relationship</td></tr>
+        <tr><td><code>technology-tools</code></td><td>laptop-code</td><td>Technology tools</td></tr>
+    </tbody>
+</DocsTable>
+
+Each subject's color and icon are fixed — there is no prop to mix a subject's
+meaning with a different color.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`children` or `text` overrides the default label. Every other `Tag` prop — `isSelected`, `isRemovable`, `href`, `maxWidth` and the rest — passes straight through.</>}>
+    <DsCanvasQuiet of={SmartTagStories.CustomLabel} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A removable, selected smart tag: `isRemovable` and `isSelected` are `Tag`'s own props, unchanged.</>}>
+    <DsCanvasQuiet of={SmartTagStories.PassesThroughTagProps} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SmartTagStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `SmartTag` wherever training content, a tutor's strengths or a feedback
+item is tagged by SMART area. For a category that is not a SMART subject, use
+`Tag` directly — `SmartTag` exists only to fix the color and icon per subject,
+not to add new behavior.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Older spellings still work.
+
+`socio-emotional` and `relationships` are accepted and map to
+`social-emotional` and `relationship`. Write new code with the current
+spelling; the aliases exist for content written before it changed.
+
+```jsx
+<SmartTag subject="advocacy" />
+<SmartTag subject="technology-tools">Tech & tools</SmartTag>
+```
+
+### Let the default label stand unless the context needs different words.
+
+Each subject already has a label people recognize. Override it with
+`children` or `text` only when the surrounding content needs a shorter or
+longer phrasing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Inherits `Tag`'s accessibility.** Selection, removal and link behavior
+  are unchanged — see `Tag`'s own Accessibility section for the full
+  contract.
+- **The subject icon is decorative.** It is `aria-hidden`; the subject's name
+  is carried by the visible label, not the icon.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a category outside the five SMART subjects, use `Tag` directly.
+- For a group of tags, including smart tags, use `TagGroup`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

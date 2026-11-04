@@ -9,15 +9,15 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
-| [DateTag](DateTag/index.md) | 6 | ✕ | ✕ | ✕ |
-| [PromptStarters](PromptStarters/index.md) | 4 | ✕ | ✕ | ✕ |
-| [SmartTag](SmartTag/index.md) | 3 | ✕ | ✕ | ✕ |
+| [DateTag](DateTag/index.md) | 6 | ✅ | ✕ | ✅ |
+| [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✕ | ✅ |
+| [SmartTag](SmartTag/index.md) | 3 | ✅ | ✕ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/9 (67%) · Correct/incorrect 6/9 (67%) · Accessibility 6/9 (67%)
+**Authored coverage:** When to use 9/9 (100%) · Correct/incorrect 6/9 (67%) · Accessibility 9/9 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
