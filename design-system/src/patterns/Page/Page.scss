@@ -45,7 +45,7 @@
 }
 
 .plus-pattern-page-pad-md {
-    padding: var(--surface-pad);
+    padding: var(--page-pad);
 }
 
 .plus-pattern-page-pad-lg {
@@ -82,7 +82,7 @@
 
 /* The page's h1: Heading/large 24/28, the top of the page outline. */
 .plus-pattern-page-title {
-    margin: 0 0 var(--surface-stack-md);
+    margin: 0 0 var(--page-stack-md);
     font: var(--heading-large);
     letter-spacing: var(--heading-large-tracking);
     // Noto Serif's glyph box is taller than this line: padding and an equal

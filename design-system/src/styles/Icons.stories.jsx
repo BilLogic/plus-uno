@@ -46,7 +46,7 @@ export const Sizes = () => (
 
 /** Solid, regular and brands: the three Font Awesome Free families. */
 export const Families = () => (
-    <div style={{ display: 'flex', gap: 'var(--surface-stack-md)', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--page-stack-md)', flexWrap: 'wrap' }}>
         {[
             ['fa-solid', ['calendar-days', 'bell', 'gear', 'user', 'circle-check']],
             ['fa-regular', ['calendar-days', 'bell', 'user', 'circle-check', 'file']],
@@ -132,7 +132,7 @@ export const OneGlyphOneMeaning = () => (
 
 /** 24 is the largest icon; a larger mark goes in a Tile. */
 export const LargerMeansTile = () => (
-    <div style={{ display: 'flex', gap: 'var(--surface-stack-md)', alignItems: 'flex-end' }}>
+    <div style={{ display: 'flex', gap: 'var(--page-stack-md)', alignItems: 'flex-end' }}>
         <span style={col('var(--element-stack-md)')}>
             <Glyph name="folder" size="--icon-lg" color="--ds-icon" />
             <span style={caption}>24: the largest icon</span>

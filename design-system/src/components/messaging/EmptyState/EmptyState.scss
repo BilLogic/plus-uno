@@ -17,12 +17,12 @@
     color: var(--ds-text);
 
     &--page {
-        padding: var(--surface-stack-lg) var(--layout-pad-x-screen);
+        padding: var(--page-stack-lg) var(--layout-pad-x-screen);
     }
 
     &--compact {
         gap: var(--section-stack-sm);
-        padding: var(--surface-stack-md) var(--surface-stack-sm);
+        padding: var(--page-stack-md) var(--page-stack-sm);
     }
 
     &__image {

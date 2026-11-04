@@ -29,9 +29,9 @@ import { DemoLabel } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /** The 240 sidebar's content box: its width less the 8 it pads either side. */
 const SIDEBAR_BOX = {
-    width: 'calc(var(--layout-width-sidebar) - 2 * var(--surface-container-pad))',
+    width: 'calc(var(--layout-width-sidebar) - 2 * var(--frame-pad))',
     boxSizing: 'content-box',
-    padding: 'var(--surface-container-pad)',
+    padding: 'var(--frame-pad)',
     backgroundColor: 'var(--ds-surface-sunken)',
 };
 

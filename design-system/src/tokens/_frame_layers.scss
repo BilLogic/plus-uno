@@ -36,12 +36,12 @@
     --layout-width-drawer-sm: var(--layout-width-modal-sm);
     --layout-width-drawer-md: var(--layout-width-modal-md);
     --layout-width-drawer-lg: var(--layout-width-modal-lg);
-    /* Surface */
-    --surface-pad: var(--space-100);
-    --surface-stack-sm: var(--space-100);
-    --surface-stack-md: var(--space-150);
-    --surface-stack-lg: var(--space-250);
-    --surface-radius: var(--radius-100);
+    /* Page */
+    --page-pad: var(--space-100);
+    --page-stack-sm: var(--space-100);
+    --page-stack-md: var(--space-150);
+    --page-stack-lg: var(--space-250);
+    --page-radius: var(--radius-100);
     /* Screen */
     --layout-width-screen: 768px;
     --layout-pad-x-screen: var(--space-150);
@@ -49,9 +49,9 @@
     --layout-max-width-screen: 1023px;
 
     /* spacing / patterns */
-    /* Surface container */
-    --surface-container-pad: var(--space-050);
-    --surface-container-stack: var(--space-050);
+    /* Frame */
+    --frame-pad: var(--space-050);
+    --frame-stack: var(--space-050);
     /* Section */
     --section-stack-sm: var(--space-050);
     --section-stack-md: var(--space-100);
@@ -162,7 +162,7 @@
         --layout-width-modal-sm: 640px;
         --layout-width-modal-md: 848px;
         --layout-width-modal-lg: 1056px;
-        --surface-pad: var(--space-150);
+        --page-pad: var(--space-150);
         --layout-width-screen: 1440px;
         --layout-pad-x-screen: var(--space-200);
         --layout-min-width-screen: 1440px;

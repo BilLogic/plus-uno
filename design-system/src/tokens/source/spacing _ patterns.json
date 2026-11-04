@@ -5,14 +5,14 @@
   "variables": [
     {
       "id": "VariableID:19378:46227",
-      "name": "Surface container/pad",
+      "name": "Frame/pad",
       "variableCollectionId": "VariableCollectionId:19378:46226",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-container-pad)"
+        "WEB": "var(--frame-pad)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -26,14 +26,14 @@
     },
     {
       "id": "VariableID:19378:46228",
-      "name": "Surface container/stack",
+      "name": "Frame/stack",
       "variableCollectionId": "VariableCollectionId:19378:46226",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-container-stack)"
+        "WEB": "var(--frame-stack)"
       },
       "valuesByMode": {
         "19378:4": {

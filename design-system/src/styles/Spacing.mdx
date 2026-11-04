@@ -106,7 +106,7 @@ context a value belongs to, step back to the box that holds it.
 />
 
 Margin, slot and viewport are never token words. What other systems
-call a page margin is the Page pad, `--surface-pad`.
+call a page margin is the Page pad, `--page-pad`.
 
 <TokenTable
     showFigma={false}
@@ -170,8 +170,8 @@ Card pad of its size: a Section message and File upload take 16, a Jumbotron
         { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
         { token: '--overlay-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
         { token: '--overlay-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
-        { token: '--surface-container-pad', figma: 'Frame/pad', use: 'The Frame around the Page' },
-        { token: '--surface-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'Inside the Page, at MD · LG · XL' },
+        { token: '--frame-pad', figma: 'Frame/pad', use: 'The Frame around the Page' },
+        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'Inside the Page, at MD · LG · XL' },
     ]}
 />
 
@@ -235,12 +235,12 @@ the content grid's margin.
 
 <TokenTable
     rows={[
-        { token: '--surface-container-pad', figma: 'Frame/pad' },
-        { token: '--surface-container-stack', figma: 'Frame/stack' },
-        { token: '--surface-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'MD · LG · XL' },
-        { token: '--surface-stack-sm', figma: 'Page/stack-sm' },
-        { token: '--surface-stack-md', figma: 'Page/stack-md', use: 'Between sections' },
-        { token: '--surface-stack-lg', figma: 'Page/stack-lg', use: 'Before a new topic' },
+        { token: '--frame-pad', figma: 'Frame/pad' },
+        { token: '--frame-stack', figma: 'Frame/stack' },
+        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'MD · LG · XL' },
+        { token: '--page-stack-sm', figma: 'Page/stack-sm' },
+        { token: '--page-stack-md', figma: 'Page/stack-md', use: 'Between sections' },
+        { token: '--page-stack-lg', figma: 'Page/stack-lg', use: 'Before a new topic' },
     ]}
 />
 
