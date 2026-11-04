@@ -80,7 +80,10 @@ export const MIN_FILES = 150;
 // Tabs.scss's one still-hand-written rule (the tab panel's own ring, a
 // different width/offset pair the mixin cannot express in one call) survives
 // the move and keeps counting.
-export const MIN_RULES = 44;
+// Lowered from 44 to 43: RichTextEditor's block menu moved from Bootstrap's
+// dropdown to DropdownMenu, whose rows draw their ring in MenuGroup.scss —
+// already counted there — so its own `.dropdown-item:focus-visible` rule is gone.
+export const MIN_RULES = 43;
 
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
