@@ -303,7 +303,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Checkbox', new: '--checkbox-control-size', old: '--layout-control-checkbox', ref: '18px' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size', old: '--layout-control-radio', ref: '12px' },
   // The `size` prop's px values (Radio group, Choice grid, Range, Toggle) are rows too, so the
-  // components read a named token and never a literal. Each name ends in the px it holds.
+  // components read a named token and never a literal. Each name ends in the `size` step it serves.
   { tier: 'components', group: 'Radio', new: '--radio-control-size-10', old: null, ref: '10px', note: 'RadioGroup size 10' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size-14', old: null, ref: '14px', note: 'RadioGroup size 14' },
   { tier: 'components', group: 'Choice grid', new: '--choice-grid-control-size-10', old: null, ref: '10px', note: 'ChoiceGrid size 12' },
