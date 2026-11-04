@@ -1,20 +1,138 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DateTagStories from './DateTag.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DateTagStories} />
 
 <Title />
-A due or event date, outlined with a fixed icon the app picks from the date and the due-soon window.
+A due or event date, outlined with a fixed icon the app picks from the date
+and the due-soon window — never a caller's choice.
 
 <DocsTabs of={DateTagStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={DateTagStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/DateTag"
+/>
 
-<ArgTypes of={DateTagStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A neutral date tag, outlined with its fixed calendar icon.</>}>
+    <Canvas of={DateTagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>`neutral` (calendar) when the date is not close, `warning` (clock) when due soon, `danger` (triangle-exclamation) when overdue. Each appearance's icon is fixed, never a caller's choice.</>}>
+    <DsCanvasQuiet of={DateTagStories.Styles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Truncation
+
+<DocsCanvasShell description={<>Past `maxWidth` the label ends in an ellipsis, and the full text becomes a tooltip reachable by hover or by Tab.</>}>
+    <DsCanvasQuiet of={DateTagStories.Truncation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DateTagStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `DateTag` for a due or event date beside the thing it belongs to — an
+assignment, a session, a report. For a status or a category, use `Tag`
+instead; `DateTag`'s outline, icon and three appearances are reserved for
+dates.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### The app picks the appearance, never taste.
+
+Derive `appearance` from the date and a due-soon window the app defines —
+`neutral` while there's time, `warning` as it nears, `danger` once it has
+passed. Write `children` as people say the date: "Due tomorrow," "2 days
+overdue," not a raw timestamp.
+
+```jsx
+<DateTag appearance="warning">Due in 2 days</DateTag>
+```
+
+### A date tag is never a button.
+
+It renders a `span` with no role and no click handler — `onClick`, `role` and
+`tabIndex` are dropped with a console warning in development. The one time it
+takes focus is when its text is truncated, so a keyboard user can still reach
+the tooltip holding the full date.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Not a control.** No role, no tab stop, no click handler — assistive
+  technology reads it as plain text beside whatever it labels.
+- **Truncated text stays reachable.** When the label is clipped, the tag
+  takes a tab stop and its full text is available as a tooltip on hover or
+  focus.
+- **The icon is decorative.** It is `aria-hidden`; the appearance's meaning
+  lives in the text, not the icon alone.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a status or a category, use `Tag`.
+- For a numeric count, use `CountTag`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

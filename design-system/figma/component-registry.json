@@ -736,7 +736,7 @@
         "import": "@/components/images-and-icons",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Image/Image.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Image",
         "source": "design-system/src/components/images-and-icons/Image/Image.jsx",
         "storybookId": "components-images-and-icons-image--docs"
       },
@@ -1105,7 +1105,7 @@
         "import": "@/components/images-and-icons",
         "export": "default",
         "mdxPath": "design-system/src/components/images-and-icons/Object/Object.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Object",
         "source": "design-system/src/components/images-and-icons/Object/Object.jsx",
         "storybookId": "components-images-and-icons-object--docs"
       },
