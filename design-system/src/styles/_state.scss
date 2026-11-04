@@ -155,8 +155,8 @@
 // The ring's own declarations, with no selector of its own — for a control
 // whose ring has to be drawn on a descendant, not on the rule `plus-state` is
 // included in. Range's thumb is the one adopter: the track element itself
-// stays un-ringed (`&:focus { outline: none; }`, written by hand, since there
-// is nothing of its own to ring) and each `::-webkit-slider-thumb` /
+// stays un-ringed (`&:focus { @include plus-ring-reset; }`, since there is
+// nothing of its own to ring) and each `::-webkit-slider-thumb` /
 // `::-moz-range-thumb` under `&:focus-visible` includes this instead.
 @mixin plus-ring(
     $ring-offset: var(--size-element-stroke-lg),
