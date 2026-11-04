@@ -8,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--layout-z-index-scrim);
+    z-index: var(--layer-blanket);
     padding: 20px;
     overflow-y: auto;
 }
@@ -92,7 +92,7 @@
 
 .plus-user-feedback-modal {
     position: relative;
-    z-index: var(--layout-z-index-modal);
+    z-index: var(--layer-modal);
     max-width: 100%;
     max-height: calc(100vh - 40px);
     display: flex;
@@ -172,7 +172,7 @@
 .plus-user-feedback-modal-divider {
     width: 100%;
     height: var(--border-default);
-    border-radius: var(--element-radius-sm);
+    border-radius: var(--radius-sm);
     background-color: var(--ds-border-bold);
     opacity: 0.1;
 }

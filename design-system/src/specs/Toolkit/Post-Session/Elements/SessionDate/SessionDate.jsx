@@ -21,7 +21,7 @@ const SessionDate = ({
     onChange,
     isRequired = true,
 }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)', width: '100%', maxWidth: 'var(--col-4)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%', maxWidth: 'var(--col-4)' }}>
         <QuestionLabel htmlFor={id} isRequired={isRequired}>{label}</QuestionLabel>
         <DatePicker
             id={id}

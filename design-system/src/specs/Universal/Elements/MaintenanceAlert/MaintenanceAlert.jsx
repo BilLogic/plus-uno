@@ -39,8 +39,8 @@ const MaintenanceAlert = ({
             appearance="warning"
             className={`plus-maintenance-alert ${className}`}
         >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--element-inline-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                     <strong>{title}</strong>
                     <span>
                         {greeting} {intro} <strong>{startTime}</strong> to <strong>{endTime}</strong>. {closing}

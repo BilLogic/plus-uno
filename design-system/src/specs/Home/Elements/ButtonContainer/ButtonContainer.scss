@@ -10,7 +10,7 @@
     align-items: flex-start;
     justify-content: center;
     position: relative;
-    width: var(--layout-width-join-row);
+    width: var(--join-row-width);
 
     &-group {
         display: flex;
@@ -18,7 +18,7 @@
         gap: var(--size-element-gap-sm);
         position: relative;
         flex-shrink: 0;
-        width: var(--layout-width-join-row);
+        width: var(--join-row-width);
     }
 
     // The session field takes the rest of the row beside the button.

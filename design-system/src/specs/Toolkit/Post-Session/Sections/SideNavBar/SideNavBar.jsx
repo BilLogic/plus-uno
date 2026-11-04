@@ -90,7 +90,7 @@ const SideNavBar = ({
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', minWidth: 0 }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <ProgressTracker orientation="vertical" spacing="compact" items={beforeStudents} label={label} />
 
                 {students.length > 0 && onStudentStep && students.map((student, index) => (
