@@ -188,14 +188,14 @@ const preview = {
             [
               "Introduction",
               "Page templates",
-              "Frame",
-              "Page",
+              "Surface container",
+              "Surface",
               "Topbar",
               "Sidebar",
               "Section",
               "Card",
               "Table",
-              "Blanket",
+              "Overlay",
               "Modal",
               "Popover family",
               "Drawer"
@@ -330,6 +330,7 @@ const preview = {
           ],
           "Data visualizations",
           [
+            "Color",
             "Comparison",
             "Correlation",
             "Distribution",
