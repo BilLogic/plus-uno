@@ -1,89 +1,148 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ScatterChartStories from './ScatterChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={ScatterChartStories} />
 
 <Title />
+Plots each record as a dot at two values, so a reader can see whether one
+measure rises with the other.
 
-A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/ScatterChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A scatter chart plots data points on X-Y axes to reveal **relationships and correlations** between two variables.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Study time against test score for two classes, one series per class.</>}>
+    <Canvas of={ScatterChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- Each **dot** represents one data point
-- **X position** = first variable value
-- **Y position** = second variable value
-- Look for **patterns**: clusters, trends, outliers
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Finding correlations</td><td>✅ Ideal</td></tr>
-    <tr><td>Identifying clusters</td><td>✅ Ideal</td></tr>
-    <tr><td>Spotting outliers</td><td>✅ Good</td></tr>
-    <tr><td>Categorical data</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>3 variables</td><td>❌ Use Bubble Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `ScatterChart` to look for a relationship between two numeric measures of
+the same records: minutes of tutoring against score gain per student, sessions
+attended against final grade. It also shows clusters and the outliers that sit
+away from them.
 
-### PLUS Context
+For a third measure shown as size, use `BubbleChart`. For so many points that
+they pile on top of each other, use `HeatmapChart`. For one measure across
+named categories, use `BarChart`; for one measure over time, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Study vs Performance**</td><td>Hours studied vs test score</td></tr>
-    <tr><td>**Engagement Analysis**</td><td>Session time vs completion rate</td></tr>
-    <tr><td>**Tutor Effect**</td><td>Sessions with tutor vs grade improvement</td></tr>
-    <tr><td>**Attendance Impact**</td><td>Classes attended vs final grade</td></tr>
-  </tbody>
-</table>
+A scatter shows that two measures move together, not that one causes the
+other. Say so in the surrounding copy when the reader might assume it.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Use clear axis labels with units
-✅ Add trend line for correlations
-✅ Use transparency for overlapping points
-✅ Include gridlines for readability
+## Anatomy
 
-**Avoid:**
-❌ Categorical data (use bar charts)
-❌ More than 3-4 series
-❌ Varying point sizes (use Bubble Chart)
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Points', <>One dot per <C>[x, y]</C> pair, at a fixed size. A series' <C>color</C> overrides the assigned one.</>],
+        ['X axis', <>The first measure. <C>xAxisLabel</C> titles it; it starts and ends on a tick.</>],
+        ['Y axis', <>The second measure. <C>yAxisLabel</C> titles it.</>],
+        ['Legend', 'Names each series. Always shown; the component has no prop to hide it.'],
+        ['Tooltip', 'The series name, then the point as "x, y". It carries no units, so put them in the axis labels.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={ScatterChartStories.Interactive} />
+## Data shape
 
+`data` is required: an array of series, each `{ name, data }`, where `data`
+holds `[x, y]` pairs. `height` defaults to 300.
+
+```jsx
+<ScatterChart
+    xAxisLabel="Tutoring minutes per week"
+    yAxisLabel="Score gain (points)"
+    data={[
+        { name: 'Grade 7', data: [[30, 4], [45, 7], [60, 9], [90, 12], [20, 2]] },
+        { name: 'Grade 8', data: [[35, 5], [50, 6], [70, 10], [10, 1], [100, 11]] },
+    ]}
+/>
+```
+
+A series may carry its own `color`; leave it out and the chart assigns one.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Keep to a few series; past six, group the rest or split the chart.
+- **Position carries the values.** Color tells series apart, and the chart sets no marker symbol of its own, so Highcharts' default gives each series its own marker shape too. A single-series scatter reads without hue; with several series, the legend and tooltip name a point's group.
+- **Dense data hides points.** Markers are solid and the same size, so overlapping points stack into one dot. There is no transparency prop; when points pile up, use `HeatmapChart`.
+- **No trend line.** The chart draws the points only. If the relationship is the message, state it in the header or description.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`ScatterChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={300} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a session is logged." />
+    : <ScatterChart data={data} xAxisLabel="Tutoring minutes per week" yAxisLabel="Score gain (points)" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ScatterChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For a third variable encoded as size, use `BubbleChart`.
-- For too many points to read individually, use `HeatmapChart`.
-- For one variable over time rather than two against each other, use `LineChart`.
+- For a third measure encoded as bubble size, use `BubbleChart`.
+- For too many points to read one by one, use `HeatmapChart`.
+- For one measure over time rather than two against each other, use `LineChart`.
+- For the spread of a single measure, use `HistogramChart`.
 
 </div>
 
 </div>
+
+

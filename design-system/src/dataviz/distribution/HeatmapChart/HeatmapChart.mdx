@@ -1,81 +1,142 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as HeatmapChartStories from './HeatmapChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={HeatmapChartStories} />
 
 <Title />
+Lays values out as a grid of cells and shades each one by size, so patterns
+across two categories show at a glance. The strongest tone is the biggest value.
 
-A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/HeatmapChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A heatmap displays data as a **matrix of colored cells**, where color intensity represents value magnitude.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Session activity by weekday and hour, on the default blue ramp.</>}>
+    <Canvas of={HeatmapChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Rows/Columns** = categories being compared
-- **Cell color** = value intensity (the strongest tone is the biggest value: darker in light mode, lighter in dark)
-- **Color scale** = one hue's sequential ramp (`hue`), or a diverging ramp around a neutral midpoint (`diverging`)
-- Look for **patterns** in color distribution
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>2D pattern analysis</td><td>✅ Ideal</td></tr>
-    <tr><td>Time-based activity</td><td>✅ Ideal</td></tr>
-    <tr><td>Correlation matrices</td><td>✅ Good</td></tr>
-    <tr><td>Precise values</td><td>❌ Use Table</td></tr>
-    <tr><td>Trends over time</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `HeatmapChart` to find patterns across two sets of categories: sessions by
+weekday and hour, students by SMART competency, tutor availability by day and
+time slot. It suits questions like "when are we busiest" or "which skills lag",
+where the shape matters more than any one number.
 
-### PLUS Context
+For exact values, use a table. For one measure over time, use `LineChart`. For
+individual points rather than a grid, use `ScatterChart`. For one dimension
+rather than two, use `HistogramChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Activity Patterns**</td><td>Sessions by day × hour</td></tr>
-    <tr><td>**Skill Matrix**</td><td>Students × skills mastered</td></tr>
-    <tr><td>**Engagement**</td><td>Subjects × engagement level</td></tr>
-    <tr><td>**Tutor Availability**</td><td>Time slots × days</td></tr>
-    <tr><td>**Performance Grid**</td><td>Students × assignments</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Use sequential color scale (light→dark)
-✅ Include color legend
-✅ Consider color-blind friendly palettes
-✅ Add cell values if space permits
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Cells', <>One per <C>[x, y, value]</C> point, shaded from the ramp. <C>pointPadding</C> (0 to 1) opens a gap between them.</>],
+        ['Cell labels', <>The raw value on each cell. On by default; <C>showDataLabels</C> turns them off.</>],
+        ['X axis', <>Names the columns from <C>xCategories</C>.</>],
+        ['Y axis', <>Names the rows from <C>yCategories</C>, first category at the top. It has no title.</>],
+        ['Color bar', <>The legend: a vertical scale on the right from the lowest value to the highest. <C>showLegend</C> hides it; <C>hideLegendNavigation</C> hides its scroll arrows.</>],
+        ['Tooltip', 'The column name, the row name and the value to two decimals.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Rainbow color scales, or a red-to-green diverging pair
-❌ Too many categories
-❌ Missing legends
+`compactSpacing` trims the chart's inset to the tighter chart spacing step so
+the grid gets more room. `enableAnimation` and `animationDuration` control the
+entrance; the duration defaults to the standard motion duration.
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={HeatmapChartStories.Interactive} />
+## Data shape
 
+`xCategories` and `yCategories` are arrays of strings. `data` is an array of
+`[x, y, value]`, where `x` and `y` are indexes into those arrays. `height`
+defaults to 400.
+
+```jsx
+<HeatmapChart
+    xCategories={['Mon', 'Tue', 'Wed', 'Thu', 'Fri']}
+    yCategories={['3pm', '4pm', '5pm']}
+    data={[
+        [0, 0, 12], [0, 1, 30], [0, 2, 18],
+        [1, 0, 15], [1, 1, 34], [1, 2, 22],
+        [2, 0, 10], [2, 1, 28], [2, 2, 25],
+        [3, 0, 14], [3, 1, 36], [3, 2, 20],
+        [4, 0, 8],  [4, 1, 19], [4, 2, 11],
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **A sequential ramp by default.** `hue` (default `blue`) picks one of the chart hues: blue, teal, green, lime, yellow, orange, red, magenta, purple, gray or brown. The ramp runs through four tokens, evenly spaced: `--ds-background-accent-{hue}-subtler` for the lowest value, then `--ds-chart-{hue}-bold`, `--ds-chart-{hue}-bolder` and `--ds-chart-{hue}-boldest` for the highest. Each step sits further from the surface than the last, so the biggest value is darker in light mode and lighter in dark.
+- **A diverging ramp on request.** `diverging={[low, high]}` takes two different hues and overrides `hue`. It builds seven steps: the low hue from `boldest` down to `bold`, the neutral midpoint `--ds-background-accent-gray-subtler`, then the high hue from `bold` up to `boldest`. Orange and blue stay apart under every common color-vision deficiency; never pair red with green.
+- **The ramp spans the data.** The lowest value takes the lightest step and the highest the strongest, not rounded ticks. Set `min` and `max` to fix the scale, so two heatmaps compare on the same ramp. For a diverging ramp, set them an equal distance either side of the baseline: the midpoint lands halfway between `min` and `max`, not at zero.
+- **Resolved per color mode.** The color bar blends between its stops, so it needs real colors, not token references. The chart reads each token's current value and reads them again whenever the color mode or contrast setting changes.
+- **Labels pick their ink.** Each cell label takes `--ds-text` or `--ds-text-inverse`, whichever contrasts more with that cell.
+- **Color is the only encoding.** Cells are all the same size, so the value lives in shade alone. Keep `showDataLabels` on wherever the grid is large enough; with labels off, readers who cannot tell the tones apart get only the tooltip.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`HeatmapChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Session activity could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Activity appears after the first week of sessions." />
+    : <HeatmapChart xCategories={days} yCategories={hours} data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={HeatmapChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -84,7 +145,10 @@ A heatmap displays data as a **matrix of colored cells**, where color intensity 
 - For individual points rather than density, use `ScatterChart`.
 - For one dimension rather than a grid, use `HistogramChart`.
 - For a grid whose cells are sized as well as colored, use `TreemapChart`.
+- For overlap between a few groups, use `VennDiagram`.
 
 </div>
 
 </div>
+
+

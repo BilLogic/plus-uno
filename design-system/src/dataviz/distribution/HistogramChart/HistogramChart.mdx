@@ -1,89 +1,147 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as HistogramChartStories from './HistogramChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={HistogramChartStories} />
 
 <Title />
+Groups raw numbers into equal ranges and draws how many fall in each, so the
+shape of a distribution shows: where values bunch, how wide they spread.
 
-A histogram displays **frequency distribution** by grouping continuous data into bins.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/HistogramChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A histogram displays **frequency distribution** by grouping continuous data into bins.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Forty-eight student test scores, binned to show where most of the class landed.</>}>
+    <Canvas of={HistogramChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **X-axis** = value ranges (bins)
-- **Y-axis** = count/frequency in each bin
-- **Bar height** = number of data points in that range
-- Shape reveals the distribution pattern
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Frequency distribution</td><td>✅ Ideal</td></tr>
-    <tr><td>Understanding data spread</td><td>✅ Ideal</td></tr>
-    <tr><td>Identifying patterns</td><td>✅ Good</td></tr>
-    <tr><td>Categorical data</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Comparing groups</td><td>❌ Use Box Plot</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `HistogramChart` for the spread of one continuous measure: test scores
+across a class, session lengths across a week, minutes to first message across
+new students. It answers "what is typical, and how far do values stray".
 
-### PLUS Context
+For counts of named categories, use `BarChart`; a histogram bins a continuous
+number, a bar chart does not. For the spread of several groups side by side,
+use `BoxPlotChart`. For a distribution across two dimensions, use
+`HeatmapChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Score Distribution**</td><td>How test scores are distributed</td></tr>
-    <tr><td>**Session Length**</td><td>Distribution of session durations</td></tr>
-    <tr><td>**Response Times**</td><td>Pattern of system response times</td></tr>
-    <tr><td>**Age Distribution**</td><td>Student age ranges</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Choose appropriate bin size
-✅ Label axes clearly
-✅ Consider overlaying distribution curve
-✅ Use consistent bin widths
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Bins', <>One column per range; height is the count. Set the range with <C>binWidth</C>, or leave it out and the chart picks the bins. Adjacent bins are outlined in <C>--ds-border-inverse</C> so they stand apart.</>],
+        ['Bin axis', <>The value ranges the bins cover. It runs along the top of the chart and takes its title from <C>yAxisLabel</C>.</>],
+        ['Raw-data axis', <>Along the bottom, titled by <C>xAxisLabel</C>. It belongs to the hidden series of raw values the bins are computed from.</>],
+        ['Count axis', 'On the left, always titled "Count". A second axis on the right is titled "Probability" and carries no series.'],
+        ['Tooltip', "A bin's range and count."],
+    ]}
+/>
 
-**Avoid:**
-❌ Too few bins (loses detail)
-❌ Too many bins (noise)
-❌ Categorical data (use bar chart)
+The axis wiring is not the usual one: `yAxisLabel` names the value ranges, not
+the counts. Set it to what the values are ("Score") and set `xAxisLabel` to
+match, as the stories do.
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={HistogramChartStories.Interactive} />
+## Data shape
 
+`data` is a flat array of numbers, one per record; the chart does the counting.
+`height` defaults to 400.
+
+```jsx
+<HistogramChart
+    xAxisLabel="Session length (min)"
+    yAxisLabel="Session length (min)"
+    binWidth={10}
+    data={[22, 28, 30, 31, 35, 38, 40, 41, 44, 45, 45, 48, 52, 55, 58, 60, 62, 75]}
+/>
+```
+
+Pick a `binWidth` that matches how readers think about the measure (5 points,
+10 minutes). Too wide hides the shape; too narrow turns it into noise.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color.** Bins take `--ds-chart-brand`; there is only ever one series, so there is no legend to read.
+- **Height carries the count.** Bins are positioned and sized by value, so the chart reads without hue. The count axis starts at zero.
+- **Uneven samples mislead.** A handful of records makes a ragged shape that looks meaningful. Say how many records are behind the chart.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`HistogramChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a session is logged." />
+    : <HistogramChart data={data} xAxisLabel="Score" yAxisLabel="Score" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={HistogramChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For comparing several distributions at once, use `BoxPlotChart`.
-- For counts of named categories rather than binned values, use `BarChart` — a histogram bins a continuous variable, a bar chart does not.
+- For counts of named categories rather than binned values, use `BarChart`.
 - For the distribution across two dimensions, use `HeatmapChart`.
+- For the individual records behind the bins, use `ScatterChart`.
 
 </div>
 
 </div>
+
+
