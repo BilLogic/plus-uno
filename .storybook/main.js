@@ -57,6 +57,12 @@ const config = {
       staticDirs.push({ from: assetsPath, to: '/assets' });
     }
 
+    // The Uno Blueprint logo on the docs' floating links; on the site it is served from public/.
+    const blueprintLogos = path.resolve(__dirname, '../public/uno-bot/logos');
+    if (fs.existsSync(blueprintLogos)) {
+      staticDirs.push({ from: blueprintLogos, to: '/uno-bot/logos' });
+    }
+
     return staticDirs;
   })(),
 
