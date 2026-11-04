@@ -37,7 +37,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-focus-ring` · `--color-outline-variant` · `--color-secondary` · `--color-secondary-text` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-surface` · `--focus-ring-width` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--size-border-radius-radius-1000` · `--size-border-stroke-stroke-100` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--type-weight-medium` · `--type-weight-semibold`
+`--body-default` · `--color-outline-variant` · `--color-secondary` · `--color-secondary-text` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border-focused` · `--ds-surface` · `--focus-ring-width` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--size-border-radius-radius-1000` · `--size-border-stroke-stroke-100` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--type-weight-medium` · `--type-weight-semibold`
 
 From `design-system/src/components/navigation/Pagination/Pagination.scss`. Override these through the token layer, never with a literal.
 

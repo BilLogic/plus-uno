@@ -9,6 +9,8 @@
  * by the cell's vertical pad.
  */
 
+@use '../../../styles/state' as *;
+
 .plus-table-wrapper {
     width: 100%;
 }
@@ -175,15 +177,15 @@
 
 // Row fills are drawn on the row, so a hovered or highlighted row reads as one
 // band across its cells.
-.plus-table-hover tbody tr:hover,
-.plus-table tbody tr.plus-table-row--clickable:hover {
-    background-color: var(--ds-background-neutral-subtle-hovered);
-}
-
-.plus-table-hover tbody tr:active,
-.plus-table tbody tr.plus-table-row--clickable:active {
-    background-color: var(--ds-background-neutral-subtle-pressed);
-}
+@include plus-state(
+    (
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-table-hover tbody tr:hover, .plus-table tbody tr.plus-table-row--clickable:hover',
+    $pressed-selector: '.plus-table-hover tbody tr:active, .plus-table tbody tr.plus-table-row--clickable:active'
+);
 
 .plus-table tbody tr.plus-table-row--clickable {
     cursor: pointer;
@@ -197,21 +199,22 @@
 .plus-table tbody tr.plus-table-row--highlighted {
     background-color: color-mix(in srgb, var(--ds-background-warning-bold) 8%, transparent);
 
-    &:hover {
-        background-color: color-mix(in srgb, var(--ds-background-warning-bold) 12%, transparent);
-    }
+    @include plus-state(
+        (hovered: (background-color: color-mix(in srgb, var(--ds-background-warning-bold) 12%, transparent))),
+        $ring: false
+    );
 }
 
 .plus-table tbody tr.plus-table-row--selected {
     background-color: var(--ds-background-selected);
 
-    &:hover {
-        background-color: var(--ds-background-selected-hovered);
-    }
-
-    &:active {
-        background-color: var(--ds-background-selected-pressed);
-    }
+    @include plus-state(
+        (
+            hovered: (background-color: var(--ds-background-selected-hovered)),
+            pressed: (background-color: var(--ds-background-selected-pressed)),
+        ),
+        $ring: false
+    );
 }
 
 .plus-table tbody tr.plus-table-row--disabled {
@@ -245,10 +248,13 @@
 .plus-table .plus-table-message-row {
     background-color: transparent;
 
-    &:hover,
-    &:active {
-        background-color: transparent;
-    }
+    @include plus-state(
+        (
+            hovered: (background-color: transparent),
+            pressed: (background-color: transparent),
+        ),
+        $ring: false
+    );
 
     .plus-table-message {
         height: var(--size-row-comfortable);
@@ -370,7 +376,12 @@
 
     .plus-table-head-cell-sort { opacity: 0; }
 
-    &:hover,
+    @include plus-state(
+        (hovered: (opacity: 1)),
+        $ring: false,
+        $hovered-selector: '&:hover .plus-table-head-cell-sort, &[data-hovered] .plus-table-head-cell-sort'
+    );
+
     &:focus-visible,
     &.plus-table-head-cell-button--sorted {
         .plus-table-head-cell-sort { opacity: 1; }
@@ -378,9 +389,13 @@
 
     &.plus-table-head-cell-button--sorted { color: var(--ds-text); }
 
-    &:hover { background-color: var(--ds-background-neutral-subtle-hovered); }
-
-    &:active { background-color: var(--ds-background-neutral-subtle-pressed); }
+    @include plus-state(
+        (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false
+    );
 
     &:focus-visible {
         outline: var(--focus-ring-width) solid var(--ds-border-focused);

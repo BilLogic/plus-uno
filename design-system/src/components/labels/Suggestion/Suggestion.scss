@@ -13,6 +13,8 @@
  * row (§4.5, "pressed: background.discovery.hovered"). The Figma set still
  * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
+@use '../../../styles/state' as *;
+
 .plus-suggestion {
     --plus-suggestion-height: 22px;
 
@@ -56,12 +58,11 @@
     color: inherit;
 }
 
-.plus-suggestion:hover {
-    background-color: var(--ds-background-discovery);
-}
-
-.plus-suggestion:active {
-    background-color: var(--ds-background-discovery-hovered);
+.plus-suggestion {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-discovery)),
+        pressed: (background-color: var(--ds-background-discovery-hovered)),
+    ), $ring: false);
 }
 
 /*
@@ -79,11 +80,10 @@
  * Disabled. The ground and ink repeat Tag's `.plus-tag--disabled` on purpose:
  * the generated docs list the tokens each component's own stylesheet names,
  * so a shared partial would drop them from both. The DisabledBesideTags story
- * asserts the two stay equal. Hover and press hold the disabled ground.
+ * asserts the two stay equal. Hover and press hold the disabled ground: this
+ * rule matches the hovered and pressed rules' specificity and comes after them.
  */
-.plus-suggestion:disabled,
-.plus-suggestion:disabled:hover,
-.plus-suggestion:disabled:active {
+.plus-suggestion:disabled {
     border-color: var(--ds-border);
     background-color: var(--ds-background-disabled);
     color: var(--ds-text-disabled);

@@ -139,9 +139,12 @@
     &[data-invalid]:not([data-checked]):not([data-indeterminate]):not([data-disabled]) {
         border-color: var(--ds-border-danger);
 
-        &:hover {
-            border-color: var(--ds-border-danger);
-        }
+        @include plus-state(
+            $states: (
+                hovered: (border-color: var(--ds-border-danger)),
+            ),
+            $ring: false
+        );
     }
 }
 

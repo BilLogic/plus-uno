@@ -4,6 +4,7 @@
  * transparent track. Applied through a wrapper class so any scrollable region
  * can opt in to the Design System scrollbar.
  */
+@use '../../../styles/state' as *;
 
 .plus-scrollbar {
     // Firefox
@@ -24,9 +25,12 @@
         background-color: var(--color-outline-variant);
         border-radius: var(--radius-md, 4px);
 
-        &:hover {
-            background-color: var(--color-outline);
-        }
+        // The hover pseudo-class alone: a `[data-hovered]` twin after a
+        // pseudo-element is an invalid selector and would drop the whole rule.
+        @include plus-state((
+            hovered: (background-color: var(--color-outline)),
+        ), $ring: false,
+            $hovered-selector: '&:hover');
     }
 
     &::-webkit-scrollbar-corner {

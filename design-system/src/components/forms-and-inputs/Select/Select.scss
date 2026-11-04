@@ -84,10 +84,13 @@
         font-size: var(--font-size-fa-body3-solid);
     }
 
-    &:hover .fa-solid {
-        // @contrast: non-text
-        color: var(--ds-icon-subtle);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (color: var(--ds-icon-subtle)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover .fa-solid'
+    );
 }
 
 .plus-select-caret {
@@ -111,9 +114,12 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        ),
+        $ring: false
+    );
 
     &:focus-visible {
         outline: var(--focus-ring-width) solid var(--ds-border-focused);
