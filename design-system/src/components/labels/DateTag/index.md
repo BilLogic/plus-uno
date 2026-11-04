@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--element-pad-default` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--size-border-radius-radius-150` · `--size-element-gap-xs` · `--size-element-pad-x-xs` · `--size-element-radius-md` · `--size-element-stroke-sm` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075`
+`--body-default` · `--body-small` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-md` · `--size-border-radius-radius-150` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
 

@@ -154,7 +154,7 @@ $tile-colors: (
     content: '';
     position: absolute;
     inset: 0;
-    border: var(--size-element-border) solid var(--color-outline-variant);
+    border: var(--border-default) solid var(--color-outline-variant);
     border-radius: inherit;
     pointer-events: none;
 }

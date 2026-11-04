@@ -17,8 +17,8 @@
     line-height: var(--line-height-125);
     background-color: var(--ds-background-code-default);
     color: var(--ds-text-code-default);
-    border: var(--size-element-border) solid var(--ds-border);
-    border-radius: var(--size-element-radius-md);
+    border: var(--border-default) solid var(--ds-border);
+    border-radius: var(--radius-md);
     tab-size: 4;
 
     &:focus-visible {

@@ -18,7 +18,7 @@
 
     display: inline-flex;
     align-items: center;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
     box-sizing: border-box;
     height: var(--plus-suggestion-height);
     max-width: 100%;
@@ -27,9 +27,9 @@
 
     /* No margin: TagGroup owns the gaps in a tag row. */
     margin: 0;
-    padding: 0 var(--size-element-pad-x-xs, 4px);
-    border: var(--size-element-border, 1px) dashed var(--ds-border-discovery);
-    border-radius: var(--size-element-radius-md, 4px);
+    padding: 0 var(--pad-x-xs, 4px);
+    border: var(--border-default, 1px) dashed var(--ds-border-discovery);
+    border-radius: var(--radius-md, 4px);
     background-color: transparent;
     appearance: none;
 

@@ -16,9 +16,9 @@ const LikertScale = ({
     // Styles matching legacy createLikertScale
     const containerStyle = {
         display: 'flex',
-        gap: 'var(--size-element-gap-lg)', // 12px
+        gap: 'var(--stack-lg)', // 12px
         alignItems: 'flex-start',
-        padding: '0 var(--size-element-pad-x-lg)',
+        padding: '0 var(--pad-x-lg)',
         width: '100%'
     };
 

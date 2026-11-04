@@ -2,8 +2,8 @@
  * The tokens the label components (Status, Count, Tag) draw with, pinned to
  * the values the BS4 Foundation variables hold.
  *
- * - `Element/pad-x-xs` aliases `space-050` (4): the trailing padding of a pill
- *   that ends in a Remove button, beside the other Element padding steps.
+ * - `Pad/pad-x-xs` aliases `space-025` (4): the trailing padding of a pill
+ *   that ends in a Remove button, beside the other Pad steps.
  * - `<Hue> Border Subtle` is the hue at 45% alpha, the border of every outlined
  *   label. A paint opacity on a bound color does not carry into Figma
  *   instances, so the alpha lives in the token rather than at the use site.
@@ -30,9 +30,9 @@ const HUES = [
   'technology-tools',
 ];
 
-test('--size-element-pad-x-xs resolves to 4px, the space-050 step', () => {
-  const entry = tokenCorpus({ root: REPO_ROOT, prefix: '--size-element-' }).get('--size-element-pad-x-xs');
-  assert.ok(entry, '--size-element-pad-x-xs is not declared');
+test('--pad-x-xs resolves to 4px, the space-025 step', () => {
+  const entry = tokenCorpus({ root: REPO_ROOT, prefix: '--pad-x-' }).get('--pad-x-xs');
+  assert.ok(entry, '--pad-x-xs is not declared');
   assert.equal(entry.value, '4px');
 });
 

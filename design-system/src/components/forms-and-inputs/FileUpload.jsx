@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from './useFieldId';
 import './FileUpload.scss';
@@ -97,12 +96,12 @@ const FileUpload = ({
             style={style}
         >
             {label && (
-                <Form.Label htmlFor={fieldId} className={`plus-file-upload-label ${disabled ? 'plus-file-upload-label-disabled' : ''}`}>
+                <label htmlFor={fieldId} className={`plus-file-upload-label ${disabled ? 'plus-file-upload-label-disabled' : ''}`}>
                     {label}
                     {required && (
                         <span className="plus-file-upload-required" aria-label="required">*</span>
                     )}
-                </Form.Label>
+                </label>
             )}
 
             {/*

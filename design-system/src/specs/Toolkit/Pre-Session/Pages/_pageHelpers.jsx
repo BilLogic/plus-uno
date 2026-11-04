@@ -51,7 +51,7 @@ export const MissingModal = ({ children }) => (
  * carries the appearance either way, so nothing about it changes visually.
  */
 export const SectionTitle = ({ title, titleAs: Heading = 'h3' }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
         <Heading className="h4 font-weight-semibold" style={{ color: 'var(--ds-text)', margin: 0 }}>
             {title}
         </Heading>
@@ -84,7 +84,7 @@ export const UpdateAlert = ({ title, description, onClose }) => (
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)'
+                gap: 'var(--stack-md)'
             }}
         >
             <span className="h6" style={{ color: 'var(--ds-text)' }}>

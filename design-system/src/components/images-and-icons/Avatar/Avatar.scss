@@ -44,7 +44,7 @@ $avatar-colors: (
     font-size: var(--avatar-font, var(--font-size-body2));
     font-weight: var(--font-weight-semibold-2);
     line-height: 1;
-    border-radius: var(--size-element-radius-full);
+    border-radius: var(--radius-full);
     --avatar-glyph: var(--font-size-fa-h5);
 }
 
@@ -100,12 +100,12 @@ $avatar-colors: (
     inset-block-end: 0;
     inline-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
     block-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
-    min-inline-size: calc(var(--size-element-border) * 6);
-    min-block-size: calc(var(--size-element-border) * 6);
+    min-inline-size: calc(var(--border-default) * 6);
+    min-block-size: calc(var(--border-default) * 6);
     box-sizing: border-box;
-    border-radius: var(--size-element-radius-full);
+    border-radius: var(--radius-full);
     // The ring cuts the dot out of the picture beneath it.
-    box-shadow: 0 0 0 calc(var(--size-element-border) * 2) var(--ds-surface);
+    box-shadow: 0 0 0 calc(var(--border-default) * 2) var(--ds-surface);
 }
 
 // A circle's edge curves in, so its dot sits on the curve, not the corner.
@@ -129,8 +129,8 @@ button.plus-avatar--overflow {
     }
 
     &:focus-visible {
-        outline: calc(var(--size-element-border) * 2) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-border);
+        outline: calc(var(--border-default) * 2) solid var(--ds-border-focused);
+        outline-offset: var(--border-default);
     }
 }
 
@@ -150,5 +150,5 @@ button.plus-avatar--overflow {
 
 // A ring separates neighbors, in the surface color the group sits on.
 .plus-avatar-group .plus-avatar {
-    box-shadow: 0 0 0 calc(var(--size-element-border) * 2) var(--ds-surface);
+    box-shadow: 0 0 0 calc(var(--border-default) * 2) var(--ds-surface);
 }

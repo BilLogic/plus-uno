@@ -21,8 +21,8 @@
 .plus-prompt-input__attachments {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--element-gap-default);
-    margin-block-end: var(--element-gap-default);
+    gap: var(--stack-md);
+    margin-block-end: var(--stack-md);
 }
 
 .plus-prompt-input__control {
@@ -34,7 +34,7 @@
 .plus-prompt-input__trailing-group {
     display: inline-flex;
     align-items: center;
-    gap: var(--element-gap-compact);
+    gap: var(--stack-sm);
 }
 
 .plus-prompt-input__send.plus-btn--icon-only {

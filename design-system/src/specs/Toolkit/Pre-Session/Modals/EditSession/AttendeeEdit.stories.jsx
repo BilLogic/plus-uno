@@ -24,7 +24,7 @@ const RosterPanel = ({ title, addLabel, items }) => (
             flexDirection: 'column',
             flex: 1,
             minWidth: 0,
-            border: 'var(--size-element-border) solid var(--color-outline-variant)',
+            border: 'var(--border-default) solid var(--color-outline-variant)',
             borderRadius: 'var(--size-modal-radius-md)',
             overflow: 'hidden',
         }}
@@ -36,7 +36,7 @@ const RosterPanel = ({ title, addLabel, items }) => (
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 padding: 'var(--size-modal-pad-y-md) var(--size-modal-pad-x-md)',
-                borderBottom: 'var(--size-element-border) solid var(--color-outline-variant)',
+                borderBottom: 'var(--border-default) solid var(--color-outline-variant)',
             }}
         >
             <span
@@ -57,7 +57,7 @@ const RosterPanel = ({ title, addLabel, items }) => (
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                padding: 'var(--size-element-pad-y-sm) var(--element-pad-compact)',
+                padding: 'var(--space-025) var(--pad-x-sm)',
                 overflowY: 'auto',
                 flex: 1,
             }}
@@ -193,7 +193,7 @@ const AttendeeEditModalBody = () => (
  * - Modal padding: --size-modal-pad-y-lg / --size-modal-pad-x-lg
  * - Modal gap: --size-modal-gap-lg (between sections), --size-modal-gap-md (between panels)
  * - Modal radius: --size-modal-radius-lg (outer), --size-modal-radius-md (panels)
- * - Panel border: --color-outline-variant, --size-element-border
+ * - Panel border: --color-outline-variant, --border-default
  * - Panel header padding: --size-modal-pad-y-md / --size-modal-pad-x-md
  * - Background: --color-surface-container-high
  * - Title: h4

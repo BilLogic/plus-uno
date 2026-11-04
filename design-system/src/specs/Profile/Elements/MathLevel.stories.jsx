@@ -67,7 +67,7 @@ const mathLevelPresetDefaults = {
 };
 
 export const Overview = () => (
-    <div style={{ width: '249px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ width: '249px', padding: 'var(--pad-y-lg, 12px)' }}>
         <MathLevel id="math-level-overview" required={true} />
     </div>
 );
@@ -78,7 +78,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <div style={{ width: '249px' }}>
@@ -107,7 +107,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ width: '249px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ width: '249px', padding: 'var(--pad-y-lg, 12px)' }}>
             <MathLevel
                 id="math-level-interactive"
                 key={args.preset}

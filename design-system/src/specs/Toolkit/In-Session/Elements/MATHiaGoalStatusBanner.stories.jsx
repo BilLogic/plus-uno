@@ -96,20 +96,20 @@ export const ModalNonGoalSetting = {
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>
                 Dashboard Alerts
             </h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                 <MATHiaGoalStatusBanner type="dashboard" sessionType="goal-setting" />
                 <MATHiaGoalStatusBanner type="dashboard" sessionType="non-goal-setting" />
             </div>
         </div>
 
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>
                 Modal Alerts
             </h6>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                 <MATHiaGoalStatusBanner type="modal" sessionType="goal-setting" />
                 <MATHiaGoalStatusBanner type="modal" sessionType="non-goal-setting" />
             </div>

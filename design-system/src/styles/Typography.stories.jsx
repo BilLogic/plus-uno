@@ -74,7 +74,7 @@ export const HeadingLevels = () => (
 /** Code/default sets code, token names and values. */
 export const CodeStyle = () => (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-        Pad a card with <C>--card-pad-md</C>: the code span takes 0.875em of the text around it, in Noto Sans Mono.
+        Pad a card with <C>--card-pad-default</C>: the code span takes 0.875em of the text around it, in Noto Sans Mono.
     </p>
 );
 

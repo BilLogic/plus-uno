@@ -36,7 +36,7 @@ export const Appearances = () => (
     <div style={col}>
         <ProgressBar value={60} appearance="default" />
         <ProgressBar value={100} appearance="success" />
-        <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--size-element-radius-md)' }}>
+        <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
             <ProgressBar value={60} appearance="inverse" />
         </div>
     </div>

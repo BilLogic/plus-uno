@@ -17,7 +17,7 @@ import './App.css';
  * 
  * Design tokens are available as CSS variables:
  *   --color-primary, --color-surface-container, --color-on-surface, etc.
- *   --size-section-gap-lg, --size-element-pad-x-md, etc.
+ *   --size-section-gap-lg, --pad-x-md, etc.
  *   --font-family-header, --font-family-body, etc.
  */
 const App = () => {
@@ -45,7 +45,7 @@ const App = () => {
                     textAlign: 'center',
                 }}
             >
-                <h3 className="h3" style={{ color: 'var(--ds-text)', marginBottom: 'var(--size-element-gap-md, 16px)' }}>
+                <h3 className="h3" style={{ color: 'var(--ds-text)', marginBottom: 'var(--space-0625, 16px)' }}>
                     <i className="fa-solid fa-rocket" style={{ marginRight: '8px', color: 'var(--color-primary)' }} />
                     Bryan's Prototype
                 </h3>
@@ -56,11 +56,11 @@ const App = () => {
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 'var(--size-element-gap-sm, 8px)',
+                        gap: 'var(--stack-md, 8px)',
                         textAlign: 'left',
-                        padding: 'var(--size-element-pad-y-md, 8px) var(--element-pad-default, 16px)',
+                        padding: 'var(--pad-y-md, 8px) var(--pad-x-md, 16px)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: 'var(--size-element-radius-md, 4px)',
+                        borderRadius: 'var(--radius-md, 4px)',
                     }}
                 >
                     <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>

@@ -47,22 +47,15 @@
   // the legacy token files above, so the alias wins; names that split by CSS
   // property or by element keep their legacy value until the component sweep.
   @include meta.load-css("../tokens/color/legacy-aliases");
-  // Deep-foundation role and motion tokens (ADR-038): generated from
-  // scripts/lib/tokens/plan.mjs, never from Figma. The alias file loads last
-  // in this layer so its old-name redeclarations win over
-  // _spacing_semantics.scss and _frame_layers.scss, at an identical value —
-  // see the header of deep/_legacy-size-aliases.scss. Regenerate, never
-  // edit: `npm run generate:design-tokens`.
-  @include meta.load-css("../tokens/deep/roles");
-  @include meta.load-css("../tokens/deep/motion");
-  @include meta.load-css("../tokens/deep/legacy-size-aliases");
-  // The four-tier ladder (#1756): also generated from plan.mjs's TOKEN_LADDER,
-  // additive new names beside the old ones they alias. Regenerate, never
-  // edit: `npm run generate:design-tokens`.
-  @include meta.load-css("../tokens/deep/semantics");
-  @include meta.load-css("../tokens/deep/patterns");
-  @include meta.load-css("../tokens/deep/components");
-  @include meta.load-css("../tokens/deep/layers");
+  // The token ladder and motion (ADR-038, #1756): generated from
+  // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
+  // values; the retired size, layout and role names are gone. Regenerate,
+  // never edit: `npm run generate:design-tokens`.
+  @include meta.load-css("../tokens/ladder/motion");
+  @include meta.load-css("../tokens/ladder/semantics");
+  @include meta.load-css("../tokens/ladder/patterns");
+  @include meta.load-css("../tokens/ladder/components");
+  @include meta.load-css("../tokens/ladder/layers");
 }
 
 @layer components {

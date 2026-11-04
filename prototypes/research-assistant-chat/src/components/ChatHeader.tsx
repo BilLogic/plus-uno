@@ -33,7 +33,7 @@ export function ChatHeader({
           onClick={onBack}
           aria-label="Back to Tutors"
           style={{
-            padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-compact, 8px)',
+            padding: 'var(--space-025, 4px) var(--pad-x-sm, 8px)',
             color: 'var(--color-primary)',
             background: 'transparent',
             border: 'none',

@@ -86,7 +86,7 @@ export default function InstitutionFormSpec() {
             }}
         >
             <div>
-                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--ds-text)' }}>
+                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--stack-sm)', color: 'var(--ds-text)' }}>
                     Register With Your Institution
                 </div>
                 <TextField
@@ -102,8 +102,8 @@ export default function InstitutionFormSpec() {
                     style={{
                         display: 'flex',
                         alignItems: 'flex-start',
-                        gap: 'var(--size-element-gap-sm)',
-                        marginTop: 'var(--size-element-gap-sm)',
+                        gap: 'var(--stack-md)',
+                        marginTop: 'var(--stack-md)',
                         color: 'var(--ds-text-subtle)',
                     }}
                 >
@@ -119,7 +119,7 @@ export default function InstitutionFormSpec() {
             </div>
 
             <div>
-                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--ds-text)' }}>
+                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--stack-sm)', color: 'var(--ds-text)' }}>
                     Institution Name
                 </div>
                 <TextField
@@ -135,8 +135,8 @@ export default function InstitutionFormSpec() {
                     style={{
                         display: 'flex',
                         alignItems: 'flex-start',
-                        gap: 'var(--size-element-gap-sm)',
-                        marginTop: 'var(--size-element-gap-sm)',
+                        gap: 'var(--stack-md)',
+                        marginTop: 'var(--stack-md)',
                         color: 'var(--ds-text-subtle)',
                     }}
                 >

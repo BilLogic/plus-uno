@@ -80,9 +80,9 @@ export const PreReview_TutorRequest = () => (
                                     style={{
                                         backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
-                                        borderRadius: 'var(--size-element-radius-full)',
-                                        padding: '0 var(--element-pad-compact)',
-                                        marginRight: 'var(--size-element-gap-sm)'
+                                        borderRadius: 'var(--radius-full)',
+                                        padding: '0 var(--pad-x-sm)',
+                                        marginRight: 'var(--stack-md)'
                                     }}
                                 >
                                     Late
@@ -296,8 +296,8 @@ export const PostReview_SupervisorReview = () => (
                                 style={{
                                     backgroundColor: 'var(--ds-background-success)',
                                     color: 'var(--color-success-text)',
-                                    borderRadius: 'var(--size-element-radius-full)',
-                                    padding: '0 var(--element-pad-compact)'
+                                    borderRadius: 'var(--radius-full)',
+                                    padding: '0 var(--pad-x-sm)'
                                 }}
                             >
                                 Approved
@@ -378,9 +378,9 @@ export const PostReview_TutorRequest = () => (
                                     style={{
                                         backgroundColor: 'var(--ds-background-danger)',
                                         color: 'var(--color-danger-text)',
-                                        borderRadius: 'var(--size-element-radius-full)',
-                                        padding: '0 var(--element-pad-compact)',
-                                        marginRight: 'var(--size-element-gap-sm)'
+                                        borderRadius: 'var(--radius-full)',
+                                        padding: '0 var(--pad-x-sm)',
+                                        marginRight: 'var(--stack-md)'
                                     }}
                                 >
                                     Late
@@ -414,9 +414,9 @@ const StateLabel = ({ stage, tab }) => (
     <div style={{
         textAlign: 'center',
         marginBottom: 'var(--size-modal-gap-md)',
-        padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+        padding: 'var(--pad-y-md) var(--pad-x-md)',
         backgroundColor: 'var(--ds-background-brand-subtlest)',
-        borderRadius: 'var(--size-element-radius-md)'
+        borderRadius: 'var(--radius-md)'
     }}>
         <div className="h6" style={{ color: 'var(--color-primary-text)', marginBottom: '4px' }}>
             Stage: <strong>{stage}</strong>

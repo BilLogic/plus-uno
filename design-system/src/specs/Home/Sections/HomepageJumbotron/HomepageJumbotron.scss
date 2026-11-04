@@ -71,7 +71,7 @@
 }
 
 .plus-homepage-jumbotron-tab-badge {
-    margin-left: var(--size-element-gap-sm);
+    margin-left: var(--stack-md);
     flex-shrink: 0;
 }
 
@@ -112,7 +112,7 @@
 // Actions (Button Container)
 .plus-homepage-jumbotron-actions {
     display: flex;
-    gap: var(--size-element-gap-md);
+    gap: var(--space-0625);
     align-items: center;
     flex-wrap: wrap;
     width: 100%;

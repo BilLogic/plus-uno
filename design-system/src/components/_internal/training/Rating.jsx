@@ -12,7 +12,7 @@ const Rating = ({ rating = "rest", onRatingChange }) => {
         display: 'flex',
         gap: 'var(--size-section-gap-md)', // space-600 / 32px
         alignItems: 'flex-start',
-        padding: '0 var(--element-pad-default)', // space-300 / 16px
+        padding: '0 var(--pad-x-md)', // space-300 / 16px
     };
 
     const handleClick = (value) => {

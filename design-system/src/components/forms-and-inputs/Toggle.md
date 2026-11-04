@@ -9,7 +9,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle.stories.jsx` — Overview, Sizes, States, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle.mdx`
 
@@ -25,6 +25,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 | `defaultChecked` | bool | — | — |
 | `size` | enum | `16` | Track height in pixels |
 | `isDisabled` | bool | `false` | Disable the toggle |
+| `isLoading` | bool | `false` | A change is being saved: shows a spinner and ignores input |
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
@@ -42,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--plus-toggle-pad` · `--plus-toggle-thumb` · `--plus-toggle-track-h` · `--plus-toggle-track-w` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--plus-toggle-pad` · `--plus-toggle-thumb` · `--plus-toggle-track-h` · `--plus-toggle-track-w` · `--radius-full` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Toggle.scss`. Override these through the token layer, never with a literal.
 

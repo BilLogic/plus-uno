@@ -35,7 +35,7 @@ export const UploadProfilePic = ({ state = 'unfilled', avatarSrc }) => {
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--element-pad-compact, 8px)',
+                gap: 'var(--pad-x-sm, 8px)',
                 alignItems: 'center',
             }}
         >
@@ -96,7 +96,7 @@ export const UploadProfilePic = ({ state = 'unfilled', avatarSrc }) => {
 export const Overview = () => (
     <div
         style={{
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
             display: 'flex',
             justifyContent: 'center',
         }}
@@ -111,7 +111,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
             justifyContent: 'center',
         }}
     >
@@ -134,7 +134,7 @@ export const Interactive = {
     render: (args) => (
         <div
             style={{
-                padding: 'var(--size-element-pad-y-lg, 12px)',
+                padding: 'var(--pad-y-lg, 12px)',
                 display: 'flex',
                 justifyContent: 'center',
             }}

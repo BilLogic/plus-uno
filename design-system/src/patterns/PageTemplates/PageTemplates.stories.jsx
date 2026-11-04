@@ -191,7 +191,7 @@ export const SidebarOverPage = {
 /* ------------------------------------------------------------- focused page */
 
 /** Stacked fields sit Element/gap-md apart (forms.md § Spacing rules). */
-const fieldStack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' };
+const fieldStack = { display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' };
 
 const NoteForm = () => (
     <>

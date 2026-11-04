@@ -42,12 +42,12 @@ function ExampleForm() {
     <Card title="Session intake" paddingSize="md" gapSize="md">
       <div
         className="d-flex flex-column"
-        style={{ gap: 'var(--size-element-gap-md)' }}
+        style={{ gap: 'var(--space-0625)' }}
       >
         <TextField id="name" label="Student name" isRequired value={name} onChange={...} />
         {/* Select has no `label` prop — it forwards `id` to the trigger and
             nothing else, so the label has to be wired from outside. */}
-        <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-sm)' }}>
+        <div className="d-flex flex-column" style={{ gap: 'var(--stack-md)' }}>
           <label htmlFor="program">Program</label>
           <Select id="program" options={programs} value={program} onChange={...} />
         </div>
@@ -55,7 +55,7 @@ function ExampleForm() {
       </div>
       <div
         className="d-flex justify-content-end"
-        style={{ gap: 'var(--size-element-gap-md)', marginTop: 'var(--size-card-gap-md)' }}
+        style={{ gap: 'var(--space-0625)', marginTop: 'var(--size-card-gap-md)' }}
       >
         <Button text="Cancel" onClick={onCancel} />
         <Button text="Save" appearance="primary" type="submit" onClick={onSave} />
@@ -69,7 +69,7 @@ function ExampleForm() {
 
 | Gap | Token | Apply between |
 |-----|-------|----------------|
-| Fields in one group | `--size-element-gap-md` | Stacked `TextField` / `Select` |
+| Fields in one group | `--space-0625` | Stacked `TextField` / `Select` |
 | Label to section | `--size-card-gap-md` | Field group → button row |
 | Card internal | `--size-card-pad-x-md`, `--size-card-pad-y-md` | Via `Card` `paddingSize` |
 
@@ -79,7 +79,7 @@ Never hardcode `padding: 16px` between fields.
 
 ```jsx
 <Modal show={show} onClose={onClose} title="Quick add" width={480} showBottomButtons={false}>
-  <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)' }}>
+  <div className="d-flex flex-column" style={{ gap: 'var(--space-0625)' }}>
     <TextField id="title" label="Title" value={title} onChange={...} />
     <TextField id="note" label="Note" value={note} onChange={...} />
   </div>
@@ -95,7 +95,7 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 - One `TextField` per label; validation via `isInvalid` + `errorMessage`
 - Cancel left, primary right in button row
 - Import form elements and actions from `@/components` (forms live in `design-system/src/components/forms-and-inputs/`, re-exported via `components/index.js`)
-- Field stack uses `flex-column` + `--size-element-gap-md`
+- Field stack uses `flex-column` + `--space-0625`
 
 ### Incorrect
 

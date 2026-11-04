@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--size-element-radius-full`
+`--ds-background-brand-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-pressed` · `--ds-background-neutral` · `--ds-background-success-bold` · `--plus-progressbar-fill-color` · `--progress-bar-height` · `--radius-full`
 
 From `design-system/src/components/loading/ProgressBar/ProgressBar.scss`. Override these through the token layer, never with a literal.
 

@@ -62,10 +62,10 @@ export const SKELETON_PRESETS = [...SKELETON_SHAPES, ...Object.keys(PRESETS)];
 /** Radius token names, each the full token with its fallback. */
 export const SKELETON_RADII = {
     none: '0',
-    'element-radius-sm': 'var(--size-element-radius-sm, 4px)',
-    'element-radius-md': 'var(--size-element-radius-md, 4px)',
-    'element-radius-lg': 'var(--size-element-radius-lg, 8px)',
-    'element-radius-full': 'var(--size-element-radius-full, 999px)',
+    'element-radius-sm': 'var(--radius-md, 4px)',
+    'element-radius-md': 'var(--radius-md, 4px)',
+    'element-radius-lg': 'var(--radius-lg, 8px)',
+    'element-radius-full': 'var(--radius-full, 999px)',
     'card-radius-sm': 'var(--size-card-radius-sm, 12px)',
     'card-radius-md': 'var(--size-card-radius-md, 16px)',
     'section-radius-sm': 'var(--size-section-radius-sm, 8px)',

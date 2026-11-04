@@ -8,7 +8,7 @@
 .sort-control {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 
     // In a row, Select's full width would share the row out unevenly.
     &__by.plus-select-wrapper {

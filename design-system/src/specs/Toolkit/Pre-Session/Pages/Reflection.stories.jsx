@@ -22,7 +22,7 @@ export default {
  * - Section gap: --size-section-gap-lg (between major sections)
  * - Section gap: --size-section-gap-sm (within table section)
  * - Card gap: --size-card-gap-md (between stat cards)
- * - Element gap: --size-element-gap-sm (between filter elements)
+ * - Element gap: --stack-md (between filter elements)
  */
 const MainContent = ({
     tabs,
@@ -62,7 +62,7 @@ const MainContent = ({
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="Session Reflections" titleAs="h2" />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
                     <CompletionFilter
                         value={completionFilter}
                         onChange={onCompletionFilterChange}

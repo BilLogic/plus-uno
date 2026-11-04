@@ -78,7 +78,7 @@ export const Interactive = {
                     sortBy={sortBy}
                     onSort={setSortBy}
                 />
-                <p className="body3-txt" style={{ marginTop: 'var(--size-element-gap-lg)' }}>
+                <p className="body3-txt" style={{ marginTop: 'var(--stack-lg)' }}>
                     Lessons: <strong data-testid="applied-lessons">{selectedFilters.lessons.join(', ') || 'all'}</strong>
                     {' · '}Sort: <strong data-testid="applied-sort">{sortBy}</strong>
                 </p>

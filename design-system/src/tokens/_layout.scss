@@ -13,38 +13,12 @@
     --breakpoint-xl-max: 1919.98px;
     --breakpoint-xxl-min: 1920px;
 
-    /* App shell + content grid */
-    --layout-sidebar-width: 164px; /* SideNav fixed width; not a Figma variable (CODE_ONLY_LAYOUT) */
     /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
-    --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --size-element-gap-sm); col-* spans assume this */
-
-    /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
-    --layout-z-index-card: 100; /* sticky headers and raised cards */
-    --layout-z-index-navigation: 200; /* sidebars and floating page navigation */
-    --layout-z-index-dialog: 300; /* side panels and inline dialogs */
-    --layout-z-index-popup: 400; /* popups and menus */
-    --layout-z-index-scrim: 500; /* the scrim under a modal */
-    --layout-z-index-modal: 510; /* a modal, over its scrim */
-    --layout-z-index-flag: 600; /* flags, above a modal */
-    --layout-z-index-spotlight: 700; /* onboarding spotlights */
-    --layout-z-index-tooltip: 800; /* tooltips, above everything */
+    --layout-grid-gap: 8px; /* Figma Grid/content-gutter (= --stack-md); col-* spans assume this */
 
     /* Min and max heights — MD values where they differ by breakpoint */
-    --layout-max-height-listbox: 300px; /* Figma Max Heights/listbox */
     --layout-min-height-card-body: 20px; /* Figma Min Heights/card-body */
-    --layout-min-height-listbox: 140px; /* Figma Min Heights/listbox */
     --layout-min-height-modal-body: 40px; /* Figma Min Heights/modal-body */
-
-    /* Fixed dimensions; not Figma variables (CODE_ONLY_DIMENSIONS) */
-    --layout-max-width-listbox: 320px; /* widest a field or button popup grows; a popup with columns is exempt */
-    --layout-width-join-row: 520px; /* Home Join button with the session Select beside it */
-    --layout-width-option-menu: 240px; /* the "…" menu on a TagInput row (Figma _Option menu) */
-    --layout-control-checkbox: 18px; /* checkbox box */
-    --layout-control-radio: 12px; /* radio dot */
-    --layout-calendar-day-sm: 28px; /* calendar day, small picker */
-    --layout-calendar-day-md: 36px; /* calendar day, medium picker */
-    --layout-calendar-day-lg: 44px; /* calendar day, large picker */
-    --layout-calendar-nav: 32px; /* calendar previous and next month buttons */
 
     /* Content-grid column spans — MD values; wider breakpoints override below */
     --col-1: 48.67px;

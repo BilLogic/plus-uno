@@ -34,7 +34,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--font-size-150` · `--font-size-200` · `--heading-medium` · `--heading-small` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--size-element-gap-xs`
+`--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--font-size-150` · `--font-size-200` · `--heading-medium` · `--heading-small` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
 

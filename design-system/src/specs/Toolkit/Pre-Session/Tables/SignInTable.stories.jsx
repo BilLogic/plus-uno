@@ -503,32 +503,32 @@ export const Overview = () => (
         <section>
             <h5 className="h5 mb-4">Regular Tutors Table</h5>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <SignInTableHeaderRow />
                 <SignInTableRow day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" state="default" />
             </div>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <SignInTableRow day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" state="hover" />
             </div>
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State</h6>
                 <SignInTableRow day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" state="pressed" />
             </div>
         </section>
         <section>
             <h5 className="h5 mb-4">Supervisors / Lead Tutors Table</h5>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <TableHeaderRowSupervisor />
                 <SignInTableRowSupervisor day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Hogwarts" teacher="Mr. Snape" tutorCount="1/5" studentCount="25" state="default" />
             </div>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <SignInTableRowSupervisor day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Hogwarts" teacher="Mr. Snape" tutorCount="1/5" studentCount="25" state="hover" />
             </div>
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State</h6>
                 <SignInTableRowSupervisor day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Hogwarts" teacher="Mr. Snape" tutorCount="1/5" studentCount="25" state="pressed" />
             </div>
         </section>
@@ -538,16 +538,16 @@ export const Overview = () => (
                 10-column layout for modal display (no action column, includes student count)
             </p>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <SignInTableHeaderRowModal />
                 <SignInTableRowModal day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" studentCount="25" state="default" />
             </div>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <SignInTableRowModal day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" studentCount="25" state="hover" />
             </div>
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State</h6>
                 <SignInTableRowModal day="Mondays" timeRange="1:00 PM - 1:50 PM" school="Central High School" tutorCount="1/5" studentCount="25" state="pressed" />
             </div>
         </section>

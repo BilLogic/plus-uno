@@ -71,7 +71,7 @@ export default function ReflectionsListPage() {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: 'var(--size-element-gap-md)',
+                        gap: 'var(--space-0625)',
                     }}
                 >
                     <h3 className="h3 m-0" style={{ color: 'var(--ds-text)' }}>Sessions</h3>
@@ -105,7 +105,7 @@ export default function ReflectionsListPage() {
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            gap: 'var(--size-element-gap-sm)',
+                            gap: 'var(--stack-md)',
                         }}
                     >
                         <h5 className="h5 m-0" style={{ color: 'var(--ds-text)' }}>Your reflections</h5>

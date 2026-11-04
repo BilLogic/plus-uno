@@ -118,7 +118,7 @@ const SessionReflectionForm = ({
         <ReflectionStep title="Session Reflection" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <QuestionLabel rank="question" isRequired>How was the overall session?</QuestionLabel>
                     <SessionRating
                         id="session-reflection-rating"

@@ -35,7 +35,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-warning` · `--ds-border` · `--ds-border-focused` · `--ds-border-warning` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-warning-bolder` · `--element-pad-compact` · `--focus-ring-width` · `--font-size-fa-body3-solid` · `--plus-ai-accent` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-element-stroke-lg`
+`--body-small` · `--border-default` · `--ds-background-warning` · `--ds-border` · `--ds-border-focused` · `--ds-border-warning` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-warning-bolder` · `--focus-ring-width` · `--font-size-fa-body3-solid` · `--pad-x-sm` · `--plus-ai-accent` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm` · `--stroke-2`
 
 From `design-system/src/components/labels/AiLabel/AiLabel.scss`. Override these through the token layer, never with a literal.
 

@@ -63,7 +63,7 @@ export const TableHeaderRow = () => (
                 gridColumn: 'span 4',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
@@ -85,7 +85,7 @@ export const TableHeaderRow = () => (
                 gridColumn: 'span 4',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
@@ -329,7 +329,7 @@ export const RowStates = () => (
         <h3 className="h5">Table Row States</h3>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default</h4>
             <TableRow
                 studentName="Cameron Williamson"
                 isNew={true}
@@ -339,7 +339,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover</h4>
             <TableRow
                 studentName="Cameron Williamson"
                 isNew={true}
@@ -349,7 +349,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed</h4>
             <TableRow
                 studentName="Cameron Williamson"
                 isNew={true}

@@ -15,7 +15,7 @@
      * with the screen, stops at 1280, never shrinks below the 768 screen and
      * ignores the sidebar. Figma's Modal/width-modal-* per mode are this rule
      * at 768 · 1024 · 1440, and its column there is Grid/width-column-screen
-     * (`--layout-width-column-screen`); scripts/frame-layer-tokens.test.mjs
+     * (`--grid-width-column-screen`); scripts/frame-layer-tokens.test.mjs
      * holds this formula to that token, and holds the same rule in
      * styles/_screen-grid.scss, which the patterns use. `--plus-modal-screen` stands in for the screen when
      * an ancestor sets it, such as a docs frame drawn at a mode's width.
@@ -27,14 +27,14 @@
      */
     --plus-modal-screen-pad: var(--space-150);
     --plus-modal-grid: clamp(
-        var(--layout-min-width-content),
+        var(--content-min-width),
         var(--plus-modal-screen, 100vw) - 2 * var(--plus-modal-screen-pad),
-        var(--layout-max-width-content)
+        var(--content-max-width)
     );
-    --plus-modal-column: calc((var(--plus-modal-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
+    --plus-modal-column: calc((var(--plus-modal-grid) - (var(--grid-columns) - 1) * var(--grid-gutter)) / var(--grid-columns));
     --plus-modal-span: 6;
 
-    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--layout-gutter) + 2 * var(--modal-pad-x-default));
+    width: calc(var(--plus-modal-span) * var(--plus-modal-column) + (var(--plus-modal-span) - 1) * var(--grid-gutter) + 2 * var(--modal-pad-x-default));
     flex-shrink: 0;
     box-sizing: border-box;
     /* The overlay pair, as every floating layer: the blanket under the modal sets it apart from a menu. */
@@ -167,7 +167,7 @@
 }
 
 .plus-modal-divider {
-    height: var(--size-element-stroke-sm);
+    height: var(--stroke-1);
     background-color: var(--ds-border);
     flex-shrink: 0;
 }

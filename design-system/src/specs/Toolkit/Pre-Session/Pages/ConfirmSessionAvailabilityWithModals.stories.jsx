@@ -57,7 +57,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Sessions</h2>
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                 <Button iconBefore="plus">
                     Create New Sessions
                 </Button>
@@ -81,7 +81,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-sm)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="My Sessions" />
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                     <SiteFilter />
                     <TimeframeFilter />
                 </div>
@@ -149,13 +149,13 @@ export const WithModals = (args) => {
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
             }}>
                 {/* Breakpoint Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0625)', flexWrap: 'wrap' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Breakpoint:
                     </span>
@@ -171,7 +171,7 @@ export const WithModals = (args) => {
                 </div>
 
                 {/* Modal Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0625)', flexWrap: 'wrap' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Modal:
                     </span>
@@ -189,8 +189,8 @@ export const WithModals = (args) => {
                 {/* Current State Info */}
                 <div style={{
                     display: 'flex',
-                    gap: 'var(--size-element-gap-lg)',
-                    padding: 'var(--size-element-pad-y-md) 0',
+                    gap: 'var(--stack-lg)',
+                    padding: 'var(--pad-y-md) 0',
                     borderTop: '1px solid var(--color-outline-variant)',
                 }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>

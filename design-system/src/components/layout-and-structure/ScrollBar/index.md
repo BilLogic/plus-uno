@@ -26,7 +26,7 @@ scrollbar styling (thin width, outline-colored thumb, transparent track) to its 
 
 ## Tokens touched
 
-`--color-outline` · `--color-outline-variant` · `--size-element-radius-sm`
+`--color-outline` · `--color-outline-variant` · `--radius-md`
 
 From `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss`. Override these through the token layer, never with a literal.
 

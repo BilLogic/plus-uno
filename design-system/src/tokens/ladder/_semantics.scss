@@ -1,0 +1,89 @@
+/**
+ * Semantics (ADR-038 ladder)
+ * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
+ * Each row declares its own value; a responsive row repeats under the media
+ * query the plan names for it, below the :root block.
+ */
+
+:root {
+
+    /* Pad */
+    --pad-x-xs: var(--space-025);
+    --pad-x-sm: var(--space-050);
+    --pad-x-md: var(--space-075);
+    --pad-x-lg: var(--space-100); /* new step; matches the old --size-element-pad-x-lg (16px) */
+    --pad-y-sm: var(--space-0125);
+    --pad-y-md: var(--space-0375);
+    --pad-y-lg: var(--space-050); /* new step; matches the old --size-element-pad-y-lg (8px) */
+
+    /* Stack */
+    --stack-sm: var(--space-025);
+    --stack-md: var(--space-050);
+    --stack-lg: var(--space-075);
+
+    /* Inline */
+    --inline-sm: var(--space-025);
+    --inline-md: var(--space-050);
+    --inline-lg: var(--space-075);
+
+    /* Radius */
+    --radius-sm: var(--radius-0125);
+    --radius-md: var(--radius-025);
+    --radius-lg: var(--radius-050);
+    --radius-h24: var(--radius-0375); /* control height 24; 24÷4 = 6 */
+    --radius-h32: var(--radius-050); /* control height 32; 32÷4 = 8 */
+    --radius-h40: var(--radius-0625); /* new step; control height 40; 40÷4 = 10 */
+
+    /* Focus */
+    --focus-ring-width: var(--size-border-stroke-stroke-200); /* matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive */
+    --focus-ring-offset: var(--size-border-stroke-stroke-200); /* defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both */
+    --focus-ring-radius: var(--radius-sm); /* first pass, no existing source; a family PR refines it */
+
+    /* Grid */
+    --grid-gutter: var(--space-100);
+    --grid-columns: 12;
+    --grid-width-column: 45.33px;
+    --grid-width-column-screen: 45.33px;
+    --grid-pad-left-container: var(--space-050);
+
+    /* Screen */
+    --screen-width: 768px;
+    --screen-min-width: 768px;
+    --screen-max-width: 1023px;
+    --screen-pad-x: var(--space-150);
+
+    /* Content */
+    --content-max-width: var(--size-7700);
+    --content-max-width-reading: var(--size-5400);
+    --content-min-width: var(--size-4500);
+    --content-width: 720px;
+
+    /* Size */
+    --control-sm: var(--size-150); /* new role; Control was missing from the Icon/Image/Item/Label/Row/Field set */
+    --control-md: var(--size-200);
+    --control-lg: var(--size-250);
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --grid-width-column: 47.33px;
+        --grid-width-column-screen: 66.67px;
+        --grid-pad-left-container: var(--space-0);
+        --screen-width: 1024px;
+        --screen-min-width: 1024px;
+        --screen-max-width: 1439px;
+        --content-width: 744px;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        --grid-width-column: 80.67px;
+        --grid-width-column-screen: 88px;
+        --screen-width: 1440px;
+        --screen-min-width: 1440px;
+        --screen-max-width: none;
+        --screen-pad-x: var(--space-200);
+        --content-width: 1144px;
+    }
+}

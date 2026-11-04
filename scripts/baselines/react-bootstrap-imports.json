@@ -1,13 +1,6 @@
 {
   "why": "react-bootstrap import statements, per file, in design-system/src, prototypes and src. Base UI is becoming the single behavior layer (#1687); a count may fall and never rise, a file that reaches zero leaves the record, and a new file starts at zero. At a baseline of zero the final sweep removes the dependency and this check becomes a hard ban. Regenerate with `npm run check:react-bootstrap-imports -- --update`; never edit by hand.",
   "counts": {
-    "design-system/src/App.jsx": 1,
-    "design-system/src/components/_internal/layout/DashboardLayout.jsx": 1,
-    "design-system/src/components/_internal/training/OnboardingModuleCard.jsx": 1,
-    "design-system/src/components/forms-and-inputs/FileUpload.jsx": 1,
-    "design-system/src/components/forms-and-inputs/Rating.jsx": 1,
-    "design-system/src/components/forms-and-inputs/Rating.stories.jsx": 1,
-    "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx": 1,
     "design-system/src/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.jsx": 1,
     "design-system/src/specs/Admin/Group/Tables/GroupsTable/GroupsTable.jsx": 1,
     "design-system/src/specs/Admin/Session/Modals/SessionModal/SessionModal.jsx": 1,
@@ -30,7 +23,6 @@
     "design-system/src/specs/Training/Onboarding/OnboardingInnerPage.jsx": 1,
     "design-system/src/specs/Training/Onboarding/OnboardingOverviewPage.jsx": 1,
     "design-system/src/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable.jsx": 1,
-    "design-system/src/styles/Colors.stories.jsx": 1,
     "prototypes/home-redesign/src/main.demo.jsx": 1,
     "prototypes/home-redesign/src/main.jsx": 1,
     "prototypes/post-session-reflection/src/main.jsx": 1,

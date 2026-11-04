@@ -81,8 +81,8 @@ const GearIconButton = ({ state = 'default' }) => {
                 justifyContent: 'center',
                 minWidth: 'var(--size-button-min-width-md)',
                 minHeight: 'var(--size-button-min-height-md)',
-                padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
-                borderRadius: 'var(--size-element-radius-md)',
+                padding: 'var(--pad-y-md) var(--pad-x-md)',
+                borderRadius: 'var(--radius-md)',
                 backgroundColor: getBackgroundColor(),
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease'
@@ -127,15 +127,15 @@ export const Overview = () => (
             }}>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="default" />
-                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Default</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--stack-md)' }}>Default</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="hover" />
-                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Hover</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--stack-md)' }}>Hover</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="pressed" />
-                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Pressed</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--stack-md)' }}>Pressed</p>
                 </div>
             </div>
         </section>
@@ -179,8 +179,8 @@ export const Overview = () => (
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+                    gap: 'var(--space-0625)',
+                    padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
@@ -191,8 +191,8 @@ export const Overview = () => (
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+                    gap: 'var(--space-0625)',
+                    padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-pen-to-square" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
@@ -203,8 +203,8 @@ export const Overview = () => (
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+                    gap: 'var(--space-0625)',
+                    padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-users" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
@@ -215,8 +215,8 @@ export const Overview = () => (
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-md)',
-                    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+                    gap: 'var(--space-0625)',
+                    padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
                     <i className="fa-solid fa-trash" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-danger)' }} />

@@ -62,7 +62,7 @@ const CallOffFormOrganism = ({
             {isToggled && (
                 <div style={{
                     marginBottom: 'var(--size-section-gap-sm)',
-                    '--size-card-gap-sm': 'var(--size-element-gap-xs)'      // Override for Figma compliance
+                    '--size-card-gap-sm': 'var(--stack-sm)'      // Override for Figma compliance
                 }}>
                     <SectionMessage
                         appearance="warning"
@@ -73,13 +73,13 @@ const CallOffFormOrganism = ({
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 'var(--size-element-gap-xs)',
+                            gap: 'var(--stack-sm)',
                         }}>
                             <Checkbox
                                 id={`supervisor-check-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}
                                 isChecked={isChecked}
                                 onChange={handleCheck}
-                                style={{ '--size-element-gap-xs': 'var(--size-element-gap-sm)' }}
+                                style={{ '--stack-sm': 'var(--stack-md)' }}
                                 label={
                                     <span className="body2-txt">I have already spoken with my supervisor about dropping this recurring session <span className="text-danger">*</span></span>
                                 }/>
@@ -95,10 +95,10 @@ const CallOffFormOrganism = ({
             )}
 
             {isToggled && isChecked && (
-                <div style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
+                <div style={{ marginBottom: 'var(--stack-lg)' }}>
                     <Form.Group controlId={`supervisor-select-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}>
                         {/* Figma Node 221:171733: Gap between label and input is element-gap-xs (4px) */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                             <Form.Label style={{
                                 fontSize: '12px',
                                 fontWeight: 400, // Regular

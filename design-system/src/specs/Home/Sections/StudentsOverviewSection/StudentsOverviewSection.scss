@@ -76,7 +76,7 @@
 
 .plus-overview-card-header {
     display: flex;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
     width: 100%;
 }
@@ -174,14 +174,14 @@
 
 .plus-overview-card-smart-bars {
     display: flex;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: flex-start;
 }
 
 .plus-overview-card-smart-bar {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     align-items: center;
 }
 
@@ -215,7 +215,7 @@
 
 .plus-students-table-header {
     display: flex;
-    gap: var(--size-element-gap-md);
+    gap: var(--space-0625);
     align-items: center;
 }
 

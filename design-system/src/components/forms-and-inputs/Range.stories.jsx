@@ -84,7 +84,7 @@ Overview.parameters = {
 
 /** The label sits directly above the slider, aligned left. A hidden label still names it. */
 export const Labels = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)', maxWidth: '600px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: '600px' }}>
         <Range id="range-visible" label="Zoom" defaultValue={30}/>
         <Range id="range-hidden" label="Brightness" showLabel={false} defaultValue={70}/>
     </div>
@@ -92,7 +92,7 @@ export const Labels = () => (
 
 /** The thumb at the start, the middle and the end of the span. */
 export const Positions = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-lg)', maxWidth: '600px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: '600px' }}>
         <Range id="range-start" label="At the start" defaultValue={0}/>
         <Range id="range-middle" label="In the middle" defaultValue={50}/>
         <Range id="range-end" label="At the end" defaultValue={100}/>

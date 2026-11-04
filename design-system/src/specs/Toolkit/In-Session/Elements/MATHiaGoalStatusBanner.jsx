@@ -48,7 +48,7 @@ const MATHiaGoalStatusBanner = ({
     // But we need h5 for title, so we'll use CSS to override
     // For modal alerts, just render body text
     const alertContent = isDashboard && title ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             <div className="h5" style={{ margin: 0, color: 'inherit' }}>
                 {title}
             </div>

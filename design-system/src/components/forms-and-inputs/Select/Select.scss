@@ -24,7 +24,7 @@
 // Chips and the combobox share the content slot, and wrap onto more lines.
 .plus-select-wrapper .plus-field__content {
     flex-wrap: wrap;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
 }
 
 .plus-select-combobox {
@@ -64,7 +64,7 @@
 // ── Trailing: the clear × and the caret (Figma `_Field Clear`, `_Dropdown icon`) ──
 
 .plus-select-wrapper .plus-field__trailing {
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 }
 
 // One step smaller than the caret, `icon.subtlest` at rest and `icon.subtle` on hover.
@@ -101,9 +101,9 @@
 .plus-select-all {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     width: 100%;
-    padding: var(--size-element-pad-y-md) var(--element-pad-default);
+    padding: var(--pad-y-md) var(--pad-x-md);
     border: 0;
     background: none;
     color: var(--ds-text);
@@ -128,9 +128,9 @@
     justify-content: center;
     width: var(--font-size-body2);
     height: var(--font-size-body2);
-    border: var(--size-element-border) solid var(--ds-border-input);
+    border: var(--border-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
-    border-radius: var(--size-element-radius-sm);
+    border-radius: var(--radius-md);
     font-size: var(--icon-sm);
 
     &.is-checked {
@@ -142,7 +142,7 @@
 
 .plus-select-hint {
     display: block;
-    padding: var(--size-element-pad-y-sm) var(--element-pad-default);
+    padding: var(--space-025) var(--pad-x-md);
     color: var(--ds-text-subtle);
     font: var(--body-small);
 }

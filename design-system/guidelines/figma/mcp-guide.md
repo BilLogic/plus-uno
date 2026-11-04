@@ -44,7 +44,7 @@ When implementing a design from a Figma link, follow all 7 steps:
 |-------|-----------|
 | `Primary/500` | `var(--color-primary)` |
 | `Display 1` | `var(--font-size-display1)` |
-| Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--size-element-gap-{xs\|sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
+| Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--stack-{sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
 | Surface tokens | `var(--color-surface-*)` — use `-container` for elevated surfaces |
 
 For the full token reference, load `design-system/agent-views/tokens/tokens.md` and `design-system/figma/token-registry.json`.

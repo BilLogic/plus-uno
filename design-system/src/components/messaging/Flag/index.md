@@ -39,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--element-radius-default` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--size-spacing-medium-space-400` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--size-spacing-medium-space-400` · `--stack-sm`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

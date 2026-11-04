@@ -95,7 +95,7 @@ export function StrategyHeatmap({
               color: t.text,
               borderBottom: '1px solid var(--chat-outline, #d1d5db)',
               borderLeft: '1px solid var(--chat-outline, #d1d5db)',
-              padding: 'var(--size-element-pad-y-sm, 4px)',
+              padding: 'var(--space-025, 4px)',
               textAlign: 'center',
             }}
           >
@@ -111,7 +111,7 @@ export function StrategyHeatmap({
               minHeight: CELL_HEIGHT,
               display: 'flex',
               alignItems: 'center',
-              padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-compact, 8px)',
+              padding: 'var(--space-025, 4px) var(--pad-x-sm, 8px)',
               fontSize: 'var(--font-size-body2, 14px)',
               fontWeight: 600,
               color: t.text,
@@ -161,8 +161,8 @@ export function StrategyHeatmap({
       <motion.div
         style={{
           display: 'flex',
-          marginTop: 'var(--size-element-gap-sm, 8px)',
-          gap: 'var(--size-element-gap-sm, 8px)',
+          marginTop: 'var(--stack-md, 8px)',
+          gap: 'var(--stack-md, 8px)',
           flexWrap: 'wrap',
         }}
         initial="hidden"
@@ -197,7 +197,7 @@ function QuoteBox({ text, theme = 'dark' }: { text: string; theme?: 'light' | 'd
       style={{
         width: 200,
         minHeight: 60,
-        padding: 'var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px)',
+        padding: 'var(--pad-y-md, 6px) var(--pad-x-md, 10px)',
         borderRadius: 'var(--size-border-radius-radius-200, 8px)',
         background: t.quoteBg,
         border: `1px solid ${t.quoteBorder}`,

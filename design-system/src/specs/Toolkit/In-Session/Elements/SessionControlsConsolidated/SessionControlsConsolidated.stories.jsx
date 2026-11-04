@@ -71,7 +71,7 @@ export const AllVariations = () => (
         backgroundColor: 'var(--ds-surface)',
     }}>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--space-0625)', color: 'var(--ds-text-subtle)' }}>
                 Lead Tutor
             </h6>
             <SessionControlsConsolidated
@@ -83,7 +83,7 @@ export const AllVariations = () => (
             />
         </div>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--space-0625)', color: 'var(--ds-text-subtle)' }}>
                 Non-lead Tutor
             </h6>
             <SessionControlsConsolidated
@@ -94,7 +94,7 @@ export const AllVariations = () => (
             />
         </div>
         <div>
-            <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)', color: 'var(--ds-text-subtle)' }}>
+            <h6 className="h6" style={{ marginBottom: 'var(--space-0625)', color: 'var(--ds-text-subtle)' }}>
                 Lead Tutor — room count waiting (before assignment)
             </h6>
             <SessionControlsConsolidated
@@ -143,7 +143,7 @@ export const Interactive = (args) => {
                     backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: 'var(--size-card-radius-sm)',
                 }}>
-                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0, marginBottom: 'var(--size-element-gap-xs)' }}>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0, marginBottom: 'var(--stack-sm)' }}>
                         Action log:
                     </p>
                     {log.map((entry, i) => (

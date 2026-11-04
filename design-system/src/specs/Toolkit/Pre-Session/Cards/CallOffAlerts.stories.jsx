@@ -34,7 +34,7 @@ export const ConfirmationAlert = ({
             width: 'var(--col-12)'
         }}
     >
-        <div className="d-flex align-items-start" style={{ gap: 'var(--size-element-gap-sm)' }}>
+        <div className="d-flex align-items-start" style={{ gap: 'var(--stack-md)' }}>
             {/*
               * The confirmation text is a sibling `<span>`, laid out in the row
               * rather than inside the checkbox, so it cannot be the checkbox's
@@ -88,7 +88,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)'
+                gap: 'var(--stack-md)'
             }}
         >
             <span className="h6" style={{ color: 'var(--ds-text)' }}>

@@ -53,7 +53,7 @@ const FormFeedbackForm = ({
         <ReflectionStep title="Form Feedback" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <QuestionLabel rank="question" isRequired>
                         On a scale from 1–5, how intuitive did you find the reflection form?
                     </QuestionLabel>

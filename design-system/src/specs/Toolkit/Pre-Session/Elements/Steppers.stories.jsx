@@ -18,7 +18,7 @@ export default {
  * Matches the Figma "Steppers" spec.
  *
  * Spacing:
- * - Gap between label and field: --size-element-gap-xs
+ * - Gap between label and field: --stack-sm
  *
  * States:
  * - steppers-enabled: Both minus and plus buttons are active
@@ -38,7 +38,7 @@ const Stepper = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-xs)',
+                gap: 'var(--stack-sm)',
                 alignItems: 'flex-start',
                 width: '100%',
             }}

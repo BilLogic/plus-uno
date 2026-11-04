@@ -10,9 +10,9 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const REGISTRY = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 const corpus = tokenCorpus();
 
-test('the small element radius stays 4px: Storybook won the conflict with Figma', () => {
-  const token = corpus.get('--size-element-radius-sm');
-  assert.equal(token?.raw, 'var(--size-border-radius-radius-100)');
+test('the medium radius stays 4px: Storybook won the conflict with Figma', () => {
+  const token = corpus.get('--radius-md');
+  assert.equal(token?.raw, 'var(--radius-025)');
   assert.equal(token?.value, '4px');
 });
 

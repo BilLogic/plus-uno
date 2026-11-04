@@ -53,7 +53,7 @@ export function FloatingChatBubble({
         transform: 'translateX(-50%)',
         width: '100%',
         maxWidth: 560,
-        padding: '0 var(--size-element-pad-x-lg, 16px)',
+        padding: '0 var(--pad-x-lg, 16px)',
         zIndex: 'var(--layer-navigation)',
       }}
     >
@@ -61,8 +61,8 @@ export function FloatingChatBubble({
       <div
         style={{
           display: 'flex',
-          gap: 'var(--size-element-gap-sm, 8px)',
-          marginBottom: 'var(--size-element-gap-sm, 8px)',
+          gap: 'var(--stack-md, 8px)',
+          marginBottom: 'var(--stack-md, 8px)',
           flexWrap: 'wrap',
         }}
       >
@@ -72,7 +72,7 @@ export function FloatingChatBubble({
             type="button"
             onClick={() => handlePromptClick(prompt)}
             style={{
-              padding: 'var(--size-element-pad-y-md, 6px) var(--size-element-pad-x-lg, 16px)',
+              padding: 'var(--pad-y-md, 6px) var(--pad-x-lg, 16px)',
               background: 'var(--chat-surface, #e5e7eb)',
               border: '1px solid var(--chat-outline, #d1d5db)',
               borderRadius: 'var(--size-border-radius-radius-300, 12px)',
@@ -98,8 +98,8 @@ export function FloatingChatBubble({
         style={{
           display: 'flex',
           alignItems: 'flex-end',
-          gap: 'var(--size-element-gap-sm, 8px)',
-          padding: 'var(--size-element-pad-y-sm, 4px) var(--element-pad-default, 10px)',
+          gap: 'var(--stack-md, 8px)',
+          padding: 'var(--space-025, 4px) var(--pad-x-md, 10px)',
           background: 'var(--chat-surface, #e5e7eb)',
           border: '1px solid var(--chat-outline, #d1d5db)',
           borderRadius: 'var(--size-border-radius-radius-300, 12px)',
@@ -116,7 +116,7 @@ export function FloatingChatBubble({
           aria-label="Message input"
           style={{
             flex: 1,
-            padding: 'var(--size-element-pad-y-md, 6px) 0',
+            padding: 'var(--pad-y-md, 6px) 0',
             fontFamily: 'var(--font-family-body)',
             fontSize: 'var(--font-size-body2, 14px)',
             color: 'var(--chat-on-surface, #f9fafb)',

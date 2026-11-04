@@ -67,7 +67,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--element-gap-default);
+    gap: var(--stack-md);
     box-sizing: border-box;
     border: none;
     background-color: transparent;
@@ -105,14 +105,14 @@
 
 .plus-tabs--compact .plus-tab {
     height: var(--item-height-sm, 24px);
-    padding: 0 var(--element-pad-x-md);
+    padding: 0 var(--pad-x-md);
 }
 
 // Default (underline) appearance
 .plus-tabs--default .plus-tab {
     margin-bottom: calc(-1 * var(--border-default));
     border-bottom: var(--border-default) solid var(--ds-border);
-    border-radius: var(--element-radius-md) var(--element-radius-md) 0 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
 
     &:disabled,
     &[data-disabled] {
@@ -149,11 +149,11 @@
 // Pill appearance: the selected tab carries a filled, fully-rounded ground
 // instead of an underline; unselected tabs carry no border at all.
 .plus-tabs--pill .plus-tabs-list {
-    gap: var(--element-gap-compact);
+    gap: var(--stack-sm);
 }
 
 .plus-tabs--pill .plus-tab {
-    border-radius: var(--element-radius-full);
+    border-radius: var(--radius-full);
 
     @include plus-state((
         hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),

@@ -383,7 +383,7 @@ export const CHECKS = [
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'scripts/baselines/size-fallback-baseline.json',
     guards:
-      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than color — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Color's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than color — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--pad-y-lg, 12px)` 52 times for one that is `8px`. Color's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
   },
   {
     name: 'check:undefined-tokens',
@@ -443,7 +443,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-focus-ring.mjs',
-    floors: { MIN_FILES: 150, MIN_RULES: 44 },
+    floors: { MIN_FILES: 150, MIN_RULES: 43 },
     baseline: 'scripts/baselines/focus-ring.json',
     guards:
       "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same gray they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. A ring on a ground its caller paints is not an exception either: its rule DECLARES the grounds (`// @grounds: --color-…`, opening the block) and is held to 3:1 on every one, so CloseButton's inverse ring is measured on the eight fills it is for rather than excused; a misplaced, duplicated, empty or unknown declaration is itself a failure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
@@ -539,7 +539,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-design-tokens.mjs',
     guards:
-      'the generated deep-foundation token files in design-system/src/tokens/deep/ (container and element role SCSS, motion SCSS, the legacy-size alias SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
+      'the generated token ladder files in design-system/src/tokens/ladder/ (the four tiers, motion SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
   },
   {
     name: 'check:old-size-tokens',
@@ -549,7 +549,7 @@ export const CHECKS = [
     module: 'scripts/check-old-size-tokens.mjs',
     baseline: 'scripts/baselines/old-size-tokens.json',
     guards:
-      'files staying off the pre-ADR-038 size vocabularies (--size-element-*, --card-*, --section-*, --modal-*, --surface-*) that the deep-foundation role tokens replace, counted per file in design-system/src, prototypes and src. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:old-size-tokens -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+      'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
     name: 'check:old-size-token-list',

@@ -1,0 +1,20 @@
+/**
+ * Layers (ADR-038 ladder; not a spacing family)
+ * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
+ * Each row declares its own value; a responsive row repeats under the media
+ * query the plan names for it, below the :root block.
+ */
+
+:root {
+
+    /* Layer */
+    --layer-card: 100;
+    --layer-navigation: 200;
+    --layer-dialog: 300;
+    --layer-popup: 400;
+    --layer-blanket: 500; /* the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word */
+    --layer-modal: 510;
+    --layer-flag: 600;
+    --layer-spotlight: 700;
+    --layer-tooltip: 800;
+}

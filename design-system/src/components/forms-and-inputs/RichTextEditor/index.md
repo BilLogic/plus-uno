@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive, BlockStyleMenu
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx`
 
@@ -43,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-outline-variant` · `--color-primary-text` · `--color-secondary-text` · `--ds-background-input` · `--ds-background-neutral` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-icon-subtle` · `--ds-surface-container` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--element-pad-compact` · `--element-pad-default` · `--elevation-light-1` · `--field-min-height-lg` · `--focus-ring-width` · `--font-line-height-fa-body3` · `--font-size-fa-body3-solid` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--size-border-radius-radius-50` · `--size-border-stroke-stroke-100` · `--size-border-stroke-stroke-150` · `--size-element-gap-sm` · `--size-element-pad-y-sm` · `--size-element-radius-md` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--type-weight-regular`
+`--body-default` · `--body-small` · `--color-disabled-opacity` · `--color-focus-ring` · `--color-outline-variant` · `--color-primary-text` · `--color-secondary-text` · `--ds-background-input` · `--ds-background-neutral` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-icon-subtle` · `--ds-surface-container` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--focus-ring-width` · `--font-line-height-fa-body3` · `--font-size-fa-body3-solid` · `--pad-x-sm` · `--radius-md` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--size-border-radius-radius-50` · `--size-border-stroke-stroke-100` · `--size-border-stroke-stroke-150` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--space-025` · `--stack-md` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

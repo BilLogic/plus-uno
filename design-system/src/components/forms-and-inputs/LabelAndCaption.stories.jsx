@@ -88,7 +88,7 @@ const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) 
         <div
             style={{
                 display: 'flex',
-                gap: 'var(--size-element-pad-y-sm)',
+                gap: 'var(--space-025)',
                 alignItems: 'flex-start',
                 opacity: state === 'disabled' ? 0.78 : 1,
             }}
@@ -146,7 +146,7 @@ export const Overview = () => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             maxWidth: '480px',
         }}
     >
@@ -214,7 +214,7 @@ export const Layout = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '400px',
                 }}
             >
@@ -239,7 +239,7 @@ export const Layout = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '400px',
                 }}
             >
@@ -266,7 +266,7 @@ export const Layout = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '400px',
                 }}
             >
@@ -293,7 +293,7 @@ export const Layout = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '400px',
                 }}
             >
@@ -324,7 +324,7 @@ export const Layout = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '400px',
                 }}
             >

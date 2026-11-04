@@ -161,9 +161,9 @@
       "Card padding": "var(--size-card-pad-{x|y}-{sm|md|lg})",
       "Card gap": "var(--size-card-gap-{sm|md|lg})",
       "Card radius": "var(--size-card-radius-{sm|md|full})",
-      "Element padding": "var(--size-element-pad-y-{sm|md|lg})",
-      "Element gap": "var(--size-element-gap-{xs|sm|md|lg})",
-      "Element radius": "var(--size-element-radius-{sm|md|lg|full})",
+      "Element padding": "var(--pad-x-{xs|sm|md|lg})",
+      "Element gap": "var(--stack-{sm|md|lg})",
+      "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--size-modal-pad-{x|y}-{sm|md|lg})",
       "Section padding": "var(--size-section-pad-{x|y}-{sm|md|lg})",
       "Surface padding": "var(--size-surface-pad-{x|y})",
@@ -307,9 +307,7 @@
       "Columns/col-7": "var(--col-7)",
       "Columns/col-8": "var(--col-8)",
       "Columns/col-9": "var(--col-9)",
-      "Max Heights/listbox": "var(--layout-max-height-listbox)",
       "Min Heights/card-body": "var(--layout-min-height-card-body)",
-      "Min Heights/listbox": "var(--layout-min-height-listbox)",
       "Min Heights/modal-body": "var(--layout-min-height-modal-body)"
     },
     "size / primitive": {
@@ -359,26 +357,6 @@
       "Card/radius-full": "var(--size-card-radius-full)",
       "Card/radius-md": "var(--size-card-radius-md)",
       "Card/radius-sm": "var(--size-card-radius-sm)",
-      "Element/border": "var(--size-element-border)",
-      "Element/gap-lg": "var(--size-element-gap-lg)",
-      "Element/gap-md": "var(--size-element-gap-md)",
-      "Element/gap-sm": "var(--size-element-gap-sm)",
-      "Element/gap-xs": "var(--size-element-gap-xs)",
-      "Element/pad-x-lg": "var(--size-element-pad-x-lg)",
-      "Element/pad-x-md": "var(--size-element-pad-x-md)",
-      "Element/pad-x-sm": "var(--size-element-pad-x-sm)",
-      "Element/pad-x-xs": "var(--size-element-pad-x-xs)",
-      "Element/pad-y-lg": "var(--size-element-pad-y-lg)",
-      "Element/pad-y-md": "var(--size-element-pad-y-md)",
-      "Element/pad-y-sm": "var(--size-element-pad-y-sm)",
-      "Element/radius-full": "var(--size-element-radius-full)",
-      "Element/radius-lg": "var(--size-element-radius-lg)",
-      "Element/radius-md": "var(--size-element-radius-md)",
-      "Element/radius-sm": "var(--size-element-radius-sm)",
-      "Element/stroke-lg": "var(--size-element-stroke-lg)",
-      "Element/stroke-md": "var(--size-element-stroke-md)",
-      "Element/stroke-sm": "var(--size-element-stroke-sm)",
-      "Element/stroke-xl": "var(--size-element-stroke-xl)",
       "Modal/border-lg": "var(--size-modal-border-lg)",
       "Modal/border-md": "var(--size-modal-border-md)",
       "Modal/border-sm": "var(--size-modal-border-sm)",
@@ -508,23 +486,21 @@
       "Border/default": "var(--border-default)",
       "Border/focused": "var(--border-focused)",
       "Border/selected": "var(--border-selected)",
-      "Element/inline-lg": "var(--element-inline-lg)",
-      "Element/inline-md": "var(--element-inline-md)",
-      "Element/inline-sm": "var(--element-inline-sm)",
-      "Element/pad-x-md": "var(--element-pad-x-md)",
-      "Element/pad-x-sm": "var(--element-pad-x-sm)",
-      "Element/pad-x-xs": "var(--element-pad-x-xs)",
-      "Element/pad-y-md": "var(--element-pad-y-md)",
-      "Element/pad-y-sm": "var(--element-pad-y-sm)",
-      "Element/radius-full": "var(--element-radius-full)",
-      "Element/radius-item-md": "var(--element-radius-item-md)",
-      "Element/radius-item-sm": "var(--element-radius-item-sm)",
-      "Element/radius-lg": "var(--element-radius-lg)",
-      "Element/radius-md": "var(--element-radius-md)",
-      "Element/radius-sm": "var(--element-radius-sm)",
-      "Element/stack-lg": "var(--element-stack-lg)",
-      "Element/stack-md": "var(--element-stack-md)",
-      "Element/stack-sm": "var(--element-stack-sm)",
+      "Element/inline-lg": "var(--inline-lg)",
+      "Element/inline-md": "var(--inline-md)",
+      "Element/inline-sm": "var(--inline-sm)",
+      "Element/pad-x-md": "var(--pad-x-md)",
+      "Element/pad-x-sm": "var(--pad-x-sm)",
+      "Element/pad-x-xs": "var(--pad-x-xs)",
+      "Element/pad-y-md": "var(--pad-y-md)",
+      "Element/pad-y-sm": "var(--pad-y-sm)",
+      "Element/radius-full": "var(--radius-full)",
+      "Element/radius-lg": "var(--radius-lg)",
+      "Element/radius-md": "var(--radius-md)",
+      "Element/radius-sm": "var(--radius-sm)",
+      "Element/stack-lg": "var(--stack-lg)",
+      "Element/stack-md": "var(--stack-md)",
+      "Element/stack-sm": "var(--stack-sm)",
       "Size/Field/min-height-lg": "var(--field-min-height-lg)",
       "Size/Field/min-height-sm": "var(--field-min-height-sm)",
       "Size/Field/width-lg": "var(--field-width-lg)",
@@ -567,26 +543,7 @@
       "Size/Width/3000": "var(--width-3000)",
       "Size/Width/500": "var(--width-500)"
     },
-    "spacing / layout": {
-      "Content/max-width-content": "var(--layout-max-width-content)",
-      "Content/max-width-reading": "var(--layout-max-width-reading)",
-      "Content/min-width-content": "var(--layout-min-width-content)",
-      "Content/width-content": "var(--layout-width-content)",
-      "Grid/columns": "var(--layout-columns)",
-      "Grid/gutter": "var(--layout-gutter)",
-      "Grid/width-column": "var(--layout-width-column)",
-      "Grid/width-column-screen": "var(--layout-width-column-screen)",
-      "Modal/width-modal-lg": "var(--layout-width-modal-lg)",
-      "Modal/width-modal-md": "var(--layout-width-modal-md)",
-      "Modal/width-modal-sm": "var(--layout-width-modal-sm)",
-      "Screen/max-width-screen": "var(--layout-max-width-screen)",
-      "Screen/min-width-screen": "var(--layout-min-width-screen)",
-      "Screen/pad-x-screen": "var(--layout-pad-x-screen)",
-      "Screen/width-screen": "var(--layout-width-screen)",
-      "Sidebar/pad-left-container": "var(--layout-pad-left-container)",
-      "Sidebar/width-sidebar": "var(--layout-width-sidebar)",
-      "Topbar/height-topbar": "var(--layout-height-topbar)"
-    },
+    "spacing / layout": {},
     "spacing / patterns": {
       "Card/inline-lg": "var(--card-inline-lg)",
       "Card/inline-md": "var(--card-inline-md)",
@@ -597,9 +554,6 @@
       "Card/min-width-lg": "var(--card-min-width-lg)",
       "Card/min-width-md": "var(--card-min-width-md)",
       "Card/min-width-sm": "var(--card-min-width-sm)",
-      "Card/pad-lg": "var(--card-pad-lg)",
-      "Card/pad-md": "var(--card-pad-md)",
-      "Card/pad-sm": "var(--card-pad-sm)",
       "Card/radius": "var(--card-radius)",
       "Card/radius-sm": "var(--card-radius-sm)",
       "Card/stack-lg": "var(--card-stack-lg)",
@@ -613,8 +567,6 @@
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
       "Modal/stack-sm": "var(--modal-stack-sm)",
-      "Overlay/pad-x": "var(--overlay-pad-x)",
-      "Overlay/pad-y": "var(--overlay-pad-y)",
       "Popover/Menu/max-height-menu": "var(--popover-max-height-menu)",
       "Popover/Menu/max-width-menu": "var(--popover-max-width-menu)",
       "Popover/Menu/min-width-menu": "var(--popover-min-width-menu)",
@@ -647,9 +599,7 @@
       "Tile/radius-lg": "var(--tile-radius-lg)",
       "Tile/radius-sm": "var(--tile-radius-sm)"
     },
-    "color / patterns": {
-      "Overlay/scrim": "var(--overlay-scrim)"
-    },
+    "color / patterns": {},
     "color / foundations": {
       "color/background/accent/lime/subtlest/default": "var(--ds-background-accent-lime-subtlest)",
       "color/background/accent/lime/subtlest/hovered": "var(--ds-background-accent-lime-subtlest-hovered)",
@@ -1187,12 +1137,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1432,
+    "scssTokenCount": 1447,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1016,
-      "resolved": 980,
-      "percent": 96,
+      "resolved": 932,
+      "percent": 92,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -1370,10 +1320,189 @@
           ]
         },
         {
+          "collection": "size / layout",
+          "figmaVariable": "Max Heights/listbox",
+          "tried": [
+            "--layout-max-height-listbox",
+            "--listbox",
+            "--size-max-heights-listbox",
+            "--size-listbox"
+          ]
+        },
+        {
+          "collection": "size / layout",
+          "figmaVariable": "Min Heights/listbox",
+          "tried": [
+            "--layout-min-height-listbox",
+            "--listbox",
+            "--size-min-heights-listbox",
+            "--size-listbox"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/border",
+          "tried": [
+            "--size-element-border"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/gap-lg",
+          "tried": [
+            "--size-element-gap-lg",
+            "--size-element-gap"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/gap-md",
+          "tried": [
+            "--size-element-gap-md",
+            "--size-element-gap"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/gap-sm",
+          "tried": [
+            "--size-element-gap-sm",
+            "--size-element-gap"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/gap-xs",
+          "tried": [
+            "--size-element-gap-xs",
+            "--size-element-gap"
+          ]
+        },
+        {
           "collection": "size / semantics",
           "figmaVariable": "Element/opacity-disabled",
           "tried": [
             "--size-element-opacity-disabled"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-lg",
+          "tried": [
+            "--size-element-pad-x-lg",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-md",
+          "tried": [
+            "--size-element-pad-x-md",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-sm",
+          "tried": [
+            "--size-element-pad-x-sm",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-x-xs",
+          "tried": [
+            "--size-element-pad-x-xs",
+            "--size-element-pad-x"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-y-lg",
+          "tried": [
+            "--size-element-pad-y-lg",
+            "--size-element-pad-y"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-y-md",
+          "tried": [
+            "--size-element-pad-y-md",
+            "--size-element-pad-y"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/pad-y-sm",
+          "tried": [
+            "--size-element-pad-y-sm",
+            "--size-element-pad-y"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/radius-full",
+          "tried": [
+            "--size-element-radius-full",
+            "--size-element-radius"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/radius-lg",
+          "tried": [
+            "--size-element-radius-lg",
+            "--size-element-radius"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/radius-md",
+          "tried": [
+            "--size-element-radius-md",
+            "--size-element-radius"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/radius-sm",
+          "tried": [
+            "--size-element-radius-sm",
+            "--size-element-radius"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/stroke-lg",
+          "tried": [
+            "--size-element-stroke-lg",
+            "--size-element-stroke"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/stroke-md",
+          "tried": [
+            "--size-element-stroke-md",
+            "--size-element-stroke"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/stroke-sm",
+          "tried": [
+            "--size-element-stroke-sm",
+            "--size-element-stroke"
+          ]
+        },
+        {
+          "collection": "size / semantics",
+          "figmaVariable": "Element/stroke-xl",
+          "tried": [
+            "--size-element-stroke-xl",
+            "--size-element-stroke"
           ]
         },
         {
@@ -1427,10 +1556,145 @@
           ]
         },
         {
+          "collection": "spacing / foundations",
+          "figmaVariable": "Element/radius-item-md",
+          "tried": [
+            "--element-radius-item-md",
+            "--radius-item-md"
+          ]
+        },
+        {
+          "collection": "spacing / foundations",
+          "figmaVariable": "Element/radius-item-sm",
+          "tried": [
+            "--element-radius-item-sm",
+            "--radius-item-sm"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Content/max-width-content",
+          "tried": [
+            "--layout-max-width-content"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Content/max-width-reading",
+          "tried": [
+            "--layout-max-width-reading"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Content/min-width-content",
+          "tried": [
+            "--layout-min-width-content"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Content/width-content",
+          "tried": [
+            "--layout-width-content"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Grid/columns",
+          "tried": [
+            "--layout-columns"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Grid/gutter",
+          "tried": [
+            "--layout-gutter"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Grid/width-column",
+          "tried": [
+            "--layout-width-column"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Grid/width-column-screen",
+          "tried": [
+            "--layout-width-column-screen"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Modal/width-modal-lg",
+          "tried": [
+            "--layout-width-modal-lg"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Modal/width-modal-md",
+          "tried": [
+            "--layout-width-modal-md"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Modal/width-modal-sm",
+          "tried": [
+            "--layout-width-modal-sm"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Screen/max-width-screen",
+          "tried": [
+            "--layout-max-width-screen"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Screen/min-width-screen",
+          "tried": [
+            "--layout-min-width-screen"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Screen/pad-x-screen",
+          "tried": [
+            "--layout-pad-x-screen"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Screen/width-screen",
+          "tried": [
+            "--layout-width-screen"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Sidebar/pad-left-container",
+          "tried": [
+            "--layout-pad-left-container"
+          ]
+        },
+        {
           "collection": "spacing / layout",
           "figmaVariable": "Sidebar/sidebar-docked",
           "tried": [
             "--layout-sidebar-docked"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Sidebar/width-sidebar",
+          "tried": [
+            "--layout-width-sidebar"
           ]
         },
         {
@@ -1469,6 +1733,48 @@
           ]
         },
         {
+          "collection": "spacing / layout",
+          "figmaVariable": "Topbar/height-topbar",
+          "tried": [
+            "--layout-height-topbar"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-lg",
+          "tried": [
+            "--card-pad-lg"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-md",
+          "tried": [
+            "--card-pad-md"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Card/pad-sm",
+          "tried": [
+            "--card-pad-sm"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Overlay/pad-x",
+          "tried": [
+            "--overlay-pad-x"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Overlay/pad-y",
+          "tried": [
+            "--overlay-pad-y"
+          ]
+        },
+        {
           "collection": "spacing / patterns",
           "figmaVariable": "Surface container/pad",
           "tried": [
@@ -1480,6 +1786,13 @@
           "figmaVariable": "Surface container/stack",
           "tried": [
             "--surface-container-stack"
+          ]
+        },
+        {
+          "collection": "color / patterns",
+          "figmaVariable": "Overlay/scrim",
+          "tried": [
+            "--overlay-scrim"
           ]
         }
       ]

@@ -85,7 +85,7 @@ export const EngagementSubmenuItems = ({
                             width: '12px', 
                             height: '12px', 
                             border: '1px solid var(--color-primary)', 
-                            borderRadius: 'var(--size-element-radius-sm)',
+                            borderRadius: 'var(--radius-md)',
                             backgroundColor: selectedReason === reason.id ? 'var(--color-primary)' : 'var(--color-on-primary)',
                             display: 'inline-block',
                             position: 'relative'

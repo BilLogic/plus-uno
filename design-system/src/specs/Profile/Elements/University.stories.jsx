@@ -57,7 +57,7 @@ export const University = ({ id = 'university', value, onChange, defaultValue, r
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ maxWidth: '400px', padding: 'var(--pad-y-lg, 12px)' }}>
         <University id="university-overview" required={false} />
     </div>
 );
@@ -68,7 +68,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <div style={{ width: '400px', maxWidth: '100%' }}>
@@ -93,7 +93,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ maxWidth: '400px', padding: 'var(--pad-y-lg, 12px)' }}>
             <University
                 id="university-interactive"
                 key={args.initialValue ?? ''}

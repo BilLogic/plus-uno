@@ -23,7 +23,7 @@ const TimeCardWithChange = () => (
         className="d-flex align-items-center"
         style={{
             gap: 'var(--size-modal-gap-md)',
-            padding: 'var(--size-modal-pad-y-lg) var(--size-element-pad-x-lg)',
+            padding: 'var(--size-modal-pad-y-lg) var(--pad-x-lg)',
         }}
     >
         {/* Icon Container */}
@@ -135,11 +135,11 @@ const SessionDetailsOneTimeSessionModalBody = () => (
             {/* Session Info Grid */}
             <div
                 style={{
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-modal-radius-md)',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     overflow: 'hidden',
                 }}
             >

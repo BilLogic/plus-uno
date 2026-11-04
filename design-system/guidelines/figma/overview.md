@@ -88,7 +88,7 @@ npm run check:token-registry
 ## Code-side source of truth
 
 - Components: `design-system/src/components/` (forms live in `components/forms-and-inputs/`), `specs/`
-- Tokens: `design-system/src/tokens/` (most families synced from a manual Figma export; deep-foundation tokens in `tokens/deep/` generate the other way, code → Figma, per ADR-038)
+- Tokens: `design-system/src/tokens/` (most families synced from a manual Figma export; the token ladder and motion in `tokens/ladder/` generate the other way, code → Figma, per ADR-038)
 - Agent knowledge entry: `design-system/guidelines/overview.md`
 - Agent views (generated): `design-system/agent-views/`
 

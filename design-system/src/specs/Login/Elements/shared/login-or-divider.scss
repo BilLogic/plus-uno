@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--size-element-gap-lg);
+    gap: var(--stack-lg);
     width: 100%;
 }
 
@@ -10,7 +10,7 @@
     flex: 1;
     height: 1px;
     background: var(--ds-border);
-    border-radius: var(--element-radius-compact);
+    border-radius: var(--radius-sm);
 }
 
 .login-or-divider__text {

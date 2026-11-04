@@ -33,12 +33,12 @@
     /* The cap from `maxWidth` (200 by default), never wider than the container. */
     max-width: min(var(--plus-status-max, 200px), 100%);
     margin: 0;
-    padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--size-element-pad-x-xs, 4px);
+    padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--pad-x-xs, 4px);
     gap: var(--size-spacing-small-space-025, 2px);
-    border-radius: var(--size-element-radius-md, 4px);
+    border-radius: var(--radius-md, 4px);
     vertical-align: middle;
     white-space: nowrap;
-    box-shadow: inset 0 0 0 var(--size-element-stroke-sm, 1px) var(--plus-status-edge);
+    box-shadow: inset 0 0 0 var(--stroke-1, 1px) var(--plus-status-edge);
 }
 
 .plus-status__content {
@@ -46,14 +46,14 @@
     align-items: center;
     min-width: 0;
     padding-right: var(--size-spacing-small-space-025, 2px);
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
 }
 
 .plus-status--spacious {
     --plus-status-height: #{label.$status-height-spacious};
     --plus-status-icon-box: 22px;
 
-    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--element-pad-default, 12px);
+    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--pad-x-md, 12px);
     gap: 0;
     border-radius: var(--size-border-radius-radius-150, 6px);
 
@@ -133,6 +133,6 @@ $status-state: (
 /* Forced colors drop box-shadows; a real border keeps the edge. */
 @media (forced-colors: active) {
     .plus-status {
-        border: var(--size-element-stroke-sm, 1px) solid CanvasText;
+        border: var(--stroke-1, 1px) solid CanvasText;
     }
 }

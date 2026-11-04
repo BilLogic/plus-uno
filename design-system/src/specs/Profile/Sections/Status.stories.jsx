@@ -40,8 +40,8 @@
  * - Card padding: var(--size-section-pad-x-md, 24px) / var(--size-section-pad-y-md, 24px)
  * - Card gap: var(--size-section-gap-md, 16px)
  * - Card border-radius: var(--size-section-radius-md, 12px)
- * - Header title-to-subtitle gap: var(--size-element-gap-xs, 4px)
- * - Field gap: var(--size-element-gap-sm, 8px)
+ * - Header title-to-subtitle gap: var(--stack-sm, 4px)
+ * - Field gap: var(--stack-md, 8px)
  * - Label-to-input gap: var(--size-small-gap-xs, 4px)
  * 
  * Width: 774px (from Figma)
@@ -117,7 +117,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs, 4px)',
+                    gap: 'var(--stack-sm, 4px)',
                     width: '100%',
                 }}
             >
@@ -126,7 +126,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 'var(--size-element-pad-y-sm, 4px)',
+                        gap: 'var(--space-025, 4px)',
                         width: '100%',
                     }}
                 >
@@ -183,7 +183,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
             <div
                 style={{
                     display: 'flex',
-                    gap: 'var(--size-element-gap-sm, 8px)',
+                    gap: 'var(--stack-md, 8px)',
                     width: '100%',
                 }}
             >
@@ -290,7 +290,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
 };
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <StatusSection />
     </div>
 );
@@ -301,7 +301,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <StatusSection clearanceStatus="verified" clearanceDate="March 16, 2026" />
@@ -329,7 +329,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <StatusSection
                 clearanceStatus={args.clearanceStatus}
                 clearanceDate={

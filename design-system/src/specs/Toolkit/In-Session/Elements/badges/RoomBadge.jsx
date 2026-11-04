@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
  * Tokens (from Figma variable defs):
  *  - default: bg --ds-background-neutral, text --color-secondary-text (#3b525f)
  *  - out of range: bg --ds-background-danger, text --color-danger-text
- *  - radius --size-element-radius-md (4px), pad-x --size-element-pad-x-sm (8px), height 20px, gap 4px
+ *  - radius --radius-md (4px), pad-x --pad-x-sm (8px), height 20px, gap 4px
  */
 export const RoomBadge = ({ number, outOfRange = false }) => {
     if (number === null || number === undefined || number === '') return null;
@@ -36,11 +36,11 @@ export const RoomBadge = ({ number, outOfRange = false }) => {
             style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm, 4px)',
+                gap: 'var(--stack-md, 4px)',
                 flexShrink: 0,
                 height: '20px',
-                padding: '0 var(--element-pad-compact)',
-                borderRadius: 'var(--size-element-radius-md)',
+                padding: '0 var(--pad-x-sm)',
+                borderRadius: 'var(--radius-md)',
                 backgroundColor: tone.bg,
                 color: tone.fg,
                 whiteSpace: 'nowrap',

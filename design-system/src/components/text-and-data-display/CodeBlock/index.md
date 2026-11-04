@@ -27,7 +27,7 @@ A block of code in the code typeface on the code surface, with optional line num
 
 ## Tokens touched
 
-`--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--size-element-border` · `--size-element-radius-md` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-100`
+`--border-default` · `--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--radius-md` · `--size-spacing-medium-space-200` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-100`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
 

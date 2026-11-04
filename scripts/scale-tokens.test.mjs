@@ -2,7 +2,8 @@
  * The scale tokens the layout, token and type system adds beside the old
  * `--size-*` ones, as code reads them after generation from the BS4
  * Foundation export: the spacing / primitives and spacing / foundations
- * collections (Foundations holds the Size, Element and Border folders).
+ * collections (Foundations holds the Size and Border folders; the Pad, Stack,
+ * Inline and Radius steps are the semantics tier of the token ladder).
  *
  * - Primitives are named by rem × 100 (`--space-025` is 4) and the radius,
  *   stroke and small size steps point at Space.
@@ -10,7 +11,7 @@
  *   of `--height-200`, not a second 32.
  * - There is no 40 Item, and a collection that holds one property skips the
  *   word (`--border-default`, `--icon-md`, `--image-sm`).
- * - The old tokens still resolve, at their old values, until every use moves.
+ * - The retired size names are gone; the `--size-spacing-*` primitives they read still resolve.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -77,24 +78,23 @@ const PRIMITIVES = {
   '--size-7700': [1232, null],
 };
 
-const ELEMENT = {
-  '--element-pad-x-xs': [4, '--space-025'],
-  '--element-pad-x-sm': [8, '--space-050'],
-  '--element-pad-x-md': [12, '--space-075'],
-  '--element-pad-y-sm': [2, '--space-0125'],
-  '--element-pad-y-md': [6, '--space-0375'],
-  '--element-stack-sm': [4, '--space-025'],
-  '--element-stack-md': [8, '--space-050'],
-  '--element-stack-lg': [12, '--space-075'],
-  '--element-inline-sm': [4, '--space-025'],
-  '--element-inline-md': [8, '--space-050'],
-  '--element-inline-lg': [12, '--space-075'],
-  '--element-radius-sm': [2, '--radius-0125'],
-  '--element-radius-md': [4, '--radius-025'],
-  '--element-radius-lg': [8, '--radius-050'],
-  '--element-radius-item-sm': [6, '--radius-0375'],
-  '--element-radius-item-md': [8, '--radius-050'],
-  '--element-radius-full': [9999, '--radius-full'],
+const SEMANTICS = {
+  '--pad-x-xs': [4, '--space-025'],
+  '--pad-x-sm': [8, '--space-050'],
+  '--pad-x-md': [12, '--space-075'],
+  '--pad-y-sm': [2, '--space-0125'],
+  '--pad-y-md': [6, '--space-0375'],
+  '--stack-sm': [4, '--space-025'],
+  '--stack-md': [8, '--space-050'],
+  '--stack-lg': [12, '--space-075'],
+  '--inline-sm': [4, '--space-025'],
+  '--inline-md': [8, '--space-050'],
+  '--inline-lg': [12, '--space-075'],
+  '--radius-sm': [2, '--radius-0125'],
+  '--radius-md': [4, '--radius-025'],
+  '--radius-lg': [8, '--radius-050'],
+  '--radius-h24': [6, '--radius-0375'],
+  '--radius-h32': [8, '--radius-050'],
 };
 
 const SIZE = {
@@ -147,7 +147,7 @@ const BORDER = {
   '--border-focused': [2, '--stroke-2'],
 };
 
-for (const [group, tokens] of Object.entries({ PRIMITIVES, ELEMENT, SIZE, BORDER })) {
+for (const [group, tokens] of Object.entries({ PRIMITIVES, SEMANTICS, SIZE, BORDER })) {
   for (const [name, [px, target]] of Object.entries(tokens)) {
     test(`${group}: ${name} resolves to ${px}px${target ? ` through ${target}` : ''}`, () => {
       const entry = corpus.get(name);
@@ -204,18 +204,15 @@ test('every scale variable has explicit scopes for its property', () => {
   }
 });
 
-test('the old tokens still resolve at their old values', () => {
-  const old = {
-    '--size-element-pad-x-xs': '4px',
-    '--size-element-pad-y-sm': '4px',
-    '--size-element-pad-y-md': '6px',
-    '--size-element-radius-sm': '4px',
-    '--size-element-radius-full': '999px',
-    '--size-element-border': '1px',
+test('the retired size names are gone and the primitives under them still resolve', () => {
+  for (const name of ['--size-element-pad-x-xs', '--size-element-pad-y-sm', '--size-element-radius-sm', '--size-element-border', '--element-pad-x-xs']) {
+    assert.equal(corpus.get(name), undefined, `${name} is retired`);
+  }
+  const primitives = {
     '--size-spacing-small-space-050': '4px',
     '--size-spacing-small-space-100': '8px',
     '--size-border-radius-radius-200': '8px',
     '--size-border-stroke-stroke-100': '1px',
   };
-  for (const [name, value] of Object.entries(old)) assert.equal(corpus.get(name)?.value, value, name);
+  for (const [name, value] of Object.entries(primitives)) assert.equal(corpus.get(name)?.value, value, name);
 });

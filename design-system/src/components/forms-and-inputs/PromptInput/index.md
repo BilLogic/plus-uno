@@ -42,7 +42,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--element-gap-compact` · `--element-gap-default` · `--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375`
+`--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 

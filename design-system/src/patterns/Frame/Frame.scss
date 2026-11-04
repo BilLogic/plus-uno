@@ -97,7 +97,7 @@
     position: static;
     flex-shrink: 0;
     padding: 0 var(--frame-pad);
-    border-right: var(--size-element-stroke-sm) solid var(--ds-border);
+    border-right: var(--stroke-1) solid var(--ds-border);
 }
 
 // Floating: over the page, from the top of the frame, with a shadow and no scrim.
