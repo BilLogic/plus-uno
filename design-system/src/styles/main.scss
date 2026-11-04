@@ -283,14 +283,11 @@ time {
 // Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
 // popover 1070, tooltip 1080) sit above a modal's scrim (500). Each moves to
 // Atlassian's layer for what it is: a popover is a popup (400), and one opened
-// from a modal mounts inside it and so takes the modal's layer (510).
-// Bootstrap's modal and backdrop are set by the Modal component itself.
+// from a modal mounts inside it and so takes the modal's layer (510). Modal
+// and Flag draw their own overlay/blanket layers directly, with no Bootstrap
+// class to override.
 .dropdown-menu {
     --bs-dropdown-zindex: var(--layer-popup);
-}
-
-.toast-container {
-    --bs-toast-zindex: var(--layer-flag);
 }
 
 .popover {
@@ -310,20 +307,5 @@ time {
 .fixed-top,
 .fixed-bottom {
     z-index: var(--layer-navigation);
-}
-
-// Modal Boundary Utility
-// Contains a react-bootstrap Modal (and its backdrop) inside this element instead of
-// letting it cover the whole viewport. Used by page specs in Storybook (`containModal`
-// prop): the modal portal is mounted into this element via the Modal `container` prop,
-// and these overrides scope Bootstrap's fixed positioning to the page frame so popups
-// never cover the outer docs page.
-.plus-modal-boundary {
-    position: relative;
-
-    >.modal,
-    >.modal-backdrop {
-        position: absolute;
-    }
 }
 } // @layer components
