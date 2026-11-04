@@ -1,5 +1,5 @@
 import React from 'react';
-import { Canvas, Controls } from '@storybook/addon-docs/blocks';
+import { ArgTypes, Canvas, Controls, Source, Stories } from '@storybook/addon-docs/blocks';
 
 /**
  * Shared Storybook docs layout primitives (PLUS DS).
@@ -29,6 +29,56 @@ export function DsCanvasQuiet({ of: ofStory, layout, ...rest }) {
             sourceState="none"
             {...rest}
         />
+    );
+}
+
+/**
+ * A component's props table, generated from its story meta (`argTypes` and the
+ * component's own doc comments), so it cannot drift from the code the way a
+ * hand-written table does. Use under a `## Properties` heading in place of a
+ * `DocsTable`; descriptions, defaults and the allowed values belong in the
+ * story's `argTypes`.
+ *
+ * @param {unknown} props.of - the story meta, as `<DocsProperties of={ButtonStories} />`
+ * @param {string[]} [props.include] - props to show, in order
+ * @param {string[]} [props.exclude] - props to hide
+ */
+export function DocsProperties({ of: ofMeta, include, exclude }) {
+    return (
+        <div className="sb-ds-docs-props not-prose">
+            <ArgTypes of={ofMeta} include={include} exclude={exclude} />
+        </div>
+    );
+}
+
+/**
+ * The source of one story, shown as code. Replaces a hand-copied snippet: it is
+ * read from the story, so it is the code that renders above it.
+ *
+ * @param {unknown} [props.of] - a story export, as `<DocsSource of={ButtonStories.Icons} />`
+ * @param {string} [props.code] - literal code, for a snippet that is not a story
+ * @param {string} [props.language='jsx']
+ */
+export function DocsSource({ of: ofStory, code, language = 'jsx' }) {
+    return (
+        <div className="sb-ds-docs-source not-prose">
+            <Source of={ofStory} code={code} language={language} dark={false} />
+        </div>
+    );
+}
+
+/**
+ * Every story of a component as a canvas with its own heading and source: the
+ * way to list variants without writing a `Canvas` per story.
+ *
+ * @param {boolean} [props.includePrimary=true]
+ * @param {string} [props.title] - heading; omit to render none
+ */
+export function DocsStories({ title, includePrimary = true }) {
+    return (
+        <div className="sb-ds-docs-stories not-prose">
+            <Stories title={title} includePrimary={includePrimary} />
+        </div>
     );
 }
 

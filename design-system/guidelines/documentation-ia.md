@@ -56,7 +56,10 @@ Every docs page uses the same skeleton:
 ```
 
 Markdown pipe-tables do not parse in this MDX setup — use styled `<table>` JSX.
-Build them from `DocsTable` (`design-system/src/storybook-docs/ds-docs-layout.jsx`);
+Build them from `DocsTable` (`design-system/src/storybook-docs/ds-docs-layout.jsx`),
+except a component's Properties section, which is `<DocsProperties of={XStories} />`:
+the table is generated from the story's `argTypes`, so descriptions and defaults
+belong there, not in the page;
 foundation pages use its `TokenTable` and `RefTable` wrappers and the `DoDont`
 pair in `design-system/src/storybook-docs/foundation-blocks.jsx`.
 
