@@ -16,7 +16,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, Reso
 <Meta of={PatternModalStories} />
 
 <Title />
-The Modal interrupts the page for one task. It is always centered on the screen inside an Overlay, and it carries a title, a body and a footer. Its width is a step of the screen grid, its height hugs or fills, and it sits on the overlay surface. The examples on this page follow the toolbar's Color mode switch.
+The Modal interrupts the page for one task. It is always centered on the screen inside an Overlay, and it carries a title, a body and a footer. Its width is a step of the screen grid, its height hugs or fills, and it sits on the overlay level. The examples on this page follow the toolbar's Color mode switch.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3031"
@@ -54,7 +54,7 @@ A Modal asks for one decision or one short task before the person goes on. It bl
     <Canvas of={PatternModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-The Modal pads 16 on every side and rounds 12 at every width. The header, body and footer stack 16 apart, and footer buttons sit 8 apart. The title is Heading/medium 20/24 and the body is Body/default 14/20. The Close button is 32 with a 16 icon. The surface is the overlay pair: `--ds-surface-overlay` with `--ds-shadow-overlay`, the level every floating layer takes.
+The Modal pads 16 on every side and rounds 12 at every width. The header, body and footer stack 16 apart, and footer buttons sit 8 apart. The title is Heading/medium 20/24 and the body is Body/default 14/20. The Close button is 32 with a 16 icon. Its fill is the overlay pair: `--ds-surface-overlay` with `--ds-shadow-overlay`, the level every floating layer takes.
 
 </div>
 
@@ -307,7 +307,7 @@ When you group fields, work in four steps. Pair a control with the field it cont
 - The Modal has the role dialog. A title-less Modal needs its own accessible name.
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - With tabs, the tab group is a tablist. Left and Right move between tabs, Home and End jump to the ends, and Tab moves from the strip into the panel. The panel is named by its tab.
-- Opening a Modal closes a floating sidebar in a Surface container.
+- Opening a Modal closes a floating sidebar in a Frame.
 - A Modal never opens another Modal. A Popup, Menu, Tooltip or a field's dropdown can still float above it, by elevation, and a Flag always renders on top.
 - Dismiss is Close, Escape, a click on the Blanket, or an optional Cancel. An inline confirmation of a destructive action turns off the Blanket click.
 - Focus order is Close, then the body, then the secondary action, then the primary action. Focus returns to the trigger on close.

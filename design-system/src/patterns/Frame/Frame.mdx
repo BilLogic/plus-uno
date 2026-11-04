@@ -10,15 +10,15 @@ export const propRows = [
     ['sidebar', 'node', 'none', 'The sidebar content. Without it there is no sidebar and no toggle.', 'sidebar = auto | floating'],
     ['sidebarDocked', 'true | false', 'unset: follows the width', 'Overrides the width default. True docks the sidebar, false closes it.', 'sidebar = auto when unset'],
     ['sidebarLabel', 'string', 'Sidebar', 'The accessible name of the sidebar region.', 'none'],
-    ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Surface width = content | reading'],
-    ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the surface, with no content box or grid, for full-bleed views.', 'none'],
+    ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Page width = content | reading'],
+    ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the page, with no content box or grid, for full-bleed views.', 'none'],
     ['contentAs', 'element type', 'div', 'The element for the content box, for example main.', 'none'],
     ['contentClassName', 'string', 'none', 'An extra class on the content box.', 'none'],
     ['className', 'string', 'none', 'An extra class on the frame.', 'none'],
     ['style', 'object', 'none', 'Inline style on the frame.', 'none'],
     ['id', 'string', 'none', 'The frame\'s id.', 'none'],
-    ['footer', 'node', 'none', 'An optional row under the surface, 8 below it and lined up with it. A focused page puts its actions here.', 'none'],
-    ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Surface content slot'],
+    ['footer', 'node', 'none', 'An optional row under the page, 8 below it and lined up with it. A focused page puts its actions here.', 'none'],
+    ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Page content slot'],
 ];
 
 export const tokens = [
@@ -26,11 +26,11 @@ export const tokens = [
     ['--surface-container-stack', '8', '8', '8', 'The gap between the Topbar row and the surface row.'],
     ['--layout-pad-left-container', '8', '0', '0', 'The left pad of the surface row: 8 while the sidebar is closed, 0 once it docks.'],
     ['--layout-width-screen', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
-    ['--layout-pad-x-screen', '24', '24', '32', 'Pads the screen. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the surface grid.'],
+    ['--layout-pad-x-screen', '24', '24', '32', 'Pads the screen. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
     ['--layout-height-topbar', '32', '32', '32', 'The Topbar height.'],
     ['--layout-width-sidebar', '240', '240', '240', 'The sidebar width, docked or floating.'],
-    ['--surface-pad', '16', '16', '24', 'The Surface pad, which is also the grid margin.'],
-    ['--surface-radius', '16', '16', '16', 'The Surface corner radius.'],
+    ['--surface-pad', '16', '16', '24', "The page's pad, which is also the grid margin."],
+    ['--surface-radius', '16', '16', '16', "The page's corner radius."],
     ['--layout-width-content', '720', '744', '1144', 'The content width at each mode, inside the surface pad.'],
     ['--layout-width-column', '45.33', '47.33', '80.67', 'The width of one content column.'],
     ['--layout-columns', '12', '12', '12', 'The columns in the content grid.'],
@@ -46,15 +46,15 @@ export const tokens = [
 
 export const colorTokens = [
     ['--ds-surface-sunken', 'The frame\'s fill.'],
-    ['--ds-surface', 'The surface\'s fill.'],
-    ['--ds-border-surface', 'The surface edge ring. Transparent, except in light increased contrast, where the frame turns white and the surface needs a line to stand on.'],
-    ['--ds-border', 'The 1px divider at the right edge of a docked sidebar. Where the surface edge is drawn, it lies over the divider, so one line shows.'],
+    ['--ds-surface', 'The page\'s fill.'],
+    ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
+    ['--ds-border', 'The 1px divider at the right edge of a docked sidebar. Where the page\'s edge is drawn, it lies over the divider, so one line shows.'],
     ['--ds-surface-overlay', 'The fill of a floating sidebar.'],
     ['--ds-shadow-overlay', 'The shadow of a floating sidebar.'],
 ];
 
-<Title>Surface container</Title>
-The surface container is the page frame: a full-width Topbar above a row that holds the sidebar and the Surface. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them. In code: `Frame`.
+<Title>Frame</Title>
+Frame is the app frame: a full-width Topbar above a row that holds the sidebar and the page. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
@@ -79,9 +79,9 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 ### When to use it
 
-Use the surface container for every page of the app. It owns the frame sizes and the sidebar's behavior, so a page only supplies its Topbar, its sidebar and its content.
+Use Frame for every page of the app. It owns the frame sizes and the sidebar's behavior, so a page only supplies its Topbar, its sidebar and its content.
 
-For a whole page with the PLUS Topbar and sidebar already filled in, start from a page template. For a bare fill and elevation, use **Surface**. For a region inside the content, use **Section**.
+For a whole page with the PLUS Topbar and sidebar already filled in, start from a page template. For a bare fill and elevation, use **Page**. For a region inside the content, use **Section**.
 
 </div>
 
@@ -90,13 +90,13 @@ For a whole page with the PLUS Topbar and sidebar already filled in, start from 
 ### Anatomy
 
 1. **Topbar** is a part. It holds the sidebar toggle, the breadcrumb and the account, in a row 32 high with no fill of its own. The toggle sits at (8, 8) at every width.
-2. **Surface** is a part. It is the rounded content box on `--ds-surface`, with the pad and radius from the table below.
+2. **Page** is a part. It is the rounded content box on `--ds-surface`, with the pad and radius from the table below.
 3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
 4. **Sidebar** is a part. It holds the logo, Home, then the sidebar sections. It docks from 1024 and floats over the page below that.
 
-An optional footer row sits under the surface, 8 below it and lined up with it. A focused page puts its actions there.
+An optional footer row sits under the page, 8 below it and lined up with it. A focused page puts its actions there.
 
-The Topbar, Sidebar and Surface have their own pages. This page covers how the frame places them.
+The Topbar, Sidebar and Page have their own pages. This page covers how the frame places them.
 
 </div>
 
@@ -127,7 +127,7 @@ The Topbar, Sidebar and Surface have their own pages. This page covers how the f
     </tbody>
 </DocsTable>
 
-In Figma the surface container has one property, sidebar, with the values auto and floating. Auto docks the sidebar from 1024 and closes it below. Floating is the sidebar peeked over the page, which code draws when a pointer rests on the toggle or the left edge of a closed sidebar.
+Frame has one sidebar property, with the values auto and floating. Auto docks the sidebar from 1024 and closes it below. Floating is the sidebar peeked over the page, which code draws when a pointer rests on the toggle or the left edge of a closed sidebar.
 
 </div>
 
@@ -187,7 +187,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 The sidebar follows the width. At Medium (768) it is closed and the toggle shows the bars icon. At Large and X-Large it docks, 240 wide, and the toggle shows angles-left. Clicking the toggle docks a closed sidebar at any width and closes a docked one.
 
-Docked below 1024, the surface is narrower than the content minimum of 720, so it scrolls sideways while the Topbar stays put. Crossing 1024 returns the sidebar to that width's default.
+Docked below 1024, the page is narrower than the content minimum of 720, so it scrolls sideways while the Topbar stays put. Crossing 1024 returns the sidebar to that width's default.
 
 <DocsCanvasShell description={<>Medium · 768: the sidebar is closed and the toggle shows bars.</>}>
     <Canvas of={FrameStories.DocsAuto768} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -197,7 +197,7 @@ Docked below 1024, the surface is narrower than the content minimum of 720, so i
     <Canvas of={FrameStories.DocsAuto1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>X-Large · 1440: the sidebar docks, and the surface pad grows to 24 at this browser width.</>}>
+<DocsCanvasShell description={<>X-Large · 1440: the sidebar docks, and the page pad grows to 24 at this browser width.</>}>
     <Canvas of={FrameStories.DocsAuto1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -205,7 +205,7 @@ Docked below 1024, the surface is narrower than the content minimum of 720, so i
 
 Hovering the toggle or the left edge of the frame opens a closed sidebar over the page. It uses the overlay fill and shadow, has no scrim, and does not move the page. An outside click, Escape or the pointer leaving closes it.
 
-<DocsCanvasShell description={<>Medium · 768, floating: a closed sidebar peeked over the page. The surface does not move.</>}>
+<DocsCanvasShell description={<>Medium · 768, floating: a closed sidebar peeked over the page. The page does not move.</>}>
     <Canvas of={FrameStories.DocsFloating768} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -244,7 +244,7 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - A peeked sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
 - Opening a modal from the floating sidebar returns focus to the toggle when the modal closes, because the trigger left with the sidebar.
 - Pass `contentAs="main"` so the page has one main landmark.
-- In light increased contrast the surface draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
+- In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
 
 </div>
 
@@ -268,12 +268,12 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 
 ### Related
 
-- <a href="?path=/docs/foundations-patterns-surfaces--docs">Surface</a> for the bare fill-and-elevation primitive the content box is built on.
+- <a href="?path=/docs/foundations-patterns-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
 - <a href="?path=/docs/foundations-patterns-topbar--docs">Topbar</a> and <a href="?path=/docs/foundations-patterns-sidebar--docs">Sidebar</a> for the two parts the frame places.
 - <a href="?path=/docs/foundations-patterns-section--docs">Section</a> for a region inside the content.
 - <a href="?path=/docs/foundations-patterns-page-templates--docs">Page templates</a>, with the focused frame, for a page that holds one task and has no sidebar.
 - <a href="?path=/docs/foundations-layout-grid--docs">Layout & grid</a> for the column math the frame is sized by.
-- <a href="?path=/docs/foundations-patterns-page-templates--docs">Page templates</a> for a whole page: the surface container with its content slot filled.
+- <a href="?path=/docs/foundations-patterns-page-templates--docs">Page templates</a> for a whole page: Frame with its content slot filled.
 
 </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import Surface, { SURFACE_EDGE, SURFACE_LEVELS } from '@/patterns/Surface';
+import Page, { PAGE_EDGE, PAGE_LEVELS } from '@/patterns/Page';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
@@ -10,7 +10,7 @@ const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 /** What each level must draw: its fill and its shadow, as a pair. */
 const LEVEL_PAIRS = {
     sunken: ['--ds-surface-sunken', 'none'],
-    default: ['--ds-surface', SURFACE_EDGE],
+    default: ['--ds-surface', PAGE_EDGE],
     raised: ['--ds-surface-raised', 'var(--ds-shadow-raised)'],
     overlay: ['--ds-surface-overlay', 'var(--ds-shadow-overlay)'],
 };
@@ -19,20 +19,20 @@ const LEVEL_PAIRS = {
 const pairLabel = (level) => {
     const [fill, shadow] = LEVEL_PAIRS[level];
     if (shadow === 'none') return `${fill}, no shadow`;
-    if (shadow === SURFACE_EDGE) return `${fill}, edged by --ds-border-surface`;
+    if (shadow === PAGE_EDGE) return `${fill}, edged by --ds-border-surface`;
     return `${fill} + ${shadow.slice('var('.length, -1)}`;
 };
 
 /** Every elevation level, lowest to highest, on the frame's sunken backdrop — docs section only */
-function SurfaceLevelsDemo() {
+function PageLevelsDemo() {
     return (
         <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
-            {SURFACE_LEVELS.map((level) => (
+            {PAGE_LEVELS.map((level) => (
                 <div key={level}>
                     <DemoLabel>{level}</DemoLabel>
-                    <Surface level={level} padding="sm" radius="md">
+                    <Page level={level} padding="sm" radius="md">
                         {slotContent(pairLabel(level))}
-                    </Surface>
+                    </Page>
                 </div>
             ))}
         </div>
@@ -40,9 +40,9 @@ function SurfaceLevelsDemo() {
 }
 
 export default {
-    title: 'Foundations/Patterns/Surface',
-    id: 'foundations-patterns-surfaces',
-    component: Surface,
+    title: 'Foundations/Patterns/Page',
+    id: 'foundations-patterns-page',
+    component: Page,
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
@@ -50,7 +50,7 @@ export default {
         as: { table: { disable: true } },
         level: {
             control: 'select',
-            options: SURFACE_LEVELS,
+            options: PAGE_LEVELS,
             description: 'Elevation level: a fill and its shadow',
             table: { category: 'Design' },
         },
@@ -83,22 +83,22 @@ export default {
 };
 
 export const Overview = () => (
-    <Surface padding="md" radius="lg">
+    <Page padding="md" radius="lg">
         {slotContent('Content slot')}
-    </Surface>
+    </Page>
 );
 
-export const Levels = () => <SurfaceLevelsDemo />;
+export const Levels = () => <PageLevelsDemo />;
 
-/** The padding and radius scales, each step on a bordered default surface. */
+/** The padding and radius scales, each step on a bordered default page. */
 export const Scales = () => (
     <div style={{ ...col, padding: 'var(--surface-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
         {['sm', 'md', 'lg'].map((step) => (
             <div key={step}>
                 <DemoLabel>{`padding ${step}, radius ${step}`}</DemoLabel>
-                <Surface padding={step} radius={step}>
+                <Page padding={step} radius={step}>
                     {slotContent('Content slot')}
-                </Surface>
+                </Page>
             </div>
         ))}
     </div>
@@ -106,12 +106,12 @@ export const Scales = () => (
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
 export const ColorModes = {
-    render: () => <SurfaceLevelsDemo />,
+    render: () => <PageLevelsDemo />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         await inEveryColorMode(async (mode) => {
-            for (const level of SURFACE_LEVELS) {
-                const el = canvasElement.querySelector(`.plus-pattern-surface-level-${level}`);
+            for (const level of PAGE_LEVELS) {
+                const el = canvasElement.querySelector(`.plus-pattern-page-level-${level}`);
                 const [fill, shadow] = LEVEL_PAIRS[level];
                 const style = getComputedStyle(el);
                 await expect(style.backgroundColor, `${mode}: ${level} fill`).toBe(tokenColor(canvasElement, fill));
@@ -122,16 +122,16 @@ export const ColorModes = {
     },
 };
 
-/** A surface used alone pads as the surface inside the frame does: the frame's `--surface-pad`, on every side. */
+/** A Page used alone pads as the content box inside the frame does: the frame's `--surface-pad`, on every side. */
 export const MediumPad = {
     render: () => (
-        <Surface padding="md">
+        <Page padding="md">
             {slotContent('Content slot')}
-        </Surface>
+        </Page>
     ),
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
-        const style = getComputedStyle(canvasElement.querySelector('.plus-pattern-surface'));
+        const style = getComputedStyle(canvasElement.querySelector('.plus-pattern-page'));
         const pad = px(probe(canvasElement, 'paddingTop', 'var(--surface-pad)', { display: 'block' }));
         for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
             await expect(px(style[`padding${side}`]), `pad ${side.toLowerCase()}`).toBe(pad);
@@ -147,8 +147,8 @@ export const Interactive = {
         border: false,
     },
     render: (args) => (
-        <Surface {...args}>
+        <Page {...args}>
             {slotContent('Content slot')}
-        </Surface>
+        </Page>
     ),
 };

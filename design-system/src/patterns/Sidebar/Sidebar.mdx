@@ -31,7 +31,7 @@ export const itemProps = [
 ];
 
 export const tokens = [
-    ['--layout-width-sidebar', '240', 'The sidebar width, set by the surface container.'],
+    ['--layout-width-sidebar', '240', 'The sidebar width, set by Frame.'],
     ['--surface-container-pad', '8', 'The sidebar pads 8 at the sides.'],
     ['--layout-pad-left-container', '8 at Medium, 0 from Large', 'The surface row\'s left pad: 8 while the sidebar floats, 0 once it docks.'],
     ['--element-stack-sm', '4', 'The gap between rows, between sections, and between a section\'s items.'],
@@ -64,7 +64,7 @@ export const tabTokens = [
 ];
 
 <Title>Sidebar</Title>
-The sidebar is the app's side navigation: a header with the logo, the top-level items, then sections. A section is a group label, its items and an optional divider, and every item is a Sidebar tab. It is a part of the surface container. In code, the foundation is `PatternSidebar` and `Sidebar` fills it with the PLUS content for each role.
+The sidebar is the app's side navigation: a header with the logo, the top-level items, then sections. A section is a group label, its items and an optional divider, and every item is a Sidebar tab. It is a part of Frame. In code, the foundation is `PatternSidebar` and `Sidebar` fills it with the PLUS content for each role.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
@@ -157,7 +157,7 @@ Each entry in items or in a section's items has these fields. A section also has
     </tbody>
 </DocsTable>
 
-In Figma, the Sidebar has two variants: state = docked | floating, and user = tutor | supervisor. A section has a title, a divider property and a slot for its items. In code, docked or floating comes from the surface container, and the user comes from the config you pass.
+In Figma, the Sidebar has two variants: state = docked | floating, and user = tutor | supervisor. A section has a title, a divider property and a slot for its items. In code, docked or floating comes from Frame, and the user comes from the config you pass.
 
 </div>
 
@@ -344,7 +344,7 @@ tabs.open('sessions', { id: 's1', title: 'Hogwarts · Tue, Sep 9', href: '/toolk
 ### Related
 
 - <a href="?path=/docs/components-navigation-sidebar-tab--docs">Sidebar tab</a> for the row itself.
-- <a href="?path=/docs/foundations-patterns-frame--docs">Surface container</a> for the frame the sidebar docks in or floats over.
+- <a href="?path=/docs/foundations-patterns-frame--docs">Frame</a> for the frame the sidebar docks in or floats over.
 - <a href="?path=/docs/foundations-patterns-topbar--docs">Topbar</a> for the toggle that opens and closes it.
 - <a href="?path=/docs/components-layout-and-structure-divider--docs">Divider</a> for the line between sections.
 
