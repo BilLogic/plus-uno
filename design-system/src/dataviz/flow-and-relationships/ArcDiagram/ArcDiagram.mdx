@@ -1,86 +1,141 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ArcDiagramStories from './ArcDiagram.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={ArcDiagramStories} />
 
 <Title />
+Lines nodes up on a single axis and joins connected pairs with arcs. Each arc
+is as thick as the connection's weight.
 
-Shows **nodes and links along a single axis** to visualize connections.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/flow-and-relationships/ArcDiagram"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **nodes and links along a single axis** to visualize connections.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Connections between subjects, with arc thickness showing how strongly two subjects are linked.</>}>
+    <Canvas of={ArcDiagramStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Nodes** = placed on a line
-- **Arcs** = connections between nodes
-- **Arc thickness** = strength/weight of connection
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Linear connections</td><td>✅ Ideal</td></tr>
-    <tr><td>Story character interactions</td><td>✅ Ideal</td></tr>
-    <tr><td>Step-based flows</td><td>✅ Good</td></tr>
-    <tr><td>Complex networks</td><td>❌ Use Network Graph</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `ArcDiagram` for weighted connections among a small set of items where a
+straight line-up helps: which subjects students take together, which lessons
+lead into which, or which units share skills.
 
-### PLUS Context
+For a larger or messier set of connections, use `NetworkGraph`. For the same
+weighted connections around a circle, use `DependencyWheel`. For an amount
+moving through stages, use `SankeyDiagram`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Lesson Flow**</td><td>Valid transitions between lessons</td></tr>
-    <tr><td>**Student Interactions**</td><td>Connections between classmates</td></tr>
-    <tr><td>**Topic Relations**</td><td>Linked concepts</td></tr>
-  </tbody>
-</table>
+Keep the node count small enough that every label fits along the axis.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Align the arc diagram setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+## Anatomy
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Nodes', <>One per distinct name in <C>data</C>, generated for you and placed along one axis.</>],
+        ['Arcs', <>One per <C>[from, to, weight]</C> row, centered on the nodes they join. Thickness is the <C>weight</C>.</>],
+        ['Node labels', 'Always on: each node shows its name.'],
+        ['Height', <>The chart is <C>height</C> pixels tall, 400 by default.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={ArcDiagramStories.Interactive} />
+## Data shape
 
+`data` is an array of `[from, to, weight]` rows. `from` and `to` are node
+names; `weight` sets the arc's thickness.
+
+```jsx
+<ArcDiagram
+    data={[
+        ['Algebra', 'Geometry', 14],
+        ['Algebra', 'Statistics', 9],
+        ['Geometry', 'Trigonometry', 11],
+        ['Statistics', 'Probability', 16],
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Every node gets its own color.** Nodes take the categorical colors in order, starting at `--ds-chart-categorical-1`. There are eight, so past eight nodes the colors repeat. Color separates nodes; it carries no value.
+- **Position, thickness and labels carry the reading.** Each node is named on the axis and each arc's thickness is its weight, so the chart reads without hue.
+- **Overlapping arcs are the hazard.** Many connections from one node stack into a fan that is hard to trace. Filter out weak connections before drawing.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`ArcDiagram` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Subject links could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No subject links yet" description="Links appear once students take more than one subject." />
+    : <ArcDiagram data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ArcDiagramStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For the same relationships laid out freely rather than on a line, use `NetworkGraph`.
-- For flow VOLUME between nodes, use `SankeyDiagram`.
-- For relationships around a circle, use `DependencyWheel`.
+- For weighted relationships around a circle, use `DependencyWheel`.
+- For an amount moving between stages, use `SankeyDiagram`.
 
 </div>
 
 </div>
+
+
