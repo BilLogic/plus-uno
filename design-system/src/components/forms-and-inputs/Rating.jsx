@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
+import { Radio as BaseRadio } from '@base-ui/react/radio';
 import useFieldId from './useFieldId';
 import './Rating.scss';
 
@@ -32,57 +34,21 @@ const Rating = ({
     ...props
 }) => {
     /**
-     * Rating renders no form control at all — five `role="radio"` items (#206,
-     * #319). There is nothing for a `<label for>` to point at, and `id` was
-     * accepted and then dropped on the floor. So the label is a `span` with an
-     * id, the row of items is the named `radiogroup`, and `id` finally lands on
-     * that group.
+     * The row of five is a Base UI `RadioGroup` and each item a Base UI radio,
+     * which bring the radio-group contract: one tab stop (the checked item, or
+     * the first while unanswered), the arrow keys move the value, and a hidden
+     * input sends it with its form under `name`. The label is a `span` with an
+     * id, since there is no single control for a `<label for>` to point at,
+     * and `id` lands on the group.
      */
     const fieldId = useFieldId(id);
     const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
+    const checkedValue = RATING_VALUES.includes(value) ? value : null;
 
-    const handleStarClick = (starValue) => {
-        if (isDisabled) return;
-        if (onChange) {
-            onChange(starValue);
-        }
-    };
-
-    /**
-     * The one item in the group that takes a tab stop (#319): the checked one,
-     * or the first when nothing is checked yet. A group where every item is
-     * tabbable is five stops for one value; a group where none is, is
-     * unreachable.
-     */
-    const tabbableValue = RATING_VALUES.includes(value) ? value : RATING_VALUES[0];
-
-    /**
-     * Arrow keys move the value, Home and End jump to the ends — the radiogroup
-     * keyboard contract. Moving the selection IS the interaction here: the group
-     * has no "focused but unselected" state to track, so a move is a change.
-     *
-     * @param {React.KeyboardEvent} event
-     */
-    const handleKeyDown = (event) => {
-        if (isDisabled) return;
-
-        const current = RATING_VALUES.includes(value) ? value : 0;
-        let next = null;
-
-        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-            next = Math.min(current + 1, RATING_VALUES[RATING_VALUES.length - 1]);
-        } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-            next = Math.max(current - 1, RATING_VALUES[0]);
-        } else if (event.key === 'Home') {
-            next = RATING_VALUES[0];
-        } else if (event.key === 'End') {
-            next = RATING_VALUES[RATING_VALUES.length - 1];
-        }
-
-        if (next === null) return;
-        event.preventDefault();
-        if (next !== value) handleStarClick(next);
+    const handleValueChange = (next) => {
+        if (isDisabled || next === value) return;
+        onChange?.(next);
     };
 
     const wrapperClasses = [
@@ -101,45 +67,29 @@ const Rating = ({
                     )}
                 </span>
             )}
-            {/*
-              * #319. The row is a `radiogroup` and each item is a `radio`, not a
-              * button. A rating is one value out of five, and `role="button"`
-              * could not say which one was chosen — selection was a fill color
-              * and nothing in the accessibility tree. `aria-checked` says it.
-              *
-              * The role brings the keyboard behavior with it: a radio group is
-              * ONE tab stop, and the arrow keys move within it. That is the
-              * roving-tabindex below — the checked item is tabbable, and if
-              * nothing is checked the first item is, so the group is always
-              * reachable.
-              */}
-            <div
+            <BaseRadioGroup
                 className="plus-rating-container"
                 id={fieldId}
-                role="radiogroup"
+                name={name}
+                value={checkedValue}
+                onValueChange={handleValueChange}
+                disabled={isDisabled}
+                required={isRequired}
                 aria-labelledby={labelId}
                 aria-label={hasLabel ? undefined : 'Rating'}
-                aria-disabled={isDisabled || undefined}
-                onKeyDown={handleKeyDown}
             >
-                {RATING_VALUES.map((starValue) => {
-                    const isSelected = value >= starValue;
-                    return (
-                        <div key={starValue} className="plus-rating-star-group">
-                            <RatingItem
-                                value={starValue}
-                                selected={isSelected}
-                                checked={value === starValue}
-                                tabbable={starValue === tabbableValue}
-                                variant={variant}
-                                icon={icon}
-                                disabled={isDisabled}
-                                onClick={() => handleStarClick(starValue)}
-                            />
-                        </div>
-                    );
-                })}
-            </div>
+                {RATING_VALUES.map((starValue) => (
+                    <div key={starValue} className="plus-rating-star-group">
+                        <RatingItem
+                            value={starValue}
+                            selected={value >= starValue}
+                            variant={variant}
+                            icon={icon}
+                            disabled={isDisabled}
+                        />
+                    </div>
+                ))}
+            </BaseRadioGroup>
             {variant === 'comments' && showCommentsLabel && (
                 <div className="plus-rating-comments-label">
                     {commentsLabel}
@@ -172,12 +122,9 @@ Rating.propTypes = {
 const RatingItem = ({
     value,
     selected = false,
-    checked = false,
-    tabbable = false,
     variant = 'comments',
     icon = 'star',
     disabled = false,
-    onClick,
     className = '',
     ...props
 }) => {
@@ -196,36 +143,24 @@ const RatingItem = ({
                 </div>
             )}
             {/*
-              * #319. `role="radio"` and `aria-checked`, kept on the item even
-              * when disabled: a disabled rating used to drop the role, the
-              * tabindex and the label together, which made it five unlabeled
-              * `div`s — invisible rather than unavailable. `aria-disabled` is
-              * how a control says "not now" and stays a control.
-              *
-              * `selected` fills the icon cumulatively (three stars for a 3);
-              * `checked` is the single value, and is the one ARIA reports.
+              * A Base UI radio inside the group: it reports `aria-checked` for
+              * the single chosen value and keeps its role and label when
+              * disabled, so a disabled rating reads as unavailable rather than
+              * vanishing. `selected` fills the icon cumulatively (three stars
+              * for a 3); checked is the one value ARIA reports.
               */}
-            <div
+            <BaseRadio.Root
+                value={value}
+                disabled={disabled}
                 className={itemClasses}
-                onClick={!disabled ? onClick : undefined}
-                role="radio"
-                aria-checked={checked}
-                aria-disabled={disabled || undefined}
-                tabIndex={disabled ? -1 : (tabbable ? 0 : -1)}
                 aria-label={`Rate ${value}`}
-                onKeyDown={!disabled && onClick ? (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onClick();
-                    }
-                } : undefined}
                 {...props}
             >
-                <i 
+                <i
                     className={selected ? `fas fa-${icon}` : `far fa-${icon}`}
                     aria-hidden="true"
                 />
-            </div>
+            </BaseRadio.Root>
         </div>
     );
 };
@@ -234,14 +169,9 @@ RatingItem.propTypes = {
     value: PropTypes.number.isRequired,
     /** Filled — true for every item up to the rating. */
     selected: PropTypes.bool,
-    /** The chosen value — true for exactly one item. This is what ARIA reports. */
-    checked: PropTypes.bool,
-    /** Holds the group's single tab stop (#319). */
-    tabbable: PropTypes.bool,
     variant: PropTypes.oneOf(['comments', 'numeric']),
     icon: PropTypes.oneOf(['star', 'thumbs-up']),
     disabled: PropTypes.bool,
-    onClick: PropTypes.func,
     className: PropTypes.string
 };
 

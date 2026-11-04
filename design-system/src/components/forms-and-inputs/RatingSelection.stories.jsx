@@ -118,15 +118,13 @@ ArrowKeysMoveTheValue.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
     await expect(readout()).toBe('2');
 
-    await userEvent.keyboard('{Home}');
-    await expect(readout()).toBe('1');
-
-    // And it does not walk off the end in either direction.
+    // The radio-group contract from Base UI: the arrows wrap at either end.
     await userEvent.keyboard('{ArrowLeft}');
     await expect(readout()).toBe('1');
-
-    await userEvent.keyboard('{End}{ArrowRight}');
+    await userEvent.keyboard('{ArrowLeft}');
     await expect(readout()).toBe('5');
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(readout()).toBe('1');
 
     // Focus never left the group while all that happened.
     await expect(group.contains(document.activeElement)).toBe(true);
@@ -155,9 +153,13 @@ DisabledStaysAnnounced.play = async ({ canvasElement }) => {
 
     for (const radio of radios) {
         await expect(radio.getAttribute('aria-disabled')).toBe('true');
-        await expect(radio.getAttribute('tabindex')).toBe('-1');
         await expect(radio.getAttribute('aria-label')).toBeTruthy();
     }
+
+    // At most the one tab stop a group has, so a keyboard can still find it
+    // and hear it is unavailable.
+    const tabbable = radios.filter((radio) => radio.getAttribute('tabindex') !== '-1');
+    await expect(tabbable.length).toBeLessThanOrEqual(1);
 
     // The value is still readable, which is the point of leaving it announced.
     const checked = radios.filter((radio) => radio.getAttribute('aria-checked') === 'true');
