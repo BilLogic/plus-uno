@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
