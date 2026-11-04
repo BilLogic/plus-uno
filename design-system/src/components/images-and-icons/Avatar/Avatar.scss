@@ -1,17 +1,15 @@
 /*
  * Avatar and AvatarGroup: a person or an agent as a picture, initials or icon.
  *
- * 16 to 48 are the Media sizes (--size-media-*). 96 and 128 are profile sizes
+ * 16 to 40 are the Media sizes (--size-media-*). 96 and 128 are profile sizes
  * no role names yet, so they sit here, built from the spacing primitives. A
  * circle rounds fully; a square takes a quarter of its size, like Tile.
  */
 $avatar-sizes: (
     16: (var(--size-media-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
-    20: (var(--size-media-xs), var(--font-size-body3), var(--font-size-fa-body2)),
     24: (var(--size-media-sm), var(--font-size-body3), var(--font-size-fa-body1)),
     32: (var(--size-media-md), var(--font-size-body2), var(--font-size-fa-h5)),
     40: (var(--size-media-lg), var(--font-size-body1), var(--font-size-fa-h4)),
-    48: (var(--size-media-xl), var(--font-size-h5), var(--font-size-fa-h3)),
     96: (var(--size-spacing-large-space-1200), var(--font-size-h2), var(--font-size-fa-h1)),
     128: (calc(var(--size-spacing-large-space-900) * 2), var(--font-size-h1), var(--font-size-fa-h1)),
 );
