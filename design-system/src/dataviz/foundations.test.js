@@ -27,33 +27,18 @@ const files = collectSourceFiles(ROOT).map((path) => ({ path, text: readFileSync
 /** A `var(--token, <literal>)` fallback: the exact pattern the data-viz foundations rule bans — a chart should trust the ladder, not carry a guess beside it. */
 const FALLBACK_PATTERN = /var\(--[\w-]+,\s*['"]?-?[\d.]+(px|rem|%|ms|s)?['"]?\)/g;
 
-/**
- * `DonutChart`'s `--font-size-title-*` / `--font-line-height-title` names
- * were never real tokens (no such declaration exists anywhere in
- * `design-system/src/tokens/`), so the `var()` has always resolved to its own
- * fallback — this predates the foundation-ladder migration and is a
- * mis-mapped heading scale, not a ladder literal. Snapping it onto the real
- * `--font-size-h1`–`h5` tokens changes the chart's rendered size (its Figma
- * scale doesn't line up 1:1 with the body heading scale), which needs a
- * design call this migration isn't making. Tracked, not silently carried:
- * a future ticket should pick the right heading step and delete this line.
- */
-const KNOWN_PRE_EXISTING_FALLBACKS = /var\(--font-(size-title-\w+|line-height-title),/;
-
 /** A bare pixel literal on the properties the foundations rule names: radius, stroke width, font size, padding/spacing. Matches a plain non-zero number — zero needs no token, it draws no line at all. */
 const LITERAL_PROPERTY_PATTERN = /\b(borderRadius|borderWidth|lineWidth|gridLineWidth|stemWidth|medianWidth|whiskerWidth|tickWidth|fontSize)\s*:\s*(['"]?[1-9])/g;
 
 describe('data-viz foundations', () => {
-    it('carries no old-ladder token names (--element-*, --size-element-*, --layout-*)', () => {
-        const offenders = files.filter(({ text }) => /--element-|--size-element-|--layout-/.test(text));
+    it('carries no old-ladder token names (--element-*, --size-element-*, --layout-*, --plus-*)', () => {
+        const offenders = files.filter(({ text }) => /--element-|--size-element-|--layout-|--plus-/.test(text));
         expect(offenders.map((f) => f.path)).toEqual([]);
     });
 
     it('never pairs a token with a literal fallback value', () => {
         const offenders = files.flatMap(({ path, text }) =>
-            [...text.matchAll(FALLBACK_PATTERN)]
-                .filter((m) => !KNOWN_PRE_EXISTING_FALLBACKS.test(m[0]))
-                .map((m) => `${path}: ${m[0]}`));
+            [...text.matchAll(FALLBACK_PATTERN)].map((m) => `${path}: ${m[0]}`));
         expect(offenders).toEqual([]);
     });
 

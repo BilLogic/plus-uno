@@ -203,16 +203,20 @@ chart needs them (see Do/Don't below). The sequence wraps back to slot 1 after
 8, repeating a color, so an eight-series chart is already past the point
 where it should have grouped.
 
-Dark mode generally steps every slot one lighter than light mode (the 700/800
-steps step down to 600/700), with three exceptions carried in the generated
-token, not guessed per-chart:
+Dark mode mostly steps one lighter than light mode: lagoon (1) 600 → 500,
+orange (2) 800 → 700, magenta (4) 800 → 700, lime (5) 500 → 400, blue (8)
+800 → 700 — carried in the generated token, not guessed per-chart. Three
+slots hold their light step instead:
 
-- **Lagoon steps two lighter** (600 → 500) rather than one, because it is the
-  brand ramp and reprises more often across a chart set.
-- **Purple keeps its light step** (700 → 700, unchanged) rather than stepping
-  down — stepping down crowded both of its dark-mode neighbors.
-- **Lime steps two lighter** (500 → 400) rather than one, to clear the
-  lightness-alternation check against magenta once dark mode was laid out.
+- **Blue (3) and orange (7) hold at 500** — there is no softer step without
+  losing their place in the lightness alternation.
+- **Purple (6) keeps its light step** (700 → 700, unchanged) rather than
+  stepping down — stepping down to 600 crowded both of its dark-mode
+  neighbors.
+
+This table holds for both Plan A (the plan the repo builds) and Plan B: the
+categorical mapping is by family and step, not by hex, so it is the same for
+every plan. `check:color-system` checks the generated tokens for both.
 
 ### Separators
 

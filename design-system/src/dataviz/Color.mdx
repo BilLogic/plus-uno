@@ -17,19 +17,21 @@ import * as ColorStories from './Color.stories.jsx';
 
 <FoundationContents />
 
+<FoundationSection title="Families">
+
+Every chart color in the current mode, grouped by job. The color guideline below is where the rules behind each family live — this page shows what they resolve to.
+
+<Canvas of={ColorStories.BrandAndNeutral} sourceState="none" />
+<Canvas of={ColorStories.CategoricalOrder} sourceState="none" />
+<Canvas of={ColorStories.StatusColors} sourceState="none" />
+<Canvas of={ColorStories.HueRamps} sourceState="none" />
+<Canvas of={ColorStories.SmartColors} sourceState="none" />
+
+</FoundationSection>
+
 <FoundationSection title="The categorical order">
 
-Series get assigned a color in this order, numbered 1 through 8 (7 and 8 only come into play once a chart has grown past six series, which it should usually avoid — see below).
-
-<Canvas of={ColorStories.CategoricalOrder} sourceState="none" />
-
-Three things decided this order:
-
-- **The brand leads.** Slot 1 is the same hue as the single-series chart color, so a chart that grows from one series to several keeps its first series looking the same.
-- **Light and dark alternate.** Slot 2 is a dark step, slot 3 is a light step, slot 4 is dark again, and so on. Two adjacent series never sit at the same lightness — that's what makes the sequence still tell apart in grayscale, and for anyone who can't distinguish hue.
-- **The hues are spread out**, not sitting next to each other on the color wheel, so neighboring series read as clearly different colors.
-
-Yellow, red and teal are never used in the categorical order — yellow and red already mean warning and danger elsewhere, and teal is the brand's own accent hue.
+Series get assigned a color in the order above, numbered 1 through 8 (7 and 8 only come into play once a chart has grown past six series, which it should usually avoid — see below). The order, and why it's built this way, is the color guideline's — see Related below.
 
 </FoundationSection>
 

@@ -188,14 +188,14 @@ const preview = {
             [
               "Introduction",
               "Page templates",
-              "Surface container",
-              "Surface",
+              "Frame",
+              "Page",
               "Topbar",
               "Sidebar",
               "Section",
               "Card",
               "Table",
-              "Overlay",
+              "Blanket",
               "Modal",
               "Popover family",
               "Drawer"
@@ -523,11 +523,11 @@ const preview = {
         },
         surface: {
           name: 'surface',
-          value: 'var(--color-surface)',
+          value: 'var(--ds-surface)',
         },
         "surface-container": {
           name: 'surface-container',
-          value: 'var(--color-surface-container)',
+          value: 'var(--ds-surface-container)',
         }
       }
     },

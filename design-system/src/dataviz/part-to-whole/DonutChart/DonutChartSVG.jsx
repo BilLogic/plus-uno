@@ -103,10 +103,9 @@ const DonutChartSVG = ({
                 
                 {/* Completed segment, shown once there is progress */}
                 {percentage > 0 && (
-                    <path 
-                        d={completedPath} 
+                    <path
+                        d={completedPath}
                         fill="var(--ds-chart-yellow-bold)"
-                        opacity="var(--ds-opacity-disabled)"
                     />
                 )}
             </svg>
