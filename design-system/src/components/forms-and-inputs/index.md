@@ -9,12 +9,12 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 21 | ✕ | ✕ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✕ | ✅ |
-| [Calendar](Calendar/index.md) | 10 | ✕ | ✕ | ✕ |
+| [Calendar](Calendar/index.md) | 10 | ✅ | ✕ | ✅ |
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 20 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✕ | ✅ |
-| [Comment](Comment/index.md) | 14 | ✕ | ✕ | ✕ |
+| [Comment](Comment/index.md) | 14 | ✅ | ✕ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
 | [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✕ | ✅ |
@@ -26,9 +26,9 @@ authored half (#166), counted rather than assumed.
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✕ | ✕ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
-| [PromptInput](PromptInput/index.md) | 16 | ✕ | ✕ | ✕ |
+| [PromptInput](PromptInput/index.md) | 16 | ✅ | ✕ | ✅ |
 | [Radio](Radio.md) | 20 | ✅ | ✕ | ✅ |
-| [RadioGroup](RadioGroup.md) | 19 | ✕ | ✕ | ✕ |
+| [RadioGroup](RadioGroup.md) | 19 | ✅ | ✕ | ✅ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
@@ -42,7 +42,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✕ | ✅ |
 
-**Authored coverage:** When to use 19/34 (56%) · Correct/incorrect 6/34 (18%) · Accessibility 23/34 (68%)
+**Authored coverage:** When to use 23/34 (68%) · Correct/incorrect 6/34 (18%) · Accessibility 27/34 (79%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

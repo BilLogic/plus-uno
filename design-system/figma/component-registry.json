@@ -249,7 +249,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Calendar",
         "source": "design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx",
         "storybookId": "components-forms-and-inputs-calendar--docs"
       },
@@ -358,7 +358,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/Comment/Comment.mdx",
-        "githubLink": null,
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Comment",
         "source": "design-system/src/components/forms-and-inputs/Comment/Comment.jsx",
         "storybookId": "components-forms-and-inputs-comment--docs"
       },
