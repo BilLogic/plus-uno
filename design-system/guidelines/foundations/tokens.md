@@ -12,22 +12,22 @@ summary: Tokens — Overview & Decision Tree
 - Choose semantic layer first (element/card/section/modal/table), then pick token.
 - Use primitives only for token-definition work, not feature implementation.
 
-## Semantic Layer Decision Tree
+## The four-tier ladder (#1756)
 
-| Context | Layer | Token prefix |
-|---------|-------|--------------|
-| Atomic interactive control (button, input, badge) | **element** | `--size-element-*` |
-| Bounded content container (info card, data card) | **card** | `--size-card-*` |
-| Page region or column (sidebar, main content) | **section** | `--size-section-*` |
-| Tabular data (rows, cells, headers) | **table** | `--size-table-*` |
-| Modal (confirmation, detail panel) | **modal** | `--size-modal-*` |
-| Page frame: topbar, sidebar, grid, content width, modal width | **layout** | `--layout-*` (per breakpoint) |
-| The Frame around the content box, and the rounded Page inside it | **Frame**, **Page** | `--frame-*`, `--page-pad`, `--page-stack-*`, `--page-radius` |
-| The Blanket: the full-screen layer under a modal | **Blanket** | `--overlay-*` |
-| Floating layer with no Blanket (menu, popup, tooltip, flag) | **Popup** | `--popover-*` |
-| A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |
+One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general to most specific. Figma collection on the left, code prefix on the right; the full old-to-new name list is `architecture/token-tiers-name-map.md`.
 
-The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/property-variant` names with no family prefix: `--card-stack-sm`, `--modal-radius`, `--section-stack-md`. They sit beside the older `--size-*` names of the same layers while uses move to them pattern by pattern.
+| Tier | Figma collection | Holds | Code |
+|---|---|---|---|
+| Primitives | `spacing / primitives` | Space, Radius, Stroke and Size ladders, ×16 numbering | `--space-*`, `--radius-*`, `--stroke-*`, `--size-*` |
+| Semantics | `spacing / semantics` | Pad, Stack, Inline, Radius (the safety net — steps only, no density), Border, Focus, Grid, Screen, Content, Size roles | `--pad-*`, `--stack-*`, `--inline-*`, `--radius-*`, `--border-*`, `--focus-ring-*`, `--grid-*`, `--screen-*`, `--content-*`, `--icon-*` / `--control-*` / etc. |
+| Patterns | `spacing / patterns` | Frame (Topbar, Sidebar), Page, Section, Card, Table, Blanket, Modal, Popover, Drawer, Focused page — density (`default`/`compact`/`spacious`) lives here | `--frame-*`, `--page-*`, `--card-*`, `--modal-*`, `--blanket-*`, … |
+| Components | `spacing / components` | A value exactly one component needs that no shared token covers (Button radius, Calendar day sizes, Checkbox/Radio control sizes, Listbox limits, …) — density here too | `--<component>-*`, e.g. `--button-radius-default` |
+
+`layers` (z-index) is its own non-spacing family, code only: `--layer-*` (card, dialog, flag, modal, navigation, popup, blanket, spotlight, tooltip).
+
+**Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for "is this a pattern token": would the value change if the pattern changed? If yes, it belongs to the pattern (or component); if the value is just a shared step nothing specific owns, it is semantics.
+
+**Still mid-migration.** The old vocabularies (`--size-element-*`, `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*`, `--layout-*`, bare pre-ladder `--element-*`) keep resolving — each new-tier name is an additive alias, not a replacement, until a family PR moves a component's callers and deletes the old declaration. `npm run check:old-size-tokens` is the ratchet; `design-system/guidelines/foundations/spacing.md`'s "Still on old size tokens" table is the to-do list.
 
 ## Token References
 
@@ -43,5 +43,5 @@ The frame and layer tokens (`_frame_layers.scss`) carry the spec's `Collection/p
 - Numeric steps are the rem value × 100: `space-050` is 8, `space-100` is 16, `space-0625` is 10.
 - A token is used bare. Never write a fallback: `var(--ds-text)`, not `var(--ds-text, #172b4d)`.
 - Choose by meaning, never by a matching value. Never bind a primitive in a component.
-- Themes are variable modes: `color / foundations` has Light, Dark, Light IC and Dark IC; `spacing / layout` has 768, 1024 and 1440.
+- Themes are variable modes: `color / semantics` (renamed from `color / foundations`) has Light, Dark, Light IC and Dark IC; the breakpoint modes (768, 1024, 1440) now sit on whichever of Semantics or Patterns owns the token, per the four-tier ladder above — `spacing / layout` is dissolved, not a live collection.
 
