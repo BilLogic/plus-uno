@@ -1,20 +1,215 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as RadioGroupStories from './RadioGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={RadioGroupStories} />
 
 <Title />
-A Radio group is one question and its radio answers: a Fieldset of Radios, pick one.
+One question and its radio answers — a `Fieldset` (the legend) holding one
+real radio group (the roving tabindex and keyboard behavior), so each layer
+does the one job it owns.
 
 <DocsTabs of={RadioGroupStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={RadioGroupStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
+/>
 
-<ArgTypes of={RadioGroupStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A legend over a stacked set of options.</>}>
+    <Canvas of={RadioGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout & composition
+
+<DocsCanvasShell description={<>`stacked` (default) or `inline`.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Orientation} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`size` sets the radio control's width in px — 10, 12 or 14.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Size} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`leadingText` and `trailingText` label the scale's ends, for a Likert-style question.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.LinearScale} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Each option can carry a `description` under its label.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Descriptions} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An option's `reveal` content shows only while that option is chosen.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Reveal} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Disabled and read-only — `isDisabled` on the group overrides every option's own.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.States} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`error` renders one message for the group and marks every option invalid.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Validation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Keyboard
+
+<DocsCanvasShell description={<>Arrow keys move the roving tab stop between options; Tab enters and leaves the group as one stop.</>}>
+    <DsCanvasQuiet of={RadioGroupStories.Keyboard} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>Required. A string is its own value and label; an object adds <code>description</code>, <code>isDisabled</code>, <code>id</code> and <code>reveal</code>.</td></tr>
+        <tr><td><code>value</code>, <code>defaultValue</code>, <code>onChange</code></td><td>—</td><td>The answer is one option's value, or <code>null</code>/<code>undefined</code> while unanswered — never a first-option fallback.</td></tr>
+        <tr><td><code>legend</code></td><td>node</td><td>The question. Names the group.</td></tr>
+        <tr><td><code>orientation</code></td><td>enum</td><td><code>stacked</code> (default) or <code>inline</code>.</td></tr>
+        <tr><td><code>leadingText</code>, <code>trailingText</code></td><td>node</td><td>Scale-end labels either side of the options.</td></tr>
+        <tr><td><code>appearance</code></td><td>enum</td><td><code>plain</code> (default) or <code>card</code>, drawing each option as a bordered tile.</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td>10, 12 or 14 — the radio control's width in px.</td></tr>
+        <tr><td><code>isRequired</code>, <code>isDisabled</code>, <code>isReadOnly</code>, <code>isInvalid</code>, <code>error</code></td><td>—</td><td>Group-level state; <code>isInvalid</code> defaults to whether <code>error</code> is set.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={RadioGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `RadioGroup` for one question with mutually exclusive answers, visible
+all at once — a handful of options someone picks by scanning, not searching.
+For a long list of options, use `Select` instead. For independent yes/no
+choices rather than one answer among several, use a group of `Checkbox`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `value` tells "answered zero" apart from "answered the first option."
+
+There is no implicit default selection — an unanswered group is `null` or
+`undefined`, never falls back to the first option. Check for that explicitly
+before treating the group as answered.
+
+```jsx
+<RadioGroup
+    legend="How was the session?"
+    leadingText="Not at all"
+    trailingText="Very"
+    options={['1', '2', '3', '4', '5']}
+    value={rating}
+    onChange={setRating}
+/>
+```
+
+### Use `reveal` instead of a separate conditional field.
+
+When choosing one option should show an extra field — "Other, please
+specify" — pass that field as the option's `reveal` rather than rendering it
+outside the group. It stays scoped to the option that triggers it and
+disappears when another option is chosen.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **One real `radiogroup`, named by the legend.** The outer `Fieldset`
+  supplies the `<fieldset>`/`<legend>` pair; the inner group repeats the
+  legend's id as its own `aria-labelledby`, so assistive technology
+  announces the question once, not twice.
+- **Roving tabindex.** Tab enters and leaves the group as a single stop;
+  arrow keys move the checked state between options, matching native radio
+  button behavior.
+- **A caller's own `aria-label`/`aria-labelledby` wins over the legend**, for
+  the rare case ("Pick one" with no visible legend) where the question is
+  named another way.
+- **One error, announced once.** `error` renders a single message tied to
+  the group via `aria-describedby`, rather than repeating it per option.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single radio outside a group, use `Radio`.
+- For a long list of options, use `Select`.
+- For independent choices instead of one answer among several, use
+  `Checkbox`.
+- For the legend-and-fields shell this builds on, see `Fieldset`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

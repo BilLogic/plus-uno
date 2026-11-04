@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as CommentStories from './Comment.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -20,16 +21,177 @@ export const figmaMeta = {
 <Meta of={CommentStories} />
 
 <Title />
+One entry in a threaded discussion, with slots for an avatar, author, time,
+content, actions and nested replies.
 
 <DocsTabs of={CommentStories}>
 
 <DocsTab tab="examples">
 
-One entry in a threaded discussion.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Comment"
+/>
 
-<Canvas of={CommentStories.Basic} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={CommentStories} />
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **Avatar** sits beside the comment's content.
+2. **Header** holds the author, the time, an "edited" marker and, when
+   restricted, who the comment is visible to.
+3. **Content** is the comment body.
+4. **Actions**, or **saving text** in their place while a change is in
+   flight.
+5. **Nested replies** sit below, at one heading level deeper via
+   `headingLevel`.
+
+<DocsCanvasShell attachSourceBelow description={<>An avatar, author, time and content, with actions below.</>}>
+    <Canvas of={CommentStories.Basic} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>`isSaving` hides `actions` and shows `savingText` in their place.</>}>
+    <DsCanvasQuiet of={CommentStories.Saving} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`isHighlighted` marks a comment, for linking directly to one in a thread.</>}>
+    <DsCanvasQuiet of={CommentStories.Highlighted} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Nested replies
+
+<DocsCanvasShell description={<>`nestedReplies` opens a `HeadingContextProvider` at `headingLevel`, so anything inside that uses `Heading` nests correctly.</>}>
+    <DsCanvasQuiet of={CommentStories.WithNestedReplies} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>avatar</code>, <code>author</code>, <code>time</code>, <code>edited</code></td><td>node</td><td>The header's parts.</td></tr>
+        <tr><td><code>restrictedTo</code></td><td>node</td><td>Who the comment is visible to, shown in the header.</td></tr>
+        <tr><td><code>content</code></td><td>node</td><td>The comment body.</td></tr>
+        <tr><td><code>actions</code></td><td>node</td><td>Hidden while <code>isSaving</code> is true.</td></tr>
+        <tr><td><code>isSaving</code>, <code>savingText</code></td><td>—</td><td>Shows <code>savingText</code> in place of <code>actions</code> while a change is in flight. Default "Saving…".</td></tr>
+        <tr><td><code>isHighlighted</code></td><td>boolean</td><td>Marks the comment, for deep-linking to one in a thread.</td></tr>
+        <tr><td><code>nestedReplies</code></td><td>node</td><td>Replies rendered inside their own heading context.</td></tr>
+        <tr><td><code>headingLevel</code></td><td>enum</td><td>1–6. The heading level <code>nestedReplies</code> opens at.</td></tr>
+        <tr><td><code>type</code></td><td>string</td><td>Set as <code>data-type</code>, for styling hooks.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CommentStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Comment` for one entry in a threaded discussion — a note on a session, a
+reply in a review thread. For a single-field text entry with no author or
+thread context, use `TextArea` instead.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Nest replies through `nestedReplies`, not by composing comments yourself.
+
+Passing replies through `nestedReplies` opens a `HeadingContextProvider` at
+`headingLevel`, so any `Heading` inside the reply tree nests one level deeper
+automatically — composing `Comment`s directly without this prop skips that
+step.
+
+```jsx
+<Comment
+    author="Jane Park"
+    time="2h ago"
+    content="Looks good to me."
+    nestedReplies={<Comment author="Sam Lee" time="1h ago" content="Agreed." />}
+/>
+```
+
+### Swap `actions` for `savingText` with `isSaving`, don't hide them yourself.
+
+Set `isSaving` rather than conditionally rendering `actions` — it keeps the
+saving state in one prop instead of two places making the same decision.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real article.** Each comment is an `<article>`, giving assistive
+  technology a landmark per entry in the thread.
+- **Replies nest their headings correctly.** Because `nestedReplies` opens
+  its own `HeadingContextProvider`, a reply thread's headings read in the
+  right outline order rather than all landing at the same level.
+- **Restricted visibility is stated, not just implied.** `restrictedTo`
+  renders as visible text in the header, so who can see the comment isn't
+  communicated by color or icon alone.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the person shown beside the comment, use `Avatar`.
+- For a single text field with no thread context, use `TextArea`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

@@ -1,7 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CalendarStories from './Calendar.stories.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,15 +23,164 @@ export const figmaMeta = {
 <Meta of={CalendarStories} />
 
 <Title />
-The month grid a date field opens.
+The month grid a date field opens — the same component `DatePicker` and
+`DateTimePicker` use, public for a caller who wants the grid on its own.
 
 <DocsTabs of={CalendarStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={CalendarStories.Overview} />
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Calendar"
+/>
 
-<ArgTypes of={CalendarStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Always six weeks, 42 cells, so the panel never changes height as months turn. Days outside the month are drawn but can't be picked.</>}>
+    <Canvas of={CalendarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<DocsCanvasShell description={<>`small`, `medium` and `large` draw 28, 36 and 44px days.</>}>
+    <DsCanvasQuiet of={CalendarStories.Sizes} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Bounds
+
+<DocsCanvasShell description={<>Days before `minDate` or after `maxDate` are disabled.</>}>
+    <DsCanvasQuiet of={CalendarStories.Bounds} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Picking a day
+
+<DocsCanvasShell description={<>`onPick` fires with the pressed day. `aria-pressed` marks the selected day.</>}>
+    <DsCanvasQuiet of={CalendarStories.PickADay} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Previous/Next month call `onViewDateChange` with the new month's first day.</>}>
+    <DsCanvasQuiet of={CalendarStories.TurnMonths} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>viewDate</code></td><td>Date</td><td>Required. Any day in the month shown.</td></tr>
+        <tr><td><code>onViewDateChange</code></td><td>function</td><td>Required. Called with the new month's first day on Previous/Next.</td></tr>
+        <tr><td><code>selected</code></td><td>string or Date</td><td>The picked day, as ISO <code>YYYY-MM-DD</code> or a <code>Date</code>.</td></tr>
+        <tr><td><code>rangeStart</code>, <code>rangeEnd</code></td><td>string or Date</td><td>With both set, the days between are marked via <code>data-in-range</code>.</td></tr>
+        <tr><td><code>minDate</code>, <code>maxDate</code></td><td>string or Date</td><td>Days outside this range are disabled.</td></tr>
+        <tr><td><code>size</code></td><td>enum</td><td><code>small</code>, <code>medium</code> or <code>large</code>.</td></tr>
+        <tr><td><code>onPick</code></td><td>function</td><td>Required. Called with the date when an enabled day is pressed.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Calendar` directly only when a date grid needs to be visible on the page
+without a field or a popup around it — a scheduling view, an embedded picker.
+For a single date field, use `DatePicker`; for a date and time together, use
+`DateTimePicker`. Both already use this same grid internally.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `viewDate` and `onViewDateChange` are the component's own navigation state.
+
+`Calendar` holds no state of its own — the caller owns which month shows and
+updates it when `onViewDateChange` fires, the same pattern `DatePicker` uses
+internally.
+
+```jsx
+const [viewDate, setViewDate] = useState(new Date());
+
+<Calendar
+    viewDate={viewDate}
+    onViewDateChange={setViewDate}
+    selected={selectedDate}
+    onPick={setSelectedDate}
+/>
+```
+
+### A fixed grid, not a shrinking one.
+
+Six weeks render every month, including the days of neighboring months that
+fill the remaining cells — this keeps the panel's height constant as someone
+pages through months, at the cost of occasionally showing a mostly-empty
+week.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Each day is a real, named button.** The accessible name is the day's
+  full date, not just a number, so a screen reader announces an unambiguous
+  date on every cell.
+- **State is marked, not just styled.** `aria-pressed` marks the picked day
+  or a range's ends, `aria-current="date"` marks today, and `data-in-range`
+  marks the days between — none of this relies on color alone.
+- **Out-of-range and out-of-month days are truly disabled**, not just dimmed:
+  they take no focus and fire no `onPick`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single date field with this grid in a popup, use `DatePicker`.
+- For a date and time together, use `DateTimePicker`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
