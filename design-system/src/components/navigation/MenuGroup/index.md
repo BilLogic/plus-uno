@@ -38,7 +38,7 @@ From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Overrid
 
 ## Related
 
-Same group: `Breadcrumb` · `Link` · `NavTabs` · `Pagination` · `Sidebar` · `SidebarTab`
+Same group: `Breadcrumb` · `Link` · `NavPills` · `NavTabs` · `Pagination` · `Sidebar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

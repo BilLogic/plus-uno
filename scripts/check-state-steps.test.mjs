@@ -108,7 +108,7 @@ const layer = (token) => `var(${token})`;
 
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
 
-const TAB = 'components/navigation/SidebarTab/SidebarTab.scss';
+const TAB = 'patterns/Sidebar/SidebarTab.scss';
 
 /**
  * The frame chain's navigation is on the new color tokens: hover and press move

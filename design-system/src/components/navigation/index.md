@@ -13,7 +13,6 @@ authored half (#166), counted rather than assumed.
 | [NavTabs](NavTabs/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
 | [Sidebar](Sidebar/index.md) | 11 | ✕ | ✕ | ✕ |
-| [SidebarTab](SidebarTab/index.md) | 14 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 4/7 (57%) · Correct/incorrect 4/7 (57%) · Accessibility 4/7 (57%)
 
