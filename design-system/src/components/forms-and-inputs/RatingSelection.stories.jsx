@@ -156,10 +156,11 @@ DisabledStaysAnnounced.play = async ({ canvasElement }) => {
         await expect(radio.getAttribute('aria-label')).toBeTruthy();
     }
 
-    // At most the one tab stop a group has, so a keyboard can still find it
-    // and hear it is unavailable.
+    // Still the one tab stop a group has, on the checked item, so a keyboard
+    // can find it and hear it is unavailable.
     const tabbable = radios.filter((radio) => radio.getAttribute('tabindex') !== '-1');
-    await expect(tabbable.length).toBeLessThanOrEqual(1);
+    await expect(tabbable).toHaveLength(1);
+    await expect(tabbable[0].getAttribute('aria-label')).toBe('Rate 4');
 
     // The value is still readable, which is the point of leaving it announced.
     const checked = radios.filter((radio) => radio.getAttribute('aria-checked') === 'true');

@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import Modal from './Modal';
+import { subscribeOverlays } from '@/lib/overlay';
 
 const panel = () => screen.getByTestId('modal');
 
@@ -120,5 +121,36 @@ describe('Modal dialog behavior', () => {
         const { user, dialog } = await open();
         await user.click(within(dialog).getByRole('button', { name: 'Close modal' }));
         await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+
+    it('takes ariaLabel as its name when it has no title', () => {
+        render(<Modal show ariaLabel="Quick note" body="Saved." onClose={() => {}} />);
+        expect(screen.getByRole('dialog', { name: 'Quick note' })).toBeInTheDocument();
+    });
+
+    it('reports lost focus when its trigger left the page while it was open', async () => {
+        const events = [];
+        const unsubscribe = subscribeOverlays((event) => events.push(event.type));
+        const Gone = () => {
+            const [open, setOpen] = React.useState(false);
+            const [triggerShown, setTriggerShown] = React.useState(true);
+            return (
+                <>
+                    {triggerShown && <button type="button" onClick={() => setOpen(true)}>Open</button>}
+                    <Modal
+                        show={open}
+                        title="Settings"
+                        primaryButton={{ text: 'Done', onClick: () => { setTriggerShown(false); setOpen(false); } }}
+                        onClose={() => setOpen(false)}
+                    />
+                </>
+            );
+        };
+        const user = userEvent.setup();
+        render(<Gone />);
+        await user.click(screen.getByRole('button', { name: 'Open' }));
+        await user.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Done' }));
+        await waitFor(() => expect(events).toContain('focus-lost'));
+        unsubscribe();
     });
 });

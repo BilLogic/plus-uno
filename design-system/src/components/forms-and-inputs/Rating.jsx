@@ -47,7 +47,7 @@ const Rating = ({
     const checkedValue = RATING_VALUES.includes(value) ? value : null;
 
     const handleValueChange = (next) => {
-        if (isDisabled || next === value) return;
+        if (next === value) return;
         onChange?.(next);
     };
 

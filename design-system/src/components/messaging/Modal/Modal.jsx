@@ -127,7 +127,9 @@ const Modal = ({
     // Base UI asks before it closes: Escape and a press outside the popup
     // (the blanket) arrive here with their reason, and `keyboard` and
     // `backdrop` decide whether the owner hears them. Staying open is the
-    // owner's state not changing, since `open` is controlled.
+    // owner's state not changing, since `open` is controlled. `static` keeps
+    // the blanket but refuses to close on a press there, for a dialog over an
+    // in-flight operation a stray click should not abandon.
     const blanketCloses = backdrop !== false && backdrop !== 'static';
     const handleOpenChange = (nextOpen, details) => {
         if (nextOpen || !onClose) return;
@@ -165,19 +167,20 @@ const Modal = ({
     };
 
     // An inline docs preview draws the same panel as a plain block; a real
-    // overlay draws it as Base UI's popup, which owns its role, aria-modal,
-    // name and description wiring, focus and dismissal.
+    // overlay draws it from Base UI's dialog parts, which own the role, the
+    // name and description wiring, focus and dismissal. Base UI leaves
+    // `aria-modal` to the caller, so it is set here.
     const isModal = renderAs === 'modal';
-    const Panel = isModal ? Dialog.Popup : 'div';
-    const Title = isModal ? Dialog.Title : 'h1';
-    const Description = isModal ? Dialog.Description : 'div';
-    const dialogProps = isModal
+    const parts = isModal
         ? {
-            'aria-modal': 'true',
-            'aria-label': !title ? ariaLabel : undefined,
-            finalFocus,
+            Panel: Dialog.Popup,
+            Title: Dialog.Title,
+            Description: Dialog.Description,
+            panelProps: { 'aria-modal': 'true', 'aria-label': !title ? ariaLabel : undefined, finalFocus },
+            titleProps: { render: <h1 /> },
         }
-        : {};
+        : { Panel: 'div', Title: 'h1', Description: 'div', panelProps: {}, titleProps: {} };
+    const { Panel, Title, Description } = parts;
 
     // A dialog is its own page: its title is the h1, so a section in it opens at
     // h2 whatever section the modal was raised from.
@@ -189,14 +192,14 @@ const Modal = ({
                 className={classes}
                 style={modalStyle}
                 data-testid={dataTestId}
-                {...dialogProps}
+                {...parts.panelProps}
             >
                 {!bodyOnly && (
                     <>
                         <div className="plus-modal-header">
                             {(title || description) && (
                                 <div className="plus-modal-heading">
-                                    {title && <Title className="plus-modal-title" id={titleId} {...(isModal ? { render: <h1 /> } : {})}>{title}</Title>}
+                                    {title && <Title className="plus-modal-title" id={titleId} {...parts.titleProps}>{title}</Title>}
                                     {description && (
                                         <Description className="plus-modal-description" id={descriptionId}>{description}</Description>
                                     )}
