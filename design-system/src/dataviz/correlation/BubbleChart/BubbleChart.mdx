@@ -1,89 +1,148 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BubbleChartStories from './BubbleChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={BubbleChartStories} />
 
 <Title />
+A scatter chart with a third measure as bubble size: position shows two values,
+area shows how much of the third.
 
-A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/correlation/BubbleChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A bubble chart extends the scatter plot by using **bubble size as a third dimension**, allowing visualization of relationships between three variables.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Two charts: a market comparison sized by headcount, and study hours against test score sized by assignments completed.</>}>
+    <Canvas of={BubbleChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **X-axis position**: First variable value
-- **Y-axis position**: Second variable value  
-- **Bubble size**: Third variable magnitude
-- Larger bubbles indicate higher values for the size variable
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Showing 3 variables at once</td><td>✅ Ideal</td></tr>
-    <tr><td>Market/portfolio analysis</td><td>✅ Ideal</td></tr>
-    <tr><td>Comparing groups with size metric</td><td>✅ Good</td></tr>
-    <tr><td>Only 2 variables</td><td>❌ Use Scatter Chart</td></tr>
-    <tr><td>Precise size comparisons</td><td>❌ Use Bar Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `BubbleChart` when three measures of the same records belong together:
+sessions per week against average rating, sized by student count per tutor;
+attendance against grade average, sized by class size. The third measure is
+read roughly, so use it for "bigger or smaller", not exact amounts.
 
-### PLUS Context
+For two measures with nothing to size by, use `ScatterChart`. For sizes alone
+with no axes, use `PackedBubbleChart`. When the size value needs exact
+comparison, give it its own `BarChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Variables (X, Y, Size)</th></tr></thead>
-  <tbody>
-    <tr><td>**Student Analysis**</td><td>Study hours, Test score, Assignments completed</td></tr>
-    <tr><td>**Class Performance**</td><td>Attendance %, Grade avg, Class size</td></tr>
-    <tr><td>**Tutor Workload**</td><td>Sessions/week, Avg rating, Student count</td></tr>
-    <tr><td>**Resource Allocation**</td><td>Cost, Impact, Usage volume</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Use clear axis labels with units
-✅ Provide a size legend
-✅ Use transparency for overlapping bubbles
-✅ Limit to 2-3 series for clarity
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Bubbles', <>One per <C>[x, y, z]</C> point. Area scales with <C>z</C>, between 10 and 60 pixels across, filled at 70% opacity so overlaps show through.</>],
+        ['X axis', <>The first measure, with vertical grid lines. <C>xAxisLabel</C> titles it.</>],
+        ['Y axis', <>The second measure. <C>yAxisLabel</C> titles it.</>],
+        ['Legend', 'Names each series.'],
+        ['Tooltip', <>The series name, then each value under its axis label: <C>xAxisLabel</C>, <C>yAxisLabel</C> and <C>zAxisLabel</C>.</>],
+        ['Zoom', 'Drag across the plot to zoom both axes.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Too many bubbles (becomes cluttered)
-❌ Very small size differences (hard to perceive)
-❌ Missing size legend
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={BubbleChartStories.Interactive} />
+`data` is an array of series, each `{ name, data }`, where `data` holds
+`[x, y, z]` triples. The labels default to "X Axis", "Y Axis" and "Size", so
+always set all three. `height` defaults to 400.
 
+```jsx
+<BubbleChart
+    xAxisLabel="Sessions per week"
+    yAxisLabel="Average rating"
+    zAxisLabel="Students"
+    data={[
+        { name: 'Math tutors', data: [[6, 4.6, 12], [9, 4.2, 18], [4, 4.8, 7]] },
+        { name: 'Reading tutors', data: [[5, 4.5, 9], [8, 4.7, 15], [3, 4.1, 5]] },
+    ]}
+/>
+```
+
+A series may carry its own `color`; leave it out and the chart assigns one.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Keep to two or three series; bubbles crowd faster than dots.
+- **Position and size carry the values.** Color only tells series apart. Area is the weakest of the three encodings: readers can rank bubbles but cannot judge their ratio.
+- **No size legend.** The chart does not draw a key for bubble size, so say what size means in the header or description; the tooltip gives the exact value under `zAxisLabel`.
+- **Overlap.** The 70% fill keeps a bubble behind another visible, but many large bubbles still hide each other. Drag-to-zoom helps a reader pull a cluster apart.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`BubbleChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Tutor stats could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No tutor stats yet" description="Stats appear after a tutor's first week of sessions." />
+    : <BubbleChart data={data} xAxisLabel="Sessions per week" yAxisLabel="Average rating" zAxisLabel="Students" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BubbleChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For two variables with no third to size by, use `ScatterChart`.
-- For grouping by size alone with no axes, use `PackedBubbleChart`.
+- For two measures with no third to size by, use `ScatterChart`.
+- For sizes grouped into clusters with no axes, use `PackedBubbleChart`.
 - For density rather than individual points, use `HeatmapChart`.
+- For a weight shown as column width instead of bubble area, use `VariwidthChart`.
 
 </div>
 
 </div>
+
+

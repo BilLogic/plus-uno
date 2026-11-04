@@ -1,76 +1,135 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as VariwidthChartStories from './VariwidthChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={VariwidthChartStories} />
 
 <Title />
+A column chart where height is one value and width is a second, such as how
+many students a score covers. Wide columns carry more weight.
 
-A column chart where **column width varies** based on a second value.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/distribution/VariwidthChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A column chart where **column width varies** based on a second value.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Average score per subject as height, enrollment as width.</>}>
+    <Canvas of={VariwidthChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Height (Y)** = Primary value (e.g., Score)
-- **Width (Z)** = Secondary value/Weight (e.g., Number of students)
-- **Area** = Total impact (Score * Students)
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Weighted comparisons</td><td>✅ Ideal</td></tr>
-    <tr><td>Market share x Growth</td><td>✅ Ideal</td></tr>
-    <tr><td>Cost x Volume</td><td>✅ Ideal</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `VariwidthChart` when a per-category value needs its weight beside it:
+average score per subject sized by enrollment, average rating per tutor sized
+by number of reviews. It keeps a high score from a small group from looking as
+important as one from a large group.
 
-### PLUS Context
+For equal-width columns where only height matters, use `BarChart`. For parts
+of a total sized by area, use `TreemapChart`. For three measures on two real
+axes, use `BubbleChart`. For the spread within each category, use
+`BoxPlotChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Subject Performance**</td><td>Avg Score (Height) x Enrollment Count (Width)</td></tr>
-    <tr><td>**Tutor Ratings**</td><td>Rating (Height) x Number of Reviews (Width)</td></tr>
-    <tr><td>**Feature Usage**</td><td>User Count (Height) x Time Spent (Width)</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the variwidth chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Columns', <>One per item. Height is <C>y</C>, width is <C>z</C>, and each takes its own color unless the item sets <C>color</C>.</>],
+        ['Value labels', <>The <C>y</C> value, rounded to a whole number, on every column.</>],
+        ['Category axis', <>Names each column from the item's <C>name</C>. <C>xAxisLabel</C> titles it; it defaults to "Category".</>],
+        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to "Value".</>],
+        ['Tooltip', <>Labeled "Value" and "Weight", for <C>y</C> and <C>z</C>. The words are fixed, so the axis labels and the header must say what each means.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+There is no legend; the category axis names every column.
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={VariwidthChartStories.Interactive} />
+## Data shape
 
+`data` is an array of `{ name, y, z, color }`. `name`, `y` and `z` are
+required; `color` is optional. `height` defaults to 400.
+
+```jsx
+<VariwidthChart
+    xAxisLabel="Subject"
+    yAxisLabel="Average score"
+    data={[
+        { name: 'Math', y: 85, z: 120 },
+        { name: 'Science', y: 78, z: 90 },
+        { name: 'Reading', y: 92, z: 30 },
+        { name: 'History', y: 70, z: 80 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Each column takes a color.** Columns run through the categorical order, slot 1 first. The axis already names each column, so these colors identify nothing; past six columns they move into the overflow slots, and past eight they repeat. To keep one hue, give every item the same `color`, such as `var(--ds-chart-brand)`.
+- **Height and width carry the values.** Neither depends on hue. Height reads well; width reads only roughly, and there is no width axis, so say what width means in the header or description.
+- **Area is not a total.** A wide, short column and a narrow, tall one can cover the same area. Readers will compare area anyway, so use this chart only when height times width means something.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`VariwidthChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a session is logged." />
+    : <VariwidthChart data={data} xAxisLabel="Subject" yAxisLabel="Average score" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={VariwidthChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -78,8 +137,11 @@ A column chart where **column width varies** based on a second value.
 
 - For equal-width bars where only height carries meaning, use `BarChart`.
 - For parts of a total sized by area, use `TreemapChart`.
+- For a third measure as bubble size on two real axes, use `BubbleChart`.
 - For the spread within each category, use `BoxPlotChart`.
 
 </div>
 
 </div>
+
+
