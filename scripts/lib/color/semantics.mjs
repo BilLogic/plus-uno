@@ -330,14 +330,14 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   const CH_WHY =
     'PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors ' +
     'alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under ' +
-    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and ' +
-    'dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the ' +
-    'brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a ' +
-    'move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) ' +
-    'in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) ' +
-    'steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No ' +
-    'yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 ' +
-    'are reprises of 2 (orange) and 3 (blue) for overflow past the limit of six.';
+    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans (the ' +
+    'mapping is by family/step, not hex, so it is plan-independent), light and dark. Dark mostly steps one ' +
+    'lighter than light: lagoon (1) 600 to 500, orange (2) 800 to 700, magenta (4) 800 to 700, lime (5) 500 to ' +
+    '400, blue (8) 800 to 700. Three slots hold their light step instead: blue (3) and orange (7) stay at 500 ' +
+    '(no softer step without losing their place in the alternation), and purple (6) stays at 700 because ' +
+    'stepping down to 600 crowded both of its dark-mode neighbors. No yellow, which reads as warning, no red, ' +
+    'which reads as danger, and no teal, which reads as the brand. 7 and 8 are reprises of 2 (orange) and 3 ' +
+    '(blue) for overflow past the limit of six.';
   const CAT = { 1: ['lagoon', 600, 500], 2: ['orange', 800, 700], 3: ['blue', 500, 500], 4: ['magenta', 800, 700],
     5: ['lime', 500, 400], 6: ['purple', 700, 700], 7: ['orange', 500, 500], 8: ['blue', 800, 700] };
   const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];

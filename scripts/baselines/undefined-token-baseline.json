@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 60,
-    "uses": 210,
+    "names": 54,
+    "uses": 200,
     "bare": 5
   },
   "tokens": {
@@ -56,36 +56,12 @@
       "uses": 1,
       "bare": 0
     },
-    "--font-line-height-title": {
-      "uses": 5,
-      "bare": 0
-    },
     "--font-size-fa-b3-solid": {
       "uses": 2,
       "bare": 0
     },
     "--font-size-fa-huge-solid": {
       "uses": 8,
-      "bare": 0
-    },
-    "--font-size-title-l": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--font-size-title-m1": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--font-size-title-m2": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--font-size-title-m4": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--font-size-title-s": {
-      "uses": 1,
       "bare": 0
     },
     "--font-weight-light": {
