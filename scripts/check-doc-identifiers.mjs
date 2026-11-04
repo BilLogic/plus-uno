@@ -141,7 +141,16 @@ function collectComponents(repoRoot = REPO_ROOT) {
       for (const p of parsePropTypes(source, symbol)) props.set(p.name, p.enumValues);
       for (const p of parseSignatureProps(source, symbol)) if (!props.has(p)) props.set(p, null);
       const entry = { name: symbol, file, symbol, props, subComponents: parseSubComponents(source, symbol) };
-      if (!index.has(symbol) || index.get(symbol).props.size < props.size) index.set(symbol, entry);
+      // A Specs page can carry a same-named stand-in for a library component (`StackedBarChart`), with a
+      // different prop list. The library's own source is what a docs page describes, so Specs never displaces it.
+      const existing = index.get(symbol);
+      const inSpecs = file.includes('/specs/');
+      const existingInSpecs = existing?.file.includes('/specs/');
+      const wins =
+        !existing ||
+        (existingInSpecs && !inSpecs) ||
+        (existingInSpecs === inSpecs && existing.props.size < props.size);
+      if (wins) index.set(symbol, entry);
       // `<Name>` when the file exports the implementation under the filename
       if (symbol !== fileName && /^[A-Z]/.test(fileName) && implSymbol(source, fileName) === symbol) {
         if (!index.has(fileName)) index.set(fileName, { ...entry, name: fileName });
