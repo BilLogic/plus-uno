@@ -168,7 +168,7 @@ const Modal = ({
     // overlay draws it as Base UI's popup, which owns its role, aria-modal,
     // name and description wiring, focus and dismissal.
     const isModal = renderAs === 'modal';
-    const Surface = isModal ? Dialog.Popup : 'div';
+    const Panel = isModal ? Dialog.Popup : 'div';
     const Title = isModal ? Dialog.Title : 'h1';
     const Description = isModal ? Dialog.Description : 'div';
     const dialogProps = isModal
@@ -183,7 +183,7 @@ const Modal = ({
     // h2 whatever section the modal was raised from.
     const panel = (
         <HeadingLevelContext.Provider value={1}>
-            <Surface
+            <Panel
                 id={id}
                 ref={panelRef}
                 className={classes}
@@ -285,7 +285,7 @@ const Modal = ({
                         </div>
                     </>
                 )}
-            </Surface>
+            </Panel>
         </HeadingLevelContext.Provider>
     );
 
