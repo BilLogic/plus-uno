@@ -167,6 +167,15 @@ const preview = {
       source: {
         type: 'code',
       },
+      /**
+       * Canvases show their code behind a "Show code" button rather than open or
+       * absent: the code is one click away for a developer and out of a
+       * designer's way. A page overrides it by naming `sourceState` on its own
+       * Canvas (`none` where code would only distract).
+       */
+      canvas: {
+        sourceState: 'hidden',
+      },
     },
 
     options: {

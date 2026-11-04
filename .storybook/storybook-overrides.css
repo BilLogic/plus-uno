@@ -1211,3 +1211,44 @@ html[data-color-mode="dark"] .docs-story {
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
 }
+
+/*
+ * Generated blocks on component pages (DocsProperties, DocsSource, DocsStories),
+ * drawn to match the hand-built tables beside them: same frame, same lines,
+ * same header weight, on tokens.
+ */
+.sbdocs .sb-ds-docs-props .docblock-argstable,
+.sbdocs .sb-ds-docs-source pre {
+    margin: 0 !important;
+    border-radius: var(--card-radius-sm);
+    border: 1px solid var(--ds-border);
+    box-shadow: none;
+}
+
+.sbdocs .sb-ds-docs-props .docblock-argstable-head th {
+    font-weight: var(--type-weight-semibold) !important;
+    color: var(--ds-text);
+    background: color-mix(in srgb, var(--ds-surface-sunken) 40%, transparent);
+}
+
+.sbdocs .sb-ds-docs-props .docblock-argstable td,
+.sbdocs .sb-ds-docs-props .docblock-argstable th {
+    border-color: var(--ds-border);
+    color: var(--ds-text);
+}
+
+.sbdocs .sb-ds-docs-props .docblock-argstable code {
+    color: var(--ds-text);
+}
+
+.sbdocs .sb-ds-docs-props .docblock-argstable {
+    background: var(--ds-surface);
+}
+
+.sbdocs .sb-ds-docs-source pre {
+    background: var(--ds-surface-container);
+}
+
+.sbdocs .sb-ds-docs-stories .docs-story {
+    margin-block: var(--stack-lg);
+}

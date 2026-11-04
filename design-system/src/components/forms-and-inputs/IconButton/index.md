@@ -17,14 +17,14 @@ Icon button: a button that is an icon and nothing else. `label` is required beca
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `icon` | string or node | — | Font Awesome Free glyph name |
-| `label` | string (required) | — | Accessible name and tooltip |
-| `appearance` | enum | `'default'` | — |
-| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
-| `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
-| `isSelected` | bool | — | — |
-| `isDisabled` | bool | — | — |
-| `isLoading` | bool | — | — |
+| `icon` | string or node | — | A Font Awesome Free glyph name, or a node. |
+| `label` | string (required) | — | The accessible name and the tooltip. Sentence case; name the object acted on. |
+| `appearance` | enum | `'default'` | The visual style. |
+| `spacing` | enum | `'default'` | Height, width and radius: `default` is 32, `compact` is 24. Compact is for tables and tight toolbars. |
+| `shape` | enum | `'default'` | Square or round. Round is for top navigation. |
+| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. |
+| `isDisabled` | bool | — | Prevents interaction. Avoid it; see Accessibility. |
+| `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | — |
 | `className` | string | — | — |
 | `title` | string | — | — |

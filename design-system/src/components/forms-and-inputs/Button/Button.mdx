@@ -6,6 +6,7 @@ import { Button } from '@/components';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
+    DocsProperties,
     DocsTable,
     DoDontPair,
     ResourcesBlock,
@@ -126,21 +127,7 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 
 ## Properties
 
-<DocsTable>
-<thead>
-<tr><th>Property</th><th>Values</th><th>Default</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td><code>text</code></td><td>string</td><td>none</td><td>The label. Children work too.</td></tr>
-<tr><td><code>appearance</code></td><td><code>default</code>, <code>primary</code>, <code>subtle</code>, <code>warning</code>, <code>danger</code>, <code>discovery</code></td><td><code>default</code></td><td>The visual style.</td></tr>
-<tr><td><code>spacing</code></td><td><code>default</code> (32), <code>compact</code> (24)</td><td><code>default</code></td><td>Height and padding. Compact is for tables and tight toolbars.</td></tr>
-<tr><td><code>iconBefore</code>, <code>iconAfter</code></td><td>a Font Awesome Free glyph name, or a node</td><td>none</td><td>An icon before or after the label.</td></tr>
-<tr><td><code>isSelected</code></td><td>boolean</td><td><code>false</code></td><td>Marks the button selected and sets <code>aria-pressed</code>.</td></tr>
-<tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Prevents interaction. Avoid it; see Usage.</td></tr>
-<tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>Shows a spinner in place of the label and blocks interaction.</td></tr>
-<tr><td><code>shouldFitContainer</code></td><td>boolean</td><td><code>false</code></td><td>Stretches the button to the width of its container.</td></tr>
-</tbody>
-</DocsTable>
+<DocsProperties of={ButtonStories} />
 
 </div>
 

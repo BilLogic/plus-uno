@@ -6,6 +6,7 @@ import { IconButton, Button } from '@/components';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
+    DocsProperties,
     DocsTable,
     DoDontPair,
     ResourcesBlock,
@@ -102,21 +103,7 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 ## Properties
 
-<DocsTable>
-<thead>
-<tr><th>Property</th><th>Values</th><th>Default</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td><code>icon</code></td><td>a Font Awesome Free glyph name, or a node</td><td>required</td><td>The glyph.</td></tr>
-<tr><td><code>label</code></td><td>string</td><td>required</td><td>The accessible name and the tooltip. Sentence case; name the object acted on.</td></tr>
-<tr><td><code>appearance</code></td><td><code>default</code>, <code>subtle</code>, <code>primary</code>, <code>discovery</code></td><td><code>default</code></td><td>The visual style.</td></tr>
-<tr><td><code>spacing</code></td><td><code>default</code> (32), <code>compact</code> (24)</td><td><code>default</code></td><td>Height, width and radius. Compact is for tables and tight toolbars.</td></tr>
-<tr><td><code>shape</code></td><td><code>default</code>, <code>circle</code></td><td><code>default</code></td><td>Square or round. Round is for top navigation.</td></tr>
-<tr><td><code>isSelected</code></td><td>boolean</td><td><code>false</code></td><td>Marks the button selected and sets <code>aria-pressed</code>.</td></tr>
-<tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Prevents interaction. Avoid it; see Accessibility.</td></tr>
-<tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>Shows a spinner in place of the icon and blocks interaction.</td></tr>
-</tbody>
-</DocsTable>
+<DocsProperties of={IconButtonStories} />
 
 </div>
 

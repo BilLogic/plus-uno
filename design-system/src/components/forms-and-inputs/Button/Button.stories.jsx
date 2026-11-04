@@ -77,21 +77,21 @@ export default {
         // CONTENT
         text: {
             control: 'text',
-            description: 'Button label text',
+            description: 'The label. Children work too.',
             table: { category: 'Content' }
         },
         iconBefore: {
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,
-            description: 'Font Awesome glyph before the label',
+            description: 'A Font Awesome Free glyph name, or a node, before the label.',
             table: { category: 'Content' }
         },
         iconAfter: {
             control: 'select',
             options: Object.keys(icons),
             mapping: icons,
-            description: 'Font Awesome glyph after the label',
+            description: 'A Font Awesome Free glyph name, or a node, after the label.',
             table: { category: 'Content' }
         },
 
@@ -99,32 +99,35 @@ export default {
         appearance: {
             control: 'select',
             options: BUTTON_APPEARANCES,
+            description: 'The visual style.',
             table: { category: 'Design' }
         },
         spacing: {
             control: 'inline-radio',
             options: ['default', 'compact'],
-            description: '`default` draws 32. `compact` draws 24, for tables and tight toolbars.',
+            description: 'Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars.',
             table: { category: 'Design' }
         },
         shouldFitContainer: {
             control: 'boolean',
-            description: 'Stretch to the width of the container',
+            description: 'Stretches the button to the width of its container.',
             table: { category: 'Design' }
         },
 
         // BEHAVIOR
         isDisabled: {
             control: 'boolean',
+            description: 'Prevents interaction. Avoid it; see Usage.',
             table: { category: 'Behavior' }
         },
         isSelected: {
             control: 'boolean',
+            description: 'Marks the button selected and sets `aria-pressed`.',
             table: { category: 'Behavior' }
         },
         isLoading: {
             control: 'boolean',
-            description: 'Show a spinner in place of the label and block interaction',
+            description: 'Shows a spinner in place of the label and blocks interaction.',
             table: { category: 'Behavior' }
         },
         href: {
