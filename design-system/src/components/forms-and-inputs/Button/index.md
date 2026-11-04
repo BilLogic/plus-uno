@@ -3,7 +3,7 @@
 
 # Button
 
-(https://atlassian.design/components/button).
+Button: triggers an action.
 
 **Import:** `import { Button } from '@/components';`
 

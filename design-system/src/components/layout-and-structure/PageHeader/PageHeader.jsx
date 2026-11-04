@@ -6,8 +6,7 @@ import './PageHeader.scss';
 
 /**
  * PageHeader: a page's title row, with an optional breadcrumb trail above it,
- * actions to its side, and a bottom bar below. Props follow Atlassian's Page
- * header (https://atlassian.design/components/page-header).
+ * actions to its side, and a bottom bar below.
  */
 export const PageHeader = ({
     title,

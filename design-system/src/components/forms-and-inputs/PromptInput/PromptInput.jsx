@@ -24,8 +24,7 @@ import './PromptInput.scss';
  *   button. **attachments** renders a row of staged files above the text.
  *   **actions** is a slot for extra controls beside the send button.
  *
- * Adapts no single Atlassian component — none of them spec a prompt input —
- * so this is PLUS's own composition of `FieldBox`, `Button` and `GenerativeBorder`.
+ * A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.
  */
 const PromptInput = ({
     id,

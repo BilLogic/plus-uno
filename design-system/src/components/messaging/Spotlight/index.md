@@ -3,7 +3,7 @@
 
 # Spotlight
 
-drawn on `Popover.Positioner` from `@base-ui/react`. Props follow Atlassian's Spotlight (https://atlassian.design/components/spotlight).
+drawn on `Popover.Positioner` from `@base-ui/react`.
 
 **Import:** `import { Spotlight } from '@/components';`
 

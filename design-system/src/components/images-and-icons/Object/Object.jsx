@@ -17,8 +17,7 @@ const objectPropTypes = {
 /**
  * Builds one typed object-kind component — `TaskIcon`, `BugIcon`, … — each a
  * fixed Font Awesome glyph at the Object sizes, named for the kind it draws
- * rather than taking a glyph name, the shape Atlassian's Object icons use
- * (https://atlassian.design/components/object).
+ * rather than taking a glyph name.
  */
 export function createObjectIcon(faClass, defaultLabel) {
     const ObjectIcon = ({ size = 'medium', label = defaultLabel, testId, className, ...props }) => (

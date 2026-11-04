@@ -30,7 +30,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isRemovable`, `isSelected`, `isDisabled`, `onAfterRemoveAction`, `removeButtonLabel` and `trailingMetric`. A tag is a link with `href`, a toggle when `isSelected` is true or false, and read-only otherwise.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Props: `isRemovable`, `isSelected`, `isDisabled`, `onAfterRemoveAction`, `removeButtonLabel` and `trailingMetric`. A tag is a link with `href`, a toggle when `isSelected` is true or false, and read-only otherwise.' },
         ],
         docs: {
             description: {

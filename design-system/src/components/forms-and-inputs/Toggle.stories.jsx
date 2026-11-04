@@ -12,7 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Toggle replaces the old switch. Props follow Atlassian: `isChecked`, `isDisabled`. `size` is the track height in pixels, 16 or 20. The track takes the neutral bold fill off and the Lagoon fill on, with named hovered steps and the 2px focus ring in `border.focused`.' },
+            { date: '2026-11-03', kind: 'changed', summary: 'Toggle replaces the old switch. Props: `isChecked`, `isDisabled`. `size` is the track height in pixels, 16 or 20. The track takes the neutral bold fill off and the Lagoon fill on, with named hovered steps and the 2px focus ring in `border.focused`.' },
         ],
         docs: {
             description: {

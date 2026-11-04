@@ -16,7 +16,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A text area lets users enter long form text which spans over multiple lines. It is 80 high at least, and `rows` grows it from there. Adapted from Atlassian Design System Text area.',
+                    'A text area lets users enter long form text which spans over multiple lines. It is 80 high at least, and `rows` grows it from there.',
             },
         },
     },
