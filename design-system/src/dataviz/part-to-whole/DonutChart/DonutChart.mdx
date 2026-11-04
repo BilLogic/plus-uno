@@ -113,7 +113,7 @@ import { BRAND, CHROME } from '@/dataviz/palette';
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={228} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Progress could not load.</SectionMessage>
-    : segments.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Progress appears after a session is logged." />
+    : segments.length === 0 ? <EmptyState spacing="compact" header="No sessions yet" description="Progress appears after a session is logged." />
     : <DonutChart value={value} label={label} segments={segments} />}
 ```
 

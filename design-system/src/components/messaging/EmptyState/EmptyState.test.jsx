@@ -38,11 +38,11 @@ describe('EmptyState', () => {
         expect(container.querySelector('.plus-empty-state__image img')).not.toBeNull();
     });
 
-    it('carries the size class and falls back to page', () => {
-        const { container, rerender } = render(<EmptyState header="A" size="compact" />);
+    it('carries the spacing class and falls back to default', () => {
+        const { container, rerender } = render(<EmptyState header="A" spacing="compact" />);
         expect(container.firstChild).toHaveClass('plus-empty-state--compact');
-        rerender(<EmptyState header="A" size="huge" />);
-        expect(container.firstChild).toHaveClass('plus-empty-state--page');
+        rerender(<EmptyState header="A" spacing="huge" />);
+        expect(container.firstChild).toHaveClass('plus-empty-state--default');
     });
 
     it('renders no action row when there are no actions', () => {
@@ -55,7 +55,7 @@ describe('EmptyState', () => {
             <Table
                 headers={['Student']}
                 rows={[]}
-                emptyState={<EmptyState size="compact" header="No students yet" />}
+                emptyState={<EmptyState spacing="compact" header="No students yet" />}
             />,
         );
         expect(screen.getByRole('heading', { name: 'No students yet' })).toBeInTheDocument();

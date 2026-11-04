@@ -3,7 +3,7 @@
 
 # EmptyState
 
-What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **size** `page` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
+What a view shows when it has nothing to show yet: a picture, a short header, one line saying what goes here, and the action that fills it. It invites; it does not apologize. - **image** is a slot for an Illustration or any picture. Without it, `icon` (a Font Awesome Free solid name) stands in. Both are decorative. - **header** is a heading one level below the section that holds the EmptyState, so it joins the page's outline. - **primaryAction** is one filled Button; **secondaryAction** an optional outlined one after it. - **spacing** `default` centers in a view on Heading/medium 20; `compact` fits a table body or a card on Heading/small 16 with a smaller picture. Pass it to a Table's `emptyState` slot.
 
 **Import:** `import { EmptyState } from '@/components';`
 
@@ -23,12 +23,12 @@ What a view shows when it has nothing to show yet: a picture, a short header, on
 | `icon` | string | — | A Font Awesome Free solid name, such as "user-group", shown when there is no `image`. |
 | `primaryAction` | node | — | The one action that fills the view: a filled Button. |
 | `secondaryAction` | node | — | An optional second action: an outlined Button. |
-| `size` | enum | `'page'` | `page` for a view or panel; `compact` for a table body or a card. |
+| `spacing` | enum | `'default'` | `default` for a view or panel; `compact` for a table body or a card. |
 | `className` | string | `''` | — |
 
 ## Variants
 
-**`size`** — `page` · `compact`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 

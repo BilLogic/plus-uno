@@ -108,7 +108,7 @@ value, shown in the tooltip.
 ```jsx
 {isLoading ? <Skeleton shape="rect" width={120} height={32} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="A trend appears after a few sessions." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No scores yet" description="A trend appears after a few sessions." />
     : <Sparkline label="Average score, last 7 weeks" data={data} />}
 ```
 

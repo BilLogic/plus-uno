@@ -111,7 +111,7 @@ const monday = Date.UTC(2026, 8, 7);
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>The schedule could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No sessions scheduled" description="Sessions appear here once tutors are booked." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No sessions scheduled" description="Sessions appear here once tutors are booked." />
     : <XRangeChart categories={categories} data={data} />}
 ```
 

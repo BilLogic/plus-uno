@@ -110,7 +110,7 @@ A series may carry its own `color`; leave it out and the chart assigns one.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={400} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Tutor stats could not load.</SectionMessage>
-    : data.length === 0 ? <EmptyState size="compact" header="No tutor stats yet" description="Stats appear after a tutor's first week of sessions." />
+    : data.length === 0 ? <EmptyState spacing="compact" header="No tutor stats yet" description="Stats appear after a tutor's first week of sessions." />
     : <BubbleChart data={data} xAxisLabel="Sessions per week" yAxisLabel="Average rating" zAxisLabel="Students" />}
 ```
 

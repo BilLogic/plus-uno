@@ -102,7 +102,7 @@ The value shows as given, with no unit added. Put the unit in `label`.
 ```jsx
 {isLoading ? <Skeleton shape="rect" height={300} />
     : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Attendance could not load.</SectionMessage>
-    : value == null ? <EmptyState size="compact" header="No sessions yet" description="Attendance appears after a session is logged." />
+    : value == null ? <EmptyState spacing="compact" header="No sessions yet" description="Attendance appears after a session is logged." />
     : <GaugeChart value={value} label="Sessions attended (%)" />}
 ```
 
