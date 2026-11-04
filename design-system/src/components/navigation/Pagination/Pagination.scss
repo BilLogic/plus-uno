@@ -201,19 +201,20 @@
    STATES
    ============================================ */
 
-/* Hover state */
-.plus-pagination .page-item:not(.disabled):not(.active) .page-link:hover {
-    background-color: var(--ds-background-neutral-subtle-hovered);
-    /* rgba(68,92,106,0.08) */
-    color: var(--color-secondary-text) !important;
-    z-index: 2;
-}
-
-/* Pressed state */
-.plus-pagination .page-item:not(.disabled):not(.active) .page-link:active {
-    background-color: var(--ds-background-neutral-subtle-pressed);
-    color: var(--color-secondary-text) !important;
-    z-index: 2;
+/* Hover and pressed */
+.plus-pagination .page-item:not(.disabled):not(.active) .page-link {
+    @include plus-state((
+        hovered: (
+            background-color: var(--ds-background-neutral-subtle-hovered),
+            color: var(--color-secondary-text) !important,
+            z-index: 2,
+        ),
+        pressed: (
+            background-color: var(--ds-background-neutral-subtle-pressed),
+            color: var(--color-secondary-text) !important,
+            z-index: 2,
+        ),
+    ), $ring: false);
 }
 
 /*
@@ -226,7 +227,7 @@
 
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus-visible,
 .plus-pagination .page-item.active .page-link:focus-visible {
-    outline: var(--focus-ring-width) solid var(--color-focus-ring);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: calc(-1 * var(--focus-ring-width));
     color: var(--color-secondary-text) !important;
     z-index: 2;
@@ -283,45 +284,37 @@
     opacity: 1;
 }
 
-/* Preserve border radius in all states */
-.plus-pagination .page-item:first-child .page-link:hover,
-.plus-pagination .page-item:first-child .page-link:focus,
-.plus-pagination .page-item:first-child .page-link:active,
-.plus-pagination .page-item:first-child.active .page-link {
-    border-top-left-radius: var(--size-border-radius-radius-1000) !important;
-    border-bottom-left-radius: var(--size-border-radius-radius-1000) !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+/*
+ * Preserve border radius in all states: hovered and pressed through the state
+ * mixin, focus and the current page beside it, all from one map per end.
+ */
+@function pagination-end-radius($end, $radius) {
+    $near: if($end == first, left, right);
+    $far: if($end == first, right, left);
+    @return (
+        border-top-#{$near}-radius: $radius !important,
+        border-bottom-#{$near}-radius: $radius !important,
+        border-top-#{$far}-radius: 0 !important,
+        border-bottom-#{$far}-radius: 0 !important,
+    );
 }
 
-.plus-pagination .page-item:last-child .page-link:hover,
-.plus-pagination .page-item:last-child .page-link:focus,
-.plus-pagination .page-item:last-child .page-link:active,
-.plus-pagination .page-item:last-child.active .page-link {
-    border-top-right-radius: var(--size-border-radius-radius-1000) !important;
-    border-bottom-right-radius: var(--size-border-radius-radius-1000) !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-}
+@each $type, $radius in ('': var(--size-border-radius-radius-1000), '.plus-pagination-text': 100px) {
+    @each $end in (first, last) {
+        $radii: pagination-end-radius($end, $radius);
 
-.plus-pagination.plus-pagination-text .page-item:first-child .page-link:hover,
-.plus-pagination.plus-pagination-text .page-item:first-child .page-link:focus,
-.plus-pagination.plus-pagination-text .page-item:first-child .page-link:active,
-.plus-pagination.plus-pagination-text .page-item:first-child.active .page-link {
-    border-top-left-radius: 100px !important;
-    border-bottom-left-radius: 100px !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-}
+        .plus-pagination#{$type} .page-item:#{$end}-child .page-link {
+            @include plus-state((hovered: $radii, pressed: $radii), $ring: false);
 
-.plus-pagination.plus-pagination-text .page-item:last-child .page-link:hover,
-.plus-pagination.plus-pagination-text .page-item:last-child .page-link:focus,
-.plus-pagination.plus-pagination-text .page-item:last-child .page-link:active,
-.plus-pagination.plus-pagination-text .page-item:last-child.active .page-link {
-    border-top-right-radius: 100px !important;
-    border-bottom-right-radius: 100px !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
+            &:focus {
+                @include plus-state-apply($radii);
+            }
+        }
+
+        .plus-pagination#{$type} .page-item:#{$end}-child.active .page-link {
+            @include plus-state-apply($radii);
+        }
+    }
 }
 
 /* ============================================

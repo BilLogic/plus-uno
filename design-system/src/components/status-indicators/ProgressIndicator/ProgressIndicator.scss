@@ -4,6 +4,7 @@
  * not a word — `tokens-over-literals` covers spacing and color, not an
  * arbitrary per-instance diameter). `spacing` sets the gap between dots.
  */
+@use '../../../styles/state' as *;
 
 .plus-progress-indicator {
     display: inline-flex;
@@ -34,10 +35,10 @@
 
 button.plus-progress-indicator__dot {
     cursor: pointer;
-}
 
-button.plus-progress-indicator__dot:hover {
-    opacity: 0.7;
+    @include plus-state((
+        hovered: (opacity: 0.7),
+    ), $ring: false);
 }
 
 button.plus-progress-indicator__dot:focus-visible {

@@ -1,3 +1,5 @@
+@use '../../../styles/state' as *;
+
 /**
  * CloseButton — an Icon button, subtle, fixed to the × glyph. Its own tone
  * repaints what Icon button doesn't reach: `inverse`, for a colored or dark
@@ -13,13 +15,13 @@
         color: var(--ds-icon-inverse);
     }
 
-    &:hover {
-        background-color: var(--ds-interaction-inverse-hovered);
-    }
-
-    &:active {
-        background-color: var(--ds-interaction-inverse-pressed);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+            pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+        ),
+        $ring: false
+    );
 
     &:focus-visible {
         outline-color: var(--ds-border-focused-inverse);

@@ -64,22 +64,18 @@
     font: var(--body-small);
     border-radius: var(--radius-md);
 
-    &:hover:not(:disabled) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:active:not(:disabled) {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $hovered-selector: '&:hover:not(:disabled)',
+        $pressed-selector: '&:active:not(:disabled)'
+    );
 
     &:disabled {
         cursor: not-allowed;
         opacity: calc(1 - var(--color-disabled-opacity));
-    }
-
-    &:focus-visible {
-        outline: var(--focus-ring-width) solid var(--color-focus-ring);
-        outline-offset: var(--focus-ring-width);
     }
 }
 
@@ -102,22 +98,18 @@
 
         // The steps of a secondary ghost button, whose icons these are: the
         // transparent rest above would otherwise drop Button's own.
-        &:hover:not(:disabled):not(.active) {
-            background-color: var(--ds-background-neutral-subtle-hovered);
-        }
-
-        &:active:not(:disabled):not(.active) {
-            background-color: var(--ds-background-neutral-subtle-pressed);
-        }
+        @include plus-state(
+            $states: (
+                hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+                pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+            ),
+            $hovered-selector: '&:hover:not(:disabled):not(.active)',
+            $pressed-selector: '&:active:not(:disabled):not(.active)'
+        );
 
         &.active {
             background-color: var(--ds-background-selected);
             color: var(--color-primary-text);
-        }
-
-        &:focus-visible {
-            outline: var(--focus-ring-width) solid var(--color-focus-ring);
-            outline-offset: var(--focus-ring-width);
         }
 
         &:disabled,

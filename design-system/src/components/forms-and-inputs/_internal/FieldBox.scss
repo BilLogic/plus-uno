@@ -174,7 +174,18 @@ textarea.plus-field__control {
 
 // ── States ──────────────────────────────────────────────────────────────────
 
-.plus-field:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--warning):not(.plus-field--valid),
+.plus-field {
+    @include plus-state(
+        $states: (
+            hovered: (border-color: var(--ds-border-focused)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field--disabled):not(.plus-field--readonly):not(.plus-field--invalid):not(.plus-field--warning):not(.plus-field--valid)'
+    );
+}
+
+// The forced hover (`state="hover"`), kept a single class so it does not outrank a
+// status border (`--invalid`, `--warning`, `--valid`) set beside it.
 .plus-field--hover {
     border-color: var(--ds-border-focused);
 }
@@ -229,15 +240,24 @@ textarea.plus-field__control {
         visibility: hidden;
     }
 
-    &:hover:not(.plus-field--disabled):not(.plus-field--readonly),
-    &.plus-field--hover {
-        border-color: transparent;
-        background-color: var(--ds-background-neutral-subtle-hovered);
+    @include plus-state(
+        $states: (
+            hovered: (
+                border-color: transparent,
+                background-color: var(--ds-background-neutral-subtle-hovered),
+            ),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field--disabled):not(.plus-field--readonly), &.plus-field--hover'
+    );
 
-        .plus-field__trailing {
-            visibility: visible;
-        }
-    }
+    @include plus-state(
+        $states: (
+            hovered: (visibility: visible),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field--disabled):not(.plus-field--readonly) .plus-field__trailing, &.plus-field--hover .plus-field__trailing'
+    );
 
     // Editing, a failed save and a confirmation look like the standard field.
     &:focus-within,

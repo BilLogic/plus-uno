@@ -1,3 +1,4 @@
+@use '../../../styles/state' as *;
 /* breadcrumb trail */
 .plus-breadcrumb {
     // Body/default, 14/20, in a 32 row (`--item-height-md`), like every other control.
@@ -34,10 +35,12 @@
             color: var(--color-primary-text); // Figma: #00547e
             text-decoration: none;
 
-            &:hover {
-                text-decoration: underline;
-                color: var(--color-primary-text);
-            }
+            @include plus-state((
+                hovered: (
+                    text-decoration: underline,
+                    color: var(--color-primary-text),
+                ),
+            ), $ring: false);
         }
 
         // Current page item

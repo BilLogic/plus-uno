@@ -5,6 +5,7 @@
  * A calendar is a fixed six-week grid, so its popup lifts the listbox's
  * height limits rather than scrolling.
  */
+@use '../../../styles/state' as *;
 
 .plus-date-popup.plus-listbox {
     min-height: 0;
@@ -49,9 +50,12 @@
     color: var(--ds-icon-subtle);
     cursor: pointer;
 
-    &:hover {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        ),
+        $ring: false
+    );
 }
 
 .plus-calendar-month {
@@ -88,9 +92,13 @@
     color: var(--ds-text);
     cursor: pointer;
 
-    &:hover:not(.plus-calendar-day--disabled):not(.plus-calendar-day--outside):not(.plus-calendar-day--selected) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-calendar-day--disabled):not(.plus-calendar-day--outside):not(.plus-calendar-day--selected)'
+    );
 
     // Subtle text, not subtlest: a day is text a tutor reads, so it holds
     // AA against the panel and still reads lighter than the month's own days.
@@ -128,6 +136,6 @@
     }
 
     .plus-calendar-day--in-range {
-        outline: 1px dashed Highlight;
+        @include plus-ring($ring-offset: 0, $ring-token: Highlight, $ring-width: 1px, $ring-style: dashed);
     }
 }

@@ -90,12 +90,12 @@ function expectNoFill(file, selector) {
 }
 
 const RING_OUTSIDE = {
-  outline: 'var(--focus-ring-width) solid var(--color-focus-ring)',
+  outline: 'var(--focus-ring-width) solid var(--ds-border-focused)',
   'outline-offset': 'var(--focus-ring-width)',
 };
 
 const RING_INSIDE = {
-  outline: 'var(--focus-ring-width) solid var(--color-focus-ring)',
+  outline: 'var(--focus-ring-width) solid var(--ds-border-focused)',
   'outline-offset': 'calc(-1 * var(--focus-ring-width))',
 };
 

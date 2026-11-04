@@ -3,6 +3,7 @@
  * drawn as Pattern/Menu's row). An Item 32 that grows with a description
  * line, inset in its list, with every state's fill on the row's own radius.
  */
+@use '../../../styles/state' as *;
 
 .plus-option-row {
     /* Figma Tree/indent and Tree/toggle, which alias these spacing steps. */
@@ -29,14 +30,15 @@
     transition: background-color 0.15s ease;
 
     /* Hover is the keyboard-highlighted row; Figma draws them as one state. */
-    &:hover:not(.is-disabled),
-    &.is-highlighted:not(.is-disabled) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:active:not(.is-disabled) {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.is-disabled), &.is-highlighted:not(.is-disabled)',
+        $pressed-selector: '&:active:not(.is-disabled)'
+    );
 
     /* Selection is neutral ink; the check in Trailing is its non-color cue. */
     &.is-selected {
@@ -47,10 +49,13 @@
             color: var(--ds-text-selected);
         }
 
-        &:hover:not(.is-disabled),
-        &.is-highlighted:not(.is-disabled) {
-            background-color: var(--ds-background-selected-hovered);
-        }
+        @include plus-state(
+            $states: (
+                hovered: (background-color: var(--ds-background-selected-hovered)),
+            ),
+            $ring: false,
+            $hovered-selector: '&:hover:not(.is-disabled), &.is-highlighted:not(.is-disabled)'
+        );
     }
 
     &:focus-visible {
@@ -113,10 +118,13 @@
     font: var(--heading-xxsmall);
     cursor: default;
 
-    &:hover,
-    &:active {
-        background-color: transparent;
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: transparent),
+            pressed: (background-color: transparent),
+        ),
+        $ring: false
+    );
 }
 
 .plus-option-row--create .plus-option-row-leading {
@@ -244,8 +252,7 @@
 @media (forced-colors: active) {
     .plus-option-row.is-highlighted,
     .plus-option-row:focus-visible {
-        outline: var(--focus-ring-width) solid Highlight;
-        outline-offset: calc(-1 * var(--focus-ring-width));
+        @include plus-ring($ring-offset: calc(-1 * var(--focus-ring-width)), $ring-token: Highlight, $ring-width: var(--focus-ring-width));
     }
 
     .plus-option-row.is-selected .plus-option-row-label {

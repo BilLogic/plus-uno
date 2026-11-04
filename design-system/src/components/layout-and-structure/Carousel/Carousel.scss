@@ -132,13 +132,10 @@
         }
 
         @include plus-state((
+            hovered: (opacity: 1, color: var(--ds-text)),
             disabled: (opacity: 0.38, cursor: not-allowed),
-        ), $ring-offset: 2px);
-
-        &:hover:not(:disabled) {
-            opacity: 1;
-            color: var(--ds-text);
-        }
+        ), $ring-offset: 2px,
+            $hovered-selector: '&:hover:not(:disabled)');
     }
 
     .plus-carousel-control-prev {

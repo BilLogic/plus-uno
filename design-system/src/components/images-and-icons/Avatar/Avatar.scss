@@ -5,6 +5,8 @@
  * no role names yet, so they sit here, built from the spacing primitives. A
  * circle rounds fully; a square takes a quarter of its size, like Tile.
  */
+@use '../../../styles/state' as *;
+
 $avatar-sizes: (
     16: (var(--size-media-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
     24: (var(--size-media-sm), var(--font-size-body3), var(--font-size-fa-body1)),
@@ -124,9 +126,12 @@ $avatar-colors: (
 button.plus-avatar--overflow {
     cursor: pointer;
 
-    &:hover {
-        background-color: var(--ds-background-accent-gray-subtle);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-accent-gray-subtle)),
+        ),
+        $ring: false
+    );
 
     &:focus-visible {
         outline: calc(var(--border-default) * 2) solid var(--ds-border-focused);

@@ -100,10 +100,9 @@
         &[data-panel-open] {
             background-color: var(--ds-background-selected);
 
-            &:hover,
-            &[data-hovered] {
-                background-color: var(--ds-background-selected-hovered);
-            }
+            @include plus-state((
+                hovered: (background-color: var(--ds-background-selected-hovered)),
+            ), $ring: false);
         }
     }
 

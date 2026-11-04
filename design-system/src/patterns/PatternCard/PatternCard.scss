@@ -7,6 +7,7 @@
  */
 
 @use '../../styles/card-title' as *;
+@use '../../styles/state' as *;
 
 .plus-pattern-card {
     // A surface tells what sits on it which surface it is: a sticky table
@@ -33,23 +34,39 @@
 
 // A clickable card lifts while hovered: the raised surface's hovered step
 // under the overlay shadow. Pressed settles back onto the raised shadow.
-.plus-pattern-card--clickable:hover {
-    --ds-utility-elevation-surface-current: var(--ds-surface-raised-hovered);
-    box-shadow: var(--ds-shadow-overlay);
-}
+@include plus-state(
+    (
+        hovered: (
+            --ds-utility-elevation-surface-current: var(--ds-surface-raised-hovered),
+            box-shadow: var(--ds-shadow-overlay),
+        ),
+        pressed: (
+            --ds-utility-elevation-surface-current: var(--ds-surface-raised-pressed),
+            box-shadow: var(--ds-shadow-raised),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-card--clickable:hover, .plus-pattern-card--clickable[data-hovered]',
+    $pressed-selector: '.plus-pattern-card--clickable:active, .plus-pattern-card--clickable[data-pressed]'
+);
 
-.plus-pattern-card--clickable:active {
-    --ds-utility-elevation-surface-current: var(--ds-surface-raised-pressed);
-    box-shadow: var(--ds-shadow-raised);
-}
+// A dragged card is over the UI: the overlay pair, held under hover and press.
+$-dragging: (
+    --ds-utility-elevation-surface-current: var(--ds-surface-overlay),
+    box-shadow: var(--ds-shadow-overlay),
+);
 
-// A dragged card is over the UI: the overlay pair.
-.plus-pattern-card--dragging,
-.plus-pattern-card--dragging:hover,
-.plus-pattern-card--dragging:active {
+.plus-pattern-card--dragging {
     --ds-utility-elevation-surface-current: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
+
+@include plus-state(
+    (hovered: $-dragging, pressed: $-dragging),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-card--dragging:hover, .plus-pattern-card--dragging[data-hovered]',
+    $pressed-selector: '.plus-pattern-card--dragging:active, .plus-pattern-card--dragging[data-pressed]'
+);
 
 .plus-pattern-card-pad-sm {
     border-radius: var(--card-radius-sm);

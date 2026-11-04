@@ -1,3 +1,5 @@
+@use '../../../styles/state' as *;
+
 /**
  * InlineEdit — a read view that is the same size as the field it opens into.
  *
@@ -42,14 +44,11 @@
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
 
-    &:hover {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:focus-visible {
-        outline: var(--focus-ring-width) solid var(--ds-border-focused);
-        outline-offset: var(--focus-ring-width);
-    }
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        )
+    );
 
     &--fill {
         display: flex;

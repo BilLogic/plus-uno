@@ -6,6 +6,8 @@
  * a 16 icon (Icon/md) and a Body/default label. Every length is a token.
  */
 
+@use '../../styles/state' as *;
+
 .plus-sidebar-tab {
     display: flex;
     align-items: center;
@@ -24,20 +26,22 @@
     transition: background-color 0.15s ease;
 
     // A link row keeps its own color on hover: without this, the link hover
-    // color (`a:hover`) wins over the row's rest color. The selected and
+    // color (Bootstrap's hovered link rule) wins over the row's rest color. The selected and
     // disabled rows restate theirs on hover for the same reason.
-    &:hover {
-        color: var(--ds-text-subtle);
-        text-decoration: none;
-    }
+    @include plus-state(
+        (hovered: (color: var(--ds-text-subtle), text-decoration: none)),
+        $ring: false
+    );
 
-    &:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
+    @include plus-state(
+        (
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)',
+        $pressed-selector: '&:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)'
+    );
 
     // The ring sits 2px inside the row's edge, so the sidebar's edge or a
     // scroller never clips it.
@@ -113,9 +117,7 @@
     background-color: var(--ds-background-selected);
     color: var(--ds-text-selected);
 
-    &:hover {
-        color: var(--ds-text-selected);
-    }
+    @include plus-state((hovered: (color: var(--ds-text-selected))), $ring: false);
 
     .plus-sidebar-tab__label {
         font-weight: var(--type-weight-medium);
@@ -126,14 +128,15 @@
     }
 }
 
-.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled),
-.plus-sidebar-tab-item:hover > .plus-sidebar-tab--selected:not(.plus-sidebar-tab--disabled) {
-    background-color: var(--ds-background-selected-hovered);
-}
-
-.plus-sidebar-tab--selected:active:not(.plus-sidebar-tab--disabled) {
-    background-color: var(--ds-background-selected-pressed);
-}
+@include plus-state(
+    (
+        hovered: (background-color: var(--ds-background-selected-hovered)),
+        pressed: (background-color: var(--ds-background-selected-pressed)),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-sidebar-tab--selected:hover:not(.plus-sidebar-tab--disabled), .plus-sidebar-tab-item:hover > .plus-sidebar-tab--selected:not(.plus-sidebar-tab--disabled)',
+    $pressed-selector: '.plus-sidebar-tab--selected:active:not(.plus-sidebar-tab--disabled)'
+);
 
 .plus-sidebar-tab--focus {
     outline: var(--focus-ring-width) solid var(--ds-border-focused);
@@ -146,9 +149,7 @@
     color: var(--ds-text-disabled);
     cursor: not-allowed;
 
-    &:hover {
-        color: var(--ds-text-disabled);
-    }
+    @include plus-state((hovered: (color: var(--ds-text-disabled))), $ring: false);
 
     .plus-sidebar-tab__icon {
         color: var(--ds-icon-disabled);
@@ -165,25 +166,31 @@
     display: flex;
     min-width: 0;
 
-    &:hover > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state(
+        (hovered: (background-color: var(--ds-background-neutral-subtle-hovered))),
+        $ring: false,
+        $hovered-selector: '&:hover > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)'
+    );
 
-    &:hover,
-    &:focus-within {
-        // Room for the actions, so the label truncates before it reaches them.
-        > .plus-sidebar-tab {
-            padding-right: calc(var(--pad-x-sm) + var(--item-height-sm));
-        }
+    // Hover or focus anywhere in the item reveals the actions. Room for them,
+    // so the label truncates before it reaches them.
+    @include plus-state(
+        (hovered: (padding-right: calc(var(--pad-x-sm) + var(--item-height-sm)))),
+        $ring: false,
+        $hovered-selector: '&:hover > .plus-sidebar-tab, &:focus-within > .plus-sidebar-tab'
+    );
 
-        .plus-sidebar-tab__after {
-            visibility: hidden;
-        }
+    @include plus-state(
+        (hovered: (visibility: hidden)),
+        $ring: false,
+        $hovered-selector: '&:hover .plus-sidebar-tab__after, &:focus-within .plus-sidebar-tab__after'
+    );
 
-        .plus-sidebar-tab__actions {
-            visibility: visible;
-        }
-    }
+    @include plus-state(
+        (hovered: (visibility: visible)),
+        $ring: false,
+        $hovered-selector: '&:hover .plus-sidebar-tab__actions, &:focus-within .plus-sidebar-tab__actions'
+    );
 }
 
 .plus-sidebar-tab__actions {

@@ -5,6 +5,8 @@
  * itself; the surrounding surface or card owns it.
  */
 
+@use '../../styles/state' as *;
+
 .plus-pattern-table {
     // How far past a sticky edge `clip-path` lets the overflow shadow reach.
     // It must cover `--ds-shadow-overflow`'s blur (12px in dark, the widest
@@ -70,13 +72,15 @@
         border-bottom-color: var(--ds-border-bold);
     }
 
-    tbody tr:hover {
-        --plus-pattern-table-row-state: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    tbody tr:active {
-        --plus-pattern-table-row-state: var(--ds-background-neutral-subtle-pressed);
-    }
+    @include plus-state(
+        (
+            hovered: (--plus-pattern-table-row-state: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (--plus-pattern-table-row-state: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: 'tbody tr:hover',
+        $pressed-selector: 'tbody tr:active'
+    );
 
     /*
      * A selected row is neutral ink across the whole row, held under hover and
@@ -88,13 +92,15 @@
         --plus-pattern-table-row-state: var(--ds-background-selected);
     }
 
-    tbody tr[aria-selected=true]:hover {
-        --plus-pattern-table-row-state: var(--ds-background-selected-hovered);
-    }
-
-    tbody tr[aria-selected=true]:active {
-        --plus-pattern-table-row-state: var(--ds-background-selected-pressed);
-    }
+    @include plus-state(
+        (
+            hovered: (--plus-pattern-table-row-state: var(--ds-background-selected-hovered)),
+            pressed: (--plus-pattern-table-row-state: var(--ds-background-selected-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: 'tbody tr[aria-selected=true]:hover',
+        $pressed-selector: 'tbody tr[aria-selected=true]:active'
+    );
 }
 
 /*
@@ -145,10 +151,16 @@
  * stack-md above and below, the cell's side pad, Element/stack-sm between
  * its lines.
  */
-.plus-pattern-table-table .plus-pattern-table-message-row,
-.plus-pattern-table-table .plus-pattern-table-message-row:hover,
-.plus-pattern-table-table .plus-pattern-table-message-row:active {
+.plus-pattern-table-table .plus-pattern-table-message-row {
     --plus-pattern-table-row-state: transparent;
+
+    @include plus-state(
+        (
+            hovered: (--plus-pattern-table-row-state: transparent),
+            pressed: (--plus-pattern-table-row-state: transparent),
+        ),
+        $ring: false
+    );
 }
 
 .plus-pattern-table-table .plus-pattern-table-message {
