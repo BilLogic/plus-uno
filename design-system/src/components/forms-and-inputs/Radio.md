@@ -3,7 +3,7 @@
 
 # Radio
 
-Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and the description caption. Base UI's Radio has no standalone `checked` prop — selection lives on a `RadioGroup` ancestor — so each Radio owns a private, single-item group of its own and stays independently controllable exactly like the native input it replaces. `RadioGroup` and `ChoiceGrid` compute `isChecked`/`onChange` per option themselves; this private group is invisible plumbing underneath. It keeps its own `role="radiogroup"` — axe rejects `aria-readonly`/`aria-required` on a role-less `div` — but drops the `aria-labelledby` it would otherwise inherit from an ambient Fieldset legend, so a nested private group never collides on name with the real one or with a sibling Radio's own private group.
+Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and the description caption. Base UI's Radio has no standalone `checked` prop — selection lives on a `RadioGroup` ancestor. `RadioGroup` renders one real, shared Base UI `RadioGroup` around all of its options and passes each one `grouped`, so the group gets Base UI's native roving-tabindex keyboard nav across options for free, same as `ChoiceGrid`'s radio-type rows. A `Radio` used on its own (no `grouped`, the default) — a lone question, a `ChoiceGrid` cell, or sibling Radios sharing a bare `name` the way the "Group" story composes them — owns a private, single-item group instead, so it stays independently controllable exactly like the native input it replaces. That private group keeps its own `role="radiogroup"` (axe rejects `aria-readonly`/ `aria-required` on a role-less `div`) but drops the `aria-labelledby` it would otherwise inherit from an ambient Fieldset legend it has no business naming itself after.
 
 **Import:** `import { Radio } from '@/components';`
 
@@ -29,6 +29,7 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Bui
 | `isRequired` | bool | `false` | Require an answer natively |
 | `description` | node | — | — |
 | `appearance` | enum | `'plain'` | — |
+| `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |

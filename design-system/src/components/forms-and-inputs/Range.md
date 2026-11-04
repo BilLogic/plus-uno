@@ -3,13 +3,13 @@
 
 # Range
 
-A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213).
+A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213). Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and Radio do — `Slider.Thumb`'s accessible name only ever comes from an explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label` registration — so the label here points at the thumb directly via `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every `Slider.Thumb` beneath it.
 
 **Import:** `import { Range } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber
+**Stories:** `design-system/src/components/forms-and-inputs/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber, Aria, Keyboard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range.mdx`
 
@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--plus-range-dot-size` · `--plus-range-track-height` · `--size-element-gap-xs` · `--size-element-radius-full` · `--value-percent`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--plus-range-dot-size` · `--plus-range-track-height` · `--radius-full` · `--space-025`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 

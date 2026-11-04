@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import { Slider as BaseSlider } from '@base-ui/react/slider';
 import useFieldId from './useFieldId';
+import FieldFrame, { FieldLabel } from './_internal/FieldFrame';
 import './Range.scss';
 
 /**
@@ -11,6 +12,14 @@ import './Range.scss';
  * what is being set. `label` is the only thing that names it, so it takes the
  * same pair as `Input` — `label` for the text, `showLabel={false}` to hide that
  * text without taking the name away (#213).
+ *
+ * Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled
+ * fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and
+ * Radio do — `Slider.Thumb`'s accessible name only ever comes from an
+ * explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label`
+ * registration — so the label here points at the thumb directly via
+ * `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every
+ * `Slider.Thumb` beneath it.
  */
 const Range = ({
     id,
@@ -30,42 +39,12 @@ const Range = ({
     style,
     ...props
 }) => {
-    const rangeRef = useRef(null);
-    /** One id for the label and the slider — see `useFieldId` (#206). */
     const fieldId = useFieldId(id);
-
-    // Logic to update --value-percent CSS variable for track filling
-    const updateValuePercent = () => {
-        if (rangeRef.current) {
-            let currentValue;
-            if (value !== undefined) {
-                // Controlled component
-                currentValue = value;
-            } else if (defaultValue !== undefined) {
-                // Uncontrolled component with default
-                currentValue = defaultValue;
-            } else {
-                // Uncontrolled component - read from DOM
-                currentValue = parseFloat(rangeRef.current.value) || min;
-            }
-            const val = parseFloat(currentValue);
-            const percent = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
-            rangeRef.current.style.setProperty('--value-percent', `${percent}%`);
-        }
-    };
-
-    useEffect(() => {
-        updateValuePercent();
-    }, [value, defaultValue, min, max]);
+    const labelId = label ? `${fieldId}-label` : undefined;
 
     /** Reports the new value as a number, then the event it came from. */
-    const handleChange = (e) => {
-        if (rangeRef.current) {
-            const val = parseFloat(e.target.value);
-            const percent = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
-            rangeRef.current.style.setProperty('--value-percent', `${percent}%`);
-        }
-        if (onChange) onChange(Number(e.target.value), e);
+    const handleValueChange = (next, eventDetails) => {
+        onChange?.(next, eventDetails.event);
     };
 
     const rangeClasses = [
@@ -75,29 +54,42 @@ const Range = ({
 
     return (
         <div className="plus-form-range-wrapper" data-size={size}>
-            {label && (
-                <Form.Label
-                    htmlFor={fieldId}
-                    className={`plus-form-range-label${showLabel ? '' : ' plus-form-range-label-hidden'}`}
-                >
-                    {label}
-                </Form.Label>
-            )}
-            <Form.Range
-                ref={rangeRef}
-                id={fieldId}
-                name={name}
-                min={min}
-                max={max}
-                step={step}
-                value={value}
-                defaultValue={defaultValue}
-                disabled={isDisabled}
-                onChange={handleChange}
-                className={rangeClasses}
-                style={style}
-                {...props}
-            />
+            <FieldFrame disabled={isDisabled}>
+                <div className="plus-form-range-row">
+                    {label && (
+                        <FieldLabel
+                            id={labelId}
+                            hidden={!showLabel}
+                            className="plus-form-range-label"
+                        >
+                            {label}
+                        </FieldLabel>
+                    )}
+                    <BaseSlider.Root
+                        id={fieldId}
+                        name={name}
+                        min={min}
+                        max={max}
+                        step={step}
+                        value={value}
+                        defaultValue={defaultValue}
+                        disabled={isDisabled}
+                        onValueChange={handleValueChange}
+                        aria-labelledby={labelId}
+                        aria-disabled={isDisabled || undefined}
+                        className={rangeClasses}
+                        style={style}
+                        {...props}
+                    >
+                        <BaseSlider.Control className="plus-form-range-control">
+                            <BaseSlider.Track className="plus-form-range-track">
+                                <BaseSlider.Indicator className="plus-form-range-indicator" />
+                                <BaseSlider.Thumb className="plus-form-range-thumb" />
+                            </BaseSlider.Track>
+                        </BaseSlider.Control>
+                    </BaseSlider.Root>
+                </div>
+            </FieldFrame>
         </div>
     );
 };
@@ -124,5 +116,3 @@ Range.propTypes = {
 };
 
 export default Range;
-
-
