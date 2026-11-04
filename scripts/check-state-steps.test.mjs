@@ -215,34 +215,27 @@ test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring o
   expectNoFill(MENU_GROUP, '.plus-menu-item:focus-visible');
 });
 
-/* ─── NavTabs ────────────────────────────────────────────────────────────── */
+/* ─── Tabs ───────────────────────────────────────────────────────────────── */
 
-const NAV = 'components/navigation/NavTabs/NavTabs.scss';
-const LINK = '.plus-nav-tabs .nav-link';
-const NOT = ':not(.disabled):not(:disabled):not(.active)';
+const TABS = 'components/navigation/Tabs/Tabs.scss';
+const DEFAULT_TAB = '.plus-tabs--default .plus-tab';
+const NOT_TAB = ':not([data-disabled]):not([data-active])';
 
-test('NavTabs: neutral subtle hovered and pressed on every tab, focus a ring with no fill', () => {
+test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with no fill', () => {
   const hovered = layer('--ds-background-neutral-subtle-hovered');
   const pressed = layer('--ds-background-neutral-subtle-pressed');
-  expectRule(NAV, `${LINK}:hover${NOT}`, { 'background-color': hovered });
-  expectRule(NAV, `${LINK}:active${NOT}`, { 'background-color': pressed });
-  expectNoFill(NAV, `${LINK}:focus-visible${NOT}`);
-  expectRule(NAV, `${LINK}:focus-visible${NOT}`, { outline: DS_RING });
+  expectRule(TABS, `${DEFAULT_TAB}:hover${NOT_TAB}`, { 'background-color': hovered });
+  expectRule(TABS, `${DEFAULT_TAB}:active${NOT_TAB}`, { 'background-color': pressed });
+  expectNoFill(TABS, '.plus-tab:focus-visible');
+  expectRule(TABS, '.plus-tab:focus-visible', { outline: DS_RING });
 
   // Selection rests on the bar and the ink, so a selected tab takes the same steps.
-  expectRule(NAV, `${LINK}.active:hover`, { 'background-color': hovered });
-  expectRule(NAV, `${LINK}.active:active`, { 'background-color': pressed });
-  expectNoFill(NAV, `${LINK}.active:focus-visible`);
-  expectRule(NAV, `${LINK}.active:focus-visible`, { outline: DS_RING });
+  expectRule(TABS, `${DEFAULT_TAB}[data-active]:hover`, { 'background-color': hovered });
+  expectRule(TABS, `${DEFAULT_TAB}[data-active]:active`, { 'background-color': pressed });
 
   // The docs canvas's forced states draw the same steps.
-  const item = '.plus-nav-tabs .nav-item';
-  expectRule(NAV, `${item}.pseudo-pressed > .nav-link${NOT}`, { 'background-color': pressed });
-  expectNoFill(NAV, `${item}.pseudo-focus > .nav-link${NOT}`);
-  expectRule(NAV, `${item}.pseudo-pressed > .nav-link.active`, { 'background-color': pressed });
-  expectNoFill(NAV, `${item}.pseudo-focus > .nav-link.active`);
-
-  expectRule(NAV, '.plus-nav-tabs .dropdown .dropdown-toggle:active', { 'background-color': pressed });
+  expectRule(TABS, `.plus-tab.pseudo-pressed${NOT_TAB}`, { 'background-color': pressed });
+  expectNoFill(TABS, '.plus-tab.pseudo-focus:not([data-disabled])');
 });
 
 /* ─── Checkbox, Radio, Toggle ────────────────────────────────────────────── */

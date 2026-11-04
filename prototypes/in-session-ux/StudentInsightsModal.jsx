@@ -4,7 +4,7 @@ import { GaugeChart, HeatmapChart } from '@/dataviz';
 import { Button, IconButton } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
-import NavTabs from '@/components/navigation/NavTabs';
+import Tabs from '@/components/navigation/Tabs';
 import Accordion from '@/components/layout-and-structure/Accordion';
 
 const PRACTICE_HEATMAP_Y = ['W4', 'W3', 'W2', 'W1'];
@@ -195,7 +195,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                     boxSizing: 'content-box'
                 }}>
                     <div className="modal-header-reveal">
-                        <NavTabs
+                        <Tabs
                             activeKey={selectedStudentId}
                             onSelect={(k) => {
                                 const student = allStudents.find((s) => s.id == k);
@@ -203,11 +203,11 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             }}
                         >
                             {allStudents.map((s) => (
-                                <NavTabs.Item key={s.id} eventKey={s.id}>
+                                <Tabs.Tab key={s.id} eventKey={s.id}>
                                     {shortName(s.name)}
-                                </NavTabs.Item>
+                                </Tabs.Tab>
                             ))}
-                        </NavTabs>
+                        </Tabs>
                     </div>
                     <IconButton
                         label="Close"

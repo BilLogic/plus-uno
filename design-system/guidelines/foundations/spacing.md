@@ -131,7 +131,6 @@ Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal
 | `design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx` | 14 |
 | `prototypes/templates/admin/tutor-admin.js` | 14 |
 | `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss` | 13 |
-| `design-system/src/components/navigation/NavTabs/NavTabs.scss` | 13 |
 | `design-system/src/specs/Toolkit/Pre-Session/Elements/SupervisorControls/SupervisorControls.stories.jsx` | 13 |
 | `design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.scss` | 13 |
 | `design-system/src/storybook-docs/foundation-page.jsx` | 13 |

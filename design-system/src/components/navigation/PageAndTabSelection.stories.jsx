@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import NavTabs from './NavTabs';
+import Tabs from './Tabs';
 import Pagination from './Pagination';
 
 /**
  * Selection the caller owns, reported by the component.
  *
- * WHY THIS FILE EXISTS (#209). `NavTabs` (11 files) and `Pagination` (13) are
+ * WHY THIS FILE EXISTS (#209). `Tabs` (11 files) and `Pagination` (13) are
  * the two navigation components with measured usage, and both are pure
- * controlled widgets: neither holds the answer. `NavTabs` takes `activeKey` and
+ * controlled widgets: neither holds the answer. `Tabs` takes `activeKey` and
  * reports through `onSelect`; `Pagination` takes `currentPage` and reports
  * through `onPageChange`. The component's whole job is the callback — which
  * means the component's whole job is invisible to a render assertion. A tab
@@ -20,8 +20,8 @@ import Pagination from './Pagination';
  *
  *   1. A selection the user made has to be reported, with the key the caller
  *      gave it — not an index, not the label.
- *   2. A selection that cannot happen must not be reported. `NavTabs` has a
- *      `disabled` item; `Pagination` disables Previous on the first page and
+ *   2. A selection that cannot happen must not be reported. `Tabs` has a
+ *      disabled tab; `Pagination` disables Previous on the first page and
  *      Next on the last. Both are guarded in code that nothing ran.
  */
 
@@ -74,7 +74,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Interaction cover for #209: `NavTabs` and `Pagination` report the '
+                    'Interaction cover for #209: `Tabs` and `Pagination` report the '
                     + 'selection the user made, and report nothing for the ones they '
                     + 'themselves disabled.',
             },
@@ -82,7 +82,7 @@ export default {
     },
 };
 
-/* ----------------------------------------------------------------- NavTabs */
+/* ------------------------------------------------------------------- Tabs */
 
 /**
  * A tab click moves the active key and swaps the panel.
@@ -97,17 +97,17 @@ export const TabSelection = () => {
 
     return (
         <div style={stack}>
-            <NavTabs
+            <Tabs
                 activeKey={active}
                 onSelect={(key) => {
                     setLog((prev) => [...prev, key]);
                     setActive(key);
                 }}
             >
-                <NavTabs.Item eventKey="overview">Overview</NavTabs.Item>
-                <NavTabs.Item eventKey="attendees">Attendees</NavTabs.Item>
-                <NavTabs.Item eventKey="billing" disabled>Billing</NavTabs.Item>
-            </NavTabs>
+                <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+                <Tabs.Tab eventKey="attendees">Attendees</Tabs.Tab>
+                <Tabs.Tab eventKey="billing" isDisabled>Billing</Tabs.Tab>
+            </Tabs>
             <p data-testid="panel">{`Panel: ${active}`}</p>
             <p data-testid="select-log">{log.join(',')}</p>
         </div>
@@ -119,20 +119,18 @@ TabSelection.play = async ({ canvasElement }) => {
     const panel = canvas.getByTestId('panel');
     const log = canvas.getByTestId('select-log');
 
-    // An item with no `href` is a button, not a link — react-bootstrap's Anchor
-    // gives a trivial href button semantics rather than leaving it unreachable.
-    const overview = canvas.getByRole('button', { name: 'Overview' });
-    const attendees = canvas.getByRole('button', { name: 'Attendees' });
-    const billing = canvas.getByRole('button', { name: 'Billing' });
+    const overview = canvas.getByRole('tab', { name: 'Overview' });
+    const attendees = canvas.getByRole('tab', { name: 'Attendees' });
+    const billing = canvas.getByRole('tab', { name: 'Billing' });
 
-    await expect(overview).toHaveClass('active');
-    await expect(attendees).not.toHaveClass('active');
+    await expect(overview).toHaveAttribute('aria-selected', 'true');
+    await expect(attendees).toHaveAttribute('aria-selected', 'false');
 
     await userEvent.click(attendees);
     await expect(log).toHaveTextContent(/^attendees$/);
     await expect(panel).toHaveTextContent('Panel: attendees');
-    await expect(attendees).toHaveClass('active');
-    await expect(overview).not.toHaveClass('active');
+    await expect(attendees).toHaveAttribute('aria-selected', 'true');
+    await expect(overview).toHaveAttribute('aria-selected', 'false');
 
     // The disabled tab is unreachable, and refuses even a click dispatched past
     // the CSS shield — the handler guard behind it has to hold on its own, so

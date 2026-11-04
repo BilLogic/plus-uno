@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import PatternModal from './PatternModal';
@@ -73,8 +73,8 @@ describe('PatternModal options', () => {
 
 /**
  * Tabs under the title: a tab group in the header, so it stays put while the
- * body, which is the tab panel, scrolls. The keyboard model is NavTabs'
- * tabs mode; these hold the wiring between the strip and the body.
+ * body, which is the tab panel, scrolls. The keyboard model is `Tabs`'
+ * own; these hold the wiring between the strip and the body.
  */
 describe('PatternModal tabs', () => {
     const tabs = [
@@ -104,21 +104,21 @@ describe('PatternModal tabs', () => {
         expect(screen.getByRole('tab', { name: 'Students' })).not.toHaveAttribute('aria-controls');
     });
 
-    it('moves between tabs with the arrow keys and relabels the panel', () => {
+    it('moves between tabs with the arrow keys and relabels the panel', async () => {
         render(<PatternModal title="Session settings" tabs={tabs} />);
         const details = screen.getByRole('tab', { name: 'Details' });
         details.focus();
         fireEvent.keyDown(details, { key: 'ArrowRight' });
         const students = screen.getByRole('tab', { name: 'Students' });
-        expect(students).toHaveAttribute('aria-selected', 'true');
+        await waitFor(() => expect(students).toHaveAttribute('aria-selected', 'true'));
         expect(students).toHaveFocus();
         expect(screen.getByRole('tabpanel')).toHaveAttribute('aria-labelledby', students.id);
         expect(screen.getByText('Students panel')).toBeInTheDocument();
         fireEvent.keyDown(students, { key: 'End' });
         const notes = screen.getByRole('tab', { name: 'Notes' });
-        expect(notes).toHaveAttribute('aria-selected', 'true');
+        await waitFor(() => expect(notes).toHaveAttribute('aria-selected', 'true'));
         fireEvent.keyDown(notes, { key: 'ArrowRight' });
-        expect(details).toHaveAttribute('aria-selected', 'true');
+        await waitFor(() => expect(details).toHaveAttribute('aria-selected', 'true'));
     });
 
     it('starts on defaultActiveTab and reports changes', () => {
@@ -167,11 +167,18 @@ describe('PatternModal tabs', () => {
         expect(screen.getByText('Students panel')).toBeInTheDocument();
     });
 
-    it('skips a disabled tab', () => {
+    it('reaches a disabled tab with the arrow keys but does not select it', async () => {
+        // Base UI's own choice (see Tabs.test.jsx): a disabled tab stays in the
+        // arrow-key path so its existence is discoverable, but is never selected.
         const withDisabled = [tabs[0], { ...tabs[1], disabled: true }, tabs[2]];
         render(<PatternModal title="Session settings" tabs={withDisabled} />);
-        fireEvent.keyDown(screen.getByRole('tab', { name: 'Details' }), { key: 'ArrowRight' });
-        expect(screen.getByRole('tab', { name: 'Notes' })).toHaveAttribute('aria-selected', 'true');
+        const details = screen.getByRole('tab', { name: 'Details' });
+        details.focus();
+        fireEvent.keyDown(details, { key: 'ArrowRight' });
+        const students = screen.getByRole('tab', { name: 'Students' });
+        await waitFor(() => expect(students).toHaveFocus());
+        expect(students).toHaveAttribute('aria-selected', 'false');
+        expect(details).toHaveAttribute('aria-selected', 'true');
     });
 
     it('scrolls the body back to the top when the tab changes', () => {

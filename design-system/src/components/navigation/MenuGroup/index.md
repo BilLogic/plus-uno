@@ -39,7 +39,7 @@ From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Overrid
 
 ## Related
 
-Same group: `Breadcrumb` · `Link` · `NavTabs` · `Pagination` · `Sidebar`
+Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

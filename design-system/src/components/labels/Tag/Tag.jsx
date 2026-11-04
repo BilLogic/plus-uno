@@ -439,7 +439,7 @@ export const Tag = ({
                   * announces (ARIA 1.2 does not support aria-disabled on a
                   * generic element), so a disabled tag that is not a button
                   * says it in words: its text is read as "Science, disabled".
-                  * `aria-disabled` is set as well, as NavTabs sets it on a
+                  * `aria-disabled` is set as well, as Tabs sets it on a
                   * disabled tab, so the tag reads as inactive to tools: its
                   * words are text.disabled, which an inactive component may be.
                   */}

@@ -54,7 +54,6 @@
     "design-system/src/components/messaging/EmptyState/EmptyState.scss": 7,
     "design-system/src/components/messaging/Modal/Modal.scss": 6,
     "design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss": 2,
-    "design-system/src/components/navigation/NavTabs/NavTabs.scss": 13,
     "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": 2,
     "design-system/src/components/text-and-data-display/Code/Code.scss": 1,
     "design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss": 2,

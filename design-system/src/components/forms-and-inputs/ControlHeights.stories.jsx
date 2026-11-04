@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, NavTabs, Radio, Range, Rating, Toggle, Button, IconButton } from '@/components';
+import { Breadcrumb, ButtonGroup, Checkbox, CloseButton, Radio, Range, Rating, Tabs as TabsComponent, Toggle, Button, IconButton } from '@/components';
 
 /**
  * Two control heights: 32 for everything, 24 compact for buttons in table rows
@@ -196,15 +196,15 @@ Breadcrumbs.play = async ({ canvasElement }) => {
 /** Nav tabs follow the button: 32, labels 14/20 medium; a selected tab is semibold. */
 export const Tabs = () => (
     <div style={stack}>
-        <NavTabs activeKey="1" onSelect={() => {}} aria-label="Tabs">
-            <NavTabs.Item eventKey="1">Home</NavTabs.Item>
-            <NavTabs.Item eventKey="2">Profile</NavTabs.Item>
-        </NavTabs>
+        <TabsComponent activeKey="1" onSelect={() => {}} aria-label="Tabs">
+            <TabsComponent.Tab eventKey="1">Home</TabsComponent.Tab>
+            <TabsComponent.Tab eventKey="2">Profile</TabsComponent.Tab>
+        </TabsComponent>
     </div>
 );
 
 Tabs.play = async ({ canvasElement }) => {
-    const links = canvasElement.querySelectorAll('.nav-link');
+    const links = canvasElement.querySelectorAll('.plus-tab');
     await expect(links).toHaveLength(2);
     for (const link of links) {
         await expect(heightOf(link), `${link.textContent} height`).toBe(32);

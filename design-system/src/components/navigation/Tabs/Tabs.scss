@@ -1,0 +1,191 @@
+/*
+ * Tabs Component Styles
+ *
+ * Underline indicator by default (`appearance="default"`); `appearance="pill"`
+ * swaps the underline for a pill-shaped selected fill. `size="default"` is a
+ * 32px tab (`--item-height-md`), matching a medium button; `size="compact"`
+ * is 24px (`--item-height-sm`).
+ *
+ * Colors: an unselected tab is text.subtle on a clear ground; hover and press
+ * are the neutral subtle steps. The selected tab is text.selected, carried by
+ * the underline (default) or the fill (pill); disabled is text.disabled.
+ *
+ * Selection and disabled state are read off Base UI's own attributes —
+ * `[data-active]` / `[data-disabled]` — rather than a class, since there is no
+ * bootstrap `.active`/`.disabled` class here to key off.
+ */
+
+.plus-tabs {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.plus-tabs-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    &--center {
+        justify-content: center;
+    }
+
+    &--right {
+        justify-content: flex-end;
+    }
+
+    &--justified {
+        .plus-tab {
+            flex: 1 1 0;
+        }
+    }
+}
+
+// Default (underline) appearance: a shared bottom border across the strip,
+// each tab's own bottom border serving as its selected indicator.
+.plus-tabs--default .plus-tabs-list {
+    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
+    width: fit-content;
+
+    &--justified {
+        width: 100%;
+    }
+}
+
+.plus-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--size-element-gap-md, 10px);
+    box-sizing: border-box;
+    border: none;
+    background-color: transparent;
+    color: var(--ds-text-subtle);
+    font: var(--body-default);
+    font-weight: var(--type-weight-medium);
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+
+    &:disabled,
+    &[data-disabled] {
+        color: var(--ds-text-disabled);
+        border-bottom-color: transparent;
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+
+    &:focus-visible {
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
+    }
+
+    // Pseudo states for Storybook documentation — forced rather than real, so
+    // the states can sit side by side for inspection.
+    &.pseudo-hover:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+    }
+
+    &.pseudo-pressed:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-pressed);
+    }
+
+    &.pseudo-focus:not([data-disabled]) {
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
+    }
+}
+
+// Sizing
+.plus-tabs--default .plus-tab {
+    height: var(--item-height-md, 32px);
+    padding: 0 var(--size-element-pad-x-lg, 16px);
+}
+
+.plus-tabs--compact .plus-tab {
+    height: var(--item-height-sm, 24px);
+    padding: 0 var(--size-element-pad-x-md, 10px);
+}
+
+// Default (underline) appearance
+.plus-tabs--default .plus-tab {
+    margin-bottom: calc(-1 * var(--size-element-stroke-sm, 1px));
+    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
+    border-radius: var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0 0;
+
+    &:hover:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+        border-bottom-color: var(--ds-border);
+    }
+
+    &:active:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-pressed);
+        border-bottom-color: var(--ds-border);
+    }
+
+    &[data-active] {
+        color: var(--ds-text-selected);
+        border-bottom-color: var(--ds-border-selected);
+        border-bottom-width: var(--size-element-stroke-md, 2px);
+        margin-bottom: calc(var(--size-element-stroke-sm, 1px) - var(--size-element-stroke-md, 2px));
+
+        &:hover {
+            background-color: var(--ds-background-neutral-subtle-hovered);
+        }
+
+        &:active {
+            background-color: var(--ds-background-neutral-subtle-pressed);
+        }
+    }
+}
+
+// Pill appearance: the selected tab carries a filled, fully-rounded ground
+// instead of an underline; unselected tabs carry no border at all.
+.plus-tabs--pill .plus-tabs-list {
+    gap: var(--size-element-gap-sm, 4px);
+}
+
+.plus-tabs--pill .plus-tab {
+    border-radius: var(--size-element-radius-full, 999px);
+
+    &:hover:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-hovered);
+    }
+
+    &:active:not([data-disabled]):not([data-active]) {
+        background-color: var(--ds-background-neutral-subtle-pressed);
+    }
+
+    &[data-active] {
+        color: var(--ds-text-inverse);
+        background-color: var(--ds-background-selected-bold);
+
+        &:hover {
+            background-color: var(--ds-background-selected-bold-hovered);
+        }
+
+        &:active {
+            background-color: var(--ds-background-selected-bold-pressed);
+        }
+    }
+}
+
+/*
+ * The panel a tab controls.
+ *
+ * Carries `tabindex="0"` (set by Base UI) so a keyboard user can reach panel
+ * content that holds nothing focusable of its own, which means it takes
+ * focus and needs a visible ring. `:focus-visible` rather than `:focus`, so
+ * clicking into the panel does not draw one.
+ */
+.plus-tabs-panel {
+    padding-top: var(--size-section-gap-sm, 16px);
+
+    &:focus-visible {
+        outline: var(--size-element-stroke-md, 2px) solid var(--ds-border-focused);
+        outline-offset: var(--size-element-stroke-sm, 1px);
+    }
+}

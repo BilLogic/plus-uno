@@ -36,26 +36,27 @@
     width: 100%;
     height: fit-content;
 
-    // Remove NavTabs default border-bottom since we use Divider component
-    border-bottom: none;
-    
-    // Override NavTabs colors for this specific component
+    // Remove Tabs' default border-bottom since we use Divider component
+    .plus-tabs-list {
+        border-bottom: none;
+    }
+
+    // Override Tabs colors for this specific component
     // Active tab: secondary-text (darker gray)
     // Inactive tab: on-surface-variant (lighter gray)
-    .nav-link,
-    .plus-nav-link {
+    .plus-tab {
         // Default (inactive) state
         color: var(--ds-text-subtle);
-        
+
         // Active state - secondary color tokens
-        &.active {
+        &[data-active] {
             color: var(--color-secondary-text) !important;
             border-bottom-color: var(--color-secondary-border) !important;
             font-weight: var(--font-weight-semibold-1, 500);
         }
-        
+
         // Hover state
-        &:hover:not(.disabled):not(:disabled):not(.active) {
+        &:hover:not([data-disabled]):not([data-active]) {
             color: var(--ds-text-subtle);
         }
     }
