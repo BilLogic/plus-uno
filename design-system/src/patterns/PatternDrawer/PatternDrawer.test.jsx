@@ -117,7 +117,7 @@ describe('PatternDrawer', () => {
         expect(onClose).not.toHaveBeenCalled();
     });
 
-    it('closes on a click on the scrim, not on the drawer', () => {
+    it('closes on a click on the blanket, not on the drawer', () => {
         const onClose = vi.fn();
         render(<PatternDrawer title="Filters" onClose={onClose}>Body</PatternDrawer>);
         fireEvent.click(screen.getByRole('dialog'));

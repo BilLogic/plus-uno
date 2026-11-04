@@ -1,7 +1,7 @@
 /**
  * Drawer pattern (Patterns/Drawer)
  * A full-height panel at the edge of the screen, placed in the Overlay
- * pattern at `start` or `end`, over the same scrim a modal takes. The overlay
+ * pattern at `start` or `end`, over the same blanket a modal takes. The overlay
  * pair (elevation.surface.overlay with elevation.shadow.overlay), Drawer/pad
  * 16, Drawer/stack-md 16 and Drawer/inline-sm 8, which alias the Modal steps;
  * no radius, since it meets the screen on three sides. Width is a step of the
@@ -57,27 +57,6 @@
     margin: 0;
     font: var(--body-default);
     color: var(--ds-text-subtle);
-}
-
-.plus-pattern-drawer-close {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    border-radius: var(--size-element-radius-md);
-    color: var(--ds-icon-subtle);
-    cursor: pointer;
-
-    &:hover {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
-
-    &:active {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
 }
 
 /* Body: takes what the header and footer leave, and scrolls past it */
