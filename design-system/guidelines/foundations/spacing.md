@@ -27,7 +27,7 @@ Read the most specific tier that has the value you need:
 2. Otherwise the pattern token of the pattern you are inside (`--card-pad-compact`).
 3. Otherwise a semantics step (`--pad-x-md`, `--stack-sm`).
 
-A value belongs to a pattern or component when it would change if that pattern or component changed; a step nothing specific owns is semantics. When no tier holds the value, name the gap and read the primitive (`--space-025` for a 4px vertical pad, `--space-0625` for a 10px gap); adding a step is a design call.
+A value belongs to a pattern or component when it would change if that pattern or component changed; a step nothing specific owns is semantics. When no tier holds the value, name the gap and add a row to `scripts/lib/tokens/plan.mjs` (then `npm run generate:design-tokens`) rather than read a primitive; adding a step is a design call.
 
 ## Choose by relationship
 

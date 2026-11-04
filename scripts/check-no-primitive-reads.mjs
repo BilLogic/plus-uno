@@ -1,6 +1,6 @@
 /**
  * `npm run check:no-primitive-reads` — the ratchet on components and patterns
- * reading a primitive (ADR-038, #1754): a component or pattern reads a tier
+ * reading a primitive (ADR-038): a component or pattern reads a tier
  * token (components, patterns, semantics), never `--space-*`, `--radius-<n>`,
  * `--size-<n>` or `--stroke-<n>` directly. When no tier holds the value, the
  * gap is named and a ladder row is added (`scripts/lib/tokens/plan.mjs`).
