@@ -10,9 +10,7 @@
 
 @use '../../../styles/icon-glyph' as *;
 
-.plus-flag.toast,
-.plus-flag,
-.toast.plus-flag {
+.plus-flag {
     display: flex;
     align-items: flex-start;
     gap: var(--inline-lg);
@@ -23,11 +21,6 @@
     background-color: var(--ds-surface-overlay);
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
-
-    // Bootstrap hides a flag that is not `.show` with display: none; keep that.
-    &:not(.show) {
-        display: none;
-    }
 
     // --- ICON: 16, in a box one title line tall ---
     .plus-flag-icon {
@@ -135,18 +128,62 @@
     }
 }
 
-// --- TOAST CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
-.plus-flag-container,
-.toast-container {
+// --- FLAG CONTAINER: bottom-left, 8 from the screen edge, 16 apart ---
+.plus-flag-container {
     z-index: var(--layer-flag);
     display: flex;
     flex-direction: column;
     gap: var(--popover-stack-flag);
     padding: var(--popover-gap-screen);
 
-    // The stack's gap spaces flags; Bootstrap's own spacer margin goes.
-    > :not(:last-child) {
-        margin-bottom: 0;
+    &[data-position='top-start'] {
+        top: 0;
+        left: 0;
+    }
+
+    &[data-position='top-center'] {
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &[data-position='top-end'] {
+        top: 0;
+        right: 0;
+    }
+
+    &[data-position='middle-start'] {
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+    }
+
+    &[data-position='middle-center'] {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    &[data-position='middle-end'] {
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+    }
+
+    &[data-position='bottom-start'] {
+        bottom: 0;
+        left: 0;
+    }
+
+    &[data-position='bottom-center'] {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    &[data-position='bottom-end'] {
+        bottom: 0;
+        right: 0;
     }
 }
 
@@ -161,7 +198,7 @@
     padding: var(--size-spacing-medium-space-400);
 }
 
-.plus-flag-interactive-demo .plus-flag-container.toast-container {
+.plus-flag-interactive-demo .plus-flag-container {
     position: absolute !important;
     margin: 0 !important;
     top: 50% !important;

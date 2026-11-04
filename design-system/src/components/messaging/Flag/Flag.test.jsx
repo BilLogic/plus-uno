@@ -43,6 +43,12 @@ describe('FlagContainer', () => {
     it('sits bottom-left by default', () => {
         render(<FlagContainer data-testid="flags"><span>flag</span></FlagContainer>);
         const container = screen.getByTestId('flags');
-        expect(container).toHaveClass('bottom-0', 'start-0');
+        expect(container).toHaveAttribute('data-position', 'bottom-start');
+        expect(container).toHaveStyle({ position: 'fixed' });
+    });
+
+    it('maps legacy corner names to their logical position', () => {
+        render(<FlagContainer data-testid="flags" position="top-right"><span>flag</span></FlagContainer>);
+        expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
     });
 });

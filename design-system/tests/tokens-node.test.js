@@ -553,7 +553,10 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 205: the same sweep's prototypes + root `src/` batch (35 files) moved
     // off `--color-surface*`/`--color-on-surface*`, and their 59 hex
     // fallbacks went with the legacy names.
-    expect(comparable).toBe(205);
+    // 201: Flag moved off react-bootstrap's Toast (#1627), and the deleted
+    // `specs/Training/Lessons/Elements/Toast/Toast.scss` took its four color
+    // fallbacks with it.
+    expect(comparable).toBe(201);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

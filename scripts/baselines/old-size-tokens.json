@@ -248,7 +248,6 @@
     "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": 6,
     "design-system/src/specs/Training/Lessons/Elements/SortControl/SortControl.scss": 1,
     "design-system/src/specs/Training/Lessons/Elements/SortControl/SortControl.stories.jsx": 1,
-    "design-system/src/specs/Training/Lessons/Elements/Toast/Toast.scss": 7,
     "design-system/src/specs/Training/Lessons/Elements/TrainingLessonStatusSelect/TrainingLessonStatusSelect.stories.jsx": 5,
     "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.scss": 26,
     "design-system/src/specs/Training/Lessons/Pages/LessonsOverviewPage/LessonsOverviewPage.scss": 13,
