@@ -42,7 +42,7 @@ export const Overview = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '589px'
                 }}
             >
@@ -66,7 +66,7 @@ export const Overview = () => (
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '589px'
                 }}
             >
@@ -104,7 +104,7 @@ export const Interactive = () => {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     maxWidth: '589px'
                 }}
             >

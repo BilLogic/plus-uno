@@ -36,7 +36,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--size-element-gap-sm`
+`--stack-md`
 
 From `design-system/src/components/labels/TagGroup/TagGroup.scss`. Override these through the token layer, never with a literal.
 

@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, container and element roles keyed to density (default/compact/spacious, default/compact)
+summary: Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted
 status: active
 verified: 2026-11-03 (#1704)
 ---
@@ -33,3 +33,11 @@ Bill, 2026-11-04: "clean up both token on figma and in code and fully align the 
 `layers` becomes its own non-spacing, code-only family (`--layer-*`), carrying the z-index scale this ADR's generator already wrote as `CODE_ONLY_LAYERS`. `design-system/figma/variables-payload.json` is the one combined Figma variables payload for every tier, superseding `tokens/deep/figma-spec.json`; `architecture/token-tiers-name-map.md` is the full old-to-new name list.
 
 This ticket (#1756, PR1 of its sequence) is additive only, the same cycle this ADR's six `LEGACY_ALIASES` already used: every new-tier name is generated as `var(--old-name)` beside the untouched old declaration, so no caller moves and no pixel changes. Caller migration by area (components, then patterns/styles, then specs, then prototypes/src) is PR2+; deleting the old declarations and zeroing `check:old-size-tokens` is the final PR in the sequence, the same shape this ADR's own "rest of the old names are a ratchet, not a guess" section already describes.
+
+## Addendum: the old vocabulary is deleted (#1756 part 2, 2026-11-04)
+
+The final PR of the sequence deletes what the ladder replaced. The retired names (`RETIRED_TOKENS` in `plan.mjs`) lose their declarations: `generate-all-tokens.js` still reads the Figma exports, which carry them, and drops them on the way out, so a regenerate cannot write one back. Every ladder row now declares its own value, with its responsive overrides under the media query the plan names, rather than aliasing an old name. `check:old-size-tokens` counts uses of the retired set and is held at zero.
+
+Bill's ruling the same day removes the "roles" concept. The container pad roles split into the patterns tier (`Card/pad-compact`, `Section/pad-x-default`, `Modal/pad-y-spacious`, `Page/pad-x-compact`, and the rest), the `--element-*` roles are gone, and callers read the semantics Pad / Stack / Radius steps. Motion keeps its tokens and becomes its own `motion` collection. The spec name never appears in a token or collection name: `tokens/deep/` is `tokens/ladder/`, and `design-system/figma/variables-payload.json` holds `spacing / semantics`, `spacing / patterns`, `spacing / components`, `layers` and `motion`. A guard test in `scripts/generate-design-tokens.test.mjs` fails on `deep`, `roles` or `element` in any of those names.
+
+Two values the old Figma element vocabulary held have no semantic step — a 4px vertical pad and a 10px gap — so their callers read `--space-025` and `--space-0625` directly. Adding a step is a design call, left open.

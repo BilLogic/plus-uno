@@ -32,7 +32,7 @@
     max-height: var(--plus-listbox-max-height);
     overflow: hidden;
     background-color: var(--ds-surface-overlay);
-    border: var(--size-element-border) solid var(--ds-border);
+    border: var(--border-default) solid var(--ds-border);
     border-radius: var(--popover-radius-menu-md);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -90,11 +90,11 @@
 }
 
 .plus-listbox-header {
-    border-bottom: var(--size-element-border) solid var(--ds-border);
+    border-bottom: var(--border-default) solid var(--ds-border);
 }
 
 .plus-listbox-footer {
-    border-top: var(--size-element-border) solid var(--ds-border);
+    border-top: var(--border-default) solid var(--ds-border);
 }
 
 .plus-listbox-body {
@@ -118,7 +118,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 var(--element-pad-compact);
+    padding: 0 var(--pad-x-sm);
     pointer-events: none;
 
     > * {
@@ -144,8 +144,8 @@
 .plus-listbox-message {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
-    padding: var(--size-element-pad-y-md) var(--element-pad-default);
+    gap: var(--stack-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
     color: var(--ds-text-subtle);
     font: var(--body-default);
 

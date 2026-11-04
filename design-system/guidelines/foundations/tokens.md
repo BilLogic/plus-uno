@@ -27,7 +27,7 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 
 **Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for "is this a pattern token": would the value change if the pattern changed? If yes, it belongs to the pattern (or component); if the value is just a shared step nothing specific owns, it is semantics.
 
-**Still mid-migration.** The old vocabularies (`--size-element-*`, `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*`, `--layout-*`, bare pre-ladder `--element-*`) keep resolving — each new-tier name is an additive alias, not a replacement, until a family PR moves a component's callers and deletes the old declaration. `npm run check:old-size-tokens` is the ratchet; `design-system/guidelines/foundations/spacing.md`'s "Still on old size tokens" table is the to-do list.
+**Retired names.** `--size-element-*`, `--element-*`, the `--layout-*` and `--overlay-*` names the ladder replaced, and the rest of `RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs` are gone; `architecture/token-tiers-name-map.md` lists each beside its replacement, and `npm run check:old-size-tokens` holds their uses at zero. The older `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*` and `--size-table-*` names still resolve; moving them onto the ladder is a follow-up.
 
 ## Token References
 

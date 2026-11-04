@@ -85,11 +85,11 @@ export const RecurringSession_PreSignUp = () => (
 
                 {/* Body Content - Info Grid using SessionInfoCard */}
                 <div style={{
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-modal-radius-md)',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     overflow: 'hidden',
                 }}>
                     {/* Row 1 */}

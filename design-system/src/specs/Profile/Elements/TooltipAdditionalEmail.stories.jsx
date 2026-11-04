@@ -29,7 +29,7 @@ const TriggerIcon = () => (
 );
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <Tooltip
             text="Get notifications sent to an alternate email address"
             placement="right"
@@ -46,7 +46,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
             alignItems: 'flex-start',
         }}
     >
@@ -82,7 +82,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <Tooltip
                 text="Get notifications sent to an alternate email address"
                 placement={args.placement}

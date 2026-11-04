@@ -11,18 +11,18 @@
     &-inner {
         display: flex;
         align-items: center;
-        padding-left: var(--element-pad-compact);
-        padding-right: var(--element-pad-compact);
+        padding-left: var(--pad-x-sm);
+        padding-right: var(--pad-x-sm);
         padding-top: 0;
         padding-bottom: 0;
         position: relative;
-        border-radius: var(--size-element-radius-full);
+        border-radius: var(--radius-full);
         flex-shrink: 0;
     }
 
     &-content {
         display: flex;
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
         align-items: center;
         justify-content: center;
         min-width: 16px;

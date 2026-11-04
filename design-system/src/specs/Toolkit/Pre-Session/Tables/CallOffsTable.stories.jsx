@@ -277,7 +277,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Tutor View - Pending Call-offs</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <CallOffsTableHeaderRow user="tutors" callOffState="pending" />
                 <CallOffsTableRow
                     user="tutors"
@@ -292,7 +292,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <CallOffsTableRow
                     user="tutors"
                     callOffState="pending"
@@ -311,7 +311,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Tutor View - Past Call-offs</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Un-excused Status</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Un-excused Status</h6>
                 <CallOffsTableHeaderRow user="tutors" callOffState="past" />
                 <CallOffsTableRow
                     user="tutors"
@@ -326,7 +326,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Approved Status</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Approved Status</h6>
                 <CallOffsTableRow
                     user="tutors"
                     callOffState="past"
@@ -340,7 +340,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <CallOffsTableRow
                     user="tutors"
                     callOffState="past"
@@ -359,7 +359,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Supervisor View - Pending Call-offs</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <CallOffsTableHeaderRow user="supervisors" callOffState="pending" />
                 <CallOffsTableRow
                     user="supervisors"
@@ -375,7 +375,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <CallOffsTableRow
                     user="supervisors"
                     callOffState="pending"
@@ -395,7 +395,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Supervisor View - Past Call-offs</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Approved Status</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Approved Status</h6>
                 <CallOffsTableHeaderRow user="supervisors" callOffState="past" />
                 <CallOffsTableRow
                     user="supervisors"
@@ -411,7 +411,7 @@ export const Overview = () => (
             </div>
 
             <div>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <CallOffsTableRow
                     user="supervisors"
                     callOffState="past"
@@ -473,7 +473,7 @@ export const Interactive = () => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
@@ -495,7 +495,7 @@ export const Interactive = () => {
                     onClick={() => setUserType('supervisors')}
                 />
 
-                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
+                <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--stack-md)' }} />
 
                 <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                     Call-off State:

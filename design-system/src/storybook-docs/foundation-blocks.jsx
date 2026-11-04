@@ -42,7 +42,7 @@ const plain = (value) => (/^-?\d+(\.\d+)?px$/.test(value) ? value.replace(/px$/,
 
 const codeStyle = { font: 'var(--code)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 
-/** Inline code for JSX prose: `<C>--card-pad-md</C>`. */
+/** Inline code for JSX prose: `<C>--card-pad-default</C>`. */
 export const C = ({ children }) => <code style={codeStyle}>{children}</code>;
 
 /**
@@ -73,7 +73,7 @@ export const TokenTable = ({ rows, swatch = false, valueHeader = 'Value', showFi
                 {rows.map((r) => (
                     <tr key={r.token}>
                         <td>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--element-inline-md)' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                                 {swatch && (
                                     <span
                                         aria-hidden="true"
@@ -81,7 +81,7 @@ export const TokenTable = ({ rows, swatch = false, valueHeader = 'Value', showFi
                                             width: 'var(--icon-lg)',
                                             height: 'var(--icon-lg)',
                                             flexShrink: 0,
-                                            borderRadius: 'var(--element-radius-md)',
+                                            borderRadius: 'var(--radius-md)',
                                             background: `var(${r.token})`,
                                             boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)',
                                         }}
@@ -175,7 +175,7 @@ export const DoDont = ({ children }) => (
         style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))',
-            gap: 'var(--layout-gutter)',
+            gap: 'var(--grid-gutter)',
             alignItems: 'stretch',
         }}
     >
@@ -215,7 +215,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
     const panes = mode === 'both' ? ['light', 'dark'] : [mode];
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)' }}>
-            <div role="group" aria-label="Color mode for these examples" style={{ display: 'inline-flex', gap: 'var(--element-inline-sm)' }}>
+            <div role="group" aria-label="Color mode for these examples" style={{ display: 'inline-flex', gap: 'var(--inline-sm)' }}>
                 {MODES.map((m) => (
                     <button
                         key={m.id}
@@ -224,8 +224,8 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                         onClick={() => setMode(m.id)}
                         style={{
                             height: 'var(--item-height-md)',
-                            padding: '0 var(--element-pad-x-md)',
-                            borderRadius: 'var(--element-radius-item-md)',
+                            padding: '0 var(--pad-x-md)',
+                            borderRadius: 'var(--radius-h32)',
                             border: 'var(--border-default) solid var(--ds-border)',
                             background: mode === m.id ? 'var(--ds-background-selected)' : 'var(--ds-background-neutral-subtle)',
                             color: mode === m.id ? 'var(--ds-text-selected)' : 'var(--ds-text-subtle)',
@@ -242,7 +242,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: `repeat(${panes.length}, minmax(0, 1fr))`,
-                    gap: 'var(--layout-gutter)',
+                    gap: 'var(--grid-gutter)',
                 }}
             >
                 {panes.map((p) => (

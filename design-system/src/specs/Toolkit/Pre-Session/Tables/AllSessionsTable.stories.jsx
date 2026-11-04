@@ -20,7 +20,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
             gridColumn: `span ${span}`,
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--size-element-gap-sm)',
+            gap: 'var(--stack-md)',
             padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
             borderRadius: 'var(--size-border-radius-radius-100)'
         }}
@@ -287,7 +287,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>In Progress Sessions</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <AllSessionsTableHeaderRow />
                 <AllSessionsTableRow
                     date="Tue, Sep 9"
@@ -302,7 +302,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <AllSessionsTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -316,7 +316,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed State</h6>
                 <AllSessionsTableRow
                     date="Tue, Sep 9"
                     timeRange="1:00 PM - 1:50 PM"
@@ -335,7 +335,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Sessions Needing Lead</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>With Need Lead Badge</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>With Need Lead Badge</h6>
                 <AllSessionsTableHeaderRow />
                 <AllSessionsTableRow
                     date="Tue, Sep 9"
@@ -475,7 +475,7 @@ export const Interactive = () => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-lg)',
+                gap: 'var(--stack-lg)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
@@ -499,7 +499,7 @@ export const Interactive = () => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',

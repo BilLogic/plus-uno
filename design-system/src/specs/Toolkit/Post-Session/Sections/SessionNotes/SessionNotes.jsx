@@ -13,7 +13,7 @@ const SessionNotes = ({ state = 'empty', notes = '' }) => (
         style={{
             backgroundColor: 'var(--ds-background-neutral)',
             border: `1px solid ${state === 'filled' ? 'var(--ds-border-bold)' : 'var(--ds-border)'}`,
-            padding: 'var(--size-element-pad-y-md) var(--element-pad-compact)',
+            padding: 'var(--pad-y-md) var(--pad-x-sm)',
             width: '100%',
             maxWidth: 'var(--col-8)',
         }}

@@ -126,7 +126,7 @@ const StudentReflectionForm = ({
         <ReflectionStep title="Student Reflection" lastUpdated={lastUpdated}>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <h3 className="h6 m-0">{studentName}</h3>
                     <SessionNotes state={initialData.notes ? 'filled' : 'empty'} notes={initialData.notes} />
                 </div>

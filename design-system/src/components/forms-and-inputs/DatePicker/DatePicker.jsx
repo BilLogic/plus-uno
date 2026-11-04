@@ -50,7 +50,7 @@ const fromValue = (value, range) => {
  *   typed and marked invalid, and `onChange` is not called.
  * - **Range:** the first click sets the first day, the second the last; a click
  *   before the first day starts again. `onChange` receives `[start, end]`.
- * - **Popup:** opens 4px (`--size-element-gap-xs`) below the field, left-aligned
+ * - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned
  *   (or as `calendarAlign` asks), and flips above with the same gap when there
  *   is no room below.
  *

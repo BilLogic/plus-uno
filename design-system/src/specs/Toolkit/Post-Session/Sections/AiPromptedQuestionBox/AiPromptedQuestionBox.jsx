@@ -43,13 +43,13 @@ const AiPromptedQuestionBox = ({
     if (state === 'loading') {
         const skeletonBar = {
             height: 'var(--font-size-body3)',
-            borderRadius: 'var(--size-element-radius-md)',
+            borderRadius: 'var(--radius-md)',
             backgroundColor: 'var(--ds-background-smart-mastering-content)',
         };
         return (
             <div className={className} role="status" aria-live="polite" style={shellStyle}>
                 <Spinner size={16} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)', flex: 1, minWidth: 0 }}>
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '84%' }} />
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '60%' }} />
                     <div data-testid="skeleton-bar" style={{ ...skeletonBar, width: '36%' }} />
@@ -76,7 +76,7 @@ const AiPromptedQuestionBox = ({
         <div className={className} style={shellStyle}>
             <AiIcon name="generate" size={24} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-sm, 10px)', flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <p className="h6 m-0" style={{ color: 'var(--ds-text)' }}>{question}</p>
                     {helper ? (
                         <p className="body3-txt m-0" style={{ color: 'var(--ds-text-subtle)' }}>{helper}</p>

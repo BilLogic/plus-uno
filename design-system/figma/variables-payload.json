@@ -128,13 +128,6 @@
           }
         },
         {
-          "name": "Radius/full",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--radius-full)"
-          }
-        },
-        {
           "name": "Radius/h24",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -315,6 +308,111 @@
           }
         },
         {
+          "name": "Page/pad-x-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-x-compact)"
+          }
+        },
+        {
+          "name": "Page/pad-x-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-x-default)"
+          }
+        },
+        {
+          "name": "Page/pad-x-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-x-spacious)"
+          }
+        },
+        {
+          "name": "Page/pad-y-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-y-compact)"
+          }
+        },
+        {
+          "name": "Page/pad-y-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-y-default)"
+          }
+        },
+        {
+          "name": "Page/pad-y-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-pad-y-spacious)"
+          }
+        },
+        {
+          "name": "Section/pad-x-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-x-compact)"
+          }
+        },
+        {
+          "name": "Section/pad-x-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-x-default)"
+          }
+        },
+        {
+          "name": "Section/pad-x-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-x-spacious)"
+          }
+        },
+        {
+          "name": "Section/pad-y-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-y-compact)"
+          }
+        },
+        {
+          "name": "Section/pad-y-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-y-default)"
+          }
+        },
+        {
+          "name": "Section/pad-y-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-pad-y-spacious)"
+          }
+        },
+        {
+          "name": "Card/pad-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--card-pad-compact)"
+          }
+        },
+        {
+          "name": "Card/pad-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--card-pad-default)"
+          }
+        },
+        {
+          "name": "Card/pad-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--card-pad-spacious)"
+          }
+        },
+        {
           "name": "Blanket/pad-x",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -330,16 +428,51 @@
         },
         {
           "name": "Blanket/fill",
-          "resolvedType": "FLOAT",
+          "resolvedType": "COLOR",
           "codeSyntax": {
             "WEB": "var(--blanket-fill)"
           }
         },
         {
-          "name": "Blanket/max-height-modal",
+          "name": "Modal/pad-x-compact",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--blanket-max-height-modal)"
+            "WEB": "var(--modal-pad-x-compact)"
+          }
+        },
+        {
+          "name": "Modal/pad-x-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-pad-x-default)"
+          }
+        },
+        {
+          "name": "Modal/pad-x-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-pad-x-spacious)"
+          }
+        },
+        {
+          "name": "Modal/pad-y-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-pad-y-compact)"
+          }
+        },
+        {
+          "name": "Modal/pad-y-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-pad-y-default)"
+          }
+        },
+        {
+          "name": "Modal/pad-y-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-pad-y-spacious)"
           }
         },
         {
@@ -579,197 +712,8 @@
       ]
     },
     {
-      "name": "Deep foundations / roles and motion",
+      "name": "motion",
       "variables": [
-        {
-          "name": "Card/pad-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-default)"
-          }
-        },
-        {
-          "name": "Card/pad-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-compact)"
-          }
-        },
-        {
-          "name": "Card/pad-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-spacious)"
-          }
-        },
-        {
-          "name": "Section/pad-x-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-default)"
-          }
-        },
-        {
-          "name": "Section/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-compact)"
-          }
-        },
-        {
-          "name": "Section/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Section/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-default)"
-          }
-        },
-        {
-          "name": "Section/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Section/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-spacious)"
-          }
-        },
-        {
-          "name": "Modal/pad-x-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-x-default)"
-          }
-        },
-        {
-          "name": "Modal/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-x-compact)"
-          }
-        },
-        {
-          "name": "Modal/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-default)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-spacious)"
-          }
-        },
-        {
-          "name": "Page/pad-x-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-default)"
-          }
-        },
-        {
-          "name": "Page/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-compact)"
-          }
-        },
-        {
-          "name": "Page/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Page/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-default)"
-          }
-        },
-        {
-          "name": "Page/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Page/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-spacious)"
-          }
-        },
-        {
-          "name": "Element/pad-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-pad-default)"
-          }
-        },
-        {
-          "name": "Element/pad-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-pad-compact)"
-          }
-        },
-        {
-          "name": "Element/gap-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-gap-default)"
-          }
-        },
-        {
-          "name": "Element/gap-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-gap-compact)"
-          }
-        },
-        {
-          "name": "Element/radius-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-radius-default)"
-          }
-        },
-        {
-          "name": "Element/radius-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--element-radius-compact)"
-          }
-        },
         {
           "name": "Motion/duration-short",
           "resolvedType": "FLOAT",

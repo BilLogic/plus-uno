@@ -21,7 +21,7 @@ function PartRenderer({ part }: { part: any }): React.ReactElement | null {
       <p
         style={{
           margin: 0,
-          marginBottom: 'var(--size-element-gap-sm, 8px)',
+          marginBottom: 'var(--stack-md, 8px)',
           fontFamily: 'var(--font-family-body)',
           fontSize: 'var(--font-size-body1, 1rem)',
           lineHeight: 'var(--font-line-height-body1, 1.5)',

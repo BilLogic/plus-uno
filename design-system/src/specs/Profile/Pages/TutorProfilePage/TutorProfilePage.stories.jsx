@@ -175,7 +175,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                         style={{
                             display: 'flex',
                             flexWrap: 'wrap',
-                            gap: 'var(--size-element-gap-sm, 8px)',
+                            gap: 'var(--stack-md, 8px)',
                             width: '100%',
                         }}
                     >
@@ -234,7 +234,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg, 12px)', width: '100%' }}>
+                    <div style={{ display: 'flex', gap: 'var(--stack-lg, 12px)', width: '100%' }}>
                         <div
                             style={{
                                 flex: '1 0 0',
@@ -344,8 +344,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                         gap: 'var(--size-section-gap-md, 16px)',
                     }}
                 >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs, 4px)', width: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-pad-y-sm, 4px)', width: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm, 4px)', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-025, 4px)', width: '100%' }}>
                             <span className="h6" style={{ color: 'var(--ds-text)' }}>
                                 Status &amp; Clearance
                             </span>
@@ -368,7 +368,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                             This information determines your eligibility to tutor with PLUS.
                         </span>
                     </div>
-                    <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm, 8px)', width: '100%' }}>
+                    <div style={{ display: 'flex', gap: 'var(--stack-md, 8px)', width: '100%' }}>
                         {[
                             { label: 'Tutor Status', value: 'Lead Tutor' },
                             { label: 'Onboarding Status:', value: 'Complete' },
@@ -423,8 +423,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                         gap: 'var(--size-section-gap-md, 16px)',
                     }}
                 >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs, 4px)', width: '100%' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-pad-y-sm, 4px)', width: '100%' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm, 4px)', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-025, 4px)', width: '100%' }}>
                             <span className="h6" style={{ color: 'var(--ds-text)' }}>
                                 Background &amp; Matching
                             </span>
@@ -449,7 +449,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
-                        <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', width: '100%' }}>
+                        <div style={{ display: 'flex', gap: 'var(--stack-md)', width: '100%' }}>
                             <div style={{ flex: '1 0 0', maxWidth: '382.67px' }}>
                                 <StudentTypeDropdown id="bg-student-type" onChange={() => setStudentTypeDirty(true)} required={true} />
                             </div>
@@ -460,7 +460,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 <GradYearDropdown id="bg-grad-year" onChange={() => setGradYearDirty(true)} />
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', width: '100%' }}>
+                        <div style={{ display: 'flex', gap: 'var(--stack-md)', width: '100%' }}>
                             <div style={{ flex: '1 0 0', maxWidth: '578px' }}>
                                 <MathLevel id="bg-math-level" onChange={() => setMathLevelDirty(true)} required={true} />
                             </div>

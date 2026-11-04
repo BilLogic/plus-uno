@@ -147,7 +147,7 @@ const SessionInfoForm = ({
                                 Select one or more reasons why the session did not happen.
                             </span>
                         )}
-                        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}
                     >
                         {CANCELLATION_REASON_OPTIONS.map((reason) => {
                             const label = reason.example ? `${reason.label} (${reason.example})` : reason.label;

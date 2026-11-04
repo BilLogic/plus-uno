@@ -57,13 +57,13 @@
     .groups-table__cell--name {
         .groups-table__expand-btn {
             display: flex;
-            gap: var(--size-element-gap-sm);
+            gap: var(--stack-md);
             align-items: center;
-            padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
+            padding: var(--space-025) var(--pad-x-sm);
             border: none;
             background: transparent;
             cursor: pointer;
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
 
             &:hover {
                 background-color: var(--ds-background-neutral-subtle-hovered);
@@ -76,8 +76,8 @@
         .groups-table__size-badge {
             &.plus-badge--info {
                 background-color: var(--ds-background-information-subtler);
-                padding: 0 var(--element-pad-compact);
-                border-radius: var(--size-element-radius-full);
+                padding: 0 var(--pad-x-sm);
+                border-radius: var(--radius-full);
                 min-width: unset;
             }
         }

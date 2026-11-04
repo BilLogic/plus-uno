@@ -61,7 +61,7 @@ export const Overview = () => (
         style={{
             position: 'relative',
             minHeight: '200px',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <UpdateProfileToast show onClose={() => {}} />
@@ -74,7 +74,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <div style={{ position: 'relative', minHeight: '200px' }}>
@@ -102,7 +102,7 @@ export const Interactive = {
     render: (args) => (
         <div
             key={String(args.show)}
-            style={{ position: 'relative', minHeight: '200px', padding: 'var(--size-element-pad-y-lg, 12px)' }}
+            style={{ position: 'relative', minHeight: '200px', padding: 'var(--pad-y-lg, 12px)' }}
         >
             {args.show ? (
                 <UpdateProfileToast show onClose={() => {}} />

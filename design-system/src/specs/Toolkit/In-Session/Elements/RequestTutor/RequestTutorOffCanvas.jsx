@@ -43,8 +43,8 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 'var(--size-element-radius-md)',
-                border: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
+                borderRadius: 'var(--radius-md)',
+                border: `var(--stroke-1) solid var(--color-outline-variant)`,
                 background: 'var(--ds-surface)',
                 color: disabled ? 'var(--color-outline-variant)' : 'var(--ds-text)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
@@ -54,7 +54,7 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
         </button>
     );
     return (
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--space-0625)' }}>
             {btn('minus', value <= min, () => onChange(Math.max(min, value - 1)), 'Decrease')}
             <span className="body1-txt font-weight-semibold" style={{ minWidth: '1.5em', textAlign: 'center', color: 'var(--ds-text)' }}>
                 {value}
@@ -71,9 +71,9 @@ const Chip = ({ selected, children, onClick }) => (
         onClick={onClick}
         className="body2-txt"
         style={{
-            padding: 'var(--size-element-pad-y-sm) var(--element-pad-default)',
-            borderRadius: 'var(--size-element-radius-full, 999px)',
-            border: `var(--size-element-stroke-sm) solid ${selected ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`,
+            padding: 'var(--space-025) var(--pad-x-md)',
+            borderRadius: 'var(--radius-full, 999px)',
+            border: `var(--stroke-1) solid ${selected ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`,
             background: selected ? 'var(--color-primary)' : 'var(--ds-background-neutral)',
             color: selected ? 'var(--color-on-primary)' : 'var(--ds-text)',
             cursor: 'pointer',
@@ -95,13 +95,13 @@ const FieldLabel = ({ children, required }) => (
 const SlackPreview = ({ role, session, tutorCount, closesAt, reason }) => (
     <div
         style={{
-            border: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
+            border: `var(--stroke-1) solid var(--color-outline-variant)`,
             borderRadius: 'var(--size-card-radius-sm)',
             background: 'var(--ds-surface)',
             padding: 'var(--size-card-pad-y-md, 16px) var(--size-card-pad-x-md, 16px)',
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-md)',
+            gap: 'var(--space-0625)',
         }}
     >
         <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
@@ -153,8 +153,8 @@ export const RequestTutorOffCanvas = ({
     const sent = step === 'sent';
 
     const Header = ({ title, subtitle }) => (
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--space-0625)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h5 className="h5" style={{ color: 'var(--ds-text)', margin: 0 }}>{title}</h5>
                 {subtitle && <p className="body2-txt" style={{ color: 'var(--ds-text-subtlest)', margin: 0 }}>{subtitle}</p>}
             </div>
@@ -165,7 +165,7 @@ export const RequestTutorOffCanvas = ({
     );
 
     const Footer = ({ primary }) => (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)', borderTop: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`, paddingTop: 'var(--size-card-pad-y-md, 16px)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--space-0625)', borderTop: `var(--stroke-1) solid var(--color-outline-variant)`, paddingTop: 'var(--size-card-pad-y-md, 16px)' }}>
             <Button text="Exit" appearance="subtle" onClick={onClose} />
             {primary}
         </div>
@@ -179,13 +179,13 @@ export const RequestTutorOffCanvas = ({
         subtitle = `Post a request to the PLUS Tutors ${channel} channel.`;
         body = (
             <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                     <FieldLabel required>Number of tutors</FieldLabel>
                     <NumberStepper value={tutorCount} onChange={setTutorCount} />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
                     <FieldLabel required>Request closes at</FieldLabel>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--element-gap-default)', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-md)', alignItems: 'center' }}>
                         {CLOSING_TIMES.map((t) => (
                             <Chip key={t} selected={closesAt === t} onClick={() => setClosesAt(t)}>{t}pm</Chip>
                         ))}
@@ -204,7 +204,7 @@ export const RequestTutorOffCanvas = ({
                 <Fieldset
                     id="request-reason"
                     legend={<span className="font-weight-semibold">Reason for request</span>}
-                    style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}
                 >
                     {REASONS.map((reason) => (
                         <Checkbox
@@ -219,7 +219,7 @@ export const RequestTutorOffCanvas = ({
                             }}
                         />
                     ))}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-gap-default)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
                         <Checkbox
                             name="request-reason"
                             value="other"
@@ -293,7 +293,7 @@ export const RequestTutorOffCanvas = ({
                 width: '400px',
                 maxWidth: '100%',
                 background: 'var(--ds-surface)',
-                borderLeft: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
+                borderLeft: `var(--stroke-1) solid var(--color-outline-variant)`,
                 boxShadow: '-8px 0 24px rgba(0,0,0,0.12)',
                 display: 'flex',
                 flexDirection: 'column',

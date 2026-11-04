@@ -6,6 +6,7 @@ import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { ALIASES } from './lib/color/legacy-map.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
+import { dropRetired } from './lib/tokens/retire.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
 /**
@@ -637,7 +638,7 @@ ${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\
     /* App shell + content grid */
 ${Object.entries(CODE_ONLY_LAYOUT).map(([token, { value, note }]) => `    --${token}: ${px(value)}; /* ${note}; not a Figma variable (CODE_ONLY_LAYOUT) */\n`).join('')}\
     /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
-    --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --size-${GRID_GAP_EQUALS}); col-* spans assume this */
+    --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --stack-md); col-* spans assume this */
 
     /* Stacking layers; not Figma variables (CODE_ONLY_LAYERS) */
 ${Object.entries(CODE_ONLY_LAYERS).map(([token, { value, note }]) => `    --${token}: ${value}; /* ${note} */\n`).join('')}
@@ -1116,10 +1117,10 @@ try {
     generated = [
         { file: '_colors.scss', generated: markOverridden(generateColorsSCSS()) },
         { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
-        { file: '_spacing_semantics.scss', generated: generateSemanticsSCSS() },
-        { file: '_layout.scss', generated: generateLayoutSCSS() },
-        { file: '_scales.scss', generated: generateScalesSCSS() },
-        { file: '_frame_layers.scss', generated: generateFrameLayersSCSS() },
+        { file: '_spacing_semantics.scss', generated: dropRetired(generateSemanticsSCSS()) },
+        { file: '_layout.scss', generated: dropRetired(generateLayoutSCSS()) },
+        { file: '_scales.scss', generated: dropRetired(generateScalesSCSS()) },
+        { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS()) },
         { file: '_type.scss', generated: generateTypeSCSS() },
     ];
 } catch (error) {

@@ -34,7 +34,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-h32` · `--size-element-stroke-md` · `--size-element-stroke-sm` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-h32` · `--size-border-stroke-stroke-150` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
 
 From `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss`. Override these through the token layer, never with a literal.
 

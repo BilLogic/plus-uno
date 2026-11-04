@@ -55,7 +55,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--element-pad-compact` · `--element-pad-default` · `--option-menu-width` · `--plus-tag-input-max-height` · `--size-element-border` · `--size-element-gap-sm` · `--size-element-pad-y-sm`
+`--body-small` · `--border-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--plus-tag-input-max-height` · `--space-025` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/TagInput.scss`. Override these through the token layer, never with a literal.
 

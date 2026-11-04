@@ -24,7 +24,7 @@
 // Action Buttons
 .tutor-performance-page__actions {
     display: flex;
-    gap: var(--size-element-gap-md, 12px);
+    gap: var(--space-0625, 12px);
     margin-bottom: var(--size-section-gap-lg, 24px);
 }
 
@@ -69,5 +69,5 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--size-section-gap-md, 16px);
-    padding: var(--size-element-pad-y-lg) var(--element-pad-default);
+    padding: var(--pad-y-lg) var(--pad-x-md);
 }

@@ -10,12 +10,12 @@
 .plus-time-picker__period-toggle {
     display: flex;
     align-items: center;
-    gap: var(--element-gap-compact);
+    gap: var(--stack-sm);
     // The toggle is 24, like a button in a field's Trailing slot.
     height: var(--item-height-sm);
     padding: 0;
     border: 0;
-    border-radius: var(--element-radius-default);
+    border-radius: var(--radius-md);
     background: transparent;
     color: var(--ds-text-brand);
     font: inherit;

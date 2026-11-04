@@ -248,7 +248,7 @@ export const Interactive = () => {
             </div>
 
             {/* Dropdown Menus */}
-            <div className="d-flex flex-wrap align-items-start" style={{ gap: 'var(--size-element-gap-lg)' }}>
+            <div className="d-flex flex-wrap align-items-start" style={{ gap: 'var(--stack-lg)' }}>
                 <div className="d-flex flex-column gap-2">
                     <span className="small text-muted fw-bold">Main Menu</span>
                     <div className="pdropdown">

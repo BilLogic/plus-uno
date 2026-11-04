@@ -175,7 +175,7 @@ const swatch = (background, color, text, extra = {}) => (
             background,
             color,
             padding: '14px 16px',
-            borderRadius: 'var(--size-element-radius-md)',
+            borderRadius: 'var(--radius-md)',
             fontFamily: 'var(--font-family-body)',
             fontSize: 'var(--font-size-body2)',
             ...extra,

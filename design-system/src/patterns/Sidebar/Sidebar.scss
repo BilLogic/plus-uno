@@ -165,7 +165,7 @@
             bottom: calc(-1 * var(--stack-sm));
             left: calc(var(--pad-x-md) + var(--icon-md) / 2);
             box-sizing: border-box;
-            border-left: var(--size-element-stroke-sm) solid var(--ds-border);
+            border-left: var(--stroke-1) solid var(--ds-border);
             pointer-events: none;
         }
     }
@@ -183,8 +183,8 @@
     // never runs into the ring: 8 - 4 = 4.
     > .plus-pattern-sidebar__thread-end::before {
         bottom: 50%;
-        width: calc(var(--icon-md) / 2 - 2 * var(--size-element-stroke-lg));
-        border-bottom: var(--size-element-stroke-sm) solid var(--ds-border);
+        width: calc(var(--icon-md) / 2 - 2 * var(--stroke-2));
+        border-bottom: var(--stroke-1) solid var(--ds-border);
         border-bottom-left-radius: var(--radius-h24);
     }
 }

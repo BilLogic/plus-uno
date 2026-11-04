@@ -225,7 +225,7 @@ export function ResearchAssistantChat({
           paddingBottom: 'var(--size-section-pad-y-lg)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--size-element-gap-md, 10px)',
+          gap: 'var(--space-0625, 10px)',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}

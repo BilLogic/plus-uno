@@ -66,7 +66,7 @@ const semesterPresetDefaults = {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ maxWidth: '400px', padding: 'var(--pad-y-lg, 12px)' }}>
         <SemesterAtPLUS
             id="semester-plus-overview"
             defaultValue={semesterPresetDefaults.one}
@@ -82,7 +82,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <div style={{ maxWidth: '400px', flex: '1 1 320px' }}>
@@ -117,7 +117,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ maxWidth: '400px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ maxWidth: '400px', padding: 'var(--pad-y-lg, 12px)' }}>
             <SemesterAtPLUS
                 id="semester-plus-interactive"
                 key={args.preset}

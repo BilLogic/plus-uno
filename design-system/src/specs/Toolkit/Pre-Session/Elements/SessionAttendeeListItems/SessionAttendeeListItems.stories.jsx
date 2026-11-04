@@ -36,11 +36,11 @@ const SessionAttendeeListItem = ({
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: isEditMode
-                    ? 'var(--size-element-pad-y-lg) var(--element-pad-compact)'
-                    : 'var(--size-element-pad-y-lg) 0',
-                borderRadius: 'var(--size-element-radius-md)',
+                    ? 'var(--pad-y-lg) var(--pad-x-sm)'
+                    : 'var(--pad-y-lg) 0',
+                borderRadius: 'var(--radius-md)',
                 backgroundColor: isEditMode ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent',
                 width: '100%'
             }}
@@ -63,7 +63,7 @@ const SessionAttendeeListItem = ({
                     flex: 1,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     minWidth: 0
                 }}
             >
@@ -136,7 +136,7 @@ export const Overview = () => (
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
@@ -178,7 +178,7 @@ export const Overview = () => (
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
@@ -213,7 +213,7 @@ export const Overview = () => (
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
@@ -280,7 +280,7 @@ export const Overview = () => (
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'

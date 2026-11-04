@@ -57,7 +57,7 @@ export const Pronouns = ({ id = 'pronouns', value, onChange, defaultValue, ...pr
 };
 
 export const Overview = () => (
-    <div style={{ width: '163px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ width: '163px', padding: 'var(--pad-y-lg, 12px)' }}>
         <Pronouns id="pronouns-overview" />
     </div>
 );
@@ -68,7 +68,7 @@ export const Variants = () => (
             display: 'flex',
             flexWrap: 'wrap',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <div style={{ width: '163px' }}>
@@ -93,7 +93,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ width: '163px', padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ width: '163px', padding: 'var(--pad-y-lg, 12px)' }}>
             <Pronouns
                 id="pronouns-interactive"
                 key={args.pronoun ?? ''}

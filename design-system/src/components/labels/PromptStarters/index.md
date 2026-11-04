@@ -24,7 +24,7 @@ A few things a person could ask PLUS AI, as a wrapping row of prompt `Suggestion
 
 ## Tokens touched
 
-`--element-gap-default`
+`--stack-md`
 
 From `design-system/src/components/labels/PromptStarters/PromptStarters.scss`. Override these through the token layer, never with a literal.
 

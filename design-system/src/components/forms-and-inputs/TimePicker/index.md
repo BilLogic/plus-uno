@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-success` · `--element-gap-compact` · `--element-radius-default` · `--item-height-sm` · `--type-weight-semibold`
+`--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-success` · `--item-height-sm` · `--radius-md` · `--stack-sm` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.scss`. Override these through the token layer, never with a literal.
 

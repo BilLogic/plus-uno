@@ -35,7 +35,7 @@ export default function LoginButtons() {
                 <div
                     style={{
                         backgroundColor: 'var(--ds-background-disabled)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        borderRadius: 'var(--radius-md)',
                         opacity: 'var(--color-disabled-opacity)',
                     }}
                 >
@@ -56,7 +56,7 @@ export default function LoginButtons() {
                 <div
                     style={{
                         backgroundColor: 'var(--ds-background-disabled)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        borderRadius: 'var(--radius-md)',
                         opacity: 'var(--color-disabled-opacity)',
                     }}
                 >

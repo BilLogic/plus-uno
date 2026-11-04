@@ -258,7 +258,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 'var(--size-element-gap-sm, 8px)',
+                        gap: 'var(--stack-md, 8px)',
                         width: '100%',
                     }}
                 >
@@ -329,7 +329,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
 };
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <PreviewImageModal zoomValue={49} />
     </div>
 );
@@ -340,7 +340,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <PreviewImageModal zoomValue={49} />
@@ -365,7 +365,7 @@ export const Interactive = {
         const wrap = (child) => (
             <div
                 key={args.preset}
-                style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}
+                style={{ padding: 'var(--pad-y-lg, 12px)' }}
             >
                 {child}
             </div>

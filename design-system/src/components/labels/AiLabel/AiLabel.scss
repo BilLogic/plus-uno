@@ -19,11 +19,11 @@
 
     display: inline-flex;
     align-items: baseline;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     max-width: 100%;
     box-sizing: border-box;
     margin: 0;
-    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
+    padding: var(--space-025) var(--pad-x-sm);
 
     /*
      * The edge, not a fill. Decision 2: the identity marks an edge and a glyph
@@ -31,9 +31,9 @@
      * whatever it is attached to.
      */
     background-color: var(--ds-surface);
-    border: var(--size-element-border) solid var(--ds-border);
-    border-inline-start: var(--size-element-stroke-lg) solid var(--plus-ai-accent);
-    border-radius: var(--size-element-radius-md);
+    border: var(--border-default) solid var(--ds-border);
+    border-inline-start: var(--stroke-2) solid var(--plus-ai-accent);
+    border-radius: var(--radius-md);
 
     color: var(--ds-text);
 }
@@ -101,10 +101,10 @@
      * is used twice with a 24px fallback and defined nowhere, and a third use
      * would grow a debt two passes have just spent shrinking.
      */
-    padding-block: var(--size-element-pad-y-sm);
+    padding-block: var(--space-025);
 }
 
 .plus-ai-label__explain:focus-visible {
     outline: var(--focus-ring-width) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-gap-xs);
+    outline-offset: var(--stack-sm);
 }

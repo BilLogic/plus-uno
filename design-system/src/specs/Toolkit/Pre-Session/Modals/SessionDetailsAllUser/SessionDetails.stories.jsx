@@ -90,11 +90,11 @@ export const SessionInfo_PostSignUp = () => (
 
                 {/* Body Content - Info Grid using SessionInfoCard */}
                 <div style={{
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-modal-radius-md)',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     overflow: 'hidden',
                 }}>
                     {/* Row 1 */}
@@ -207,8 +207,8 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                 }}>
                     {/* Tutor Roster Panel */}
                     <div style={{
-                        border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        border: 'var(--border-default) solid var(--color-outline-variant)',
+                        borderRadius: 'var(--radius-md)',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden'
@@ -226,8 +226,8 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             <div style={{ overflowY: 'auto', flex: 1, padding: '0 var(--size-modal-pad-x-md)', gap: 'var(--size-modal-gap-md)', display: 'flex', flexDirection: 'column' }}>
                                 {/* Tutor Row - Lead */}
                                 <div className="d-flex justify-content-between align-items-center w-100" style={{
-                                    padding: 'var(--size-element-pad-y-lg) 0',
-                                    gap: 'var(--size-element-gap-sm)',
+                                    padding: 'var(--pad-y-lg) 0',
+                                    gap: 'var(--stack-md)',
                                 }}>
                                     <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>Ben Green</span>
                                     <StatusTag appearance="info">Lead</StatusTag>
@@ -235,8 +235,8 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                                 {/* Other Tutors */}
                                 {[1, 2, 3].map((i) => (
                                     <div key={i} className="d-flex align-items-center w-100" style={{
-                                        padding: 'var(--size-element-pad-y-lg) 0',
-                                        gap: 'var(--size-element-gap-sm)',
+                                        padding: 'var(--pad-y-lg) 0',
+                                        gap: 'var(--stack-md)',
                                     }}>
                                         <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>Ben Green</span>
                                     </div>
@@ -253,8 +253,8 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
 
                     {/* Student Roster Panel */}
                     <div style={{
-                        border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        border: 'var(--border-default) solid var(--color-outline-variant)',
+                        borderRadius: 'var(--radius-md)',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden'
@@ -355,11 +355,11 @@ export const OneTimeSession_PreFillIn = () => (
 
                 {/* Body Content - Info Grid using SessionInfoCard */}
                 <div style={{
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-modal-radius-md)',
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                     overflow: 'hidden',
                 }}>
                     {/* Row 1 */}

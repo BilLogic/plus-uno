@@ -1,0 +1,79 @@
+/**
+ * Patterns (ADR-038 ladder)
+ * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
+ * Each row declares its own value; a responsive row repeats under the media
+ * query the plan names for it, below the :root block.
+ */
+
+:root {
+
+    /* Frame */
+    --frame-topbar-height: var(--height-200);
+    --frame-sidebar-width: var(--width-1500);
+    --frame-sidebar-width-nav: 164px; /* fixed SideNav width (164), distinct from the responsive sidebar above */
+
+    /* Page */
+    --page-pad-x-compact: var(--space-150);
+    --page-pad-x-default: var(--space-200);
+    --page-pad-x-spacious: var(--space-250);
+    --page-pad-y-compact: var(--space-100);
+    --page-pad-y-default: var(--space-150);
+    --page-pad-y-spacious: var(--space-200);
+
+    /* Section */
+    --section-pad-x-compact: var(--space-100);
+    --section-pad-x-default: var(--space-150);
+    --section-pad-x-spacious: var(--space-200);
+    --section-pad-y-compact: var(--space-100);
+    --section-pad-y-default: var(--space-150);
+    --section-pad-y-spacious: var(--space-200);
+
+    /* Card */
+    --card-pad-compact: var(--space-100);
+    --card-pad-default: var(--space-125);
+    --card-pad-spacious: var(--space-150);
+
+    /* Blanket */
+    --blanket-pad-x: var(--space-100);
+    --blanket-pad-y: var(--space-400);
+    --blanket-fill: rgba(0, 0, 0, 0.38); /* the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word */
+    --blanket-max-height-modal: calc(100dvh - 2 * var(--blanket-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
+
+    /* Modal */
+    --modal-pad-x-compact: var(--space-0625);
+    --modal-pad-x-default: var(--space-100);
+    --modal-pad-x-spacious: var(--space-125);
+    --modal-pad-y-compact: var(--space-050);
+    --modal-pad-y-default: var(--space-075);
+    --modal-pad-y-spacious: var(--space-100);
+    --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the pattern’s pad/stack tokens */
+    --modal-width-md: 507px;
+    --modal-width-lg: 629px;
+
+    /* Drawer */
+    --drawer-width-sm: var(--modal-width-sm);
+    --drawer-width-md: var(--modal-width-md);
+    --drawer-width-lg: var(--modal-width-lg);
+}
+
+@media (max-height: 639.98px) {
+    :root {
+        --blanket-pad-y: var(--space-150);
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --modal-width-sm: 512px;
+        --modal-width-md: 677px;
+        --modal-width-lg: 843px;
+    }
+}
+
+@media (min-width: 1440px) {
+    :root {
+        --modal-width-sm: 640px;
+        --modal-width-md: 848px;
+        --modal-width-lg: 1056px;
+    }
+}

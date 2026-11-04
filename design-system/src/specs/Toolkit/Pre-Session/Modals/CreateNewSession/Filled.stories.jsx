@@ -45,7 +45,7 @@ const FieldWrapper = ({ label, required = true, children }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             flex: '1 0 0',
             minWidth: 0,
         }}
@@ -58,7 +58,7 @@ const FieldWrapper = ({ label, required = true, children }) => (
 // ─── Stepper Column ───────────────────────────────────────────
 
 const StepperColumn = ({ children }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs)', flex: 1 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', flex: 1 }}>
         {children}
     </div>
 );

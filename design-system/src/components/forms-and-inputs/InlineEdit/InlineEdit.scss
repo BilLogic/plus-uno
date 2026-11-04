@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
@@ -32,8 +32,8 @@
     height: var(--height-250);
     box-sizing: border-box;
     margin: 0;
-    padding: 0 calc(var(--pad-x-md) - var(--size-element-border));
-    border: var(--size-element-border) solid transparent;
+    padding: 0 calc(var(--pad-x-md) - var(--border-default));
+    border: var(--border-default) solid transparent;
     border-radius: var(--radius-0625);
     background-color: transparent;
     color: var(--ds-text);
@@ -88,18 +88,18 @@
     align-self: stretch;
     height: 0;
     // Takes back the column's gap above it, so the row adds nothing.
-    margin-block-start: calc(-1 * var(--size-element-gap-xs));
+    margin-block-start: calc(-1 * var(--stack-sm));
 }
 
 .plus-inline-edit__actions {
     position: absolute;
-    inset-block-start: var(--size-element-gap-xs);
+    inset-block-start: var(--stack-sm);
     inset-inline-end: 0;
     z-index: 1;
     display: flex;
-    gap: var(--size-element-gap-xs);
-    padding: var(--size-element-gap-xs);
-    border-radius: var(--size-element-radius-sm);
+    gap: var(--stack-sm);
+    padding: var(--stack-sm);
+    border-radius: var(--radius-md);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }

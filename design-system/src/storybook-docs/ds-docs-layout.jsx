@@ -332,9 +332,9 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
 /**
  * The breathing room between the canvas's tallest state and the Controls
  * divider. A design value, so it names a Token rather than a number:
- * `--size-element-gap-lg` is the design system's 12px element gap.
+ * `--stack-lg` is the design system's 12px element gap.
  */
-const CANVAS_OVERLAY_GAP = 'var(--size-element-gap-lg)';
+const CANVAS_OVERLAY_GAP = 'var(--stack-lg)';
 
 /**
  * One do or don't card: a live example above a one-line caption.

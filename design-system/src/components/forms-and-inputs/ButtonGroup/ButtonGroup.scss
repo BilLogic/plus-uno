@@ -16,7 +16,7 @@
         position: relative;
 
         &:not(:first-child) {
-            margin-left: calc(-1 * var(--size-element-border));
+            margin-left: calc(-1 * var(--border-default));
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }

@@ -31,7 +31,7 @@
 .plus-skeleton {
     --plus-skeleton-width: 100%;
     --plus-skeleton-height: var(--size-spacing-large-space-900, 64px);
-    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md, 4px);
     --plus-skeleton-duration: 1.6s;
 
     display: inline-block;
@@ -53,13 +53,13 @@
 .plus-skeleton--circle {
     --plus-skeleton-width: var(--size-spacing-large-space-600, 32px);
     --plus-skeleton-height: var(--size-spacing-large-space-600, 32px);
-    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+    --plus-skeleton-radius: var(--radius-full, 999px);
 }
 
 /* A text bar: 16 tall, radius 4, filling the line unless given a width. */
 .plus-skeleton--text {
     --plus-skeleton-height: var(--size-spacing-medium-space-300, 16px);
-    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md, 4px);
 }
 
 /* ----------------------------------------------------------- label presets */
@@ -67,7 +67,7 @@
 .plus-skeleton--status {
     --plus-skeleton-width: var(--size-spacing-large-space-900, 64px);
     --plus-skeleton-height: #{label.$status-height};
-    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md, 4px);
 }
 
 .plus-skeleton--status-spacious {
@@ -79,19 +79,19 @@
 .plus-skeleton--count {
     --plus-skeleton-width: #{label.$count-height};
     --plus-skeleton-height: #{label.$count-height};
-    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+    --plus-skeleton-radius: var(--radius-full, 999px);
 }
 
 .plus-skeleton--tag {
     --plus-skeleton-width: 72px;
     --plus-skeleton-height: #{label.$tag-height};
-    --plus-skeleton-radius: var(--size-element-radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md, 4px);
 }
 
 .plus-skeleton--tag-person {
     --plus-skeleton-width: var(--size-spacing-large-space-1000, 80px);
     --plus-skeleton-height: #{label.$tag-height};
-    --plus-skeleton-radius: var(--size-element-radius-full, 999px);
+    --plus-skeleton-radius: var(--radius-full, 999px);
 }
 
 /* ------------------------------------------------------------------ groups */
@@ -102,7 +102,7 @@
 
     display: inline-flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
     width: var(--plus-skeleton-width);
     max-width: 100%;
     vertical-align: middle;
@@ -121,7 +121,7 @@
 .plus-skeleton-group--tags {
     display: inline-flex;
     align-items: center;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
     vertical-align: middle;
     pointer-events: none;
 }
@@ -164,7 +164,7 @@
 /* Forced colors drop the fill; an outline keeps the shape without changing its size. */
 @media (forced-colors: active) {
     .plus-skeleton {
-        outline: var(--size-element-stroke-sm, 1px) solid GrayText;
-        outline-offset: calc(-1 * var(--size-element-stroke-sm, 1px));
+        outline: var(--stroke-1, 1px) solid GrayText;
+        outline-offset: calc(-1 * var(--stroke-1, 1px));
     }
 }

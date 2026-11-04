@@ -16,7 +16,7 @@ const ROLE_LABELS = {
  *
  * - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name
  *   truncates at `--label-max-width`.
- * - `size="lg"` pads `--size-element-pad-y-md` around a 32 pill, for table rows.
+ * - `size="lg"` pads `--pad-y-md` around a 32 pill, for table rows.
  */
 const UserAvatar = ({
     firstChar = 'J',

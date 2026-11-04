@@ -24,13 +24,13 @@
 @mixin screen-grid-width($pad: var(--modal-pad-x-default)) {
     --plus-overlay-screen-pad: var(--space-150);
     --plus-overlay-grid: clamp(
-        var(--layout-min-width-content),
+        var(--content-min-width),
         var(--plus-overlay-screen, 100vw) - 2 * var(--plus-overlay-screen-pad),
-        var(--layout-max-width-content)
+        var(--content-max-width)
     );
-    --plus-overlay-column: calc((var(--plus-overlay-grid) - (var(--layout-columns) - 1) * var(--layout-gutter)) / var(--layout-columns));
+    --plus-overlay-column: calc((var(--plus-overlay-grid) - (var(--grid-columns) - 1) * var(--grid-gutter)) / var(--grid-columns));
 
-    width: calc(var(--plus-overlay-span) * var(--plus-overlay-column) + (var(--plus-overlay-span) - 1) * var(--layout-gutter) + 2 * #{$pad});
+    width: calc(var(--plus-overlay-span) * var(--plus-overlay-column) + (var(--plus-overlay-span) - 1) * var(--grid-gutter) + 2 * #{$pad});
     flex-shrink: 0;
     box-sizing: border-box;
 }

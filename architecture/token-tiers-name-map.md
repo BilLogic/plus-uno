@@ -9,9 +9,7 @@ Generated from `scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER` by `npm run genera
 
 One plan, four tiers, most general to most specific: **primitives** (`--space-*` / `--radius-*` / `--stroke-*` / `--size-*`, unchanged — still Figma-sourced, `generate-all-tokens.js`) -> **semantics** -> **patterns** -> **components**, plus **layers** as its own non-spacing z-index family. Figma collection names: `spacing / primitives`, `spacing / semantics`, `spacing / patterns`, `spacing / components`, `layers`.
 
-This ladder's first PR (#1756 PR1) is additive only: every `New` name below is a generated alias (`var(--old-name)`, or a literal primitive reference where `Old` reads *(new)*) living in `design-system/src/tokens/deep/_semantics.scss`, `_patterns.scss`, `_components.scss`, `_layers.scss`. The `Old` declaration is untouched and still resolves exactly as it does today. A row where `Old` and `New` are identical is not a rename — it is a token already correctly named for its tier (listed here so this is every token, not just the ones that moved); those rows are excluded from the generated SCSS and Figma payload (an alias to itself is a no-op).
-
-Caller migration, by area, is PR2+; deleting the `Old` declarations and zeroing the ratchets is the final PR in this sequence.
+Every `New` name below is declared by the generator in `design-system/src/tokens/ladder/_semantics.scss`, `_patterns.scss`, `_components.scss` or `_layers.scss`, with its own value. The `Old` name is retired: its declaration is gone and nothing reads it. A row where `Old` and `New` are identical is not a rename — it is a token already correctly named for its tier (listed so this is every token, not just the ones that moved); those rows are excluded from the generated SCSS and Figma payload.
 
 Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 - `--focus-ring-radius` has no existing source; seeded at `--radius-sm` as a first pass.
@@ -39,7 +37,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Radius | `--element-radius-sm` | `--radius-sm` |  |
 | Radius | `--element-radius-md` | `--radius-md` |  |
 | Radius | `--element-radius-lg` | `--radius-lg` |  |
-| Radius | `--element-radius-full` | `--radius-full` |  |
+| Radius | `--radius-full` | `--radius-full` (reclassified, unchanged) |  |
 | Radius | `--element-radius-item-sm` | `--radius-h24` | control height 24; 24÷4 = 6 |
 | Radius | `--element-radius-item-md` | `--radius-h32` | control height 32; 32÷4 = 8 |
 | Radius | *(new)* | `--radius-h40` | new step; control height 40; 40÷4 = 10 |
@@ -100,18 +98,30 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Frame | `--layout-width-sidebar` | `--frame-sidebar-width` |  |
 | Frame | `--layout-sidebar-width` | `--frame-sidebar-width-nav` | fixed SideNav width (164), distinct from the responsive sidebar above |
 | Page | `--page-pad` | `--page-pad` (reclassified, unchanged) |  |
+| Page | *(new)* | `--page-pad-x-compact` |  |
+| Page | *(new)* | `--page-pad-x-default` |  |
+| Page | *(new)* | `--page-pad-x-spacious` |  |
+| Page | *(new)* | `--page-pad-y-compact` |  |
+| Page | *(new)* | `--page-pad-y-default` |  |
+| Page | *(new)* | `--page-pad-y-spacious` |  |
 | Page | `--page-stack-sm` | `--page-stack-sm` (reclassified, unchanged) |  |
 | Page | `--page-stack-md` | `--page-stack-md` (reclassified, unchanged) |  |
 | Page | `--page-stack-lg` | `--page-stack-lg` (reclassified, unchanged) |  |
 | Page | `--page-radius` | `--page-radius` (reclassified, unchanged) |  |
+| Section | *(new)* | `--section-pad-x-compact` |  |
+| Section | *(new)* | `--section-pad-x-default` |  |
+| Section | *(new)* | `--section-pad-x-spacious` |  |
+| Section | *(new)* | `--section-pad-y-compact` |  |
+| Section | *(new)* | `--section-pad-y-default` |  |
+| Section | *(new)* | `--section-pad-y-spacious` |  |
 | Section | `--section-stack-sm` | `--section-stack-sm` (reclassified, unchanged) |  |
 | Section | `--section-stack-md` | `--section-stack-md` (reclassified, unchanged) |  |
 | Section | `--section-stack-lg` | `--section-stack-lg` (reclassified, unchanged) |  |
 | Section | `--section-min-width-main` | `--section-min-width-main` (reclassified, unchanged) |  |
 | Section | `--section-min-width-side` | `--section-min-width-side` (reclassified, unchanged) |  |
-| Card | `--card-pad-sm` | `--card-pad-sm` (reclassified, unchanged) |  |
-| Card | `--card-pad-md` | `--card-pad-md` (reclassified, unchanged) |  |
-| Card | `--card-pad-lg` | `--card-pad-lg` (reclassified, unchanged) |  |
+| Card | *(new)* | `--card-pad-compact` |  |
+| Card | *(new)* | `--card-pad-default` |  |
+| Card | *(new)* | `--card-pad-spacious` |  |
 | Card | `--card-stack-sm` | `--card-stack-sm` (reclassified, unchanged) |  |
 | Card | `--card-stack-md` | `--card-stack-md` (reclassified, unchanged) |  |
 | Card | `--card-stack-lg` | `--card-stack-lg` (reclassified, unchanged) |  |
@@ -136,8 +146,14 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Blanket | `--overlay-pad-x` | `--blanket-pad-x` |  |
 | Blanket | `--overlay-pad-y` | `--blanket-pad-y` |  |
 | Blanket | `--overlay-scrim` | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
-| Blanket | `--layout-max-height-modal` | `--blanket-max-height-modal` |  |
+| Blanket | `--layout-max-height-modal` | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad` | `--modal-pad` (reclassified, unchanged) |  |
+| Modal | *(new)* | `--modal-pad-x-compact` |  |
+| Modal | *(new)* | `--modal-pad-x-default` |  |
+| Modal | *(new)* | `--modal-pad-x-spacious` |  |
+| Modal | *(new)* | `--modal-pad-y-compact` |  |
+| Modal | *(new)* | `--modal-pad-y-default` |  |
+| Modal | *(new)* | `--modal-pad-y-spacious` |  |
 | Modal | `--modal-stack-sm` | `--modal-stack-sm` (reclassified, unchanged) |  |
 | Modal | `--modal-stack-md` | `--modal-stack-md` (reclassified, unchanged) |  |
 | Modal | `--modal-stack-lg` | `--modal-stack-lg` (reclassified, unchanged) |  |
@@ -221,4 +237,39 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Layer | `--layout-z-index-flag` | `--layer-flag` |  |
 | Layer | `--layout-z-index-spotlight` | `--layer-spotlight` |  |
 | Layer | `--layout-z-index-tooltip` | `--layer-tooltip` |  |
+
+## Retired with no ladder row
+
+| Old | Now reads |
+|---|---|
+| `--size-element-pad-x-lg` | `--pad-x-lg` |
+| `--size-element-pad-x-md` | `--pad-x-md` |
+| `--size-element-pad-x-sm` | `--pad-x-sm` |
+| `--size-element-pad-x-xs` | `--pad-x-xs` |
+| `--size-element-pad-y-lg` | `--pad-y-lg` |
+| `--size-element-pad-y-md` | `--pad-y-md` |
+| `--size-element-pad-y-sm` | `--space-025` |
+| `--size-element-gap-xs` | `--stack-sm` |
+| `--size-element-gap-sm` | `--stack-md` |
+| `--size-element-gap-md` | `--space-0625` |
+| `--size-element-gap-lg` | `--stack-lg` |
+| `--size-element-radius-sm` | `--radius-md` |
+| `--size-element-radius-md` | `--radius-md` |
+| `--size-element-radius-lg` | `--radius-lg` |
+| `--size-element-radius-full` | `--radius-full` |
+| `--size-element-stroke-sm` | `--stroke-1` |
+| `--size-element-stroke-md` | `--size-border-stroke-stroke-150` |
+| `--size-element-stroke-lg` | `--stroke-2` |
+| `--size-element-stroke-xl` | `--size-border-stroke-stroke-300` |
+| `--size-element-border` | `--border-default` |
+| `--element-radius-full` | `--radius-full` |
+| `--element-pad-default` | `--pad-x-md` |
+| `--element-pad-compact` | `--pad-x-sm` |
+| `--element-gap-default` | `--stack-md` |
+| `--element-gap-compact` | `--stack-sm` |
+| `--element-radius-default` | `--radius-md` |
+| `--element-radius-compact` | `--radius-sm` |
+| `--card-pad-sm` | `--card-pad-compact` |
+| `--card-pad-md` | `--card-pad-default` |
+| `--card-pad-lg` | `--card-pad-spacious` |
 

@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-` · `--ds-text` · `--element-gap-default` · `--font-size-fa-h4-solid` · `--heading-small` · `--item-height-md` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-modal-radius-sm` · `--type-weight-medium`
+`--body-default` · `--color-` · `--ds-text` · `--font-size-fa-h4-solid` · `--heading-small` · `--item-height-md` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-modal-radius-sm` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

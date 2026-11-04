@@ -17,7 +17,7 @@ export default {
 
 /** All three reflection status badges. */
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)', alignItems: 'flex-start' }}>
         <ReflectionStatusBadge status="not-started" />
         <ReflectionStatusBadge status="in-progress" />
         <ReflectionStatusBadge status="complete" />

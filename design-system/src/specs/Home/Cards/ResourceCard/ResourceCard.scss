@@ -14,7 +14,7 @@
 .plus-resource-card-subtitle {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     
     i {
         color: var(--color-primary);
@@ -37,7 +37,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
 }
 
 .plus-resource-card-title {
@@ -76,6 +76,6 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 }
 

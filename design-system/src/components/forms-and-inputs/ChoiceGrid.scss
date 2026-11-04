@@ -44,13 +44,13 @@
     border-collapse: separate;
     border-spacing: 0;
     background-color: var(--ds-surface-container);
-    border-radius: var(--size-element-radius-md, 4px);
+    border-radius: var(--radius-md, 4px);
     overflow: hidden;
 }
 
 // Table header row
 .plus-choice-grid-column-header {
-    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
+    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
     text-align: center;
     color: var(--ds-text);
     font: var(--plus-choice-grid-label-font, var(--body-default));
@@ -59,7 +59,7 @@
 
 // Row label column
 .plus-choice-grid-row-label {
-    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
+    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
     text-align: left;
     color: var(--ds-text);
     font: var(--plus-choice-grid-label-font, var(--body-default));
@@ -69,7 +69,7 @@
 
 // Grid cells
 .plus-choice-grid-cell {
-    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
+    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
     text-align: center;
     vertical-align: middle;
     background-color: var(--ds-surface-container);

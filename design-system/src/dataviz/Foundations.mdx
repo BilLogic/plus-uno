@@ -72,7 +72,7 @@ A `0` (removing a border or line entirely) needs no token.
 
 Tick labels, legends, tooltips and data labels take the current text tokens — never a `'12px'` literal, and never a token `var()` paired with a literal fallback value. A chart's title comes from its surrounding Section or Card header, not Highcharts' own `title` option.
 
-Series entrance and hover transitions take the motion tokens in `design-system/src/tokens/deep/_motion.scss`. `prefers-reduced-motion` is handled once, globally — every duration collapses to `0ms` under it — so a chart needs no reduced-motion branch of its own.
+Series entrance and hover transitions take the motion tokens in `design-system/src/tokens/ladder/_motion.scss`. `prefers-reduced-motion` is handled once, globally — every duration collapses to `0ms` under it — so a chart needs no reduced-motion branch of its own.
 
 </FoundationSection>
 

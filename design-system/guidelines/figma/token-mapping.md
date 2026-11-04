@@ -108,9 +108,9 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Card padding | `var(--size-card-pad-{x\|y}-{sm\|md\|lg})` |
 | Card gap | `var(--size-card-gap-{sm\|md\|lg})` |
 | Card radius | `var(--size-card-radius-{sm\|md\|full})` |
-| Element padding | `var(--size-element-pad-y-{sm\|md\|lg})`, plus `var(--size-element-pad-x-{xs\|lg})` (4 · 16); x-sm and x-md moved to `--element-pad-compact` and `--element-pad-default` (ADR-038) |
-| Element gap | `var(--size-element-gap-{xs\|sm\|md\|lg})` |
-| Element radius | `var(--size-element-radius-{sm\|md\|lg\|full})` |
+| Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
+| Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
+| Element radius | `var(--radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--size-modal-pad-{x\|y}-{sm\|md\|lg})` |
 | Section padding | `var(--size-section-pad-{x\|y}-{sm\|md\|lg})` |
 | Surface padding | `var(--size-surface-pad-{x\|y})` |
@@ -124,9 +124,9 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
 | spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
-| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--element-pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--size-element-pad-y-sm` is 4; the new one is 2 |
-| Foundations `Element/stack-*`, `inline-*` | `var(--element-stack-md)`, `var(--element-inline-sm)` | 4 · 8 · 12 |
-| Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--element-radius-item-md)` | 2 · 4 · 8, items 6 · 8 |
+| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old `--space-025` is 4; the new one is 2 |
+| Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
+| Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--radius-h32)` | 2 · 4 · 8, items 6 · 8 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
 | Foundations `Size/Item/height-{sm\|md}` | `var(--item-height-md)` | 24 · 32; there is no 40 Item |
 | Foundations `Size/Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |
@@ -150,15 +150,15 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
-| Min Heights/listbox | `var(--layout-min-height-listbox)` | 140 at every breakpoint. Code does not apply it: a list is as tall as its rows, so a short list has no empty band |
-| Max Heights/listbox | `var(--layout-max-height-listbox)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
+| Min Heights/listbox | `var(--listbox-min-height)` | 140 at every breakpoint. Code does not apply it: a list is as tall as its rows, so a short list has no empty band |
+| Max Heights/listbox | `var(--listbox-max-height)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
 | Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
 | Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
-| — (code only) | `var(--layout-z-index-card)` … `var(--layout-z-index-tooltip)` | Atlassian's layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
-| — (code only) | `var(--layout-max-width-listbox)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
-| — (code only) | `var(--layout-control-checkbox)` · `var(--layout-control-radio)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
-| — (code only) | `var(--layout-calendar-day-sm)` · `var(--layout-calendar-day-md)` · `var(--layout-calendar-day-lg)` · `var(--layout-calendar-nav)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
-| — (code only) | `var(--layout-width-join-row)` | 520, the Home Join button with the session Select beside it |
+| — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | Atlassian's layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
+| — (code only) | `var(--listbox-max-width)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
+| — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
+| — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` · `var(--calendar-nav-size)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
+| — (code only) | `var(--join-row-width)` | 520, the Home Join button with the session Select beside it |
 
 ## Rules for create_design_system_rules
 
@@ -166,6 +166,6 @@ When encoding rules via `create_design_system_rules`, include these conventions:
 
 1. **Never hardcode** — all visual values must map to the tokens above
 2. **Container for filled surfaces** — use `-container` tokens for filled surfaces
-3. **Semantic context** — choose token by context (card → `--size-card-*`, element → `--size-element-*`)
+3. **Semantic context** — choose token by context (card → `--size-card-*`, element → the semantics `--pad-*`, `--stack-*`, `--inline-*`, `--radius-*`)
 4. **Font Awesome Free only** — `fa-solid`, `fa-regular`, `fa-brands`. No Pro icons
 5. **React-Bootstrap base** — components extend Bootstrap 5.3, not alternative frameworks

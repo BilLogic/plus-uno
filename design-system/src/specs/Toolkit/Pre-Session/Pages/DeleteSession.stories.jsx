@@ -52,7 +52,7 @@ The page uses the **PageLayout** component which provides:
 - \`--size-card-gap-md\`: Between stat cards
 
 ### Element Spacing
-- \`--size-element-gap-sm\`: Between filter dropdowns
+- \`--stack-md\`: Between filter dropdowns
 
 ## Interactive Features
 
@@ -73,7 +73,7 @@ The Interactive story includes:
  * - Section gap: --size-section-gap-lg (between major sections)
  * - Section gap: --size-section-gap-sm (within table section)
  * - Card gap: --size-card-gap-md (between stat cards)
- * - Element gap: --size-element-gap-sm (between filter dropdowns)
+ * - Element gap: --stack-md (between filter dropdowns)
  */
 const MainContent = ({
     showAlert = true,
@@ -103,7 +103,7 @@ const MainContent = ({
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Sessions</h2>
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                 <Button iconBefore="plus">
                     Create New Sessions
                 </Button>
@@ -128,7 +128,7 @@ const MainContent = ({
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 className="h4 font-weight-semibold" style={{ color: 'var(--ds-text)', margin: 0 }}>My Sessions</h3>
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                     <SiteFilter />
                     <TimeframeFilter />
                 </div>

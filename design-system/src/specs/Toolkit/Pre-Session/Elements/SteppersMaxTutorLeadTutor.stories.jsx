@@ -20,8 +20,8 @@ Two steppers side by side for setting the max number of regular tutors and lead 
 - **Invalid lead tutor #**: Regular tutors normal, lead tutors has error (red border, no buttons) + error caption
 
 ## Design Tokens
-- **Row gap**: \`--size-element-gap-lg\` (12px) between the two steppers
-- **Label-to-input gap**: \`--size-element-gap-xs\` (4px)
+- **Row gap**: \`--stack-lg\` (12px) between the two steppers
+- **Label-to-input gap**: \`--stack-sm\` (4px)
 - **Error border**: \`--color-danger\`
 - **Error caption**: body3-txt, \`--color-danger-text\`, icon \`fa-triangle-exclamation\`
                 `
@@ -40,7 +40,7 @@ const ErrorStepper = ({ label = 'Max # of lead tutors', value = '4' }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             alignItems: 'flex-start',
             width: '100%',
         }}
@@ -74,7 +74,7 @@ const StepperRow = ({ children }) => (
         style={{
             display: 'flex',
             alignItems: 'flex-start',
-            gap: 'var(--size-element-gap-lg)',
+            gap: 'var(--stack-lg)',
             width: '100%',
         }}
     >
@@ -90,7 +90,7 @@ const StepperColumn = ({ children }) => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             flex: 1,
         }}
     >

@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-danger` · `--color-outline-variant` · `--color-primary` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-text` · `--icon-md` · `--item-height-md` · `--size-element-gap-md` · `--size-element-gap-sm` · `--size-element-gap-xs` · `--type-weight-regular`
+`--body-default` · `--color-danger` · `--color-outline-variant` · `--color-primary` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-text` · `--icon-md` · `--item-height-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating.scss`. Override these through the token layer, never with a literal.
 

@@ -49,7 +49,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--element-gap-default` · `--radio-control-size` · `--space-0625`
+`--body-default` · `--ds-text` · `--radio-control-size` · `--space-0625` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/RadioGroup.scss`. Override these through the token layer, never with a literal.
 

@@ -29,7 +29,7 @@ const slot = (label, minHeight = 'var(--height-500)') => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight,
-            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
+            border: 'var(--border-default) dashed var(--ds-border-bold)',
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
             font: 'var(--body-default)',
@@ -167,7 +167,7 @@ export const ColorModes = {
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
         await expect(tokenLength(frame, '--size-surface-border'), 'the surface edge covers the divider')
-            .toBeGreaterThanOrEqual(tokenLength(frame, '--size-element-stroke-sm'));
+            .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
             const surfaceStyle = getComputedStyle(surface);
@@ -178,7 +178,7 @@ export const ColorModes = {
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
                 .toBe(computedShadow(canvasElement, PAGE_EDGE));
             await expect(asideStyle.borderRightStyle, `${mode}: the docked sidebar's divider`).toBe('solid');
-            await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--size-element-stroke-sm'), 1);
+            await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
             await expect(asideStyle.borderRightColor, `${mode}: in the border color`).toBe(tokenColor(canvasElement, '--ds-border'));
             if (mode.startsWith('dark')) {
                 await expect(frameStyle.backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);

@@ -10,7 +10,7 @@ const row = { display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wra
 const inverseGround = {
     ...row,
     padding: '16px',
-    borderRadius: 'var(--size-element-radius-md)',
+    borderRadius: 'var(--radius-md)',
     background: 'var(--color-inverse-surface)',
 };
 const primaryGround = { ...inverseGround, background: 'var(--color-primary)' };
@@ -146,7 +146,7 @@ export const InverseGrounds = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
             {INVERSE_GROUNDS.map((ground) => (
-                <div key={ground} data-ground={ground} style={{ ...row, padding: '16px', borderRadius: 'var(--size-element-radius-md)', background: `var(${ground})` }}>
+                <div key={ground} data-ground={ground} style={{ ...row, padding: '16px', borderRadius: 'var(--radius-md)', background: `var(${ground})` }}>
                     <CloseButton tone="inverse" label={`Dismiss example on ${ground.replace('--color-', '')}`} />
                 </div>
             ))}

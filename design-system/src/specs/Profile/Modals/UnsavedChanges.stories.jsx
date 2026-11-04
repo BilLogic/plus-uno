@@ -28,7 +28,7 @@
  * Spacing:
  * - Modal padding: var(--size-modal-pad-x-lg, 20px) / var(--size-modal-pad-y-lg, 16px)
  * - Modal gap: var(--size-modal-gap-lg, 20px)
- * - Body padding-y: var(--size-element-pad-y-lg, 8px)
+ * - Body padding-y: var(--pad-y-lg, 8px)
  * - Button footer gap: var(--size-modal-gap-sm, 8px)
  * - Modal border-radius: var(--size-border-radius-large, 12px)
  * 
@@ -99,7 +99,7 @@ const UnsavedChangesModal = () => {
             <div
                 style={{
                     width: '100%',
-                    padding: 'var(--size-element-pad-y-lg, 8px) 0',
+                    padding: 'var(--pad-y-lg, 8px) 0',
                 }}
             >
                 <p
@@ -143,7 +143,7 @@ const UnsavedChangesModal = () => {
 
 export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <UnsavedChangesModal />
         </div>
     ),

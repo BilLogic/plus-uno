@@ -31,7 +31,7 @@ const RadioLabel = () => (
  * their own RadioGroup beside the other answers.
  *
  * Tokens:
- * - Gap between date pickers and "to": --size-element-gap-sm
+ * - Gap between date pickers and "to": --stack-md
  * - Typography: body2-txt
  * - Color: --color-on-surface
  */
@@ -51,7 +51,7 @@ export const dateRangeOption = ({
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
             }}
         >
             <DatePicker

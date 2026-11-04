@@ -15,7 +15,7 @@ const galleryLabel = {
     color: 'var(--ds-text-subtle)',
     fontWeight: 600,
     display: 'block',
-    marginBottom: 'var(--size-element-gap-sm)',
+    marginBottom: 'var(--stack-md)',
 };
 
 /**

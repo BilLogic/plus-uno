@@ -115,14 +115,16 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   sit beside the old size files and generate
   `_scales.scss`. Each records `hiddenFromPublishing`, and its variables
   carry `scopes` and `codeSyntax`. A variable's `codeSyntax.WEB`
-  (`var(--element-pad-x-sm)`) is its CSS name, so the generator refuses a
+  (`var(--pad-x-sm)`) is its CSS name, so the generator refuses a
   variable without one instead of deriving a name.
 - The old `sync:tokens` Figma-pull script is deleted (ADR-038): it wrote to a
   `new tokens/` folder nothing read, and resolved only one alias level. These
   files come from a manual Figma export under `tokens/source/`; the
-  deep-foundation families (space/size roles, radius, border width,
-  typography roles, motion) generate the other direction instead, code →
-  Figma, via `npm run generate:design-tokens`.
+  four-tier token ladder (semantics, patterns, components, layers) and motion
+  generate the other direction instead, code → Figma, via
+  `npm run generate:design-tokens`. `generate:tokens` drops the retired names
+  (`RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs`) that the Figma exports
+  still carry.
 - Never edit generated token files (`_colors.scss`, `_spacing_semantics.scss`, etc.) directly
 - Where a token deliberately differs from Figma, or is not in Figma, the
   generator says so in a named constant (`SEMANTIC_OVERRIDES`,

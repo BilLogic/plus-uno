@@ -19,7 +19,7 @@ export default {
 export const Default = () => {
     const [status, setStatus] = useState('unknown');
     return (
-        <div className="d-flex flex-column" style={{ gap: 'var(--size-element-gap-md)', minHeight: '160px' }}>
+        <div className="d-flex flex-column" style={{ gap: 'var(--space-0625)', minHeight: '160px' }}>
             <AttendanceDropdown onStatusChange={setStatus} />
             <p className="body3-txt">Attendance: <strong data-testid="applied">{status}</strong></p>
         </div>

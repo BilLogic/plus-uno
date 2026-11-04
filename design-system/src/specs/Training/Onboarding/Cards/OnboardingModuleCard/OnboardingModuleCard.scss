@@ -108,15 +108,15 @@
     &__info {
         display: flex;
         flex-direction: column;
-        gap: var(--element-pad-compact, 8px);
-        padding: 0 var(--size-element-pad-y-sm, 4px);
+        gap: var(--pad-x-sm, 8px);
+        padding: 0 var(--space-025, 4px);
         width: 100%;
     }
 
     &__tags {
         display: flex;
         align-items: center;
-        padding: var(--size-element-pad-y-sm, 4px) 0;
+        padding: var(--space-025, 4px) 0;
         width: 100%;
     }
 
@@ -153,9 +153,9 @@
     &__footer {
         border-top: 1px solid var(--color-outline-variant);
         display: flex;
-        gap: var(--size-element-gap-sm, 8px);
+        gap: var(--stack-md, 8px);
         align-items: center;
-        padding: var(--size-element-gap-sm, 8px) 0;
+        padding: var(--stack-md, 8px) 0;
         width: 100%;
     }
 }

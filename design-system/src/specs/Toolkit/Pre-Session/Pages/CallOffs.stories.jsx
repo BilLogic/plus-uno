@@ -49,7 +49,7 @@ const CallOffStateToggle = ({ selected, onSelect, interactive = true }) => (
  * - Section gap: --size-section-gap-lg (between major sections)
  * - Section gap: --size-section-gap-sm (within table section)
  * - Card gap: --size-card-gap-md (between stat cards)
- * - Element gap: --size-element-gap-sm (between filter elements)
+ * - Element gap: --stack-md (between filter elements)
  */
 const MainContent = ({
     tabs,
@@ -92,7 +92,7 @@ const MainContent = ({
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="Call-off requests" />
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
                     <CallOffStateToggle
                         selected={callOffState}
                         onSelect={onCallOffStateChange}
@@ -335,13 +335,13 @@ export const WithModals = (args) => {
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
             }}>
                 {/* Breakpoint Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0625)', flexWrap: 'wrap' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '80px' }}>
                         Breakpoint:
                     </span>
@@ -357,12 +357,12 @@ export const WithModals = (args) => {
                 </div>
 
                 {/* Modal State Toggle */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                         Modal State:
                     </span>
                     {Object.entries(modalStates).map(([category, states]) => (
-                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)', flexWrap: 'wrap' }}>
                             <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', minWidth: '120px', fontSize: '0.75rem' }}>
                                 {category}:
                             </span>
