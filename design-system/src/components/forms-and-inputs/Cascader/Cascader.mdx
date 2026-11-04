@@ -1,20 +1,181 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CascaderStories from './Cascader.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CascaderStories} />
 
 <Title />
-A cascader picks a path through a hierarchy, one column per level.
+Picks a path through a hierarchy, one column per level — choose a value at
+one level to reveal the next column of choices beneath it.
 
 <DocsTabs of={CascaderStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={CascaderStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/Cascader"
+/>
 
-<ArgTypes of={CascaderStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A path field, closed.</>}>
+    <Canvas of={CascaderStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Opening an empty field builds the path column by column. A pre-selected path shows its value in the field, and opening reveals columns up to the current level.</>}>
+    <DsCanvasQuiet of={CascaderStories.Content} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
+    <DsCanvasQuiet of={CascaderStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>Disabled and invalid.</>}>
+    <DsCanvasQuiet of={CascaderStories.InteractionStates} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CascaderStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>options</code></td><td>array</td><td>Nested nodes: a string, or an object with <code>value</code>, <code>text</code> or <code>label</code>, <code>children</code> and <code>disabled</code>.</td></tr>
+        <tr><td><code>value</code></td><td>array</td><td>The full path, outermost value first.</td></tr>
+        <tr><td><code>onChange</code></td><td>function</td><td>Called with the path array as each column is chosen.</td></tr>
+        <tr><td><code>label</code>, <code>caption</code>, <code>info</code></td><td>—</td><td>Without a visible <code>label</code>, pass <code>aria-label</code> or <code>aria-labelledby</code>.</td></tr>
+        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
+        <tr><td><code>isDisabled</code>, <code>isRequired</code>, <code>isInvalid</code>, <code>errorMessage</code></td><td>—</td><td>—</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Cascader` when a choice is naturally made one level at a time, in
+sequence — a region, then a city, then a neighborhood. For a hierarchy where
+someone might pick or see several nodes at once rather than one path, use
+`TreeSelect` instead. For a flat list, use `Select`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `value` is the path, not just the final node.
+
+Pass and read the whole array — `['zhejiang', 'hangzhou', 'westlake']` — not
+just the last segment, since the intermediate levels are part of the
+answer, not scaffolding to discard.
+
+```jsx
+<Cascader
+    label="Region"
+    value={region}
+    onChange={setRegion}
+    options={[
+        { value: 'zhejiang', label: 'Zhejiang', children: [
+            { value: 'hangzhou', label: 'Hangzhou', children: [
+                { value: 'westlake', label: 'West Lake' },
+            ] },
+        ] },
+    ]}
+/>
+```
+
+### Reopening a field with a path shows the columns leading to it.
+
+A pre-selected `Cascader` doesn't reopen to a blank first column — it reveals
+every column up to the current level, so the person can see and change any
+step of the path, not just restart from the top.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The field states the full path**, not just the deepest choice, so its
+  accessible value matches what's visibly shown.
+- **Without a visible label, name the field explicitly** with `aria-label`
+  or `aria-labelledby`.
+- **Disabled nodes are skipped, not just dimmed** — they take no focus and
+  can't be chosen at any column.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a hierarchy where several nodes can be picked or seen at once, use
+  `TreeSelect`.
+- For a flat list with no hierarchy, use `Select`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
