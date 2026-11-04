@@ -50,6 +50,8 @@ const RadioGroup = ({
     error,
     className = '',
     style,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
     ...props
 }) => {
     const isControlled = value !== undefined;
@@ -99,6 +101,15 @@ const RadioGroup = ({
     const errorId = error ? `${fieldId}-error` : undefined;
     const describedBy = [leadingId, trailingId, errorId].filter(Boolean).join(' ') || undefined;
 
+    // Base UI's RadioGroup does not inherit the ambient Fieldset's legend as
+    // its own accessible name (unlike Radio's private group, which inherits
+    // too much and has to suppress it — see Radio.jsx). `legendId` repeats
+    // Fieldset's own `${fieldId}-legend` so the one real group gets named by
+    // the question it groups. A caller's own `aria-label`/`aria-labelledby`
+    // (the "Pick one" story) wins over the legend.
+    const legendId = legend ? `${fieldId}-legend` : undefined;
+    const groupLabelledBy = ariaLabelledBy ?? (ariaLabel ? undefined : legendId);
+
     const classes = [
         'plus-radio-group',
         `plus-radio-group-${orientation}`,
@@ -133,6 +144,8 @@ const RadioGroup = ({
                 required={isRequired}
                 aria-describedby={describedBy}
                 aria-invalid={invalid || undefined}
+                aria-label={ariaLabel}
+                aria-labelledby={groupLabelledBy}
             >
                 {leadingText || trailingText ? (
                     <div className="plus-radio-group-scale">
