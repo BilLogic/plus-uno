@@ -39,7 +39,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--size-element-gap-lg);
+    gap: var(--stack-lg);
     flex-shrink: 0;
 }
 
@@ -66,11 +66,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
+    padding: var(--space-025) var(--pad-x-sm);
     margin-left: auto;
     background: transparent;
     border: none;
-    border-radius: var(--size-element-radius-md);
+    border-radius: var(--radius-md);
     color: var(--ds-icon-subtle);
     cursor: pointer;
 
@@ -93,7 +93,7 @@
 /* Divider: the 1px rule under the header and above the footer, the modal stack on both sides */
 .plus-pattern-modal-divider {
     flex-shrink: 0;
-    height: var(--size-element-border);
+    height: var(--border-default);
     background-color: var(--ds-border);
 }
 
@@ -108,6 +108,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     flex-shrink: 0;
 }

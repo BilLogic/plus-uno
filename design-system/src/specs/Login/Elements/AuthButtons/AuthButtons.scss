@@ -1,7 +1,7 @@
 .login-auth-buttons {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-lg);
+    gap: var(--stack-lg);
     width: 100%;
 }
 
@@ -17,8 +17,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--size-element-radius-md);
-    border: var(--size-element-border) solid #2e76ff;
+    border-radius: var(--radius-md);
+    border: var(--border-default) solid #2e76ff;
     background: #2e76ff;
     overflow: hidden;
     padding: 0;

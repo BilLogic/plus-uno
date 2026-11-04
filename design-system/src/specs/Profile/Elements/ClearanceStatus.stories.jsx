@@ -95,7 +95,7 @@ export function ClearanceStatus({ status = 'verified', date = 'March 16, 2026' }
 }
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <ClearanceStatus status="verified" date="March 16, 2026" />
     </div>
 );
@@ -106,7 +106,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-md, 16px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <ClearanceStatus status="verified" date="March 16, 2026" />
@@ -134,7 +134,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <ClearanceStatus
                 status={args.status}
                 date={args.status === 'in-progress' ? undefined : args.date}

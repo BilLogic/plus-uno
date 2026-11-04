@@ -126,7 +126,7 @@ export const AllStates = () => (
 
         <div>
             <h6 className="text-muted mb-2">Badge States (Static Reference)</h6>
-            <div className="d-flex flex-wrap align-items-center" style={{ gap: 'var(--size-element-gap-lg)' }}>
+            <div className="d-flex flex-wrap align-items-center" style={{ gap: 'var(--stack-lg)' }}>
                 <EngagementBadge status="unknown" showDropdown={true} />
                 <EngagementBadge status="fully-engaged" showDropdown={true} />
                 <EngagementBadge status="partially-engaged" showDropdown={true} />

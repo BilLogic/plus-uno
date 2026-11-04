@@ -84,7 +84,7 @@ export default function LoginPortal({
                     <h1 className="login-portal-header__title h1">Add Your Details</h1>
                 </div>
 
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-lg)' }}>
                     <div style={{ flex: 1 }}>
                         <div className="login-field">
                             <div className="login-field__label body1-txt font-weight-semibold">
@@ -153,7 +153,7 @@ export default function LoginPortal({
                     <h1 className="login-portal-header__title h1">Add Your Details</h1>
                 </div>
 
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-lg)' }}>
                     <div style={{ flex: 1 }}>
                         <div className="login-field">
                             <div className="login-field__label body1-txt font-weight-semibold">

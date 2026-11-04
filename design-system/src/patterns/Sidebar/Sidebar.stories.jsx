@@ -609,7 +609,7 @@ export const Thread = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const outline = tokenColor(canvasElement, '--ds-border');
-        const stroke = tokenLength(canvasElement, '--size-element-stroke-sm');
+        const stroke = tokenLength(canvasElement, '--stroke-1');
         const thread = (li) => getComputedStyle(li, '::before');
         const parentRow = canvas.getByRole('button', { name: /^Sessions$/ });
         const parentIcon = parentRow.querySelector('.plus-sidebar-tab__icon').getBoundingClientRect();
@@ -639,7 +639,7 @@ export const Thread = {
                     await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
                     await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--radius-h24'), 0);
                     await expect(box.left + px(line.left) + px(line.width), 'the stub stops short of a focused surface\'s ring')
-                        .toBeCloseTo(box.left + column - 2 * tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
+                        .toBeCloseTo(box.left + column - 2 * tokenLength(canvasElement, '--stroke-2'), 0);
                 } else {
                     await expect(box.top + px(line.top) + px(line.height), 'runs through the gap to the next row').toBeCloseTo(rows[index + 1].getBoundingClientRect().top, 0);
                     await expect(px(line.borderBottomWidth), 'no elbow mid-thread').toBe(0);

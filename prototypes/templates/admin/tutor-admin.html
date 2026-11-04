@@ -68,8 +68,8 @@
             color: var(--ds-text-subtle);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: var(--size-element-gap-sm);
-            padding: 0 var(--element-pad-compact);
+            margin-bottom: var(--stack-md);
+            padding: 0 var(--pad-x-sm);
         }
         
         /* Main Content Area - Surface */
@@ -83,30 +83,30 @@
         /* Header - Surface Container */
         .tutor-admin-header {
             background-color: var(--ds-surface-container);
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
             padding: var(--size-surface-container-pad-y) var(--size-surface-pad-x);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--size-element-gap-md);
+            gap: var(--space-0625);
         }
         
         .header-left {
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-md);
+            gap: var(--space-0625);
         }
         
         .header-right {
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-md);
+            gap: var(--space-0625);
         }
         
         .user-info {
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-sm);
+            gap: var(--stack-md);
         }
         
         .user-icon {
@@ -132,13 +132,13 @@
         /* Tabs */
         .tutor-tabs {
             display: flex;
-            gap: var(--size-element-gap-sm);
+            gap: var(--stack-md);
             margin-bottom: var(--size-section-gap-md);
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
         }
         
         .tutor-tab {
-            padding: var(--size-element-pad-y-md) var(--element-pad-default);
+            padding: var(--pad-y-md) var(--pad-x-md);
             background: none;
             border: none;
             border-bottom: 2px solid transparent;
@@ -148,7 +148,7 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-sm);
+            gap: var(--stack-md);
             transition: all 0.2s;
         }
         
@@ -165,7 +165,7 @@
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: var(--size-element-gap-md);
+            gap: var(--space-0625);
             margin-bottom: var(--size-section-gap-md);
             flex-wrap: wrap;
         }
@@ -194,7 +194,7 @@
             font-weight: var(--font-weight-semibold-2);
             font-size: var(--font-size-body2);
             color: var(--ds-text-subtle);
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
         }
         
         .tutor-table th.sortable {
@@ -202,7 +202,7 @@
             user-select: none;
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-xs);
+            gap: var(--stack-sm);
         }
         
         .tutor-table th.sortable:hover {
@@ -211,7 +211,7 @@
         
         .tutor-table td {
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
             font-size: var(--font-size-body1);
             color: var(--ds-text);
         }
@@ -227,7 +227,7 @@
         .tutor-name-cell {
             display: flex;
             align-items: center;
-            gap: var(--size-element-gap-sm);
+            gap: var(--stack-md);
         }
         
         .tutor-email {
@@ -237,7 +237,7 @@
         
         .tutor-actions {
             display: flex;
-            gap: var(--size-element-gap-md);
+            gap: var(--space-0625);
         }
         
         .tutor-action-link {
@@ -254,7 +254,7 @@
         /* Footer */
         .tutor-admin-footer {
             background-color: var(--ds-surface-container);
-            border-top: var(--size-element-border) solid var(--color-outline-variant);
+            border-top: var(--border-default) solid var(--color-outline-variant);
             padding: var(--size-section-pad-y-sm) var(--size-surface-pad-x);
             display: flex;
             justify-content: space-between;
@@ -269,7 +269,7 @@
             border: none;
             color: var(--ds-text);
             cursor: pointer;
-            padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
+            padding: var(--space-025) var(--pad-x-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -277,7 +277,7 @@
         
         .collapse-sidebar-btn:hover {
             background-color: var(--ds-background-neutral-subtle-hovered);
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
         }
         
         /* Bulk Actions Toolbar */
@@ -304,9 +304,9 @@
         .plus-textarea,
         .plus-select {
             width: 100%;
-            padding: var(--size-element-pad-y-md) var(--element-pad-default);
-            border: var(--size-element-border) solid var(--color-outline);
-            border-radius: var(--size-element-radius-sm);
+            padding: var(--pad-y-md) var(--pad-x-md);
+            border: var(--border-default) solid var(--color-outline);
+            border-radius: var(--radius-md);
             background-color: var(--ds-surface);
             color: var(--ds-text);
             font-family: var(--font-family-body);

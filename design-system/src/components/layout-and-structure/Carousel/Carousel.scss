@@ -43,7 +43,7 @@
 .plus-carousel {
     position: relative;
     width: 100%;
-    border-radius: var(--size-element-radius-md);
+    border-radius: var(--radius-md);
     overflow: hidden;
 
     // --- TRACK & SLIDES ---
@@ -91,7 +91,7 @@
 
         .plus-carousel-title {
             font: var(--heading-medium);
-            margin-bottom: var(--size-element-gap-sm);
+            margin-bottom: var(--stack-md);
             color: inherit;
         }
 
@@ -157,7 +157,7 @@
         right: 0;
         z-index: 2;
         margin-bottom: var(--size-section-pad-y-sm);
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
         display: flex;
         justify-content: center;
         padding: 0;
@@ -168,7 +168,7 @@
         height: var(--size-spacing-small-space-075); // 6px
         padding: 0;
         border: none;
-        border-radius: var(--size-element-radius-lg);
+        border-radius: var(--radius-lg);
         background-color: var(--ds-border);
         opacity: 1;
         cursor: pointer;

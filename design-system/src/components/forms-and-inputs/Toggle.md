@@ -42,7 +42,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--plus-toggle-pad` · `--plus-toggle-thumb` · `--plus-toggle-track-h` · `--plus-toggle-track-w` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral-bold` · `--ds-background-neutral-bold-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--plus-toggle-pad` · `--plus-toggle-thumb` · `--plus-toggle-track-h` · `--plus-toggle-track-w` · `--radius-full` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Toggle.scss`. Override these through the token layer, never with a literal.
 

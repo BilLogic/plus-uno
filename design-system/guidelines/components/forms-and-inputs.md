@@ -133,11 +133,11 @@ announces it through a visually hidden "Required" description on the trigger.
 rule: `Select`, `TagInput`, `TreeSelect`, `Cascader`, `DatePicker`,
 `DateTimePicker` and the `Dropdown` menu.
 
-- **Gap:** `--size-element-gap-xs` (4px) between the trigger's edge and the
+- **Gap:** `--stack-sm` (4px) between the trigger's edge and the
   popup surface, as a token, with Bootstrap's spacer margin reset to zero.
   Every popup in the family decides its flip and alignment through one
   module, `_internal/anchorPlacement.js`; a popup placed in CSS uses
-  `calc(100% + var(--size-element-gap-xs))`.
+  `calc(100% + var(--stack-sm))`.
 - **Alignment:** the popup's left edge sits on the trigger's left edge. Near
   the viewport's right edge it right-aligns instead.
 - **Width:** at least the trigger's width. Content grows it up to 320px, and

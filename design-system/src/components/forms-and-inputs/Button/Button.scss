@@ -64,7 +64,7 @@ $btn-appearances: (
 
     // Every appearance draws a 1px edge, transparent unless the appearance
     // colors it, so the height is the same in all of them.
-    border: var(--size-element-border) solid transparent;
+    border: var(--border-default) solid transparent;
     text-align: center;
     white-space: nowrap;
     text-decoration: none;

@@ -43,7 +43,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
         hover: { backgroundColor: 'var(--ds-background-neutral-subtle-hovered)' },
         pressed: { backgroundColor: 'var(--ds-background-neutral-subtle-pressed)' },
         focus: {
-            border: 'var(--size-element-stroke-lg) solid var(--ds-border-focused)'
+            border: 'var(--stroke-2) solid var(--ds-border-focused)'
         },
         disabled: { opacity: 0.5, pointerEvents: 'none' }
     };
@@ -76,7 +76,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -97,7 +97,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
-                    gap: 'var(--size-element-gap-xs)',
+                    gap: 'var(--stack-sm)',
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis'
@@ -160,7 +160,7 @@ export const TableHeaderRow = () => (
                 gridColumn: 'span 2',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
@@ -182,7 +182,7 @@ export const TableHeaderRow = () => (
                 gridColumn: 'span 2',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-sm)',
+                gap: 'var(--stack-md)',
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
@@ -271,7 +271,7 @@ export const RowStates = () => (
         <h3 className="h5">Table Row States</h3>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -283,7 +283,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -295,7 +295,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Pressed</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Pressed</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -307,7 +307,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Focus</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Focus</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"
@@ -319,7 +319,7 @@ export const RowStates = () => (
         </div>
 
         <div>
-            <h4 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Disabled</h4>
+            <h4 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Disabled</h4>
             <TableRow
                 date="Tue, Sep 9"
                 timeRange="12:30 PM - 1:30 PM"

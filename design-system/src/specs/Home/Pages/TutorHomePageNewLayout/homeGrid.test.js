@@ -14,15 +14,15 @@ const last = tokenCorpus({ precedence: 'last' });
 /** A length token's Medium value (`:root`), or its widest-mode value with `last`. */
 const px = (token, corpus = first) => parseFloat(corpus.get(token).value);
 const grid = {
-    columns: parseInt(first.get('--layout-columns').value, 10),
-    gutter: px('--layout-gutter'),
+    columns: parseInt(first.get('--grid-columns').value, 10),
+    gutter: px('--grid-gutter'),
     cardMin: px('--card-min-width-md'),
 };
 const width = {
-    md: px('--layout-width-content'),
+    md: px('--content-width'),
     // Large's content: the screen less the docked sidebar, the frame's right pad and two surface pads.
-    lg: px('--breakpoint-lg-min') - px('--layout-width-sidebar') - px('--frame-pad') - 2 * px('--page-pad'),
-    xl: px('--layout-width-content', last),
+    lg: px('--breakpoint-lg-min') - px('--frame-sidebar-width') - px('--frame-pad') - 2 * px('--page-pad'),
+    xl: px('--content-width', last),
 };
 
 describe('the grid arithmetic', () => {

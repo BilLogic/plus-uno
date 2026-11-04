@@ -28,7 +28,7 @@ A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fields
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--element-gap-default`
+`--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Fieldset.scss`. Override these through the token layer, never with a literal.
 

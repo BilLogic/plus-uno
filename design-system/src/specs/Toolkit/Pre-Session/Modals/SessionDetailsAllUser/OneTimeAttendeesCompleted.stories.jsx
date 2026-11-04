@@ -25,8 +25,8 @@ export default {
  * A single student row inside a tutor panel showing name and attendance badge
  *
  * Tokens:
- * - Padding: --size-element-pad-y-lg 0
- * - Gap: --size-element-gap-sm
+ * - Padding: --pad-y-lg 0
+ * - Gap: --stack-md
  * - Name: body2-txt font-weight-light, --color-on-surface
  * - Joined badge: success style
  * - Did not join badge: danger style
@@ -35,8 +35,8 @@ const AttendeeRow = ({ name, status = 'joined' }) => (
     <div
         className="d-flex justify-content-between align-items-center w-100"
         style={{
-            padding: 'var(--size-element-pad-y-lg) 0',
-            gap: 'var(--size-element-gap-sm)',
+            padding: 'var(--pad-y-lg) 0',
+            gap: 'var(--stack-md)',
         }}
     >
         <span
@@ -54,8 +54,8 @@ const AttendeeRow = ({ name, status = 'joined' }) => (
  * A panel showing a tutor's name, student count, and their assigned students
  *
  * Tokens:
- * - Border: --size-element-border solid --color-outline-variant
- * - Border radius: --size-element-radius-md
+ * - Border: --border-default solid --color-outline-variant
+ * - Border radius: --radius-md
  * - Header padding: --size-modal-pad-y-md --size-modal-pad-x-md
  * - Header name: body2-txt font-weight-semibold, --color-on-surface
  * - Student count badge: info style, b3 size, users icon
@@ -64,8 +64,8 @@ const AttendeeRow = ({ name, status = 'joined' }) => (
 const TutorPanel = ({ tutorName, studentCount, students = [] }) => (
     <div
         style={{
-            border: 'var(--size-element-border) solid var(--color-outline-variant)',
-            borderRadius: 'var(--size-element-radius-md)',
+            border: 'var(--border-default) solid var(--color-outline-variant)',
+            borderRadius: 'var(--radius-md)',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',

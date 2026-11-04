@@ -15,7 +15,7 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   children from "one per open overlay" into "one, ever," which the
  *   contract-test harness (and anything else that reads body's direct
  *   children to find a portaled node) depends on. `Flag` is the one adapter
- *   with no portal or stack entry: it draws from `--layout-z-index-flag`, the
+ *   with no portal or stack entry: it draws from `--layer-flag`, the
  *   top of the scale in `design-system/src/tokens/_layout.scss`, so it layers
  *   above a modal wherever its `FlagContainer` is placed.
  * - **At most two overlays stack**: a modal (or drawer) and the confirm it

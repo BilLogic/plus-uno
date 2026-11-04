@@ -240,7 +240,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Completed Reflections</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <ReflectionsTableHeaderRow />
                 <ReflectionsTableRow
                     date="Tue, Sep 9"
@@ -253,7 +253,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <ReflectionsTableRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -270,7 +270,7 @@ export const Overview = () => (
             <h5 className="h5" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>Incomplete Reflections</h5>
             
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Default State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Default State</h6>
                 <ReflectionsTableHeaderRow />
                 <ReflectionsTableRow
                     date="Tue, Sep 9"
@@ -283,7 +283,7 @@ export const Overview = () => (
             </div>
 
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
-                <h6 className="h6" style={{ marginBottom: 'var(--size-element-gap-md)' }}>Hover State</h6>
+                <h6 className="h6" style={{ marginBottom: 'var(--space-0625)' }}>Hover State</h6>
                 <ReflectionsTableRow
                     date="Tue, Sep 9"
                     timeRange="12:30 PM - 1:30 PM"
@@ -370,7 +370,7 @@ export const Interactive = () => {
             <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-lg)',
+                gap: 'var(--stack-lg)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)'

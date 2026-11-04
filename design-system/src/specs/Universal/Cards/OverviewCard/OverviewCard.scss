@@ -33,7 +33,7 @@
     &__header {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-xs, 4px);
+        gap: var(--stack-sm, 4px);
         width: 100%;
         flex-shrink: 0;
     }
@@ -122,7 +122,7 @@
     // SMART Vertical Bars (ensure labels have room and are not clipped)
     &__smart-viz {
         display: flex;
-        gap: var(--size-element-gap-xs, 4px);
+        gap: var(--stack-sm, 4px);
         align-items: flex-end;
         overflow: visible;
     }
@@ -131,7 +131,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--size-element-gap-xs, 4px);
+        gap: var(--stack-sm, 4px);
         overflow: visible;
     }
 

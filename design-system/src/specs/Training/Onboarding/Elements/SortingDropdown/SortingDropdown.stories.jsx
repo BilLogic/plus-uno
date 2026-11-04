@@ -63,7 +63,7 @@ export const Interactive = {
 
         return (
             <div style={{ padding: 'var(--size-section-pad-y-lg)', minHeight: '320px' }}>
-                <p className="body2-txt" style={{ marginBottom: 'var(--size-element-gap-lg)' }}>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)' }}>
                     Sorted by: <strong data-testid="applied">{`${sort.sortBy} ${sort.sortOrder}`}</strong>
                 </p>
                 <SortingDropdown

@@ -46,7 +46,7 @@
 // Lesson Progress Bar
 .lesson-progress-bar {
     display: flex;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
     align-items: flex-start;
     padding: 0;
     width: 100%;
@@ -65,7 +65,7 @@
         background-color: var(--ds-surface-container);
         height: 4px;
         width: 100%;
-        border-radius: var(--size-element-radius-sm);
+        border-radius: var(--radius-md);
         overflow: hidden;
         position: relative;
 
@@ -78,11 +78,11 @@
 // Supervisor Alert
 .supervisor-alert {
     display: flex;
-    gap: var(--size-element-gap-md, 12px);
+    gap: var(--space-0625, 12px);
     align-items: flex-start;
     padding: var(--size-card-pad-y-sm, 12px) var(--size-card-pad-x-sm, 16px);
     background-color: var(--ds-surface);
-    border: var(--size-element-border) solid var(--color-primary-border);
+    border: var(--border-default) solid var(--color-primary-border);
     border-radius: var(--size-card-radius-sm, 8px);
     width: 100%;
     box-sizing: border-box;
@@ -127,9 +127,9 @@
 .likert-scale {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-md, 12px);
+    gap: var(--space-0625, 12px);
     width: 100%;
-    padding: var(--size-element-pad-y-sm, 4px);
+    padding: var(--space-025, 4px);
 
     &__label {
         color: var(--ds-text-subtle);
@@ -192,9 +192,9 @@
 
     &__subtitle {
         display: flex;
-        gap: var(--size-element-gap-sm, 8px);
+        gap: var(--stack-md, 8px);
         align-items: center;
-        margin-top: var(--size-element-gap-sm, 8px);
+        margin-top: var(--stack-md, 8px);
 
         i {
             color: var(--color-on-primary-container);
@@ -252,7 +252,7 @@
         p,
         ul {
             color: var(--ds-text-subtle);
-            margin: 0 0 var(--size-element-gap-md, 12px) 0;
+            margin: 0 0 var(--space-0625, 12px) 0;
         }
 
         ul {
@@ -260,7 +260,7 @@
         }
 
         li {
-            margin-bottom: var(--size-element-gap-sm, 8px);
+            margin-bottom: var(--stack-md, 8px);
         }
     }
 
@@ -306,7 +306,7 @@
         p,
         ul {
             color: var(--ds-text-subtle);
-            margin: 0 0 var(--size-element-gap-md, 12px) 0;
+            margin: 0 0 var(--space-0625, 12px) 0;
         }
 
         ul {
@@ -314,7 +314,7 @@
         }
 
         li {
-            margin-bottom: var(--size-element-gap-sm, 8px);
+            margin-bottom: var(--stack-md, 8px);
         }
     }
 
@@ -329,19 +329,19 @@
         min-width: 600px;
         border-collapse: separate;
         border-spacing: 0;
-        border: var(--size-element-border) solid var(--color-outline-variant);
+        border: var(--border-default) solid var(--color-outline-variant);
 
         th {
             background-color: var(--color-info-container);
             color: var(--color-on-info-container);
-            padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
+            padding: var(--pad-y-md, 8px) var(--pad-x-md, 12px);
             text-align: left;
             font-weight: var(--font-weight-semibold-1);
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
 
             &:first-child {
                 width: 50%;
-                border-right: var(--size-element-border) solid var(--color-outline-variant);
+                border-right: var(--border-default) solid var(--color-outline-variant);
             }
 
             &:last-child {
@@ -352,12 +352,12 @@
         td {
             background-color: var(--ds-surface);
             color: var(--ds-text-subtle);
-            padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
+            padding: var(--pad-y-md, 8px) var(--pad-x-md, 12px);
             vertical-align: top;
-            border-bottom: var(--size-element-border) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--color-outline-variant);
 
             &:first-child {
-                border-right: var(--size-element-border) solid var(--color-outline-variant);
+                border-right: var(--border-default) solid var(--color-outline-variant);
             }
         }
 
@@ -372,7 +372,7 @@
 
         p {
             color: var(--ds-text-subtle);
-            margin: 0 0 var(--size-element-gap-md, 12px) 0;
+            margin: 0 0 var(--space-0625, 12px) 0;
         }
 
         a {
@@ -387,7 +387,7 @@
         margin: 0;
 
         li {
-            margin-bottom: var(--size-element-gap-sm, 8px);
+            margin-bottom: var(--stack-md, 8px);
         }
 
         a {
@@ -400,8 +400,8 @@
         width: 100%;
         min-height: 100px;
         border: 1px solid var(--color-outline-variant);
-        border-radius: var(--size-element-radius-sm);
-        padding: var(--size-element-pad-y-sm, 8px) var(--element-pad-compact, 8px);
+        border-radius: var(--radius-md);
+        padding: var(--space-025, 8px) var(--pad-x-sm, 8px);
         font-family: var(--font-family-body);
         font-size: var(--font-size-body3);
         color: var(--ds-text);
@@ -415,7 +415,7 @@
     &__radio-group {
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-gap-sm, 8px);
+        gap: var(--stack-md, 8px);
         padding: 0;
         width: 100%;
         box-sizing: border-box;
@@ -423,7 +423,7 @@
 
     &__radio-option {
         display: flex;
-        gap: var(--size-element-gap-sm, 8px);
+        gap: var(--stack-md, 8px);
         align-items: flex-start;
         cursor: pointer;
 
@@ -482,7 +482,7 @@
 
     &__score {
         margin-top: var(--size-section-gap-md, 16px);
-        padding-bottom: var(--size-element-pad-y-lg, 16px);
+        padding-bottom: var(--pad-y-lg, 16px);
 
         h1,
         .h1 {

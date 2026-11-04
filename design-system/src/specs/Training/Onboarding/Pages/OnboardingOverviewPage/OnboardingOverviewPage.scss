@@ -25,7 +25,7 @@
         justify-content: space-between;
         width: 100%;
         flex-wrap: wrap;
-        gap: var(--size-element-gap-md, 16px);
+        gap: var(--space-0625, 16px);
     }
 
     &__title-container {
@@ -36,7 +36,7 @@
 
     &__controls {
         display: flex;
-        gap: var(--size-element-gap-sm, 8px);
+        gap: var(--stack-md, 8px);
         align-items: center;
         justify-content: center;
     }
@@ -62,7 +62,7 @@
     &__carousel {
         display: flex;
         flex-wrap: nowrap;
-        gap: var(--size-element-gap-md, 16px);
+        gap: var(--space-0625, 16px);
         height: 348px;
         align-items: flex-start;
         overflow-x: auto;

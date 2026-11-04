@@ -55,7 +55,7 @@ export function EngagementChart({
         height={CHART_HEIGHT}
         theme={theme}
         style={{
-          padding: 'var(--size-element-pad-y-lg, 8px)',
+          padding: 'var(--pad-y-lg, 8px)',
           boxSizing: 'border-box',
         }}
       />

@@ -26,9 +26,9 @@ export default {
  * - Background: --color-surface-container-lowest
  * 
  * Spacing:
- * - Padding: --size-element-pad-y-md / --size-element-pad-x-md
- * - Gap between text and icon: --size-element-gap-md
- * - Border radius: --size-element-radius-sm (via --size-small-gap-xs for inner gap)
+ * - Padding: --pad-y-md / --pad-x-md
+ * - Gap between text and icon: --space-0625
+ * - Border radius: --radius-md (via --size-small-gap-xs for inner gap)
  */
 const DateInput = ({
     placeholder = 'MM/DD/YY',
@@ -40,7 +40,7 @@ const DateInput = ({
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-element-gap-xs)',
+            gap: 'var(--stack-sm)',
             alignItems: 'flex-start',
             overflow: 'hidden',
             width: '100%',
@@ -50,10 +50,10 @@ const DateInput = ({
             style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 'var(--size-element-gap-md)',
-                padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+                gap: 'var(--space-0625)',
+                padding: 'var(--pad-y-md) var(--pad-x-md)',
                 width: '100%',
-                borderRadius: 'var(--size-element-radius-sm)',
+                borderRadius: 'var(--radius-md)',
                 border: `1px solid ${validation === 'invalid' ? 'var(--color-danger)' : 'var(--color-outline-variant)'}`,
                 backgroundColor: disabled ? 'var(--ds-background-neutral)' : 'var(--ds-background-input)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
@@ -171,7 +171,7 @@ const SessionDateInput = ({
 
             {/* Validation Caption */}
             {(state === 'invalid-date' || state === 'missing-date') && (
-                <div style={{ marginTop: 'var(--size-element-gap-xs)' }}>
+                <div style={{ marginTop: 'var(--stack-sm)' }}>
                     <Caption
                         text={state === 'invalid-date' ? 'Invalid Date' : 'Session date is required'}
                         state="danger"

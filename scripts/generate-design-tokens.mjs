@@ -1,18 +1,14 @@
 #!/usr/bin/env node
 /**
- * `npm run generate:design-tokens` — the deep-foundations role and motion
- * tokens (ADR-038), generated from `scripts/lib/tokens/plan.mjs`.
+ * `npm run generate:design-tokens` — the four-tier token ladder and motion
+ * (ADR-038, #1756), generated from `scripts/lib/tokens/plan.mjs`.
  *
- * WHAT IT WRITES. `design-system/src/tokens/deep/`: `_roles.scss` (container
- * and element role tokens, keyed to density), `_motion.scss` (duration and
- * easing roles, reduced-motion handled once), `_legacy-size-aliases.scss`
- * (the old names the role tokens make redundant, for one cycle), and the
- * four-tier ladder (#1756) — `_semantics.scss`, `_patterns.scss`,
- * `_components.scss`, `_layers.scss` — generated from `TOKEN_LADDER` in
- * `scripts/lib/tokens/plan.mjs`. `design-system/figma/variables-payload.json`
- * is the combined Figma variables payload for all of the above — written,
- * never pushed; pushing it is a separate, one-writer-queue step, out of scope
- * here.
+ * WHAT IT WRITES. `design-system/src/tokens/ladder/`: `_semantics.scss`,
+ * `_patterns.scss`, `_components.scss`, `_layers.scss` from `TOKEN_LADDER`,
+ * and `_motion.scss` (duration and easing tokens, reduced motion handled
+ * once). `design-system/figma/variables-payload.json` is the combined Figma
+ * variables payload for all of the above — written, never pushed; pushing it
+ * is a separate, one-writer-queue step, out of scope here.
  *
  * Primitives (`--space-*`, `--radius-*`) are NOT written here: they already
  * exist, already on PLUS ×16 numbering, and nothing reads this generator for
@@ -50,7 +46,7 @@ export function run({ repoRoot = ROOT } = {}) {
     .map(({ path }) => ({ file: path, message: 'is stale or missing — run: npm run generate:design-tokens' }));
 }
 
-export const summary = () => `${artifacts().length} deep-foundation token files match the plan`;
+export const summary = () => `${artifacts().length} token ladder files match the plan`;
 
 if (isEntry(import.meta.url)) {
   if (process.argv.includes('--check')) {

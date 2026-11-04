@@ -28,7 +28,7 @@ All render from the shared **StudentTag** component (warning-tonal Badge + signa
 
 ## Design tokens
 - **Surface**: \`--ds-background-warning\` (tonal warning) · **Text**: \`--color-warning-text\`
-- **Radius**: \`--size-element-radius-full\` (pill) · **Type**: body3 (12px)
+- **Radius**: \`--radius-full\` (pill) · **Type**: body3 (12px)
                 `
             }
         }
@@ -102,7 +102,7 @@ export const AllVariations = () => (
             <h6 className="text-muted small text-uppercase fw-bold m-0" style={{ letterSpacing: '0.5px', fontSize: '11px' }}>
                 Inline layout
             </h6>
-            <div className="d-flex flex-wrap" style={{ gap: 'var(--size-element-gap-sm)' }}>
+            <div className="d-flex flex-wrap" style={{ gap: 'var(--stack-md)' }}>
                 {CATEGORIES.flatMap((c) => c.tags).map(([label, signal], i) => (
                     <StudentTag key={`${label}-${i}`} label={label} signal={signal} />
                 ))}

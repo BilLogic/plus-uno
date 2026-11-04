@@ -17,7 +17,7 @@
     .plus-tutor-home-user-section {
         display: flex;
         align-items: center;
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
     }
 
     .plus-tutor-home-jumbotron-section {
@@ -109,7 +109,7 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-gap-md, 16px);
+        gap: var(--space-0625, 16px);
         width: 100%;
         height: 100%;
         grid-column: 2;
@@ -141,7 +141,7 @@
 
     .plus-tutor-home-impact-controls {
         display: flex;
-        gap: var(--size-element-gap-xs);
+        gap: var(--stack-sm);
     }
 
     .plus-tutor-home-recommendations-section {
@@ -165,7 +165,7 @@
 
     .plus-tutor-home-recommendations-controls {
         display: flex;
-        gap: var(--size-element-gap-xs);
+        gap: var(--stack-sm);
     }
 
     .plus-tutor-home-recommendations-carousel {

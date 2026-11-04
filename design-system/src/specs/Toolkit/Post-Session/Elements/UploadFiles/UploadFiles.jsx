@@ -37,7 +37,7 @@ const UploadFiles = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-xs)',
+                gap: 'var(--stack-sm)',
                 width: '100%',
                 maxWidth: 'var(--col-9)',
             }}
@@ -48,7 +48,7 @@ const UploadFiles = ({
                 Upload this session’s Zoom recording folder — video, audio, and student chat come in together. Single files and .zip work too.
             </QuestionCaption>
 
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-md)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 <Button
                     text="Upload Folder"
                     appearance="primary"
@@ -84,7 +84,7 @@ const UploadFiles = ({
             )}
 
             {showReason && (
-                <div style={{ width: '100%', paddingTop: 'var(--size-element-pad-y-lg, 8px)' }}>
+                <div style={{ width: '100%', paddingTop: 'var(--pad-y-lg, 8px)' }}>
                     <NoRecordingReason
                         id={reasonId}
                         value={noRecordingReason}

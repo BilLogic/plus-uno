@@ -15,8 +15,8 @@ const ColumnHeader = ({ label, showSort = true }) => (
         style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--size-element-gap-sm)',
-            padding: 'var(--size-element-pad-y-lg) var(--element-pad-default)',
+            gap: 'var(--stack-md)',
+            padding: 'var(--pad-y-lg) var(--pad-x-md)',
         }}
     >
         <span
@@ -86,7 +86,7 @@ const DataCell = ({ value }) => (
  * - Table header: body2-txt regular, --color-on-surface
  * - Table data: body2-txt light, --color-on-surface
  * - Sort icon: fa-arrow-up, --color-on-surface-variant
- * - Cell padding: --size-element-pad-y-lg / --size-element-pad-x-md (header),
+ * - Cell padding: --pad-y-lg / --pad-x-md (header),
  *                 --size-table-cell-y / --size-table-cell-x (data)
  */
 export const DeleteModalSessionCard = ({
@@ -113,7 +113,7 @@ export const DeleteModalSessionCard = ({
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 width: '100%',
-                borderRadius: 'var(--size-element-radius-sm)',
+                borderRadius: 'var(--radius-md)',
             }}
         >
             <ColumnHeader label="Date" />
@@ -128,7 +128,7 @@ export const DeleteModalSessionCard = ({
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
                 width: '100%',
-                borderRadius: 'var(--size-element-radius-sm)',
+                borderRadius: 'var(--radius-md)',
             }}
         >
             <DataCell value={date} />

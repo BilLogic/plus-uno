@@ -1,14 +1,14 @@
 .login-field {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 }
 
 .login-field__label {
     color: var(--ds-text);
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs);
+    gap: var(--stack-sm);
 }
 
 .login-field__required {
@@ -18,7 +18,7 @@
 .login-field__caption {
     display: flex;
     align-items: flex-start;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     color: var(--ds-text-subtlest);
 }
 

@@ -28,7 +28,7 @@ const END = '<!-- /gen:OLD-SIZE-TOKENS -->';
 const REMEDY = 'Run `npm run generate:old-size-token-list` and commit the guide.';
 
 const scan = (repoRoot = DEFAULT_ROOT) =>
-  [...measure(sourcesOf(repoRoot), oldSizeTokenNames(repoRoot)).entries()]
+  [...measure(sourcesOf(repoRoot), oldSizeTokenNames()).entries()]
     .map(([file, { count }]) => ({ file, uses: count }))
     .sort((a, b) => b.uses - a.uses || a.file.localeCompare(b.file));
 

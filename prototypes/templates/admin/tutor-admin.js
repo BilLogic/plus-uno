@@ -167,9 +167,9 @@ function buildSidebarNavigation() {
             navItem.className = 'body1-txt';
             navItem.style.display = 'flex';
             navItem.style.alignItems = 'center';
-            navItem.style.gap = `var(--size-element-gap-sm)`;
-            navItem.style.padding = `var(--size-element-pad-y-sm) var(--element-pad-compact)`;
-            navItem.style.borderRadius = `var(--size-element-radius-sm)`;
+            navItem.style.gap = `var(--stack-md)`;
+            navItem.style.padding = `var(--space-025) var(--pad-x-sm)`;
+            navItem.style.borderRadius = `var(--radius-md)`;
             navItem.style.textDecoration = 'none';
             navItem.style.color = item.selected 
                 ? 'var(--ds-text-selected)' 
@@ -377,7 +377,7 @@ function buildTutorTable() {
         
         const icon = document.createElement('i');
         icon.className = 'fas fa-user';
-        icon.style.marginRight = 'var(--size-element-gap-sm)';
+        icon.style.marginRight = 'var(--stack-md)';
         nameContainer.appendChild(icon);
         
         const nameWrapper = document.createElement('div');
@@ -399,7 +399,7 @@ function buildTutorTable() {
                 style: 'primary',
                 size: 'b2'
             });
-            adminBadge.style.marginLeft = 'var(--size-element-gap-sm)';
+            adminBadge.style.marginLeft = 'var(--stack-md)';
             nameContainer.appendChild(adminBadge);
         }
         
@@ -415,7 +415,7 @@ function buildTutorTable() {
             
             const dropdownIcon = document.createElement('i');
             dropdownIcon.className = 'fas fa-chevron-down';
-            dropdownIcon.style.marginLeft = 'var(--size-element-gap-xs)';
+            dropdownIcon.style.marginLeft = 'var(--stack-sm)';
             dropdownIcon.style.cursor = 'pointer';
             groupsCell.appendChild(dropdownIcon);
         } else {
@@ -433,7 +433,7 @@ function buildTutorTable() {
             
             const dropdownIcon = document.createElement('i');
             dropdownIcon.className = 'fas fa-chevron-down';
-            dropdownIcon.style.marginLeft = 'var(--size-element-gap-xs)';
+            dropdownIcon.style.marginLeft = 'var(--stack-sm)';
             dropdownIcon.style.cursor = 'pointer';
             studentsCell.appendChild(dropdownIcon);
         } else {
@@ -523,12 +523,12 @@ function addBulkActionsToolbar() {
     toolbar.style.display = 'flex';
     toolbar.style.alignItems = 'center';
     toolbar.style.justifyContent = 'space-between';
-    toolbar.style.gap = `var(--size-element-gap-md)`;
+    toolbar.style.gap = `var(--space-0625)`;
     
     const leftSection = document.createElement('div');
     leftSection.style.display = 'flex';
     leftSection.style.alignItems = 'center';
-    leftSection.style.gap = `var(--size-element-gap-md)`;
+    leftSection.style.gap = `var(--space-0625)`;
     
     const selectedCount = document.createElement('span');
     selectedCount.id = 'selected-count';
@@ -555,7 +555,7 @@ function addBulkActionsToolbar() {
     
     const rightSection = document.createElement('div');
     rightSection.style.display = 'flex';
-    rightSection.style.gap = `var(--size-element-gap-sm)`;
+    rightSection.style.gap = `var(--stack-md)`;
     
     const bulkEmailBtn = createButton({
         btnText: "Email Selected",
@@ -640,7 +640,7 @@ function showBulkEmailModal() {
     const subjectLabel = document.createElement('label');
     subjectLabel.className = 'body2-txt';
     subjectLabel.textContent = 'Subject';
-    subjectLabel.style.marginBottom = 'var(--size-element-gap-xs)';
+    subjectLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(subjectLabel);
     
     const subjectInput = document.createElement('input');
@@ -653,7 +653,7 @@ function showBulkEmailModal() {
     const messageLabel = document.createElement('label');
     messageLabel.className = 'body2-txt';
     messageLabel.textContent = 'Message';
-    messageLabel.style.marginBottom = 'var(--size-element-gap-xs)';
+    messageLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(messageLabel);
     
     const messageTextarea = document.createElement('textarea');
@@ -714,14 +714,14 @@ function showBulkAssignModal() {
     const groupLabel = document.createElement('label');
     groupLabel.className = 'body2-txt';
     groupLabel.textContent = 'Select Group';
-    groupLabel.style.marginBottom = 'var(--size-element-gap-xs)';
+    groupLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(groupLabel);
     
     const groupSelect = document.createElement('select');
     groupSelect.className = 'plus-select body2-txt';
     groupSelect.style.marginBottom = 'var(--size-modal-gap-md)';
     groupSelect.style.width = '100%';
-    groupSelect.style.padding = `var(--size-element-pad-y-md) var(--element-pad-default)`;
+    groupSelect.style.padding = `var(--pad-y-md) var(--pad-x-md)`;
     
     const defaultOption = document.createElement('option');
     defaultOption.value = '';

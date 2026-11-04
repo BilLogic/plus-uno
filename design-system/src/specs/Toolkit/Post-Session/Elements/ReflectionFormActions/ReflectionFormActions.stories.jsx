@@ -17,7 +17,7 @@ export default {
 
 /** Start · Continue · Edit actions used on the Reflections table. */
 export const Overview = () => (
-    <div style={{ display: 'flex', gap: 'var(--size-element-gap-md)', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-0625)', alignItems: 'center' }}>
         <ReflectionFormActions action="start" />
         <ReflectionFormActions action="continue" />
         <ReflectionFormActions action="edit" />

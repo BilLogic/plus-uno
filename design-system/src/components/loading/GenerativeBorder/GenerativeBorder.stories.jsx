@@ -57,7 +57,7 @@ const box = {
 const wrap = { maxWidth: 'var(--section-min-width-main)' };
 
 const toggle = {
-    padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
+    padding: 'var(--pad-y-md) var(--pad-x-md)',
     border: 'var(--border-default) solid var(--ds-border-input)',
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-input)',

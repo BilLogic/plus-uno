@@ -383,7 +383,7 @@ export const CHECKS = [
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'scripts/baselines/size-fallback-baseline.json',
     guards:
-      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than color — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--size-element-pad-y-lg, 12px)` 52 times for one that is `8px`. Color's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than color — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--pad-y-lg, 12px)` 52 times for one that is `8px`. Color's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
   },
   {
     name: 'check:undefined-tokens',
@@ -539,7 +539,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-design-tokens.mjs',
     guards:
-      'the generated deep-foundation token files in design-system/src/tokens/deep/ (container and element role SCSS, motion SCSS, the legacy-size alias SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
+      'the generated token ladder files in design-system/src/tokens/ladder/ (the four tiers, motion SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
   },
   {
     name: 'check:old-size-tokens',
@@ -549,7 +549,7 @@ export const CHECKS = [
     module: 'scripts/check-old-size-tokens.mjs',
     baseline: 'scripts/baselines/old-size-tokens.json',
     guards:
-      'files staying off the pre-ADR-038 size vocabularies (--size-element-*, --card-*, --section-*, --modal-*, --surface-*) that the deep-foundation role tokens replace, counted per file in design-system/src, prototypes and src. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:old-size-tokens -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+      'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
     name: 'check:old-size-token-list',

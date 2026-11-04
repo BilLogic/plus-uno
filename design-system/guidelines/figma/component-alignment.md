@@ -23,7 +23,7 @@ Figma component set (instance on canvas)
         ↕  component-registry.json
 PLUS Button.jsx  ←  imported in prototypes via @/
         ↕  same tokens
-Figma Variables  →  (manual export) → design-system/src/tokens/; deep-foundation tokens go the other way (ADR-038)
+Figma Variables  →  (manual export) → design-system/src/tokens/; the token ladder and motion go the other way (ADR-038)
         ↕  token-registry.json
 ```
 

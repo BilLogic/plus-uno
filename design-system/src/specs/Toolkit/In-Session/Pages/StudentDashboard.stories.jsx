@@ -53,8 +53,8 @@ The page uses the **PageLayout** component which provides:
 - \`--size-section-gap-sm\`: Within content areas
 
 ### Element Spacing
-- \`--size-element-gap-sm\`: Between controls
-- \`--size-element-gap-md\`: Between button groups
+- \`--stack-md\`: Between controls
+- \`--space-0625\`: Between button groups
 
 ## Interactive Features
 
@@ -100,7 +100,7 @@ const StatusFilter = ({ statuses, onChange }) => (
  * Main Content Area (used by Overview and Interactive stories)
  * Uses semantic tokens:
  * - Section gap: --size-section-gap-lg (between major sections)
- * - Element gap: --size-element-gap-sm (between controls)
+ * - Element gap: --stack-md (between controls)
  */
 const MainContent = ({
     students,
@@ -140,11 +140,11 @@ const MainContent = ({
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
                 flexWrap: 'wrap',
-                gap: 'var(--size-element-gap-md)'
+                gap: 'var(--space-0625)'
             }}
         >
             {/* Left: Title and Status Filter */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0625)' }}>
                 <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Students</h2>
                 <StatusFilter
                     statuses={statusFilter}
@@ -612,7 +612,7 @@ const RegularTutorLoadedContent = ({
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" />
@@ -697,7 +697,7 @@ const RegularTutorEmptyContent = ({
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" />
@@ -776,7 +776,7 @@ const LeadSupervisorLoadedContent = ({
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" />
@@ -861,7 +861,7 @@ const LeadSupervisorEmptyContent = ({
                     flexWrap: 'wrap',
                     alignItems: 'center',
                     justifyContent: 'flex-end',
-                    gap: 'var(--size-element-gap-sm)',
+                    gap: 'var(--stack-md)',
                 }}
             >
                 <SortingOptions initialSort="status" initialOrder="needs_motivation" />

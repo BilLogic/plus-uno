@@ -14,7 +14,7 @@
     &__filter-bar {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--size-element-gap-md);
+        gap: var(--space-0625);
         align-items: flex-start;
         justify-content: space-between;
         width: 100%;
@@ -23,13 +23,13 @@
 
     &__filter-left {
         display: flex;
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
         align-items: flex-start;
     }
 
     &__filter-right {
         display: flex;
-        gap: var(--size-element-gap-sm);
+        gap: var(--stack-md);
         align-items: center;
     }
 
@@ -37,26 +37,26 @@
         display: flex;
         gap: 0;
         align-items: center;
-        border-radius: var(--size-element-radius-sm);
+        border-radius: var(--radius-md);
         overflow: hidden;
-        border: var(--size-element-border) solid var(--color-outline-variant);
+        border: var(--border-default) solid var(--color-outline-variant);
 
         button {
             border-radius: 0;
-            border-right: var(--size-element-border) solid var(--color-outline-variant);
+            border-right: var(--border-default) solid var(--color-outline-variant);
 
             &:last-child {
                 border-right: none;
             }
 
             &:first-child {
-                border-top-left-radius: var(--size-element-radius-sm);
-                border-bottom-left-radius: var(--size-element-radius-sm);
+                border-top-left-radius: var(--radius-md);
+                border-bottom-left-radius: var(--radius-md);
             }
 
             &:last-child {
-                border-top-right-radius: var(--size-element-radius-sm);
-                border-bottom-right-radius: var(--size-element-radius-sm);
+                border-top-right-radius: var(--radius-md);
+                border-bottom-right-radius: var(--radius-md);
             }
         }
     }
@@ -70,17 +70,17 @@
         margin-bottom: var(--size-surface-gap-md);
 
         &::-webkit-scrollbar {
-            height: var(--size-element-gap-sm);
+            height: var(--stack-md);
         }
 
         &::-webkit-scrollbar-track {
             background: var(--ds-background-neutral);
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
         }
 
         &::-webkit-scrollbar-thumb {
             background: var(--color-outline-variant);
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
 
             &:hover {
                 background: var(--ds-background-neutral);

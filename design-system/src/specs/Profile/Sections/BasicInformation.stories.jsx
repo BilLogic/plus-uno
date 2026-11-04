@@ -41,9 +41,9 @@
  * - Card padding: var(--size-section-pad-x-md, 24px) / var(--size-section-pad-y-md, 24px)
  * - Card gap: var(--size-section-gap-md, 16px)
  * - Card border-radius: var(--size-section-radius-md, 12px)
- * - Field gap (between fields): var(--size-element-gap-sm, 8px)
+ * - Field gap (between fields): var(--stack-md, 8px)
  * - Label-to-input gap: var(--size-small-gap-xs, 4px)
- * - Input padding: var(--element-pad-default, 10px) / var(--size-element-pad-y-md, 6px)
+ * - Input padding: var(--pad-x-md, 10px) / var(--pad-y-md, 6px)
  * - Input border-radius: var(--size-border-radius-50, 2px)
  * 
  * Width: ~848px (from Figma)
@@ -126,7 +126,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 style={{
                     display: 'flex',
                     flexWrap: 'wrap',
-                    gap: 'var(--size-element-gap-sm, 8px)',
+                    gap: 'var(--stack-md, 8px)',
                     width: '100%',
                 }}
             >
@@ -207,7 +207,7 @@ export const BasicInformationSection = ({ changed = false }) => {
             <div
                 style={{
                     display: 'flex',
-                    gap: 'var(--size-element-gap-lg, 12px)',
+                    gap: 'var(--stack-lg, 12px)',
                     width: '100%',
                 }}
             >
@@ -324,7 +324,7 @@ export const BasicInformationSection = ({ changed = false }) => {
 };
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+    <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
         <BasicInformationSection changed={false} />
     </div>
 );
@@ -335,7 +335,7 @@ export const Variants = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-xl, 32px)',
-            padding: 'var(--size-element-pad-y-lg, 12px)',
+            padding: 'var(--pad-y-lg, 12px)',
         }}
     >
         <BasicInformationSection changed={false} />
@@ -355,7 +355,7 @@ export const Interactive = {
         },
     },
     render: (args) => (
-        <div style={{ padding: 'var(--size-element-pad-y-lg, 12px)' }}>
+        <div style={{ padding: 'var(--pad-y-lg, 12px)' }}>
             <BasicInformationSection changed={args.changed} />
         </div>
     ),

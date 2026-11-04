@@ -7,16 +7,16 @@
 .plus-file-upload-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
     width: 100%;
 }
 
 .plus-file-upload-container {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm, 8px);
-    padding: var(--size-element-pad-y-md, 12px) var(--element-pad-default, 16px);
-    border-radius: var(--size-element-radius-md, 4px);
+    gap: var(--stack-md, 8px);
+    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
+    border-radius: var(--radius-md, 4px);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     
     // Focus state with border
@@ -98,7 +98,7 @@
 .plus-file-upload-validation {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-xs, 4px);
+    gap: var(--stack-sm, 4px);
     font: var(--body-small);
     
     i {

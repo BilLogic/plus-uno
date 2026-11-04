@@ -61,9 +61,9 @@ const AttendeeRow = ({ name, initialStatus = 'unknown' }) => (
     <div
         className="d-flex align-items-center"
         style={{
-            gap: 'var(--size-element-gap-sm)',
-            padding: 'var(--size-element-pad-y-lg) 0',
-            borderRadius: 'var(--size-element-radius-md)',
+            gap: 'var(--stack-md)',
+            padding: 'var(--pad-y-lg) 0',
+            borderRadius: 'var(--radius-md)',
         }}
     >
         <span
@@ -99,7 +99,7 @@ export const AttendanceLoadingLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -132,8 +132,8 @@ export const AttendanceLoadingLead = () => (
                             className="d-flex flex-column"
                             style={{
                                 flex: '1 0 0', height: '100%', opacity: 0,
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-300)',
                                 gap: 'var(--size-spacing-medium-space-200)',
                             }}
@@ -149,8 +149,8 @@ export const AttendanceLoadingLead = () => (
                             className="d-flex flex-column"
                             style={{
                                 flex: '1 0 0', height: '100%', opacity: 0,
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-spacing-medium-space-200) var(--size-spacing-medium-space-300)',
                                 gap: 'var(--size-spacing-medium-space-200)',
                             }}
@@ -171,7 +171,7 @@ export const AttendanceLoadingLead = () => (
                 </div>
 
                 {/* Footer */}
-                <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)', borderBottom: 'var(--size-element-border) solid var(--ds-border)' }}>
+                <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)', borderBottom: 'var(--border-default) solid var(--ds-border)' }}>
                     <Button text="Close" onClick={() => {}} />
                     <Button text="Update Attendance" appearance="primary" onClick={() => {}} />
                 </div>
@@ -199,7 +199,7 @@ export const AttendanceInitialLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -230,8 +230,8 @@ export const AttendanceInitialLead = () => (
                             style={{
                                 flex: '1 0 0',
                                 height: '100%',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                             }}
@@ -256,8 +256,8 @@ export const AttendanceInitialLead = () => (
                             style={{
                                 flex: '1 0 0',
                                 height: '100%',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                                 overflow: 'auto',
@@ -310,7 +310,7 @@ export const AttendanceLoadedLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -341,8 +341,8 @@ export const AttendanceLoadedLead = () => (
                             style={{
                                 flex: '1 0 0',
                                 height: '100%',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                             }}
@@ -367,8 +367,8 @@ export const AttendanceLoadedLead = () => (
                             style={{
                                 flex: '1 0 0',
                                 height: '100%',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                                 overflow: 'auto',
@@ -406,7 +406,7 @@ export const AttendanceLoadedLead = () => (
 const AssignmentModalHeader = () => (
     <div
         className="d-flex flex-column"
-        style={{ gap: 'var(--size-element-gap-xs)' }}
+        style={{ gap: 'var(--stack-sm)' }}
     >
         <div className="d-flex justify-content-between align-items-center">
             <span className="h4" style={{ margin: 0, color: 'var(--ds-text)' }}>
@@ -458,7 +458,7 @@ export const AssignmentLoadingLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -531,9 +531,9 @@ const AssignmentStudentRow = ({ name }) => (
     <div
         className="d-flex align-items-center"
         style={{
-            gap: 'var(--size-element-gap-sm)',
-            padding: 'var(--size-element-pad-y-lg) 0',
-            borderRadius: 'var(--size-element-radius-md)',
+            gap: 'var(--stack-md)',
+            padding: 'var(--pad-y-lg) 0',
+            borderRadius: 'var(--radius-md)',
         }}
     >
         <span
@@ -550,7 +550,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
     <div
         className="d-flex flex-column"
         style={{
-            border: 'var(--size-element-border) solid var(--color-outline-variant)',
+            border: 'var(--border-default) solid var(--color-outline-variant)',
             borderRadius: '8px',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
             gap: 'var(--size-card-gap-sm)',
@@ -561,9 +561,9 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
         <div
             className="d-flex align-items-center"
             style={{
-                gap: 'var(--size-element-gap-sm)',
-                padding: 'var(--size-element-pad-y-lg) 0',
-                borderRadius: 'var(--size-element-radius-md)',
+                gap: 'var(--stack-md)',
+                padding: 'var(--pad-y-lg) 0',
+                borderRadius: 'var(--radius-md)',
             }}
         >
             <span
@@ -600,7 +600,7 @@ export const AssignmentLoadedLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -709,7 +709,7 @@ export const SessionInfoLoadingLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                     height: '584px',
@@ -774,7 +774,7 @@ export const SessionInfoLoadedLead = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -792,11 +792,11 @@ export const SessionInfoLoadedLead = () => (
                     {/* Session Info Grid */}
                     <div
                         style={{
-                            border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                            border: 'var(--border-default) solid var(--color-outline-variant)',
                             borderRadius: 'var(--size-modal-radius-md)',
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr',
-                            gap: 'var(--size-element-gap-sm)',
+                            gap: 'var(--stack-md)',
                             overflow: 'hidden',
                         }}
                     >
@@ -876,7 +876,7 @@ export const SessionInfoLoadedRegular = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -894,11 +894,11 @@ export const SessionInfoLoadedRegular = () => (
                     {/* Session Info Grid */}
                     <div
                         style={{
-                            border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                            border: 'var(--border-default) solid var(--color-outline-variant)',
                             borderRadius: 'var(--size-modal-radius-md)',
                             display: 'grid',
                             gridTemplateColumns: '1fr 1fr',
-                            gap: 'var(--size-element-gap-sm)',
+                            gap: 'var(--stack-md)',
                             overflow: 'hidden',
                         }}
                     >
@@ -962,7 +962,7 @@ const RegularAttendeeTabButtonGroup = () => (
 );
 
 const RosterHeader = ({ title, count, showInfo = false }) => (
-    <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
+    <div className="d-flex align-items-center" style={{ gap: 'var(--stack-md)' }}>
         <span className="h6" style={{ margin: 0, color: 'var(--ds-text)' }}>
             {title}
         </span>
@@ -993,7 +993,7 @@ export const AttendanceLoadedRegular = () => (
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    border: 'var(--size-element-border) solid var(--color-outline-variant)',
+                    border: 'var(--border-default) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -1018,8 +1018,8 @@ export const AttendanceLoadedRegular = () => (
                             className="d-flex flex-column"
                             style={{
                                 flex: '1 0 0',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                             }}
@@ -1038,8 +1038,8 @@ export const AttendanceLoadedRegular = () => (
                             className="d-flex flex-column"
                             style={{
                                 flex: '1 0 0',
-                                border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                                borderRadius: 'var(--size-element-radius-lg)',
+                                border: 'var(--border-default) solid var(--color-outline-variant)',
+                                borderRadius: 'var(--radius-lg)',
                                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                                 gap: 'var(--size-card-gap-sm)',
                             }}

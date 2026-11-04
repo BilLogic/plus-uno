@@ -6,13 +6,13 @@
 .plus-user-avatar {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-md);
+    gap: var(--space-0625);
     width: fit-content;
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    padding: var(--size-element-pad-y-md) var(--element-pad-default);
-    border-radius: var(--size-element-radius-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border-radius: var(--radius-md);
     background-color: var(--ds-surface);
     color: var(--ds-text);
     transition: background-color 0.15s ease;
@@ -75,7 +75,7 @@
     justify-content: center;
     flex-shrink: 0;
     min-width: var(--label-height-md);
-    padding: 0 var(--element-pad-compact);
+    padding: 0 var(--pad-x-sm);
     border-radius: var(--radius-full);
     background-color: var(--ds-background-danger-subtler);
     color: var(--color-danger-text);

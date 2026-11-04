@@ -76,7 +76,7 @@ export const Overview = () => (
 export const Interactive = () => {
     const [statuses, setStatuses] = useState([]);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
             <SessionStatusFilter value={statuses} onChange={setStatuses} />
             <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                 Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>

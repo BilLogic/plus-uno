@@ -19,7 +19,7 @@
 .login-portal-header {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-sm); // 8px in Figma (Element/gap-sm)
+    gap: var(--stack-md); // 8px in Figma (Element/gap-sm)
     color: var(--ds-text);
 }
 
@@ -43,7 +43,7 @@
 .login-portal-terms {
     display: flex;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
 }
 
 .login-portal-terms__checkbox {
@@ -78,6 +78,6 @@
 .login-portal-disabled-button {
     width: 100%;
     background-color: var(--ds-background-disabled);
-    border-radius: var(--size-element-radius-md);
+    border-radius: var(--radius-md);
     opacity: var(--color-disabled-opacity);
 }

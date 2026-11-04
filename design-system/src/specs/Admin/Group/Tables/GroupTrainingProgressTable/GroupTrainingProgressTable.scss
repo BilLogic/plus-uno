@@ -87,20 +87,20 @@
     // Expand button
     .training-progress-table__expand-btn {
         display: flex;
-        gap: var(--size-element-gap-md);
+        gap: var(--space-0625);
         align-items: center;
         padding: var(--size-table-cell-y) var(--size-table-cell-x);
         border: none;
         background: transparent;
         cursor: pointer;
-        border-radius: var(--size-element-radius-sm);
+        border-radius: var(--radius-md);
 
         &:hover {
             background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         &.training-progress-table__expand-btn--level-2 {
-            padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+            padding: var(--pad-y-lg) var(--pad-x-lg);
             flex: 1;
         }
     }
@@ -115,7 +115,7 @@
             position: relative;
             width: 48px;
             height: 40px;
-            padding: 0 var(--element-pad-default);
+            padding: 0 var(--pad-x-md);
 
             svg {
                 position: absolute;
@@ -146,7 +146,7 @@
     // Action cell
     .training-progress-table__cell--action {
         .plus-btn {
-            border-radius: var(--size-element-radius-sm);
+            border-radius: var(--radius-md);
         }
     }
 }

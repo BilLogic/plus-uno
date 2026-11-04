@@ -35,7 +35,7 @@ export const TimeframeFilter = ({ value, defaultValue = 'this_week', onChange, o
     };
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)' }}>
             <FilterSelect
                 aria-label="Timeframe"
                 clearable={false}
@@ -72,7 +72,7 @@ export const Overview = () => (
         </section>
         <section>
             <h6 className="h6 mb-3">Other picks</h6>
-            <div style={{ display: 'flex', gap: 'var(--size-element-gap-lg)' }}>
+            <div style={{ display: 'flex', gap: 'var(--stack-lg)' }}>
                 <TimeframeFilter defaultValue="this_month" />
                 <TimeframeFilter defaultValue="all_time" />
             </div>
@@ -84,7 +84,7 @@ export const Overview = () => (
 export const Interactive = () => {
     const [timeframe, setTimeframe] = useState('this_week');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
             <TimeframeFilter value={timeframe} onChange={setTimeframe} />
             <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                 Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>

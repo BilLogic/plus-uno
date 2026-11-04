@@ -22,9 +22,9 @@ const defaultTabs = [
  * Tab Item
  * Individual tab with label and counter badge
  * Uses semantic tokens:
- * - Gap: --size-element-gap-lg
- * - Padding: --size-element-pad-y-lg, --size-element-pad-x-lg
- * - Radius: --size-element-radius-md (top corners)
+ * - Gap: --stack-lg
+ * - Padding: --pad-y-lg, --pad-x-lg
+ * - Radius: --radius-md (top corners)
  * - Border: --color-secondary (selected indicator)
  * - Colors: --color-secondary-text (selected), --color-on-surface-variant (default)
  * - Typography: body1-txt font-weight-semibold
@@ -37,12 +37,12 @@ const TabItem = ({ label, count, isSelected, onClick }) => (
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 'var(--size-element-gap-lg)',
-            padding: 'var(--size-element-pad-y-lg) var(--size-element-pad-x-lg)',
+            gap: 'var(--stack-lg)',
+            padding: 'var(--pad-y-lg) var(--pad-x-lg)',
             backgroundColor: 'transparent',
             border: 'none',
             borderBottom: isSelected ? '2px solid var(--color-secondary)' : '2px solid transparent',
-            borderRadius: 'var(--size-element-radius-md) var(--size-element-radius-md) 0 0',
+            borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
             cursor: 'pointer',
             color: isSelected ? 'var(--color-secondary-text)' : 'var(--ds-text-subtle)',
             whiteSpace: 'nowrap',

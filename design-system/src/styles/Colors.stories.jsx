@@ -401,8 +401,8 @@ const useResolvedTokens = () => {
 
 const swatchBase = {
     minHeight: 'var(--size-spacing-large-space-800)',
-    borderRadius: 'var(--size-element-radius-lg)',
-    padding: 'var(--element-pad-default)',
+    borderRadius: 'var(--radius-lg)',
+    padding: 'var(--pad-x-md)',
     display: 'flex',
     alignItems: 'center',
     font: 'var(--body-default)',
@@ -460,7 +460,7 @@ export const Modes = () => {
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (
-                    <figure key={label} style={{ margin: 0, display: 'grid', gap: 'var(--size-element-gap-sm)' }}>
+                    <figure key={label} style={{ margin: 0, display: 'grid', gap: 'var(--stack-md)' }}>
                         <div style={{ ...swatchBase, ...style }}>{label}</div>
                         <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
                             {tokens.map((name) => (

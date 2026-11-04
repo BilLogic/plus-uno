@@ -3,9 +3,9 @@
  * reads them after generation: spacing / layout (modes Medium (768px) ·
  * Large (1024px) · X-Large (1440px)), spacing / patterns and color / patterns.
  *
- * Every new token is pinned by name and resolved value, per mode where the
- * collection has modes. The old tokens these sit beside are pinned too, since
- * nothing moves to the new names until the migration tickets land.
+ * Every token is pinned by name and resolved value, per mode where the
+ * collection has modes. The retired names these replaced are gone; the
+ * ladder files under tokens/ladder/ carry the values now.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -16,12 +16,17 @@ import { fileURLToPath } from 'node:url';
 import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { LAYOUT_MODES, deriveLayout } from './layout-derived.mjs';
+import { retiredRenames } from './lib/tokens/plan.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE_DIR = path.join(REPO_ROOT, TOKEN_DIR, 'source');
-const STYLESHEET = path.join(REPO_ROOT, TOKEN_DIR, '_frame_layers.scss');
+const STYLESHEETS = ['_frame_layers.scss', ...['semantics', 'patterns', 'components', 'layers'].map((t) => `ladder/_${t}.scss`)].map((f) => path.join(REPO_ROOT, TOKEN_DIR, f));
 const corpus = tokenCorpus({ root: REPO_ROOT });
-const stylesheet = fs.readFileSync(STYLESHEET, 'utf8');
+const stylesheet = STYLESHEETS.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
+
+/** Every `@media (min-width: Npx)` block's body across the token stylesheets, joined. */
+const blocksAt = (width) =>
+  [...stylesheet.matchAll(new RegExp(`@media \\(min-width: ${width}px\\) \\{([\\s\\S]*?)\\n\\}`, 'g'))].map((m) => m[1]).join('\n');
 
 /** A token's resolved value at a mode: `:root` for Medium, the breakpoint block above it otherwise. */
 function atMode(name, mode) {
@@ -31,7 +36,7 @@ function atMode(name, mode) {
   for (const [key, width] of Object.entries(LAYOUT_MODES)) {
     if (width <= LAYOUT_MODES['Medium (768px)']) continue;
     if (width > LAYOUT_MODES[mode]) break;
-    const block = stylesheet.match(new RegExp(`@media \\(min-width: ${width}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? '';
+    const block = blocksAt(width);
     for (const [, declared, raw] of block.matchAll(tokenDeclarationPattern('--'))) {
       if (declared !== name) continue;
       const alias = raw.trim().match(/^var\((--[a-z0-9-]+)\)$/)?.[1];
@@ -47,34 +52,37 @@ function rawAtMode(name, mode) {
   let raw = corpus.get(name)?.raw;
   for (const width of Object.values(LAYOUT_MODES)) {
     if (width <= LAYOUT_MODES['Medium (768px)'] || width > LAYOUT_MODES[mode]) continue;
-    const block = stylesheet.match(new RegExp(`@media \\(min-width: ${width}px\\) \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? '';
+    const block = blocksAt(width);
     for (const [, declared, value] of block.matchAll(tokenDeclarationPattern('--'))) if (declared === name) raw = value.trim();
   }
   return raw;
 }
 
+/** A retired `--layout-*` name's replacement on the token ladder. */
+const renamed = (old) => retiredRenames().get(old) ?? assert.fail(`${old} has no replacement`);
+
 const px = (n) => `${+n.toFixed(2)}px`;
 
 /* Layout: one value per mode, Medium · Large · X-Large. */
 const LAYOUT = {
-  '--layout-height-topbar': ['32px', '32px', '32px'],
-  '--layout-width-sidebar': ['240px', '240px', '240px'],
-  '--layout-pad-left-container': ['8px', '0px', '0px'],
-  '--layout-gutter': ['16px', '16px', '16px'],
-  '--layout-width-column': ['45.33px', '47.33px', '80.67px'],
-  '--layout-width-column-screen': ['45.33px', '66.67px', '88px'],
-  '--layout-max-width-content': ['1232px', '1232px', '1232px'],
-  '--layout-max-width-reading': ['864px', '864px', '864px'],
-  '--layout-min-width-content': ['720px', '720px', '720px'],
-  '--layout-width-content': ['720px', '744px', '1144px'],
-  '--layout-width-modal-sm': ['384px', '512px', '640px'],
-  '--layout-width-modal-md': ['507px', '677px', '848px'],
-  '--layout-width-modal-lg': ['629px', '843px', '1056px'],
-  '--layout-width-screen': ['768px', '1024px', '1440px'],
-  '--layout-min-width-screen': ['768px', '1024px', '1440px'],
-  '--layout-max-width-screen': ['1023px', '1439px', 'none'],
-  '--layout-pad-x-screen': ['24px', '24px', '32px'],
-  '--layout-columns': ['12', '12', '12'],
+  '--frame-topbar-height': ['32px', '32px', '32px'],
+  '--frame-sidebar-width': ['240px', '240px', '240px'],
+  '--grid-pad-left-container': ['8px', '0px', '0px'],
+  '--grid-gutter': ['16px', '16px', '16px'],
+  '--grid-width-column': ['45.33px', '47.33px', '80.67px'],
+  '--grid-width-column-screen': ['45.33px', '66.67px', '88px'],
+  '--content-max-width': ['1232px', '1232px', '1232px'],
+  '--content-max-width-reading': ['864px', '864px', '864px'],
+  '--content-min-width': ['720px', '720px', '720px'],
+  '--content-width': ['720px', '744px', '1144px'],
+  '--modal-width-sm': ['384px', '512px', '640px'],
+  '--modal-width-md': ['507px', '677px', '848px'],
+  '--modal-width-lg': ['629px', '843px', '1056px'],
+  '--screen-width': ['768px', '1024px', '1440px'],
+  '--screen-min-width': ['768px', '1024px', '1440px'],
+  '--screen-max-width': ['1023px', '1439px', 'none'],
+  '--screen-pad-x': ['24px', '24px', '32px'],
+  '--grid-columns': ['12', '12', '12'],
 };
 
 /* Surface has modes for its pad only. */
@@ -112,8 +120,8 @@ const FIXED = {
   '--table-indent': '24px',
   '--table-radius': '8px',
   '--table-stack': '8px',
-  '--overlay-pad-x': '16px',
-  '--overlay-pad-y': '64px',
+  '--blanket-pad-x': '16px',
+  '--blanket-pad-y': '64px',
   '--modal-stack-sm': '8px',
   '--modal-stack-md': '16px',
   '--modal-stack-lg': '24px',
@@ -158,15 +166,15 @@ test('every Layout token resolves to its value at Medium, Large and X-Large', ()
 test('the derived Layout rows are the frame rules worked at each mode width', () => {
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [leaf, value] of Object.entries(deriveLayout(width))) {
-      assert.equal(atMode(`--layout-${leaf}`, mode), px(value), `${leaf} at ${mode}`);
+      assert.equal(atMode(renamed(`--layout-${leaf}`), mode), px(value), `${leaf} at ${mode}`);
     }
   }
 });
 
 test('the screen and container pads alias the space scale per mode', () => {
   const RAW = {
-    '--layout-pad-left-container': ['var(--space-050)', 'var(--space-0)', 'var(--space-0)'],
-    '--layout-pad-x-screen': ['var(--space-150)', 'var(--space-150)', 'var(--space-200)'],
+    '--grid-pad-left-container': ['var(--space-050)', 'var(--space-0)', 'var(--space-0)'],
+    '--screen-pad-x': ['var(--space-150)', 'var(--space-150)', 'var(--space-200)'],
   };
   for (const [name, raws] of Object.entries(RAW)) {
     const actual = Object.keys(LAYOUT_MODES).map((mode) => rawAtMode(name, mode));
@@ -177,7 +185,7 @@ test('the screen and container pads alias the space scale per mode', () => {
 test('a drawer takes the Modal width steps: each Drawer width aliases its Modal width at every mode', () => {
   for (const size of ['sm', 'md', 'lg']) {
     for (const mode of Object.keys(LAYOUT_MODES)) {
-      assert.equal(rawAtMode(`--layout-width-drawer-${size}`, mode), `var(--layout-width-modal-${size})`, `${size} at ${mode}`);
+      assert.equal(rawAtMode(`--drawer-width-${size}`, mode), `var(--modal-width-${size})`, `${size} at ${mode}`);
     }
   }
 });
@@ -187,7 +195,7 @@ test('the Drawer pattern tokens alias the same space steps as Modal, and there i
     assert.equal(corpus.get(`--drawer-${leaf}`)?.raw, corpus.get(`--modal-${leaf}`)?.raw, leaf);
   }
   // Modal's own pad moved to the role token `--modal-pad-x-default` (ADR-038,
-  // declared in tokens/deep, outside this file's corpus); Drawer still aliases the same step.
+  // declared in tokens/ladder, outside this file's corpus); Drawer still aliases the same step.
   assert.equal(corpus.get('--drawer-pad')?.raw, 'var(--space-100)', 'pad');
   assert.equal(corpus.get('--drawer-radius'), undefined);
 });
@@ -195,7 +203,7 @@ test('the Drawer pattern tokens alias the same space steps as Modal, and there i
 test('no modal width is fractional at any mode', () => {
   for (const size of ['sm', 'md', 'lg']) {
     for (const mode of Object.keys(LAYOUT_MODES)) {
-      assert.match(atMode(`--layout-width-modal-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
+      assert.match(atMode(`--modal-width-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
     }
   }
 });
@@ -203,9 +211,9 @@ test('no modal width is fractional at any mode', () => {
 test('each mode\'s screen range starts at its default width and ends a pixel before the next mode; X-Large has no end', () => {
   const widths = Object.values(LAYOUT_MODES);
   Object.keys(LAYOUT_MODES).forEach((mode, i) => {
-    assert.equal(atMode('--layout-min-width-screen', mode), atMode('--layout-width-screen', mode), mode);
+    assert.equal(atMode('--screen-min-width', mode), atMode('--screen-width', mode), mode);
     const next = widths[i + 1];
-    assert.equal(atMode('--layout-max-width-screen', mode), next ? `${next - 1}px` : 'none', mode);
+    assert.equal(atMode('--screen-max-width', mode), next ? `${next - 1}px` : 'none', mode);
   });
 });
 
@@ -213,11 +221,11 @@ test('Figma holds the X-Large maximum as a 10000 stand-in, which code reads as n
   const layout = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'spacing _ layout.json'), 'utf8'));
   const max = layout.variables.find((v) => v.name === 'Screen/max-width-screen');
   assert.deepEqual(Object.values(max.valuesByMode), [1023, 1439, 10000]);
-  assert.match(rawAtMode('--layout-max-width-screen', 'X-Large (1440px)'), /^none\b/);
+  assert.match(rawAtMode('--screen-max-width', 'X-Large (1440px)'), /^none\b/);
 });
 
 test('the column count is a plain number, so a grid can repeat it', () => {
-  assert.equal(corpus.get('--layout-columns')?.raw, '12');
+  assert.equal(corpus.get('--grid-columns')?.raw, '12');
 });
 
 test('Surface/pad is 16 below 1440 and 24 from 1440', () => {
@@ -232,15 +240,15 @@ test('every one-mode frame and layer token resolves to its value', () => {
 });
 
 test('the scrim is black at 38%', () => {
-  assert.equal(corpus.get('--overlay-scrim')?.value, 'rgba(0, 0, 0, 0.38)');
+  assert.equal(corpus.get('--blanket-fill')?.value, 'rgba(0, 0, 0, 0.38)');
 });
 
 test('a modal is never taller than the screen less the overlay pad above and below', () => {
-  assert.equal(corpus.get('--layout-max-height-modal')?.raw, 'calc(100dvh - 2 * var(--overlay-pad-y))');
+  assert.equal(corpus.get('--blanket-max-height-modal')?.raw, 'calc(100dvh - 2 * var(--blanket-pad-y))');
 });
 
 test('no new token name uses a banned word', () => {
-  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--overlay-scrim'];
+  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill'];
   for (const name of names) {
     assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
   }
@@ -276,7 +284,7 @@ test('every exported variable offers itself only where it belongs: explicit scop
 });
 
 test('the new names take no family prefix, and never land on an old --size-* name', () => {
-  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--overlay-scrim']) {
+  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill']) {
     assert.doesNotMatch(name, /^--(size|color)-/, name);
   }
   // Specs reference these ahead of time with fallbacks; they stay undefined until the Modal migration.
@@ -286,18 +294,18 @@ test('the new names take no family prefix, and never land on an old --size-* nam
 
 test('every alias lands on the scales, never on an old --size-* primitive', () => {
   const ALIASES = {
-    '--layout-height-topbar': 'var(--height-200)',
-    '--layout-width-sidebar': 'var(--width-1500)',
-    '--layout-gutter': 'var(--space-100)',
-    '--layout-max-width-content': 'var(--size-7700)',
+    '--frame-topbar-height': 'var(--height-200)',
+    '--frame-sidebar-width': 'var(--width-1500)',
+    '--grid-gutter': 'var(--space-100)',
+    '--content-max-width': 'var(--size-7700)',
     '--page-pad': 'var(--space-100)',
     '--card-min-width-md': 'var(--width-1900)',
     '--card-max-height-sm': 'var(--size-1900)',
     '--card-max-height-md': 'var(--size-2500)',
     '--card-max-height-lg': 'var(--size-4000)',
     '--table-stack': 'var(--space-050)',
-    '--layout-pad-left-container': 'var(--space-050)',
-    '--layout-pad-x-screen': 'var(--space-150)',
+    '--grid-pad-left-container': 'var(--space-050)',
+    '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-075)',
     '--popover-radius-menu-sm': 'var(--radius-0625)',
@@ -312,7 +320,7 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
 
 test('the old tokens the new ones sit beside still resolve, unchanged', () => {
   const OLD = {
-    '--layout-sidebar-width': '164px',
+    '--frame-sidebar-width-nav': '164px',
     '--layout-grid-gap': '8px',
     '--col-1': '48.67px',
     '--color-scrim': 'rgba(0, 0, 0, 0.32)',
@@ -322,7 +330,7 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
     '--size-surface-pad-x': '32px',
     '--size-surface-container-pad-x': '16px',
     '--size-table-radius-md': '8px',
-    '--layout-max-width-listbox': '320px',
+    '--listbox-max-width': '320px',
     '--size-card-radius-sm': '12px',
     '--size-surface-radius': '16px',
   };
@@ -339,7 +347,7 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
  */
 const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
 
-// `--modal-pad-x-default` (ADR-038, tokens/deep, outside this file's corpus) is
+// `--modal-pad-x-default` (ADR-038, tokens/ladder, outside this file's corpus) is
 // non-responsive, same 16px the old `--modal-pad` held at every mode.
 const MODAL_PAD_PX = 16;
 
@@ -349,7 +357,7 @@ function modalWidth(span, width, mode) {
   assert.ok(block, 'Modal.scss has no .plus-modal block');
   const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-modal-'))].map(([, n, v]) => [n, v.trim()]));
   local['--plus-modal-span'] = String(span);
-  // ADR-038, tokens/deep, outside this file's corpus: inject it like a local.
+  // ADR-038, tokens/ladder, outside this file's corpus: inject it like a local.
   local['--modal-pad-x-default'] = String(MODAL_PAD_PX);
   const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1];
   assert.ok(formula, '.plus-modal declares no width');
@@ -373,8 +381,8 @@ test('Modal.scss widths at 768, 1024 and 1440 are 6 · 8 · 10 screen columns, t
   const num = (name, mode) => parseFloat(atMode(name, mode));
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const span of [6, 8, 10]) {
-      const expected = span * num('--layout-width-column-screen', mode)
-        + (span - 1) * num('--layout-gutter', mode)
+      const expected = span * num('--grid-width-column-screen', mode)
+        + (span - 1) * num('--grid-gutter', mode)
         + 2 * MODAL_PAD_PX;
       // The token holds the column to two decimals, so ten columns drift by under a tenth of a pixel.
       const actual = modalWidth(span, width, mode);
@@ -419,7 +427,7 @@ test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440
   const spans = { sm: 6, md: 8, lg: 10 };
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [size, span] of Object.entries(spans)) {
-      const expected = parseFloat(atMode(`--layout-width-modal-${size}`, mode));
+      const expected = parseFloat(atMode(`--modal-width-${size}`, mode));
       const actual = screenGridWidth(span, width, mode);
       // The column is held to two decimals, so ten columns land within half a pixel of the whole-pixel token.
       assert.ok(Math.abs(actual - expected) < 0.5, `${size} at ${mode}: _screen-grid.scss ${actual}, Figma ${expected}`);

@@ -11,7 +11,7 @@
 
 .plus-tag-input {
     /* Three rows of tags and the two gaps between them. */
-    --plus-tag-input-max-height: calc(3 * #{label.$tag-height} + 2 * var(--size-element-gap-sm));
+    --plus-tag-input-max-height: calc(3 * #{label.$tag-height} + 2 * var(--stack-md));
 }
 
 .plus-tag-input__anchor {
@@ -22,7 +22,7 @@
     display: flex;
     flex: 1 1 auto;
     align-items: center;
-    gap: var(--size-element-gap-sm);
+    gap: var(--stack-md);
     min-width: 0;
     width: 100%;
 }
@@ -37,7 +37,7 @@
 
     &.plus-tag-input__content--has-tags .plus-tag-input__entry {
         flex: 0 0 auto;
-        width: var(--size-element-gap-sm);
+        width: var(--stack-md);
     }
 }
 
@@ -96,15 +96,15 @@
 
 /* The name field in the header, and Delete set off from the colors. */
 .plus-tag-input__rename {
-    padding: var(--size-element-pad-y-sm) var(--element-pad-compact);
+    padding: var(--space-025) var(--pad-x-sm);
 }
 
 .plus-tag-input__menu .plus-listbox-options > [role='option'] + [role='group'] {
-    border-top: var(--size-element-border) solid var(--ds-border);
+    border-top: var(--border-default) solid var(--ds-border);
 }
 
 .plus-tag-input__hint {
-    padding: var(--size-element-pad-y-sm) var(--element-pad-default);
+    padding: var(--space-025) var(--pad-x-md);
     color: var(--ds-text-subtle);
     font: var(--body-small);
 }

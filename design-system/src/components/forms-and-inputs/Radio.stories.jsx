@@ -71,7 +71,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
 
 /** A controlled group of radios sharing one name. */
 const Group = ({ name, options, initial, ...radioProps }) => {
@@ -178,7 +178,7 @@ Interactive.args = {
  * radio, so a read-only question goes in a RadioGroup, which announces it.
  */
 export const ReadOnly = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <Radio id="radio-readonly-1" name="radio-readonly" label="In person" value="in-person" defaultChecked isReadOnly/>
         <Radio id="radio-readonly-2" name="radio-readonly" label="Online" value="online" isReadOnly/>
     </div>
@@ -194,7 +194,7 @@ ReadOnly.play = async ({ canvasElement }) => {
 
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' }}>
         <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time."/>
         <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked/>
     </div>
@@ -212,7 +212,7 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
  * checked primary border merged into it and stopped reading as focus.
  */
 export const KeyboardFocus = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <Radio id="radio-focus-1" name="radio-focus" label="Morning" value="morning" defaultChecked/>
         <Radio id="radio-focus-2" name="radio-focus" label="Evening" value="evening"/>
     </div>
@@ -240,7 +240,7 @@ KeyboardFocus.play = async ({ canvasElement }) => {
  * `icon.inverse` in every mode, and in `icon.disabled` on a disabled radio.
  */
 export const HoverStep = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <Radio id="radio-hover-1" name="radio-hover" label="Checked" value="checked" defaultChecked/>
         <Radio id="radio-hover-2" name="radio-hover" label="Unchecked" value="unchecked"/>
         <Radio id="radio-hover-3" name="radio-hover-disabled" label="Disabled" value="disabled" defaultChecked isDisabled/>

@@ -14,7 +14,7 @@ export const DemoLabel = ({ children }) => (
     <span
         style={{
             display: 'block',
-            marginBottom: 'var(--element-stack-md)',
+            marginBottom: 'var(--stack-md)',
             font: 'var(--heading-xxsmall)',
             textTransform: 'uppercase',
             color: 'var(--ds-text-subtle)',
@@ -32,8 +32,8 @@ export const slotContent = (label) => (
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '96px',
-            border: 'var(--size-element-border) dashed var(--ds-border-bold)',
-            borderRadius: 'var(--size-element-radius-md)',
+            border: 'var(--border-default) dashed var(--ds-border-bold)',
+            borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
         }}
         className="body1-txt"

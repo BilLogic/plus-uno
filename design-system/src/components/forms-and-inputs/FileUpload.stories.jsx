@@ -197,8 +197,8 @@ export const ReadOnly = () => (
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 'var(--size-element-gap-sm)',
-                    padding: 'var(--size-element-pad-y-sm) 0',
+                    gap: 'var(--stack-md)',
+                    padding: 'var(--space-025) 0',
                     color: 'var(--ds-text)',
                 }}
             >
@@ -228,8 +228,8 @@ export const WithFiles = () => (
                     style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 'var(--size-element-gap-sm)',
-                        padding: 'var(--size-element-pad-y-sm) 0',
+                        gap: 'var(--stack-md)',
+                        padding: 'var(--space-025) 0',
                         color: 'var(--ds-text)',
                     }}
                 >

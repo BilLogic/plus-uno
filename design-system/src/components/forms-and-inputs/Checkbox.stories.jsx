@@ -68,7 +68,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
 
 export const Overview = () => (
     <div style={{ maxWidth: '600px' }}>
@@ -138,7 +138,7 @@ export const SelectAll = () => {
                 onChange={toggleAll}
             />
             {keys.map((k) => (
-                <div key={k} style={{ paddingLeft: 'var(--size-element-gap-lg)' }}>
+                <div key={k} style={{ paddingLeft: 'var(--stack-lg)' }}>
                     <Checkbox
                         id={`cb-${k}`}
                         label={k}

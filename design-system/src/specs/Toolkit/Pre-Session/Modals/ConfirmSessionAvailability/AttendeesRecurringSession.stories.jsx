@@ -86,8 +86,8 @@ const AttendeesRecurringSessionModalBody = () => (
                 {/* Tutor Roster Panel */}
                 <div
                     style={{
-                        border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        border: 'var(--border-default) solid var(--color-outline-variant)',
+                        borderRadius: 'var(--radius-md)',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden',
@@ -144,8 +144,8 @@ const AttendeesRecurringSessionModalBody = () => (
                 {/* Student Roster Panel */}
                 <div
                     style={{
-                        border: 'var(--size-element-border) solid var(--color-outline-variant)',
-                        borderRadius: 'var(--size-element-radius-md)',
+                        border: 'var(--border-default) solid var(--color-outline-variant)',
+                        borderRadius: 'var(--radius-md)',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden',
@@ -235,8 +235,8 @@ const AttendeesRecurringSessionModalBody = () => (
  * - Background: --color-surface-container-high
  * - Title: h4, --color-on-surface
  * - Close icon: fa-xmark, --font-size-fa-h4-solid, --color-on-surface-variant
- * - Panel border: --size-element-border, --color-outline-variant
- * - Panel radius: --size-element-radius-md
+ * - Panel border: --border-default, --color-outline-variant
+ * - Panel radius: --radius-md
  */
 export const Attendees_Recurring_Session = () => (
     <Modal

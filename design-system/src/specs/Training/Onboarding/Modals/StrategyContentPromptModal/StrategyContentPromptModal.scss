@@ -17,7 +17,7 @@
     &__intro {
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-gap-xs, 4px);
+        gap: var(--stack-sm, 4px);
         align-items: flex-start;
         width: 100%;
     }
@@ -44,7 +44,7 @@
     &__question {
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-gap-lg, 12px);
+        gap: var(--stack-lg, 12px);
         align-items: flex-start;
         width: 100%;
     }
@@ -52,7 +52,7 @@
     &__label {
         display: flex;
         flex-direction: column;
-        gap: var(--size-element-gap-xs, 4px);
+        gap: var(--stack-sm, 4px);
         align-items: flex-start;
         width: 100%;
     }
@@ -101,7 +101,7 @@
     &__footer {
         display: flex;
         flex-wrap: wrap;
-        gap: var(--size-element-gap-lg, 12px);
+        gap: var(--stack-lg, 12px);
         align-items: center;
         justify-content: flex-end;
         width: 100%;

@@ -17,8 +17,8 @@ const FileListItem = ({ name, size = '', onRemove }) => (
         style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 'var(--element-pad-default)',
-            padding: 'var(--size-element-pad-y-md) var(--size-element-gap-md)',
+            gap: 'var(--pad-x-md)',
+            padding: 'var(--pad-y-md) var(--space-0625)',
             width: '100%',
             maxWidth: 'var(--col-8)',
         }}

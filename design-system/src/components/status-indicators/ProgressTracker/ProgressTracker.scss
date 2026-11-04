@@ -43,7 +43,7 @@
     content: '';
     align-self: center;
     width: var(--space-150);
-    height: var(--size-element-stroke-sm);
+    height: var(--stroke-1);
     background-color: var(--ds-border);
     margin-inline: var(--inline-sm);
 }
@@ -92,7 +92,7 @@ button.plus-progress-tracker__item:focus-visible {
     width: var(--space-050);
     height: var(--space-050);
     border-radius: 50%;
-    border: var(--size-element-stroke-md) solid var(--ds-icon-subtle);
+    border: var(--size-border-stroke-stroke-150) solid var(--ds-icon-subtle);
 }
 
 .plus-progress-tracker__icon {

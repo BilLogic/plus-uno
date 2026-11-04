@@ -57,7 +57,7 @@ The page uses the **PageLayout** component which provides:
 - \`--size-card-gap-md\`: Between stat cards
 
 ### Element Spacing
-- \`--size-element-gap-sm\`: Between filter dropdowns
+- \`--stack-md\`: Between filter dropdowns
 
 ## Interactive Features
 
@@ -83,7 +83,7 @@ The Interactive story includes:
  * - Section gap: --size-section-gap-lg (between major sections)
  * - Section gap: --size-section-gap-sm (within table section)
  * - Card gap: --size-card-gap-md (between stat cards)
- * - Element gap: --size-element-gap-sm (between filter dropdowns)
+ * - Element gap: --stack-md (between filter dropdowns)
  */
 const MainContent = ({
     showAlert = true,
@@ -133,7 +133,7 @@ const MainContent = ({
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h3 className="h4 font-weight-semibold" style={{ color: 'var(--ds-text)', margin: 0 }}>My Sessions</h3>
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                     <SiteFilter />
                     <TimeframeFilter />
                 </div>
@@ -400,13 +400,13 @@ export const WithModals = (args) => {
             <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                 backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
             }}>
                 {/* Breakpoint Toggle */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-0625)', flexWrap: 'wrap' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '80px' }}>
                         Breakpoint:
                     </span>
@@ -422,12 +422,12 @@ export const WithModals = (args) => {
                 </div>
 
                 {/* Modal State Toggle */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                         Modal State:
                     </span>
                     {Object.entries(modalStates).map(([category, states]) => (
-                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)', flexWrap: 'wrap' }}>
+                        <div key={category} style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)', flexWrap: 'wrap' }}>
                             <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', minWidth: '140px', fontSize: '0.75rem' }}>
                                 {category}:
                             </span>

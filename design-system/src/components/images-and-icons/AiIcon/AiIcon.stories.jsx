@@ -101,7 +101,7 @@ export const CloseUp = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--grid-gutter)', color: 'var(--ds-icon)' }}>
         {AI_ICON_NAMES.map((name) => (
             <div key={name} style={cell}>
-                <span style={{ display: 'inline-flex', transform: 'scale(2)', transformOrigin: 'center', margin: 'var(--size-element-pad-y-md)' }}>
+                <span style={{ display: 'inline-flex', transform: 'scale(2)', transformOrigin: 'center', margin: 'var(--pad-y-md)' }}>
                     <AiIcon name={name} size={24} />
                 </span>
                 <AiIcon name={name} size={24} />

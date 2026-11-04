@@ -42,7 +42,7 @@ export const Overview = () => (
                 border: '1px dashed var(--color-outline-variant)',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--size-element-gap-md)',
+                gap: 'var(--space-0625)',
                 maxWidth: '420px',
             }}
         >

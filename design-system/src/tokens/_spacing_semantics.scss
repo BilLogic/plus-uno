@@ -6,29 +6,6 @@
  */
 
 :root {
-
-    /* Elements Layer */
-    --size-element-pad-x-lg: var(--size-spacing-medium-space-300);
-    --size-element-pad-x-md: var(--size-spacing-medium-space-200);
-    --size-element-pad-x-sm: var(--size-spacing-small-space-100);
-    --size-element-pad-x-xs: var(--size-spacing-small-space-050);
-    --size-element-pad-y-lg: var(--size-spacing-small-space-100);
-    --size-element-pad-y-md: var(--size-spacing-small-space-075);
-    --size-element-pad-y-sm: var(--size-spacing-small-space-050);
-    --size-element-gap-lg: var(--size-spacing-medium-space-200);
-    --size-element-gap-md: var(--size-spacing-small-space-150);
-    --size-element-gap-sm: var(--size-spacing-small-space-100);
-    --size-element-gap-xs: var(--size-spacing-small-space-050);
-    --size-element-radius-lg: var(--size-border-radius-radius-200);
-    --size-element-radius-md: var(--size-border-radius-radius-100);
-    --size-element-radius-sm: var(--size-border-radius-radius-100);
-    --size-element-radius-full: var(--size-border-radius-radius-1000);
-    --size-element-stroke-lg: var(--size-border-stroke-stroke-200);
-    --size-element-stroke-md: var(--size-border-stroke-stroke-150);
-    --size-element-stroke-sm: var(--size-border-stroke-stroke-100);
-    --size-element-stroke-xl: var(--size-border-stroke-stroke-300);
-    --size-element-border: var(--size-border-stroke-stroke-100);
-
     /* Cards Layer */
     --size-card-pad-x-lg: var(--size-spacing-medium-space-500);
     --size-card-pad-x-md: var(--size-spacing-medium-space-400);
@@ -112,11 +89,6 @@
     /* Indicator Sizes */
     --size-indicator-sm: var(--size-spacing-medium-space-300);
     --size-indicator-md: var(--size-spacing-medium-space-400);
-
-    /* Control Sizes */
-    --size-control-sm: var(--size-spacing-medium-space-500);
-    --size-control-md: var(--size-spacing-large-space-600);
-    --size-control-lg: var(--size-spacing-large-space-700);
 
     /* Row Sizes */
     --size-row-compact: var(--size-spacing-large-space-600);

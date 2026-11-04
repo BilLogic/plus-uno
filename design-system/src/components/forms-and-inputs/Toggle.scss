@@ -20,7 +20,7 @@
     font: var(--body-default);
     align-items: center;
     width: 100%;
-    gap: var(--size-element-gap-sm, 8px);
+    gap: var(--stack-md, 8px);
 
     // A choice row is 24 (`--item-height-sm`); a bare track with no label
     // keeps its own, smaller height.
@@ -43,7 +43,7 @@
     padding: 0;
     margin: 0;
     border: 0;
-    border-radius: var(--size-element-radius-full, 999px);
+    border-radius: var(--radius-full, 999px);
     cursor: pointer;
     transition: background-color 0.2s ease;
     position: relative;
@@ -88,7 +88,7 @@
     left: var(--plus-toggle-pad);
     width: var(--plus-toggle-thumb);
     height: var(--plus-toggle-thumb);
-    border-radius: var(--size-element-radius-full, 999px);
+    border-radius: var(--radius-full, 999px);
     background-color: var(--ds-icon-inverse);
     transition: transform 0.2s ease;
     display: block;

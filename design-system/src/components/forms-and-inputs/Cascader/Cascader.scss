@@ -48,7 +48,7 @@
     flex: 1 0 auto;
     min-width: 0;
     overflow-y: auto;
-    border-right: var(--size-element-border) solid var(--ds-border);
+    border-right: var(--border-default) solid var(--ds-border);
 
     &:last-child {
         border-right: none;

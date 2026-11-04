@@ -86,7 +86,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 
 **Real token examples:**
 
-- Spacing: `--size-element-pad-x-lg`, `--size-card-pad-x-md`, `--size-section-gap-lg`, `--size-modal-radius-lg`, `--size-surface-pad-x`
+- Spacing: `--pad-x-lg`, `--size-card-pad-x-md`, `--size-section-gap-lg`, `--size-modal-radius-lg`, `--size-surface-pad-x`
 - Color: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-surface-container`, `--color-danger`
 - Typography: `--font-family-header`, `--font-family-body`, `--font-size-h1`, `--font-weight-semibold-1`, `--font-line-height-body2`
 - Elevation: `--elevation-light-1` through `--elevation-light-5`
@@ -102,7 +102,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 ## Token workflow
 
 ```
-Figma export (manual) → npm run generate:tokens → commit SCSS; deep-foundation tokens (ADR-038) generate code → Figma instead, via npm run generate:design-tokens
+Figma export (manual) → npm run generate:tokens → commit SCSS; the token ladder and motion (ADR-038) generate code → Figma instead, via npm run generate:design-tokens
 ```
 
 - Never edit generated token files (`_colors.scss`, `_spacing.scss`, etc.) directly

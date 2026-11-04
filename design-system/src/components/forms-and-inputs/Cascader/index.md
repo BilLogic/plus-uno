@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-border` · `--plus-listbox-viewport-width` · `--size-element-border`
+`--border-default` · `--ds-border` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
 

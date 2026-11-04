@@ -6,7 +6,7 @@
 .content-blurb {
     display: flex;
     flex-direction: column;
-    gap: var(--size-element-gap-lg, 12px);
+    gap: var(--stack-lg, 12px);
     align-items: flex-start;
     width: 332px;
     max-width: 100%;
@@ -14,8 +14,8 @@
     &__tags {
         display: flex;
         align-items: center;
-        padding: var(--size-element-pad-y-sm, 4px) 0;
-        gap: var(--size-element-gap-sm, 4px);
+        padding: var(--space-025, 4px) 0;
+        gap: var(--stack-md, 4px);
     }
 
     &__bullet {
@@ -62,6 +62,6 @@
     }
 
     &__button {
-        margin-top: var(--size-element-gap-sm, 4px);
+        margin-top: var(--stack-md, 4px);
     }
 }

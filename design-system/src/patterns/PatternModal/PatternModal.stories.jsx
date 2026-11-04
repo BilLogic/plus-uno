@@ -351,7 +351,7 @@ export const Divider = {
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             for (const rule of rules) {
                 await expect(getComputedStyle(rule).backgroundColor, `rule color (${mode})`).toBe(token('--ds-border'));
-                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--size-element-border')}px`);
+                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--border-default')}px`);
             }
         });
     },

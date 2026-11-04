@@ -96,7 +96,7 @@ export default {
  * - Section gap: --size-section-gap-lg (between major sections)
  * - Section gap: --size-section-gap-sm (within table section)
  * - Card gap: --size-card-gap-md (between stat cards)
- * - Element gap: --size-element-gap-sm (between filter dropdowns)
+ * - Element gap: --stack-md (between filter dropdowns)
  */
 const MainContent = ({
     showAlert = true,
@@ -151,7 +151,7 @@ const MainContent = ({
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <SectionTitle title="All Sessions" />
-                <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
+                <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
                     <SessionStatusFilter defaultValue={filters.status} />
                     <TutorFilter value={filters.tutor} onChange={(val) => onFilterChange?.('tutor', val)} />
                     <SiteFilter defaultValue={filters.school} />
