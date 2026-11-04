@@ -22,6 +22,28 @@
 
     /* Radio */
     --radio-control-size: 12px;
+    --radio-control-size-10: 10px; /* RadioGroup size 10 */
+    --radio-control-size-14: 14px; /* RadioGroup size 14 */
+
+    /* Choice grid */
+    --choice-grid-control-size-10: 10px; /* ChoiceGrid size 12 */
+    --choice-grid-control-size-12: 12px; /* ChoiceGrid size 14 and 16 */
+
+    /* Range */
+    --range-dot-size-8: 8px; /* Range size 8 */
+    --range-dot-size-12: 12px; /* Range size 12 */
+    --range-dot-size-16: 16px; /* Range size 16 */
+    --range-dot-size-default: 20px; /* Range with no size */
+    --range-track-height-4: 4px; /* Range size 8, and the default */
+    --range-track-height-6: 6px; /* Range size 12 */
+    --range-track-height-8: 8px; /* Range size 16 */
+
+    /* Toggle */
+    --toggle-track-height-16: 16px; /* Toggle size 16 */
+    --toggle-track-height-20: 20px; /* Toggle size 20 */
+    --toggle-track-width-16: 32px; /* Toggle size 16 */
+    --toggle-track-width-20: 40px; /* Toggle size 20 */
+    --toggle-pad: var(--space-0125); /* both sizes */
 
     /* Listbox */
     --listbox-max-width: 320px;

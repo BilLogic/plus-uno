@@ -141,6 +141,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/no-primitive-reads.json',
+    check: 'check:no-primitive-reads',
+    command: 'node scripts/check-no-primitive-reads.mjs --update',
+    prose: 'why',
+    // `<path>` -> count of primitive reads in a component or pattern (ADR-038).
+    // A count may fall; one that reaches zero leaves the record, and the stale
+    // sweep asks for a regenerate.
+    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
+  },
+  {
     file: 'scripts/baselines/old-size-tokens.json',
     check: 'check:old-size-tokens',
     command: 'node scripts/check-old-size-tokens.mjs --update',

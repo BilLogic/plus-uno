@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--plus-range-dot-size` · `--plus-range-track-height` · `--radius-full` · `--space-025`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--item-height-md` · `--radius-full` · `--range-dot-size-12` · `--range-dot-size-16` · `--range-dot-size-8` · `--range-dot-size-default` · `--range-track-height-4` · `--range-track-height-6` · `--range-track-height-8` · `--space-025`
 
 From `design-system/src/components/forms-and-inputs/Range.scss`. Override these through the token layer, never with a literal.
 
