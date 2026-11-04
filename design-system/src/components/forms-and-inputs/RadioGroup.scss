@@ -1,0 +1,50 @@
+/**
+ * RadioGroup — a `Fieldset` holding a row or column of Radios, with an
+ * optional scale (leading/trailing text) either side of the options.
+ */
+
+// `size`: the radio control (dot) width, in px. Unset keeps today's rendering.
+.plus-radio-group {
+    &[data-size="10"] { --layout-control-radio: 10px; }
+    &[data-size="12"] { --layout-control-radio: 12px; }
+    &[data-size="14"] { --layout-control-radio: 14px; }
+}
+
+.plus-radio-group-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-gap-default);
+}
+
+.plus-radio-group-inline .plus-radio-group-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: var(--space-0625);
+}
+
+.plus-radio-group-scale {
+    display: flex;
+    align-items: center;
+    gap: var(--space-0625);
+}
+
+.plus-radio-group-scale-end {
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+.plus-radio-group-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-gap-default);
+}
+
+// Inline choices size to their content rather than filling the row.
+.plus-radio-group-inline .plus-radio-group-item > [class*='-wrapper'] {
+    width: auto;
+}
+
+// Under the option's label, past its control and the label gap.
+.plus-radio-group-reveal {
+    padding-left: calc(var(--layout-control-radio) + var(--element-gap-default));
+}

@@ -5,6 +5,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 import Checkbox from './Checkbox';
+import Fieldset from './Fieldset';
 
 export default {
     title: 'Components/Forms and inputs/Checkbox',
@@ -156,6 +157,43 @@ SelectAll.play = async ({ canvasElement }) => {
     await userEvent.click(canvas.getByRole('checkbox', { name: 'wed' }));
     await waitFor(() => expect(all.indeterminate).toBe(false));
     await expect(all.checked).toBe(true);
+};
+
+/** Checkbox group: Checkboxes inside a Fieldset with a legend, picking any number. */
+export const CheckboxGroup = () => {
+    const [picked, setPicked] = useState([]);
+    const options = [
+        { value: 'fewer-tutors', label: 'Fewer tutors than expected' },
+        { value: 'more-students', label: 'More students than expected' },
+        { value: 'schedule-change', label: 'Schedule changed' },
+    ];
+    const toggle = (value, checked) => {
+        setPicked((prev) => (checked ? [...prev, value] : prev.filter((v) => v !== value)));
+    };
+    return (
+        <div style={stack}>
+            <Fieldset legend="Reason for request" isRequired>
+                {options.map((option) => (
+                    <Checkbox
+                        key={option.value}
+                        name="checkbox-group-overview"
+                        value={option.value}
+                        label={option.label}
+                        isChecked={picked.includes(option.value)}
+                        onChange={(event) => toggle(option.value, event.target.checked)}
+                    />
+                ))}
+            </Fieldset>
+            <p className="body2-txt m-0" data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
+        </div>
+    );
+};
+CheckboxGroup.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: /Reason for request/ });
+    await expect(group.tagName).toBe('FIELDSET');
+    await userEvent.click(within(group).getByRole('checkbox', { name: 'Schedule changed' }));
+    await expect(canvas.getByTestId('checkbox-group-value').textContent).toBe('Picked: schedule-change');
 };
 
 export const Interactive = (args) => {

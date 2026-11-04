@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChoiceGroup } from '@/components';
+import { RadioGroup } from '@/components';
 import DatePicker from '@/components/forms-and-inputs/DatePicker';
 
 export default {
@@ -26,9 +26,9 @@ const RadioLabel = () => (
 // ─── Reusable option ─────────────────────────────────────────
 
 /**
- * The "during a specific date period" answer, as a ChoiceGroup option: while it
+ * The "during a specific date period" answer, as a RadioGroup option: while it
  * is chosen, the date range opens under it. The Delete Session modals put it in
- * their own ChoiceGroup beside the other answers.
+ * their own RadioGroup beside the other answers.
  *
  * Tokens:
  * - Gap between date pickers and "to": --size-element-gap-sm
@@ -79,7 +79,7 @@ export const dateRangeOption = ({
 
 /** The option on its own, chosen or not, for the state gallery below. */
 const DeleteSessionRadioItem = ({ selected = false, ...dates }) => (
-    <ChoiceGroup
+    <RadioGroup
         name="delete-session-radio"
         aria-label="Sessions to cancel"
         options={[dateRangeOption(dates)]}

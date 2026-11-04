@@ -16,8 +16,8 @@ const ChoiceGrid = ({
     rows = [],
     columns = [],
     values = {}, // { rowId: { columnId: boolean } } for checkbox, { rowId: columnId } for radio
-    disabled = false,
-    readOnly = false,
+    isDisabled = false,
+    isReadOnly = false,
     /** Option-label font size in px (`12` · `14` · `16`), and the control width that goes with it (`10` · `12` · `12`). Unset keeps the default rendering. */
     size,
     onChange,
@@ -26,7 +26,7 @@ const ChoiceGrid = ({
     ...props
 }) => {
     const handleChange = (rowId, columnId, checked) => {
-        if (disabled || readOnly) return;
+        if (isDisabled || isReadOnly) return;
 
         if (onChange) {
             if (type === 'radio') {
@@ -61,7 +61,7 @@ const ChoiceGrid = ({
     const wrapperClasses = [
         'plus-choice-grid-wrapper',
         `plus-choice-grid-${type}`,
-        disabled ? 'plus-choice-grid-disabled' : '',
+        isDisabled ? 'plus-choice-grid-disabled' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -116,8 +116,8 @@ const ChoiceGrid = ({
                                                 name={inputName}
                                                 value={column.id}
                                                 isChecked={checked}
-                                                isDisabled={disabled}
-                                                isReadOnly={readOnly}
+                                                isDisabled={isDisabled}
+                                                isReadOnly={isReadOnly}
                                                 className="plus-choice-grid-control"
                                                 aria-labelledby={`${rowLabelId} ${columnHeaderId}`}
                                                 onChange={(e) => handleChange(
@@ -152,9 +152,9 @@ ChoiceGrid.propTypes = {
     })).isRequired,
     /** Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. */
     values: PropTypes.object,
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     /** Shown and focusable, not changeable. */
-    readOnly: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     /** Option-label font size in px, and the control width that goes with it. Unset keeps the default rendering. */
     size: PropTypes.oneOf([12, 14, 16]),
     onChange: PropTypes.func,

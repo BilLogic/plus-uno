@@ -20,12 +20,12 @@ Rating component with 5 stars, supporting two variants: 1. With "Comments" label
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | — |
-| `required` | bool | `false` | Show required indicator |
+| `isRequired` | bool | `false` | Show required indicator |
 | `value` | number | `0` | — |
 | `variant` | enum | `'comments'` | Variant type: comments (label below) or numeric (labels above) |
 | `showCommentsLabel` | bool | `true` | — |
 | `commentsLabel` | node | `'Comments'` | — |
-| `disabled` | bool | `false` | Disable the rating component |
+| `isDisabled` | bool | `false` | Disable the rating component |
 | `onChange` | func | — | — |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
@@ -65,6 +65,6 @@ Implemented as `RatingItem`.
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

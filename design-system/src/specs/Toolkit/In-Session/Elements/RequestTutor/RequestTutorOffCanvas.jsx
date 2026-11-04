@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button/Button';
-import { ChoiceGroup, Select } from '@/components';
+import { Fieldset, Checkbox, TextField, Select } from '@/components';
 
 /**
  * RequestTutorOffCanvas — the "Request tutor(s)" / "Request lead tutor" side sheet triggered
@@ -154,7 +154,7 @@ export const RequestTutorOffCanvas = ({
 
     const Header = ({ title, subtitle }) => (
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}>
                 <h5 className="h5" style={{ color: 'var(--color-on-surface)', margin: 0 }}>{title}</h5>
                 {subtitle && <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>{subtitle}</p>}
             </div>
@@ -185,7 +185,7 @@ export const RequestTutorOffCanvas = ({
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
                     <FieldLabel required>Request closes at</FieldLabel>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--size-element-gap-sm)', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--element-gap-default)', alignItems: 'center' }}>
                         {CLOSING_TIMES.map((t) => (
                             <Chip key={t} selected={closesAt === t} onClick={() => setClosesAt(t)}>{t}pm</Chip>
                         ))}
@@ -201,21 +201,52 @@ export const RequestTutorOffCanvas = ({
                         />
                     </div>
                 </div>
-                <ChoiceGroup
+                <Fieldset
                     id="request-reason"
-                    name="request-reason"
-                    type="checkbox"
                     legend={<span className="font-weight-semibold">Reason for request</span>}
-                    options={REASONS.map((r) => ({ value: r.id, label: r.label }))}
-                    value={reasons}
-                    onChange={setReasons}
-                    other={{
-                        label: 'Other',
-                        placeholder: 'Tell us more…',
-                        text: otherReason,
-                        onTextChange: setOtherReason,
-                    }}
-                />
+                    style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}
+                >
+                    {REASONS.map((reason) => (
+                        <Checkbox
+                            key={reason.id}
+                            name="request-reason"
+                            value={reason.id}
+                            label={reason.label}
+                            isChecked={reasons.includes(reason.id)}
+                            onChange={(event) => {
+                                const without = reasons.filter((v) => v !== reason.id);
+                                setReasons(event.target.checked ? [...without, reason.id] : without);
+                            }}
+                        />
+                    ))}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-gap-default)' }}>
+                        <Checkbox
+                            name="request-reason"
+                            value="other"
+                            label="Other"
+                            isChecked={reasons.includes('other')}
+                            onChange={(event) => {
+                                const without = reasons.filter((v) => v !== 'other');
+                                setReasons(event.target.checked ? [...without, 'other'] : without);
+                            }}
+                        />
+                        <TextField
+                            id="request-reason-other-text"
+                            label="Other, please specify"
+                            isLabelHidden
+                            spacing="compact"
+                            placeholder="Tell us more…"
+                            value={otherReason}
+                            onChange={(event) => {
+                                setOtherReason(event.target.value);
+                                // Writing an answer chooses it.
+                                if (event.target.value && !reasons.includes('other')) {
+                                    setReasons([...reasons, 'other']);
+                                }
+                            }}
+                        />
+                    </div>
+                </Fieldset>
             </>
         );
         footer = <Footer primary={<Button text="Next" appearance="primary" iconAfter="arrow-right" onClick={() => setStep('preview')} />} />;

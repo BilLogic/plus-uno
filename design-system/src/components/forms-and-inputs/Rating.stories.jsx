@@ -34,12 +34,12 @@ export default {
             description: 'Variant type: comments (label below) or numeric (labels above)',
             table: { category: 'Design' }
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the rating component',
             table: { category: 'Behavior' }
         },
-        required: {
+        isRequired: {
             control: 'boolean',
             description: 'Show required indicator',
             table: { category: 'Content' }
@@ -64,7 +64,7 @@ export const Overview = () => {
             <Rating
                 id="rating-overview"
                 label="Rating"
-                required
+                isRequired
                 value={value}
                 variant="comments"
                 onChange={setValue}
@@ -91,7 +91,7 @@ export const Content = () => {
                 <Rating
                     id="rating-content"
                     label="Rating"
-                    required
+                    isRequired
                     value={value}
                     variant="comments"
                     onChange={setValue}
@@ -133,8 +133,8 @@ export const InteractionStates = () => (
                 Disabled ratings remain visible but cannot be changed.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-                <Rating id="rating-disabled-comments" value={3} variant="comments" disabled />
-                <Rating id="rating-disabled-numeric" value={3} variant="numeric" disabled />
+                <Rating id="rating-disabled-comments" value={3} variant="comments" isDisabled />
+                <Rating id="rating-disabled-numeric" value={3} variant="numeric" isDisabled />
             </div>
         </section>
     </div>
@@ -151,9 +151,9 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '400px' }}>
             <Rating
                 label={args.label}
-                required={args.required}
+                isRequired={args.isRequired}
                 variant={args.variant}
-                disabled={args.disabled}
+                isDisabled={args.isDisabled}
                 value={value}
                 onChange={setValue}
             />
@@ -162,9 +162,9 @@ export const Interactive = (args) => {
 };
 Interactive.args = {
     label: 'Rating',
-    required: false,
+    isRequired: false,
     variant: 'comments',
-    disabled: false,
+    isDisabled: false,
 };
 
 

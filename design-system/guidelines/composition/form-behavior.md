@@ -67,11 +67,11 @@ Pass `required` to draw the asterisk, and put one legend line above the first
 field: "Required fields are marked with an asterisk (*)." A form marks what is
 required and leaves every other field unmarked, with no "(optional)" labels.
 
-For a group of choices, mark the group: pass `required` to `ChoiceGroup`, which
-puts the asterisk on its `legend`, and keep `required` off each `Checkbox` and
-`Radio`.
-`required` draws the mark and nothing more on most fields, so the form's own
-check still enforces it.
+For a group of choices, mark the group: pass `isRequired` to `RadioGroup` or a
+`Fieldset`, which puts the asterisk on its `legend`, and keep `isRequired` off
+each `Checkbox` and `Radio` in it.
+`isRequired`/`required` draws the mark and nothing more on most fields, so the
+form's own check still enforces it.
 
 ## Disabled vs read-only
 
@@ -84,11 +84,11 @@ A permission split — an admin edits a profile, a tutor views it — is read-on
 After a submit that fails on permission, the form turns read-only and says
 why in an `Alert`, keeping the values readable.
 
-The prop is spelled per component: `isReadOnly` on `TextField` and `TextArea`; `readOnly` on
-`Checkbox`, `Radio`, `Switch`, `ChoiceGroup` and `ChoiceGrid`; `readonly` on
+The prop is spelled per component: `isReadOnly` on `TextField`, `TextArea`,
+`Checkbox`, `Radio`, `Switch`, `RadioGroup` and `ChoiceGrid`; `readonly` on
 `Select` and `DateTimePicker`. `Select` treats
 `readonly` as disabled today. A read-only choice keeps its focus and contrast
-and ignores clicks and keys; put radios in a `ChoiceGroup`, since ARIA lets the
+and ignores clicks and keys; put radios in a `RadioGroup`, since ARIA lets the
 radio group announce read-only and not a lone radio.
 
 ## Unsaved changes

@@ -18,7 +18,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A radio lets a person choose one option from a set. Radios that share a name form a group; the group is usually a ChoiceGroup.',
+                    'A radio lets a person choose one option from a set. Radios that share a name form a group; the group is usually a RadioGroup.',
             },
         },
     },
@@ -175,7 +175,7 @@ Interactive.args = {
 /**
  * Read-only: the answer is shown at full contrast and stays in the tab order,
  * and clicking does not change it. ARIA has no `aria-readonly` for a lone
- * radio, so a read-only question goes in a ChoiceGroup, which announces it.
+ * radio, so a read-only question goes in a RadioGroup, which announces it.
  */
 export const ReadOnly = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-sm)' }}>

@@ -353,62 +353,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
       }
     },
-    "ChoiceGroup": {
-      "code": {
-        "import": "@/components/forms-and-inputs",
-        "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/ChoiceGroup.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
-        "source": "design-system/src/components/forms-and-inputs/ChoiceGroup.jsx",
-        "storybookId": "components-forms-and-inputs-radio-radio-group--docs",
-        "props": {
-          "type": {
-            "type": "enum",
-            "values": [
-              "radio",
-              "checkbox"
-            ]
-          },
-          "orientation": {
-            "type": "enum",
-            "values": [
-              "stacked",
-              "inline"
-            ]
-          },
-          "appearance": {
-            "type": "enum",
-            "values": [
-              "plain",
-              "card"
-            ]
-          },
-          "description": {
-            "type": "string"
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "choice-group",
-            "name": "ChoiceGroup",
-            "componentSetNodeId": "18265:52386",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
-            "source": "node-chart",
-            "status": "verified",
-            "verifiedAt": "2026-10-15",
-            "notes": "Four variants, type × orientation. Legend, then a row of Leading text, the Options slot (Form Radio Button or Form Checkbox, at least two) and Trailing text, then Other and Error. Replaces the deleted Multiple Choice (Radio) 13540:9207, Multiple Choice (Checkbox) 13540:9717 and Scale Radio Button 13536:6785. Linear Scale stays in the library, deprecated, until the Specs file swaps its six instances."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52386",
-        "deliberate": {
-          "appearance": "Figma sets appearance on each Form Checkbox and Form Radio Button in the Options slot, since a group cannot reach into its slot; code sets it once on ChoiceGroup and passes it to every choice.",
-          "description": "Figma sets description on each choice in the Options slot; code takes it per option in `options` and passes it to that choice."
-        }
-      }
-    },
     "Comment": {
       "code": {
         "import": "@/components/forms-and-inputs",

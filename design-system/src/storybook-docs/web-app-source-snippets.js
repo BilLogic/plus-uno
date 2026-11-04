@@ -340,7 +340,7 @@ export const webAppSourceSnippets = {
         '<Rating',
         '  id="rating-overview"',
         '  label="Rating"',
-        '  required',
+        '  isRequired',
         '  value={value}',
         '  variant="comments"',
         '  onChange={setValue}',
@@ -374,12 +374,12 @@ export const webAppSourceSnippets = {
         '  onChange={(rowId, columnId) => setRadioValues({ ...radioValues, [rowId]: columnId })}',
         '/>'
     ]),
-    formChoiceGroup: snippet([
+    formRadioGroup: snippet([
         'const [value, setValue] = useState(null);',
         '',
-        '<ChoiceGroup',
-        '  id="cg-overview"',
-        '  name="cg-overview"',
+        '<RadioGroup',
+        '  id="rg-overview"',
+        '  name="rg-overview"',
         '  legend="Which subject did you tutor?"',
         '  options={[',
         '    { value: "math", label: "Math" },',

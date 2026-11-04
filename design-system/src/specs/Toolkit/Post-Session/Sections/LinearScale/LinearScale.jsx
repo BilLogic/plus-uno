@@ -1,14 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ChoiceGroup } from '@/components';
+import { RadioGroup } from '@/components';
 import './LinearScale.scss';
 
 const SCALE_OPTIONS = [1, 2, 3, 4, 5].map((n) => ({ value: n, label: String(n) }));
 
 /**
  * Five-point linear scale (Figma Sections · Linear Scale `10819:11602`).
- * Post-Session shell around a Foundations `ChoiceGroup`: inline radios with
- * the two scale ends as its leading and trailing text.
+ * Post-Session shell around a Foundations `RadioGroup` (itself a `Fieldset`
+ * plus `Radio`s): inline radios with the two scale ends as its leading and
+ * trailing text.
  *
  * @param {object} props
  * @param {React.ReactNode} [props.legend] - The question. Names the scale.
@@ -28,13 +29,13 @@ const LinearScale = ({
     lowLabel = 'I struggled to find my footing.',
     highLabel = 'I nailed it!',
 }) => (
-    <ChoiceGroup
+    <RadioGroup
         id={name}
         name={name}
         className="post-session-linear-scale"
         legend={legend}
         aria-label={legend ? undefined : `${lowLabel} to ${highLabel}`}
-        required={required}
+        isRequired={required}
         orientation="inline"
         leadingText={lowLabel}
         trailingText={highLabel}

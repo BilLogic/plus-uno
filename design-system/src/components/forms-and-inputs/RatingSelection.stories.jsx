@@ -141,7 +141,7 @@ ArrowKeysMoveTheValue.play = async ({ canvasElement }) => {
  */
 export const DisabledStaysAnnounced = () => (
     <div style={stack}>
-        <Rating id="rs-disabled" label="Session rating" value={4} disabled onChange={() => {}} />
+        <Rating id="rs-disabled" label="Session rating" value={4} isDisabled onChange={() => {}} />
     </div>
 );
 

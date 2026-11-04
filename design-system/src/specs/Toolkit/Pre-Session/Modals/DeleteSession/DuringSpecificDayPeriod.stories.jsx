@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
-import { ChoiceGroup } from '@/components';
+import { RadioGroup } from '@/components';
 import { DeleteModalSessionCard } from '@/specs/Toolkit/Pre-Session/Cards/DeleteModalSessionCard.stories';
 import { dateRangeOption } from '@/specs/Toolkit/Pre-Session/Elements/DeleteSessionRadioSelection.stories';
 import { CancelButton, ConfirmCancelButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
@@ -81,7 +81,7 @@ const DuringSpecificDayPeriodModalBody = () => (
             />
 
             {/* Radio Options Section */}
-            <ChoiceGroup
+            <RadioGroup
                 name="delete-session"
                 aria-label="Sessions to cancel"
                 defaultValue="date-period"

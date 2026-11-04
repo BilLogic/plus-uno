@@ -9,7 +9,7 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox.mdx`
 
@@ -51,6 +51,6 @@ From `design-system/src/components/forms-and-inputs/Checkbox.scss`. Override the
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `ChoiceGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
