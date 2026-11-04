@@ -75,13 +75,13 @@ The Blanket has one more property. **Height** (hug or fill) lives on the Modal i
 <tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
 </thead>
 <tbody>
-<tr><td><code>--overlay-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
-<tr><td><code>--overlay-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
+<tr><td><code>--blanket-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
+<tr><td><code>--blanket-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
 <tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill, under every modal and drawer.</td></tr>
-<tr><td><code>--layout-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
-<tr><td><code>--layout-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
-<tr><td><code>--layout-max-width-content</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
-<tr><td><code>--layout-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+<tr><td><code>--grid-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
+<tr><td><code>--grid-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
+<tr><td><code>--content-max-width</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
+<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -139,12 +139,12 @@ Figma has no z-index, so the order is written here and lives in code.
 <tr><th>Layer</th><th>Number</th><th>Token</th><th>Holds</th></tr>
 </thead>
 <tbody>
-<tr><td>Navigation</td><td>200</td><td><code>--layout-z-index-navigation</code></td><td>The floating sidebar. It has a shadow and no blanket, and an outside click closes it.</td></tr>
-<tr><td>Menu and Popup</td><td>400</td><td><code>--layout-z-index-popup</code></td><td>The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510.</td></tr>
-<tr><td>Blanket</td><td>500</td><td><code>--layout-z-index-scrim</code></td><td>The Blanket and its fill.</td></tr>
-<tr><td>Modal</td><td>510</td><td><code>--layout-z-index-modal</code></td><td>A Modal or a Drawer.</td></tr>
-<tr><td>Flag</td><td>600</td><td><code>--layout-z-index-flag</code></td><td>Flags, above a modal.</td></tr>
-<tr><td>Tooltip</td><td>800</td><td><code>--layout-z-index-tooltip</code></td><td>Tooltips, above everything.</td></tr>
+<tr><td>Navigation</td><td>200</td><td><code>--layer-navigation</code></td><td>The floating sidebar. It has a shadow and no blanket, and an outside click closes it.</td></tr>
+<tr><td>Menu and Popup</td><td>400</td><td><code>--layer-popup</code></td><td>The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510.</td></tr>
+<tr><td>Blanket</td><td>500</td><td><code>--layer-blanket</code></td><td>The Blanket and its fill.</td></tr>
+<tr><td>Modal</td><td>510</td><td><code>--layer-modal</code></td><td>A Modal or a Drawer.</td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layer-flag</code></td><td>Flags, above a modal.</td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layer-tooltip</code></td><td>Tooltips, above everything.</td></tr>
 </tbody>
 </DocsTable>
 

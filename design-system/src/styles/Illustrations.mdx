@@ -16,7 +16,7 @@ export const Row = ({ children }) => (
 );
 
 export const Captioned = ({ caption, children }) => (
-    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-sm)' }}>
+    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
         {children}
         <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>
     </figure>
@@ -206,10 +206,10 @@ The body color stands for the area, so a character only appears with its own are
 
 <DoDont>
 <Do caption="The technology character with the Technology & tools lesson.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Technology & tools</strong></div>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Technology & tools</strong></div>
 </Do>
 <Dont caption="The mastering content character on a Relationships lesson.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-lg)' }}><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Relationships</strong></div>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xsmall)' }}>Relationships</strong></div>
 </Dont>
 </DoDont>
 
@@ -236,14 +236,14 @@ A single character carries the mood; a crowd competes with the message.
 
 <DoDont>
 <Do caption="One character above the empty-state message.">
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-md)', textAlign: 'center' }}>
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
     <Illustration character="relationships" size={96} />
     <strong style={{ font: 'var(--heading-xsmall)' }}>No sessions yet</strong>
     <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
 </div>
 </Do>
 <Dont caption="Four characters crowding one empty state. A collage like this belongs on a marketing page, not in the product.">
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--element-stack-md)', textAlign: 'center' }}>
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
     <span style={{ display: 'flex' }}>{['mastering-content', 'advocacy', 'technology', 'relationships'].map((c) => <Illustration key={c} character={c} size={48} />)}</span>
     <strong style={{ font: 'var(--heading-xsmall)' }}>No sessions yet</strong>
     <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>

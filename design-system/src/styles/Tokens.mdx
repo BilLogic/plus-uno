@@ -39,7 +39,7 @@ Design tokens are name and value pairings that represent small, repeatable desig
 For example, instead of picking one of many grays for helper text under a field, apply `color/text/subtle`. It is the same decision everywhere the app shows helper text, in every theme.
 
 <FoundationExample caption="The helper line takes color/text/subtle: var(--ds-text-subtle).">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
     <span style={{ font: 'var(--body-default)' }}>School</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Choose the school the student attends.</span>
 </div>
@@ -115,7 +115,7 @@ Knowing how to read token names helps you find the right token faster in a desig
         [<C>color/border/focused</C>, 'color', 'border', 'focused', <C>var(--ds-border-focused)</C>],
         [<C>elevation/surface/raised</C>, 'elevation', 'surface', 'raised', <C>var(--ds-surface-raised)</C>],
         [<C>Card/radius-sm</C>, 'Card (pattern)', 'radius', 'sm', <C>var(--card-radius-sm)</C>],
-        [<C>Element/radius-lg</C>, 'Element', 'radius', 'lg', <C>var(--element-radius-lg)</C>],
+        [<C>Element/radius-lg</C>, 'Element', 'radius', 'lg', <C>var(--radius-lg)</C>],
         [<C>Space/space-0625</C>, 'Space (primitive)', 'space', '0625 = 10px', <C>var(--space-0625)</C>],
     ]}
 />
@@ -153,7 +153,7 @@ Code prefixes keep the names they were generated with, so the Frame is `--frame-
 Bind the token and nothing else. A token never takes a fallback, and the layer comes from what the thing is.
 
 - A token is used bare: `var(--ds-text)`, never with a second value after a comma. That fallback is a fifth, unthemed color: it hides a missing token and drifts from every mode.
-- Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-default`); a filter chip takes the element layer (`--element-pad-x-md`).
+- Pick the layer by what the thing is. A session card takes the card layer (`--card-pad-default`); a filter chip takes the element layer (`--pad-x-md`).
 - Spell tokens and copy in American English: gray, color, behavior.
 
 **Use the token bare.** A helper line under a field.

@@ -37,8 +37,8 @@ In code, a region lays itself out on the grid rather than reading column widths:
 
 ```css
 display: grid;
-grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
-gap: var(--layout-gutter);
+grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+gap: var(--grid-gutter);
 ```
 
 Figma holds the breakpoint modes in the `spacing / layout` collection: 768, 1024 and 1440. The content grid is on the Page's content frame; the screen grid is on the Blanket only.
@@ -88,13 +88,13 @@ breakpoint: Medium · Large · X-Large.
 <TokenTable
     valueHeader="MD · LG · XL"
     rows={[
-        { token: '--layout-columns', figma: 'Grid/columns', value: '12 · 12 · 12' },
-        { token: '--layout-gutter', figma: 'Grid/gutter', value: '16 · 16 · 16' },
-        { token: '--layout-width-screen', figma: 'Screen/width-screen', value: '768 · 1024 · 1440' },
-        { token: '--layout-pad-x-screen', figma: 'Screen/pad-x-screen', value: '24 · 24 · 32' },
-        { token: '--layout-width-column-screen', figma: 'Grid/width-column-screen', value: '45.33 · 66.67 · 88' },
-        { token: '--layout-width-content', figma: 'Content/width-content', value: '720 · 744 · 1144' },
-        { token: '--layout-width-column', figma: 'Grid/width-column', value: '45.33 · 47.33 · 80.67' },
+        { token: '--grid-columns', figma: 'Grid/columns', value: '12 · 12 · 12' },
+        { token: '--grid-gutter', figma: 'Grid/gutter', value: '16 · 16 · 16' },
+        { token: '--screen-width', figma: 'Screen/width-screen', value: '768 · 1024 · 1440' },
+        { token: '--screen-pad-x', figma: 'Screen/pad-x-screen', value: '24 · 24 · 32' },
+        { token: '--grid-width-column-screen', figma: 'Grid/width-column-screen', value: '45.33 · 66.67 · 88' },
+        { token: '--content-width', figma: 'Content/width-content', value: '720 · 744 · 1144' },
+        { token: '--grid-width-column', figma: 'Grid/width-column', value: '45.33 · 47.33 · 80.67' },
         { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24' },
     ]}
 />
@@ -125,10 +125,10 @@ Pick one width mode per page and keep it.
 <RefTable
     head={['Mode', 'Width', 'Token', 'Use']}
     rows={[
-        ['Fixed-wide (default)', '1232', <C>--layout-max-width-content</C>, 'Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1528 screen.'],
-        ['Fixed-narrow', '864', <C>--layout-max-width-reading</C>, 'Long-form reading, so lines stay a comfortable length.'],
+        ['Fixed-wide (default)', '1232', <C>--content-max-width</C>, 'Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1528 screen.'],
+        ['Fixed-narrow', '864', <C>--content-max-width-reading</C>, 'Long-form reading, so lines stay a comfortable length.'],
         ['Fluid', 'no cap', '—', 'Canvases, boards and timelines that grow sideways.'],
-        ['Minimum', '720', <C>--layout-min-width-content</C>, 'Narrower than this, the content stays 720 and the page scrolls sideways; the topbar stays put.'],
+        ['Minimum', '720', <C>--content-min-width</C>, 'Narrower than this, the content stays 720 and the page scrolls sideways; the topbar stays put.'],
     ]}
 />
 
@@ -142,9 +142,9 @@ row with the sidebar and the Page.
 <TokenTable
     valueHeader="MD · LG · XL"
     rows={[
-        { token: '--layout-height-topbar', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
-        { token: '--layout-width-sidebar', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
-        { token: '--layout-pad-left-container', figma: 'Sidebar/pad-left-container', value: '8 · 0 · 0' },
+        { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
+        { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
+        { token: '--grid-pad-left-container', figma: 'Sidebar/pad-left-container', value: '8 · 0 · 0' },
         { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24' },
         { token: '--page-radius', figma: 'Page/radius', value: '16 · 16 · 16' },
     ]}
@@ -196,11 +196,11 @@ than 16 to the side of the screen.
 <TokenTable
     valueHeader="MD · LG · XL"
     rows={[
-        { token: '--layout-width-modal-sm', figma: 'Modal/width-modal-sm', value: '384 · 512 · 640' },
-        { token: '--layout-width-modal-md', figma: 'Modal/width-modal-md', value: '507 · 677 · 848' },
-        { token: '--layout-width-modal-lg', figma: 'Modal/width-modal-lg', value: '629 · 843 · 1056' },
-        { token: '--overlay-pad-x', figma: 'Blanket/pad-x', value: '16' },
-        { token: '--overlay-pad-y', figma: 'Blanket/pad-y', value: '64' },
+        { token: '--modal-width-sm', figma: 'Modal/width-modal-sm', value: '384 · 512 · 640' },
+        { token: '--modal-width-md', figma: 'Modal/width-modal-md', value: '507 · 677 · 848' },
+        { token: '--modal-width-lg', figma: 'Modal/width-modal-lg', value: '629 · 843 · 1056' },
+        { token: '--blanket-pad-x', figma: 'Blanket/pad-x', value: '16' },
+        { token: '--blanket-pad-y', figma: 'Blanket/pad-y', value: '64' },
     ]}
 />
 
@@ -212,23 +212,23 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 
 <FoundationExample caption="Control, Row and Media at each size, drawn from the size tokens.">
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--section-stack-md)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Control</strong>
         {[['--item-height-sm', 24], ['--item-height-md', 32]].map(([t, v]) => (
-            <span key={t} style={{ display: 'flex', alignItems: 'center', height: `var(${t})`, padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
+            <span key={t} style={{ display: 'flex', alignItems: 'center', height: `var(${t})`, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Row</strong>
         {[['--row-height-sm', 32], ['--row-height-md', 40], ['--row-height-lg', 48]].map(([t, v]) => (
             <span key={t} style={{ display: 'flex', alignItems: 'center', minHeight: `var(${t})`, padding: '0 var(--table-pad-x-cell)', borderBottom: 'var(--border-default) solid var(--ds-border)', font: 'var(--body-small)' }}><C>{t}</C>&nbsp;{v}</span>
         ))}
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Media</strong>
-        <span style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--element-inline-md)' }}>
+        <span style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
             {[['--image-xxs', 16], ['--image-xs', 20], ['--image-sm', 24], ['--image-md', 32], ['--image-lg', 40], ['--image-xl', 48]].map(([t, v]) => (
-                <span key={t} title={`${t} ${v}`} style={{ width: `var(${t})`, height: `var(${t})`, borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-accent-teal-subtle)' }} />
+                <span key={t} title={`${t} ${v}`} style={{ width: `var(${t})`, height: `var(${t})`, borderRadius: 'var(--radius-md)', background: 'var(--ds-background-accent-teal-subtle)' }} />
             ))}
         </span>
     </div>
@@ -310,15 +310,15 @@ Minimum and maximum sizes the patterns carry. Frame and modal sizes are under Th
 
 <DoDont>
 <Do caption="A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--element-inline-md)' }}>
-    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
+    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Do>
 <Dont caption="A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--element-inline-md)' }}>
-    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-sm)', padding: '0 var(--element-pad-x-sm)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}>
+    <span style={{ flex: 1, display: 'flex', alignItems: 'center', minHeight: 'var(--row-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)', font: 'var(--body-default)', color: 'var(--ds-text-subtlest)' }}>Search students</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-sm)', padding: '0 var(--pad-x-sm)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Add</span>
 </div>
 </Dont>
 </DoDont>
@@ -394,17 +394,17 @@ Every box either hugs its content or fills the space it is given. The container 
 
 <DoDont>
 <Do caption="The name fills; the tag and the button keep their own width.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ flex: 1, fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
+    <span style={{ padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center' }}>View</span>
 </div>
 </Do>
 <Dont caption="The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-default)' }}>
+<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
     <span style={{ fontWeight: 'var(--type-weight-medium)' }}>Maya Chen</span>
     <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-success)' }}>Active</span>
-    <span style={{ flex: 1, padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
+    <span style={{ flex: 1, padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)', height: 'var(--item-height-md)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>View</span>
 </div>
 </Dont>
 </DoDont>
@@ -428,8 +428,8 @@ Align containers to the grid, keep the grid on the page, and build with auto lay
 <FoundationSection title="Accessibility">
 
 - The grid sets line length, reflow and reading order.
-- Cap long-form text at the reading width (`--layout-max-width-reading`, 864) so lines stay a readable length on wide screens.
-- Content holds a 720 minimum (`--layout-min-width-content`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when the page is zoomed. PLUS is desktop only, from 768 up.
+- Cap long-form text at the reading width (`--content-max-width-reading`, 864) so lines stay a readable length on wide screens.
+- Content holds a 720 minimum (`--content-min-width`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when the page is zoomed. PLUS is desktop only, from 768 up.
 - Content never sits under the sidebar or the topbar. Below 1024 the sidebar opens over the page and closes on an outside click or Escape, and focus returns to its toggle.
 - Keep the order of content in the file the same as its order on the grid, so keyboard focus and screen readers follow the sequence a reader sees.
 - Every control is at least 24 tall, and 32 or more outside a table row or an inline toolbar, so it stays an easy target. An icon-only control still needs a name.

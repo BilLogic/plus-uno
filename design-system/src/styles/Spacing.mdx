@@ -96,10 +96,10 @@ context a value belongs to, step back to the box that holds it.
     head={['Word', 'Means', 'Example']}
     rows={[
         [<C>pad</C>, 'The space between a box’s edge and its content, the same on all four sides', <><C>--card-pad-md</C> 20</>],
-        [<><C>pad-x</C> · <C>pad-y</C></>, 'Used only when the two axes differ, as on an Item', <><C>--element-pad-x-md</C> 12 · <C>--element-pad-y-md</C> 6</>],
+        [<><C>pad-x</C> · <C>pad-y</C></>, 'Used only when the two axes differ, as on an Item', <><C>--pad-x-md</C> 12 · <C>--pad-y-md</C> 6</>],
         [<C>stack</C>, 'The vertical gap between rows, chosen by use, never by the size of the box', <><C>--section-stack-md</C> 16</>],
         [<C>inline</C>, 'The horizontal gap between things side by side', <><C>--modal-inline-sm</C> 8</>],
-        [<C>gutter</C>, 'The gap between grid columns, and between cards side by side on the grid', <><C>--layout-gutter</C> 16</>],
+        [<C>gutter</C>, 'The gap between grid columns, and between cards side by side on the grid', <><C>--grid-gutter</C> 16</>],
         [<C>radius</C>, 'Corner radius, set per component (see Radius)', <><C>--card-radius</C> 16</>],
         [<><C>height</C> · <C>width</C> · <C>min</C> · <C>max</C></>, 'Size roles (see Size roles)', <><C>--item-height-md</C> 32</>],
     ]}
@@ -146,11 +146,11 @@ other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 acros
 
 <TokenTable
     rows={[
-        { token: '--element-pad-x-xs', figma: 'Element/pad-x-xs', use: 'Labels: Tag, Status, Count' },
-        { token: '--element-pad-x-sm', figma: 'Element/pad-x-sm', use: 'Compact 24 Items' },
-        { token: '--element-pad-x-md', figma: 'Element/pad-x-md', use: 'Default 32 Items' },
-        { token: '--element-pad-y-sm', figma: 'Element/pad-y-sm', use: 'Compact 24 Items' },
-        { token: '--element-pad-y-md', figma: 'Element/pad-y-md', use: 'Default 32 Items' },
+        { token: '--pad-x-xs', figma: 'Element/pad-x-xs', use: 'Labels: Tag, Status, Count' },
+        { token: '--pad-x-sm', figma: 'Element/pad-x-sm', use: 'Compact 24 Items' },
+        { token: '--pad-x-md', figma: 'Element/pad-x-md', use: 'Default 32 Items' },
+        { token: '--pad-y-sm', figma: 'Element/pad-y-sm', use: 'Compact 24 Items' },
+        { token: '--pad-y-md', figma: 'Element/pad-y-md', use: 'Default 32 Items' },
     ]}
 />
 
@@ -167,8 +167,8 @@ Card pad of its size: a Section message and File upload take 16.
         { token: '--modal-pad', figma: 'Modal/pad', use: 'Every side, at every width' },
         { token: '--popover-pad', figma: 'Popup and flag/pad', use: 'Popup and flag' },
         { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
-        { token: '--overlay-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
-        { token: '--overlay-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
+        { token: '--blanket-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
+        { token: '--blanket-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
         { token: '--frame-pad', figma: 'Frame/pad', use: 'The Frame around the Page' },
         { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'Inside the Page, at MD · LG · XL' },
     ]}
@@ -211,12 +211,12 @@ size: stack follows use, not the size of the box.
 
 <TokenTable
     rows={[
-        { token: '--element-stack-sm', figma: 'Element/stack-sm' },
-        { token: '--element-stack-md', figma: 'Element/stack-md' },
-        { token: '--element-stack-lg', figma: 'Element/stack-lg' },
-        { token: '--element-inline-sm', figma: 'Element/inline-sm' },
-        { token: '--element-inline-md', figma: 'Element/inline-md' },
-        { token: '--element-inline-lg', figma: 'Element/inline-lg' },
+        { token: '--stack-sm', figma: 'Element/stack-sm' },
+        { token: '--stack-md', figma: 'Element/stack-md' },
+        { token: '--stack-lg', figma: 'Element/stack-lg' },
+        { token: '--inline-sm', figma: 'Element/inline-sm' },
+        { token: '--inline-md', figma: 'Element/inline-md' },
+        { token: '--inline-lg', figma: 'Element/inline-lg' },
     ]}
 />
 
@@ -303,8 +303,8 @@ The Blanket pads the screen. A modal pads 16 on every side at every width.
 
 <TokenTable
     rows={[
-        { token: '--overlay-pad-x', figma: 'Blanket/pad-x' },
-        { token: '--overlay-pad-y', figma: 'Blanket/pad-y' },
+        { token: '--blanket-pad-x', figma: 'Blanket/pad-x' },
+        { token: '--blanket-pad-y', figma: 'Blanket/pad-y' },
         { token: '--modal-pad', figma: 'Modal/pad' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
@@ -349,7 +349,7 @@ Before you pick a token, group the content from the inside out; each step out
 is one tier up. In a modal form:
 
 1. Pair a control with what it changes, such as a field and its "Repeats
-   weekly" toggle: `--element-stack-md` (8).
+   weekly" toggle: `--stack-md` (8).
 2. Gather related fields: `--modal-stack-md` (16) between them.
 3. Separate unrelated groups: `--modal-stack-lg` (24).
 4. Separate the header from the body, and the body from the footer:
@@ -403,18 +403,18 @@ A gap tells the eye there is a boundary, but it cannot say what the boundary is.
 <DoDont>
 <Do caption="A 24 gap and a subsection heading say the same thing twice.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Student</strong>
         <span style={{ font: 'var(--body-default)' }}>School · Teacher</span>
     </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <strong style={{ font: 'var(--heading-xsmall)' }}>Schedule</strong>
         <span style={{ font: 'var(--body-default)' }}>Session date · Time</span>
     </div>
 </div>
 </Do>
 <Dont caption="Four fields and one unexplained gap. People who cannot see the spacing, or whose screen reader skips it, miss the break.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)', font: 'var(--body-default)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', font: 'var(--body-default)' }}>
     <span>School</span><span>Teacher</span><span style={{ marginBlockStart: 'var(--modal-stack-lg)' }}>Session date</span><span>Time</span>
 </div>
 </Dont>
@@ -431,14 +431,14 @@ Group by proximity, match the token to the container you are in, and take every 
 <DoDont>
 <Do caption="Label to field 8 (Element/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)', font: 'var(--body-small)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}><span>School</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>
 </Do>
 <Dont caption="Label to field 24 and group to group 8: each label sits nearer the previous field than its own.">
 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-sm)', font: 'var(--body-small)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>School</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a school</span></div>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-lg)' }}><span>Teacher</span><span style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-input)' }}>Select a teacher</span></div>
 </div>
 </Dont>
 </DoDont>
@@ -450,7 +450,7 @@ Group by proximity, match the token to the container you are in, and take every 
 <div style={{ padding: 'var(--card-pad-default)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Do>
 <Dont caption="An element token on a card squeezes the content to a button-sized pad.">
-<div style={{ padding: 'var(--element-pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
+<div style={{ padding: 'var(--pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Dont>
 </DoDont>
 
