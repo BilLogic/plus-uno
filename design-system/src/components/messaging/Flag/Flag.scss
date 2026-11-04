@@ -136,6 +136,18 @@
     gap: var(--popover-stack-flag);
     padding: var(--popover-gap-screen);
 
+    &[data-container-position='fixed'] {
+        position: fixed;
+    }
+
+    &[data-container-position='absolute'] {
+        position: absolute;
+    }
+
+    &[data-container-position='static'] {
+        position: static;
+    }
+
     &[data-position='top-start'] {
         top: 0;
         left: 0;

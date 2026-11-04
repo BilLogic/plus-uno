@@ -134,6 +134,14 @@ Flag.propTypes = {
     timestamp: PropTypes.node
 };
 
+// Legacy corner names, mapped onto the logical ones.
+const LEGACY_POSITIONS = {
+    'top-right': 'top-end',
+    'top-left': 'top-start',
+    'bottom-right': 'bottom-end',
+    'bottom-left': 'bottom-start',
+};
+
 /**
  * Where flags sit: bottom-left by default, fixed to the screen,
  * Popover/gap-screen 8 from its edges, stacking Popover/stack-flag 16 apart.
@@ -144,27 +152,16 @@ export const FlagContainer = ({
     className = '',
     children,
     ...props
-}) => {
-    // Map legacy positions if needed
-    const mapPosition = (pos) => {
-        if (pos === 'top-right') return 'top-end';
-        if (pos === 'top-left') return 'top-start';
-        if (pos === 'bottom-right') return 'bottom-end';
-        if (pos === 'bottom-left') return 'bottom-start';
-        return pos;
-    };
-
-    return (
-        <div
-            data-position={mapPosition(position)}
-            style={{ position: containerPosition }}
-            className={`plus-flag-container ${className}`}
-            {...props}
-        >
-            {children}
-        </div>
-    );
-};
+}) => (
+    <div
+        data-position={LEGACY_POSITIONS[position] ?? position}
+        data-container-position={containerPosition}
+        className={`plus-flag-container ${className}`}
+        {...props}
+    >
+        {children}
+    </div>
+);
 
 FlagContainer.propTypes = {
     position: PropTypes.string,
