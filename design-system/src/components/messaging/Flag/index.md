@@ -45,6 +45,6 @@ From `design-system/src/components/messaging/Flag/Flag.scss`. Override these thr
 
 ## Related
 
-Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage`
+Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1,0 +1,36 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import * as SpotlightStories from './Spotlight.stories.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "spotlight",
+      "name": "Spotlight",
+      "componentSetNodeId": "20630:74",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-74",
+      "source": "node-chart",
+      "status": "verified",
+      "isComponentSet": false
+    }
+  ]
+};
+
+<Meta of={SpotlightStories} />
+
+<Title />
+
+<DocsTabs of={SpotlightStories}>
+
+<DocsTab tab="examples">
+
+A one-step onboarding callout anchored to a target element.
+
+<Canvas of={SpotlightStories.Basic} />
+
+<ArgTypes of={SpotlightStories} />
+
+</DocsTab>
+
+</DocsTabs>

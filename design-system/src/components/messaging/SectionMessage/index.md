@@ -44,6 +44,6 @@ From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`
 
 ## Related
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal`
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

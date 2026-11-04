@@ -80,6 +80,7 @@ export { default as Flag, FLAG_AUTO_CLOSE_MS, FlagContainer } from '@/components
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
 export { default as Modal, createModal } from '@/components/messaging/Modal';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
+export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';

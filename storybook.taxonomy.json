@@ -88,7 +88,8 @@
       "Flag",
       "Inline message",
       "Modal dialog",
-      "Section message"
+      "Section message",
+      "Spotlight"
     ],
     "Navigation": [
       "Breadcrumbs",
@@ -268,7 +269,8 @@
         "Flag",
         "Inline message",
         "Modal dialog",
-        "Section message"
+        "Section message",
+        "Spotlight"
       ],
       "Navigation",
       [
