@@ -10,7 +10,7 @@
   font-family: var(--font-family-body);
   font-size: 12px;
   line-height: 1.35;
-  color: var(--color-on-surface, #1a1b21);
+  color: var(--ds-text);
 }
 
 .live-app-nav__toggle {
@@ -20,7 +20,7 @@
   padding: 8px 12px;
   border: 1px solid var(--color-outline-variant, #c4c6d0);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-surface, #fff) 94%, transparent);
+  background: color-mix(in srgb, var(--ds-surface) 94%, transparent);
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
   color: inherit;
   cursor: pointer;
@@ -29,7 +29,7 @@
 }
 
 .live-app-nav__toggle:hover {
-  background: var(--color-surface, #fff);
+  background: var(--ds-surface);
 }
 
 .live-app-nav__panel {
@@ -38,7 +38,7 @@
   overflow: auto;
   padding: 12px;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--color-surface, #fff) 96%, transparent);
+  background: color-mix(in srgb, var(--ds-surface) 96%, transparent);
   border: 1px solid var(--color-outline-variant, #c4c6d0);
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);
 }
@@ -49,13 +49,13 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
   font-size: 10px;
-  color: var(--color-on-surface-variant, #45464f);
+  color: var(--ds-text-subtle);
 }
 
 .live-app-nav__hint {
   margin: 0 0 8px;
   font-size: 10px;
-  color: var(--color-on-surface-variant, #45464f);
+  color: var(--ds-text-subtle);
   word-break: break-all;
 }
 
@@ -66,7 +66,7 @@
 .live-app-nav__group-label {
   font-weight: 600;
   margin-bottom: 4px;
-  color: var(--color-on-surface-variant, #45464f);
+  color: var(--ds-text-subtle);
 }
 
 .live-app-nav__list {
@@ -86,7 +86,7 @@
 }
 
 .live-app-nav__link:hover {
-  background: var(--color-surface-container-high, #e8e8ef);
+  background: var(--ds-background-neutral-subtle-hovered);
 }
 
 .live-app-nav__link.is-active {
@@ -101,7 +101,7 @@
   height: 100%;
   min-height: 100%;
   font-family: var(--font-family-body);
-  color: var(--color-on-surface-variant, #45464f);
+  color: var(--ds-text-subtle);
 }
 
 /**
@@ -115,7 +115,7 @@
   height: 100%;
   min-height: 0;
   overflow: hidden;
-  background: var(--color-surface-container, #f0f0f5);
+  background: var(--ds-surface-container);
 }
 
 .live-app-shell__page {

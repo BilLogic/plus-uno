@@ -30,13 +30,13 @@ const App = () => {
                 justifyContent: 'center',
                 minHeight: '100vh',
                 padding: 'var(--size-section-pad-y-lg, 24px)',
-                backgroundColor: 'var(--color-surface-container-low, #f5f5f5)',
+                backgroundColor: 'var(--ds-surface-container)',
                 gap: 'var(--size-section-gap-lg, 24px)',
             }}
         >
             <div
                 style={{
-                    backgroundColor: 'var(--color-surface-container, #fff)',
+                    backgroundColor: 'var(--ds-surface)',
                     borderRadius: 'var(--size-card-radius-md, 12px)',
                     padding: 'var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 24px)',
                     border: '1px solid var(--color-outline-variant, #ddd)',
@@ -45,11 +45,11 @@ const App = () => {
                     textAlign: 'center',
                 }}
             >
-                <h3 className="h3" style={{ color: 'var(--color-on-surface)', marginBottom: 'var(--size-element-gap-md, 16px)' }}>
+                <h3 className="h3" style={{ color: 'var(--ds-text)', marginBottom: 'var(--size-element-gap-md, 16px)' }}>
                     <i className="fa-solid fa-rocket" style={{ marginRight: '8px', color: 'var(--color-primary)' }} />
                     Bryan's Prototype
                 </h3>
-                <p className="body1-txt" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-section-gap-md, 16px)' }}>
+                <p className="body1-txt" style={{ color: 'var(--ds-icon-subtle)', marginBottom: 'var(--size-section-gap-md, 16px)' }}>
                     Your prototypes is ready! Edit <code>src/App.jsx</code> to start building.
                 </p>
                 <div
@@ -59,20 +59,20 @@ const App = () => {
                         gap: 'var(--size-element-gap-sm, 8px)',
                         textAlign: 'left',
                         padding: 'var(--size-element-pad-y-md, 8px) var(--element-pad-default, 16px)',
-                        backgroundColor: 'var(--color-surface-container-high, #f0f0f0)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: 'var(--size-element-radius-md, 4px)',
                     }}
                 >
-                    <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                         Quick start:
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         1. Import components from <code>@/components/</code>
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         2. Use design tokens for all styling
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         3. Reference Figma designs with MCP tools
                     </span>
                 </div>

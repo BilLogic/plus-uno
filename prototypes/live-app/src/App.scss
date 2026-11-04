@@ -1,6 +1,6 @@
 .live-app {
   min-height: 100vh;
-  background: var(--color-surface-container, #f0f0f5);
+  background: var(--ds-surface-container);
 }
 
 .live-app-fallback {
@@ -9,5 +9,5 @@
   justify-content: center;
   min-height: 100vh;
   font-family: var(--font-family-body);
-  color: var(--color-on-surface-variant, #45464f);
+  color: var(--ds-text-subtle);
 }

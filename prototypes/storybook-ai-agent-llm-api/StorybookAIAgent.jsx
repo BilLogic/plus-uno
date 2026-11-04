@@ -673,12 +673,12 @@ const NavMatchList = ({ matches, selectedIndex, onSelect }) => (
                         onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); onSelect(entry); } }}
                     >
                         <span style={{ fontWeight: 600 }}>{entry.label}</span>
-                        <span style={{ fontSize: 12, color: 'var(--color-on-surface-variant)' }}> ({entry.category})</span>
+                        <span style={{ fontSize: 12, color: 'var(--ds-text-subtle)' }}> ({entry.category})</span>
                     </button>
                 </li>
             ))}
         </ul>
-        <p style={{ fontSize: 12, color: 'var(--color-on-surface-variant)', marginTop: 8 }}>Click or use ↑↓ + Enter to open.</p>
+        <p style={{ fontSize: 12, color: 'var(--ds-text-subtle)', marginTop: 8 }}>Click or use ↑↓ + Enter to open.</p>
     </div>
 );
 
@@ -754,7 +754,7 @@ const buildResponse = (actionId, pageContext) => {
             return (
                 <div>
                     <p style={{ fontWeight: 600, marginBottom: 8, fontSize: '14px' }}>🎒 New Starter Kit</p>
-                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--color-on-surface-variant)', background: 'var(--color-surface-container-high)', padding: '6px 10px', borderRadius: '6px' }}>
+                    <p style={{ marginBottom: 16, fontSize: '11px', color: 'var(--ds-background-neutral)', background: 'var(--ds-surface-container)', padding: '6px 10px', borderRadius: '6px' }}>
                         💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
                     </p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
@@ -1277,7 +1277,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                     role: 'bot', content: (
                         <div>
                             <p style={{ fontWeight: 600, marginBottom: 8 }}>🧩 What's on this screen (Local Analysis)</p>
-                            <p style={{ marginBottom: 8, fontSize: 13, color: 'var(--color-on-surface-variant)' }}><em>Note: AI server is offline, showing local component analysis.</em></p>
+                            <p style={{ marginBottom: 8, fontSize: 13, color: 'var(--ds-text-subtle)' }}><em>Note: AI server is offline, showing local component analysis.</em></p>
                             <ul style={{ margin: 0, paddingLeft: 20 }}>
                                 <li><strong>NavTabs</strong> — horizontal tab navigation (4 tabs)</li>
                                 <li><strong>ButtonGroup</strong> — toggle "By Tutor / By Lesson"</li>

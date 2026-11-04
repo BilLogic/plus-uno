@@ -138,7 +138,7 @@ export default function MonthlyReportPage() {
         const colors = {
             emerald: 'rgba(16, 185, 129, 0.1)',
             amber: 'rgba(245, 158, 11, 0.1)',
-            stone: 'var(--color-surface-container)',
+            stone: 'var(--ds-background-neutral)',
             rose: 'rgba(244, 63, 94, 0.1)'
         };
         return colors[bg] || colors.emerald;
@@ -148,7 +148,7 @@ export default function MonthlyReportPage() {
         const colors = {
             emerald: 'var(--color-success)',
             amber: 'var(--color-warning)',
-            stone: 'var(--color-on-surface-variant)',
+            stone: 'var(--ds-icon-subtle)',
             rose: 'var(--color-danger)'
         };
         return colors[bg] || colors.emerald;

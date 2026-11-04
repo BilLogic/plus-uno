@@ -26,10 +26,10 @@ body {
   min-height: 100vh;
   font-family: var(--font-family-body);
   font-size: var(--font-size-body2, 14px);
-  color: var(--color-on-surface, #191c1e);
+  color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
   /* No centering / no gray matte: the app fills the whole window. */
-  background-color: var(--color-surface-container, #fff);
+  background-color: var(--ds-surface-container);
   overflow: hidden;
 }
 
@@ -39,7 +39,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: var(--color-surface-container);
+  background-color: var(--ds-surface-container);
 }
 
 /* Strip the PageLayout's card frame (border + radius are inline styles → need !important). */

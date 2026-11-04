@@ -173,7 +173,7 @@ function buildSidebarNavigation() {
             navItem.style.textDecoration = 'none';
             navItem.style.color = item.selected 
                 ? 'var(--ds-text-selected)' 
-                : 'var(--color-on-surface)';
+                : 'var(--ds-text)';
             navItem.style.backgroundColor = item.selected 
                 ? 'var(--ds-background-selected)' 
                 : 'transparent';
@@ -420,7 +420,7 @@ function buildTutorTable() {
             groupsCell.appendChild(dropdownIcon);
         } else {
             groupsCell.textContent = 'None';
-            groupsCell.style.color = 'var(--color-on-surface-variant)';
+            groupsCell.style.color = 'var(--ds-text-subtle)';
         }
         row.appendChild(groupsCell);
         
@@ -438,7 +438,7 @@ function buildTutorTable() {
             studentsCell.appendChild(dropdownIcon);
         } else {
             studentsCell.textContent = 'None';
-            studentsCell.style.color = 'var(--color-on-surface-variant)';
+            studentsCell.style.color = 'var(--ds-text-subtle)';
         }
         row.appendChild(studentsCell);
         
@@ -633,7 +633,7 @@ function showBulkEmailModal() {
     
     const tutorList = document.createElement('div');
     tutorList.className = 'body2-txt';
-    tutorList.style.color = 'var(--color-on-surface-variant)';
+    tutorList.style.color = 'var(--ds-text-subtle)';
     tutorList.textContent = selectedTutorNames;
     modalBody.appendChild(tutorList);
     
