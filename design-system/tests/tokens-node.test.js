@@ -543,7 +543,11 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // fallback moved onto --ds-blanket, which has none.
     // 401: Divider was retired and its `.plus-divider-line` hex fallback went
     // with it.
-    expect(comparable).toBe(401);
+    // 392: the surface-to-zero Material color sweep moved Tile, Rating,
+    // main.scss, the skeleton shimmer and a Pagination story canvas off
+    // `--color-surface*`/`--color-on-surface*`, and their nine hex fallbacks
+    // went with the legacy names.
+    expect(comparable).toBe(392);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

@@ -13,7 +13,7 @@
 
 .plus-rating-label {
     margin-bottom: var(--size-element-gap-xs, 4px);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     font-weight: var(--type-weight-regular);
     
     .plus-rating-required {
@@ -37,7 +37,7 @@
 
 .plus-rating-comments-label {
     font: var(--body-default);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     text-align: left;
 }
 
@@ -51,7 +51,7 @@
 
 .plus-rating-item-label {
     font: var(--body-default);
-    color: var(--color-on-surface);
+    color: var(--ds-text);
     text-align: center;
     min-width: 20px;
 }
@@ -65,7 +65,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-surface-container-low, #f3f3f6);
+    background-color: var(--ds-background-neutral);
     cursor: pointer;
     transition: all 0.2s ease;
     
@@ -76,7 +76,7 @@
     
     // Hover state (only when not disabled)
     &:not(.plus-rating-item-disabled):hover {
-        background-color: var(--color-surface-container, #e8e8ed);
+        background-color: var(--ds-background-neutral-hovered);
     }
     
     // Focus state

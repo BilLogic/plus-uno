@@ -70,6 +70,6 @@ PageItem.args = {
  */
 export const Divider = () => (
     <div className="plus-breadcrumb">
-        <span style={{ color: 'var(--color-on-surface-variant)' }}>/</span>
+        <span style={{ color: 'var(--ds-text-subtlest)' }}>/</span>
     </div>
 );

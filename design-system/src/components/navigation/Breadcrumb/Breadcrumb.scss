@@ -24,7 +24,7 @@
         & + .plus-breadcrumb-item {
             &::before {
                 padding-right: var(--size-element-gap-sm);
-                color: var(--color-on-surface-variant); // Figma: #3f484a
+                color: var(--ds-text-subtlest);
                 content: var(--plus-breadcrumb-divider, '/');
             }
         }
@@ -42,7 +42,7 @@
 
         // Current page item
         &.plus-breadcrumb-current span {
-            color: var(--color-on-surface-variant); // Figma: #3f484a
+            color: var(--ds-text-subtlest);
         }
     }
 }

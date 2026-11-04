@@ -850,7 +850,7 @@ const Cell = ({ ratio, passes }) => (
             padding: '6px 10px',
             textAlign: 'right',
             fontVariantNumeric: 'tabular-nums',
-            color: passes ? 'var(--color-on-surface)' : 'var(--color-danger-text)',
+            color: passes ? 'var(--ds-text)' : 'var(--color-danger-text)',
             fontWeight: passes ? 400 : 700,
         }}
     >

@@ -31,7 +31,7 @@
     /* Container border - single border around entire pill */
     border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
     /* #bec8ca */
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
     overflow: hidden;
 
     /* Default (medium) border-radius: 999px (Pill) */
@@ -85,7 +85,7 @@
     margin: 0;
 
     /* Background */
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
 
     /* Cursor */
     cursor: pointer;
@@ -256,7 +256,7 @@
 /* Disabled state - Figma: opacity-40 (40%) */
 .plus-pagination .page-item.disabled .page-link {
     color: color-mix(in srgb, var(--color-secondary-text) 38%, transparent) !important;
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
     cursor: not-allowed;
     pointer-events: none;
     opacity: 0.4;
@@ -277,7 +277,7 @@
 /* Ellipsis styling - same as regular segments */
 .plus-pagination .page-item-ellipsis .page-link {
     color: var(--color-secondary-text) !important;
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
     cursor: default;
     pointer-events: none;
     opacity: 1;

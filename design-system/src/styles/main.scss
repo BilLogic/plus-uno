@@ -158,7 +158,7 @@ time {
 }
 
 .color-neutral {
-    color: var(--color-on-surface) !important;
+    color: var(--ds-text) !important;
 }
 
 .color-error {
@@ -262,12 +262,12 @@ time {
 
 // Image Placeholder Utility
 .image-placeholder {
-    background-color: var(--color-surface-container-low, #f3f3f6);
+    background-color: var(--ds-surface-container);
     border: 1px dashed var(--color-outline-variant, #bec8ca);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-on-surface-variant, #3f484a);
+    color: var(--ds-text-subtle);
     font: var(--body-small);
     box-sizing: border-box;
 }

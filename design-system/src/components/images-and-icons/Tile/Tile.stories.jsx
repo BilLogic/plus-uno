@@ -124,14 +124,14 @@ export const IconSubtle = () => (
 
 /**
  * Subtle is the color's Container with its on-container glyph. Gray has no
- * container of its own, so it takes surface-container-high and on-surface-variant.
+ * container of its own, so it takes the neutral background and icon roles.
  */
 IconSubtle.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const color of ICON_COLORS) {
         const tile = canvas.getByTestId(`tile-${color}`);
         const [ground, ink] = color === 'gray'
-            ? ['--color-surface-container-high', '--color-on-surface-variant']
+            ? ['--ds-background-neutral', '--ds-icon-subtle']
             : [`--color-${HUE[color]}-container`, `--color-on-${HUE[color]}-container`];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
         await expect(getComputedStyle(tile.querySelector('i')).color, `${color} glyph`).toBe(tokenColor(canvasElement, ink));
@@ -147,15 +147,15 @@ export const IconBold = () => (
 );
 
 /**
- * Bold is the solid color with its on-color glyph. Gray bold is the inverse
- * surface, so a bold gray tile reads as dark rather than as a darker gray.
+ * Bold is the solid color with its on-color glyph. Gray bold is the bold
+ * neutral fill, so a bold gray tile reads as dark rather than as a darker gray.
  */
 IconBold.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const color of ICON_COLORS) {
         const tile = canvas.getByTestId(`tile-${color}`);
         const [ground, ink] = color === 'gray'
-            ? ['--color-inverse-surface', '--color-inverse-on-surface']
+            ? ['--ds-background-neutral-bold', '--ds-icon-inverse']
             : [`--color-${HUE[color]}`, `--color-on-${HUE[color]}`];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
         await expect(getComputedStyle(tile.querySelector('i')).color, `${color} glyph`).toBe(tokenColor(canvasElement, ink));
@@ -205,8 +205,8 @@ Logos.play = async ({ canvasElement }) => {
     }
 
     const grounds = {
-        white: '--color-surface-container-lowest',
-        gray: '--color-surface-container',
+        white: '--ds-surface',
+        gray: '--ds-background-neutral',
         ...Object.fromEntries(Object.entries(HUE).map(([c, h]) => [c, `--color-${h}-container`])),
     };
     for (const color of TILE_COLORS) {
@@ -222,7 +222,7 @@ export const LogoDefaultsToWhite = () => (
 
 LogoDefaultsToWhite.play = async ({ canvasElement }) => {
     const tile = within(canvasElement).getByTestId('tile');
-    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--color-surface-container-lowest'));
+    await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
 };
 
 /* ----------------------------------------------------------------- images */

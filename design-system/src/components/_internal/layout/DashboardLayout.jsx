@@ -5,7 +5,7 @@ import { Topbar } from '@/patterns';
 
 const DashboardLayout = ({ children }) => {
     return (
-        <div className="d-flex" style={{ minHeight: '100vh', backgroundColor: 'var(--color-surface)' }}>
+        <div className="d-flex" style={{ minHeight: '100vh', backgroundColor: 'var(--ds-surface-sunken)' }}>
             {/* Sidebar Placeholder */}
             <div className="d-flex flex-column p-3 bg-white border-end" style={{ width: '280px', flexShrink: 0 }}>
                 <div className="mb-4 px-2">

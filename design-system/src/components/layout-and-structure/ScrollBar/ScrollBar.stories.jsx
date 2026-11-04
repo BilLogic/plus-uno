@@ -50,7 +50,7 @@ function TallContent({ count = 12 }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {Array.from({ length: count }, (_, i) => (
-                <p key={i} className="plus-body-2" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+                <p key={i} className="plus-body-2" style={{ margin: 0, color: 'var(--ds-text)' }}>
                     Row {i + 1} — scrollable content inside the wrapper.
                 </p>
             ))}
@@ -67,10 +67,10 @@ function WideContent({ count = 12 }) {
                     style={{
                         ...demoBox,
                         minWidth: '160px',
-                        backgroundColor: 'var(--color-surface-container-low)'
+                        backgroundColor: 'var(--ds-surface-container)'
                     }}
                 >
-                    <p className="plus-body-2" style={{ margin: 0, color: 'var(--color-on-surface)' }}>Card {i + 1}</p>
+                    <p className="plus-body-2" style={{ margin: 0, color: 'var(--ds-text)' }}>Card {i + 1}</p>
                 </div>
             ))}
         </div>
@@ -91,7 +91,7 @@ export const Layout = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', width: '100%', maxWidth: '600px' }}>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VERTICAL (DEFAULT)</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
             <div style={demoBox}>
@@ -102,7 +102,7 @@ export const Layout = () => (
         </section>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HORIZONTAL</span>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
+            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Wide content scrolls sideways with the same thin, tokenized scrollbar.
             </p>
             <div style={demoBox}>
@@ -117,7 +117,7 @@ export const Layout = () => (
 export const Content = () => (
     <div style={{ width: '100%', maxWidth: '600px' }}>
         <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USE CASE EXAMPLE</span>
-        <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--color-on-surface)' }}>
+        <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>
         <div style={{ ...demoBox, padding: 0 }}>

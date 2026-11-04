@@ -103,7 +103,7 @@ Overview.parameters = {
 
 export const Content = () => (
     <div style={{ maxWidth: '800px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Label, required asterisk, accepted formats, and button copy.
         </p>
         <FileUpload
@@ -183,7 +183,7 @@ export const InteractionStates = () => (
 
 export const ReadOnly = () => (
     <div style={{ maxWidth: '640px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Read-only shows the field and the files already chosen, with no button to choose another.
         </p>
         <FileUpload
@@ -199,10 +199,10 @@ export const ReadOnly = () => (
                     alignItems: 'center',
                     gap: 'var(--size-element-gap-sm)',
                     padding: 'var(--size-element-pad-y-sm) 0',
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                 }}
             >
-                <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)' }} />
+                <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                 zoom_0.mp4
             </div>
         </FileUpload>
@@ -211,7 +211,7 @@ export const ReadOnly = () => (
 
 export const WithFiles = () => (
     <div style={{ maxWidth: '640px' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload.
         </p>
         <FileUpload
@@ -230,10 +230,10 @@ export const WithFiles = () => (
                         alignItems: 'center',
                         gap: 'var(--size-element-gap-sm)',
                         padding: 'var(--size-element-pad-y-sm) 0',
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                     }}
                 >
-                    <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--color-on-surface-variant)' }} />
+                    <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                     {file}
                 </div>
             ))}

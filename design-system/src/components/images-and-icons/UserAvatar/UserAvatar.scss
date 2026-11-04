@@ -13,8 +13,8 @@
     box-sizing: border-box;
     padding: var(--size-element-pad-y-md) var(--element-pad-default);
     border-radius: var(--size-element-radius-md);
-    background-color: var(--color-surface-container-lowest);
-    color: var(--color-on-surface);
+    background-color: var(--ds-surface);
+    color: var(--ds-text);
     transition: background-color 0.15s ease;
 
     &:hover,
@@ -62,7 +62,7 @@
     font: var(--body-default);
     white-space: nowrap;
     text-overflow: ellipsis;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .plus-user-avatar__role {

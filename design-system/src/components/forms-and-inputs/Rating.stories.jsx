@@ -85,7 +85,7 @@ export const Content = () => {
         <div style={ratingCol}>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BASELINE RATING</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
                 <Rating
@@ -109,14 +109,14 @@ export const Variants = () => {
         <div style={ratingCol}>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMMENTS</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NUMERIC</span>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
                 <Rating id="rating-numeric-variant" value={numericValue} variant="numeric" onChange={setNumericValue} />
@@ -129,7 +129,7 @@ export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
-            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
