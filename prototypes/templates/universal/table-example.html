@@ -83,7 +83,7 @@
         }
 
         .plus-table tbody tr:hover {
-            background-color: var(--ds-surface-container);
+            background-color: var(--ds-background-neutral-subtle-hovered);
             cursor: pointer;
         }
 
@@ -93,11 +93,11 @@
         }
 
         .plus-table.striped tbody tr:nth-child(odd) {
-            background-color: var(--ds-surface-container);
+            background-color: var(--ds-background-neutral);
         }
 
         .plus-table.striped tbody tr:hover {
-            background-color: var(--ds-surface-container);
+            background-color: var(--ds-background-neutral-subtle-hovered);
         }
 
         /* Table Container */
@@ -245,12 +245,17 @@
                             <tr>
                                 <td><code>--ds-surface-container</code></td>
                                 <td>Design token</td>
-                                <td>Table background</td>
+                                <td>Table background & header</td>
                             </tr>
                             <tr>
-                                <td><code>--ds-surface-container</code></td>
+                                <td><code>--ds-background-neutral</code></td>
                                 <td>Design token</td>
-                                <td>Header background & hover</td>
+                                <td>Striped row (odd)</td>
+                            </tr>
+                            <tr>
+                                <td><code>--ds-background-neutral-subtle-hovered</code></td>
+                                <td>Design token</td>
+                                <td>Row hover</td>
                             </tr>
                         </tbody>
                     </table>
