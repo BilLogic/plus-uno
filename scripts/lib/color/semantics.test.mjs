@@ -46,8 +46,9 @@ test('checked controls follow brand.bold; tags step one further; SMART aliases i
   assert.deepEqual(refs('A', 'color.text.accent.blue'), ['blue.850', 'blue.250', 'blue.1000', 'blue.100']);
   assert.deepEqual(refs('A', 'color.text.smart.relationship'), refs('A', 'color.text.accent.magenta'));
   assert.deepEqual(refs('A', 'color.background.accent.brown.subtler'), ['brown.200', 'brown.900', 'brown.200', 'brown.900']);
-  assert.deepEqual(refs('A', 'color.chart.categorical.1'), ['blue.600', 'blue.600', 'blue.850', 'blue.400']);
-  assert.deepEqual(refs('A', 'color.chart.categorical.4'), ['orange.500', 'orange.500', 'orange.800', 'orange.300']);
+  // The categorical chart order is brand-led: lagoon, orange, blue, magenta, lime, ...
+  assert.deepEqual(refs('A', 'color.chart.categorical.1'), ['lagoon.600', 'lagoon.500', 'lagoon.850', 'lagoon.300']);
+  assert.deepEqual(refs('A', 'color.chart.categorical.4'), ['magenta.800', 'magenta.700', 'magenta.1000', 'magenta.500']);
   assert.deepEqual(refs('A', 'color.background.danger.subtle'), ['red.300', 'red.800', 'red.300', 'red.900']);
 });
 
