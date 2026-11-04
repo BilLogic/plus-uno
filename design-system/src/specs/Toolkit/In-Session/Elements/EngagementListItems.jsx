@@ -5,9 +5,9 @@ import React from 'react';
  * Dropdown menu items for selecting engagement status
  * 
  * Renders bare `.dropdown-item` rows — the menu surface, radius, shadow and item
- * padding/typography all come from the shared Dropdown styles
- * (components/forms-and-inputs/Dropdown/Dropdown.scss). Do NOT re-declare the menu
- * background/radius here; wrap these items in a `.dropdown-menu` container instead.
+ * padding/typography all come from the shared Bootstrap-bridge styles
+ * (styles/main.scss). Do NOT re-declare the menu background/radius here; wrap
+ * these items in a `.dropdown-menu` container instead.
  */
 
 // Sub-menu items for "Partially engaged" option

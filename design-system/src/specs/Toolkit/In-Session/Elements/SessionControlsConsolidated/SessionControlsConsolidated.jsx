@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Button, IconButton } from '@/components';
+import { Button, IconButton, DropdownMenu, ButtonItem } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
-import Dropdown from '@/components/forms-and-inputs/Dropdown';
 import './SessionControlsConsolidated.scss';
 
 /**
@@ -54,20 +53,18 @@ const SessionControlsConsolidated = ({
     }, [onCopyAssignments]);
 
     // "Copy assignments" flips to a non-interactive "Copied" confirmation for ~2s.
-    const copyItem = {
-        text: copyState === 'copied' ? 'Copied' : 'Copy assignments',
-        leadingIcon: copyState === 'copied' ? 'check' : 'copy',
-        onClick: handleCopyAssignments,
-        keepOpen: copyState === 'copied',
-    };
+    const copyRow = (
+        <ButtonItem
+            key="copy"
+            onClick={handleCopyAssignments}
+            elemBefore={<i className={`fa-solid fa-${copyState === 'copied' ? 'check' : 'copy'}`} aria-hidden="true" />}
+            data-keep-open={copyState === 'copied' ? 'true' : undefined}
+        >
+            {copyState === 'copied' ? 'Copied' : 'Copy assignments'}
+        </ButtonItem>
+    );
 
     if (role === 'lead') {
-        const overflowItems = [
-            { text: 'Request tutors', leadingIcon: 'user-plus', onClick: onRequestTutors },
-            { text: 'View session info', leadingIcon: 'circle-info', onClick: onViewSessionInfo },
-            { ...copyItem },
-        ];
-
         return (
             <div className="plus-session-controls">
                 <SessionInfoBadges
@@ -83,31 +80,23 @@ const SessionControlsConsolidated = ({
                     iconBefore="gear"
                     onClick={onManageSession}
                 />
-                <Dropdown
+                <DropdownMenu
                     id="session-overflow"
-                    items={overflowItems}
-                    style="primary"
-                    fill="outline"
-                    size="small"
-                    toggle={
-                        <IconButton
-                            spacing="compact"
-                            icon="ellipsis"
-                            label="More session actions"
-                        />
-                    }
-                />
+                    trigger={<IconButton spacing="compact" icon="ellipsis" label="More session actions" />}
+                >
+                    <ButtonItem onClick={onRequestTutors} elemBefore={<i className="fa-solid fa-user-plus" aria-hidden="true" />}>
+                        Request tutors
+                    </ButtonItem>
+                    <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className="fa-solid fa-circle-info" aria-hidden="true" />}>
+                        View session info
+                    </ButtonItem>
+                    {copyRow}
+                </DropdownMenu>
             </div>
         );
     }
 
     // Non-lead tutor: student + tutor badges (no room count) + "Tutor tools" (outlined).
-    const tutorItems = [
-        { text: 'Request lead tutor', leadingIcon: 'user-plus', onClick: onRequestLeadTutor },
-        { text: 'View session info', leadingIcon: 'circle-info', onClick: onViewSessionInfo },
-        { ...copyItem },
-    ];
-
     return (
         <div className="plus-session-controls">
             <SessionInfoBadges
@@ -115,14 +104,25 @@ const SessionControlsConsolidated = ({
                 tutorCount={tutorCount}
                 showRoom={false}
             />
-            <Dropdown
+            <DropdownMenu
                 id="tutor-tools"
-                buttonText="Tutor tools"
-                items={tutorItems}
-                style="primary"
-                fill="outline"
-                size="small"
-            />
+                trigger={(
+                    <Button
+                        text="Tutor tools"
+                        appearance="default"
+                        spacing="compact"
+                        iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />}
+                    />
+                )}
+            >
+                <ButtonItem onClick={onRequestLeadTutor} elemBefore={<i className="fa-solid fa-user-plus" aria-hidden="true" />}>
+                    Request lead tutor
+                </ButtonItem>
+                <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className="fa-solid fa-circle-info" aria-hidden="true" />}>
+                    View session info
+                </ButtonItem>
+                {copyRow}
+            </DropdownMenu>
         </div>
     );
 };

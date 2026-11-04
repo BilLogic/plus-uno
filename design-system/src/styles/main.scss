@@ -70,7 +70,6 @@
 
   @include meta.load-css("../components/forms-and-inputs/ButtonGroup/ButtonGroup");
   // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
-  @include meta.load-css("../components/forms-and-inputs/Dropdown/Dropdown");
 
 @include meta.load-css("../components/messaging/Modal/Modal");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/

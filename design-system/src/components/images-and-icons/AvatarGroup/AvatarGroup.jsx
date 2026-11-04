@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { AVATAR_SIZES, AVATAR_SHAPES } from '../Avatar';
-import Dropdown from '../../forms-and-inputs/Dropdown';
+import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
+import { CustomItem } from '@/components/navigation/MenuGroup';
 import '../Avatar/Avatar.scss';
 
 /**
@@ -30,11 +31,10 @@ export const AvatarGroup = ({
     const shown = overflows ? members.slice(0, cap - 1) : members;
     const hidden = overflows ? members.slice(cap - 1) : [];
 
-    const items = useMemo(
-        () => hidden.map((child) => ({
-            text: child.props.name || child.props.label || '',
-            isStatic: true,
-        })),
+    const rows = useMemo(
+        () => hidden.map((child) => (
+            <CustomItem key={child.key}>{child.props.name || child.props.label || ''}</CustomItem>
+        )),
         // `hidden` is rebuilt each render; its names are what matter.
         // eslint-disable-next-line react-hooks/exhaustive-deps
         [hidden.map((child) => child.props.name || child.props.label || '').join('\n')],
@@ -48,8 +48,6 @@ export const AvatarGroup = ({
             type="button"
             className={`plus-avatar plus-avatar--${size} plus-avatar--${shape} plus-avatar--gray plus-avatar--overflow`}
             aria-label={`${text}, ${count} more ${count === 1 ? 'person' : 'people'}`}
-            aria-expanded={open}
-            aria-haspopup="true"
         >
             <span className="plus-avatar__initials">{text}</span>
         </button>
@@ -69,13 +67,13 @@ export const AvatarGroup = ({
             ))}
             {overflows && (
                 <span className="plus-avatar-group__item">
-                    <Dropdown
-                        className="plus-avatar-group__menu"
+                    <DropdownMenu
+                        trigger={toggle}
                         isOpen={open}
-                        onToggle={setOpen}
-                        items={items}
-                        toggle={toggle}
-                    />
+                        onOpenChange={setOpen}
+                    >
+                        {rows}
+                    </DropdownMenu>
                 </span>
             )}
         </div>

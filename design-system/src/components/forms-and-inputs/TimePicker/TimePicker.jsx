@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import Dropdown from '../Dropdown/Dropdown';
+import DropdownMenu from '../DropdownMenu/DropdownMenu';
+import { ButtonItem } from '@/components/navigation/MenuGroup';
 import FieldBox from '../_internal/FieldBox';
 import './TimePicker.scss';
 
@@ -60,7 +61,7 @@ const parseTyped = (text) => {
  *
  * Built from the shared parts: the field is `FieldBox`, which owns the box,
  * the border, the fill, the size and every state, same as DatePicker; the
- * AM/PM menu in Trailing is the PLUS Dropdown.
+ * AM/PM menu in Trailing is the PLUS DropdownMenu.
  *
  * - **Typing:** the field takes an hour and a minute, with or without a
  *   colon. It is checked when you press Enter or leave the field: a real time
@@ -172,25 +173,23 @@ const TimePicker = ({
             type="button"
             className="plus-time-picker__period-toggle"
             disabled={!interactive}
-            aria-haspopup={interactive ? 'true' : undefined}
-            aria-expanded={interactive ? isPeriodOpen : undefined}
         >
             {period}
             {!isReadOnly && <i className="fa-solid fa-caret-down" aria-hidden="true" />}
         </button>
     );
     const trailing = interactive ? (
-        <Dropdown
-            className="plus-time-picker__period-dropdown"
+        <DropdownMenu
+            trigger={periodToggle}
             isOpen={isPeriodOpen}
-            onToggle={setIsPeriodOpen}
-            toggle={periodToggle}
-            items={['AM', 'PM'].map((option) => ({
-                text: option,
-                selected: period === option,
-                onClick: () => handlePeriodChange(option),
-            }))}
-        />
+            onOpenChange={setIsPeriodOpen}
+        >
+            {['AM', 'PM'].map((option) => (
+                <ButtonItem key={option} isSelected={period === option} onClick={() => handlePeriodChange(option)}>
+                    {option}
+                </ButtonItem>
+            ))}
+        </DropdownMenu>
     ) : periodToggle;
 
     return (

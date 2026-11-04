@@ -4,7 +4,7 @@ import TimePicker from './TimePicker';
 
 vi.mock('@fortawesome/fontawesome-free', () => ({}));
 
-/** The toggle's own text — `getByRole('button', { name: /PM/ })` also matches the (always-rendered) dropdown items. */
+/** The toggle's own text, read by class since its role is `button` and an open menu's row is `menuitem`. */
 const toggleText = (container) => container.querySelector('.plus-time-picker__period-toggle').textContent.trim();
 
 describe('TimePicker', () => {
@@ -56,7 +56,7 @@ describe('TimePicker', () => {
         const onChange = vi.fn();
         const { container } = render(<TimePicker aria-label="Time" value="09:15 AM" onChange={onChange} />);
         fireEvent.click(container.querySelector('.plus-time-picker__period-toggle'));
-        fireEvent.click(screen.getByRole('button', { name: 'PM' }));
+        fireEvent.click(screen.getByRole('menuitem', { name: 'PM' }));
         expect(onChange).toHaveBeenLastCalledWith('09:15 PM');
     });
 
