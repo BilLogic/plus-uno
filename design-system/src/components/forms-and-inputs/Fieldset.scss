@@ -1,0 +1,29 @@
+// Fieldset — legend plus grouped fields, on Base UI's `fieldset` and `legend`.
+//
+// A `<fieldset>` brings a border, margin, padding and a min-content width
+// that a div does not; the group is laid out by its contents only.
+.plus-fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: var(--element-gap-default);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.plus-fieldset-legend {
+    font: var(--body-default);
+    color: var(--ds-text);
+    margin: 0;
+    padding: 0;
+}
+
+.plus-fieldset-required {
+    color: var(--ds-text-danger);
+}
+
+.plus-fieldset-error {
+    font: var(--body-small);
+    color: var(--ds-text-danger);
+}

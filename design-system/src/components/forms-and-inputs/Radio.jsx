@@ -22,7 +22,7 @@ const Radio = ({
     /**
      * Shown, focusable, not changeable. ARIA allows `aria-readonly` on a
      * radiogroup and not on a radio, so a lone Radio carries the behavior and
-     * the group (ChoiceGroup) carries the announcement.
+     * the group (RadioGroup) carries the announcement.
      */
     isReadOnly = false,
     isRequired = false,
@@ -54,7 +54,7 @@ const Radio = ({
      * `useFieldId` — `useId` runs per instance and each option in the group
      * gets its own value. Components that render the whole group derive one
      * base and suffix it per option instead; see `optionIdBase` in
-     * `ChoiceGroup`.
+     * `RadioGroup`.
      *
      * A caller who passes `id` gets exactly that id back.
      */

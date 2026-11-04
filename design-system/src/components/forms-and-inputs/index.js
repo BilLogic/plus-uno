@@ -14,6 +14,7 @@ export { default as InlineEditableTextfield } from './InlineEditableTextfield';
 export { default as Cascader } from './Cascader';
 export { default as TreeSelect } from './TreeSelect';
 export { default as ChoiceGrid } from './ChoiceGrid';
-export { default as ChoiceGroup } from './ChoiceGroup';
+export { default as RadioGroup } from './RadioGroup';
+export { default as Fieldset } from './Fieldset';
 export { default as FileUpload } from './FileUpload';
 export { default as Rating } from './Rating';

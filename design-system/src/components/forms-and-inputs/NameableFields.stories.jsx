@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import ChoiceGroup from './ChoiceGroup';
+import RadioGroup from './RadioGroup';
 import DatePicker from './DatePicker/DatePicker';
 import TextField from './TextField/TextField';
 import RichTextEditor from './RichTextEditor/RichTextEditor';
@@ -25,7 +25,7 @@ import Select from './Select';
  *
  * `MultipleChoice` rendered the options and nothing around them. The question
  * lived on the page and was attached to nothing, so the answers were four
- * controls with no subject. `ChoiceGroup` replaced it and is always a
+ * controls with no subject. `RadioGroup` replaced it and is always a
  * `fieldset`, named by its `legend`.
  *
  * axe catches the first of those three and not the other two: an `input` with no
@@ -54,7 +54,7 @@ export const EveryFieldCanBeNamed = () => (
     <div style={stack}>
         <TextField id="nf-amount" label="Amount" elemBefore="£" />
         <RichTextEditor id="nf-notes" label="Session notes" />
-        <ChoiceGroup
+        <RadioGroup
             name="level"
             legend="What level are you teaching?"
             options={['Beginner', 'Advanced']}
@@ -88,14 +88,14 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
 /**
  * Naming a field must not change what it looks like.
  *
- * `isLabelHidden` on a Text field, and `ChoiceGroup` with `aria-label`
+ * `isLabelHidden` on a Text field, and `RadioGroup` with `aria-label`
  * instead of a legend, are the two ways a caller keeps a question off screen —
  * so both have to keep the name they are hiding.
  */
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
         <TextField id="nf-hidden" label="Search" isLabelHidden elemAfter={<i className="fa-solid fa-plus" aria-hidden="true" />} />
-        <ChoiceGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
+        <RadioGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );
 

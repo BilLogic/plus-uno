@@ -26,14 +26,14 @@ importable from `@/components` today.
 |---|---|
 | free text, one line | `TextField` |
 | free text, several lines | `TextArea`, sized with `rows` |
-| one pick, fewer than 5 options | `ChoiceGroup` (`type="radio"`, the default) |
+| one pick, fewer than 5 options | `RadioGroup` |
 | one pick, 5–15 options | `Select` |
 | one pick, more than 15 options | `Select searchable` |
-| several picks, fewer than 5 options | `ChoiceGroup type="checkbox"` |
+| several picks, fewer than 5 options | A Checkbox group (`Fieldset` + `Checkbox`) |
 | several picks from a longer, fixed list | `Select mode="multi"` |
 | several picks, or values the user adds | `TagInput` |
 | a pick through a hierarchy | `Cascader` for one leaf along one path · `TreeSelect` to see the tree, pick a parent, or pick several — see below |
-| a rating on a scale | `ChoiceGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale · `Rating` for stars |
+| a rating on a scale | `RadioGroup orientation="inline"` with `leadingText` and `trailingText` for a numbered scale (Linear scale) · `Rating` for stars |
 | the same choice for several questions | `ChoiceGrid` |
 | an action run from a button | `Dropdown` — a button, not a field |
 
@@ -49,9 +49,9 @@ independent yes/no saved with the form, `DateTimePicker` for a date or time,
 The counts above are a starting point; two things move them. When there is a
 good default, a `Select` suits even a short list: it shows the default and
 keeps the alternatives quiet. When people must compare every option to answer,
-or no default stands out, keep the options in view with `ChoiceGroup`, even
-past 5. Several picks go through checkboxes in view (`ChoiceGroup
-type="checkbox"`) or `Select mode="multi"`, which keeps the picks visible as
+or no default stands out, keep the options in view with `RadioGroup`, even
+past 5. Several picks go through a Checkbox group in view (`Fieldset` +
+`Checkbox`) or `Select mode="multi"`, which keeps the picks visible as
 tags in the field; never through a single-pick `Select`.
 
 ### Cascader or TreeSelect
@@ -81,12 +81,13 @@ trigger, and supports multi-select and search. If the trigger should still read
 ### A group is the group component's job
 
 Reach for the group component before mapping `Checkbox` or `Radio` over an
-array. `ChoiceGroup` takes an `options` array, owns the value and renders a
-`fieldset` named by its `legend`, stacked or inline, with scale ends, an
-"Other" answer, per-option descriptions, the `card` appearance and one group
-`error`; `ChoiceGrid` builds the rows-by-columns matrix from the same Checkbox
-and Radio and labels every cell with `aria-labelledby` pointing at both its row
-and its column.
+array. `RadioGroup` takes an `options` array, owns the value and renders a
+`Fieldset` named by its `legend`, stacked or inline, with scale ends,
+per-option descriptions, the `card` appearance and one group `error`; a
+Checkbox group composes the same `Fieldset` with `Checkbox` by hand for
+several picks. `ChoiceGrid` builds the rows-by-columns matrix from the same
+Checkbox and Radio and labels every cell with `aria-labelledby` pointing at
+both its row and its column.
 
 ### Names that look importable and are not the answer
 
@@ -123,9 +124,9 @@ not in an `Alert` at the top of the form — see
 **`isRequired` means three different things.** On `TextField`, `TextArea`,
 `FileUpload`, `DateTimePicker`, `Rating` and `TagInput` it draws an
 asterisk marked `aria-label="required"` and stops there, so enforce it yourself.
-`Checkbox` forwards it to the native input. `ChoiceGroup` marks its legend and,
-for radios, sets `aria-required` on the group and `required` on every radio; a
-checkbox group cannot be enforced natively, so check it yourself. `Select`
+`Checkbox` forwards it to the native input. `RadioGroup` marks its legend and
+sets `aria-required` on the group and `required` on every radio; a Checkbox
+group cannot be enforced natively, so check it yourself. `Select`
 announces it through a visually hidden "Required" description on the trigger.
 
 **Popup placement.** Every popup that opens from a field or button follows one
@@ -160,8 +161,8 @@ value — read from `onChange`, which hands you the value rather than an event.
 The menu-backed fields that do carry a full ARIA pattern are `Cascader`
 (`combobox` → `listbox` → `option`), `TreeSelect` (`combobox` → `tree` →
 `treeitem`) and `DatePicker`'s trigger (`combobox` → `dialog`). Where the list
-is short enough, `ChoiceGroup` beats all of them: every option is a native
-radio or checkbox.
+is short enough, `RadioGroup` beats all of them: every option is a native
+radio.
 
 ## Buttons
 
@@ -189,7 +190,7 @@ an action:
 
 | You want | Reach for | Not |
 |---|---|---|
-| A value the user picks | `Select`, `ChoiceGroup` | Buttons with `active` |
+| A value the user picks | `Select`, `RadioGroup` | Buttons with `active` |
 | A menu of things to do | `Dropdown` | A Button that opens a div |
 | Switching between views | `NavTabs`, `NavPills` | A ButtonGroup of two |
 | A setting that applies now | `Switch` | A toggle Button |

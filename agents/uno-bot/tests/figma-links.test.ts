@@ -330,24 +330,26 @@ describe("only registry components", () => {
     // Figma from the rebuilt code and the registry entries return. 67:
     // AvatarGroup gained its own story + figmaMeta (+1), and Table split
     // into Static table, Dynamic table and Tree table, one Figma page each
-    // (+2 net, replacing the single Table row).
-    // 68: TimePicker became its own public component, carrying forward the
+    // (+2 net, replacing the single Table row). 66: ChoiceGroup's single
+    // registry row was replaced by Fieldset and RadioGroup, neither of
+    // which has figmaMeta yet (-1 net); Phase D backfills Figma for both.
+    // 67: TimePicker became its own public component, carrying forward the
     // `_Time Field` node id that used to live on DateTimePicker's own entry
-    // (+1 net). 69: Calendar became its own public component, wrapping the
+    // (+1 net). 68: Calendar became its own public component, wrapping the
     // shared `_Calendar` part DatePicker and DateTimePicker already open
-    // (+1 net). 70: Heading is a new component with its own figmaMeta (+1).
-    // 71: Page header gained its own component and figmaMeta (+1 net).
-    // 72: Panel gained its own component and figmaMeta (+1 net).
-    // 73: Link is a new component with its own figmaMeta (+1).
-    // 74: Menu group gained its own component and figmaMeta (+1 net).
-    // 75: Image is a new component with its own figmaMeta (+1).
-    // 76: Object is a new component with its own figmaMeta (+1).
-    // 77: Comment is a new component with its own figmaMeta (+1).
-    // 78: Spotlight is a new component with its own figmaMeta (+1).
-    // 69: Card, Divider, Collapse, Jumbotron, List group, Media object,
+    // (+1 net). 69: Heading is a new component with its own figmaMeta (+1).
+    // 70: Page header gained its own component and figmaMeta (+1 net).
+    // 71: Panel gained its own component and figmaMeta (+1 net).
+    // 72: Link is a new component with its own figmaMeta (+1).
+    // 73: Menu group gained its own component and figmaMeta (+1 net).
+    // 74: Image is a new component with its own figmaMeta (+1).
+    // 75: Object is a new component with its own figmaMeta (+1).
+    // 76: Comment is a new component with its own figmaMeta (+1).
+    // 77: Spotlight is a new component with its own figmaMeta (+1).
+    // 68: Card, Divider, Collapse, Jumbotron, List group, Media object,
     // Scrollspy, Nav pills and Navbar were retired and their registry rows
     // went with them (-9 net).
-    assert.equal(names.length, 69);
+    assert.equal(names.length, 68);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

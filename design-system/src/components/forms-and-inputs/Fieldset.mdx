@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as FieldsetStories from './Fieldset.stories.jsx';
+
+<Meta of={FieldsetStories} />
+
+<Title />
+A fieldset groups a legend with the fields underneath it.
+
+<DocsTabs of={FieldsetStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={FieldsetStories.Default} />
+
+<ArgTypes of={FieldsetStories} />
+
+</DocsTab>
+
+</DocsTabs>

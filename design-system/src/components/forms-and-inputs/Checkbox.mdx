@@ -124,6 +124,10 @@ A checkbox lets a person select one or more options from a list, or confirm a si
     <DsCanvasQuiet of={CheckboxStories.SelectAll} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>A Checkbox group: Checkboxes inside a Fieldset with a legend, for picking any number of answers.</>}>
+    <DsCanvasQuiet of={CheckboxStories.CheckboxGroup} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -217,7 +221,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 - **`isRequired` reaches the input**, so native validation applies. The marker is a span marked `aria-label="required"`.
 - **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none.
-- **Group related boxes** in a `fieldset` with a `legend`, or let ChoiceGroup own the set.
+- **Group related boxes** in a `Fieldset` with a `legend` — a Checkbox group.
 
 </div>
 
@@ -226,8 +230,8 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 ## Related
 
 - To turn a setting on or off at once, use Toggle.
-- For one answer from several options, use Radio, or ChoiceGroup for the whole set.
-- For a group of checkboxes, use ChoiceGroup with `type="checkbox"`. It owns the value and the group label.
+- For one answer from several options, use Radio, or Radio group for the whole set.
+- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
 - For a rows-by-columns matrix of choices, use ChoiceGrid.
 - For choices in a popup, use Select.
 

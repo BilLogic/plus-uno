@@ -23,8 +23,8 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 | `rows` | arrayOf or shape or string or number or node | `[]` | — |
 | `columns` | arrayOf or shape or string or number or node | `[]` | — |
 | `values` | object | `{}` | Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. |
-| `disabled` | bool | `false` | Disable the choice grid |
-| `readOnly` | bool | `false` | Shown and focusable, not changeable. |
+| `isDisabled` | bool | `false` | Disable the choice grid |
+| `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |
 | `size` | enum | — | Option-label font size in px, and the control width that goes with it. Unset keeps the default rendering. |
 | `onChange` | func | — | — |
 | `className` | string | `''` | — |
@@ -46,7 +46,7 @@ From `design-system/src/components/forms-and-inputs/ChoiceGrid.scss`. Override t
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Dropdown` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
