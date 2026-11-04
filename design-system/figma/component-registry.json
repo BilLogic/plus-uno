@@ -1201,6 +1201,29 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
       }
     },
+    "Object": {
+      "code": {
+        "import": "@/components/images-and-icons",
+        "export": "default",
+        "mdxPath": "design-system/src/components/images-and-icons/Object/Object.mdx",
+        "githubLink": null,
+        "source": "design-system/src/components/images-and-icons/Object/Object.jsx",
+        "storybookId": "components-images-and-icons-object--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "object",
+            "name": "Object",
+            "componentSetNodeId": "20630:40",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40",
+            "source": "node-chart",
+            "status": "verified"
+          }
+        ]
+      }
+    },
     "OverviewCard": {
       "code": {
         "import": "@/specs/Universal/Cards/OverviewCard/OverviewCard",

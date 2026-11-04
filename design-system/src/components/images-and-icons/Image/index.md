@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
