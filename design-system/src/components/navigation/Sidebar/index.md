@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Related
 
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `NavPills` · `NavTabs` · `Navbar` · `Pagination` · `Scrollspy` · `SidebarTab`
+Same group: `Breadcrumb` · `Link` · `MenuGroup` · `NavTabs` · `Pagination` · `SidebarTab`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 
