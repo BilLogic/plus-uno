@@ -143,7 +143,7 @@ page. Each moves to the timing above; `MonthlyReportContent.jsx` checks its
 feedback field on every keystroke.
 
 - `design-system/src/specs/Home/Modals/UserFeedbackModal/UserFeedbackModal.jsx` and `.stories.jsx`
-- `design-system/src/specs/Home/Sections/HomepageJumbotron/HomepageJumbotron.jsx` and `.stories.jsx`
+- `design-system/src/specs/Home/Sections/HomeHero/HomeHero.jsx` and `.stories.jsx`
 - `design-system/src/specs/Login/Elements/AccessCodeForm/AccessCodeForm.jsx`
 - `design-system/src/specs/Login/Sections/LoginForm/LoginForm.jsx`
 - `design-system/src/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons.jsx`

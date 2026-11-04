@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ShellContext } from '../context/ShellContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import ChatSimulationCard from './ChatSimulationCard';
-import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
+import HomeHero from '@/specs/Home/Sections/HomeHero';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { RecommendedLessons } from '@/specs/Home/Cards';
 import { IconButton } from '@/components';
@@ -272,7 +272,7 @@ export const Dashboard = () => {
                         style={{ display: 'contents' }}
                     >
                         <div className="home-redesign-jumbotron-section">
-                            <HomepageJumbotron
+                            <HomeHero
                                 tutorName="Boyuan"
                                 onSignUp={() => { }}
                                 onViewSchedule={() => { }}

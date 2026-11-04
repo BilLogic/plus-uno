@@ -28,7 +28,7 @@ design-system/src/specs/Home/
 │   ├── UserFeedbackModal/     # problem | question | feedback
 │   └── UpdateNotification/    # Meet your AI Coach
 ├── Sections/
-│   ├── HomepageJumbotron/     # sign-up | session | reflection
+│   ├── HomeHero/     # sign-up | session | reflection
 │   └── StudentsOverviewSection/
 └── Pages/
     ├── TutorHomePageSkillsOverview/
@@ -54,7 +54,7 @@ design-system/src/specs/Home/
 | Cards · Overview Card / Training Progress | `Cards/TrainingProgressCard` |
 | Modals · User Feedback Modal | `Modals/UserFeedbackModal` |
 | Modals · Update Notification | `Modals/UpdateNotification` |
-| Sections · Homepage Jumbotron | `Sections/HomepageJumbotron` |
+| Sections · Home Hero | `Sections/HomeHero` |
 | Sections · Students Overview (Bottom Section) | `Sections/StudentsOverviewSection` |
 | Pages · Skills (Home Page) | `Pages/TutorHomePageSkillsOverview` (+ Progress / Different Layout variants) |
 | BS4 Foundation · Patterns › Page templates · Home (tutor) | `Pages/TutorHomePageNewLayout` (Home (new layout), for review beside the pages above) |

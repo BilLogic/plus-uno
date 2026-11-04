@@ -1,9 +1,9 @@
 /**
- * HomepageJumbotron Component Styles
+ * HomeHero Component Styles
  * Matches Figma design specifications using design tokens
  */
 
-.plus-homepage-jumbotron {
+.plus-home-hero {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -23,7 +23,7 @@
 }
 
 // Tabs Wrapper - applies padding so divider respects it
-.plus-homepage-jumbotron-tabs-wrapper {
+.plus-home-hero-tabs-wrapper {
     display: flex;
     flex-direction: column;
     padding: 0;
@@ -32,7 +32,7 @@
 }
 
 // Tab Navigation
-.plus-homepage-jumbotron-nav-tabs {
+.plus-home-hero-nav-tabs {
     width: 100%;
     height: fit-content;
 
@@ -63,20 +63,20 @@
 }
 
 // Divider - respects parent padding
-.plus-homepage-jumbotron-divider {
+.plus-home-hero-divider {
     width: 100%;
     height: var(--border-default);
     border-radius: var(--radius-sm);
     background-color: var(--ds-border);
 }
 
-.plus-homepage-jumbotron-tab-badge {
+.plus-home-hero-tab-badge {
     margin-left: var(--stack-md);
     flex-shrink: 0;
 }
 
 // Content Area
-.plus-homepage-jumbotron-content {
+.plus-home-hero-content {
     display: flex;
     flex-direction: column;
     gap: var(--size-section-gap-md);
@@ -86,7 +86,7 @@
 }
 
 // Title
-.plus-homepage-jumbotron-title {
+.plus-home-hero-title {
     font-family: var(--font-family-headline);
     font-size: var(--font-size-h2);
     font-weight: var(--font-weight-headline);
@@ -98,7 +98,7 @@
 }
 
 // Description
-.plus-homepage-jumbotron-description {
+.plus-home-hero-description {
     font-family: var(--font-family-body);
     font-size: var(--font-size-body1);
     font-weight: var(--font-weight-normal);
@@ -110,7 +110,7 @@
 }
 
 // Actions (Button Container)
-.plus-homepage-jumbotron-actions {
+.plus-home-hero-actions {
     display: flex;
     gap: var(--space-0625);
     align-items: center;

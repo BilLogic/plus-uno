@@ -34,7 +34,7 @@ This prototype uses the **PLUS DataViz** framework from `design-system/src/DataV
 ## Sections
 
 1. **Shell** – PageLayout, TopBar (Home, Boyuan Guo / Lead), Sidebar (tutor).
-2. **Jumbotron** – Sign-up CTA + BadgeCard.
+2. **Hero** – Sign-up CTA + BadgeCard.
 3. **Three cards** – Tutoring Performance (radar), Weekly Tutoring Load (16.8 hrs + 84% donut + colored breakdown bars), Student Momentum (4×2 grid, BarChart per student).
 4. **Personalized Trainings** – Carousel of `RecommendedLessons` cards (368px width to match reference). Illustrations are in `public/assets/`: `giving-effective-praise.png`, `reacting-to-errors.png`, `prompting-students-to-explain.png`, `supporting-growth-mindset.png` (copied from `Downloads/Illustrations`). To refresh: copy new PNGs into `public/assets/` with the same names, or update `PERSONALIZED_TRAININGS[].image` in `App.jsx`.
 

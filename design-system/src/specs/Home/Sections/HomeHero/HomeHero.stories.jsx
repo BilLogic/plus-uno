@@ -1,17 +1,17 @@
 import React from 'react';
-import HomepageJumbotron from './HomepageJumbotron';
+import HomeHero from './HomeHero';
 
 export default {
-    title: 'Specs/Home/Sections/Homepage Jumbotron',
-    component: HomepageJumbotron,
+    title: 'Specs/Home/Sections/Home Hero',
+    component: HomeHero,
     tags: ['!dev', '!autodocs'],
 };
 
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <HomepageJumbotron activeTab="sign-up" />
-        <HomepageJumbotron activeTab="session" />
-        <HomepageJumbotron activeTab="reflection" />
+        <HomeHero activeTab="sign-up" />
+        <HomeHero activeTab="session" />
+        <HomeHero activeTab="reflection" />
     </div>
 );
 
