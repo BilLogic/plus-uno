@@ -418,9 +418,10 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * not seen. That is how every state-layer wash was written, so a re-mixed
    * base left its washes stale and nothing said so.
    *
-   * Measured over the live tree: 1 `var(--color-*, rgba(…))` sites, every one
-   * captured, and every one names a defined token and is compared with
-   * alpha on both sides. All 1 agree (3 until the Status tag's date borders moved onto --ds- tokens; 16 until the Admin, Training, Home, Login and Universal state washes moved onto --ds- tokens; 18 until 2026-11-03, when the prototypes moved onto the --ds- tokens; 34 until 2026-11-03, when the Labels state steps moved onto --ds- tokens; 38 until the Range thumb sweep; 81 until 2026-10-24, when a Dropdown
+   * Measured over the live tree: 0 `var(--color-*, rgba(…))` sites. All 0
+   * agree (1 until 2026-11-04, when the Onboarding completion blanket's
+   * `var(--color-scrim, rgba(0, 0, 0, 0.32))` fallback moved onto
+   * `--ds-blanket`, which carries no fallback; 3 until the Status tag's date borders moved onto --ds- tokens; 16 until the Admin, Training, Home, Login and Universal state washes moved onto --ds- tokens; 18 until 2026-11-03, when the prototypes moved onto the --ds- tokens; 34 until 2026-11-03, when the Labels state steps moved onto --ds- tokens; 38 until the Range thumb sweep; 81 until 2026-10-24, when a Dropdown
    * fallback that duplicated its token was dropped and Tag's × lost its focus
    * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
    * tokens, which carry no fallbacks), because the disagreeing washes were
@@ -444,7 +445,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
       (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
       0,
     );
-    expect(washes).toBe(1);
+    expect(washes).toBe(0);
 
     const tokens = new Map(
       [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
@@ -496,7 +497,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 3: the Admin, Training, Home, Login and Universal state washes moved onto
     // the --ds- tokens.
     // 1: Status tag's date borders moved onto the --ds- tokens, and two washes went.
-    expect(withAlpha).toBe(1);
+    // 0: the Onboarding completion blanket's scrim fallback moved onto --ds-blanket.
+    expect(withAlpha).toBe(0);
     // 403: Divider was retired and its `.plus-divider-line` hex fallback went
     // with it.
     // 1711: ProgressRing's `--color-progress-ring-fill`, once undefined, was
@@ -537,7 +539,11 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 404: the Labels moved onto the --ds- tokens, and their 27 color fallbacks went.
     // 402: Skeleton's fill and shimmer moved onto color.skeleton tokens, and
     // their two hex fallbacks went.
-    expect(comparable).toBe(402);
+    // 402 (again, 2026-11-04): the Onboarding completion blanket's scrim
+    // fallback moved onto --ds-blanket, which has none.
+    // 401: Divider was retired and its `.plus-divider-line` hex fallback went
+    // with it.
+    expect(comparable).toBe(401);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

@@ -111,7 +111,7 @@
     &__scrim {
         position: absolute;
         inset: 0;
-        background-color: var(--color-scrim, rgba(0, 0, 0, 0.32));
+        background-color: var(--ds-blanket);
         display: flex;
         flex-direction: column;
         gap: 10px;

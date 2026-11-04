@@ -373,8 +373,8 @@ Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal
 | `design-system/src/components/loading/ProgressBar/ProgressBar.stories.jsx` | 1 |
 | `design-system/src/components/loading/Spinner/Spinner.stories.jsx` | 1 |
 | `design-system/src/components/text-and-data-display/Code/Code.scss` | 1 |
+| `design-system/src/patterns/Blanket/Blanket.stories.jsx` | 1 |
 | `design-system/src/patterns/Frame/Frame.stories.jsx` | 1 |
-| `design-system/src/patterns/Overlay/Overlay.stories.jsx` | 1 |
 | `design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx` | 1 |
 | `design-system/src/patterns/PatternCard/PatternCard.mdx` | 1 |
 | `design-system/src/patterns/PopoverFamily/PopoverFamily.stories.jsx` | 1 |
