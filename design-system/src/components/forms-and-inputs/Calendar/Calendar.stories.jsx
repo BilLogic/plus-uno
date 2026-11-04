@@ -17,9 +17,9 @@ export default {
         className: { table: { disable: true } },
         size: {
             control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Day cell size: 28, 36 or 44px',
-            table: { category: 'Design', defaultValue: { summary: 'medium' } },
+            options: [28, 36, 44],
+            description: 'Day cell width in pixels',
+            table: { category: 'Design', defaultValue: { summary: '36' } },
         },
         minDate: {
             control: 'text',
@@ -49,7 +49,7 @@ export const Overview = () => {
 
 export const Sizes = () => (
     <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-        {['small', 'medium', 'large'].map((size) => (
+        {[28, 36, 44].map((size) => (
             <Calendar
                 key={size}
                 size={size}

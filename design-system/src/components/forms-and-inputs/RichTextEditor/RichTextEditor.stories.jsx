@@ -9,6 +9,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-04', kind: 'changed', summary: '`size` became `spacing` (`default` or `compact`), the name every other field uses; the small and large sizes are gone.' },
             { date: '2026-11-04', kind: 'changed', summary: 'The block-style menu opens on the Dropdown menu and its rows are menu items, so it is keyboard-operable (Enter opens, arrows move, Escape closes) and the editor no longer imports react-bootstrap.' },
             { date: '2026-10-24', kind: 'changed', summary: 'Toolbar buttons hover at secondary 08 and press at 12, the block toggle at on-surface 08 and 12; focus is the 2px focus ring. The block menu selects at primary 08 and shows keyboard focus as a ring.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The editing area became 120 high at least, growing with what is typed.' },
@@ -34,10 +35,10 @@ export default {
             description: 'Starting editor content',
             table: { category: 'Content' }
         },
-        size: {
+        spacing: {
             control: 'select',
-            options: ['small', 'medium', 'large'],
-            description: 'Editor size',
+            options: ['default', 'compact'],
+            description: 'Editor spacing',
             table: { category: 'Design' }
         },
         readOnly: {
@@ -104,7 +105,7 @@ export const Interactive = (args) => {
         <div style={{ maxWidth: '880px' }}>
             <RichTextEditor
                 label="Session notes"
-                size={args.size}
+                spacing={args.spacing}
                 readOnly={args.readOnly}
                 disabled={args.disabled}
                 placeholder={args.placeholder}
@@ -119,7 +120,7 @@ export const Interactive = (args) => {
 Interactive.args = {
     placeholder: 'Interactive editor...',
     initialContent: '<p>Initial content...</p>',
-    size: 'medium',
+    spacing: 'default',
     readOnly: false,
     disabled: false,
     minHeight: 200,

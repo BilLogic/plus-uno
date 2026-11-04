@@ -56,6 +56,13 @@ test('retired props, classes and words are counted; inline CSS and SVG fill are 
   assert.equal(words.get('word:Rovo a.scss').count, 1);
 });
 
+test('a size prop type that lists small / medium / large is counted; pixel sizes are not', () => {
+  const old = "Calendar.propTypes = {\n  size: PropTypes.oneOf(['small', 'medium', 'large']),\n  other: PropTypes.oneOf(['small']),\n};\n";
+  assert.equal(countOf([src('a.jsx', old)], 'proptype:size a.jsx'), 1);
+  const px = 'Calendar.propTypes = {\n  size: PropTypes.oneOf([28, 36, 44]),\n};\n';
+  assert.equal(countOf([src('a.jsx', px)], 'proptype:size a.jsx'), undefined);
+});
+
 test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on purpose', () => {
   assert.equal(measure([src('docs/knowledge/archive/x.mdx', 'Rovo scrim')]).size, 0);
   assert.equal(measure([src('docs/adr/001.mdx', 'Rovo')]).size, 0);

@@ -21,7 +21,7 @@
 | `placeholder` | string | — | Placeholder text |
 | `value` | string | — | — |
 | `defaultValue` | string | `''` | — |
-| `size` | enum | `'medium'` | Editor size |
+| `spacing` | enum | `'default'` | Editor spacing |
 | `readOnly` | bool | `false` | Read-only state |
 | `disabled` | bool | `false` | Disabled state |
 | `minHeight` | number | — | Minimum editor height |
@@ -35,7 +35,7 @@
 
 ## Variants
 
-**`size`** — `small` · `medium` · `large`
+**`spacing`** — `default` · `compact`
 
 **`toolbarPreset`** — `compact` · `full`
 

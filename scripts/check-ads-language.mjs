@@ -27,6 +27,9 @@
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`.
+ *   proptype:size    lines declaring `size: PropTypes.oneOf(['small', ...])`, the prop-type
+ *                    side of `prop:size`: a component that declares the old vocabulary
+ *                    never writes it as JSX, so only the declaration shows it.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
@@ -106,6 +109,7 @@ const LINE_RULES = [
   ['prop:style', /\bstyle="[a-z][a-z-]*"/],
   ['prop:fill', /\bfill="(?:filled|tonal|outline|ghost|text)"/],
   ['prop:size', /\bsize="(?:small|medium|large|sm|md|lg)"/],
+  ['proptype:size', /\bsize:\s*(?:PropTypes\.)?oneOf\(\s*\[\s*['"](?:small|medium|large|sm|md|lg)['"]/],
   ['class:plus-btn', /plus-btn--(?:filled|tonal|outline|ghost|text|small|medium|large)/],
   ['word:surface-container', /surface container/i],
   ['word:scrim', /\bscrim/i],
