@@ -276,3 +276,35 @@ export function tocFailures(t) {
   if (t.wrapped.length) failures.push(`${where}: entries wrapping past one line: ${t.wrapped.join(', ')}`);
   return failures;
 }
+
+/** The numbers in a CSS color, as `r,g,b[,a]`, so `#141413` and `rgb(20, 20, 19)` compare equal. */
+export function colorNumbers(value) {
+  const hex = /^#([0-9a-f]{6})$/i.exec(value.trim());
+  if (hex) return [0, 2, 4].map((i) => parseInt(hex[1].slice(i, i + 2), 16)).join(',');
+  return (value.match(/[\d.]+/g) ?? []).map(Number).join(',');
+}
+
+/**
+ * The manager's sidebar follows the Color mode toolbar global. `reads` is what
+ * the browser painted per step; `expected` the token-resolved literal for it.
+ *
+ * @param {{step: string, mode: string, sidebar: string, selected: string}[]} reads
+ * @param {Record<string, {mode: string, sidebar: string, selected: string}>} expected  by step
+ * @returns {string[]}
+ */
+export function managerFailures(reads, expected) {
+  const failures = [];
+  for (const r of reads) {
+    const want = expected[r.step];
+    if (r.mode !== want.mode) failures.push(`manager ${r.step}: theme is "${r.mode}", expected "${want.mode}"`);
+    for (const part of ['sidebar', 'selected']) {
+      if (colorNumbers(r[part]) !== colorNumbers(want[part])) {
+        failures.push(`manager ${r.step}: ${part} paints ${r[part]}, the ${want.mode} tokens say ${want[part]}`);
+      }
+    }
+  }
+  if (reads.length >= 2 && colorNumbers(reads[0].sidebar) === colorNumbers(reads[reads.length - 1].sidebar)) {
+    failures.push('manager: switching Color mode left the sidebar the same color');
+  }
+  return failures;
+}

@@ -39,7 +39,8 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { chromeFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
+import { chromeFailures, managerFailures, measureScript, tocFailures, tocMeasureScript } from './docs-chrome.mjs';
+import { resolveManagerThemes } from './lib/manager-theme.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -213,6 +214,39 @@ async function measureToc(context, baseUrl) {
   });
 }
 
+/**
+ * Opens the manager (not the iframe), reads the sidebar, switches the toolbar's
+ * Color mode to Dark through its menu, and reads again. The expected colors are
+ * the token-resolved literals from scripts/lib/manager-theme.mjs.
+ */
+async function measureManager(context, baseUrl) {
+  const themes = resolveManagerThemes();
+  const page = await context.newPage();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${baseUrl}/?path=/docs/${TOC_PAGE}`, { waitUntil: 'load' });
+  await page.waitForSelector('.sidebar-container [data-selected="true"]', { timeout: 60_000 });
+  const read = (step) =>
+    page.evaluate((s) => {
+      const paint = (el) => getComputedStyle(el).backgroundColor;
+      return {
+        step: s,
+        mode: document.documentElement.dataset.plusManagerMode,
+        sidebar: paint(document.querySelector('.sidebar-container')),
+        selected: paint(document.querySelector('.sidebar-container [data-selected="true"]')),
+      };
+    }, step);
+  const settle = () => page.waitForTimeout(1000);
+  await settle();
+  const light = await read('light');
+  await page.getByRole('button', { name: /Color mode/i }).click();
+  await page.getByText('Dark', { exact: true }).first().click();
+  await settle();
+  const dark = await read('dark');
+  await page.close();
+  const want = (key) => ({ mode: key, sidebar: themes[key].theme.appBg, selected: themes[key].vars['--plus-manager-selected-bg'] });
+  return managerFailures([light, dark], { light: want('light-no-preference'), dark: want('dark-no-preference') });
+}
+
 let exitCode = 0;
 const browser = await chromium.launch();
 try {
@@ -252,7 +286,9 @@ try {
 
   const tocProblems = missing.includes(TOC_PAGE) ? [] : await measureToc(context, base);
 
-  const failures = [...chromeFailures(measurements), ...tocProblems];
+  const managerProblems = await measureManager(context, base);
+
+  const failures = [...chromeFailures(measurements), ...tocProblems, ...managerProblems];
   if (failures.length) {
     console.error(`[docs-chrome] ${failures.length} problem(s):`);
     for (const f of failures) console.error(`  -> ${f}`);
