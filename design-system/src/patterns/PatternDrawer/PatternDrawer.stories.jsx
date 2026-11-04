@@ -311,17 +311,31 @@ export const DrawerSharesTheTwoOverlayLimit = {
         const canvas = within(canvasElement);
         const body = within(canvasElement.ownerDocument.body);
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Open session details' }));
+        const opener = canvas.getByRole('button', { name: 'Open session details' });
+        await userEvent.click(opener);
         await waitFor(() => expect(body.queryByRole('dialog', { name: 'Session details' })).not.toBeNull());
 
-        await userEvent.click(body.getByRole('button', { name: 'Delete session' }));
+        const deleteButton = body.getByRole('button', { name: 'Delete session' });
+        await userEvent.click(deleteButton);
         await waitFor(() => expect(body.queryByRole('dialog', { name: 'Delete this session?' })).not.toBeNull());
         await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open underneath').not.toBeNull();
 
+        // The two-overlay limit: a third, raised from the confirm, is refused.
         await userEvent.click(body.getByRole('button', { name: 'Open a third' }));
         await expect(body.queryByRole('dialog', { name: 'Third' }), 'a third overlay is refused, whether raised from a drawer or a modal').toBeNull();
         await expect(body.queryByRole('dialog', { name: 'Delete this session?' }), 'the confirm stays open').not.toBeNull();
         await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open').not.toBeNull();
+
+        // Topmost Escape: closes the confirm first, focus returns to what raised it.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(body.queryByRole('dialog', { name: 'Delete this session?' })).toBeNull());
+        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer is still open').not.toBeNull();
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on what raised the confirm').toBe(deleteButton));
+
+        // Escape again closes the drawer, focus returns to its own opener.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(body.queryByRole('dialog', { name: 'Session details' })).toBeNull());
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the original opener').toBe(opener));
     },
 };
 

@@ -110,10 +110,10 @@ export function getOverlayPortalRoot() {
  * of it rather than two copies of `.closest('.modal') ?? document.body`.
  *
  * @param {Element | null | undefined} fromNode a node inside the trigger
- * @returns {Element}
+ * @returns {Element | null} `null` only without a `document` (SSR)
  */
 export function overlayMountOf(fromNode) {
-    return fromNode?.closest?.('.modal') ?? getOverlayPortalRoot() ?? document.body;
+    return fromNode?.closest?.('.modal') ?? getOverlayPortalRoot();
 }
 
 /**
