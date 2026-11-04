@@ -1,5 +1,5 @@
 /*
- * Popup Component Styles: the Popover family's Popup.
+ * Popup Component Styles: the Popup family's Popup.
  *
  * STRUCTURE:
  * .plus-popup (one surface: fill, border, radius, shadow, pad)
@@ -24,7 +24,7 @@
 }
 
 // ===== MAIN CONTAINER =====
-// The Popover family's Popup (Figma Pattern/Popup): one surface, no overlay
+// The Popup family's Popup (Figma Pattern/Popup): one surface, no overlay
 // backdrop and no arrow. Pad Popover/pad 16, radius Popover/radius 12, and a fixed width
 // tier, Popover/width-sm · md · lg (320 · 400 · 480). The title and body stack
 // Element/stack-md 8 apart on the popup's own fill.
