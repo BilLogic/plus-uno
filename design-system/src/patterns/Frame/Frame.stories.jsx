@@ -113,7 +113,7 @@ const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
 /** The toggle sits at (8, 8) at every width and in every sidebar state. */
 const expectToggleHome = async (frame, toggle) => {
-    const pad = tokenLength(frame, '--surface-container-pad');
+    const pad = tokenLength(frame, '--frame-pad');
     const at = offset(frame, toggle);
     await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
     await expect(at.y, 'toggle y').toBeCloseTo(pad, 0);
@@ -144,7 +144,7 @@ const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 const expectRowStack = async (frame, surface) => {
     const topbar = frame.querySelector('.plus-frame__topbar');
     await expect(rect(surface).top - rect(topbar).bottom, 'stack between the rows')
-        .toBeCloseTo(tokenLength(frame, '--surface-container-stack'), 0);
+        .toBeCloseTo(tokenLength(frame, '--frame-stack'), 0);
 };
 
 /* ------------------------------------------------------------- stories */
@@ -268,9 +268,9 @@ export const WithFooter = {
         const footer = frame.querySelector('.plus-frame__footer');
         await expect(footer, 'the footer row renders').not.toBeNull();
         await expect(rect(footer).top - rect(surface).bottom, 'a stack under the surface')
-            .toBeCloseTo(tokenLength(frame, '--surface-container-stack'), 0);
+            .toBeCloseTo(tokenLength(frame, '--frame-stack'), 0);
         await expect(rect(frame).bottom - rect(footer).bottom, 'the container pad below it')
-            .toBeCloseTo(tokenLength(frame, '--surface-container-pad'), 0);
+            .toBeCloseTo(tokenLength(frame, '--frame-pad'), 0);
         await expect(rect(footer.firstElementChild).left, 'what it holds lines up with the surface').toBeCloseTo(rect(surface).left, 0);
     }),
 };
@@ -284,9 +284,9 @@ export const Medium768 = {
         await waitFor(() => expect(sidebar(), `closed below 1024 (found ${sidebar()?.className}, viewport ${window.innerWidth})`).toBeNull());
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
-        const pad = tokenLength(frame, '--surface-container-pad');
+        const pad = tokenLength(frame, '--frame-pad');
         await expect(offset(frame, surface).x, 'surface starts after the container pad').toBeCloseTo(pad, 0);
-        await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
+        await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
         await expectRowStack(frame, surface);
@@ -343,7 +343,7 @@ export const Large1024 = {
         await waitFor(() => expect(sidebar(), 'docked from 1024').not.toBeNull());
         await expect(getComputedStyle(sidebar()).position).toBe('static');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--layout-width-sidebar'), 0);
-        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
+        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
         await expectRowStack(frame, surface);
@@ -355,7 +355,7 @@ export const Large1024 = {
         await userEvent.click(toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
         await expect(offset(frame, surface).x, 'closed: the surface takes the container pad')
-            .toBeCloseTo(tokenLength(frame, '--surface-container-pad'), 0);
+            .toBeCloseTo(tokenLength(frame, '--frame-pad'), 0);
         await expectToggleHome(frame, toggle);
 
         // Closed at 1024, a hover still peeks without pushing.
@@ -372,7 +372,7 @@ export const XLarge1440 = {
         const { frame, toggle, surface, content, sidebar } = parts(canvasElement);
         await expectToggleHome(frame, toggle);
         await waitFor(() => expect(sidebar()).not.toBeNull());
-        await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--surface-pad'), 0);
+        await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--layout-width-content'), 0);
     }),

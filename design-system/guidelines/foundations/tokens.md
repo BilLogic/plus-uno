@@ -22,7 +22,7 @@ summary: Tokens — Overview & Decision Tree
 | Tabular data (rows, cells, headers) | **table** | `--size-table-*` |
 | Modal (confirmation, detail panel) | **modal** | `--size-modal-*` |
 | Page frame: topbar, sidebar, grid, content width, modal width | **layout** | `--layout-*` (per breakpoint) |
-| The Frame around the content box, and the rounded Page inside it (code keeps the older prefixes) | **Frame**, **Page** | `--surface-container-*`, `--surface-pad`, `--surface-stack-*`, `--surface-radius` |
+| The Frame around the content box, and the rounded Page inside it (code keeps the older prefixes) | **Frame**, **Page** | `--frame-*`, `--page-pad`, `--page-stack-*`, `--page-radius` |
 | The Blanket: the full-screen layer under a modal | **Blanket** | `--overlay-*` |
 | Floating layer with no Blanket (menu, popup, tooltip, flag) | **Popup** | `--popover-*` |
 | A value one component needs that no shared role covers (a size-20 Tile's radius 5) | **component-scoped**, used only inside that component | `--tile-*` |

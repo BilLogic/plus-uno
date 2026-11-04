@@ -32,8 +32,8 @@ export const LAYOUT_MODES = { 'Medium (768px)': 768, 'Large (1024px)': 1024, 'X-
 const CONTAINER_PAD = 8;
 const SIDEBAR = 240;
 const DOCK_FROM = 1024;
-const SURFACE_PAD = 16;
-const WIDE_SURFACE_PAD = 24;
+const PAGE_PAD = 16;
+const WIDE_PAGE_PAD = 24;
 const WIDE_PAD_FROM = 1440;
 const MAX_CONTENT = 1232;
 const MIN_CONTENT = 720;
@@ -56,10 +56,10 @@ const span = (n, col) => n * col + (n - 1) * GUTTER;
  */
 export function deriveLayout(width) {
   const docked = width >= DOCK_FROM;
-  const surfacePad = width >= WIDE_PAD_FROM ? WIDE_SURFACE_PAD : SURFACE_PAD;
-  const surfaceX = docked ? SIDEBAR : CONTAINER_PAD;
-  const content = clamp(width - surfaceX - CONTAINER_PAD - 2 * surfacePad);
-  const padXScreen = CONTAINER_PAD + surfacePad;
+  const pagePad = width >= WIDE_PAD_FROM ? WIDE_PAGE_PAD : PAGE_PAD;
+  const pageX = docked ? SIDEBAR : CONTAINER_PAD;
+  const content = clamp(width - pageX - CONTAINER_PAD - 2 * pagePad);
+  const padXScreen = CONTAINER_PAD + pagePad;
   const screenColumn = column(clamp(width - 2 * padXScreen));
   const modal = (n) => Math.round(span(n, screenColumn) + 2 * MODAL_PAD);
   return {

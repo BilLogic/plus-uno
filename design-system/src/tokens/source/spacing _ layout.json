@@ -447,14 +447,14 @@
     },
     {
       "id": "VariableID:19378:46221",
-      "name": "Surface/pad",
+      "name": "Page/pad",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-pad)"
+        "WEB": "var(--page-pad)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -478,14 +478,14 @@
     },
     {
       "id": "VariableID:19378:46222",
-      "name": "Surface/stack-sm",
+      "name": "Page/stack-sm",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-stack-sm)"
+        "WEB": "var(--page-stack-sm)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -509,14 +509,14 @@
     },
     {
       "id": "VariableID:19378:46223",
-      "name": "Surface/stack-md",
+      "name": "Page/stack-md",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-stack-md)"
+        "WEB": "var(--page-stack-md)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -540,14 +540,14 @@
     },
     {
       "id": "VariableID:19378:46224",
-      "name": "Surface/stack-lg",
+      "name": "Page/stack-lg",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-stack-lg)"
+        "WEB": "var(--page-stack-lg)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -571,14 +571,14 @@
     },
     {
       "id": "VariableID:19378:46225",
-      "name": "Surface/radius",
+      "name": "Page/radius",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--surface-radius)"
+        "WEB": "var(--page-radius)"
       },
       "valuesByMode": {
         "19378:1": {

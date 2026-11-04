@@ -62,7 +62,7 @@ export const CONTAINER_PAD_ROLES = [
     steps: { compact: '--space-050', default: '--space-075', spacious: '--space-100' },
   },
   {
-    // `--size-surface-pad-x` (32px) and `_frame_layers.scss`'s `--surface-pad`
+    // `--size-surface-pad-x` (32px) and `_frame_layers.scss`'s `--page-pad`
     // (16px, responsive to 24px at 1440px) each name one step, not three; Page
     // keeps the layout pad's default (32, the value every current Page reads)
     // and this plan adds compact/spacious around it as its own call.
@@ -116,7 +116,7 @@ export const MOTION_EASINGS = {
  * name never has to wait for this file to change anything.
  *
  * ONLY THE UNAMBIGUOUS, NON-RESPONSIVE NAMES ARE HERE. Left out, deliberately:
- *  - `--surface-pad` (`_frame_layers.scss`) steps at the 1440px breakpoint; an
+ *  - `--page-pad` (`_frame_layers.scss`) steps at the 1440px breakpoint; an
  *    alias at `:root` would silently drop that step. It stays hand-authored.
  *  - gap and radius old names: `_spacing_semantics.scss` and `_frame_layers.scss`
  *    disagree with each other on what "sm" means for a gap or a radius, so
@@ -135,4 +135,4 @@ export const MOTION_EASINGS = {
 export const LEGACY_ALIASES = [];
 
 /** The five old-name prefixes the "still on old size tokens" ratchet tracks. */
-export const OLD_SIZE_PREFIXES = ['--size-element-', '--card-', '--section-', '--modal-', '--surface-'];
+export const OLD_SIZE_PREFIXES = ['--size-element-', '--card-', '--section-', '--modal-', '--page-'];

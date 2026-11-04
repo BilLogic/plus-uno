@@ -78,16 +78,16 @@ const LAYOUT = {
 };
 
 /* Surface has modes for its pad only. */
-const SURFACE_PAD = ['16px', '16px', '24px'];
+const PAGE_PAD = ['16px', '16px', '24px'];
 
 /* One-mode collections. */
 const FIXED = {
-  '--surface-container-pad': '8px',
-  '--surface-container-stack': '8px',
-  '--surface-stack-sm': '16px',
-  '--surface-stack-md': '24px',
-  '--surface-stack-lg': '40px',
-  '--surface-radius': '16px',
+  '--frame-pad': '8px',
+  '--frame-stack': '8px',
+  '--page-stack-sm': '16px',
+  '--page-stack-md': '24px',
+  '--page-stack-lg': '40px',
+  '--page-radius': '16px',
   '--section-stack-sm': '8px',
   '--section-stack-md': '16px',
   '--section-stack-lg': '24px',
@@ -221,8 +221,8 @@ test('the column count is a plain number, so a grid can repeat it', () => {
 });
 
 test('Surface/pad is 16 below 1440 and 24 from 1440', () => {
-  const actual = Object.keys(LAYOUT_MODES).map((mode) => atMode('--surface-pad', mode));
-  assert.deepEqual(actual, SURFACE_PAD);
+  const actual = Object.keys(LAYOUT_MODES).map((mode) => atMode('--page-pad', mode));
+  assert.deepEqual(actual, PAGE_PAD);
 });
 
 test('every one-mode frame and layer token resolves to its value', () => {
@@ -240,7 +240,7 @@ test('a modal is never taller than the screen less the overlay pad above and bel
 });
 
 test('no new token name uses a banned word', () => {
-  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--surface-pad', '--overlay-scrim'];
+  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--overlay-scrim'];
   for (const name of names) {
     assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
   }
@@ -276,7 +276,7 @@ test('every exported variable offers itself only where it belongs: explicit scop
 });
 
 test('the new names take no family prefix, and never land on an old --size-* name', () => {
-  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--surface-pad', '--overlay-scrim']) {
+  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--overlay-scrim']) {
     assert.doesNotMatch(name, /^--(size|color)-/, name);
   }
   // Specs reference these ahead of time with fallbacks; they stay undefined until the Modal migration.
@@ -290,7 +290,7 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--layout-width-sidebar': 'var(--width-1500)',
     '--layout-gutter': 'var(--space-100)',
     '--layout-max-width-content': 'var(--size-7700)',
-    '--surface-pad': 'var(--space-100)',
+    '--page-pad': 'var(--space-100)',
     '--card-min-width-md': 'var(--width-1900)',
     '--card-max-height-sm': 'var(--size-1900)',
     '--card-max-height-md': 'var(--size-2500)',
@@ -305,7 +305,7 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--popover-offset': 'var(--space-025)',
   };
   for (const [name, raw] of Object.entries(ALIASES)) assert.equal(corpus.get(name)?.raw, raw, name);
-  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--surface-pad']) {
+  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad']) {
     assert.doesNotMatch(corpus.get(name)?.raw ?? '', /--size-(spacing|border)-/, name);
   }
 });

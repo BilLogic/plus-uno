@@ -583,11 +583,6 @@
       "Screen/width-screen": "var(--layout-width-screen)",
       "Sidebar/pad-left-container": "var(--layout-pad-left-container)",
       "Sidebar/width-sidebar": "var(--layout-width-sidebar)",
-      "Surface/pad": "var(--surface-pad)",
-      "Surface/radius": "var(--surface-radius)",
-      "Surface/stack-lg": "var(--surface-stack-lg)",
-      "Surface/stack-md": "var(--surface-stack-md)",
-      "Surface/stack-sm": "var(--surface-stack-sm)",
       "Topbar/height-topbar": "var(--layout-height-topbar)"
     },
     "spacing / patterns": {
@@ -636,8 +631,6 @@
       "Section/stack-lg": "var(--section-stack-lg)",
       "Section/stack-md": "var(--section-stack-md)",
       "Section/stack-sm": "var(--section-stack-sm)",
-      "Surface container/pad": "var(--surface-container-pad)",
-      "Surface container/stack": "var(--surface-container-stack)",
       "Table/indent": "var(--table-indent)",
       "Table/min-width-title": "var(--table-min-width-title)",
       "Table/pad-x-cell": "var(--table-pad-x-cell)",
@@ -1192,8 +1185,8 @@
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1016,
-      "resolved": 981,
-      "percent": 97,
+      "resolved": 974,
+      "percent": 96,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -1451,6 +1444,41 @@
           ]
         },
         {
+          "collection": "spacing / layout",
+          "figmaVariable": "Surface/pad",
+          "tried": [
+            "--layout-pad"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Surface/radius",
+          "tried": [
+            "--layout-radius"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Surface/stack-lg",
+          "tried": [
+            "--layout-stack-lg"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Surface/stack-md",
+          "tried": [
+            "--layout-stack-md"
+          ]
+        },
+        {
+          "collection": "spacing / layout",
+          "figmaVariable": "Surface/stack-sm",
+          "tried": [
+            "--layout-stack-sm"
+          ]
+        },
+        {
           "collection": "spacing / patterns",
           "figmaVariable": "Card/pad-lg",
           "tried": [
@@ -1476,6 +1504,20 @@
           "figmaVariable": "Modal/pad",
           "tried": [
             "--modal-pad"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Surface container/pad",
+          "tried": [
+            "--surface-container-pad"
+          ]
+        },
+        {
+          "collection": "spacing / patterns",
+          "figmaVariable": "Surface container/stack",
+          "tried": [
+            "--surface-container-stack"
           ]
         }
       ]

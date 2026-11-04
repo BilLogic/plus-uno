@@ -54,7 +54,7 @@ export const ThreeKinds = () => (
 
 /** Items pad by their height: compact 24, default 32, label 20. */
 export const ItemHeights = () => (
-    <div style={row('var(--surface-stack-md)')}>
+    <div style={row('var(--page-stack-md)')}>
         <div style={col('var(--element-stack-md)')}>
             <span><Button text="Compact" spacing="compact" /></span>
             <span style={tag}>24 · pad-y 2, pad-x 8 · table rows and inline toolbars</span>
@@ -121,8 +121,8 @@ const MiniSection = ({ title, gap, cardGap }) => (
 /** 3 · Rhythm: gaps come in tiers that grow with the box. */
 export const Rhythm = () => (
     <DoDont>
-        <Do caption={<>Sections 24 apart (<C>--surface-stack-md</C>), heading to cards 16 (<C>--section-stack-md</C>), cards 16 apart on the gutter.</>}>
-            <div style={col('var(--surface-stack-md)')}>
+        <Do caption={<>Sections 24 apart (<C>--page-stack-md</C>), heading to cards 16 (<C>--section-stack-md</C>), cards 16 apart on the gutter.</>}>
+            <div style={col('var(--page-stack-md)')}>
                 <MiniSection title="This week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
                 <MiniSection title="Next week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
             </div>

@@ -123,7 +123,7 @@ export const Frame = {
             const frame = canvasElement.querySelector('.plus-frame');
             const topbar = frame.querySelector('.plus-frame__topbar');
             const toggle = canvas.getByRole('button', { name: /sidebar/i });
-            const pad = tokenLength(frame, '--surface-container-pad');
+            const pad = tokenLength(frame, '--frame-pad');
             await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);
             await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
             await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(pad, 0);
@@ -341,7 +341,7 @@ const expectFocusedLayout = async (canvasElement, width) => {
     const stack = tokenLength(frame, '--focused-page-stack-sm');
     const reading = tokenLength(frame, '--layout-max-width-reading');
     const minimum = tokenLength(frame, '--layout-min-width-content');
-    const surfacePad = tokenLength(frame, '--surface-pad');
+    const surfacePad = tokenLength(frame, '--page-pad');
 
     await expect(rect(banner).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--layout-height-topbar'), 0);
     await expect(rect(banner).top - rect(frame).top, 'the frame pads the top').toBeCloseTo(padY, 0);

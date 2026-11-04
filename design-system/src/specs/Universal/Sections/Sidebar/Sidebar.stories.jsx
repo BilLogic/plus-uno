@@ -30,7 +30,7 @@ const panel = {
     flexDirection: 'column',
     width: 'var(--layout-width-sidebar)',
     boxSizing: 'border-box',
-    padding: 'var(--surface-container-pad)',
+    padding: 'var(--frame-pad)',
     backgroundColor: 'var(--surface-sunken)',
 };
 
@@ -118,7 +118,7 @@ export const Interactive = {
                 ...panel,
                 height: 'var(--size-5400)',
                 overflow: 'hidden',
-                borderRadius: 'var(--surface-radius)',
+                borderRadius: 'var(--page-radius)',
             }}
         >
             <Sidebar
