@@ -113,8 +113,8 @@ $date-look: (
 
 /* Focusable only while truncated, as the tooltip's trigger. */
 .plus-date-tag:focus-visible {
-    outline: var(--size-element-stroke-lg, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--size-element-stroke-lg, 2px);
+    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width, 2px);
 }
 
 /* Forced colors drop box-shadows; a real border keeps the edge. */

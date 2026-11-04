@@ -226,8 +226,8 @@
 
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus-visible,
 .plus-pagination .page-item.active .page-link:focus-visible {
-    outline: var(--size-element-stroke-lg) solid var(--color-focus-ring);
-    outline-offset: calc(-1 * var(--size-element-stroke-lg));
+    outline: var(--focus-ring-width) solid var(--color-focus-ring);
+    outline-offset: calc(-1 * var(--focus-ring-width));
     color: var(--color-secondary-text) !important;
     z-index: 2;
 }

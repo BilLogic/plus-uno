@@ -22,8 +22,8 @@
     tab-size: 4;
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 
     code {

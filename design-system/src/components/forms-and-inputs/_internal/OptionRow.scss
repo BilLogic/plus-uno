@@ -54,8 +54,8 @@
     }
 
     &:focus-visible {
-        outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 
     &.is-disabled {
@@ -244,8 +244,8 @@
 @media (forced-colors: active) {
     .plus-option-row.is-highlighted,
     .plus-option-row:focus-visible {
-        outline: var(--size-element-stroke-lg) solid Highlight;
-        outline-offset: calc(-1 * var(--size-element-stroke-lg));
+        outline: var(--focus-ring-width) solid Highlight;
+        outline-offset: calc(-1 * var(--focus-ring-width));
     }
 
     .plus-option-row.is-selected .plus-option-row-label {
