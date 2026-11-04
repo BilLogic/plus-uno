@@ -7,11 +7,8 @@
     "--color-on-danger-container #c5221f",
     "--color-on-primary-container #381e72",
     "--color-on-success-container #1e4620",
-    "--color-on-surface-variant #43474e",
-    "--color-on-surface-variant #5c5c5c",
     "--color-outline #79747e",
     "--color-outline #8e8e8e",
-    "--color-outline-variant #3f4847",
     "--color-outline-variant #98a2ad",
     "--color-outline-variant #c4c4c4",
     "--color-outline-variant #c4c6d0",
@@ -19,7 +16,6 @@
     "--color-outline-variant #dddddd",
     "--color-outline-variant #e0e0e0",
     "--color-outline-variant #e2e2e5",
-    "--color-outline-variant #e4e4e7",
     "--color-primary #006b5e",
     "--color-primary #0e8175",
     "--color-primary-container #d0bcff",
@@ -33,17 +29,10 @@
     "--color-success-container #a1eb83",
     "--color-success-container #d6f7c8",
     "--color-success-container #e6f4ea",
-    "--color-surface #191c1e",
-    "--color-surface #fffbfe",
-    "--color-surface #ffffff",
-    "--color-surface-container-lowest #191c1e",
-    "--color-surface-container-lowest #f8f9fa",
     "--color-tertiary #c96a6a",
     "--color-warning-container #f8efc1"
   ],
   "undefinedTokens": [
-    "--color-border",
-    "--color-muted",
-    "--color-neutral-text"
+    "--color-border"
   ]
 }

@@ -369,6 +369,60 @@ export function findings(source, index) {
   return found;
 }
 
+// ── the chrome vocabulary guard ─────────────────────────────────────────────
+//
+// The value check above only sees a literal that some token happens to carry,
+// so a hex nobody tokenized, or a `var(--color-outline-variant)` on the name the
+// design system retired, walked past it. The docs chrome is the design system's
+// own showcase: it speaks the current vocabulary (`--ds-*` color, the spacing
+// ladder, `--type-*`) and carries no raw hex. Two rules, by NAME, so they hold
+// whatever the token table says this week:
+//
+//   1. no hex color in a chrome stylesheet or a string in a chrome component;
+//   2. no `var()` use of a pre-ladder name: `--color-*`, `--size-*`,
+//      `--element-*`, `--layout-*`, or the old `--font-*` role names.
+//
+// Comments are blanked first, so prose may still say `#d63384` or name a
+// retired token. `.storybook/manager.js` and `preview.jsx` are outside the
+// corpus on purpose: they hold brand ink and the canvas backgrounds list as
+// data, not styling. A hex that genuinely belongs in the chrome goes in a
+// comment-justified declaration of its own and is read in review.
+
+/** Retired names, as consumed through `var()`. Definitions (Tailwind's `@theme`) are not uses. */
+export const OLD_VOCABULARY =
+  /var\(\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-(?:size|family|weight|line-height)-(?:body\d|h\d|headline|header|code|title|normal|bold|medium|semibold-\d))/g;
+const CHROME_HEX_CSS = /#[0-9a-f]{3,8}\b/gi;
+const CHROME_HEX_STRING = /(['"`])#[0-9a-f]{3,8}\1/gi;
+
+/** Block comments and whole-line `//` comments, blanked to spaces so lines keep their numbers. */
+export function blankProse(source) {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/^[ \t]*\/\/.*$/gm, (m) => ' '.repeat(m.length));
+}
+
+/** @returns {{line:number, literal:string, kind:'hex'|'old-token'}[]} */
+export function chromeFindings(source, { css }) {
+  const text = blankProse(source);
+  const found = [];
+  const lineOf = (offset) => text.slice(0, offset).split('\n').length;
+  for (const m of text.matchAll(css ? CHROME_HEX_CSS : CHROME_HEX_STRING)) {
+    found.push({ line: lineOf(m.index), literal: m[0], kind: 'hex' });
+  }
+  for (const m of text.matchAll(OLD_VOCABULARY)) {
+    found.push({ line: lineOf(m.index), literal: m[1], kind: 'old-token' });
+  }
+  return found.sort((a, b) => a.line - b.line);
+}
+
+const CHROME_EXT = ['.css', '.jsx', '.tsx', '.js', '.mdx', '.html'];
+const chromeFiles = (repoRoot) =>
+  ['.storybook', 'design-system/src/storybook-docs']
+    .flatMap((dir) => documents(dir, { root: repoRoot, ext: CHROME_EXT }))
+    .filter((rel) => !/\.storybook\/(manager|preview)\.jsx?$/.test(rel))
+    .filter((rel) => !/storybook-docs\/lib\//.test(rel))
+    .map((rel) => path.join(repoRoot, rel));
+
 // ── the runner ──────────────────────────────────────────────────────────────
 
 const cssFiles = (dir, repoRoot = REPO_ROOT) =>
@@ -440,6 +494,20 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         file: path.relative(repoRoot, file),
         line: f.line,
         message: `${f.prop}: … ${f.literal} …  -> ${offered}`,
+      });
+    }
+  }
+
+  for (const file of chromeFiles(repoRoot)) {
+    const isCss = file.endsWith('.css');
+    for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), { css: isCss })) {
+      found.push({
+        file: path.relative(repoRoot, file),
+        line: f.line,
+        message:
+          f.kind === 'hex'
+            ? `raw hex ${f.literal}  -> a --ds-* color token`
+            : `retired token ${f.literal}  -> its current name (--ds-* color, --section-*/--stack-*/--pad-* spacing, --type-* type)`,
       });
     }
   }

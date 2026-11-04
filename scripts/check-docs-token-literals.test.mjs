@@ -29,6 +29,7 @@ import {
   findings,
   blankFallbacks,
   alwaysAllowed,
+  chromeFindings,
   run,
 } from './check-docs-token-literals.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
@@ -267,6 +268,63 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
       found.some((message) => /indexed 0 tokens/.test(message) && /expected at least 200/.test(message)),
       `expected the token-table floor, got:\n${found.join('\n')}`,
     );
+  } finally {
+    done();
+  }
+});
+
+// ── the chrome vocabulary guard ─────────────────────────────────────────────
+
+test('chrome 1. a raw hex in a chrome stylesheet is caught even when no token carries it', () => {
+  const hit = chromeFindings('.a {\n  color: #123456;\n}\n', { css: true });
+  assert.deepEqual(hit.map((f) => [f.kind, f.literal, f.line]), [['hex', '#123456', 2]]);
+});
+
+test('chrome 1b. green twin: a token, and a hex that only a comment mentions', () => {
+  const clean = '/* Bootstrap paints code #d63384 */\n.a {\n  color: var(--ds-text);\n}\n';
+  assert.deepEqual(chromeFindings(clean, { css: true }), []);
+});
+
+test('chrome 2. a pre-ladder token name is caught, in a stylesheet and in a component style', () => {
+  const css = '.a { color: var(--color-on-surface); margin: var(--size-section-gap-md); }';
+  assert.deepEqual(
+    chromeFindings(css, { css: true }).map((f) => f.literal),
+    ['--color-on-surface', '--size-section-gap-md'],
+  );
+  const jsx = "const s = { borderRadius: 'var(--size-card-radius-sm)', gap: 'var(--element-stack-md)' };";
+  assert.deepEqual(
+    chromeFindings(jsx, { css: false }).map((f) => f.literal),
+    ['--size-card-radius-sm', '--element-stack-md'],
+  );
+  assert.deepEqual(
+    chromeFindings('.a { font-family: var(--font-family-headline); font-weight: var(--font-weight-medium); }', { css: true }).map((f) => f.literal),
+    ['--font-family-headline', '--font-weight-medium'],
+  );
+});
+
+test('chrome 2b. green twin: the current vocabulary, and a definition that is not a use', () => {
+  const clean =
+    '@theme inline { --color-card: var(--card); }\n' +
+    '.a { color: var(--ds-text); gap: var(--section-stack-md); font-size: var(--font-size-100); font-size: var(--font-size-display4); font-family: var(--type-family-body); }';
+  assert.deepEqual(chromeFindings(clean, { css: true }), []);
+});
+
+test('chrome 3. a hex string in a component is caught; an anchor like "#top" is not', () => {
+  assert.deepEqual(chromeFindings("const c = '#0472a8';", { css: false }).map((f) => f.literal), ["'#0472a8'"]);
+  assert.deepEqual(chromeFindings('<a href="#top">x</a>', { css: false }), []);
+});
+
+test('chrome 4. run() reports the planted hex and the retired token in the live corpus layout', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_colors.scss': tokenSheet(),
+    '.storybook/storybook-overrides.css': '.a { color: #123456; margin: var(--size-section-gap-md); }\n',
+    'design-system/src/storybook-docs/x.jsx': "export const s = { borderRadius: 'var(--size-card-radius-sm)' };\n",
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(found.some((m) => /raw hex #123456/.test(m)), found.join('\n'));
+    assert.ok(found.some((m) => /retired token --size-section-gap-md/.test(m)), found.join('\n'));
+    assert.ok(found.some((m) => /retired token --size-card-radius-sm/.test(m)), found.join('\n'));
   } finally {
     done();
   }
