@@ -22,6 +22,7 @@
       "Close button",
       "Vertical button",
       "Checkbox",
+      "Comment",
       "Date time picker",
       "Date picker",
       "Dropdown menu",
@@ -175,6 +176,7 @@
           "Vertical button"
         ],
         "Checkbox",
+        "Comment",
         "Date time picker",
         "Date picker",
         "Dropdown menu",

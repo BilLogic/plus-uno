@@ -1,10 +1,10 @@
 import React from 'react';
-import Alert from '@/components/messaging/Alert/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage/SectionMessage';
 
 export default {
     tags: ['!dev', '!autodocs'],
     title: 'Specs/Toolkit/Pre-Session/Cards/Confirm Session Attendance Alert (Tutor View)',
-    component: Alert,
+    component: SectionMessage,
     parameters: {
         layout: 'padded',
     },
@@ -31,15 +31,15 @@ const AlertContainer = ({ children }) => (
  */
 export const SessionTimeChange_OneTime = () => (
     <AlertContainer>
-        <Alert
-            style="warning"
+        <SectionMessage
+            appearance="warning"
             dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
                 The start time for one of your sessions on <span className="font-weight-bold">Tues, Oct 28</span> has been moved to <span className="font-weight-bold">2:00 PM</span>.
             </span>
-        </Alert>
+        </SectionMessage>
     </AlertContainer>
 );
 
@@ -49,15 +49,15 @@ export const SessionTimeChange_OneTime = () => (
  */
 export const SessionTimeChange_Recurring = () => (
     <AlertContainer>
-        <Alert
-            style="warning"
+        <SectionMessage
+            appearance="warning"
             dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
                 The start time for your recurring session starting on <span className="font-weight-bold">Tues, Oct 28</span> has been moved to <span className="font-weight-bold">2:00 PM</span>.
             </span>
-        </Alert>
+        </SectionMessage>
     </AlertContainer>
 );
 
@@ -67,15 +67,15 @@ export const SessionTimeChange_Recurring = () => (
  */
 export const SessionCanceled = () => (
     <AlertContainer>
-        <Alert
-            style="danger"
+        <SectionMessage
+            appearance="danger"
             dismissible={true}
             onDismiss={() => { }}
         >
             <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
                 Your session on <span className="font-weight-bold">Tues, Oct 28</span> at <span className="font-weight-bold">2:00 PM</span> has been canceled.
             </span>
-        </Alert>
+        </SectionMessage>
     </AlertContainer>
 );
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Dropdown, Modal, Popover, Table, Flag } from '@/components';
+import { Dropdown, Modal, Popup, Table, Flag } from '@/components';
 import { PatternCard, PatternSection, Surface } from '@/patterns';
 
 /**
@@ -109,7 +109,7 @@ ModalTitle.play = async () => {
 /** A popup's title and a flag's title are 14. */
 export const PopupAndFlagTitles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
-        <Popover
+        <Popup
             title="Session notes"
             triggerType="manual"
             show
@@ -117,7 +117,7 @@ export const PopupAndFlagTitles = () => (
             trigger={<button type="button">Notes</button>}
         >
             Shared with the student.
-        </Popover>
+        </Popup>
         <Flag style="info" title="Session moved" show onClose={() => {}}>Now Thursday at 4:00 PM.</Flag>
     </div>
 );

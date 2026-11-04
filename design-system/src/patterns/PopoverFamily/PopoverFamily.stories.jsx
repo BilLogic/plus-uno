@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
-import { Button, Dropdown, Popover, Flag, FlagContainer, Tooltip } from '@/components';
+import { Button, Dropdown, Popup, Flag, FlagContainer, Tooltip } from '@/components';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 
 /** The popup widths, Popover/width-sm · md · lg. */
@@ -53,9 +53,6 @@ const Stage = ({ height = 160, children, style }) => {
         </div>
     );
 };
-
-/** The style of the host element around a Button: a real DOM element, which the placement engine can take a ref from. */
-const anchor = { display: 'inline-flex' };
 
 const menuRows = [
     { text: 'Group heading', header: true },
@@ -121,17 +118,17 @@ export const Popups = {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 216 }}>
                     {POPUP_WIDTHS.map((width) => (
                         <div key={width}>
-                            <Popover
+                            <Popup
                                 id={popupIds[width]}
                                 width={width}
                                 triggerType="manual"
                                 show={open}
                                 placement="bottom-start"
                                 title="Session notes"
-                                trigger={<span style={anchor}><Button text={`Popup ${width}`} spacing="compact" /></span>}
+                                trigger={<Button text={`Popup ${width}`} spacing="compact" />}
                             >
                                 {width === 'lg' ? noteList : 'Notes stay with the session.'}
-                            </Popover>
+                            </Popup>
                         </div>
                     ))}
                 </div>
@@ -187,7 +184,7 @@ export const Tooltips = {
             {({ open }) => (
                 <>
                     <Tooltip id="pfam-tooltip-short" show={open} placement="top" text="Copy link">
-                        <span style={anchor}><Button text="Copy" spacing="compact" /></span>
+                        <Button text="Copy" spacing="compact" />
                     </Tooltip>
                     <Tooltip
                         id="pfam-tooltip-long"
@@ -195,7 +192,7 @@ export const Tooltips = {
                         placement="bottom"
                         text="Copies the session link so you can paste it into a message to the student's family"
                     >
-                        <span style={anchor}><Button text="Share" spacing="compact" /></span>
+                        <Button text="Share" spacing="compact" />
                     </Tooltip>
                 </>
             )}
@@ -206,10 +203,10 @@ export const Tooltips = {
         const short = await waitFor(() => {
             const node = doc.getElementById('pfam-tooltip-short');
             if (!node) throw new Error('not open');
-            return node.querySelector('.tooltip-inner');
+            return node;
         });
         await expect(short.getBoundingClientRect().height, 'one line is 24').toBe(24);
-        const long = doc.getElementById('pfam-tooltip-long').querySelector('.tooltip-inner');
+        const long = doc.getElementById('pfam-tooltip-long');
         await expect(long.getBoundingClientRect().width, 'max-width-tooltip').toBe(240);
     },
 };
@@ -220,14 +217,14 @@ export const Interactive = {
     render: (args) => (
         <Stage height={220}>
             {() => (
-                <Popover
+                <Popup
                     width={args.width}
                     placement={args.placement}
                     title={args.title}
-                    trigger={<span style={anchor}><Button text="Open popup" spacing="compact" /></span>}
+                    trigger={<Button text="Open popup" spacing="compact" />}
                 >
                     Notes stay with the session.
-                </Popover>
+                </Popup>
             )}
         </Stage>
     ),

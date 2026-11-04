@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 
 /**
  * Dismissible primary alert banner for login session messages. The Login page
@@ -14,9 +14,9 @@ import Alert from '@/components/messaging/Alert';
  */
 export default function LoginAlertBanner({ children, dismissible = true }) {
     return (
-        <Alert style="primary" leadingVisual={false} dismissible={dismissible}>
+        <SectionMessage appearance="primary" leadingVisual={false} dismissible={dismissible}>
             {children}
-        </Alert>
+        </SectionMessage>
     );
 }
 

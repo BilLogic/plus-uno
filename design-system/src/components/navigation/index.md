@@ -7,7 +7,7 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Breadcrumb](Breadcrumb/index.md) | 5 | ✅ | ✅ | ✅ |
+| [Breadcrumb](Breadcrumb/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✕ | ✕ | ✕ |
 | [MenuGroup](MenuGroup/index.md) | 6 | ✕ | ✕ | ✕ |
 | [NavTabs](NavTabs/index.md) | 7 | ✅ | ✅ | ✅ |

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Alert from '@/components/messaging/Alert/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage/SectionMessage';
 import Form from 'react-bootstrap/Form';
 import Toggle from '@/components/forms-and-inputs/Toggle';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
@@ -64,12 +64,12 @@ const CallOffFormOrganism = ({
                     marginBottom: 'var(--size-section-gap-sm)',
                     '--size-card-gap-sm': 'var(--size-element-gap-xs)'      // Override for Figma compliance
                 }}>
-                    <Alert
-                        style="warning"
+                    <SectionMessage
+                        appearance="warning"
                         dismissible={false}
                         className="mb-0"
                     >
-                        {/* Figma Node 221:171732: Alert content has specific padding and gap */}
+                        {/* Figma Node 221:171732: SectionMessage content has specific padding and gap */}
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
@@ -90,7 +90,7 @@ const CallOffFormOrganism = ({
                                 Please contact your supervisor via email/Slack before proceeding.
                             </div>
                         </div>
-                    </Alert>
+                    </SectionMessage>
                 </div>
             )}
 

@@ -3,7 +3,7 @@ import Modal from '@/components/messaging/Modal';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup';
 import Button from '@/components/forms-and-inputs/Button';
 import CountTag from '@/components/labels/CountTag';
-import Alert from '@/components/messaging/Alert';
+import SectionMessage from '@/components/messaging/SectionMessage';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import Pagination from '@/components/navigation/Pagination';
 
@@ -31,7 +31,7 @@ export default {
 /**
  * Fill In (Empty State)
  * Empty state when there are no fill-in sessions available.
- * Reuses: Alert (warning, dismissible), Button (primary outline + leading refresh icon),
+ * Reuses: SectionMessage (warning, dismissible), Button (primary outline + leading refresh icon),
  * info icon, close icon, hourglass icon, body typography tokens.
  */
 export const FillIn_EmptyState = () => (
@@ -74,11 +74,11 @@ export const FillIn_EmptyState = () => (
                         />
                     </div>
                 </div>
-                {/* One-time Fill-ins banner (design system Alert, Figma copy) */}
-                <Alert style="warning" dismissible>
+                {/* One-time Fill-ins banner (design system SectionMessage, Figma copy) */}
+                <SectionMessage appearance="warning" dismissible>
                     <strong>One-time Fill-ins:</strong> Help cover specific sessions that need additional tutors.
                     These are individual sessions, not recurring commitments.
-                </Alert>
+                </SectionMessage>
                 {/* Empty state: hourglass + primary message + secondary message */}
                 <div
                     className="d-flex flex-column align-items-center justify-content-center"
@@ -125,7 +125,7 @@ const fillInListSessions = Array.from({ length: 5 }, () => ({
 /**
  * Fill In
  * List of available sessions: table with checkboxes, pagination, Close / Copy recruit message / Continue (0 selected).
- * Reuses: Alert (One-time Fill-ins), TableRow/TableHeaderRow, Pagination, CloseButton, CopyRecruitmentMessageButton.
+ * Reuses: SectionMessage (One-time Fill-ins), TableRow/TableHeaderRow, Pagination, CloseButton, CopyRecruitmentMessageButton.
  */
 export const FillIn = () => (
     <Modal
@@ -167,11 +167,11 @@ export const FillIn = () => (
                         />
                     </div>
                 </div>
-                {/* One-time Fill-ins banner (design system Alert, Figma copy) */}
-                <Alert style="warning" dismissible>
+                {/* One-time Fill-ins banner (design system SectionMessage, Figma copy) */}
+                <SectionMessage appearance="warning" dismissible>
                     <strong>One-time Fill-ins:</strong> Help cover specific sessions that need additional tutors.
                     These are individual sessions, not recurring commitments.
-                </Alert>
+                </SectionMessage>
                 {/* Table: Date & time, School & teacher, Tutor Count + checkboxes (design system TableRow/TableHeaderRow) */}
                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                     <TableHeaderRow />
@@ -455,7 +455,7 @@ const cellStyle = {
 /**
  * Confirmation
  * Confirm fill-in step: warning alert, session list (pre-session/tables/Fill Ins), Back + Confirm fill-in.
- * Reuses: Alert, BackButton, Button, close icon; pre-session/tables/Fill Ins (FillInTableHeaderRow, FillInTableRow).
+ * Reuses: SectionMessage, BackButton, Button, close icon; pre-session/tables/Fill Ins (FillInTableHeaderRow, FillInTableRow).
  */
 export const Confirmation = () => {
     const confirmationSessions = [
@@ -492,10 +492,10 @@ export const Confirmation = () => {
                         />
                     </div>
                     <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                        {/* Warning alert (design system Alert) */}
-                        <Alert style="warning" dismissible={false}>
+                        {/* Warning message (design system SectionMessage) */}
+                        <SectionMessage appearance="warning" dismissible={false}>
                             You're filling in for the following session(s). Please confirm before continuing.
-                        </Alert>
+                        </SectionMessage>
                         {/* Session table: pre-session/tables/Fill Ins */}
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <FillInTableHeaderRow />
@@ -534,7 +534,7 @@ const successSessions = [
 /**
  * Success
  * Fill-in success state: success alert, table (Table / my sessions: Date & time, School & teacher, Status, Actions), Check my schedule.
- * Reuses: Alert (success), CheckScheduleButton; TableHeaderRow + TableRow from MySessions.stories (Figma 2279-148185, 2279-148186).
+ * Reuses: SectionMessage (success), CheckScheduleButton; TableHeaderRow + TableRow from MySessions.stories (Figma 2279-148185, 2279-148186).
  */
 export const Success = () => (
     <Modal
@@ -567,10 +567,10 @@ export const Success = () => (
                     />
                 </div>
                 <div className="d-flex flex-column" style={{ gap: 'var(--size-modal-gap-md)' }}>
-                    {/* Success alert (design system Alert) */}
-                    <Alert style="success" dismissible={false}>
+                    {/* Success message (design system SectionMessage) */}
+                    <SectionMessage appearance="success" dismissible={false}>
                         The following session(s) have been added to your schedule.
-                    </Alert>
+                    </SectionMessage>
                     {/* Table: Table / my sessions — Date & time (ET) | School & teacher | Status | Actions (Figma 2279-148185, 2279-148186) */}
                     <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
                         <MySessionsTableHeaderRow />

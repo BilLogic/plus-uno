@@ -27,7 +27,7 @@ That pattern is implemented with colocated `*.mdx` files, shared docs layout pri
    Most components and many forms follow this pattern. Example references: [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), [`Checkbox.mdx`](../../../design-system/src/components/forms-and-inputs/Checkbox.mdx).
 
 2. **Single entry, merged subcomponent stories**
-   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Example: [`Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx).
+   Some components have a second `*.Subcomponents.stories.jsx` file, but it reuses the same `title` so Storybook keeps everything under one sidebar item. Example: [`SectionMessage.mdx`](../../../design-system/src/components/messaging/SectionMessage/SectionMessage.mdx).
 
 3. **Single entry, richer composed docs**
    A few pages are more editorially composed and do not rely only on `Canvas` sections. The clearest example is [`Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx), which sets its sections on the Core Component template and builds its examples from the stories.
@@ -108,7 +108,7 @@ Use it when:
 - those parts matter to how designers review or compose it
 - a plain `Content` section would blur “what goes in it” with “what it is made of”
 
-Strong current example: [`Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx).
+Strong current example: [`SectionMessage.mdx`](../../../design-system/src/components/messaging/SectionMessage/SectionMessage.mdx).
 
 #### `Behavior`
 
@@ -340,4 +340,4 @@ Avoid making the page read like plugin or implementation documentation. The poin
 - [`design-system/src/storybook-docs/Introduction.mdx`](../../../design-system/src/storybook-docs/Introduction.mdx)
 - [`design-system/src/storybook-docs/ds-docs-layout.jsx`](../../../design-system/src/storybook-docs/ds-docs-layout.jsx)
 - [`design-system/src/components/forms-and-inputs/Button/Button.mdx`](../../../design-system/src/components/forms-and-inputs/Button/Button.mdx)
-- [`design-system/src/components/messaging/Alert/Alert.mdx`](../../../design-system/src/components/messaging/Alert/Alert.mdx)
+- [`design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`](../../../design-system/src/components/messaging/SectionMessage/SectionMessage.mdx)

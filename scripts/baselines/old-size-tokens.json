@@ -57,7 +57,6 @@
     "design-system/src/components/loading/Skeleton/Skeleton.jsx": 4,
     "design-system/src/components/loading/Skeleton/Skeleton.scss": 11,
     "design-system/src/components/loading/Spinner/Spinner.stories.jsx": 1,
-    "design-system/src/components/messaging/Alert/Alert.scss": 2,
     "design-system/src/components/messaging/EmptyState/EmptyState.scss": 7,
     "design-system/src/components/messaging/Modal/Modal.scss": 8,
     "design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss": 2,

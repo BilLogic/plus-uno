@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { OverlayTrigger, Overlay, Tooltip as BSTooltip } from 'react-bootstrap';
-import { popoverOverlayProps } from '@/lib/popoverPlacement';
+import { Tooltip as BaseTooltip } from '@base-ui/react/tooltip';
 import './Tooltip.scss';
 
 /**
- * Design-system tooltip wrapper around Bootstrap OverlayTrigger.
+ * One line of help on hover or focus, built on Base UI.
  *
  * @param {object} props
  * @param {React.ReactNode} props.text - Tooltip body
  * @param {'top'|'bottom'|'left'|'right'} [props.placement='top']
- * @param {string|string[]} [props.trigger]
+ * @param {string|string[]} [props.trigger=['hover','focus']] - an empty array disables the tooltip, for a caller that only wants one when its trigger is truncated
+ * @param {'small'|'default'|'large'} [props.size='default'] - kept so no call site breaks; every size draws the one tooltip
  * @param {React.ReactElement} props.children - Single trigger element
  * @param {string} [props.id]
  * @param {string} [props.className]
@@ -22,6 +22,7 @@ const Tooltip = ({
     text,
     placement = 'top',
     trigger = ['hover', 'focus'],
+    size = 'default',
     children,
     id,
     className = '',
@@ -29,49 +30,30 @@ const Tooltip = ({
     delayShow = 250,
     delayHide = 400,
 }) => {
-    const uniqueId = useRef(`tooltip-${Math.random().toString(36).substring(2, 9)}`);
-    const [targetElement, setTargetElement] = useState(null);
-
-    /**
-     * @param {object} props
-     * @returns {React.ReactElement}
-     */
-    const renderTooltip = (props) => (
-        <BSTooltip
-            id={id || uniqueId.current}
-            {...props}
-            className={`plus-tooltip ${className}`}
-        >
-            {text}
-        </BSTooltip>
-    );
-
-    if (show !== undefined) {
-        return (
-            <>
-                {React.cloneElement(children, { ref: setTargetElement })}
-                <Overlay
-                    target={targetElement}
-                    show={show}
-                    placement={placement}
-                    {...popoverOverlayProps()}
-                >
-                    {renderTooltip}
-                </Overlay>
-            </>
-        );
-    }
+    const triggerElement = React.isValidElement(children) ? children : <span>{children}</span>;
+    const disabled = Array.isArray(trigger) ? trigger.length === 0 : !trigger;
 
     return (
-        <OverlayTrigger
-            placement={placement}
-            delay={{ show: delayShow, hide: delayHide }}
-            overlay={renderTooltip}
-            trigger={trigger}
-            {...popoverOverlayProps()}
+        <BaseTooltip.Root
+            open={show}
+            disabled={disabled}
+            delay={delayShow}
+            closeDelay={delayHide}
         >
-            {children}
-        </OverlayTrigger>
+            <BaseTooltip.Trigger render={triggerElement} />
+            <BaseTooltip.Portal>
+                <BaseTooltip.Positioner side={placement} sideOffset={4} collisionPadding={8}>
+                    <BaseTooltip.Popup
+                        id={id}
+                        role="tooltip"
+                        className={`plus-tooltip plus-tooltip-${size} ${className}`}
+                        data-tooltip-size={size}
+                    >
+                        {text}
+                    </BaseTooltip.Popup>
+                </BaseTooltip.Positioner>
+            </BaseTooltip.Portal>
+        </BaseTooltip.Root>
     );
 };
 
@@ -82,6 +64,7 @@ Tooltip.propTypes = {
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
     ]),
+    size: PropTypes.oneOf(['small', 'default', 'large']),
     children: PropTypes.node.isRequired,
     id: PropTypes.string,
     className: PropTypes.string,

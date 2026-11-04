@@ -3,7 +3,7 @@ import { expect, waitFor, within } from 'storybook/test';
 
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Dropdown, Flag, FlagContainer } from '@/components';
-import Popover from './Popover/Popover';
+import Popup from './Popup/Popup';
 import Tooltip from './Tooltip/Tooltip';
 
 /**
@@ -199,7 +199,7 @@ export const PopupWidths = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '200px', padding: '24px 600px 240px 24px' }}>
             {Object.entries(popupIds).map(([width, id]) => (
-                <Popover
+                <Popup
                     key={width}
                     id={id}
                     width={width}
@@ -210,7 +210,7 @@ export const PopupWidths = () => {
                     trigger={<button type="button">{`Popup ${width}`}</button>}
                 >
                     Notes stay with the session.
-                </Popover>
+                </Popup>
             ))}
         </div>
     );
@@ -251,7 +251,7 @@ export const PopupLayers = () => {
     const open = useOpenAfterMount();
     return (
         <div style={{ minHeight: '200px', padding: '24px' }}>
-            <Popover
+            <Popup
                 id="pf-popup-page"
                 triggerType="manual"
                 show={open}
@@ -260,9 +260,9 @@ export const PopupLayers = () => {
                 trigger={<button type="button">Page popup</button>}
             >
                 Notes stay with the session.
-            </Popover>
+            </Popup>
             <div className="modal" style={{ position: 'relative', display: 'block', zIndex: 'var(--layout-z-index-modal)' }}>
-                <Popover
+                <Popup
                     id="pf-popup-modal"
                     triggerType="manual"
                     show={open}
@@ -271,7 +271,7 @@ export const PopupLayers = () => {
                     trigger={<button type="button">Modal popup</button>}
                 >
                     Notes stay with the session.
-                </Popover>
+                </Popup>
             </div>
         </div>
     );
@@ -297,7 +297,7 @@ export const PopupKeepsOffTheScreenEdge = () => {
     const open = useOpenAfterMount();
     return (
         <div style={{ position: 'fixed', top: '16px', left: 0 }}>
-            <Popover
+            <Popup
                 id="pf-popup-edge"
                 width="lg"
                 triggerType="manual"
@@ -306,7 +306,7 @@ export const PopupKeepsOffTheScreenEdge = () => {
                 trigger={<button type="button">Edge</button>}
             >
                 A wide popup opened from a trigger at the screen edge.
-            </Popover>
+            </Popup>
         </div>
     );
 };
@@ -347,7 +347,7 @@ TooltipSize.play = async ({ canvasElement }) => {
         if (!node) throw new Error('not open');
         return node;
     });
-    const inner = tooltip.querySelector('.tooltip-inner');
+    const inner = tooltip;
     const style = getComputedStyle(inner);
     await expect(px(style.paddingTop)).toBe(4);
     await expect(px(style.paddingLeft)).toBe(8);

@@ -1,12 +1,9 @@
 import React from 'react';
-import RBBreadcrumb from 'react-bootstrap/Breadcrumb';
 import './Breadcrumb.scss';
 
 /**
  * Subcomponent documentation for Breadcrumb.
  * Demonstrates the internal building blocks of the Breadcrumb component as per Figma specifications.
- * 
- * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=27-499&m=dev
  */
 export default {
     title: 'Components/Navigation/Breadcrumbs',
@@ -51,14 +48,12 @@ export default {
  */
 export const PageItem = ({ text, href, isCurrent }) => (
     <nav aria-label="breadcrumb" className="plus-breadcrumb">
-        <ol className="breadcrumb">
-            <RBBreadcrumb.Item
-                href={isCurrent ? undefined : href}
-                active={isCurrent}
-                className={isCurrent ? 'plus-breadcrumb-current' : 'plus-breadcrumb-link'}
-            >
-                {text}
-            </RBBreadcrumb.Item>
+        <ol className="plus-breadcrumb-list">
+            {isCurrent ? (
+                <li aria-current="page" className="plus-breadcrumb-item plus-breadcrumb-current">{text}</li>
+            ) : (
+                <li className="plus-breadcrumb-item plus-breadcrumb-link"><a href={href}>{text}</a></li>
+            )}
         </ol>
     </nav>
 );

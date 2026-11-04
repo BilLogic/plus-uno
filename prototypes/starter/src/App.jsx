@@ -11,7 +11,7 @@ import './App.css';
  *   import { Button } from '@/components';
  *   import { Modal } from '@/components';
  *   import { StatusTag } from '@/components';
- *   import { Alert } from '@/components';
+ *   import { SectionMessage } from '@/components';
  *   import { PageLayout } from '@/specs/Universal/Pages';
  *   ... and more from design-system/src/components/
  * 

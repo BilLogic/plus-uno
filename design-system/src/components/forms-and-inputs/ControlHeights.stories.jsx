@@ -179,9 +179,9 @@ export const Breadcrumbs = () => (
 );
 
 Breadcrumbs.play = async ({ canvasElement }) => {
-    const list = canvasElement.querySelector('.breadcrumb');
+    const list = canvasElement.querySelector('.plus-breadcrumb-list');
     await expect(heightOf(list)).toBe(32);
-    for (const item of list.querySelectorAll('.breadcrumb-item')) {
+    for (const item of list.querySelectorAll('.plus-breadcrumb-item')) {
         await expectLabel(item, item.textContent);
     }
 };

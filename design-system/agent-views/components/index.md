@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (39)
+## UI components (46)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiLabel](../../src/components/labels/AiLabel/index.md)
@@ -16,14 +16,18 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Breadcrumb](../../src/components/navigation/Breadcrumb/index.md)
 - [ButtonGroup](../../src/components/forms-and-inputs/ButtonGroup/index.md)
 - [Calendar](../../src/components/forms-and-inputs/Calendar/index.md)
+- [Card](../../src/components/layout-and-structure/Card/index.md)
 - [Carousel](../../src/components/layout-and-structure/Carousel/index.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid.md)
 - [ChoiceGroup](../../src/components/forms-and-inputs/ChoiceGroup.md)
 - [CloseButton](../../src/components/forms-and-inputs/CloseButton/index.md)
 - [Code](../../src/components/text-and-data-display/Code/index.md)
+- [Collapse](../../src/components/layout-and-structure/Collapse/index.md)
+- [Comment](../../src/components/forms-and-inputs/Comment/index.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [DateTimePicker](../../src/components/forms-and-inputs/DateTimePicker/index.md)
+- [Divider](../../src/components/layout-and-structure/Divider/index.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
 - [Footer](../../src/components/layout-and-structure/Footer/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
@@ -31,7 +35,10 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
+- [MediaObject](../../src/components/layout-and-structure/MediaObject/index.md)
+- [NavPills](../../src/components/navigation/NavPills/index.md)
 - [NavTabs](../../src/components/navigation/NavTabs/index.md)
+- [Navbar](../../src/components/navigation/Navbar/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)
 - [Radio](../../src/components/forms-and-inputs/Radio.md)
 - [Range](../../src/components/forms-and-inputs/Range.md)

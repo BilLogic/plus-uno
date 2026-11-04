@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Popover from '../../overlays-and-layering/Popover/Popover';
+import Popup from '../../overlays-and-layering/Popup/Popup';
 import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
 import './InlineMessage.scss';
 
@@ -21,7 +21,7 @@ const INLINE_MESSAGE_ICONS = {
 
 /**
  * InlineMessage: a compact icon trigger that opens a Popup carrying the full
- * message. Built on Popover so placement, dismissal and focus return are
+ * message. Built on Popup so placement, dismissal and focus return are
  * shared with every other popup in the system.
  */
 export const InlineMessage = ({
@@ -37,7 +37,7 @@ export const InlineMessage = ({
     const { glyph, token } = INLINE_MESSAGE_ICONS[appearance];
 
     return (
-        <Popover
+        <Popup
             trigger={(
                 <IconButton
                     icon={<i className={`fa-solid fa-${glyph}`} style={{ color: `var(${token})` }} aria-hidden="true" />}
@@ -61,7 +61,7 @@ export const InlineMessage = ({
                 )}
                 {children}
             </div>
-        </Popover>
+        </Popup>
     );
 };
 
