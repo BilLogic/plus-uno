@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as BaseUISwitch from '@base-ui/react/switch';
 import useFieldId from './useFieldId';
+import Spinner from '../loading/Spinner';
 import { choiceClasses } from './choiceItem';
 import './Toggle.scss';
 
@@ -28,6 +29,7 @@ const { Switch } = BaseUISwitch;
  * @param {boolean} [props.defaultChecked]
  * @param {16|20} [props.size=16] - Track height in pixels. 16 is the default for pages with many toggles; 20 calls attention to one setting.
  * @param {boolean} [props.isDisabled=false]
+ * @param {boolean} [props.isLoading=false] - A change is being saved: a spinner shows beside the track, the toggle ignores changes, and `aria-busy` is set. Keeps its place in the tab order.
  * @param {boolean} [props.isReadOnly=false] - Shown, focusable and announced read-only; the state does not change
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {(event: React.FocusEvent) => void} [props.onFocus]
@@ -44,6 +46,7 @@ const Toggle = ({
     defaultChecked,
     size = 16,
     isDisabled = false,
+    isLoading = false,
     isReadOnly = false,
     onChange,
     onFocus,
@@ -82,7 +85,10 @@ const Toggle = ({
                 checked={isControlled ? isChecked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
                 disabled={isDisabled}
-                readOnly={isReadOnly}
+                // Loading blocks the change the way read-only does, without announcing the toggle as read-only.
+                readOnly={isReadOnly || isLoading}
+                aria-readonly={isReadOnly || undefined}
+                aria-busy={isLoading || undefined}
                 onCheckedChange={handleCheckedChange}
                 onFocus={onFocus}
                 onBlur={onBlur}
@@ -93,6 +99,7 @@ const Toggle = ({
             >
                 <Switch.Thumb className="plus-toggle-thumb" />
             </Switch.Root>
+            {isLoading && <Spinner size={16} label="Saving" className="plus-toggle-spinner" />}
             {label && <label htmlFor={fieldId} className="plus-toggle-label">{label}</label>}
         </div>
     );
@@ -107,6 +114,7 @@ Toggle.propTypes = {
     defaultChecked: PropTypes.bool,
     size: PropTypes.oneOf([16, 20]),
     isDisabled: PropTypes.bool,
+    isLoading: PropTypes.bool,
     isReadOnly: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
