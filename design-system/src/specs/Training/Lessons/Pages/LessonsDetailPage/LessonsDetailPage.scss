@@ -62,7 +62,7 @@
     }
 
     &__track {
-        background-color: var(--color-surface-container-highest);
+        background-color: var(--ds-surface-container);
         height: 4px;
         width: 100%;
         border-radius: var(--size-element-radius-sm);
@@ -81,7 +81,7 @@
     gap: var(--size-element-gap-md, 12px);
     align-items: flex-start;
     padding: var(--size-card-pad-y-sm, 12px) var(--size-card-pad-x-sm, 16px);
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
     border: var(--size-element-border) solid var(--color-primary-border);
     border-radius: var(--size-card-radius-sm, 8px);
     width: 100%;
@@ -96,7 +96,7 @@
 
     &__content {
         flex-grow: 1;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
 
         p {
             margin: 0;
@@ -108,7 +108,7 @@
         border: none;
         padding: 0;
         cursor: pointer;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         font-size: var(--font-size-body2);
         flex-shrink: 0;
         width: 20px;
@@ -118,7 +118,7 @@
         justify-content: center;
 
         &:hover {
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
     }
 }
@@ -132,7 +132,7 @@
     padding: var(--size-element-pad-y-sm, 4px);
 
     &__label {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         white-space: nowrap;
         flex-shrink: 0;
     }
@@ -151,12 +151,12 @@
     box-sizing: border-box;
 
     &__inner {
-        background-color: var(--color-surface-container-low);
+        background-color: var(--ds-surface-raised);
         padding: var(--size-card-pad-y-sm, 16px) var(--size-card-pad-x-sm, 16px);
         border-radius: var(--size-card-radius-sm);
 
         p {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             margin: 0;
             font-style: italic;
         }
@@ -201,7 +201,7 @@
         }
 
         span {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
         }
     }
 
@@ -226,7 +226,7 @@
     &__image-placeholder {
         width: 200px;
         height: 160px;
-        background-color: var(--color-surface-container);
+        background-color: var(--ds-surface-container);
         border-radius: var(--size-card-radius-sm, 8px);
         display: flex;
         align-items: center;
@@ -234,7 +234,7 @@
 
         i {
             font-size: 48px;
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             opacity: 0.5;
         }
 
@@ -251,7 +251,7 @@
 
         p,
         ul {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             margin: 0 0 var(--size-element-gap-md, 12px) 0;
         }
 
@@ -305,7 +305,7 @@
 
         p,
         ul {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             margin: 0 0 var(--size-element-gap-md, 12px) 0;
         }
 
@@ -350,8 +350,8 @@
         }
 
         td {
-            background-color: var(--color-surface);
-            color: var(--color-on-surface-variant);
+            background-color: var(--ds-surface);
+            color: var(--ds-text-subtle);
             padding: var(--size-element-pad-y-md, 8px) var(--element-pad-default, 12px);
             vertical-align: top;
             border-bottom: var(--size-element-border) solid var(--color-outline-variant);
@@ -371,7 +371,7 @@
         width: 100%;
 
         p {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             margin: 0 0 var(--size-element-gap-md, 12px) 0;
         }
 
@@ -404,11 +404,11 @@
         padding: var(--size-element-pad-y-sm, 8px) var(--element-pad-compact, 8px);
         font-family: var(--font-family-body);
         font-size: var(--font-size-body3);
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         resize: vertical;
 
         &::placeholder {
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
         }
     }
 
@@ -435,12 +435,12 @@
         }
 
         span.body1-txt {
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             flex-grow: 1;
         }
 
         input[type="radio"]:checked~.lesson-content__radio-custom {
-            background-color: var(--color-surface);
+            background-color: var(--ds-background-input);
 
             &::after {
                 content: '';
@@ -505,7 +505,7 @@
     width: 100%;
 
     p {
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         margin: 0;
         text-align: center;
     }

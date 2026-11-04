@@ -67,10 +67,10 @@ export const SignInTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {day}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -84,7 +84,7 @@ export const SignInTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
             </div>
@@ -97,7 +97,7 @@ export const SignInTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
             </div>
@@ -182,10 +182,10 @@ const SignInTableRowSupervisor = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {day}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -200,10 +200,10 @@ const SignInTableRowSupervisor = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>
@@ -216,7 +216,7 @@ const SignInTableRowSupervisor = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
             </div>
@@ -230,7 +230,7 @@ const SignInTableRowSupervisor = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {studentCount}
                 </span>
             </div>
@@ -265,16 +265,16 @@ export const SignInTableHeaderRow = () => (
         }}
     >
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Day & time</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Day & time</span>
         </div>
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>School</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>School</span>
         </div>
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Tutor count</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Tutor count</span>
         </div>
         <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Actions</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Actions</span>
         </div>
     </div>
 );
@@ -290,19 +290,19 @@ const TableHeaderRowSupervisor = () => (
         }}
     >
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Day & time</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Day & time</span>
         </div>
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>School & teacher</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>School & teacher</span>
         </div>
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Tutor count</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Tutor count</span>
         </div>
         <div style={{ gridColumn: 'span 3', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Student count</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Student count</span>
         </div>
         <div style={{ gridColumn: 'span 2', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: 'var(--size-table-cell-y) var(--size-table-cell-x)' }}>
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Actions</span>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Actions</span>
         </div>
     </div>
 );
@@ -366,10 +366,10 @@ export const SignInTableRowModal = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {day}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -385,11 +385,11 @@ export const SignInTableRowModal = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
                 {teacher && (
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                         {teacher}
                     </span>
                 )}
@@ -404,7 +404,7 @@ export const SignInTableRowModal = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount}
                 </span>
             </div>
@@ -418,7 +418,7 @@ export const SignInTableRowModal = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {studentCount}
                 </span>
             </div>
@@ -449,7 +449,7 @@ export const SignInTableHeaderRowModal = ({ showTeacher = false }) => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Day & time
             </span>
         </div>
@@ -463,7 +463,7 @@ export const SignInTableHeaderRowModal = ({ showTeacher = false }) => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 {showTeacher ? 'School & teacher' : 'School'}
             </span>
         </div>
@@ -477,7 +477,7 @@ export const SignInTableHeaderRowModal = ({ showTeacher = false }) => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Tutor count
             </span>
         </div>
@@ -491,7 +491,7 @@ export const SignInTableHeaderRowModal = ({ showTeacher = false }) => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
             }}
         >
-            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Student count
             </span>
         </div>
@@ -534,7 +534,7 @@ export const Overview = () => (
         </section>
         <section>
             <h5 className="h5 mb-4">Modal Version - Regular Tutors</h5>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>
                 10-column layout for modal display (no action column, includes student count)
             </p>
             <div style={{ marginBottom: 'var(--size-section-gap-lg)' }}>
@@ -569,13 +569,13 @@ export const InteractiveRegularTutors = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <h6 className="h6 mb-3">Regular Tutors - Interactive</h6>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>Click Sign Up to register for a session.</p>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>Click Sign Up to register for a session.</p>
             <SignInTableHeaderRow />
             {sampleSessions.map((session, index) => (
                 <SignInTableRow key={index} day={session.day} timeRange={session.timeRange} school={session.school} tutorCount={session.tutorCount} onSignUp={() => handleSignUp(index)} />
             ))}
             <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
             </div>
         </div>
     );
@@ -596,13 +596,13 @@ export const InteractiveSupervisors = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
             <h6 className="h6 mb-3">Supervisors / Lead Tutors - Interactive</h6>
-            <p className="body2-txt mb-4" style={{ color: 'var(--color-on-surface-variant)' }}>Click Sign Up to register for a session.</p>
+            <p className="body2-txt mb-4" style={{ color: 'var(--ds-text-subtle)' }}>Click Sign Up to register for a session.</p>
             <TableHeaderRowSupervisor />
             {sampleSessions.map((session, index) => (
                 <SignInTableRowSupervisor key={index} day={session.day} timeRange={session.timeRange} school={session.school} teacher={session.teacher} tutorCount={session.tutorCount} studentCount={session.studentCount} onSignUp={() => handleSignUp(index)} />
             ))}
             <div style={{ marginTop: 'var(--size-spacing-medium-space-400)', padding: 'var(--size-spacing-medium-space-200)' }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>Signed up for: {signedUpSessions.length} session(s)</span>
             </div>
         </div>
     );

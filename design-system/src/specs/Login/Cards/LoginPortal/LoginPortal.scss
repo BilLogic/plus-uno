@@ -6,7 +6,7 @@
     width: 100%;
     /* Match Figma login portal card width (~558px) while remaining responsive */
     max-width: 558px;
-    background: var(--color-surface-container-lowest);
+    background: var(--ds-surface-raised);
     border-radius: var(--size-card-radius-md);
     box-shadow: var(--elevation-light-3);
     padding: var(--size-card-pad-y-lg) var(--size-card-pad-x-lg);
@@ -20,7 +20,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-element-gap-sm); // 8px in Figma (Element/gap-sm)
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .login-portal-header__title {
@@ -29,7 +29,7 @@
 
 .login-portal-header__subtitle {
     margin: 0;
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .login-portal-demo-role-buttons {
@@ -56,7 +56,7 @@
 }
 
 .login-portal-terms__text {
-    color: var(--color-on-surface);
+    color: var(--ds-text);
 }
 
 .login-portal-terms__link {

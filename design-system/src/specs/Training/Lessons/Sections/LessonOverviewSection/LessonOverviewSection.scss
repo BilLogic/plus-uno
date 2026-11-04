@@ -2,7 +2,7 @@
 
 .lesson-overview-section {
     width: 100%;
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-container);
     // Figma Padding: 32px vertical, 24px horizontal
     padding: var(--size-spacing-medium-space-800, 32px) var(--size-spacing-medium-space-600, 24px);
 
@@ -15,7 +15,7 @@
 
     &__title {
         margin: 0;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         padding-left: 0; // Padding handled by parent
     }
 

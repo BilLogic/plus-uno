@@ -73,7 +73,7 @@ const FormingModalBody = () => (
         className="d-flex flex-column"
         style={{
             gap: 'var(--size-modal-gap-lg)',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
             padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
             borderRadius: 'var(--size-modal-radius-lg)',
         }}
@@ -85,7 +85,7 @@ const FormingModalBody = () => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />

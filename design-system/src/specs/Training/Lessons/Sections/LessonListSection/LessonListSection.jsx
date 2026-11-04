@@ -92,7 +92,7 @@ const LessonListSection = ({
                                         {student.focusArea ? (
                                             <SmartTag subject={student.focusArea} />
                                         ) : (
-                                            <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                            <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                                 —
                                             </span>
                                         )}

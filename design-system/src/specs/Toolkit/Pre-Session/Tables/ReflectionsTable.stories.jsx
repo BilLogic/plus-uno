@@ -37,7 +37,7 @@ export const ReflectionsTableHeaderRow = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     Date & time
                 </span>
             </div>
@@ -51,7 +51,7 @@ export const ReflectionsTableHeaderRow = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     School & teacher
                 </span>
             </div>
@@ -65,7 +65,7 @@ export const ReflectionsTableHeaderRow = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     Status
                 </span>
             </div>
@@ -79,7 +79,7 @@ export const ReflectionsTableHeaderRow = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     Actions
                 </span>
             </div>
@@ -161,10 +161,10 @@ export const ReflectionsTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -181,10 +181,10 @@ export const ReflectionsTableRow = ({
                     overflow: 'hidden'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>
@@ -372,10 +372,10 @@ export const Interactive = () => {
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-lg)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Total Reflections: <strong>{reflections.length}</strong>
                 </span>
                 <span className="body2-txt" style={{ color: 'var(--color-success)' }}>
@@ -389,10 +389,10 @@ export const Interactive = () => {
             {/* Instructions */}
             <div style={{
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Click "Start" on incomplete reflections to mark them as completed. Click "Details" to view completed reflections.
                 </span>
             </div>

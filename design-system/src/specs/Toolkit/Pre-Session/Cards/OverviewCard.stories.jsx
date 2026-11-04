@@ -16,7 +16,7 @@ export default {
 export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLabel = 'View options' }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-surface-container-lowest)',
+            backgroundColor: 'var(--ds-surface)',
             borderRadius: 'var(--size-card-radius-sm)',
             padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
             display: 'flex',
@@ -29,7 +29,7 @@ export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLa
         <div className="d-flex align-items-center justify-content-between">
             <span
                 className="h6"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-icon)' }}
             >
                 {title}
             </span>
@@ -39,7 +39,7 @@ export const StatCard = ({ title = 'Card title', value = '{#}', icon, iconAriaLa
         {/* Large stat value */}
         <span
             className="h1"
-            style={{ color: 'var(--color-on-surface)' }}
+            style={{ color: 'var(--ds-icon)' }}
         >
             {value}
         </span>
@@ -60,13 +60,13 @@ const FieldRow = ({ label, value }) => (
     >
         <span
             className="body2-txt font-weight-semibold"
-            style={{ color: 'var(--color-on-surface)' }}
+            style={{ color: 'var(--ds-text)' }}
         >
             {label}
         </span>
         <span
             className="body2-txt"
-            style={{ color: 'var(--color-on-surface)' }}
+            style={{ color: 'var(--ds-text)' }}
         >
             {value}
         </span>
@@ -80,7 +80,7 @@ const FieldRow = ({ label, value }) => (
 const SessionDetailsCard = ({ session = 'Hogwarts', dateTime = 'Mon, Sep 15 at 3:30 PM - 4:20 PM' }) => (
     <div
         style={{
-            backgroundColor: 'var(--color-surface-variant)',
+            backgroundColor: 'var(--ds-background-neutral)',
             borderRadius: 'var(--size-card-radius-sm)',
             padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
             display: 'flex',

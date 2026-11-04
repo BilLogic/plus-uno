@@ -238,7 +238,7 @@ const TutorTrainingProgressPage = ({
                 {/* Training Progress Overview Section */}
                 <div className="tutor-training-progress-page__overview-section">
                     <div className="tutor-training-progress-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Training Progress Overview
                         </h2>
                         <ButtonGroup className="tutor-training-progress-page__toggle">
@@ -311,7 +311,7 @@ const TutorTrainingProgressPage = ({
                 {/* Training Progress Details Section */}
                 <div className="tutor-training-progress-page__details-section">
                     <div className="tutor-training-progress-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Training Progress Details
                         </h2>
                     </div>
@@ -331,7 +331,7 @@ const TutorTrainingProgressPage = ({
 
                     {/* Pagination Footer */}
                     <div className="tutor-training-progress-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination

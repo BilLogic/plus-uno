@@ -50,7 +50,7 @@ export const SessionInfo_PostSignUp = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -62,7 +62,7 @@ export const SessionInfo_PostSignUp = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -160,7 +160,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -172,7 +172,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -229,7 +229,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                                     padding: 'var(--size-element-pad-y-lg) 0',
                                     gap: 'var(--size-element-gap-sm)',
                                 }}>
-                                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>Ben Green</span>
+                                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>Ben Green</span>
                                     <StatusTag appearance="info">Lead</StatusTag>
                                 </div>
                                 {/* Other Tutors */}
@@ -238,7 +238,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                                         padding: 'var(--size-element-pad-y-lg) 0',
                                         gap: 'var(--size-element-gap-sm)',
                                     }}>
-                                        <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>Ben Green</span>
+                                        <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>Ben Green</span>
                                     </div>
                                 ))}
                             </div>
@@ -315,7 +315,7 @@ export const OneTimeSession_PreFillIn = () => (
         body={
             <div className="d-flex flex-column" style={{
                 gap: 'var(--size-modal-gap-lg)',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
                 padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                 borderRadius: 'var(--size-modal-radius-lg)'
             }}>
@@ -327,7 +327,7 @@ export const OneTimeSession_PreFillIn = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer'
                         }}
                     />
@@ -449,10 +449,10 @@ export const FillIn_ReviewChoices = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -467,10 +467,10 @@ export const FillIn_ReviewChoices = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>
@@ -486,7 +486,7 @@ export const FillIn_ReviewChoices = () => {
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount} (Leads: {leadCount})
                 </span>
                 {hasNoLead && (
@@ -520,7 +520,7 @@ export const FillIn_ReviewChoices = () => {
                     className="fa-solid fa-arrow-up"
                     style={{
                         fontSize: 'var(--font-size-fa-body1-solid)',
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-icon)',
                     }}
                 />
             </div>
@@ -566,7 +566,7 @@ export const FillIn_ReviewChoices = () => {
             body={
                 <div className="d-flex flex-column" style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)'
                 }}>
@@ -578,7 +578,7 @@ export const FillIn_ReviewChoices = () => {
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer'
                             }}
                         />
@@ -646,7 +646,7 @@ export const Unregister_PostSignUp = () => {
             body={
                 <div className="d-flex flex-column" style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)'
                 }}>
@@ -658,7 +658,7 @@ export const Unregister_PostSignUp = () => {
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer'
                             }}
                         />

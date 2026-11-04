@@ -41,7 +41,7 @@ $color-other: #807878;
     }
 
     &::-webkit-scrollbar-track {
-        background: var(--color-surface-container, #f5f5f5);
+        background: var(--ds-background-neutral);
         border-radius: 4px;
     }
 
@@ -59,7 +59,7 @@ $color-other: #807878;
     display: flex;
     flex-direction: column;
     gap: 16px; // Direct flat gaps between Header, Graph, Legend
-    background-color: var(--color-surface-container-lowest, white);
+    background-color: var(--ds-surface);
     border-radius: 8px;
     padding: var(--size-spacing-medium-space-500);
     width: 445px;
@@ -80,7 +80,7 @@ $color-other: #807878;
         font-size: 24px;
         font-weight: 600;
         line-height: 1.333;
-        color: var(--color-on-surface, #191c1e);
+        color: var(--ds-text);
         margin: 0;
         white-space: nowrap;
     }
@@ -132,7 +132,7 @@ $color-other: #807878;
             font-size: 12px;
             font-weight: 300;
             line-height: 1;
-            color: var(--color-on-surface, #191c1e);
+            color: var(--ds-text);
             display: flex;
             align-items: center;
             justify-content: flex-end;
@@ -165,7 +165,7 @@ $color-other: #807878;
         bottom: 0;
         left: 0;
         width: 1px;
-        background-color: var(--color-on-surface, #191c1e);
+        background-color: var(--ds-border-bold);
     }
 
     &__axis-x {
@@ -174,7 +174,7 @@ $color-other: #807878;
         right: 0;
         bottom: 0;
         height: 1px;
-        background-color: var(--color-on-surface, #191c1e);
+        background-color: var(--ds-border-bold);
     }
 
     // Columns container
@@ -251,7 +251,7 @@ $color-other: #807878;
         font-size: 12px;
         font-weight: 300;
         line-height: 1.667;
-        color: var(--color-on-background, #191c1e);
+        color: var(--ds-text);
         margin-top: 8px; // Reduced to match Figma visual gap better
         white-space: nowrap;
         text-align: center;
@@ -278,7 +278,7 @@ $color-other: #807878;
             font-size: 12px;
             font-weight: 300;
             line-height: 1.667;
-            color: var(--color-on-surface, #191c1e);
+            color: var(--ds-text);
             white-space: nowrap;
         }
     }
@@ -359,7 +359,7 @@ $color-other: #807878;
                 background-color: $color-neutral;
 
                 .stacked-bar-chart__bar-value {
-                    color: var(--color-on-surface, #191c1e);
+                    color: var(--ds-text);
                 }
             }
         }
@@ -423,7 +423,7 @@ $color-other: #807878;
                 background-color: $color-neutral;
 
                 .stacked-bar-chart__bar-value {
-                    color: var(--color-on-surface, #191c1e);
+                    color: var(--ds-text);
                 }
             }
         }

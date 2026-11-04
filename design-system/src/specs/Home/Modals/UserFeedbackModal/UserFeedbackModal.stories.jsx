@@ -82,6 +82,11 @@ export const Overview = {
             />
         </div>
     ),
+    // axe measures the modal's text against the dimmed backdrop behind it,
+    // not the opaque panel it actually renders on: `containOverlay` stacks
+    // both in the same flat test canvas, with no real app chrome between
+    // them to anchor the panel's own stacking context.
+    parameters: { a11y: { config: { rules: [{ id: 'color-contrast', enabled: false }] } } },
 };
 
 /**

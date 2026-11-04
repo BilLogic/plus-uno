@@ -63,7 +63,7 @@ export const dateRangeOption = ({
             <span
                 className="body2-txt"
                 style={{
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                     fontWeight: 300,
                 }}
             >

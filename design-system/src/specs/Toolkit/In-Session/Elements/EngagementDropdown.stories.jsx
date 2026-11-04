@@ -88,7 +88,7 @@ export const AllStates = () => (
         style={{ 
             padding: 'var(--size-section-gap-lg)', 
             gap: 'var(--size-section-gap-lg)', 
-            backgroundColor: 'var(--color-surface-variant)', 
+            backgroundColor: 'var(--ds-background-neutral)', 
             minHeight: '100vh' 
         }}
     >
@@ -154,7 +154,7 @@ export const Interactive = () => {
             style={{ 
                 padding: 'var(--size-section-gap-lg)', 
                 gap: 'var(--size-section-gap-lg)', 
-                backgroundColor: 'var(--color-surface-variant)', 
+                backgroundColor: 'var(--ds-background-neutral)', 
                 minHeight: '100vh' 
             }}
         >
@@ -167,7 +167,7 @@ export const Interactive = () => {
             <div 
                 className="d-flex flex-wrap gap-3 p-3" 
                 style={{ 
-                    backgroundColor: 'var(--color-surface-container-low)', 
+                    backgroundColor: 'var(--ds-surface-container)', 
                     borderRadius: 'var(--size-card-radius-sm)' 
                 }}
             >

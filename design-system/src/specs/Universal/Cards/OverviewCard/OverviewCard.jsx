@@ -179,7 +179,7 @@ const OverviewCard = ({
         const clamped = Math.max(0, Math.min(100, Number.isFinite(val) ? val : 0));
         return [
             { value: clamped, color: chartColor || 'var(--color-primary, #006b5e)', label: 'Value' },
-            { value: 100 - clamped, color: 'var(--color-surface-variant, #dde3ea)', label: 'Remaining' }
+            { value: 100 - clamped, color: 'var(--ds-background-neutral)', label: 'Remaining' }
         ];
     };
 

@@ -28,13 +28,13 @@ export const ModalScrim = ({ open, children }) => (
 /** Placeholder card shown inside a scrim when no modal matches the current args. */
 export const MissingModal = ({ children }) => (
     <div style={{
-        backgroundColor: 'var(--color-surface-container-high)',
+        backgroundColor: 'var(--ds-surface-container)',
         borderRadius: 'var(--size-modal-radius-lg)',
         padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
         width: '672px',
         textAlign: 'center',
     }}>
-        <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
+        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0 }}>
             {children}
         </p>
     </div>
@@ -52,14 +52,14 @@ export const MissingModal = ({ children }) => (
  */
 export const SectionTitle = ({ title, titleAs: Heading = 'h3' }) => (
     <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-sm)' }}>
-        <Heading className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
+        <Heading className="h4 font-weight-semibold" style={{ color: 'var(--ds-text)', margin: 0 }}>
             {title}
         </Heading>
         <i
             className="fa-solid fa-circle-info"
             style={{
                 fontSize: 'var(--font-size-fa-h6-solid)',
-                color: 'var(--color-on-surface-variant)',
+                color: 'var(--ds-icon-subtle)',
                 cursor: 'pointer'
             }}
         />
@@ -87,10 +87,10 @@ export const UpdateAlert = ({ title, description, onClose }) => (
                 gap: 'var(--size-element-gap-sm)'
             }}
         >
-            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="h6" style={{ color: 'var(--ds-text)' }}>
                 {title}
             </span>
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 {description}
             </span>
         </div>
@@ -110,7 +110,7 @@ export const UpdateAlert = ({ title, description, onClose }) => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--color-on-surface-variant)'
+                    color: 'var(--ds-icon-subtle)'
                 }}
             />
         </button>

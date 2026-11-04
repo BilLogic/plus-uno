@@ -44,7 +44,7 @@ const TabItem = ({ label, count, isSelected, onClick }) => (
             borderBottom: isSelected ? '2px solid var(--color-secondary)' : '2px solid transparent',
             borderRadius: 'var(--size-element-radius-md) var(--size-element-radius-md) 0 0',
             cursor: 'pointer',
-            color: isSelected ? 'var(--color-secondary-text)' : 'var(--color-on-surface-variant)',
+            color: isSelected ? 'var(--color-secondary-text)' : 'var(--ds-text-subtle)',
             whiteSpace: 'nowrap',
             minWidth: '120px'
         }}

@@ -375,7 +375,7 @@ const TutorModal = ({
                     {/* ADD: MULTIPLE TAB */}
                     {mode === 'add' && activeTab === 'multiple' && (
                         <div className="tutor-modal__multiple-tab">
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', textAlign: 'center', margin: '40px 0' }}>
+                            <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)', textAlign: 'center', margin: '40px 0' }}>
                                 Bulk upload functionality coming soon.
                             </p>
                         </div>

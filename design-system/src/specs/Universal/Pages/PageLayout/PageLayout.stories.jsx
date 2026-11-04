@@ -83,7 +83,7 @@ export const Overview = {
             }}
         >
             <h2 className="h3">Page Title</h2>
-            <p className="body2-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 This demonstrates the PageLayout component with TopBar, Sidebar, and content area.
                 The sidebar docks from 1024px; below that, hover the menu control to peek it and click to dock it.
             </p>
@@ -223,7 +223,7 @@ export const Interactive = {
         >
             <div style={{ padding: '24px' }}>
                 <PageHeader title="Page Title" />
-                <p className="body1-txt mt-3" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body1-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Use the MD / LG / XL toolbar above to simulate viewport width. The sidebar docks from
                     1024px; below that, hover the menu control to peek it over the page and click to dock it.
                 </p>
@@ -239,7 +239,7 @@ export const Interactive = {
                     {Array(4).fill(0).map((_, i) => (
                         <PatternCard key={i} className="p-3">
                             <h2 className="h5">Card {i + 1}</h2>
-                            <p className="body3-txt mt-2" style={{ color: 'var(--color-on-surface-variant)' }}>
+                            <p className="body3-txt mt-2" style={{ color: 'var(--ds-text-subtle)' }}>
                                 Content
                             </p>
                         </PatternCard>

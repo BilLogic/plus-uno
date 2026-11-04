@@ -103,8 +103,8 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
         <div
             style={{
                 width: '100%',
-                backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
-                border: '1px solid var(--color-surface-container-low, #f3f3f6)',
+                backgroundColor: 'var(--ds-background-neutral)',
+                border: '1px solid var(--ds-border)',
                 borderRadius: 'var(--size-section-radius-md, 12px)',
                 padding: 'var(--size-section-pad-y-md, 24px) var(--size-section-pad-x-md, 24px)',
                 display: 'flex',
@@ -133,7 +133,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     <span
                         className="h6"
                         style={{
-                            color: 'var(--color-on-surface)',
+                            color: 'var(--ds-text)',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -172,7 +172,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                 <span
                     className="body3-txt font-weight-light"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                     }}
                 >
                     This information determines your eligibility to tutor with PLUS.

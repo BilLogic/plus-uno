@@ -44,7 +44,7 @@
                 border: none;
                 vertical-align: middle;
                 font-weight: var(--font-weight-normal);
-                color: var(--color-on-surface);
+                color: var(--ds-text);
                 background-color: transparent;
             }
         }
@@ -86,7 +86,7 @@
         gap: var(--table-cell-gap, 10px);
 
         span {
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             white-space: nowrap;
         }
     }

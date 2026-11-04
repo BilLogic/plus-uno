@@ -99,7 +99,7 @@
 
 .plus-training-progress-bar-bg {
     position: absolute;
-    background-color: var(--color-surface-container-lowest);
+    background-color: var(--ds-surface);
     border-radius: 16px;
     bottom: 0;
 }
@@ -138,6 +138,6 @@
     border-radius: 16px;
     flex-shrink: 0;
 }.plus-training-progress-breakdown-item span {
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     text-transform: uppercase;
 }

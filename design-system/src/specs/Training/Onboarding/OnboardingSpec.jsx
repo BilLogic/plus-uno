@@ -69,7 +69,7 @@ export const OnboardingSpec = () => {
                             <PatternCard
                                 key={idx}
                                 title={mod.title}
-                                style={{ minWidth: '300px', backgroundColor: 'var(--color-surface-container-low)' }}
+                                style={{ minWidth: '300px', backgroundColor: 'var(--ds-surface-container)' }}
                             >
                                 <div className="body2-txt text-muted mb-2">{mod.duration}</div>
                                 <Button text="Start Module" className="w-100" />

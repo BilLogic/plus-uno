@@ -11,7 +11,7 @@ import { LoginForm } from '@/specs/Login/Sections';
 const LoginPage = () => {
     return (
         <div className="login-page" style={{
-            backgroundColor: 'var(--color-surface-container-low)',
+            backgroundColor: 'var(--ds-surface-container)',
             minHeight: '100vh',
             display: 'flex',
             alignItems: 'center',

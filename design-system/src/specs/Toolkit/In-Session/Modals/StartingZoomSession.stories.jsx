@@ -27,21 +27,21 @@ export const StartingZoomSession = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-sm)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm)',
                     borderRadius: 'var(--size-modal-radius-md)',
                 }}
             >
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <span className="h5" style={{ margin: 0, color: 'var(--color-on-surface)', whiteSpace: 'nowrap' }}>
+                    <span className="h5" style={{ margin: 0, color: 'var(--ds-text)', whiteSpace: 'nowrap' }}>
                         Ready to Start Zoom Session?
                     </span>
                     <i
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h3-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer',
                         }}
                     />
@@ -58,7 +58,7 @@ export const StartingZoomSession = () => (
                 />
 
                 {/* Body */}
-                <span className="body3-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body3-txt" style={{ color: 'var(--ds-text)' }}>
                     Click below to launch Zoom and connect with your student.
                 </span>
 

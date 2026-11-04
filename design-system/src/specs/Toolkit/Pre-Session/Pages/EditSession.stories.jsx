@@ -102,7 +102,7 @@ const MainContent = ({
 
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Sessions</h2>
             <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
                 <Button iconBefore="plus">
                     Create New Sessions
@@ -127,7 +127,7 @@ const MainContent = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-sm)' }}>
             {/* Table Header with Title and Filters */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 className="h4 font-weight-semibold" style={{ color: 'var(--color-on-surface)', margin: 0 }}>My Sessions</h3>
+                <h3 className="h4 font-weight-semibold" style={{ color: 'var(--ds-text)', margin: 0 }}>My Sessions</h3>
                 <div style={{ display: 'flex', gap: 'var(--size-element-gap-sm)' }}>
                     <SiteFilter />
                     <TimeframeFilter />

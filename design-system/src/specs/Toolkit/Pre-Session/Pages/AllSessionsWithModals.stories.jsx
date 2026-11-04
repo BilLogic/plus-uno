@@ -64,7 +64,7 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
     >
         {/* Page Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 className="h4" style={{ color: 'var(--color-on-surface)', margin: 0 }}>Your Sessions</h2>
+            <h2 className="h4" style={{ color: 'var(--ds-text)', margin: 0 }}>Your Sessions</h2>
             <Button appearance="primary" iconBefore="calendar-plus" text="Fill in" />
         </div>
 
@@ -190,12 +190,12 @@ export const WithModals = (args) => {
                 flexDirection: 'column',
                 gap: 'var(--size-element-gap-md)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
             }}>
                 {/* Breakpoint Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '120px' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Breakpoint:
                     </span>
                     {Object.entries(breakpointWidths).map(([bp, width]) => (
@@ -211,7 +211,7 @@ export const WithModals = (args) => {
 
                 {/* Session Type Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '120px' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Session Type:
                     </span>
                     {sessionTypes.map(type => (
@@ -227,7 +227,7 @@ export const WithModals = (args) => {
 
                 {/* Tab Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '120px' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Tab:
                     </span>
                     {tabOptions.map(t => (
@@ -243,7 +243,7 @@ export const WithModals = (args) => {
 
                 {/* Session Status Toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-gap-md)', flexWrap: 'wrap' }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600, minWidth: '120px' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600, minWidth: '120px' }}>
                         Session Status:
                     </span>
                     {statusOptions.map(status => (
@@ -264,7 +264,7 @@ export const WithModals = (args) => {
                     padding: 'var(--size-element-pad-y-md) 0',
                     borderTop: '1px solid var(--color-outline-variant)',
                 }}>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Showing: <strong>{sessionType} / {tab} / {sessionStatus}</strong>
                     </span>
                     {!ModalComponent && (

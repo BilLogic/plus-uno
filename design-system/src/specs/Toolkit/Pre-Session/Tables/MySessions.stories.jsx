@@ -82,10 +82,10 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -103,10 +103,10 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>

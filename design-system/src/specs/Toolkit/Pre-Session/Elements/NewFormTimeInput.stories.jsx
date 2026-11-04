@@ -95,7 +95,7 @@ const SessionTimeInput = ({
                 <span
                     className="body2-txt"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         fontWeight: 300,
                         lineHeight: 1.571,
                         width: 9,

@@ -33,7 +33,7 @@ const UpdateProfileToast = ({ show = true, onClose = () => {} }) => {
                 dismissible={true}
                 autohide={false}
             >
-                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     You're almost set!{' '}
                     <a
                         href="#"
@@ -81,7 +81,7 @@ export const Variants = () => (
             <UpdateProfileToast show onClose={() => {}} />
         </div>
         <div style={{ position: 'relative', minHeight: '120px' }}>
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
+            <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0 }}>
                 Hidden — use Interactive playground to toggle <code>show</code>.
             </p>
         </div>
@@ -107,7 +107,7 @@ export const Interactive = {
             {args.show ? (
                 <UpdateProfileToast show onClose={() => {}} />
             ) : (
-                <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>
+                <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', margin: 0 }}>
                     Hidden — set show to true in controls.
                 </p>
             )}

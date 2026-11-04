@@ -145,7 +145,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     width: '100%',
                 }}
             >
-                <h2 className="h3" style={{ color: 'var(--color-on-surface)', margin: 0 }}>
+                <h2 className="h3" style={{ color: 'var(--ds-text)', margin: 0 }}>
                     Tutor Profile
                 </h2>
 
@@ -156,8 +156,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                 <div
                     style={{
                         width: '100%',
-                        backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
-                        border: '1px solid var(--color-surface-container-low, #f3f3f6)',
+                        backgroundColor: 'var(--ds-surface-container)',
+                        border: '1px solid var(--ds-border)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
                         padding: 'var(--size-section-pad-y-md, 24px) var(--size-section-pad-x-md, 24px)',
                         display: 'flex',
@@ -166,7 +166,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                     }}
                 >
                     <div style={{ display: 'flex', alignItems: 'center', height: '24px', width: '100%' }}>
-                        <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="h6" style={{ color: 'var(--ds-text)' }}>
                             Basic Information
                         </span>
                     </div>
@@ -335,8 +335,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                 <div
                     style={{
                         width: '100%',
-                        backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
-                        border: '1px solid var(--color-surface-container-low, #f3f3f6)',
+                        backgroundColor: 'var(--ds-surface-container)',
+                        border: '1px solid var(--ds-border)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
                         padding: 'var(--size-section-pad-y-md, 24px) var(--size-section-pad-x-md, 24px)',
                         display: 'flex',
@@ -346,7 +346,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs, 4px)', width: '100%' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-pad-y-sm, 4px)', width: '100%' }}>
-                            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+                            <span className="h6" style={{ color: 'var(--ds-text)' }}>
                                 Status &amp; Clearance
                             </span>
                             <Tooltip text={<InfoTooltipContent />} placement="right" id="tooltip-status-interactive">
@@ -364,7 +364,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 </span>
                             </Tooltip>
                         </div>
-                        <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             This information determines your eligibility to tutor with PLUS.
                         </span>
                     </div>
@@ -414,8 +414,8 @@ function TutorProfileInteractiveDemo({ profileState }) {
                 <div
                     style={{
                         width: '100%',
-                        backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
-                        border: '1px solid var(--color-surface-container-low, #f3f3f6)',
+                        backgroundColor: 'var(--ds-surface-container)',
+                        border: '1px solid var(--ds-border)',
                         borderRadius: 'var(--size-section-radius-md, 12px)',
                         padding: 'var(--size-section-pad-y-md, 24px) var(--size-section-pad-x-md, 24px)',
                         display: 'flex',
@@ -425,7 +425,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-xs, 4px)', width: '100%' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--size-element-pad-y-sm, 4px)', width: '100%' }}>
-                            <span className="h6" style={{ color: 'var(--color-on-surface)' }}>
+                            <span className="h6" style={{ color: 'var(--ds-text)' }}>
                                 Background &amp; Matching
                             </span>
                             <Tooltip text={<InfoTooltipContent />} placement="right" id="tooltip-bg-interactive">
@@ -443,7 +443,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 </span>
                             </Tooltip>
                         </div>
-                        <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             This information helps us match tutors with students .
                         </span>
                     </div>

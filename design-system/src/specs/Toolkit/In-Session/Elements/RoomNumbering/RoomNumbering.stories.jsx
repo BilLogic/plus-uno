@@ -41,7 +41,7 @@ const ROSTER = () => [
 /** A single student row with its room-number chip. */
 const StudentRow = ({ s }) => (
     <div className="d-flex align-items-center justify-content-between" style={{ gap: 'var(--size-element-gap-md)', padding: '4px 0' }}>
-        <span className="body3-txt" style={{ color: s.absent ? 'var(--color-on-surface-variant)' : 'var(--color-on-surface)', textDecoration: s.absent ? 'line-through' : 'none' }}>
+        <span className="body3-txt" style={{ color: s.absent ? 'var(--ds-text-subtle)' : 'var(--ds-text)', textDecoration: s.absent ? 'line-through' : 'none' }}>
             {s.name}{s.absent ? ' (absent)' : ''}
         </span>
         {s.room != null && (
@@ -59,12 +59,12 @@ const TutorColumn = ({ state, tutorId }) => {
             flex: '1 1 0', minWidth: 150,
             border: '1px solid var(--color-outline-variant)',
             borderRadius: 'var(--size-card-radius-sm)',
-            background: 'var(--color-surface-container-lowest)',
+            background: 'var(--ds-surface)',
             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
         }}>
             <div className="d-flex align-items-center justify-content-between" style={{ marginBottom: 8 }}>
                 <span className="body2-txt" style={{ fontWeight: 600 }}>{tutor.name}</span>
-                <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     {block ? `rooms ${block.start}–${block.end}` : 'inherited'}
                 </span>
             </div>
@@ -103,7 +103,7 @@ export const Interactive = () => {
             <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-md)' }}>
                 <span className="body2-txt" style={{ fontWeight: 600 }}>Room count</span>
                 <StatusTag appearance={'neutral'} leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={assigned ? "Rooms to create in Zoom (includes each tutor's buffer)" : 'Assign students to tutors to size breakout rooms'}>{assigned ? String(roomCount) : '—'}</StatusTag>
-                <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <span className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
                     {assigned ? `frozen · buffer ${state.buffer}/tutor` : 'waiting — lead has not run assignment'}
                     {outOfRangeCount > 0 ? ` · ${outOfRangeCount} out-of-range` : ''}
                 </span>

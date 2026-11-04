@@ -188,7 +188,7 @@ const StudentAdminPage = ({
                 {/* Student Overview Section */}
                 <div className="student-admin-page__overview-section">
                     <div className="student-admin-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Student Overview
                         </h2>
                         <div className="student-admin-page__filters">
@@ -215,7 +215,7 @@ const StudentAdminPage = ({
                 {/* Student Details Section */}
                 <div className="student-admin-page__details-section">
                     <div className="student-admin-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Student Details
                         </h2>
                         <Button
@@ -235,7 +235,7 @@ const StudentAdminPage = ({
 
                     {/* Pagination Footer */}
                     <div className="student-admin-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination

@@ -47,7 +47,7 @@ export const TimeframeFilter = ({ value, defaultValue = 'this_week', onChange, o
             {isCustom && (
                 <>
                     <DatePicker spacing="compact" aria-label="From date" />
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>to</span>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>to</span>
                     <DatePicker spacing="compact" aria-label="To date" />
                 </>
             )}
@@ -86,8 +86,8 @@ export const Interactive = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
             <TimeframeFilter value={timeframe} onChange={setTimeframe} />
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {timeframe}
                 </strong>
             </p>

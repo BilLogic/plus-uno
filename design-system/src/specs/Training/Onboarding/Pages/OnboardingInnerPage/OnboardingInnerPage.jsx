@@ -124,7 +124,7 @@ const OnboardingInnerPage = ({
                         />
                     ) : (
                         <div className="onboarding-inner-page__iframe-placeholder">
-                            <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                            <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                 Module content will be embedded here (Google Sites iframe)
                             </p>
                         </div>

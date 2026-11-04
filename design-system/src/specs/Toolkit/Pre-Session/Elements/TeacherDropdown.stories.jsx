@@ -55,7 +55,7 @@ const teacherOptions = [
  */
 const TeacherLabel = () => (
     <div style={{ display: 'flex', gap: 'var(--size-ele-gap-xs, 4px)' }}>
-        <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+        <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
             Teacher
         </span>
         <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
@@ -96,7 +96,7 @@ export const Overview = () => (
             flexDirection: 'column',
             gap: 'var(--size-section-gap-lg)',
             padding: 'var(--size-section-gap-lg)',
-            backgroundColor: 'var(--color-surface-variant)',
+            backgroundColor: 'var(--ds-background-neutral)',
             minHeight: '100vh',
         }}
     >
@@ -187,7 +187,7 @@ export const Interactive = () => {
                 flexDirection: 'column',
                 gap: 'var(--size-section-gap-lg)',
                 padding: 'var(--size-section-gap-lg)',
-                backgroundColor: 'var(--color-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 minHeight: '100vh',
             }}
         >

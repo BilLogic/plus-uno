@@ -103,7 +103,7 @@ const TrainingProgressCard = ({
     ].filter(Boolean).join(' ');
 
     const cardStyle = {
-        backgroundImage: `linear-gradient(90deg, var(--ds-background-smart-social-emotional) 0%, var(--ds-background-smart-social-emotional) 100%), linear-gradient(90deg, var(--color-surface-bright) 0%, var(--color-surface-bright) 100%)`,
+        backgroundImage: `linear-gradient(90deg, var(--ds-background-smart-social-emotional) 0%, var(--ds-background-smart-social-emotional) 100%), linear-gradient(90deg, var(--ds-surface-raised) 0%, var(--ds-surface-raised) 100%)`,
         ...style
     };
 

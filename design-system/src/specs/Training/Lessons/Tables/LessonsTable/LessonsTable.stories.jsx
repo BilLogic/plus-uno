@@ -84,7 +84,7 @@ export const Overview = {
         ];
 
         return (
-            <div style={{ padding: '32px', backgroundColor: 'var(--color-surface)' }}>
+            <div style={{ padding: '32px', backgroundColor: 'var(--ds-surface)' }}>
                 <h3 className="h3" style={{ marginBottom: '24px' }}>Lesson List Item States</h3>
 
                 {sections.map((section, index) => (

@@ -12,7 +12,7 @@
         border: none;
         border-radius: var(--size-modal-radius, 6px);
         box-shadow: var(--shadow-modal, 0 4px 24px rgba(0, 0, 0, 0.12));
-        background-color: var(--color-surface-container, #edeef0);
+        background-color: var(--ds-surface-overlay);
     }
 
     &__container {
@@ -30,7 +30,7 @@
         font-size: 24px; // 24px per design
         font-weight: 600;
         line-height: 1.333;
-        color: var(--color-on-surface, #191c1e);
+        color: var(--ds-text);
         margin: 0;
         width: 100%;
         text-align: left;
@@ -41,7 +41,7 @@
         font-size: 16px;
         font-weight: 300; // Light
         line-height: 1.5;
-        color: var(--color-on-surface, #000000);
+        color: var(--ds-text);
         margin: 0;
         width: 100%;
         text-align: left;

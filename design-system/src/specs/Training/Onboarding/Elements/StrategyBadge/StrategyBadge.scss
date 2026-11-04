@@ -15,7 +15,7 @@
     i {
         font-size: 12px;
         line-height: 1.833;
-        color: var(--color-on-surface-variant, #6B6B6B);
+        color: var(--ds-text-subtle);
     }
 
     &__label {
@@ -23,7 +23,7 @@
         font-size: var(--font-size-body3, 12px);
         font-weight: var(--font-weight-normal, 400);
         line-height: 1.667;
-        color: var(--color-on-surface-variant, #6B6B6B);
+        color: var(--ds-text-subtle);
         white-space: nowrap;
     }
 }

@@ -36,7 +36,7 @@ export const SessionTimeChange_OneTime = () => (
             dismissible={true}
             onDismiss={() => { }}
         >
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 The start time for one of your sessions on <span className="font-weight-bold">Tues, Oct 28</span> has been moved to <span className="font-weight-bold">2:00 PM</span>.
             </span>
         </SectionMessage>
@@ -54,7 +54,7 @@ export const SessionTimeChange_Recurring = () => (
             dismissible={true}
             onDismiss={() => { }}
         >
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 The start time for your recurring session starting on <span className="font-weight-bold">Tues, Oct 28</span> has been moved to <span className="font-weight-bold">2:00 PM</span>.
             </span>
         </SectionMessage>
@@ -72,7 +72,7 @@ export const SessionCanceled = () => (
             dismissible={true}
             onDismiss={() => { }}
         >
-            <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                 Your session on <span className="font-weight-bold">Tues, Oct 28</span> at <span className="font-weight-bold">2:00 PM</span> has been canceled.
             </span>
         </SectionMessage>

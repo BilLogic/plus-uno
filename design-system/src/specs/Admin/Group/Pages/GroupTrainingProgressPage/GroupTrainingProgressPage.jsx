@@ -119,7 +119,7 @@ const GroupTrainingProgressPage = ({
                 <div className="group-training-progress-page__inner">
                     {/* Title Section */}
                     <div className="group-training-progress-page__title-section">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Group Training Progress
                         </h2>
                         {/* One group at a time, or all: a single Select. */}

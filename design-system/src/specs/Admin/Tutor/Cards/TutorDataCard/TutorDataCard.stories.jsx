@@ -66,7 +66,7 @@ Node ID: 258-262197
  */
 export const Overview = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--ds-surface)' }}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>Tutor Data Card</h6>
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                 <TutorDataCard
@@ -93,7 +93,7 @@ export const Overview = {
  */
 export const Interactive = {
     render: (args) => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg)', backgroundColor: 'var(--ds-surface)' }}>
             <h6 className="h6" style={{ marginBottom: 'var(--size-section-gap-sm, 16px)' }}>
                 Tutor Data Card - Interactive
             </h6>

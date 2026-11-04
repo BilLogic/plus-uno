@@ -39,7 +39,7 @@ const TimeCardWithChange = () => (
                 className="fa-regular fa-clock"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     lineHeight: 'var(--font-line-height-fa-h4-solid)',
                 }}
             />
@@ -52,14 +52,14 @@ const TimeCardWithChange = () => (
         >
             <span
                 className="body2-txt font-weight-semibold"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 Time
             </span>
             <span
                 className="body2-txt font-weight-light"
                 style={{
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                     textDecoration: 'line-through',
                 }}
             >
@@ -82,7 +82,7 @@ const SessionDetailsRecurringSessionModalBody = () => (
         className="d-flex flex-column"
         style={{
             gap: 'var(--size-modal-gap-lg)',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
             padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
             borderRadius: 'var(--size-modal-radius-lg)',
         }}
@@ -94,7 +94,7 @@ const SessionDetailsRecurringSessionModalBody = () => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />

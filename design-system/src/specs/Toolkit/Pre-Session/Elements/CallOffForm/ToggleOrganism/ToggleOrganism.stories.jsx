@@ -42,8 +42,8 @@ const CallOffFormOrganism = ({
         <div style={{ maxWidth: '531px', fontFamily: 'var(--font-family-body)' }}>
             <div className="d-flex justify-content-between align-items-center" style={{ marginBottom: 'var(--size-section-gap-sm)' }}>
                 <div className="d-flex flex-column" style={{ gap: '2px', flex: 1, minWidth: 0 }}>
-                    <strong className="d-block body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>Call off entire recurring session</strong>
-                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>This will call you off from all future sessions in this recurring session</span>
+                    <strong className="d-block body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>Call off entire recurring session</strong>
+                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>This will call you off from all future sessions in this recurring session</span>
                 </div>
                 {/*
                   * The heading to the left is the switch's visible text, but it

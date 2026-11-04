@@ -25,7 +25,7 @@ const ModalHeader = () => (
         style={{ gap: 'var(--size-spacing-small-space-050)' }}
     >
         <div className="d-flex justify-content-between align-items-center">
-            <span className="h4" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+            <span className="h4" style={{ margin: 0, color: 'var(--ds-text)' }}>
                 Track Attendance
             </span>
             <i
@@ -33,12 +33,12 @@ const ModalHeader = () => (
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
                     lineHeight: 'var(--font-line-height-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />
         </div>
-        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <span className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
             Mark which tutors and students are present for today's session.
         </span>
     </div>
@@ -70,7 +70,7 @@ const AttendeeRow = ({ name, initialStatus = 'unknown' }) => (
             className="body2-txt font-weight-light"
             style={{
                 flex: 1,
-                color: 'var(--color-on-surface)',
+                color: 'var(--ds-text)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
             }}
@@ -98,7 +98,7 @@ export const AttendanceLoadingLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -139,7 +139,7 @@ export const AttendanceLoadingLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Tutor Roster</span>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>Tutor Roster</span>
                                 <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
                             </div>
                         </div>
@@ -156,22 +156,22 @@ export const AttendanceLoadingLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>Student Roster</span>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>Student Roster</span>
                                 <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
                             </div>
                         </div>
 
                         {/* Loading Animation */}
                         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '52px', height: '52px' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
                         </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)', borderBottom: 'var(--size-element-border) solid var(--color-surface-container-highest)' }}>
+                <div className="d-flex align-items-center justify-content-end" style={{ gap: 'var(--size-modal-gap-sm)', borderBottom: 'var(--size-element-border) solid var(--ds-border)' }}>
                     <Button text="Close" onClick={() => {}} />
                     <Button text="Update Attendance" appearance="primary" onClick={() => {}} />
                 </div>
@@ -198,7 +198,7 @@ export const AttendanceInitialLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -237,7 +237,7 @@ export const AttendanceInitialLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>
                                     Tutor Roster
                                 </span>
                                 <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
@@ -264,7 +264,7 @@ export const AttendanceInitialLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>
                                     Student Roster
                                 </span>
                                 <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
@@ -309,7 +309,7 @@ export const AttendanceLoadedLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -348,7 +348,7 @@ export const AttendanceLoadedLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>
                                     Tutor Roster
                                 </span>
                                 <Button text="Add tutor" spacing="compact" iconBefore="user-plus" />
@@ -375,7 +375,7 @@ export const AttendanceLoadedLead = () => (
                             }}
                         >
                             <div className="d-flex align-items-center" style={{ gap: 'var(--size-spacing-small-space-150)' }}>
-                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--color-on-surface)' }}>
+                                <span className="h6" style={{ flex: 1, margin: 0, color: 'var(--ds-text)' }}>
                                     Student Roster
                                 </span>
                                 <Button text="Add Student" spacing="compact" iconBefore="user-plus" />
@@ -409,7 +409,7 @@ const AssignmentModalHeader = () => (
         style={{ gap: 'var(--size-element-gap-xs)' }}
     >
         <div className="d-flex justify-content-between align-items-center">
-            <span className="h4" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+            <span className="h4" style={{ margin: 0, color: 'var(--ds-text)' }}>
                 Manage Assignment
             </span>
             <i
@@ -417,12 +417,12 @@ const AssignmentModalHeader = () => (
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
                     lineHeight: 'var(--font-line-height-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />
         </div>
-        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <span className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
             Review and adjust how students are paired with tutors for optimal learning.
         </span>
     </div>
@@ -457,7 +457,7 @@ export const AssignmentLoadingLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -488,9 +488,9 @@ export const AssignmentLoadingLead = () => (
                     >
                         {/* Loading Animation */}
                         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '52px', height: '52px' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
                         </div>
 
                         {/* Scrollbar */}
@@ -501,7 +501,7 @@ export const AssignmentLoadingLead = () => (
                                 top: 0,
                                 right: '4px',
                                 bottom: 0,
-                                backgroundColor: 'var(--color-surface-container-highest)',
+                                backgroundColor: 'var(--ds-surface-container)',
                             }}
                         >
                             <div className="d-flex align-items-center justify-content-center" style={{ flexShrink: 0 }}>
@@ -538,7 +538,7 @@ const AssignmentStudentRow = ({ name }) => (
     >
         <span
             className="body2-txt font-weight-light"
-            style={{ flex: 1, color: 'var(--color-on-surface)', overflow: 'hidden', textOverflow: 'ellipsis' }}
+            style={{ flex: 1, color: 'var(--ds-text)', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
             {name}
         </span>
@@ -568,7 +568,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
         >
             <span
                 className="body2-txt font-weight-semibold"
-                style={{ flex: 1, color: 'var(--color-on-surface)', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{ flex: 1, color: 'var(--ds-text)', overflow: 'hidden', textOverflow: 'ellipsis' }}
             >
                 {tutorName}
             </span>
@@ -599,7 +599,7 @@ export const AssignmentLoadedLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -663,7 +663,7 @@ export const AssignmentLoadedLead = () => (
 
 const SessionInfoModalHeader = () => (
     <div className="d-flex justify-content-between align-items-center">
-        <span className="h4" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+        <span className="h4" style={{ margin: 0, color: 'var(--ds-text)' }}>
             Lincoln High School - 8/14/2025
         </span>
         <i
@@ -671,7 +671,7 @@ const SessionInfoModalHeader = () => (
             style={{
                 fontSize: 'var(--font-size-fa-h4-solid)',
                 lineHeight: 'var(--font-line-height-fa-h4-solid)',
-                color: 'var(--color-on-surface-variant)',
+                color: 'var(--ds-icon-subtle)',
                 cursor: 'pointer',
             }}
         />
@@ -708,7 +708,7 @@ export const SessionInfoLoadingLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -739,9 +739,9 @@ export const SessionInfoLoadingLead = () => (
                     >
                         {/* Loading Animation */}
                         <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '52px', height: '52px' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
-                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--color-on-surface-variant)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: '53.85%', bottom: '53.85%', backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: 0, right: '53.85%', bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
+                            <div style={{ position: 'absolute', top: '53.85%', left: '53.85%', right: 0, bottom: 0, backgroundColor: 'var(--ds-background-neutral)', borderRadius: '1px' }} />
                         </div>
                     </div>
                 </div>
@@ -773,7 +773,7 @@ export const SessionInfoLoadedLead = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -875,7 +875,7 @@ export const SessionInfoLoadedRegular = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
@@ -963,7 +963,7 @@ const RegularAttendeeTabButtonGroup = () => (
 
 const RosterHeader = ({ title, count, showInfo = false }) => (
     <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-sm)' }}>
-        <span className="h6" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+        <span className="h6" style={{ margin: 0, color: 'var(--ds-text)' }}>
             {title}
         </span>
         {showInfo && (
@@ -972,7 +972,7 @@ const RosterHeader = ({ title, count, showInfo = false }) => (
                 style={{
                     fontSize: 'var(--font-size-fa-body3-solid)',
                     lineHeight: 'var(--font-line-height-fa-body3-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                 }}
             />
         )}
@@ -992,7 +992,7 @@ export const AttendanceLoadedRegular = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     border: 'var(--size-element-border) solid var(--color-outline-variant)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',

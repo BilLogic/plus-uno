@@ -12,7 +12,7 @@ export default {
 
 export const SupervisorSignUpMgmtButton = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-lg)' }}>
-        <p className="plus-body-2" style={{ color: 'var(--color-on-surface)' }}>
+        <p className="plus-body-2" style={{ color: 'var(--ds-text)' }}>
             Overview of Supervisor Sign-Up MGMT buttons (Icon only).
         </p>
 

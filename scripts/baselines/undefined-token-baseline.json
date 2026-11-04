@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 65,
-    "uses": 215,
+    "names": 60,
+    "uses": 210,
     "bare": 5
   },
   "tokens": {
@@ -28,27 +28,7 @@
       "uses": 2,
       "bare": 0
     },
-    "--color-error-container": {
-      "uses": 1,
-      "bare": 0
-    },
     "--color-neutral-text": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-on-background": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-on-surface-variant-2": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-on-surface-variant-3": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--color-on-surface-variant-light": {
       "uses": 1,
       "bare": 0
     },

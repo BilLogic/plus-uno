@@ -168,7 +168,7 @@ const TutorStatusWarningsPage = ({
                 {/* Status Overview Section */}
                 <div className="tutor-status-warnings-page__overview-section">
                     <div className="tutor-status-warnings-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Status Overview
                         </h2>
                         <AdminDateRangeFilter
@@ -252,7 +252,7 @@ const TutorStatusWarningsPage = ({
                 {/* Status Details Section */}
                 <div className="tutor-status-warnings-page__details-section">
                     <div className="tutor-status-warnings-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Status Details
                         </h2>
                         <Button
@@ -271,7 +271,7 @@ const TutorStatusWarningsPage = ({
 
                     {/* Pagination Footer */}
                     <div className="tutor-status-warnings-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination

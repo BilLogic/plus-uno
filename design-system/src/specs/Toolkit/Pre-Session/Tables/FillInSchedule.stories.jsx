@@ -111,10 +111,10 @@ export const TableRow = ({
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {date}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {timeRange}
                 </span>
             </div>
@@ -131,10 +131,10 @@ export const TableRow = ({
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {teacher}
                 </span>
             </div>
@@ -150,7 +150,7 @@ export const TableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
                     {tutorCount} (Leads: {leadCount})
                 </span>
                 {hasNoLead && (
@@ -201,7 +201,7 @@ export const TableHeaderRow = () => (
                 className="fa-solid fa-arrow-up"
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
-                    color: 'var(--color-on-surface)'
+                    color: 'var(--ds-icon)'
                 }}
             />
         </div>

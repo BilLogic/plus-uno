@@ -47,7 +47,7 @@
 
     // Featured Modules Carousel
     &__carousel-container {
-        background-color: var(--color-surface-container-low);
+        background-color: var(--ds-surface-container);
         border-radius: var(--size-section-radius-sm, 8px);
         display: flex;
         flex-direction: column;
@@ -77,7 +77,7 @@
         }
 
         &::-webkit-scrollbar-track {
-            background: var(--color-surface-variant, #dde3ea);
+            background: var(--ds-background-neutral);
             border-radius: 3px;
         }
 
@@ -86,7 +86,7 @@
             border-radius: 3px;
 
             &:hover {
-                background: var(--color-on-surface-variant, #3f484a);
+                background: var(--ds-background-neutral);
             }
         }
     }

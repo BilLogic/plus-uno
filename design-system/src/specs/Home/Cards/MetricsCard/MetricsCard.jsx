@@ -44,7 +44,7 @@ const MetricsCard = ({
                                 cy="90"
                                 r="80"
                                 fill="none"
-                                stroke="var(--color-surface-container)"
+                                stroke="var(--ds-background-neutral)"
                                 strokeWidth="12"
                             />
                             <circle

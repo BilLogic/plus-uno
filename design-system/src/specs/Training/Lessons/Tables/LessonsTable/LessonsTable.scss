@@ -101,7 +101,7 @@
                 border: none; // Remove default Bootstrap borders
                 border-top: none;
                 vertical-align: middle;
-                color: var(--color-on-surface);
+                color: var(--ds-text);
             }
         }
 
@@ -118,7 +118,7 @@
                         padding: 0;
                         margin-right: 8px;
                         cursor: pointer;
-                        color: var(--color-on-surface-variant);
+                        color: var(--ds-text-subtle);
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -133,7 +133,7 @@
                     }
 
                     .lesson-title {
-                        color: var(--color-on-surface);
+                        color: var(--ds-text);
                     }
                 }
             }
@@ -178,7 +178,7 @@
     }
 
     &--default {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
     }
 
     &--success {

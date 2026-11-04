@@ -65,7 +65,7 @@
 
     // Iframe Section
     &__iframe-section {
-        background-color: var(--color-surface-container-low);
+        background-color: var(--ds-surface-container);
         border-radius: 12px 12px var(--size-element-gap-md, 8px) var(--size-element-gap-md, 8px);
         display: flex;
         flex-direction: column;
@@ -90,7 +90,7 @@
         justify-content: center;
         width: 100%;
         height: 300px;
-        background-color: var(--color-surface-container);
+        background-color: var(--ds-surface-container);
         border-radius: var(--size-element-radius-sm, 4px);
         border: 1px dashed var(--color-outline-variant);
     }

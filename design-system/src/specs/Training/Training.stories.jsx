@@ -38,7 +38,7 @@ export const Overview = () => (
             {/* Lessons */}
             <section style={{
                 padding: '24px',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
@@ -53,27 +53,27 @@ export const Overview = () => (
                         View in Figma →
                     </a>
                 </h2>
-                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                     Training lessons module with overview and detail pages.
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     <div style={{ 
                         padding: '16px', 
-                        backgroundColor: 'var(--color-surface)', 
+                        backgroundColor: 'var(--ds-surface)', 
                         borderRadius: 'var(--size-element-radius-md, 8px)' 
                     }}>
                         <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsOverviewPage</h3>
-                        <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                        <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                             Main lessons list with progress tracking, status filters, and navigation.
                         </p>
                     </div>
                     <div style={{ 
                         padding: '16px', 
-                        backgroundColor: 'var(--color-surface)', 
+                        backgroundColor: 'var(--ds-surface)', 
                         borderRadius: 'var(--size-element-radius-md, 8px)' 
                     }}>
                         <h3 className="h6" style={{ marginBottom: '8px' }}>LessonsDetailPage (5 variants)</h3>
-                        <p className="body3-txt" style={{ marginBottom: '8px', color: 'var(--color-on-surface-variant)' }}>
+                        <p className="body3-txt" style={{ marginBottom: '8px', color: 'var(--ds-text-subtle)' }}>
                             Individual lesson content with variant-based rendering:
                         </p>
                         <ul style={{ margin: 0, paddingLeft: '16px' }}>
@@ -90,12 +90,12 @@ export const Overview = () => (
             {/* Onboarding */}
             <section style={{
                 padding: '24px',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
                 <h2 className="h4" style={{ marginBottom: '12px' }}>Onboarding</h2>
-                <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Onboarding module (separate specification).
                 </p>
             </section>
@@ -103,12 +103,12 @@ export const Overview = () => (
             {/* PLUS DS Components Used */}
             <section style={{
                 padding: '24px',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm, 12px)',
                 border: '1px solid var(--color-outline-variant)'
             }}>
                 <h2 className="h4" style={{ marginBottom: '12px' }}>PLUS DS Components Used</h2>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--color-on-surface-variant)' }}>
+                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Training pages are built using these core PLUS Design System components:
                 </p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>

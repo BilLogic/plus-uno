@@ -52,7 +52,7 @@ export const AttendanceRosterRow = ({
             <span
                 className="body2-txt font-weight-light"
                 style={{
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                 }}

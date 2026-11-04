@@ -45,14 +45,14 @@ export const AddTutor = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-sm)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm)',
                     borderRadius: 'var(--size-modal-radius-md)',
                 }}
             >
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <span className="h5" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+                    <span className="h5" style={{ margin: 0, color: 'var(--ds-text)' }}>
                         Add Tutor
                     </span>
                     <i
@@ -60,7 +60,7 @@ export const AddTutor = () => (
                         style={{
                             fontSize: 'var(--font-size-fa-h3-solid)',
                             lineHeight: 'var(--font-line-height-fa-h3-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer',
                         }}
                     />
@@ -76,7 +76,7 @@ export const AddTutor = () => (
                 >
                     <span
                         className="body3-txt font-weight-light"
-                        style={{ color: 'var(--color-on-surface)' }}
+                        style={{ color: 'var(--ds-text)' }}
                     >
                         Add a tutor who is present for today's session but not on the regular roster.
                     </span>
@@ -91,7 +91,7 @@ export const AddTutor = () => (
                         >
                             <span
                                 className="body3-txt font-weight-semibold"
-                                style={{ color: 'var(--color-on-surface)' }}
+                                style={{ color: 'var(--ds-text)' }}
                             >
                                 Tutor name
                             </span>
@@ -139,14 +139,14 @@ export const AddStudent = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-sm)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-sm) var(--size-modal-pad-x-sm)',
                     borderRadius: 'var(--size-modal-radius-md)',
                 }}
             >
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-center">
-                    <span className="h5" style={{ margin: 0, color: 'var(--color-on-surface)' }}>
+                    <span className="h5" style={{ margin: 0, color: 'var(--ds-text)' }}>
                         Add Student
                     </span>
                     <i
@@ -154,7 +154,7 @@ export const AddStudent = () => (
                         style={{
                             fontSize: 'var(--font-size-fa-h3-solid)',
                             lineHeight: 'var(--font-line-height-fa-h3-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer',
                         }}
                     />
@@ -170,7 +170,7 @@ export const AddStudent = () => (
                 >
                     <span
                         className="body3-txt font-weight-light"
-                        style={{ color: 'var(--color-on-surface)' }}
+                        style={{ color: 'var(--ds-text)' }}
                     >
                         Add a student who is present for today's session but not on the regular roster.
                     </span>
@@ -185,7 +185,7 @@ export const AddStudent = () => (
                         >
                             <span
                                 className="body3-txt font-weight-semibold"
-                                style={{ color: 'var(--color-on-surface)' }}
+                                style={{ color: 'var(--ds-text)' }}
                             >
                                 Student name
                             </span>
