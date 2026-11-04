@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Rating from './Rating';
 
@@ -168,3 +168,38 @@ Interactive.args = {
 };
 
 
+
+/** Each prop shows up in the DOM: numeric labels, comments label, icon family, required mark. */
+export const PropsRender = () => (
+    <div style={ratingCol}>
+        <Rating id="rating-props-numeric" label="Numeric" variant="numeric" icon="thumbs-up" isRequired value={2} />
+        <Rating id="rating-props-comments" label="Comments" variant="comments" commentsLabel="Tell us more" value={2} />
+    </div>
+);
+PropsRender.parameters = { docs: { disable: true } };
+PropsRender.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const numeric = canvas.getByRole('radiogroup', { name: /Numeric/ });
+    const comments = canvas.getByRole('radiogroup', { name: /Comments/ });
+
+    // variant=numeric: a label 1-5 above each item, no comments label.
+    for (const n of [1, 2, 3, 4, 5]) {
+        await expect(within(numeric.parentElement).getByText(String(n))).toBeTruthy();
+    }
+    await expect(within(numeric.parentElement).queryByText('Comments')).toBeNull();
+
+    // variant=comments: the comments label sits below, no numbers.
+    await expect(canvas.getByText('Tell us more')).toBeTruthy();
+    await expect(within(comments.parentElement).queryByText('1')).toBeNull();
+
+    // icon=thumbs-up: filled for items up to the value, outline after.
+    const items = within(numeric).getAllByRole('radio');
+    await expect(items[1].querySelector('i').className).toContain('fa-thumbs-up');
+    await expect(items[1].querySelector('i').className).toContain('fas');
+    await expect(items[2].querySelector('i').className).toContain('far');
+    await expect(within(comments).getAllByRole('radio')[0].querySelector('i').className).toContain('fa-star');
+
+    // isRequired: the mark is announced, and only on the required rating.
+    await expect(within(numeric.parentElement).getByLabelText('required')).toBeTruthy();
+    await expect(within(comments.parentElement).queryByLabelText('required')).toBeNull();
+};
