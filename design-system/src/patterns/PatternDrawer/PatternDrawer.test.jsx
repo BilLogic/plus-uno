@@ -36,18 +36,18 @@ describe('PatternDrawer', () => {
         expect(drawer).toHaveAccessibleDescription('Thursday · 4:00–5:00 PM');
     });
 
-    it('takes a width step and sits in an Overlay at the end edge by default', () => {
+    it('takes a width step and sits in a Blanket at the end edge by default', () => {
         render(<PatternDrawer title="Filters" width="lg">Body</PatternDrawer>);
         const drawer = screen.getByRole('dialog');
         expect(drawer).toHaveClass('plus-pattern-drawer', 'plus-pattern-drawer-width-lg');
-        expect(drawer.parentElement).toHaveClass('plus-pattern-overlay', 'plus-pattern-overlay-placement-end');
+        expect(drawer.parentElement).toHaveClass('plus-pattern-blanket', 'plus-pattern-blanket-placement-end');
     });
 
     it('defaults to the sm width and can sit at the start edge', () => {
         render(<PatternDrawer title="Filters" placement="start">Body</PatternDrawer>);
         const drawer = screen.getByRole('dialog');
         expect(drawer).toHaveClass('plus-pattern-drawer-width-sm');
-        expect(drawer.parentElement).toHaveClass('plus-pattern-overlay-placement-start');
+        expect(drawer.parentElement).toHaveClass('plus-pattern-blanket-placement-start');
     });
 
     it('draws the footer slot only when a footer is passed', () => {
@@ -137,7 +137,7 @@ describe('PatternDrawer', () => {
         expect(elsewhere).not.toHaveFocus();
         const drawer = screen.getByRole('dialog');
         expect(drawer).toHaveAttribute('aria-modal', 'false');
-        expect(drawer.parentElement).toHaveClass('plus-pattern-overlay-inline');
+        expect(drawer.parentElement).toHaveClass('plus-pattern-blanket-inline');
         expect(drawer.parentElement.style.getPropertyValue('--plus-overlay-screen')).toBe('1024px');
     });
 

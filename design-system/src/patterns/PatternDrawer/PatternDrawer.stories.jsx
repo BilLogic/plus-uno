@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternDrawer, { DRAWER_PLACEMENTS } from '@/patterns/PatternDrawer';
-import { OVERLAY_WIDTHS } from '@/patterns/Overlay';
+import { BLANKET_WIDTHS } from '@/patterns/Blanket';
 import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -80,7 +80,7 @@ export default {
         },
         width: {
             control: 'inline-radio',
-            options: OVERLAY_WIDTHS,
+            options: BLANKET_WIDTHS,
             description: 'Screen-grid columns: 6 · 8 · 10 plus the drawer pad',
             table: { category: 'Design' },
         },
@@ -99,7 +99,7 @@ export default {
 export const Overview = {
     render: () => <Inline>{details}</Inline>,
     play: async ({ canvasElement }) => {
-        const overlay = canvasElement.querySelector('.plus-pattern-overlay');
+        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
         const [drawer] = dialogs(canvasElement);
         const style = getComputedStyle(drawer);
         await expect(style.paddingTop, 'Drawer/pad').toBe(`${tokenLength(canvasElement, '--drawer-pad')}px`);
@@ -126,14 +126,14 @@ export const Overview = {
 export const Widths = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            {OVERLAY_WIDTHS.map((width) => (
+            {BLANKET_WIDTHS.map((width) => (
                 <Inline key={width} title={`width="${width}"`} width={width} screenHeight={320}>{details}</Inline>
             ))}
         </div>
     ),
     play: async ({ canvasElement }) => {
         const drawers = dialogs(canvasElement);
-        for (const [i, width] of OVERLAY_WIDTHS.entries()) {
+        for (const [i, width] of BLANKET_WIDTHS.entries()) {
             await expect(drawers[i].getBoundingClientRect().width, `width ${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
     },
@@ -149,7 +149,7 @@ export const Placements = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const overlays = canvasElement.querySelectorAll('.plus-pattern-overlay');
+        const overlays = canvasElement.querySelectorAll('.plus-pattern-blanket');
         const [end, start] = dialogs(canvasElement);
         await expect(end.getBoundingClientRect().right, 'end meets the right edge').toBeCloseTo(overlays[0].getBoundingClientRect().right, 0);
         await expect(start.getBoundingClientRect().left, 'start meets the left edge').toBeCloseTo(overlays[1].getBoundingClientRect().left, 0);
