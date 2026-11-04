@@ -14,8 +14,8 @@ export const BLUEPRINT_LOGO_SRC = '/uno-bot/logos/uno-blueprint.png';
  * The floating stack in the Storybook docs' bottom-right corner, top to bottom:
  * AI agent, Prototype Marketplace, Uno Blueprint.
  *
- * `aiAgent` is the slot for the AI agent button. It renders nothing until a
- * later ticket passes one; give it a circle `IconButton` with a `tooltip` so it
+ * `aiAgent` is the slot for the AI agent button. Nothing renders when it is
+ * omitted; give it a circle `IconButton` with a `tooltip` so it
  * matches the two below.
  */
 export const DocsFab = ({ aiAgent = null }) => (
@@ -23,6 +23,7 @@ export const DocsFab = ({ aiAgent = null }) => (
         {aiAgent}
         <LinkIconButton
             shape="circle"
+            className="plus-docs-fab__button"
             icon="store"
             label="Prototype Marketplace"
             tooltip="Prototype Marketplace"
@@ -31,6 +32,7 @@ export const DocsFab = ({ aiAgent = null }) => (
         />
         <LinkIconButton
             shape="circle"
+            className="plus-docs-fab__button"
             icon={<img className="plus-docs-fab__logo" src={BLUEPRINT_LOGO_SRC} alt="" />}
             label="Uno Blueprint"
             tooltip="Uno Blueprint"
