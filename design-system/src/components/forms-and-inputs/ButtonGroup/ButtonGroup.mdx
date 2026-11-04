@@ -1,20 +1,143 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonGroupStories from './ButtonGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ButtonGroupStories} />
 
 <Title />
-A connected row of related buttons.
+A visually connected row of related actions — a plain container for `Button`
+children, each keeping its own appearance and spacing.
 
 <DocsTabs of={ButtonGroupStories}>
 
 <DocsTab tab="examples">
 
-<Canvas of={ButtonGroupStories.Overview} />
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/ButtonGroup"
+/>
 
-<ArgTypes of={ButtonGroupStories} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Three connected buttons.</>}>
+    <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Each button keeps its own `appearance` — the group adds no styling of its own beyond the connecting edges.</>}>
+    <DsCanvasQuiet of={ButtonGroupStories.Appearances} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Every button in a group shares the same `spacing`, for an even row.</>}>
+    <DsCanvasQuiet of={ButtonGroupStories.Spacing} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Icon-only buttons connect the same way as text buttons.</>}>
+    <DsCanvasQuiet of={ButtonGroupStories.IconOnly} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>A selected button is each `Button`'s own state — `ButtonGroup` has no selection logic of its own.</>}>
+    <DsCanvasQuiet of={ButtonGroupStories.Selected} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ButtonGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `ButtonGroup` for a short row of related actions that read as one unit —
+view toggles, a set of filters. For mutually exclusive options that pick one
+value, consider whether `RadioGroup` fits the data better than buttons
+styled to look selected.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Give every group a `label`.
+
+`ButtonGroup` has no visible title of its own — `label` is the only thing
+that tells assistive technology the buttons form one related set.
+
+```jsx
+<ButtonGroup label="View options">
+    <Button text="List" isSelected={view === 'list'} onClick={() => setView('list')} />
+    <Button text="Grid" isSelected={view === 'grid'} onClick={() => setView('grid')} />
+</ButtonGroup>
+```
+
+### Selection state lives on each `Button`, not on the group.
+
+`ButtonGroup` renders children as given — set `isSelected` on the `Button`
+that should read as current, and manage which one that is yourself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named group.** The row is `role="group"` with `label` as its accessible
+  name, so assistive technology announces the buttons as one related set.
+- **Each button keeps its own accessible name and state.** `ButtonGroup`
+  adds no roles or attributes beyond the group wrapper.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single action, use `Button` directly.
+- For a group of buttons stacked vertically instead of in a row, use
+  `VerticalButton`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
