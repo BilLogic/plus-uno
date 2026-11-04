@@ -432,7 +432,7 @@
             "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle, neutral and default; hasRing is the ring in Figma. Inverse exists in neutral only, and dot at default spacing only. Docs page: node 17883:1895."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17883-1895"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-869"
       }
     },
     "DatePicker": {
@@ -798,7 +798,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52724"
       }
     },
     "Link": {
@@ -1317,7 +1317,7 @@
             "status": "verified"
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6622"
       }
     },
     "Rating": {
@@ -1502,7 +1502,7 @@
             "notes": "On the Loading page. Figma has one preset property for shapes and presets alike (rect (default), circle, text, paragraph and the label presets); code takes all ten values as preset, and rect, circle and text are also shape, which resize freely either way. shimmer? is isShimmering, off by default in Figma so static designs read clearly and on by default in code. Docs page: node 17885:47731."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-47731"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-854"
       }
     },
     "SmartBadges": {
@@ -1720,7 +1720,7 @@
             "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17885-57"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17867-28"
       }
     },
     "Tabs": {
@@ -1820,7 +1820,7 @@
             "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled is isDisabled, or TagContext for a whole field; remove? on a link is href plus isRemovable; count? is trailingMetric. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled and focus × on a link's separate ×; code ignores it on a removable or selectable tag with a warning."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17884-2099"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-1324"
       }
     },
     "TagGroup": {
@@ -2018,7 +2018,7 @@
             "notes": "On the Iconography, Logos & Imagery page. Figma marks defaults in the value name (\"32 (default)\", \"subtle (default)\", \"gray (default)\"); code takes the bare value. Logo and image variants hold a media slot, which code fills with `children` or `src`. Image variants exist for gray only, since the picture covers the ground."
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18314-53755"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-516"
       }
     },
     "TimePicker": {
