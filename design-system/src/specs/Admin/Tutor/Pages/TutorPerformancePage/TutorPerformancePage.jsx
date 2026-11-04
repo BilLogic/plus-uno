@@ -195,7 +195,7 @@ const TutorPerformancePage = ({
                 {/* Performance Overview Section */}
                 <div className="tutor-performance-page__overview-section">
                     <div className="tutor-performance-page__overview-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Performance Overview
                         </h2>
                         <AdminDateRangeFilter
@@ -221,7 +221,7 @@ const TutorPerformancePage = ({
                 {/* Performance Details Section */}
                 <div className="tutor-performance-page__details-section">
                     <div className="tutor-performance-page__details-header">
-                        <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                        <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                             Performance Details
                         </h2>
                         <Button
@@ -240,7 +240,7 @@ const TutorPerformancePage = ({
 
                     {/* Pagination Footer */}
                     <div className="tutor-performance-page__pagination">
-                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                        <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                             Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                         </div>
                         <Pagination

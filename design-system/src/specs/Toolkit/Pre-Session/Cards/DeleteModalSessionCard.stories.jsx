@@ -22,7 +22,7 @@ const ColumnHeader = ({ label, showSort = true }) => (
         <span
             className="body2-txt"
             style={{
-                color: 'var(--color-on-surface)',
+                color: 'var(--ds-text)',
                 fontWeight: 400,
                 textTransform: 'capitalize',
                 whiteSpace: 'nowrap',
@@ -36,7 +36,7 @@ const ColumnHeader = ({ label, showSort = true }) => (
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     lineHeight: 'var(--font-line-height-fa-body1-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                 }}
             />
         )}
@@ -57,7 +57,7 @@ const DataCell = ({ value }) => (
         <span
             className="body2-txt"
             style={{
-                color: 'var(--color-on-surface)',
+                color: 'var(--ds-text)',
                 fontWeight: 300,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -101,7 +101,7 @@ export const DeleteModalSessionCard = ({
             flexDirection: 'column',
             alignItems: 'flex-start',
             padding: 'var(--size-card-pad-x-sm)',
-            backgroundColor: 'var(--color-surface-container-low)',
+            backgroundColor: 'var(--ds-surface-container)',
             border: 'var(--size-section-border) solid var(--color-outline-variant)',
             borderRadius: 'var(--size-modal-radius-md)',
             width: '100%',

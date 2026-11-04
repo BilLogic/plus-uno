@@ -71,7 +71,7 @@ export const AllVariations = () => (
         className="d-flex flex-column gap-4"
         style={{
             padding: 'var(--size-section-gap-lg)',
-            backgroundColor: 'var(--color-surface-variant)',
+            backgroundColor: 'var(--ds-background-neutral)',
             minHeight: '100vh',
         }}
     >

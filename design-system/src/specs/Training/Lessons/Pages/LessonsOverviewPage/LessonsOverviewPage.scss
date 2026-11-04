@@ -74,7 +74,7 @@
         }
 
         &::-webkit-scrollbar-track {
-            background: var(--color-surface-variant);
+            background: var(--ds-background-neutral);
             border-radius: var(--size-element-radius-sm);
         }
 
@@ -83,7 +83,7 @@
             border-radius: var(--size-element-radius-sm);
 
             &:hover {
-                background: var(--color-on-surface-variant);
+                background: var(--ds-background-neutral);
             }
         }
     }
@@ -100,7 +100,7 @@
         flex-shrink: 0;
 
         p {
-            color: var(--color-on-surface);
+            color: var(--ds-text);
             margin: 0;
             font-weight: 300;
         }

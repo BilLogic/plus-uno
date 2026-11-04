@@ -74,14 +74,14 @@ const ProfileImagePlaceholder = ({ zoom = 50 }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: 'var(--color-surface)',
+                backgroundColor: 'var(--ds-surface)',
             }}
         >
             <i
                 className="fa-solid fa-user"
                 style={{
                     fontSize: `${48 * scale}px`,
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     transition: 'font-size 0.15s ease',
                 }}
             />
@@ -109,7 +109,7 @@ const LoadingSpinner = () => (
                 left: 0,
                 width: '46.15%',
                 height: '46.15%',
-                backgroundColor: 'var(--color-on-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 borderRadius: '1px',
             }}
         />
@@ -120,7 +120,7 @@ const LoadingSpinner = () => (
                 left: 0,
                 width: '46.15%',
                 height: '46.15%',
-                backgroundColor: 'var(--color-on-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 borderRadius: '1px',
             }}
         />
@@ -131,7 +131,7 @@ const LoadingSpinner = () => (
                 right: 0,
                 width: '46.15%',
                 height: '46.15%',
-                backgroundColor: 'var(--color-on-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 borderRadius: '1px',
             }}
         />
@@ -162,7 +162,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
         <div
             style={{
                 width: '340px',
-                backgroundColor: 'var(--color-surface-container-high, #e7e8eb)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: '6px',
                 padding: 'var(--size-modal-pad-y-sm, 8px) var(--size-modal-pad-x-sm, 10px)',
                 display: 'flex',
@@ -186,7 +186,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     className="h5"
                     style={{
                         flex: '1 0 0',
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                     }}
                 >
                     Preview
@@ -195,7 +195,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     className="fa-solid fa-xmark"
                     style={{
                         fontSize: '24px',
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-icon-subtle)',
                         cursor: 'pointer',
                     }}
                 />
@@ -249,7 +249,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                 <span
                     className="body3-txt"
                     style={{
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-text-subtle)',
                     }}
                 >
                     Zoom

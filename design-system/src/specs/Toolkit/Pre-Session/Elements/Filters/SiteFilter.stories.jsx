@@ -60,8 +60,8 @@ export const Interactive = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
             <SiteFilter value={schools} onChange={setSchools} />
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {schools.length ? schools.join(', ') : 'all schools'}
                 </strong>
             </p>

@@ -66,7 +66,7 @@ const GroupsTable = ({
                                         style={{
                                             color: header.active
                                                 ? 'var(--color-secondary-text)'
-                                                : 'var(--color-on-surface)',
+                                                : 'var(--ds-text)',
                                             fontWeight: 400
                                         }}
                                     >
@@ -106,7 +106,7 @@ const GroupsTable = ({
                                         className={`fas ${expandedGroups[group.id] ? 'fa-caret-down' : 'fa-caret-right'}`}
                                         style={{
                                             fontSize: 'var(--font-size-body3)',
-                                            color: 'var(--color-on-surface-variant)'
+                                            color: 'var(--ds-icon-subtle)'
                                         }}
                                     />
                                     <span

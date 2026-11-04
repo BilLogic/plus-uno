@@ -28,14 +28,14 @@ export const ForLeads = () => (
         >
             <span
                 className="body3-txt font-weight-light"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 It's been 10 minutes since the session started. Would you like to{' '}
                 <a
                     href="#"
                     className="body3-txt font-weight-bold"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         textDecoration: 'underline',
                     }}
                     onClick={(e) => e.preventDefault()}
@@ -66,7 +66,7 @@ export const ForAll = () => (
         >
             <span
                 className="body3-txt font-weight-light"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 Your student roster was just updated. Take a moment to review your new assignments.
             </span>
@@ -92,7 +92,7 @@ export const WarmupPhase = () => (
         >
             <span
                 className="body3-txt font-weight-light"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 Students are working toward default IXL expectations (e.g., 40 min/week, 2 skills/week).
                 Personalized goals will be available in a few weeks.{' '}

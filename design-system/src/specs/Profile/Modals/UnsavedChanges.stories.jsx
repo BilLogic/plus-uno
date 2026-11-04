@@ -59,7 +59,7 @@ const UnsavedChangesModal = () => {
         <div
             style={{
                 width: '388.67px',
-                backgroundColor: 'var(--color-surface-container-high, #e7e8eb)',
+                backgroundColor: 'var(--ds-surface-container)',
                 border: '1px solid var(--color-outline-variant, #bec8ca)',
                 borderRadius: 'var(--size-border-radius-large, 12px)',
                 padding: 'var(--size-modal-pad-y-lg, 16px) var(--size-modal-pad-x-lg, 20px)',
@@ -80,7 +80,7 @@ const UnsavedChangesModal = () => {
                     className="h4"
                     style={{
                         flex: '1 0 0',
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                     }}
                 >
                     You have unsaved changes
@@ -89,7 +89,7 @@ const UnsavedChangesModal = () => {
                     className="fa-solid fa-xmark"
                     style={{
                         fontSize: '20px',
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-icon-subtle)',
                         cursor: 'pointer',
                     }}
                 />
@@ -105,7 +105,7 @@ const UnsavedChangesModal = () => {
                 <p
                     className="body1-txt font-weight-light"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         margin: 0,
                     }}
                 >

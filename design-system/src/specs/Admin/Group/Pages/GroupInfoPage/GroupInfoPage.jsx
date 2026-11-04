@@ -96,7 +96,7 @@ const GroupInfoPage = ({
 
                 {/* Title Section */}
                 <div className="group-info-page__title-section">
-                    <h2 className="h4" style={{ color: 'var(--color-on-surface)' }}>
+                    <h2 className="h4" style={{ color: 'var(--ds-text)' }}>
                         Group Info
                     </h2>
                     <Button
@@ -116,7 +116,7 @@ const GroupInfoPage = ({
 
                 {/* Pagination Footer */}
                 <div className="group-info-page__pagination">
-                    <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--color-on-surface)' }}>
+                    <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
                         Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
                     </div>
                     <Pagination

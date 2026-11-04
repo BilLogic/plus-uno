@@ -38,8 +38,8 @@ Node ID: 1009-130962
  */
 export const Default = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
-            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--color-on-surface)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--ds-surface)' }}>
+            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--ds-text)' }}>
                 Tool Usage Metrics
             </h3>
             <TutorToolUsageSection />
@@ -52,8 +52,8 @@ export const Default = {
  */
 export const Loading = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
-            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--color-on-surface)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--ds-surface)' }}>
+            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--ds-text)' }}>
                 Tool Usage Metrics - Loading
             </h3>
             <TutorToolUsageSection loading={true} />
@@ -66,8 +66,8 @@ export const Loading = {
  */
 export const CustomData = {
     render: () => (
-        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--color-surface-container, #f5f5f5)' }}>
-            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--color-on-surface)' }}>
+        <div style={{ padding: 'var(--size-section-pad-y-lg, 40px)', backgroundColor: 'var(--ds-surface)' }}>
+            <h3 className="h3" style={{ marginBottom: '24px', color: 'var(--ds-text)' }}>
                 Tool Usage Metrics - Custom Data
             </h3>
             <TutorToolUsageSection

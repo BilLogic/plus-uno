@@ -41,7 +41,7 @@ const RosterPanel = ({ title, addLabel, items }) => (
         >
             <span
                 className="h6"
-                style={{ color: 'var(--color-on-surface)', margin: 0 }}
+                style={{ color: 'var(--ds-text)', margin: 0 }}
             >
                 {title}
             </span>
@@ -82,7 +82,7 @@ const AttendeeEditModalBody = () => (
         className="d-flex flex-column"
         style={{
             gap: 'var(--size-modal-gap-lg)',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
             padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
             borderRadius: 'var(--size-modal-radius-lg)',
         }}
@@ -94,7 +94,7 @@ const AttendeeEditModalBody = () => (
                 className="fa-solid fa-xmark"
                 style={{
                     fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--color-on-surface-variant)',
+                    color: 'var(--ds-icon-subtle)',
                     cursor: 'pointer',
                 }}
             />

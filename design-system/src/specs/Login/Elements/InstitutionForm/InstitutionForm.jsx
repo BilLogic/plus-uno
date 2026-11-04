@@ -86,7 +86,7 @@ export default function InstitutionFormSpec() {
             }}
         >
             <div>
-                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
+                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--ds-text)' }}>
                     Register With Your Institution
                 </div>
                 <TextField
@@ -104,7 +104,7 @@ export default function InstitutionFormSpec() {
                         alignItems: 'flex-start',
                         gap: 'var(--size-element-gap-sm)',
                         marginTop: 'var(--size-element-gap-sm)',
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-text-subtle)',
                     }}
                 >
                     <i className="fa-solid fa-circle-info" aria-hidden="true" />
@@ -119,7 +119,7 @@ export default function InstitutionFormSpec() {
             </div>
 
             <div>
-                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--color-on-surface)' }}>
+                <div className="body3-txt font-weight-semibold" style={{ marginBottom: 'var(--size-element-gap-xs)', color: 'var(--ds-text)' }}>
                     Institution Name
                 </div>
                 <TextField
@@ -137,7 +137,7 @@ export default function InstitutionFormSpec() {
                         alignItems: 'flex-start',
                         gap: 'var(--size-element-gap-sm)',
                         marginTop: 'var(--size-element-gap-sm)',
-                        color: 'var(--color-on-surface-variant)',
+                        color: 'var(--ds-text-subtle)',
                     }}
                 >
                     <i className="fa-solid fa-circle-info" aria-hidden="true" />

@@ -4,7 +4,7 @@
  */
 
 .module-completion-modal {
-    background-color: var(--color-surface-container-high);
+    background-color: var(--ds-surface-container);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-modal-radius-lg, 16px);
     display: flex;
@@ -46,7 +46,7 @@
         font-size: var(--font-size-h4, 24px);
         font-weight: var(--font-weight-title);
         line-height: 1.333;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         width: 100%;
         margin: 0;
     }
@@ -68,7 +68,7 @@
 
         i {
             font-size: var(--font-size-fa-h4-solid, 20px);
-            color: var(--color-on-surface-variant);
+            color: var(--ds-text-subtle);
             line-height: 1.6;
         }
     }

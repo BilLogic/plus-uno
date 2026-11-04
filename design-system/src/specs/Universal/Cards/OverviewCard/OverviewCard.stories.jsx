@@ -105,7 +105,7 @@ export const SMARTCards = () => (
         gridTemplateColumns: 'repeat(3, 275px)',
         gap: '16px',
         padding: '24px',
-        backgroundColor: 'var(--color-surface, #f9f9fc)'
+        backgroundColor: 'var(--ds-surface)'
     }}>
         <OverviewCard
             type="relationships"
@@ -151,7 +151,7 @@ export const MetricCards = () => (
         gridTemplateColumns: 'repeat(3, 275px)',
         gap: '16px',
         padding: '24px',
-        backgroundColor: 'var(--color-surface, #f9f9fc)'
+        backgroundColor: 'var(--ds-surface)'
     }}>
         <OverviewCard
             type="status"
@@ -357,7 +357,7 @@ export const Interactive = {
  * Overview - All variants in one view
  */
 export const Overview = () => (
-    <div style={{ padding: '24px', backgroundColor: 'var(--color-surface, #f9f9fc)' }}>
+    <div style={{ padding: '24px', backgroundColor: 'var(--ds-surface)' }}>
         <h3 style={{ marginBottom: '16px', fontFamily: 'var(--font-family-header)' }}>SMART Cards (Student Needs)</h3>
         <div style={{
             display: 'flex',
@@ -401,8 +401,8 @@ const ICON_HUES = {
     'mastering-content': '--color-mastering-content',
     advocacy: '--color-advocacy',
     'technology-tools': '--color-technology-tools',
-    undefined: '--color-on-surface-variant',
-    status: '--color-on-surface-variant',
+    undefined: '--ds-text-subtle',
+    status: '--ds-text-subtle',
 };
 
 /**
@@ -436,7 +436,7 @@ export const IconColors = () => (
 );
 
 IconColors.play = async ({ canvasElement }) => {
-    const neutral = tokenColor(canvasElement, '--color-on-surface-variant');
+    const neutral = tokenColor(canvasElement, '--ds-text-subtle');
     for (const [type, token] of Object.entries(ICON_HUES)) {
         const hue = tokenColor(canvasElement, token);
         const card = (variant) => canvasElement.querySelector(`[data-card="${type}-${variant}"]`);

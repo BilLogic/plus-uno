@@ -45,7 +45,7 @@ export const FillIn_EmptyState = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -58,7 +58,7 @@ export const FillIn_EmptyState = () => (
                             className="fa-solid fa-circle-info"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                             }}
                             aria-hidden
                         />
@@ -66,7 +66,7 @@ export const FillIn_EmptyState = () => (
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer',
                             }}
                             aria-hidden
@@ -86,13 +86,13 @@ export const FillIn_EmptyState = () => (
                 >
                     <i
                         className="fa-solid fa-hourglass-half"
-                        style={{ fontSize: '3rem', color: 'var(--color-on-surface-variant)' }}
+                        style={{ fontSize: '3rem', color: 'var(--ds-icon-subtle)' }}
                         aria-hidden
                     />
-                    <span className="body1-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-icon)' }}>
                         No fill-ins needed now.
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
                         Check back later for urgent coverage requests.
                     </span>
                 </div>
@@ -138,7 +138,7 @@ export const FillIn = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -151,7 +151,7 @@ export const FillIn = () => (
                             className="fa-solid fa-circle-info"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                             }}
                             aria-hidden
                         />
@@ -159,7 +159,7 @@ export const FillIn = () => (
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer',
                             }}
                             aria-hidden
@@ -195,7 +195,7 @@ export const FillIn = () => (
                     className="d-flex justify-content-between align-items-center"
                     style={{ flexWrap: 'wrap', gap: 'var(--size-element-gap-sm)' }}
                 >
-                    <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                         Showing 1 to 5 of 36 entries
                     </span>
                     <Pagination
@@ -245,7 +245,7 @@ export const ConsentForm = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -258,7 +258,7 @@ export const ConsentForm = () => (
                             className="fa-solid fa-circle-info"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                             }}
                             aria-hidden
                         />
@@ -266,7 +266,7 @@ export const ConsentForm = () => (
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer',
                             }}
                             aria-hidden
@@ -274,7 +274,7 @@ export const ConsentForm = () => (
                         />
                     </div>
                 </div>
-                <p className="body1-txt m-0" style={{ color: 'var(--color-on-surface)' }}>
+                <p className="body1-txt m-0" style={{ color: 'var(--ds-text)' }}>
                     Please review and acknowledge the following forms before completing your sign-up.
                 </p>
                 {/* Consent items: card per item with checkbox, title* + external link icon, description (design system Checkbox) */}
@@ -286,7 +286,7 @@ export const ConsentForm = () => (
                             style={{
                                 gap: 'var(--size-element-gap-sm)',
                                 padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
-                                backgroundColor: 'var(--color-surface-container)',
+                                backgroundColor: 'var(--ds-surface-container)',
                                 borderRadius: 'var(--size-modal-radius-md)',
                                 border: 'var(--size-element-border) solid var(--color-outline-variant)',
                             }}
@@ -305,7 +305,7 @@ export const ConsentForm = () => (
                             </div>
                             <div className="d-flex flex-column" style={{ gap: 'var(--size-table-cell-gap)', flex: 1, minWidth: 0 }}>
                                 <div className="d-flex align-items-center" style={{ gap: 'var(--size-element-gap-xs)' }}>
-                                    <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                                    <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                         {item.title}
                                     </span>
                                     <span style={{ color: 'var(--color-danger)', flexShrink: 0 }}>*</span>
@@ -320,7 +320,7 @@ export const ConsentForm = () => (
                                         role="button"
                                     />
                                 </div>
-                                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                     {item.description}
                                 </span>
                             </div>
@@ -357,7 +357,7 @@ export const SessionDetails = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -370,7 +370,7 @@ export const SessionDetails = () => (
                             className="fa-solid fa-gear"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                             }}
                             aria-hidden
                         />
@@ -378,7 +378,7 @@ export const SessionDetails = () => (
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer',
                             }}
                             aria-hidden
@@ -472,7 +472,7 @@ export const Confirmation = () => {
                     className="d-flex flex-column"
                     style={{
                         gap: 'var(--size-modal-gap-lg)',
-                        backgroundColor: 'var(--color-surface-container-high)',
+                        backgroundColor: 'var(--ds-surface-container)',
                         padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                         borderRadius: 'var(--size-modal-radius-lg)',
                     }}
@@ -484,7 +484,7 @@ export const Confirmation = () => {
                             className="fa-solid fa-xmark"
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
-                                color: 'var(--color-on-surface-variant)',
+                                color: 'var(--ds-icon-subtle)',
                                 cursor: 'pointer',
                             }}
                             aria-hidden
@@ -547,7 +547,7 @@ export const Success = () => (
                 className="d-flex flex-column"
                 style={{
                     gap: 'var(--size-modal-gap-lg)',
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
                     borderRadius: 'var(--size-modal-radius-lg)',
                 }}
@@ -559,7 +559,7 @@ export const Success = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer',
                         }}
                         aria-hidden

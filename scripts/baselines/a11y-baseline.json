@@ -4,9 +4,9 @@
     "storyFiles": 473,
     "tests": 1816
   },
-  "violatingStories": 33,
+  "violatingStories": 25,
   "rules": {
-    "color-contrast": 29,
+    "color-contrast": 21,
     "scrollable-region-focusable": 2,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
@@ -35,12 +35,6 @@
     "design-system/src/specs/Toolkit/In-Session/Modals/InSessionPopUpModal.stories.jsx::Assignment Loaded Lead": [
       "scrollable-region-focusable"
     ],
-    "design-system/src/specs/Toolkit/In-Session/Modals/InSessionPopUpModal.stories.jsx::Session Info Loaded Lead": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Modals/InSessionPopUpModal.stories.jsx::Session Info Loaded Regular": [
-      "color-contrast"
-    ],
     "design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx::Interactive": [
       "color-contrast"
     ],
@@ -62,26 +56,8 @@
     "design-system/src/specs/Toolkit/Pre-Session/Modals/ConfirmSessionAvailability/SessionDetailsRecurringSession.stories.jsx::Session Details Recurring Session": [
       "color-contrast"
     ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/DeleteSession/DuringSpecificDayPeriod.stories.jsx::During Specific Day Period": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/DeleteSession/OneSessionNA.stories.jsx::One Session NA": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/DeleteSession/RecurringNA.stories.jsx::Recurring NA": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionDetailsAllUser/SessionDetails.stories.jsx::One Time Session Pre Fill In": [
-      "color-contrast"
-    ],
     "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionDetailsAllUser/SessionDetails.stories.jsx::Session Attendees Post Sign Up Fill In": [
       "scrollable-region-focusable"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionDetailsAllUser/SessionDetails.stories.jsx::Session Info Post Sign Up": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Modals/SessionFillIns/SessionFillIns.stories.jsx::Session Details": [
-      "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Interactive": [
       "color-contrast"

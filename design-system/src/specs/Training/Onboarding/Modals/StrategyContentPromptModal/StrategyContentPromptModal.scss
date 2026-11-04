@@ -4,7 +4,7 @@
  */
 
 .strategy-content-prompt-modal {
-    background-color: var(--color-surface-container-low);
+    background-color: var(--ds-surface-container);
     border-radius: var(--size-section-radius-md, 12px);
     display: flex;
     flex-direction: column;
@@ -62,7 +62,7 @@
         font-size: var(--font-size-body1, 16px);
         font-weight: var(--font-weight-semibold-2, 600);
         line-height: 1.5;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         width: 100%;
     }
 
@@ -82,7 +82,7 @@
         font-size: var(--font-size-body1, 16px);
         font-weight: var(--font-weight-normal, 400);
         line-height: 1.5;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         width: 100%;
         margin: 0;
     }

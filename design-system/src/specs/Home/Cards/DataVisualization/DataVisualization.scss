@@ -60,7 +60,7 @@
     border: none;
     border-radius: var(--size-element-radius-full, 999px);
     background: transparent;
-    color: var(--color-on-surface-variant, #3f484a);
+    color: var(--ds-text-subtle);
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease;
 
@@ -69,11 +69,11 @@
     }
 
     &:hover {
-        color: var(--color-on-surface, #191c1e);
+        color: var(--ds-text);
     }
 
     &.active {
-        background-color: var(--color-surface-container-lowest, #fff);
+        background-color: var(--ds-surface);
         color: var(--color-secondary-text, #445c6a);
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
@@ -85,11 +85,11 @@
     
     // Inactive tab styling
     .plus-nav-link:not(.active) {
-        color: var(--color-on-surface) !important;
+        color: var(--ds-text) !important;
         font-weight: var(--font-weight-normal, 300) !important;
         
         .plus-data-viz-tab-content i {
-            color: var(--color-on-surface-variant) !important;
+            color: var(--ds-text-subtle) !important;
         }
     }
     
@@ -230,7 +230,7 @@
     border: none;
     padding: 0;
     cursor: pointer;
-    color: var(--color-on-surface-variant);
+    color: var(--ds-text-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -256,7 +256,7 @@
 
 .plus-data-viz-card {
     // Background color token for card
-    background-color: var(--color-surface-container-lowest) !important;
+    background-color: var(--ds-surface-raised) !important;
     
     // Custom padding: 12px sides, 16px top/bottom (matching Figma)
     // Note: Using primitive token for 12px as there's no semantic card-pad-x token for this value

@@ -109,7 +109,7 @@ const TutorsTrainingProgressTable = ({
     const getStateColor = (percentage) => {
         if (percentage >= 85) return 'var(--color-success-container, #d6f7c8)';
         if (percentage >= 60) return 'var(--color-warning-container, #f8efc1)';
-        return 'var(--color-error-container, #f8d7d7)';
+        return 'var(--color-danger-container)';
     };
 
     const rows = displayTutors.map((tutor, rowIndex) => [
@@ -121,7 +121,7 @@ const TutorsTrainingProgressTable = ({
                             <i className="fas fa-chalkboard-user" />
                         </div>
                         <div className="tutors-training-progress-table__avatar-info">
-                            <span className="body2-txt font-semibold" style={{ color: 'var(--color-on-surface)' }}>{tutor.tutorName}</span>
+                            <span className="body2-txt font-semibold" style={{ color: 'var(--ds-icon)' }}>{tutor.tutorName}</span>
                             <span className="tutors-training-progress-table__email">{tutor.email}</span>
                         </div>
                     </div>

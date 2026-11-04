@@ -18,7 +18,7 @@ export const RosterItem = ({ name, isLead, removeState, isHovered }) => {
         justifyContent: 'space-between',
         width: '100%',
         padding: 'var(--size-element-pad-y-sm) var(--element-pad-compact)', // 4px 8px
-        backgroundColor: isHovered ? 'var(--color-surface-container-highest)' : 'transparent',
+        backgroundColor: isHovered ? 'var(--ds-background-neutral-subtle-hovered)' : 'transparent',
         borderRadius: 'var(--size-element-radius-md)',
         cursor: 'default',
         // Ensure consistent height/vertical rhythm

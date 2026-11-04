@@ -43,7 +43,7 @@ export const Overview = {
     render: () => (
         <div style={{ 
             padding: 'var(--size-section-pad-y-lg, 24px)',
-            backgroundColor: 'var(--color-surface)',
+            backgroundColor: 'var(--ds-surface)',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-section-gap-md, 24px)'
@@ -96,7 +96,7 @@ export const Interactive = {
     render: (args) => (
         <div style={{ 
             padding: 'var(--size-section-pad-y-lg, 24px)', 
-            backgroundColor: 'var(--color-surface)' 
+            backgroundColor: 'var(--ds-surface)' 
         }}>
             <StrategyBadge {...args} />
         </div>

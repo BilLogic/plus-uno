@@ -107,7 +107,7 @@ const LessonsTable = ({
                                     style={{ width: header.width }}
                                 >
                                     <div className="lessons-table__header-content">
-                                        <span className="body3-txt" style={{ color: 'var(--color-on-surface)' }}>
+                                        <span className="body3-txt" style={{ color: 'var(--ds-text)' }}>
                                             {header.text}
                                         </span>
                                     </div>
@@ -157,7 +157,7 @@ const LessonsTable = ({
                                     {lesson.competencyArea ? (
                                         <SmartTag subject={lesson.competencyArea} />
                                     ) : (
-                                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                        <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                             {lesson.competency || 'N/A'}
                                         </span>
                                     )}
@@ -170,7 +170,7 @@ const LessonsTable = ({
 
                                 {/* Duration Column */}
                                 <td className="lessons-table__cell">
-                                    <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                         {lesson.duration}
                                     </span>
                                 </td>
@@ -220,7 +220,7 @@ const LessonsTable = ({
                                     <tr className="lessons-table__row-expanded-content">
                                         <td colSpan={headers.length} className="lessons-table__cell--expanded">
                                             <div className="lessons-table__description">
-                                                <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+                                                <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                                                     {lesson.description}
                                                 </p>
                                             </div>

@@ -43,7 +43,7 @@ export const CallOffsTableHeaderRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {firstColumnLabel}
                 </span>
             </div>
@@ -57,7 +57,7 @@ export const CallOffsTableHeaderRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     Type
                 </span>
             </div>
@@ -71,7 +71,7 @@ export const CallOffsTableHeaderRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     {thirdColumnLabel}
                 </span>
             </div>
@@ -85,7 +85,7 @@ export const CallOffsTableHeaderRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                     Actions
                 </span>
             </div>
@@ -191,19 +191,19 @@ export const CallOffsTableRow = ({
             >
                 {user === 'tutors' ? (
                     <>
-                        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                             {schoolName}
                         </span>
-                        <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             {date} · {timeRange}
                         </span>
                     </>
                 ) : (
                     <>
-                        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                             {tutorName}
                         </span>
-                        <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                        <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             {schoolName} · {date} · {timeRange}
                         </span>
                     </>
@@ -219,7 +219,7 @@ export const CallOffsTableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     {type === 'one-time' ? 'One-time' : 'Recurring'}
                 </span>
             </div>
@@ -475,11 +475,11 @@ export const Interactive = () => {
                 alignItems: 'center',
                 gap: 'var(--size-element-gap-md)',
                 padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
-                backgroundColor: 'var(--color-surface-container-low)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-sm)',
                 flexWrap: 'wrap'
             }}>
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                     User Type:
                 </span>
                 <Button
@@ -497,7 +497,7 @@ export const Interactive = () => {
 
                 <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline-variant)', margin: '0 var(--size-element-gap-sm)' }} />
 
-                <span className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 600 }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 600 }}>
                     Call-off State:
                 </span>
                 <Button

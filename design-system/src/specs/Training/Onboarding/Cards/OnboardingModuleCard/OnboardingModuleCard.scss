@@ -4,7 +4,7 @@
  */
 
 .onboarding-module-card {
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface-raised);
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--size-card-radius-sm, 12px);
     width: 275.33px;
@@ -82,7 +82,7 @@
         font-size: var(--font-size-body2, 14px);
         font-weight: var(--font-weight-normal, 400);
         line-height: 1.571;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         text-align: center;
         flex: 1;
         margin: 0;
@@ -125,7 +125,7 @@
         font-size: var(--font-size-body3, 12px);
         font-weight: var(--font-weight-normal, 400);
         line-height: 1.667;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         white-space: nowrap;
     }
 
@@ -141,7 +141,7 @@
         font-size: var(--font-size-h5, 20px);
         font-weight: var(--font-weight-title);
         line-height: 1.4;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

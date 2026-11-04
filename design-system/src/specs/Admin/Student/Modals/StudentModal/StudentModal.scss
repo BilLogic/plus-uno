@@ -11,7 +11,7 @@
     .modal-content {
         border: none;
         border-radius: var(--size-modal-radius-md, 8px);
-        background-color: var(--color-surface-container);
+        background-color: var(--ds-surface-overlay);
         overflow: hidden;
     }
 }
@@ -32,7 +32,7 @@
 
     .student-modal__title {
         margin: 0;
-        color: var(--color-on-surface);
+        color: var(--ds-text);
     }
 
     .student-modal__close-btn {
@@ -44,7 +44,7 @@
         padding: 0;
         border: none;
         background: transparent;
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         cursor: pointer;
         font-size: 24px;
         border-radius: var(--size-element-radius-sm, 4px);
@@ -56,7 +56,7 @@
 
         &:hover {
             background-color: var(--ds-background-neutral-subtle-hovered);
-            color: var(--color-on-surface);
+            color: var(--ds-text);
         }
     }
 }
@@ -133,18 +133,18 @@
     }
 
     .student-modal__label {
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
         font-weight: var(--font-weight-semibold-1);
     }
 
     .student-modal__input {
-        background-color: var(--color-surface);
+        background-color: var(--ds-background-input);
         border: 0.8px solid var(--color-outline-variant);
         border-radius: var(--size-element-radius-sm, 2px);
         padding: var(--size-element-pad-y-md, 6px) var(--element-pad-default, 10px);
         font-size: var(--font-size-body2);
         font-weight: var(--font-weight-normal);
-        color: var(--color-on-surface-variant);
+        color: var(--ds-text-subtle);
 
         &:focus {
             border-color: var(--color-primary-border);
@@ -164,14 +164,14 @@
             right: 10px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--color-on-surface-variant);
+            color: var(--ds-icon-subtle);
             font-size: 12px;
             pointer-events: none;
         }
     }
 
     .student-modal__caption {
-        color: var(--color-on-surface);
+        color: var(--ds-text);
         font-weight: var(--font-weight-normal);
     }
 }

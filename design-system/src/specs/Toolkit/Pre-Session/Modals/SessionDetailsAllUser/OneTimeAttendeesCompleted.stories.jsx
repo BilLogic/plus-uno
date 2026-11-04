@@ -41,7 +41,7 @@ const AttendeeRow = ({ name, status = 'joined' }) => (
     >
         <span
             className="body2-txt font-weight-light"
-            style={{ color: 'var(--color-on-surface)' }}
+            style={{ color: 'var(--ds-text)' }}
         >
             {name}
         </span>
@@ -80,7 +80,7 @@ const TutorPanel = ({ tutorName, studentCount, students = [] }) => (
         >
             <span
                 className="body2-txt font-weight-semibold"
-                style={{ color: 'var(--color-on-surface)' }}
+                style={{ color: 'var(--ds-text)' }}
             >
                 {tutorName}
             </span>
@@ -144,7 +144,7 @@ export const OneTimeAttendeesCompleted = () => (
         style={{
             width: 672,
             gap: 'var(--size-modal-gap-lg)',
-            backgroundColor: 'var(--color-surface-container-high)',
+            backgroundColor: 'var(--ds-surface-container)',
             padding: 'var(--size-modal-pad-y-lg) var(--size-modal-pad-x-lg)',
             borderRadius: 'var(--size-modal-radius-lg)',
         }}
@@ -156,7 +156,7 @@ export const OneTimeAttendeesCompleted = () => (
                         className="fa-solid fa-xmark"
                         style={{
                             fontSize: 'var(--font-size-fa-h4-solid)',
-                            color: 'var(--color-on-surface-variant)',
+                            color: 'var(--ds-icon-subtle)',
                             cursor: 'pointer',
                         }}
                     />

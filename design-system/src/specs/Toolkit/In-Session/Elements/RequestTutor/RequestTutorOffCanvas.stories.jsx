@@ -29,7 +29,7 @@ const Stage = ({ children, open, onOpen }) => (
             position: 'relative',
             minHeight: '520px',
             height: '100%',
-            background: 'var(--color-surface-container-lowest)',
+            background: 'var(--ds-surface)',
             borderRadius: 'var(--size-card-radius-sm)',
             overflow: 'hidden',
         }}

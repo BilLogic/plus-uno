@@ -39,7 +39,7 @@ export const Overview = () => (
                 style={{
                     border: '1px solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-card-radius-sm)',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                 }}
             >
                 <h2 className="h4 mb-2">Elements</h2>
@@ -56,7 +56,7 @@ export const Overview = () => (
                 style={{
                     border: '1px solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-card-radius-sm)',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                 }}
             >
                 <h2 className="h4 mb-2">Sections</h2>
@@ -74,7 +74,7 @@ export const Overview = () => (
                 style={{
                     border: '1px solid var(--color-outline-variant)',
                     borderRadius: 'var(--size-card-radius-sm)',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                 }}
             >
                 <h2 className="h4 mb-2">Pages</h2>
@@ -85,7 +85,7 @@ export const Overview = () => (
             </div>
         </div>
 
-        <p className="body2-txt mt-4" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <p className="body2-txt mt-4" style={{ color: 'var(--ds-text-subtle)' }}>
             Navigate to each category in the sidebar to see the individual components and their stories.
         </p>
     </div>

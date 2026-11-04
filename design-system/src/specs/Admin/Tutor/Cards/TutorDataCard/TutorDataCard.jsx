@@ -49,7 +49,7 @@ const TutorDataCard = ({
                         data={{ percentage: safePercentage, label: subtitle }}
                         legend={legend.length > 0 ? legend : [
                             { color: 'var(--color-primary-container, #61b5cf)', label: subtitle },
-                            { color: 'var(--color-surface-container-highest, #e2e2e5)', label: 'Remaining' }
+                            { color: 'var(--ds-background-neutral)', label: 'Remaining' }
                         ]}
                         className="tutor-data-card__chart-wrapper"
                     />

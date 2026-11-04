@@ -66,7 +66,7 @@ export function ClearanceStatus({ status = 'verified', date = 'March 16, 2026' }
                     alignItems: 'flex-start',
                 }}
             >
-                <span className="body3-txt" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body3-txt" style={{ color: 'var(--ds-text)' }}>
                     Clearance Status
                 </span>
             </div>

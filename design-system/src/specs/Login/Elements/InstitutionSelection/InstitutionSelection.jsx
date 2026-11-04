@@ -46,7 +46,7 @@ export default function InstitutionSelection() {
 
             <div
                 style={{
-                    backgroundColor: 'var(--color-surface-container-high)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     padding: 'var(--size-section-pad-y-lg)',
                     borderRadius: 'var(--size-card-radius-sm)',
                     border: '1px dashed var(--color-outline-variant)',

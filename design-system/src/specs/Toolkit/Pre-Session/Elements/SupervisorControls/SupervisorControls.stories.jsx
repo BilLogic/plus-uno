@@ -11,7 +11,7 @@ export default {
 
 const gearTrigger = (
     <button type="button" className="plus-btn plus-btn--default" aria-label="Session actions" style={{ border: 'none', background: 'none' }}>
-        <i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--color-on-surface-variant)' }} />
+        <i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--ds-icon-subtle)' }} />
     </button>
 );
 
@@ -114,7 +114,7 @@ export const Overview = () => (
         {/* Gear Icon Button States */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Gear Icon Button States</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 The gear icon button in default, hover, and pressed states. Uses primary color for the icon.
             </p>
             <div style={{ 
@@ -122,20 +122,20 @@ export const Overview = () => (
                 alignItems: 'center', 
                 gap: 'var(--size-section-gap-md)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)'
             }}>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="default" />
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--size-element-gap-sm)' }}>Default</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Default</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="hover" />
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--size-element-gap-sm)' }}>Hover</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Hover</p>
                 </div>
                 <div style={{ textAlign: 'center' }}>
                     <GearIconButton state="pressed" />
-                    <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', marginTop: 'var(--size-element-gap-sm)' }}>Pressed</p>
+                    <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)', marginTop: 'var(--size-element-gap-sm)' }}>Pressed</p>
                 </div>
             </div>
         </section>
@@ -143,7 +143,7 @@ export const Overview = () => (
         {/* Open State */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Open State (Dropdown Visible)</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Dropdown menu with supervisor action options. Cancel session uses danger color.
             </p>
             <div style={{ 
@@ -151,7 +151,7 @@ export const Overview = () => (
                 alignItems: 'flex-start', 
                 justifyContent: 'center',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                backgroundColor: 'var(--color-surface-container)',
+                backgroundColor: 'var(--ds-surface-container)',
                 borderRadius: 'var(--size-card-radius-md)',
                 minHeight: 'var(--size-modal-min-height-sm)'
             }}>
@@ -164,13 +164,13 @@ export const Overview = () => (
         {/* Dropdown Menu Items */}
         <section>
             <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Dropdown Menu Items</h6>
-            <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+            <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                 Individual menu items with their respective icons. Cancel session uses danger color.
             </p>
             <div style={{ 
                 display: 'flex', 
                 flexDirection: 'column',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-overlay)',
                 borderRadius: 'var(--size-modal-radius-sm)',
                 maxWidth: 'var(--size-modal-width-sm)',
                 boxShadow: 'var(--elevation-light-2)'
@@ -183,8 +183,8 @@ export const Overview = () => (
                     padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
-                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)', flex: 1 }}>Join session</span>
+                    <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Join session</span>
                 </div>
                 
                 {/* Edit session */}
@@ -195,8 +195,8 @@ export const Overview = () => (
                     padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-pen-to-square" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
-                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)', flex: 1 }}>Edit session</span>
+                    <i className="fa-solid fa-pen-to-square" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Edit session</span>
                 </div>
                 
                 {/* Recruit tutors */}
@@ -207,8 +207,8 @@ export const Overview = () => (
                     padding: 'var(--size-element-pad-y-md) var(--element-pad-default)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-users" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-on-surface-variant)' }} />
-                    <span className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface)', flex: 1 }}>Recruit tutors</span>
+                    <i className="fa-solid fa-users" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Recruit tutors</span>
                 </div>
                 
                 {/* Cancel session - Danger style */}
@@ -249,7 +249,7 @@ export const Interactive = () => {
         >
             <section>
                 <h6 className="h6" style={{ marginBottom: 'var(--size-card-gap-md)' }}>Interactive Demo</h6>
-                <p className="body2-txt font-weight-light" style={{ color: 'var(--color-on-surface-variant)', marginBottom: 'var(--size-card-gap-md)' }}>
+                <p className="body2-txt font-weight-light" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-card-gap-md)' }}>
                     Click the gear icon to open the dropdown menu. Click outside or select an option to close.
                 </p>
                 <div style={{ 
@@ -257,7 +257,7 @@ export const Interactive = () => {
                     alignItems: 'flex-start', 
                     justifyContent: 'center',
                     padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: 'var(--size-card-radius-md)',
                     minHeight: 'var(--size-modal-min-height-md)'
                 }}>

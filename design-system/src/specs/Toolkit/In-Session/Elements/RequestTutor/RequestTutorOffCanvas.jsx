@@ -45,8 +45,8 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
                 justifyContent: 'center',
                 borderRadius: 'var(--size-element-radius-md)',
                 border: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
-                background: 'var(--color-surface-container-lowest)',
-                color: disabled ? 'var(--color-outline-variant)' : 'var(--color-on-surface)',
+                background: 'var(--ds-surface)',
+                color: disabled ? 'var(--color-outline-variant)' : 'var(--ds-text)',
                 cursor: disabled ? 'not-allowed' : 'pointer',
             }}
         >
@@ -56,7 +56,7 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
     return (
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
             {btn('minus', value <= min, () => onChange(Math.max(min, value - 1)), 'Decrease')}
-            <span className="body1-txt font-weight-semibold" style={{ minWidth: '1.5em', textAlign: 'center', color: 'var(--color-on-surface)' }}>
+            <span className="body1-txt font-weight-semibold" style={{ minWidth: '1.5em', textAlign: 'center', color: 'var(--ds-icon)' }}>
                 {value}
             </span>
             {btn('plus', value >= max, () => onChange(Math.min(max, value + 1)), 'Increase')}
@@ -75,7 +75,7 @@ const Chip = ({ selected, children, onClick }) => (
             borderRadius: 'var(--size-element-radius-full, 999px)',
             border: `var(--size-element-stroke-sm) solid ${selected ? 'var(--color-primary)' : 'var(--color-outline-variant)'}`,
             background: selected ? 'var(--color-primary)' : 'var(--ds-background-neutral)',
-            color: selected ? 'var(--color-on-primary)' : 'var(--color-on-surface)',
+            color: selected ? 'var(--color-on-primary)' : 'var(--ds-text)',
             cursor: 'pointer',
             whiteSpace: 'nowrap',
         }}
@@ -85,7 +85,7 @@ const Chip = ({ selected, children, onClick }) => (
 );
 
 const FieldLabel = ({ children, required }) => (
-    <label className="body2-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)', display: 'block' }}>
+    <label className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)', display: 'block' }}>
         {children}
         {required && <span style={{ color: 'var(--color-danger)' }}> *</span>}
     </label>
@@ -97,28 +97,28 @@ const SlackPreview = ({ role, session, tutorCount, closesAt, reason }) => (
         style={{
             border: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
             borderRadius: 'var(--size-card-radius-sm)',
-            background: 'var(--color-surface-container-lowest)',
+            background: 'var(--ds-surface)',
             padding: 'var(--size-card-pad-y-md, 16px) var(--size-card-pad-x-md, 16px)',
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--size-element-gap-md)',
         }}
     >
-        <span className="body1-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+        <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
             🟥 Need {tutorCount} {role === 'lead' ? (tutorCount > 1 ? 'tutors' : 'tutor') : 'lead tutor'} ASAP
         </span>
-        <div className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            <span><strong style={{ color: 'var(--color-on-surface)' }}>Time:</strong> {session.time}</span>
-            <span><strong style={{ color: 'var(--color-on-surface)' }}>Class:</strong> {session.class}</span>
-            <span><strong style={{ color: 'var(--color-on-surface)' }}>Teacher:</strong> {session.teacher}</span>
+        <div className="body3-txt" style={{ color: 'var(--ds-text-subtle)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <span><strong style={{ color: 'var(--ds-text)' }}>Time:</strong> {session.time}</span>
+            <span><strong style={{ color: 'var(--ds-text)' }}>Class:</strong> {session.class}</span>
+            <span><strong style={{ color: 'var(--ds-text)' }}>Teacher:</strong> {session.teacher}</span>
             {role === 'lead' && closesAt && (
-                <span><strong style={{ color: 'var(--color-on-surface)' }}>Request closes:</strong> {closesAt}</span>
+                <span><strong style={{ color: 'var(--ds-text)' }}>Request closes:</strong> {closesAt}</span>
             )}
             {role === 'lead' && reason && (
-                <span><strong style={{ color: 'var(--color-on-surface)' }}>Reason:</strong> {reason}</span>
+                <span><strong style={{ color: 'var(--ds-text)' }}>Reason:</strong> {reason}</span>
             )}
         </div>
-        <div className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
+        <div className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             If you can cover this:{' '}
             <span style={{ display: 'block' }}>1. React with ✅ so others know it&apos;s covered.</span>
             <span style={{ display: 'block' }}>2. Fill in for the session here: <a href="#" onClick={(e) => e.preventDefault()} style={{ color: 'var(--color-primary-text)' }}>session link</a></span>
@@ -155,10 +155,10 @@ export const RequestTutorOffCanvas = ({
     const Header = ({ title, subtitle }) => (
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--size-element-gap-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}>
-                <h5 className="h5" style={{ color: 'var(--color-on-surface)', margin: 0 }}>{title}</h5>
-                {subtitle && <p className="body2-txt" style={{ color: 'var(--color-on-surface-variant)', margin: 0 }}>{subtitle}</p>}
+                <h5 className="h5" style={{ color: 'var(--ds-text)', margin: 0 }}>{title}</h5>
+                {subtitle && <p className="body2-txt" style={{ color: 'var(--ds-text-subtlest)', margin: 0 }}>{subtitle}</p>}
             </div>
-            <button type="button" aria-label="Close" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--color-on-surface-variant)' }}>
+            <button type="button" aria-label="Close" onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: 'var(--ds-text-subtlest)' }}>
                 <i className="fa-solid fa-xmark" style={{ fontSize: 'var(--font-size-fa-h6-solid)' }} />
             </button>
         </div>
@@ -292,7 +292,7 @@ export const RequestTutorOffCanvas = ({
                 bottom: 0,
                 width: '400px',
                 maxWidth: '100%',
-                background: 'var(--color-surface)',
+                background: 'var(--ds-surface)',
                 borderLeft: `var(--size-element-stroke-sm) solid var(--color-outline-variant)`,
                 boxShadow: '-8px 0 24px rgba(0,0,0,0.12)',
                 display: 'flex',

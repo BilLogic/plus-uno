@@ -151,7 +151,7 @@ const ProgressRing = ({ value, label, size = 48, height = 48, color, animated = 
     }, [animated, delay, parsed]);
 
     const fillColor = color || 'var(--color-warning-container, #FFE17A)';
-    const trackColor = 'var(--color-surface-variant, #DEE3E5)';
+    const trackColor = 'var(--ds-background-neutral)';
 
     const options = useMemo(() => ({
         chart: {

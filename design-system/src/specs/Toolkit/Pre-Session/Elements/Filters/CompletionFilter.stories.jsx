@@ -68,8 +68,8 @@ export const Interactive = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-element-gap-md)' }}>
             <CompletionFilter value={completion} onChange={setCompletion} />
-            <p className="body3-txt" style={{ color: 'var(--color-on-surface-variant)' }}>
-                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--color-on-surface)' }}>
+            <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                Currently filtering by: <strong data-testid="applied" style={{ color: 'var(--ds-text)' }}>
                     {completion}
                 </strong>
             </p>

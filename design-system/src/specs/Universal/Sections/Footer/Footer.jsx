@@ -31,14 +31,14 @@ const Footer = ({
             <p
                 className="body3-txt m-0"
                 style={{
-                    color: 'var(--color-on-surface)',
+                    color: 'var(--ds-text)',
                     fontWeight: 300
                 }}
             >
                 {version} | {copyright} | <a
                     href={termsUrl}
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         textDecoration: 'none'
                     }}
                 >{termsText}</a>

@@ -19,7 +19,7 @@ export const Overview = {
                 gap: '24px',
                 flexWrap: 'wrap',
                 padding: '24px',
-                backgroundColor: 'var(--color-surface-container-high)',
+                backgroundColor: 'var(--ds-surface-container)',
             }}
         >
             <BadgeCard

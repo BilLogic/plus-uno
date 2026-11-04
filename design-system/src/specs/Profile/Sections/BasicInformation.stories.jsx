@@ -90,8 +90,8 @@ export const BasicInformationSection = ({ changed = false }) => {
         <div
             style={{
                 width: '100%',
-                backgroundColor: 'var(--color-surface-container-low, #f3f3f6)',
-                border: '1px solid var(--color-surface-container-low, #f3f3f6)',
+                backgroundColor: 'var(--ds-surface-container)',
+                border: '1px solid var(--ds-border)',
                 borderRadius: 'var(--size-section-radius-md, 12px)',
                 padding: 'var(--size-section-pad-y-md, 24px) var(--size-section-pad-x-md, 24px)',
                 display: 'flex',
@@ -111,7 +111,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                 <span
                     className="h6"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',

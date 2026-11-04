@@ -229,7 +229,7 @@ const GroupTrainingProgressTable = ({
                             >
                                 <i
                                     className={`fas ${isExpanded ? 'fa-caret-down' : 'fa-caret-right'}`}
-                                    style={{ color: 'var(--color-on-surface)' }}
+                                    style={{ color: 'var(--ds-icon)' }}
                                 />
                                 <SmartTag subject={item.competencyArea} />
                             </button>
@@ -242,7 +242,7 @@ const GroupTrainingProgressTable = ({
                             >
                                 <i
                                     className={`fas ${isExpanded ? 'fa-caret-down' : 'fa-caret-right'}`}
-                                    style={{ color: 'var(--color-on-surface-variant)' }}
+                                    style={{ color: 'var(--ds-icon-subtle)' }}
                                 />
                                 <span className="body3-txt" style={{ color: 'var(--color-secondary-text)' }}>
                                     {item.lessonName}
@@ -273,7 +273,7 @@ const GroupTrainingProgressTable = ({
 
                     {/* Time Spent column */}
                     <td className="training-progress-table__cell training-progress-table__cell--time">
-                        <span className="body3-txt" style={{ color: 'var(--color-on-surface-variant)', fontWeight: 300 }}>
+                        <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)', fontWeight: 300 }}>
                             {item.timeSpent}
                         </span>
                     </td>
@@ -313,7 +313,7 @@ const GroupTrainingProgressTable = ({
                                     <span
                                         className="body3-txt"
                                         style={{
-                                            color: 'var(--color-on-surface)',
+                                            color: 'var(--ds-text)',
                                             fontWeight: 400
                                         }}
                                     >

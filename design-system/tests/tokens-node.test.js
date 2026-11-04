@@ -547,7 +547,10 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // main.scss, the skeleton shimmer and a Pagination story canvas off
     // `--color-surface*`/`--color-on-surface*`, and their nine hex fallbacks
     // went with the legacy names.
-    expect(comparable).toBe(392);
+    // 264: the same sweep's specs batch moved all 233 `design-system/src/specs`
+    // files off `--color-surface*`/`--color-on-surface*`, and their 128 hex
+    // fallbacks went with the legacy names.
+    expect(comparable).toBe(264);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

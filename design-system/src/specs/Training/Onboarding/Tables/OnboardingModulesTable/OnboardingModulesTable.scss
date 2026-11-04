@@ -16,7 +16,7 @@
     }
 
     &::-webkit-scrollbar-track {
-        background: var(--color-surface-variant, #dde3ea);
+        background: var(--ds-background-neutral);
         border-radius: 4px;
     }
 
@@ -25,7 +25,7 @@
         border-radius: 4px;
 
         &:hover {
-            background: var(--color-on-surface-variant, #3f484a);
+            background: var(--ds-background-neutral);
         }
     }
 }

@@ -32,7 +32,7 @@ export const Overview = () => {
             <h2 className="h2" style={{ marginBottom: 'var(--size-section-gap-md)' }}>
                 Certified Tutor Badges
             </h2>
-            <p className="body2-txt" style={{ marginBottom: 'var(--size-section-gap-lg)', color: 'var(--color-on-surface-variant)' }}>
+            <p className="body2-txt" style={{ marginBottom: 'var(--size-section-gap-lg)', color: 'var(--ds-text-subtle)' }}>
                 Hexagonal badges for certified tutors. All badge types and sizes are displayed using PNG images.
             </p>
 
@@ -51,7 +51,7 @@ export const Overview = () => {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 gap: '12px',
-                                backgroundColor: 'var(--color-surface-container-lowest)',
+                                backgroundColor: 'var(--ds-surface)',
                                 borderRadius: '12px',
                                 padding: '24px',
                                 border: '1px solid var(--color-outline-variant)'
@@ -66,7 +66,7 @@ export const Overview = () => {
                                     <CertifiedTutorBadge type={badgeType.type} size={size.size} />
                                 </div>
                                 <span className="body2-txt font-weight-semibold">{size.label}</span>
-                                <code style={{ fontSize: '11px', color: 'var(--color-on-surface-variant)' }}>
+                                <code style={{ fontSize: '11px', color: 'var(--ds-text-subtle)' }}>
                                     {badgeType.type} / {size.size}
                                 </code>
                             </div>

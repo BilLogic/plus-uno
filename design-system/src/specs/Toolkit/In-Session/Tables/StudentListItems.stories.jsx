@@ -67,7 +67,7 @@ const SortIcon = () => (
         className="fa-solid fa-arrow-up"
         style={{
             fontSize: 'var(--font-size-fa-b3-solid, 10px)',
-            color: 'var(--color-on-surface-variant)',
+            color: 'var(--ds-icon-subtle)',
         }}
     />
 );
@@ -119,7 +119,7 @@ export const ListItemHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
             }}
         >
-            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Status
             </span>
             <SortIcon />
@@ -135,7 +135,7 @@ export const ListItemHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
             }}
         >
-            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Progress
             </span>
             <SortIcon />
@@ -151,7 +151,7 @@ export const ListItemHeaderRow = () => (
                 padding: 'var(--size-table-cell-y) var(--size-table-cell-x)',
             }}
         >
-            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                 Action
             </span>
             <SortIcon />
@@ -198,7 +198,7 @@ export const ListItemRow = ({
     const stateStyles = {
         default: {},
         hover: {
-            backgroundColor: 'var(--color-surface-container)',
+            backgroundColor: 'var(--ds-surface-container)',
         },
     };
 
@@ -245,7 +245,7 @@ export const ListItemRow = ({
                 <span
                     className="body3-txt"
                     style={{
-                        color: 'var(--color-on-surface)',
+                        color: 'var(--ds-text)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -304,7 +304,7 @@ export const ListItemRow = ({
                     <span
                         className="body3-txt"
                         style={{
-                            color: 'var(--color-on-surface)',
+                            color: 'var(--ds-text)',
                             opacity: 0.38,
                         }}
                     >
@@ -356,7 +356,7 @@ export const Overview = () => (
             flexDirection: 'column',
             gap: 'var(--size-section-gap-lg)',
             padding: 'var(--size-section-gap-lg)',
-            backgroundColor: 'var(--color-surface-variant)',
+            backgroundColor: 'var(--ds-background-neutral)',
             minHeight: '100vh',
         }}
     >
@@ -370,7 +370,7 @@ export const Overview = () => (
         {/* Full Table */}
         <div
             style={{
-                backgroundColor: 'var(--color-surface-container-lowest)',
+                backgroundColor: 'var(--ds-surface)',
                 borderRadius: 'var(--size-card-radius-sm)',
                 padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
             }}
@@ -441,7 +441,7 @@ export const Overview = () => (
                     <span className="small text-muted d-block mb-1">Default — Insights Available</span>
                     <div
                         style={{
-                            backgroundColor: 'var(--color-surface-container-lowest)',
+                            backgroundColor: 'var(--ds-surface)',
                             borderRadius: 'var(--size-card-radius-sm)',
                             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                         }}
@@ -464,7 +464,7 @@ export const Overview = () => (
                     <span className="small text-muted d-block mb-1">Default — No Insights Available</span>
                     <div
                         style={{
-                            backgroundColor: 'var(--color-surface-container-lowest)',
+                            backgroundColor: 'var(--ds-surface)',
                             borderRadius: 'var(--size-card-radius-sm)',
                             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                         }}
@@ -487,7 +487,7 @@ export const Overview = () => (
                     <span className="small text-muted d-block mb-1">Hover — Insights Available</span>
                     <div
                         style={{
-                            backgroundColor: 'var(--color-surface-container-lowest)',
+                            backgroundColor: 'var(--ds-surface)',
                             borderRadius: 'var(--size-card-radius-sm)',
                             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                         }}
@@ -510,7 +510,7 @@ export const Overview = () => (
                     <span className="small text-muted d-block mb-1">Hover — No Insights Available</span>
                     <div
                         style={{
-                            backgroundColor: 'var(--color-surface-container-lowest)',
+                            backgroundColor: 'var(--ds-surface)',
                             borderRadius: 'var(--size-card-radius-sm)',
                             padding: 'var(--size-card-pad-y-sm) var(--size-card-pad-x-sm)',
                         }}
@@ -599,7 +599,7 @@ export const Interactive = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 width: '100%',
-                backgroundColor: 'var(--color-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 padding: 'var(--size-section-gap-lg)',
                 minHeight: '100vh',
             }}
@@ -613,7 +613,7 @@ export const Interactive = () => {
 
             <div
                 style={{
-                    backgroundColor: 'var(--color-surface-container-lowest)',
+                    backgroundColor: 'var(--ds-surface)',
                     borderRadius: 'var(--size-card-radius-sm)',
                     padding: 'var(--size-card-pad-y-lg) var(--size-card-pad-x-lg)',
                 }}

@@ -18,7 +18,7 @@ export const SpecOverview = ({ title, description, categories }) => {
                             padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
                             border: '1px solid var(--color-outline-variant)',
                             borderRadius: 'var(--size-card-radius-sm)',
-                            backgroundColor: 'var(--color-surface-container)'
+                            backgroundColor: 'var(--ds-surface-container)'
                         }}
                     >
                         <h3 className="h4" style={{ marginBottom: 'var(--size-element-gap-sm)' }}>{category.name}</h3>
@@ -29,7 +29,7 @@ export const SpecOverview = ({ title, description, categories }) => {
 
             <p className="body2-txt" style={{
                 marginTop: 'var(--size-card-gap-lg)',
-                color: 'var(--color-on-surface-variant)'
+                color: 'var(--ds-text-subtle)'
             }}>
                 Navigate to each category in the sidebar to see the individual components and their stories.
             </p>

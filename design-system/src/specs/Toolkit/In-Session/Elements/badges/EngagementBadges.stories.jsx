@@ -124,7 +124,7 @@ export const AllVariations = () => (
         className="d-flex flex-column gap-4"
         style={{
             padding: 'var(--size-section-gap-lg)',
-            backgroundColor: 'var(--color-surface-variant)',
+            backgroundColor: 'var(--ds-background-neutral)',
             minHeight: '100vh'
         }}
     >
@@ -199,7 +199,7 @@ export const Interactive = () => {
             className="d-flex flex-column gap-4"
             style={{
                 padding: 'var(--size-section-gap-lg)',
-                backgroundColor: 'var(--color-surface-variant)',
+                backgroundColor: 'var(--ds-background-neutral)',
                 minHeight: '100vh'
             }}
         >
@@ -212,7 +212,7 @@ export const Interactive = () => {
             <div
                 className="d-flex flex-wrap gap-3 p-3"
                 style={{
-                    backgroundColor: 'var(--color-surface-container-low)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: 'var(--size-card-radius-sm)'
                 }}
             >
@@ -260,7 +260,7 @@ export const Interactive = () => {
             <div
                 className="d-flex justify-content-center align-items-center p-4"
                 style={{
-                    backgroundColor: 'var(--color-surface-container)',
+                    backgroundColor: 'var(--ds-surface-container)',
                     borderRadius: 'var(--size-card-radius-sm)',
                     minHeight: '120px'
                 }}

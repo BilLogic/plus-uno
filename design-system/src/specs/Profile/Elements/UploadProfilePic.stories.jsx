@@ -77,11 +77,11 @@ export const UploadProfilePic = ({ state = 'unfilled', avatarSrc }) => {
                     overflow: 'hidden',
                 }}
             >
-                <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+                <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                     Upload a square image (e.g., 200 × 200 px)
                 </span>
             </div>
-            <span className="body3-txt font-weight-light" style={{ color: 'var(--color-on-surface)' }}>
+            <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                 Accepted formats: PNG, JPG, or JPEG
             </span>
             {isFilled ? (

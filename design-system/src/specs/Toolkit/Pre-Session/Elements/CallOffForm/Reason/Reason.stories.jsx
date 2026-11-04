@@ -49,7 +49,7 @@ export const Overview = () => (
                 }}
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
-                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                         Reason for call-Off
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
@@ -73,7 +73,7 @@ export const Overview = () => (
                 }}
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
-                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                         Reason for call-Off
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>
@@ -111,7 +111,7 @@ export const Interactive = () => {
                 }}
             >
                 <div style={{ display: 'flex', gap: 'var(--size-spacing-small-space-050)' }}>
-                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--color-on-surface)' }}>
+                    <span className="body3-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                         Reason for call-Off
                     </span>
                     <span className="body3-txt" style={{ color: 'var(--color-danger)' }}>*</span>

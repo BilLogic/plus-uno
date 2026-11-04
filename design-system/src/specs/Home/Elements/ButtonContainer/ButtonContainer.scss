@@ -83,7 +83,7 @@
     &--disabled {
         .plus-button-container-button {
             border-color: var(--color-outline) !important;
-            color: var(--color-on-surface) !important;
+            color: var(--ds-text) !important;
             background-color: transparent !important;
             opacity: 0.38;
         }
