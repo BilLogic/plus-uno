@@ -65,14 +65,6 @@
     "legacy-ring-token design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 3,
     "legacy-ring-token design-system/src/components/layout-and-structure/Collapse/Collapse.scss": 1,
     "legacy-ring-token design-system/src/components/navigation/NavPills/NavPills.scss": 4,
-    "legacy-ring-token design-system/src/components/navigation/Pagination/Pagination.scss": 1,
-    "outline-none design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss": 1,
-    "outline-none design-system/src/components/forms-and-inputs/Range.scss": 2,
-    "outline-none design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 3,
-    "outline-none design-system/src/components/forms-and-inputs/Select/Select.scss": 1,
-    "outline-none design-system/src/components/forms-and-inputs/_internal/Listbox.scss": 1,
-    "outline-none design-system/src/components/labels/Tag/Tag.scss": 1,
-    "outline-none design-system/src/components/navigation/NavPills/NavPills.scss": 2,
-    "outline-none design-system/src/components/navigation/Pagination/Pagination.scss": 1
+    "legacy-ring-token design-system/src/components/navigation/Pagination/Pagination.scss": 1
   }
 }

@@ -5,6 +5,7 @@
  * calendar is the shared Calendar on the `_Listbox` surface (Calendar.scss,
  * Listbox.scss). This file only places the input and the calendar icon.
  */
+@use '../../../styles/state' as *;
 
 .plus-date-picker__input {
     flex: 1 1 auto;
@@ -14,9 +15,12 @@
     margin: 0;
     border: none;
     background: transparent;
-    outline: none;
     font: inherit;
     color: inherit;
+
+    &:focus {
+        @include plus-ring-reset;
+    }
 
     &::placeholder {
         color: var(--ds-text-subtlest);
