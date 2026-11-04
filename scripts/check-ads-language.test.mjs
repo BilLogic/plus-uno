@@ -61,6 +61,8 @@ test('a size prop type that lists small / medium / large is counted; pixel sizes
   assert.equal(countOf([src('a.jsx', old)], 'proptype:size a.jsx'), 1);
   const px = 'Calendar.propTypes = {\n  size: PropTypes.oneOf([28, 36, 44]),\n};\n';
   assert.equal(countOf([src('a.jsx', px)], 'proptype:size a.jsx'), undefined);
+  const named = "const SIZES = ['sm', 'md', 'lg'];\nT.propTypes = {\n  size: PropTypes.oneOf(SIZES),\n};\n";
+  assert.equal(countOf([src('a.jsx', named)], 'proptype:size a.jsx'), 1, 'a named constant does not hide it');
 });
 
 test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on purpose', () => {

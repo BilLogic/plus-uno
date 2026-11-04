@@ -158,6 +158,12 @@ export function measure(sources) {
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
+    // `size: PropTypes.oneOf(SIZES)` with `const SIZES = ['sm', ...]` in the same file.
+    const constSize = text.match(/\bsize:\s*(?:PropTypes\.)?oneOf\(\s*([A-Z_]+)\s*\)/);
+    if (constSize && new RegExp(`const\\s+${constSize[1]}\\s*=\\s*\\[\\s*['"](?:small|medium|large|sm|md|lg)['"]`).test(text)) {
+      const line = live.findIndex((l) => constSize[0] && l.includes(constSize[0])) + 1;
+      add('proptype:size', file, 1, line || 1);
+    }
     if (DOC_PATH.test(file)) {
       for (const [oldName] of Object.entries(RENAMED_NO_ALIAS)) {
         const re = new RegExp(`\\b${oldName}\\b`);
