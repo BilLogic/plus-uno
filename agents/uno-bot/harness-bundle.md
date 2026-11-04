@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **105,253 chars from 9 files**, against an assembled budget of 175,500 (70,247 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 84,869 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **105,989 chars from 9 files**, against an assembled budget of 175,500 (69,511 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 85,605 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,715 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,343 | 27,736 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 49,204 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 50,850 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,098 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 57,792 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,578 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 89,398 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 92,866 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 99,424 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 104,397 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 105,253 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,079 | 28,472 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 49,940 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,586 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,834 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,528 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 70,314 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 90,134 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 93,602 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 100,160 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 105,133 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 105,989 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -315,6 +315,22 @@ _Avoid_: "tag list"
 **Suggestion**:
 A label that offers something PLUS AI proposes, which a person accepts or dismisses.
 _Avoid_: "AI chip"
+
+**Fieldset**:
+A legend plus the fields it groups: one `fieldset` and `legend`, built on Base UI. The base `RadioGroup` and a Checkbox group compose on top of.
+_Avoid_: "field group"
+
+**Radio group**:
+One question and its radio answers: a `Fieldset` holding `Radio`s, pick one. Replaced `ChoiceGroup`.
+_Avoid_: "multiple choice", "radio list"
+
+**Choice grid**:
+A PLUS-only pattern: the same question asked of several rows, as a table — one `Radio group` per row, built from `Radio`.
+_Avoid_: "matrix question"
+
+**Linear scale**:
+A PLUS pattern on `Radio group`: an inline row of options with a label at either end, used for a reflection form's five-point scale. Replaced the Scale page.
+_Avoid_: "scale", bare "slider" for this pattern
 
 **appearance**:
 The prop that picks how a component looks within its role, such as `default`, `subtle` or `primary`.
