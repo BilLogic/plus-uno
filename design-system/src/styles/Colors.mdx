@@ -9,6 +9,7 @@ import {
     FoundationExample,
     TokenSwatches,
 } from '@/storybook-docs/foundation-page.jsx';
+import { AccentPalette, ChartPalette } from '@/storybook-docs/token-blocks.jsx';
 import * as ColorsStories from './Colors.stories.jsx';
 
 <Meta of={ColorsStories} />
@@ -137,14 +138,9 @@ A role describes the intention behind a color. Pick the role for the job, then t
 
 <FoundationSection title="Accent hues">
 
-Ten hues decorate: tags, charts, avatars and illustrations. A hue means nothing on its own. When the color carries meaning, use a role instead.
+Eleven hues decorate: tags, charts, avatars and illustrations. A hue means nothing on its own. When the color carries meaning, use a role instead.
 
-<TokenSwatches
-    items={['lime', 'red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'magenta', 'gray', 'brown'].flatMap((hue) => [
-        { token: `--ds-background-accent-${hue}-subtler`, text: `--ds-text-accent-${hue}-bolder`, label: `${hue} · subtler` },
-        { token: `--ds-background-accent-${hue}-bolder`, text: '--ds-text-inverse', label: `${hue} · bolder` },
-    ])}
-/>
+<AccentPalette />
 
 <Canvas of={ColorsStories.AccentOnComponents} sourceState="none" />
 
@@ -216,7 +212,7 @@ Charts take the chart tokens, and every chart color does one job. Never reach fo
     head={['Job', 'What it encodes', 'Tokens']}
     rows={[
         ['One series', 'The data, with nothing to tell apart', <><C>--ds-chart-brand</C>; a comparison or reference line takes <C>--ds-chart-neutral</C></>],
-        ['Categorical', 'Which series', <><C>--ds-chart-categorical-1</C> to <C>-6</C>, in order</>],
+        ['Categorical', 'Which series', <><C>--ds-chart-categorical-1</C> to <C>-8</C>, in order</>],
         ['Sequential', 'How much', 'One hue from its bold to its boldest step; the strongest tone is the biggest value'],
         ['Diverging', 'Which side of a baseline', 'Two hues around a gray midpoint, orange and blue by default'],
         ['Status', 'On track, at risk, off track', <><C>--ds-chart-success</C>, <C>-warning</C>, <C>-danger</C>, each with <C>-bold</C></>],
@@ -224,17 +220,7 @@ Charts take the chart tokens, and every chart color does one job. Never reach fo
     ]}
 />
 
-<TokenSwatches
-    items={[
-        { token: '--ds-chart-brand', label: 'brand', sample: '' },
-        { token: '--ds-chart-neutral', label: 'neutral', sample: '' },
-        ...[1, 2, 3, 4, 5, 6].map((n) => ({ token: `--ds-chart-categorical-${n}`, label: `cat ${n}`, sample: '' })),
-        { token: '--ds-chart-success', label: 'success', sample: '' },
-        { token: '--ds-chart-warning', label: 'warning', sample: '' },
-        { token: '--ds-chart-danger', label: 'danger', sample: '' },
-    ]}
-    min="var(--card-min-width-sm)"
-/>
+<ChartPalette />
 
 - Use five or six categories at most and group the rest.
 - Never mix categorical and status colors in one chart, and give every color a second cue: a label, a shape or a pattern.
