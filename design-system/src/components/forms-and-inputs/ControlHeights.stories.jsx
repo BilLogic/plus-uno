@@ -161,7 +161,10 @@ Ranges.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const slider = canvas.getByRole('slider', { name: 'Range' });
     await expect(heightOf(slider), 'slider').toBe(32);
-    await expectLabel(canvasElement.querySelector(`label[for="${slider.id}"]`), 'range label', '400');
+    // Range names its slider through `aria-labelledby`, not a native
+    // `label[for]` — Base UI's Slider has no DOM-query label lookup the way
+    // Checkbox and Radio do (see Range.jsx).
+    await expectLabel(canvasElement.querySelector('.plus-field-label'), 'range label', '400');
 };
 
 /** Rating items are 32 with a 16 star. */

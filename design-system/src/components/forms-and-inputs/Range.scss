@@ -110,4 +110,21 @@
     &[data-dragging] {
         background-color: var(--ds-background-selected-bold-hovered);
     }
+
+    // The real, focusable, `role="slider"` element — Base UI's hidden native
+    // `input[type="range"]` — is the accessible and interactive control
+    // itself (unlike Checkbox and Radio, there is no separate span). Base UI
+    // sizes it inline at 100% of this small thumb box, so `!important`
+    // overrides that inline `width`/`height` to the full 32 control height
+    // instead: a bigger hit and focus target than the visible dot, the same
+    // row the native `<input type="range">` used to be before Base UI.
+    input[type="range"] {
+        width: var(--item-height-md) !important;
+        height: var(--item-height-md) !important;
+        top: 50%;
+        left: 50%;
+        margin: 0;
+        cursor: pointer;
+        transform: translate(-50%, -50%);
+    }
 }
