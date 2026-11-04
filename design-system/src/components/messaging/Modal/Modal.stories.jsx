@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
-import { IconButton } from '@/components';
+import { IconButton, Button } from '@/components';
 
 export default {
     title: 'Components/Messaging/Modal dialog',
@@ -415,4 +416,99 @@ export const Overview = {
             source: { language: 'jsx', code: webAppSourceSnippets.modal }
         }
     }
+};
+
+/* --------------------------------------------------------- nested overlay */
+
+/**
+ * The shared overlay module's two-overlay limit (B4): a modal and the confirm
+ * it raises nest through the confirm sitting in the first modal's own
+ * `children`, which is what gives it the parent's `OverlayContext`. A third
+ * modal, attempted from inside the confirm, stays closed: `useOverlaySlot`
+ * refuses it and the nested-confirm pattern never shows a third dialog.
+ */
+const NestedConfirmDemo = () => {
+    const [open, setOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [thirdOpen, setThirdOpen] = useState(false);
+
+    return (
+        <>
+            <Button text="Open settings" onClick={() => setOpen(true)} />
+            <Modal
+                show={open}
+                width="sm"
+                title="Settings"
+                body="Closing asks you to confirm."
+                primaryButton={{ text: 'Delete account', onClick: () => setConfirmOpen(true) }}
+                onClose={() => setOpen(false)}
+            >
+                <Modal
+                    show={confirmOpen}
+                    width="sm"
+                    title="Delete account?"
+                    body="This cannot be undone."
+                    primaryButton={{ text: 'Open a third', onClick: () => setThirdOpen(true) }}
+                    onClose={() => setConfirmOpen(false)}
+                >
+                    <Modal
+                        show={thirdOpen}
+                        width="sm"
+                        title="Third"
+                        body="At most two stack; this one is refused."
+                        onClose={() => setThirdOpen(false)}
+                    />
+                </Modal>
+            </Modal>
+        </>
+    );
+};
+
+const dialogNamed = (canvasElement, name) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name });
+
+/** Escape closes the topmost dialog first, and focus returns to what raised it. */
+export const NestedConfirmTopmostEscape = {
+    render: () => <NestedConfirmDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const openSettings = canvas.getByRole('button', { name: 'Open settings' });
+        await userEvent.click(openSettings);
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).not.toBeNull());
+
+        const deleteButton = within(dialogNamed(canvasElement, 'Settings')).getByRole('button', { name: 'Delete account' });
+        await userEvent.click(deleteButton);
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).not.toBeNull());
+        await expect(dialogNamed(canvasElement, 'Settings'), 'the raising dialog stays open underneath').not.toBeNull();
+
+        // Escape closes the topmost dialog only.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).toBeNull());
+        await expect(dialogNamed(canvasElement, 'Settings'), 'the outer dialog is still open').not.toBeNull();
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on what raised the confirm').toBe(deleteButton));
+
+        // Escape again closes the outer dialog, and focus returns to its own trigger.
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).toBeNull());
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the original trigger').toBe(openSettings));
+    },
+};
+
+/** At most two overlays stack: a third, raised from the confirm, is refused and never shows. */
+export const NestedConfirmTwoOverlayLimit = {
+    render: () => <NestedConfirmDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Open settings' }));
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).not.toBeNull());
+        await userEvent.click(within(dialogNamed(canvasElement, 'Settings')).getByRole('button', { name: 'Delete account' }));
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).not.toBeNull());
+
+        const thirdTrigger = within(dialogNamed(canvasElement, 'Delete account?')).getByRole('button', { name: 'Open a third' });
+        await userEvent.click(thirdTrigger);
+
+        // The third dialog never appears; the two already open are untouched.
+        await expect(dialogNamed(canvasElement, 'Third'), 'a third overlay is refused').toBeNull();
+        await expect(dialogNamed(canvasElement, 'Delete account?'), 'the confirm stays open').not.toBeNull();
+        await expect(dialogNamed(canvasElement, 'Settings'), 'the outer dialog stays open').not.toBeNull();
+    },
 };

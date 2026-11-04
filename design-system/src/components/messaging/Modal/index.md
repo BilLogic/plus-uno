@@ -9,7 +9,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview, NestedConfirmTopmostEscape, NestedConfirmTwoOverlayLimit
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 

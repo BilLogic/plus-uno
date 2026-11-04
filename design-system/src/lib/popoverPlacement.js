@@ -5,6 +5,7 @@
  * Field popups place themselves with `placePopup` (forms-and-inputs); popups
  * and tooltips hand the same two numbers to Popper.
  */
+import { overlayMountOf } from '@/lib/overlay';
 
 /** The offset in px when the token can't be read; matches `--popover-offset`. */
 export const POPOVER_OFFSET = 4;
@@ -64,11 +65,12 @@ export function popoverOverlayProps(offset) {
  *
  * A popup is on the popup layer (400), under a modal (510). One opened from a
  * trigger inside a modal mounts in the modal's overlay instead, so it takes
- * the modal's layer and draws above the dialog.
+ * the modal's layer and draws above the dialog. Resolved through the shared
+ * overlay module (`@/lib/overlay`), the one place this rule is spelled out.
  *
  * @param {{current: Element | null} | undefined} triggerRef the trigger
  * @returns {Element}
  */
 export function popupMountOf(triggerRef) {
-    return triggerRef?.current?.closest('.modal') ?? document.body;
+    return overlayMountOf(triggerRef?.current);
 }
