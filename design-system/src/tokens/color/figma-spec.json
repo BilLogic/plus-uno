@@ -12129,23 +12129,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "blue/600"
+       "name": "lagoon/600"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/600"
+       "name": "lagoon/500"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "blue/850"
+       "name": "lagoon/850"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/400"
+       "name": "lagoon/300"
       }
      }
     },
@@ -12160,23 +12160,23 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.1 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
+     "description": "Hovered state of color.chart.categorical.1 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
-       "name": "blue/700"
+       "name": "lagoon/700"
       },
       "Dark": {
        "alias": "color / primitives",
-       "name": "blue/500"
+       "name": "lagoon/400"
       },
       "Light IC": {
        "alias": "color / primitives",
-       "name": "blue/900"
+       "name": "lagoon/900"
       },
       "Dark IC": {
        "alias": "color / primitives",
-       "name": "blue/300"
+       "name": "lagoon/250"
       }
      }
     },
@@ -12191,379 +12191,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "yellow/500"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "yellow/500"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "yellow/800"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "yellow/300"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/2/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-2-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.2 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "yellow/600"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "yellow/400"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "yellow/850"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "yellow/250"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/3/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-3)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "magenta/800"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "magenta/700"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "magenta/1000"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "magenta/500"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/3/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-3-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.3 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "magenta/850"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "magenta/600"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "magenta/1100"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "magenta/400"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/4/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-4)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "orange/500"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "orange/500"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "orange/800"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "orange/300"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/4/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-4-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.4 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "orange/600"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "orange/400"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "orange/850"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "orange/250"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/5/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-5)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "purple/600"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "purple/500"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "purple/850"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "purple/300"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/5/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-5-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.5 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "purple/700"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "purple/400"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "purple/900"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "purple/250"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/6/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-6)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "lime/500"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "lime/500"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "lime/800"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "lime/300"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/6/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-6-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.6 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "lime/600"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "lime/400"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "lime/850"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "lime/250"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/7/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-7)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "blue/800"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "blue/700"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "blue/1000"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "blue/500"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/7/hovered",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-7-hovered)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.7 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
-     "values": {
-      "Light": {
-       "alias": "color / primitives",
-       "name": "blue/850"
-      },
-      "Dark": {
-       "alias": "color / primitives",
-       "name": "blue/600"
-      },
-      "Light IC": {
-       "alias": "color / primitives",
-       "name": "blue/1100"
-      },
-      "Dark IC": {
-       "alias": "color / primitives",
-       "name": "blue/400"
-      }
-     }
-    },
-    {
-     "name": "color/chart/categorical/8/default",
-     "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-8)"
-     },
-     "scopes": [
-      "FRAME_FILL",
-      "SHAPE_FILL",
-      "STROKE_COLOR"
-     ],
-     "hiddenFromPublishing": true,
-     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12584,9 +12212,9 @@
      }
     },
     {
-     "name": "color/chart/categorical/8/hovered",
+     "name": "color/chart/categorical/2/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-chart-categorical-8-hovered)"
+      "WEB": "var(--ds-chart-categorical-2-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
@@ -12594,7 +12222,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": true,
-     "description": "Hovered state of color.chart.categorical.8 PLUS: PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and pull same-family neighbors together. No red, which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are darker reprises of 1 and 4 for overflow past the limit of six.",
+     "description": "Hovered state of color.chart.categorical.2 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -12611,6 +12239,378 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "orange/400"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/3/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-3)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "blue/500"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "blue/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "blue/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "blue/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/3/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-3-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.3 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "blue/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "blue/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "blue/850"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "blue/250"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/4/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-4)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/700"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/500"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/4/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-4-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.4 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "magenta/850"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "magenta/600"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "magenta/1100"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "magenta/400"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/5/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-5)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/500"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/250"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/5/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-5-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.5 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lime/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lime/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lime/850"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lime/200"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/6/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-6)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "purple/700"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "purple/700"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "purple/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "purple/500"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/6/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-6-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.6 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "purple/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "purple/600"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "purple/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "purple/400"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/7/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-7)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/500"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/300"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/7/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-7-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.7 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "orange/600"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "orange/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "orange/850"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "orange/250"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/8/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-8)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "For data visualisation only. Follow numbered sequence PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "blue/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "blue/700"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "blue/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "blue/500"
+      }
+     }
+    },
+    {
+     "name": "color/chart/categorical/8/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-chart-categorical-8-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": true,
+     "description": "Hovered state of color.chart.categorical.8 PLUS: PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 are darker reprises of 3 and 1 for overflow past the limit of six.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "blue/850"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "blue/600"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "blue/1100"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "blue/400"
       }
      }
     },

@@ -320,18 +320,25 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
   setMode('color.background.neutral.bold.pressed', 'light_ic', N(900));
   setMode('color.icon.danger', 'light_ic', H('red', 800));
 
-  // ---- charts: categorical order chosen for color-vision deficiency (protan and deutan) in both plans ----
-  // Atlassian's order is blue, lime, purple, orange, then darker blue, purple, teal and orange. PLUS keeps blue
-  // first and Atlassian's limit of six, and re-picks the hues and steps so neighbors stay apart.
+  // ---- charts: categorical order (option B, Bill 2026-11-04) ----
+  // Brand leads (slot 1 = color.chart.brand's own hue, lagoon), and neighbors alternate light and dark steps so the
+  // sequence reads in grayscale and for color-blind readers: lagoon-600, orange-800, blue-500, magenta-800,
+  // lime-500, purple-700, then orange-500, blue-800 as darker reprises for overflow past the limit of six. No
+  // yellow (reads as warning), no red (reads as danger), no teal (too close to the brand); lime and purple-500
+  // overlap success and discovery, so a chart never mixes categorical and status colors.
   const CH_WHY =
-    'PLUS: series 1-6 are blue, yellow, magenta, orange, purple and lime, picked so neighbors stay apart under ' +
-    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15) in both plans, light and dark. ' +
-    'Dark keeps the light steps, one lighter at most: the 300 and 400 steps wash out on the dark surface and ' +
-    'pull same-family neighbors together. No red, ' +
-    'which reads as danger, no green, which reads as success, and no teal, which reads as the brand. 7 and 8 are ' +
-    'darker reprises of 1 and 4 for overflow past the limit of six.';
-  const CAT = { 1: ['blue', 600, 600], 2: ['yellow', 500, 500], 3: ['magenta', 800, 700], 4: ['orange', 500, 500],
-    5: ['purple', 600, 500], 6: ['lime', 500, 500], 7: ['blue', 800, 700], 8: ['orange', 800, 700] };
+    'PLUS: series 1-6 are lagoon (the brand hue), orange, blue, magenta, lime and purple, ordered so neighbors ' +
+    'alternate light and dark steps (deltaE(L) >= 0.08 OKLCH, direction flipping in dark) and stay apart under ' +
+    'protan and deutan simulation (deltaE >= 8) and for full color vision (deltaE >= 15), in both plans, light and ' +
+    'dark. Dark keeps the light steps, one lighter at most: the 700/800 steps step down one (600/700), and the ' +
+    'brand (lagoon) steps down two (600 to 500) since it reprises the brand ramp more often. Two slots needed a ' +
+    'move to clear the lightness-alternation check once dark was laid out: purple (6) keeps its light step (700) ' +
+    'in dark too, instead of stepping down, because stepping down crowded it against both neighbors; lime (5) ' +
+    'steps down two in dark (500 to 400, i.e. lighter) instead of one, to clear 0.08 against magenta (4). No ' +
+    'yellow, which reads as warning, no red, which reads as danger, and no teal, which reads as the brand. 7 and 8 ' +
+    'are darker reprises of 3 and 1 for overflow past the limit of six.';
+  const CAT = { 1: ['lagoon', 600, 500], 2: ['orange', 800, 700], 3: ['blue', 500, 500], 4: ['magenta', 800, 700],
+    5: ['lime', 500, 400], 6: ['purple', 700, 700], 7: ['orange', 500, 500], 8: ['blue', 800, 700] };
   const nxt = (st, k) => STEPS[Math.max(0, Math.min(STEPS.length - 1, STEPS.indexOf(st) + k))];
   for (const [i, [f, l, d]] of Object.entries(CAT)) {
     for (const [suf, dl] of [['', 0], ['.hovered', 1]]) {
