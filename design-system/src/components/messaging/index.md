@@ -11,7 +11,7 @@ authored half (#166), counted rather than assumed.
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 13 | ✅ | ✅ | ✅ |
 | [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✕ | ✅ |
-| [Modal](Modal/index.md) | 33 | ✅ | ✅ | ✅ |
+| [Modal](Modal/index.md) | 27 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Spotlight](Spotlight/index.md) | 12 | ✅ | ✕ | ✅ |
 

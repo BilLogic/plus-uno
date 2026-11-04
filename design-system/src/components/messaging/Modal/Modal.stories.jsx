@@ -67,9 +67,6 @@ export default {
         footer: { table: { disable: true, category: 'Development' } },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
-        enforceFocus: { table: { disable: true, category: 'Development' } },
-        autoFocus: { table: { disable: true, category: 'Development' } },
-        restoreFocus: { table: { disable: true, category: 'Development' } },
         renderAs: { table: { disable: true, category: 'Development' } },
         onClose: { table: { disable: true, category: 'Development' } },
         primaryButton: { table: { disable: true, category: 'Development' } },
@@ -418,19 +415,18 @@ export const Overview = {
     }
 };
 
-/* --------------------------------------------------------- nested overlay */
+/* ----------------------------------------------------------- confirm view */
+
+const dialogNamed = (canvasElement, name) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name });
 
 /**
- * The shared overlay module's two-overlay limit (B4): a modal and the confirm
- * it raises nest through the confirm sitting in the first modal's own
- * `children`, which is what gives it the parent's `OverlayContext`. A third
- * modal, attempted from inside the confirm, stays closed: `useOverlaySlot`
- * refuses it and the nested-confirm pattern never shows a third dialog.
+ * A follow-up that needs confirming does not stack a second Modal: the
+ * caller swaps `title`, `body` and the footer buttons in place, driven by
+ * its own `confirming` state, so at most one dialog is ever open for this flow.
  */
-const NestedConfirmDemo = () => {
+const ConfirmViewDemo = () => {
     const [open, setOpen] = useState(false);
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [thirdOpen, setThirdOpen] = useState(false);
+    const [confirming, setConfirming] = useState(false);
 
     return (
         <>
@@ -438,77 +434,86 @@ const NestedConfirmDemo = () => {
             <Modal
                 show={open}
                 width="sm"
-                title="Settings"
-                body="Closing asks you to confirm."
-                primaryButton={{ text: 'Delete account', onClick: () => setConfirmOpen(true) }}
+                title={confirming ? 'Delete account?' : 'Settings'}
+                body={confirming ? 'This cannot be undone.' : 'Closing asks you to confirm.'}
+                secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : undefined}
+                primaryButton={
+                    confirming
+                        ? { text: 'Delete', appearance: 'danger', onClick: () => setOpen(false) }
+                        : { text: 'Delete account', onClick: () => setConfirming(true) }
+                }
                 onClose={() => setOpen(false)}
-            >
-                <Modal
-                    show={confirmOpen}
-                    width="sm"
-                    title="Delete account?"
-                    body="This cannot be undone."
-                    primaryButton={{ text: 'Open a third', onClick: () => setThirdOpen(true) }}
-                    onClose={() => setConfirmOpen(false)}
-                >
-                    <Modal
-                        show={thirdOpen}
-                        width="sm"
-                        title="Third"
-                        body="At most two stack; this one is refused."
-                        onClose={() => setThirdOpen(false)}
-                    />
-                </Modal>
-            </Modal>
+            />
         </>
     );
 };
 
-const dialogNamed = (canvasElement, name) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name });
+/** The named action swaps the dialog's content in place; Back swaps it back. */
+export const ConfirmView = {
+    render: () => <ConfirmViewDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Open settings' }));
+        const dialog = dialogNamed(canvasElement, 'Settings');
+        await waitFor(() => expect(dialog).not.toBeNull());
 
-/** Escape closes the topmost dialog first, and focus returns to what raised it. */
-export const NestedConfirmTopmostEscape = {
-    render: () => <NestedConfirmDemo />,
+        await userEvent.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+        // Still one dialog: the content swapped in place, named for the confirm now.
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).toBe(dialog));
+        const deleteButton = within(dialog).getByRole('button', { name: 'Delete' });
+        await expect(deleteButton, 'the danger action takes the danger appearance').toHaveClass('plus-btn--danger');
+
+        // Back returns to the default content without closing the dialog.
+        await userEvent.click(within(dialog).getByRole('button', { name: 'Back' }));
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).toBe(dialog));
+    },
+};
+
+/** Escape closes the dialog from either state, and focus returns to what raised it. */
+export const ConfirmViewEscape = {
+    render: () => <ConfirmViewDemo />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const openSettings = canvas.getByRole('button', { name: 'Open settings' });
         await userEvent.click(openSettings);
         await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).not.toBeNull());
 
-        const deleteButton = within(dialogNamed(canvasElement, 'Settings')).getByRole('button', { name: 'Delete account' });
-        await userEvent.click(deleteButton);
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).not.toBeNull());
-        await expect(dialogNamed(canvasElement, 'Settings'), 'the raising dialog stays open underneath').not.toBeNull();
-
-        // Escape closes the topmost dialog only.
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).toBeNull());
-        await expect(dialogNamed(canvasElement, 'Settings'), 'the outer dialog is still open').not.toBeNull();
-        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on what raised the confirm').toBe(deleteButton));
-
-        // Escape again closes the outer dialog, and focus returns to its own trigger.
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).toBeNull());
-        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the original trigger').toBe(openSettings));
-    },
-};
-
-/** At most two overlays stack: a third, raised from the confirm, is refused and never shows. */
-export const NestedConfirmTwoOverlayLimit = {
-    render: () => <NestedConfirmDemo />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole('button', { name: 'Open settings' }));
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Settings')).not.toBeNull());
         await userEvent.click(within(dialogNamed(canvasElement, 'Settings')).getByRole('button', { name: 'Delete account' }));
         await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).not.toBeNull());
 
-        const thirdTrigger = within(dialogNamed(canvasElement, 'Delete account?')).getByRole('button', { name: 'Open a third' });
-        await userEvent.click(thirdTrigger);
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete account?')).toBeNull());
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the trigger').toBe(openSettings));
+    },
+};
 
-        // The third dialog never appears; the two already open are untouched.
+/** At most two overlays stack (B4): a second Modal opened independently is refused. */
+export const TwoOverlayLimit = {
+    render: () => {
+        const [firstOpen, setFirstOpen] = useState(false);
+        const [secondOpen, setSecondOpen] = useState(false);
+        const [thirdOpen, setThirdOpen] = useState(false);
+        return (
+            <>
+                <Button text="Open first" onClick={() => setFirstOpen(true)} />
+                <Button text="Open second" onClick={() => setSecondOpen(true)} />
+                <Button text="Open third" onClick={() => setThirdOpen(true)} />
+                <Modal show={firstOpen} width="sm" title="First" body="One." onClose={() => setFirstOpen(false)} />
+                <Modal show={secondOpen} width="sm" title="Second" body="Two." onClose={() => setSecondOpen(false)} />
+                <Modal show={thirdOpen} width="sm" title="Third" body="At most two stack; this one is refused." onClose={() => setThirdOpen(false)} />
+            </>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
+        await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+        await userEvent.click(canvas.getByRole('button', { name: 'Open second' }));
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Second')).not.toBeNull());
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Open third' }));
         await expect(dialogNamed(canvasElement, 'Third'), 'a third overlay is refused').toBeNull();
-        await expect(dialogNamed(canvasElement, 'Delete account?'), 'the confirm stays open').not.toBeNull();
-        await expect(dialogNamed(canvasElement, 'Settings'), 'the outer dialog stays open').not.toBeNull();
+        await expect(dialogNamed(canvasElement, 'First'), 'the first dialog stays open').not.toBeNull();
+        await expect(dialogNamed(canvasElement, 'Second'), 'the second dialog stays open').not.toBeNull();
     },
 };

@@ -3,13 +3,13 @@
 
 # Modal
 
-Universal modal component for creating dialog windows that overlay the main content. Note: This component is wrapped in a react-bootstrap Modal under the hood to handle automatic overlay creation, backdrop clicking, and centering.
+Universal modal component for creating dialog windows that overlay the main content. It is a real dialog, placed in `Blanket`: opening it moves focus inside and Tab cycles there, Escape and a click on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up that needs confirming — "delete this?" — does not stack a second Modal: the caller swaps `title`, `body` and the footer buttons in place, driven by its own state. One dialog is open at a time.
 
 **Import:** `import { Modal } from '@/components';`
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview, NestedConfirmTopmostEscape, NestedConfirmTwoOverlayLimit
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -31,15 +31,9 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `dividers` | bool | `false` | A rule under the header and over the footer. |
 | `loading` | bool | `false` | Skeleton bars in place of the body while its content loads. |
 | `show` | bool | `false` | — |
-| `backdrop` | bool or string | `true` | — |
-| `keyboard` | bool | `true` | — |
-| `centered` | bool | `true` | — |
+| `backdrop` | enum | `true` | `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. |
+| `keyboard` | bool | `true` | Escape closes, by default. `false` for a dialog that has to be answered. |
 | `renderAs` | enum | `'modal'` | — |
-| `container` | any | — | — |
-| `manager` | any | — | — |
-| `enforceFocus` | bool | — | — |
-| `autoFocus` | bool | — | — |
-| `restoreFocus` | bool | — | — |
 | `primaryButton` | buttonShape | — | — |
 | `secondaryButton` | buttonShape | — | — |
 | `onClose` | func | — | — |
@@ -57,6 +51,8 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **`type`** — `default` · `scrollable`
 
+**`backdrop`** — `static`
+
 **`renderAs`** — `modal` · `inline`
 
 **`paddingSize`** — `sm` · `md` · `lg`
@@ -71,7 +67,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--blanket-pad-x` · `--blanket-pad-y` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-blanket` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--layer-blanket` · `--layer-modal` · `--layout-columns` · `--layout-gutter` · `--layout-max-width-content` · `--layout-min-width-content` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--size-element-stroke-sm` · `--size-modal-gap-lg` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-lg` · `--size-modal-pad-x-md` · `--size-modal-pad-x-sm` · `--size-modal-pad-y-lg` · `--size-modal-pad-y-md` · `--size-modal-pad-y-sm` · `--size-modal-radius-lg` · `--size-modal-radius-md` · `--size-modal-radius-sm` · `--space-150` · `--stack-md` · `--stack-sm`
+`--blanket-max-height-modal` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--layout-columns` · `--layout-gutter` · `--layout-max-width-content` · `--layout-min-width-content` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--size-element-stroke-sm` · `--size-modal-gap-lg` · `--size-modal-gap-md` · `--size-modal-gap-sm` · `--size-modal-pad-x-lg` · `--size-modal-pad-x-md` · `--size-modal-pad-x-sm` · `--size-modal-pad-y-lg` · `--size-modal-pad-y-md` · `--size-modal-pad-y-sm` · `--size-modal-radius-lg` · `--size-modal-radius-md` · `--size-modal-radius-sm` · `--space-150` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

@@ -1,16 +1,33 @@
-import React, { createContext, useContext, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import BootstrapModal from 'react-bootstrap/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { useOverlaySlot, reportFocusLost, getOverlayPortalRoot } from '@/lib/overlay';
+import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
+import Blanket from '@/patterns/Blanket';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
 
 /** The widths from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
 const GRID_WIDTHS = ['sm', 'md', 'lg'];
+
+/** What can take focus inside the dialog, in DOM order. */
+const FOCUSABLE = [
+    'a[href]',
+    'area[href]',
+    'button:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    'iframe',
+    '[contenteditable=""]',
+    '[contenteditable="true"]',
+    '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
+const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
+    .filter((node) => !node.closest('[hidden], [inert]'));
 
 /**
  * Resolves a fixed `width` to CSS lengths, or `null` for a grid width.
@@ -40,16 +57,6 @@ const resolveModalWidth = (width) => {
 };
 
 /**
- * The overlay a modal sits in, for a modal raised from inside it.
- *
- * A nested confirm mounts into the first modal's overlay rather than beside
- * it, so its scrim and dialog reuse the 500 / 510 layers inside the first
- * modal's own layer and cover it. Beside it, the second scrim (500) would sit
- * under the first modal (510).
- */
-const OverlayContext = createContext(null);
-
-/**
  * True while an element's content is taller than its box.
  * A body that scrolls has to be a tab stop so a keyboard can scroll it.
  */
@@ -73,8 +80,15 @@ function useOverflows(ref, show, loading) {
  * Modal component for PLUS design system.
  * Universal modal component for creating dialog windows that overlay the main content.
  *
- * Note: This component is wrapped in a react-bootstrap Modal under the hood to handle
- * automatic overlay creation, backdrop clicking, and centering.
+ * It is a real dialog, placed in `Blanket`: opening it moves focus inside and
+ * Tab cycles there, Escape and a click on the blanket close it, and closing
+ * returns focus to what had it. It takes a stack slot from the shared overlay
+ * module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a
+ * third stays closed and calls `onClose`.
+ *
+ * A follow-up that needs confirming — "delete this?" — does not stack a
+ * second Modal: the caller swaps `title`, `body` and the footer buttons in
+ * place, driven by its own state. One dialog is open at a time.
  */
 const Modal = ({
     id,
@@ -95,13 +109,7 @@ const Modal = ({
     onClose,
     backdrop = true,
     keyboard = true,
-    centered = true,
     renderAs = 'modal',
-    container,
-    manager,
-    enforceFocus,
-    autoFocus,
-    restoreFocus,
     paddingSize,
     gapSize,
     radiusSize,
@@ -113,10 +121,9 @@ const Modal = ({
     'data-testid': dataTestId,
 }) => {
     /*
-     * A DIALOG WITHOUT A NAME. react-bootstrap renders `role="dialog"
-     * aria-modal="true"` and nothing else, so a screen reader announced
-     * "dialog" and stopped. The title is the dialog's h1 and names it; the
-     * description describes it.
+     * A DIALOG WITHOUT A NAME. A `div role="dialog"` with nothing else makes a
+     * screen reader announce "dialog" and stop. The title is the dialog's h1
+     * and names it; the description describes it.
      *
      * `useId` rather than a counter or the caller's `id`: the id has to be
      * unique per instance and stable across renders, and `id` is optional on
@@ -127,29 +134,73 @@ const Modal = ({
     const panelRef = useRef(null);
     const bodyRef = useRef(null);
 
-    const parent = useContext(OverlayContext);
-    // A modal raised from a modal waits for that modal's place, so when both
-    // mount open the outer one takes its place first.
-    const [placed, trigger] = useOverlaySlot(
-        show && renderAs === 'modal' && (parent ? parent.placed : true),
-        onClose,
-    );
+    const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
-    const overlay = useMemo(() => ({
-        placed: renderAs === 'inline' ? (parent ? parent.placed : true) : placed,
-        element: () => panelRef.current?.closest('.modal') ?? null,
-    }), [renderAs, parent, placed]);
-    // Focus goes back to the trigger on close; one that has left the page
-    // cannot take it, so whoever removed it is told.
-    const onExited = () => {
-        if (trigger.current && !trigger.current.isConnected) reportFocusLost();
-        trigger.current = null;
-    };
 
     const scrollable = type === 'scrollable';
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
     const overflows = useOverflows(bodyRef, visible, loading);
+
+    // A real overlay (not an inline docs preview) takes focus into the
+    // dialog on open. A follow-up confirmation swaps `title`/`body`/the
+    // footer buttons in place rather than mounting new content, so the
+    // focused button stays the same element and keeps its focus.
+    const isRealOverlay = visible && renderAs === 'modal';
+    useEffect(() => {
+        if (!isRealOverlay) return;
+        const panel = panelRef.current;
+        const [first] = focusablesIn(panel);
+        (first ?? panel)?.focus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isRealOverlay]);
+
+    // Closing gives focus back to the trigger `useOverlaySlot` captured, so a
+    // keyboard user lands where they were. One that has left the page (a
+    // parent that removed it while the dialog was open) cannot take it back,
+    // so whoever removed it is told.
+    useEffect(() => {
+        if (!isRealOverlay) return undefined;
+        return () => {
+            const opener = trigger.current;
+            if (opener && typeof opener.focus === 'function' && opener.isConnected) {
+                opener.focus();
+            } else if (opener && !opener.isConnected) {
+                reportFocusLost();
+            }
+        };
+    }, [isRealOverlay, trigger]);
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Escape') {
+            if (!keyboard || event.defaultPrevented || !onClose) return;
+            event.stopPropagation();
+            onClose(event);
+            return;
+        }
+        if (event.key !== 'Tab') return;
+        const nodes = focusablesIn(panelRef.current);
+        if (nodes.length === 0) {
+            event.preventDefault();
+            return;
+        }
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        const active = document.activeElement;
+        const panel = panelRef.current;
+        if (active !== panel && !nodes.includes(active)) {
+            event.preventDefault();
+            (event.shiftKey ? last : first).focus();
+        } else if (event.shiftKey && (active === first || active === panel)) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && active === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
+
+    if (!visible) return null;
 
     const classes = [
         'plus-modal',
@@ -171,9 +222,22 @@ const Modal = ({
 
     // A dialog is its own page: its title is the h1, so a section in it opens at
     // h2 whatever section the modal was raised from.
-    const modalContent = (
+    const panel = (
         <HeadingLevelContext.Provider value={1}>
-            <div id={id} ref={panelRef} className={classes} style={modalStyle} data-testid={dataTestId}>
+            <div
+                id={id}
+                ref={panelRef}
+                className={classes}
+                style={modalStyle}
+                data-testid={dataTestId}
+                role={renderAs === 'modal' ? 'dialog' : undefined}
+                aria-modal={renderAs === 'modal' ? 'true' : undefined}
+                aria-labelledby={renderAs === 'modal' && title ? titleId : undefined}
+                aria-describedby={renderAs === 'modal' && description ? descriptionId : undefined}
+                aria-label={renderAs === 'modal' && !title ? ariaLabel : undefined}
+                tabIndex={renderAs === 'modal' ? -1 : undefined}
+                onKeyDown={renderAs === 'modal' ? handleKeyDown : undefined}
+            >
                 {!bodyOnly && (
                     <>
                         <div className="plus-modal-header">
@@ -273,34 +337,17 @@ const Modal = ({
     );
 
     if (renderAs === 'inline') {
-        return modalContent;
+        return panel;
     }
 
+    // `static` keeps the blanket but refuses to close on a click there, for a
+    // dialog over an in-flight operation a stray click should not abandon.
+    const blanketCloses = backdrop !== false && backdrop !== 'static';
+
     return (
-        <OverlayContext.Provider value={overlay}>
-            <BootstrapModal
-                show={visible}
-                onHide={onClose}
-                onExited={onExited}
-                backdrop={backdrop}
-                keyboard={keyboard}
-                centered={centered}
-                container={container ?? (parent ? parent.element : getOverlayPortalRoot())}
-                manager={manager}
-                enforceFocus={enforceFocus}
-                autoFocus={autoFocus}
-                restoreFocus={restoreFocus}
-                className="plus-modal-overlay"
-                backdropClassName="plus-modal-scrim"
-                contentClassName="plus-bootstrap-modal-content-reset"
-                dialogClassName="plus-bootstrap-modal-dialog-reset"
-                aria-labelledby={title ? titleId : undefined}
-                aria-describedby={description ? descriptionId : undefined}
-                aria-label={title ? undefined : ariaLabel}
-            >
-                {modalContent}
-            </BootstrapModal>
-        </OverlayContext.Provider>
+        <Blanket onBlanketClick={blanketCloses ? onClose : undefined}>
+            {panel}
+        </Blanket>
     );
 };
 
@@ -339,15 +386,11 @@ Modal.propTypes = {
     /** Skeleton bars in place of the body while its content loads. */
     loading: PropTypes.bool,
     show: PropTypes.bool,
-    backdrop: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+    /** `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. */
+    backdrop: PropTypes.oneOf([true, false, 'static']),
+    /** Escape closes, by default. `false` for a dialog that has to be answered. */
     keyboard: PropTypes.bool,
-    centered: PropTypes.bool,
     renderAs: PropTypes.oneOf(['modal', 'inline']),
-    container: PropTypes.any,
-    manager: PropTypes.any,
-    enforceFocus: PropTypes.bool,
-    autoFocus: PropTypes.bool,
-    restoreFocus: PropTypes.bool,
     primaryButton: buttonShape,
     secondaryButton: buttonShape,
     onClose: PropTypes.func,
