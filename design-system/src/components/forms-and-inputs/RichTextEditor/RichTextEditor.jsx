@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import useFieldId from '@/components/forms-and-inputs/useFieldId';
-import { Dropdown } from 'react-bootstrap';
+import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu/DropdownMenu';
+import { ButtonItem } from '@/components/navigation/MenuGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
@@ -51,19 +52,6 @@ function normalizeBlockTag(raw) {
     if (BLOCK_OPTIONS.some(o => o.value === t)) return t;
     return 'p';
 }
-
-/** Plain toggle for block-style dropdown (Figma “text button”; not the main DS Button). */
-const RichTextBlockToggle = React.forwardRef(({ children, className, ...rest }, ref) => (
-    <button
-        ref={ref}
-        type="button"
-        className={['plus-rich-text-editor-block-toggle', 'dropdown-toggle', className].filter(Boolean).join(' ')}
-        {...rest}
-    >
-        {children}
-    </button>
-));
-RichTextBlockToggle.displayName = 'RichTextBlockToggle';
 
 const RichTextEditor = ({
     id,
@@ -261,38 +249,34 @@ const RichTextEditor = ({
                     renderFullToolbar()
                 ) : (
                     <>
-                        <Dropdown
-                            className="plus-rich-text-editor-block-dropdown"
-                            onSelect={(next) => {
-                                if (next != null) execCommand('formatBlock', next);
-                            }}
+                        <DropdownMenu
+                            className="plus-rich-text-editor-block-menu"
+                            spacing="compact"
+                            minWidth="10rem"
+                            trigger={(
+                                <button
+                                    type="button"
+                                    id={`${fieldId}-block-format`}
+                                    className="plus-rich-text-editor-block-toggle"
+                                    disabled={disabled || readOnly}
+                                >
+                                    <span className="plus-rich-text-editor-block-toggle-label">{blockLabel}</span>
+                                    <span className="plus-rich-text-editor-block-toggle-caret" aria-hidden>
+                                        <i className="fa-solid fa-arrows-up-down" />
+                                    </span>
+                                </button>
+                            )}
                         >
-                            <Dropdown.Toggle
-                                as={RichTextBlockToggle}
-                                id={`${fieldId}-block-format`}
-                                disabled={disabled || readOnly}
-                            >
-                                <span className="plus-rich-text-editor-block-toggle-label">{blockLabel}</span>
-                                <span className="plus-rich-text-editor-block-toggle-caret" aria-hidden>
-                                    <i className="fa-solid fa-arrows-up-down" />
-                                </span>
-                            </Dropdown.Toggle>
-                            <Dropdown.Menu
-                                align="start"
-                                className="plus-rich-text-editor-block-menu dropdown-menu"
-                            >
-                                {BLOCK_OPTIONS.map((opt) => (
-                                    <Dropdown.Item
-                                        key={opt.value}
-                                        eventKey={opt.value}
-                                        active={blockFormat === opt.value}
-                                        className="plus-rich-text-editor-block-option"
-                                    >
-                                        {opt.label}
-                                    </Dropdown.Item>
-                                ))}
-                            </Dropdown.Menu>
-                        </Dropdown>
+                            {BLOCK_OPTIONS.map((opt) => (
+                                <ButtonItem
+                                    key={opt.value}
+                                    isSelected={blockFormat === opt.value}
+                                    onClick={() => execCommand('formatBlock', opt.value)}
+                                >
+                                    {opt.label}
+                                </ButtonItem>
+                            ))}
+                        </DropdownMenu>
                         <div
                             className="plus-rich-text-editor-biu-cluster"
                             role="group"
