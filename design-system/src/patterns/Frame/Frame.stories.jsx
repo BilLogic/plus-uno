@@ -99,6 +99,9 @@ const parts = (canvasElement) => {
         surface: frame.querySelector('.plus-frame__surface'),
         content: frame.querySelector('.plus-frame__content'),
         sidebar: () => canvas.queryByRole('complementary', { name: 'Sidebar' }),
+        // Under an open modal the page is hidden from assistive tech, so the
+        // sidebar is found among the hidden roles: still there, still docked.
+        coveredSidebar: () => canvas.queryByRole('complementary', { name: 'Sidebar', hidden: true }),
         edge: () => frame.querySelector('.plus-frame__edge'),
     };
 };
@@ -526,8 +529,9 @@ export const ModalLeavesDockedSidebar = {
         const trigger = p.canvas.getByRole('button', { name: 'Page settings' });
         await userEvent.click(trigger);
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
-        await expect(p.sidebar(), 'still docked').not.toBeNull();
-        await expect(getComputedStyle(p.sidebar()).position).toBe('static');
+        await expect(p.sidebar(), 'hidden from assistive tech under the modal').toBeNull();
+        await expect(p.coveredSidebar(), 'still docked').not.toBeNull();
+        await expect(getComputedStyle(p.coveredSidebar()).position).toBe('static');
 
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
@@ -547,7 +551,7 @@ export const ModalLeavesDockedSidebarAt768 = {
 
         await userEvent.click(p.canvas.getByRole('button', { name: 'Page settings' }));
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
-        await expect(p.sidebar(), 'still docked').not.toBeNull();
+        await expect(p.coveredSidebar(), 'still docked').not.toBeNull();
 
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());

@@ -55,12 +55,9 @@ Implemented as `RatingItem`.
 |------|------|---------|-------------|
 | `value` | number (required) | — | — |
 | `selected` | bool | — | Filled — true for every item up to the rating. |
-| `checked` | bool | — | The chosen value — true for exactly one item. This is what ARIA reports. |
-| `tabbable` | bool | — | Holds the group's single tab stop (#319). |
 | `variant` | enum | — | — |
 | `icon` | enum | — | — |
 | `disabled` | bool | — | — |
-| `onClick` | func | — | — |
 | `className` | string | — | — |
 
 ## Related

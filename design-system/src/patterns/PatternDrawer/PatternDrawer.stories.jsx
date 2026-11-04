@@ -318,13 +318,16 @@ export const DrawerSharesTheTwoOverlayLimit = {
         const deleteButton = body.getByRole('button', { name: 'Delete session' });
         await userEvent.click(deleteButton);
         await waitFor(() => expect(body.queryByRole('dialog', { name: 'Delete this session?' })).not.toBeNull());
-        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open underneath').not.toBeNull();
+        // The confirm is modal: the drawer under it stays open, hidden from
+        // assistive tech until the confirm closes.
+        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer is covered').toBeNull();
+        await expect(body.queryByRole('dialog', { name: 'Session details', hidden: true }), 'the drawer stays open underneath').not.toBeNull();
 
         // The two-overlay limit: a third, raised from the confirm, is refused.
         await userEvent.click(body.getByRole('button', { name: 'Open a third' }));
         await expect(body.queryByRole('dialog', { name: 'Third' }), 'a third overlay is refused, whether raised from a drawer or a modal').toBeNull();
         await expect(body.queryByRole('dialog', { name: 'Delete this session?' }), 'the confirm stays open').not.toBeNull();
-        await expect(body.queryByRole('dialog', { name: 'Session details' }), 'the drawer stays open').not.toBeNull();
+        await expect(body.queryByRole('dialog', { name: 'Session details', hidden: true }), 'the drawer stays open').not.toBeNull();
 
         // Topmost Escape: closes the confirm first, focus returns to what raised it.
         await userEvent.keyboard('{Escape}');
