@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_ANIMATION_DURATION_MS, CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
 import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
@@ -41,7 +41,7 @@ const HeatmapChart = ({
     /** When false, disables Highcharts series animation (useful to avoid replay on redraw). */
     enableAnimation = true,
     /** Animation duration in ms when animation is enabled. */
-    animationDuration = 1000
+    animationDuration = CHART_ANIMATION_DURATION_MS
 }) => {
     const mode = useColorModeKey();
     const options = useMemo(() => {
@@ -53,7 +53,7 @@ const HeatmapChart = ({
             ...chartTheme.chart,
             type: 'heatmap',
             height: height,
-            ...(compactSpacing && { spacing: [6, 6, 6, 6] })
+            ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
         },
         title: { text: null },
         xAxis: {

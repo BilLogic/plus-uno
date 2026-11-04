@@ -51,8 +51,8 @@ const DonutChartSVG = ({
         if (centerTextSize === 'body3') {
             return {
                 fontFamily: 'var(--font-family-body)',
-                fontWeight: 'var(--font-weight-normal, 300)',
-                fontSize: '12px',
+                fontWeight: 'var(--font-weight-normal)',
+                fontSize: 'var(--font-size-body3)',
                 lineHeight: '1.4',
                 color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'

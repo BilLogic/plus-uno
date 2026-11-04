@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_NODE_RADIUS } from '@/dataviz/chartTheme';
 import { CHROME } from '@/dataviz/palette';
 
 /**
@@ -31,6 +31,7 @@ const TreegraphChart = ({
                 name: item.name
             })),
             tooltip: {
+                ...chartTheme.tooltip,
                 pointFormat: '{point.name}'
             },
             marker: {
@@ -38,7 +39,7 @@ const TreegraphChart = ({
                 width: '25%',
                 height: 30
             },
-            borderRadius: 10,
+            borderRadius: CHART_NODE_RADIUS,
             dataLabels: {
                 enabled: true,
                 style: {
