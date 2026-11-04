@@ -4,6 +4,7 @@
  * without a blanket), a `color.border` edge and
  * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
  */
+@use '../../../styles/state' as *;
 
 .plus-listbox {
     /*
@@ -129,7 +130,10 @@
     display: flex;
     flex-direction: column;
     padding: var(--popover-pad-menu);
-    outline: none;
+
+    &:focus {
+        @include plus-ring-reset;
+    }
 
     &:focus-visible {
         outline: var(--size-element-stroke-lg) solid var(--ds-border-focused);

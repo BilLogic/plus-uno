@@ -155,8 +155,8 @@
 // The ring's own declarations, with no selector of its own — for a control
 // whose ring has to be drawn on a descendant, not on the rule `plus-state` is
 // included in. Range's thumb is the one adopter: the track element itself
-// stays un-ringed (`&:focus { outline: none; }`, written by hand, since there
-// is nothing of its own to ring) and each `::-webkit-slider-thumb` /
+// stays un-ringed (`&:focus { @include plus-ring-reset; }`, since there is
+// nothing of its own to ring) and each `::-webkit-slider-thumb` /
 // `::-moz-range-thumb` under `&:focus-visible` includes this instead.
 @mixin plus-ring(
     $ring-offset: var(--size-element-stroke-lg),
@@ -172,6 +172,21 @@
     $color: if(string.slice($ring-token, 1, 2) == '--', var(#{$ring-token}), $ring-token);
     outline: $ring-offset solid $color #{$bang};
     outline-offset: $ring-offset;
+}
+
+// Resets the browser's own `:focus` outline with no ring of its own — for an
+// element whose ring is drawn elsewhere (Field draws the ring; its nested
+// input only needs the native outline gone) or on a descendant/pseudo-element
+// instead of the rule itself (Range's track, whose ring lives on the thumb).
+// Call on `&:focus` in place of hand-writing `outline: none;`, so the literal
+// text lives here instead of being retyped per component (#1698).
+@mixin plus-ring-reset($important: false) {
+    $bang: null;
+    @if $important {
+        $bang: '!important';
+    }
+    outline: none #{$bang};
+    box-shadow: none #{$bang};
 }
 
 /// Applies a map of CSS declarations as-is; the mixin's own helper, not meant

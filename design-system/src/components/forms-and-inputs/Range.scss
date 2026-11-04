@@ -56,7 +56,6 @@
     padding: 0;
     margin: 0;
     background: transparent;
-    outline: none;
     -webkit-appearance: none;
     appearance: none;
     cursor: pointer;
@@ -139,7 +138,7 @@
     // Keyboard focus is the 2px ring on `border.focused`, 2px off the thumb.
     // A pointer focus draws none.
     &:focus {
-        outline: none;
+        @include plus-ring-reset;
     }
 
     &:focus-visible {

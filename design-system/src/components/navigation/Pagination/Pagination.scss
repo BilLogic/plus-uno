@@ -9,6 +9,7 @@
  * - Thin vertical dividers between segments; no gaps
  * - States: default / hover / active / disabled match Figma exactly
  */
+@use '../../../styles/state' as *;
 
 /* ============================================
    PAGINATION CONTAINER
@@ -220,8 +221,7 @@
  * not cover it. A pointer focus draws nothing.
  */
 .plus-pagination .page-link:focus {
-    outline: none;
-    box-shadow: none;
+    @include plus-ring-reset;
 }
 
 .plus-pagination .page-item:not(.disabled):not(.active) .page-link:focus-visible,
