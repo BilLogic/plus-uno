@@ -25,8 +25,8 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body3, 12px)',
-            fontWeight: 'var(--font-weight-semibold-1, 400)'
+            fontSize: 'var(--font-size-body3)',
+            fontWeight: 'var(--font-weight-semibold-1)'
         }
     },
     title: {
@@ -79,7 +79,7 @@ const chartTheme = {
     colors: CATEGORICAL,
     chart: {
         backgroundColor: 'transparent',
-        spacing: [16, 16, 16, 16], // Matches --size-card-pad-md
+        spacing: [16, 16, 16, 16], // Matches --card-pad-md
         style: {
             fontFamily: BODY,
             color: CHROME.text
@@ -90,14 +90,14 @@ const chartTheme = {
             color: CHROME.text,
             fontFamily: 'var(--font-family-headline)',
             fontWeight: 'var(--font-weight-headline)',
-            fontSize: 'var(--font-size-h4, 24px)'
+            fontSize: 'var(--font-size-h4)'
         }
     },
     subtitle: {
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body2, 14px)'
+            fontSize: 'var(--font-size-body2)'
         }
     },
     xAxis: axis(0),
@@ -106,7 +106,7 @@ const chartTheme = {
         itemStyle: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontWeight: 'var(--font-weight-semibold-1, 400)'
+            fontWeight: 'var(--font-weight-semibold-1)'
         },
         itemHoverStyle: {
             color: CHROME.text
@@ -118,12 +118,12 @@ const chartTheme = {
     tooltip: {
         backgroundColor: CHROME.tooltip,
         borderColor: CHROME.axis,
-        borderRadius: 8, // Matches --size-element-radius-md
+        borderRadius: 8, // Matches --radius-md
         borderWidth: 1,
         style: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body2, 14px)'
+            fontSize: 'var(--font-size-body2)'
         },
         shadow: true
     },
