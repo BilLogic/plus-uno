@@ -157,6 +157,22 @@ _Avoid_: "tag list"
 A label that offers something PLUS AI proposes, which a person accepts or dismisses.
 _Avoid_: "AI chip"
 
+**Fieldset**:
+A legend plus the fields it groups: one `fieldset` and `legend`, built on Base UI. The base `RadioGroup` and a Checkbox group compose on top of.
+_Avoid_: "field group"
+
+**Radio group**:
+One question and its radio answers: a `Fieldset` holding `Radio`s, pick one. Replaced `ChoiceGroup`.
+_Avoid_: "multiple choice", "radio list"
+
+**Choice grid**:
+A PLUS-only pattern: the same question asked of several rows, as a table — one `Radio group` per row, built from `Radio`.
+_Avoid_: "matrix question"
+
+**Linear scale**:
+A PLUS pattern on `Radio group`: an inline row of options with a label at either end, used for a reflection form's five-point scale. Replaced the Scale page.
+_Avoid_: "scale", bare "slider" for this pattern
+
 **appearance**:
 The prop that picks how a component looks within its role, such as `default`, `subtle` or `primary`.
 

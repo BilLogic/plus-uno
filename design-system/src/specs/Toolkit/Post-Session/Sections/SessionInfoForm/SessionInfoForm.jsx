@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { ChoiceGroup } from '@/components';
+import { Fieldset, Checkbox } from '@/components';
 import NavigationButtons from '@/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons';
 import ReflectionStep from '@/specs/Toolkit/Post-Session/Sections/ReflectionStep/ReflectionStep';
 import SessionDate from '@/specs/Toolkit/Post-Session/Elements/SessionDate/SessionDate';
@@ -139,23 +139,36 @@ const SessionInfoForm = ({
 
             {hasDateAndSession && formData.didNotHappen && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: 'var(--col-8)' }}>
-                    <ChoiceGroup
+                    <Fieldset
                         id="cancel-reason"
-                        name="cancel-reason"
-                        type="checkbox"
-                        required
+                        isRequired
                         legend={(
                             <span className="body1-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                                 Select one or more reasons why the session did not happen.
                             </span>
                         )}
-                        options={CANCELLATION_REASON_OPTIONS.map((reason) => ({
-                            value: reason.id,
-                            label: reason.example ? `${reason.label} (${reason.example})` : reason.label,
-                        }))}
-                        value={formData.cancellationReasons}
-                        onChange={(cancellationReasons) => patchForm({ cancellationReasons })}
-                    />
+                        style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-gap-default)' }}
+                    >
+                        {CANCELLATION_REASON_OPTIONS.map((reason) => {
+                            const label = reason.example ? `${reason.label} (${reason.example})` : reason.label;
+                            const checked = formData.cancellationReasons.includes(reason.id);
+                            return (
+                                <Checkbox
+                                    key={reason.id}
+                                    name="cancel-reason"
+                                    value={reason.id}
+                                    label={label}
+                                    isChecked={checked}
+                                    onChange={(event) => {
+                                        const without = formData.cancellationReasons.filter((v) => v !== reason.id);
+                                        patchForm({
+                                            cancellationReasons: event.target.checked ? [...without, reason.id] : without,
+                                        });
+                                    }}
+                                />
+                            );
+                        })}
+                    </Fieldset>
 
                     <FreeResponseQuestion
                         id="cancellation-description"

@@ -8,7 +8,7 @@ Mirrors `design-system/src/components/`. Import via `@/components/`.
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
-## UI components (42)
+## UI components (43)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiLabel](../../src/components/labels/AiLabel/index.md)
@@ -19,12 +19,12 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [Carousel](../../src/components/layout-and-structure/Carousel/index.md)
 - [Checkbox](../../src/components/forms-and-inputs/Checkbox.md)
 - [ChoiceGrid](../../src/components/forms-and-inputs/ChoiceGrid.md)
-- [ChoiceGroup](../../src/components/forms-and-inputs/ChoiceGroup.md)
 - [CloseButton](../../src/components/forms-and-inputs/CloseButton/index.md)
 - [Code](../../src/components/text-and-data-display/Code/index.md)
 - [Comment](../../src/components/forms-and-inputs/Comment/index.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [DateTimePicker](../../src/components/forms-and-inputs/DateTimePicker/index.md)
+- [Fieldset](../../src/components/forms-and-inputs/Fieldset.md)
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload.md)
 - [Footer](../../src/components/layout-and-structure/Footer/index.md)
 - [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
@@ -37,6 +37,7 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [PromptInput](../../src/components/forms-and-inputs/PromptInput/index.md)
 - [PromptStarters](../../src/components/labels/PromptStarters/index.md)
 - [Radio](../../src/components/forms-and-inputs/Radio.md)
+- [RadioGroup](../../src/components/forms-and-inputs/RadioGroup.md)
 - [Range](../../src/components/forms-and-inputs/Range.md)
 - [Rating](../../src/components/forms-and-inputs/Rating.md)
 - [RichTextEditor](../../src/components/forms-and-inputs/RichTextEditor/index.md)

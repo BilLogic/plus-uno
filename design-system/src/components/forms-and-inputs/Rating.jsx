@@ -20,12 +20,12 @@ const Rating = ({
     id,
     name,
     label,
-    required = false,
+    isRequired = false,
     value = 0,
     variant = 'comments', // 'comments' or 'numeric'
     showCommentsLabel = true,
     commentsLabel = 'Comments',
-    disabled = false,
+    isDisabled = false,
     onChange,
     className = '',
     style,
@@ -44,7 +44,7 @@ const Rating = ({
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
 
     const handleStarClick = (starValue) => {
-        if (disabled) return;
+        if (isDisabled) return;
         if (onChange) {
             onChange(starValue);
         }
@@ -66,7 +66,7 @@ const Rating = ({
      * @param {React.KeyboardEvent} event
      */
     const handleKeyDown = (event) => {
-        if (disabled) return;
+        if (isDisabled) return;
 
         const current = RATING_VALUES.includes(value) ? value : 0;
         let next = null;
@@ -88,7 +88,7 @@ const Rating = ({
 
     const wrapperClasses = [
         'plus-rating-wrapper',
-        disabled ? 'plus-rating-disabled' : '',
+        isDisabled ? 'plus-rating-disabled' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -97,7 +97,7 @@ const Rating = ({
             {hasLabel && (
                 <Form.Label as="span" id={labelId} className="plus-rating-label">
                     {label}
-                    {required && (
+                    {isRequired && (
                         <span className="plus-rating-required" aria-label="required">*</span>
                     )}
                 </Form.Label>
@@ -120,7 +120,7 @@ const Rating = ({
                 role="radiogroup"
                 aria-labelledby={labelId}
                 aria-label={hasLabel ? undefined : 'Rating'}
-                aria-disabled={disabled || undefined}
+                aria-disabled={isDisabled || undefined}
                 onKeyDown={handleKeyDown}
             >
                 {RATING_VALUES.map((starValue) => {
@@ -134,7 +134,7 @@ const Rating = ({
                                 tabbable={starValue === tabbableValue}
                                 variant={variant}
                                 icon={icon}
-                                disabled={disabled}
+                                disabled={isDisabled}
                                 onClick={() => handleStarClick(starValue)}
                             />
                         </div>
@@ -154,12 +154,12 @@ Rating.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     value: PropTypes.number,
     variant: PropTypes.oneOf(['comments', 'numeric']),
     showCommentsLabel: PropTypes.bool,
     commentsLabel: PropTypes.node,
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     onChange: PropTypes.func,
     className: PropTypes.string,
     style: PropTypes.object,

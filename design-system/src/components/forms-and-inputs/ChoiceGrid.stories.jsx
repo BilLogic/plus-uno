@@ -41,7 +41,7 @@ export default {
             description: 'Number of columns in the demo grid',
             table: { category: 'Content' },
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the choice grid',
             table: { category: 'Behavior' },
@@ -192,7 +192,7 @@ export const InteractionStates = () => (
             rows={singleRow}
             columns={columns}
             values={{ 'row-1': 'col-2' }}
-            disabled
+            isDisabled
         />
     </div>
 );
@@ -245,7 +245,7 @@ export const ReadOnly = () => (
             rows={singleRow}
             columns={overviewColumns}
             values={{ 'row-1': { 'col-1': true } }}
-            readOnly
+            isReadOnly
             onChange={() => {
                 throw new Error('a read-only grid reported a change');
             }}
@@ -286,7 +286,7 @@ export const Interactive = (args) => {
                 rows={rows}
                 columns={cols}
                 values={args.type === 'radio' ? radioValues : checkboxValues}
-                disabled={args.disabled}
+                isDisabled={args.isDisabled}
                 onChange={
                     args.type === 'radio'
                         ? (rowId, columnId) => setRadioValues({ ...radioValues, [rowId]: columnId })
@@ -301,5 +301,5 @@ Interactive.args = {
     type: 'radio',
     rowCount: singleRow.length,
     columnCount: columns.length,
-    disabled: false,
+    isDisabled: false,
 };

@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import ChoiceGroup from './ChoiceGroup';
+import RadioGroup from './RadioGroup';
 
 export default {
     title: 'Components/Forms and inputs/Radio/Radio group',
-    component: ChoiceGroup,
+    component: RadioGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
                 component:
-                    'One question and its answers: a fieldset of radios (pick one) or checkboxes (pick any), '
-                    + 'stacked or inline, with an optional scale, an "Other" answer and one group error.',
+                    'One question and its radio answers: a Fieldset of Radios, stacked or inline, with an '
+                    + 'optional scale and one group error.',
             },
         },
     },
@@ -23,14 +23,7 @@ export default {
         options: { table: { disable: true, category: 'Development' } },
         value: { table: { disable: true, category: 'Development' } },
         defaultValue: { table: { disable: true, category: 'Development' } },
-        other: { table: { disable: true, category: 'Development' } },
         legend: { control: 'text', table: { category: 'Content' } },
-        type: {
-            control: 'select',
-            options: ['radio', 'checkbox'],
-            description: 'radio: pick one. checkbox: pick any.',
-            table: { category: 'Content' },
-        },
         orientation: {
             control: 'select',
             options: ['stacked', 'inline'],
@@ -50,9 +43,9 @@ export default {
         leadingText: { control: 'text', table: { category: 'Content' } },
         trailingText: { control: 'text', table: { category: 'Content' } },
         error: { control: 'text', table: { category: 'Behavior' } },
-        required: { control: 'boolean', table: { category: 'Behavior' } },
-        disabled: { control: 'boolean', table: { category: 'Behavior' } },
-        readOnly: { control: 'boolean', table: { category: 'Behavior' } },
+        isRequired: { control: 'boolean', table: { category: 'Behavior' } },
+        isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
+        isReadOnly: { control: 'boolean', table: { category: 'Behavior' } },
     },
 };
 
@@ -70,22 +63,22 @@ export const Overview = () => {
     const [value, setValue] = useState(null);
     return (
         <div style={stack}>
-            <ChoiceGroup
-                id="cg-overview"
-                name="cg-overview"
+            <RadioGroup
+                id="rg-overview"
+                name="rg-overview"
                 legend="Which subject did you tutor?"
                 options={subjects}
                 value={value}
                 onChange={setValue}
             />
-            <p className="body2-txt m-0" data-testid="cg-overview-value">
+            <p className="body2-txt m-0" data-testid="rg-overview-value">
                 Answer: {value ?? 'none'}
             </p>
         </div>
     );
 };
 Overview.parameters = {
-    docs: { source: { language: 'jsx', code: webAppSourceSnippets.formChoiceGroup } },
+    docs: { source: { language: 'jsx', code: webAppSourceSnippets.formRadioGroup } },
 };
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -106,54 +99,23 @@ Overview.play = async ({ canvasElement }) => {
 
     await userEvent.click(canvas.getByRole('radio', { name: 'Reading' }));
     await expect(canvas.getByRole('radio', { name: 'Reading' }).checked).toBe(true);
-    await expect(canvas.getByTestId('cg-overview-value').textContent).toBe('Answer: reading');
-};
-
-export const Types = () => (
-    <div style={stack}>
-        <ChoiceGroup
-            name="cg-type-radio"
-            legend="Radio: pick one"
-            options={subjects}
-            defaultValue="math"
-        />
-        <ChoiceGroup
-            name="cg-type-checkbox"
-            type="checkbox"
-            legend="Checkbox: pick any"
-            options={subjects}
-            defaultValue={['math']}
-        />
-    </div>
-);
-Types.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const pickAny = canvas.getByRole('group', { name: 'Checkbox: pick any' });
-    await expect(pickAny.tagName).toBe('FIELDSET');
-
-    await userEvent.click(within(pickAny).getByRole('checkbox', { name: 'Science' }));
-    const checked = within(pickAny).getAllByRole('checkbox').filter((c) => c.checked).map((c) => c.value);
-    await expect(checked).toEqual(['math', 'science']);
-
-    // Unchecking takes it back out.
-    await userEvent.click(within(pickAny).getByRole('checkbox', { name: 'Math' }));
-    await expect(within(pickAny).getByRole('checkbox', { name: 'Math' }).checked).toBe(false);
+    await expect(canvas.getByTestId('rg-overview-value').textContent).toBe('Answer: reading');
 };
 
 export const Orientation = () => (
     <div style={stack}>
-        <ChoiceGroup name="cg-stacked" legend="Stacked" options={subjects} />
-        <ChoiceGroup name="cg-inline" legend="Inline" orientation="inline" options={subjects} />
+        <RadioGroup name="rg-stacked" legend="Stacked" options={subjects} />
+        <RadioGroup name="rg-inline" legend="Inline" orientation="inline" options={subjects} />
     </div>
 );
 
-/** `size` sets the radio control width. Unset keeps today's rendering; no effect on checkboxes. */
+/** `size` sets the radio control width. Unset keeps today's rendering. */
 export const Size = () => (
     <div style={stack}>
         {[10, 12, 14].map((size) => (
-            <ChoiceGroup
+            <RadioGroup
                 key={size}
-                name={`cg-size-${size}`}
+                name={`rg-size-${size}`}
                 legend={String(size)}
                 size={size}
                 options={subjects}
@@ -162,14 +124,15 @@ export const Size = () => (
     </div>
 );
 Size.play = async ({ canvasElement }) => {
-    const groups = [...canvasElement.querySelectorAll('.plus-choice-group-radio')];
+    const groups = [...canvasElement.querySelectorAll('.plus-radio-group')];
     await expect(groups.map((group) => group.getAttribute('data-size'))).toEqual(['10', '12', '14']);
 };
 
-export const ScaleEnds = () => (
+/** An inline Radio group with end labels — the reflection form's five-point scale. */
+export const LinearScale = () => (
     <div style={stack}>
-        <ChoiceGroup
-            name="cg-scale"
+        <RadioGroup
+            name="rg-scale"
             legend="How did this session go for you?"
             orientation="inline"
             leadingText="I struggled"
@@ -178,7 +141,7 @@ export const ScaleEnds = () => (
         />
     </div>
 );
-ScaleEnds.play = async ({ canvasElement }) => {
+LinearScale.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('radiogroup', { name: 'How did this session go for you?' });
 
@@ -201,23 +164,13 @@ const described = [
 
 export const Descriptions = () => (
     <div style={stack}>
-        <ChoiceGroup name="cg-desc-plain" legend="How often? (plain)" options={described} />
-        <ChoiceGroup
-            name="cg-desc-card"
+        <RadioGroup name="rg-desc-plain" legend="How often? (plain)" options={described} />
+        <RadioGroup
+            name="rg-desc-card"
             legend="How often? (card)"
             appearance="card"
             options={described}
             defaultValue="biweekly"
-        />
-        <ChoiceGroup
-            name="cg-desc-card-checkbox"
-            type="checkbox"
-            legend="Reminders (card)"
-            appearance="card"
-            options={[
-                { value: 'email', label: 'Email', description: 'The evening before.' },
-                { value: 'sms', label: 'Text message', description: 'An hour before.' },
-            ]}
         />
     </div>
 );
@@ -236,55 +189,18 @@ Descriptions.play = async ({ canvasElement }) => {
     await expect(cards).toHaveLength(3);
 };
 
-export const Other = () => {
-    const [value, setValue] = useState([]);
-    const [otherText, setOtherText] = useState('');
-    return (
-        <div style={stack}>
-            <ChoiceGroup
-                name="cg-other"
-                type="checkbox"
-                legend="Reason for request"
-                options={[
-                    { value: 'fewer-tutors', label: 'Fewer tutors than expected' },
-                    { value: 'more-students', label: 'More students than expected' },
-                ]}
-                value={value}
-                onChange={setValue}
-                other={{ label: 'Other', placeholder: 'Tell us more…', text: otherText, onTextChange: setOtherText }}
-            />
-            <p className="body2-txt m-0" data-testid="cg-other-value">{JSON.stringify({ value, otherText })}</p>
-        </div>
-    );
-};
-Other.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const group = canvas.getByRole('group', { name: 'Reason for request' });
-
-    // "Other" is an answer like the rest, and its text box is named for it.
-    const otherBox = within(group).getByRole('checkbox', { name: 'Other' });
-    await expect(otherBox.checked).toBe(false);
-    const text = within(group).getByRole('textbox', { name: 'Other, please specify' });
-
-    // Typing an answer chooses it.
-    await userEvent.type(text, 'Fire drill');
-    await expect(otherBox.checked).toBe(true);
-    await expect(JSON.parse(canvas.getByTestId('cg-other-value').textContent))
-        .toEqual({ value: ['other'], otherText: 'Fire drill' });
-};
-
 /** An option's `reveal` opens under it while it is chosen. */
 export const Reveal = () => (
     <div style={stack}>
-        <ChoiceGroup
-            name="cg-reveal"
+        <RadioGroup
+            name="rg-reveal"
             legend="Which sessions?"
             options={[
                 { value: 'this', label: 'This session' },
                 {
                     value: 'range',
                     label: 'Sessions in a date range',
-                    reveal: <p className="body2-txt m-0" data-testid="cg-reveal-content">Pick the dates.</p>,
+                    reveal: <p className="body2-txt m-0" data-testid="rg-reveal-content">Pick the dates.</p>,
                 },
             ]}
             defaultValue="this"
@@ -293,23 +209,15 @@ export const Reveal = () => (
 );
 Reveal.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.queryByTestId('cg-reveal-content')).toBeNull();
+    await expect(canvas.queryByTestId('rg-reveal-content')).toBeNull();
     await userEvent.click(canvas.getByRole('radio', { name: 'Sessions in a date range' }));
-    await expect(canvas.getByTestId('cg-reveal-content')).toBeTruthy();
+    await expect(canvas.getByTestId('rg-reveal-content')).toBeTruthy();
 };
 
 export const States = () => (
     <div style={stack}>
-        <ChoiceGroup name="cg-disabled" legend="Disabled" options={subjects} defaultValue="math" disabled />
-        <ChoiceGroup name="cg-readonly" legend="Read-only" options={subjects} defaultValue="math" readOnly />
-        <ChoiceGroup
-            name="cg-readonly-checkbox"
-            type="checkbox"
-            legend="Read-only checkboxes"
-            options={subjects}
-            defaultValue={['reading']}
-            readOnly
-        />
+        <RadioGroup name="rg-disabled" legend="Disabled" options={subjects} defaultValue="math" isDisabled />
+        <RadioGroup name="rg-readonly" legend="Read-only" options={subjects} defaultValue="math" isReadOnly />
     </div>
 );
 States.play = async ({ canvasElement }) => {
@@ -324,14 +232,6 @@ States.play = async ({ canvasElement }) => {
     await expect(science.checked).toBe(false);
     await expect(within(readOnly).getByRole('radio', { name: 'Math' }).checked).toBe(true);
 
-    const boxes = canvas.getByRole('group', { name: 'Read-only checkboxes' });
-    const math = within(boxes).getByRole('checkbox', { name: 'Math' });
-    await expect(math.getAttribute('aria-readonly')).toBe('true');
-    await userEvent.click(math);
-    await expect(math.checked).toBe(false);
-    await userEvent.click(within(boxes).getByRole('checkbox', { name: 'Reading' }));
-    await expect(within(boxes).getByRole('checkbox', { name: 'Reading' }).checked).toBe(true);
-
     // Disabled: every choice is.
     const disabled = canvas.getByRole('radiogroup', { name: 'Disabled' });
     await expect(within(disabled).getAllByRole('radio').every((r) => r.disabled)).toBe(true);
@@ -339,20 +239,12 @@ States.play = async ({ canvasElement }) => {
 
 export const Validation = () => (
     <div style={stack}>
-        <ChoiceGroup
-            name="cg-required"
+        <RadioGroup
+            name="rg-required"
             legend="Did the session happen?"
             options={['Yes', 'No']}
-            required
+            isRequired
             error="Choose an answer."
-        />
-        <ChoiceGroup
-            name="cg-required-checkbox"
-            type="checkbox"
-            legend="Who attended?"
-            options={['Ava', 'Ben']}
-            required
-            error="Choose at least one student."
         />
     </div>
 );
@@ -361,22 +253,17 @@ Validation.play = async ({ canvasElement }) => {
     const group = canvas.getByRole('radiogroup', { name: /Did the session happen\?/ });
 
     // One error for the group, announced, and pointed at by the group.
-    const alerts = canvas.getAllByRole('alert');
-    await expect(alerts.map((a) => a.textContent)).toEqual(['Choose an answer.', 'Choose at least one student.']);
-    await expect(group.getAttribute('aria-describedby')).toBe(alerts[0].id);
+    const alert = canvas.getByRole('alert');
+    await expect(alert.textContent).toBe('Choose an answer.');
+    await expect(group.getAttribute('aria-describedby')).toBe(alert.id);
     await expect(group.getAttribute('aria-required')).toBe('true');
-
-    // `required` sits on the group. On radios the platform enforces it, on
-    // checkboxes it cannot without requiring every box, so it stays on the group.
     await expect(within(group).getAllByRole('radio').every((r) => r.required)).toBe(true);
-    const boxes = within(canvas.getByRole('group', { name: /Who attended\?/ })).getAllByRole('checkbox');
-    await expect(boxes.some((b) => b.required)).toBe(false);
 };
 
 export const TwoGroupsWithoutIds = () => (
     <div style={stack}>
-        <ChoiceGroup legend="First" options={['A', 'B']} />
-        <ChoiceGroup legend="Second" options={['A', 'B']} />
+        <RadioGroup legend="First" options={['A', 'B']} />
+        <RadioGroup legend="Second" options={['A', 'B']} />
     </div>
 );
 TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
@@ -394,15 +281,12 @@ TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
 };
 
 export const Interactive = (args) => {
-    const [value, setValue] = useState(args.type === 'checkbox' ? [] : null);
-    useEffect(() => {
-        setValue(args.type === 'checkbox' ? [] : null);
-    }, [args.type]);
+    const [value, setValue] = useState(null);
     return (
         <div style={{ maxWidth: '560px' }}>
-            <ChoiceGroup
+            <RadioGroup
                 {...args}
-                name="cg-interactive"
+                name="rg-interactive"
                 options={args.leadingText || args.trailingText ? fivePoint : described}
                 value={value}
                 onChange={setValue}
@@ -412,13 +296,12 @@ export const Interactive = (args) => {
 };
 Interactive.args = {
     legend: 'How often?',
-    type: 'radio',
     orientation: 'stacked',
     appearance: 'plain',
     leadingText: '',
     trailingText: '',
     error: '',
-    required: false,
-    disabled: false,
-    readOnly: false,
+    isRequired: false,
+    isDisabled: false,
+    isReadOnly: false,
 };

@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-33 components. Each row links to the generated facts; the three columns after it are the
+34 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -13,12 +13,12 @@ authored half (#166), counted rather than assumed.
 | [Cascader](Cascader/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Checkbox](Checkbox.md) | 19 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid.md) | 12 | ✅ | ✕ | ✅ |
-| [ChoiceGroup](ChoiceGroup.md) | 20 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✕ | ✕ | ✕ |
 | [Comment](Comment/index.md) | 14 | ✕ | ✕ | ✕ |
 | [DatePicker](DatePicker/index.md) | 18 | ✕ | ✕ | ✕ |
 | [DateTimePicker](DateTimePicker/index.md) | 30 | ✕ | ✕ | ✕ |
 | [Dropdown](Dropdown/index.md) | 13 | ✅ | ✅ | ✅ |
+| [Fieldset](Fieldset.md) | 8 | ✕ | ✕ | ✕ |
 | [FileUpload](FileUpload.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✕ | ✕ | ✕ |
 | [IconButton](IconButton/index.md) | 11 | ✕ | ✕ | ✅ |
@@ -28,6 +28,7 @@ authored half (#166), counted rather than assumed.
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✕ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✕ | ✕ | ✕ |
 | [Radio](Radio.md) | 18 | ✅ | ✕ | ✅ |
+| [RadioGroup](RadioGroup.md) | 19 | ✕ | ✕ | ✕ |
 | [Range](Range.md) | 14 | ✅ | ✕ | ✅ |
 | [Rating](Rating.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
@@ -41,7 +42,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✕ | ✕ | ✕ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✕ | ✕ | ✕ |
 
-**Authored coverage:** When to use 14/33 (42%) · Correct/incorrect 7/33 (21%) · Accessibility 18/33 (55%)
+**Authored coverage:** When to use 13/34 (38%) · Correct/incorrect 7/34 (21%) · Accessibility 17/34 (50%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

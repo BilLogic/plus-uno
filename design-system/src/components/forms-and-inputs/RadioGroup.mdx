@@ -1,0 +1,21 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+
+import * as RadioGroupStories from './RadioGroup.stories.jsx';
+
+<Meta of={RadioGroupStories} />
+
+<Title />
+A Radio group is one question and its radio answers: a Fieldset of Radios, pick one.
+
+<DocsTabs of={RadioGroupStories}>
+
+<DocsTab tab="examples">
+
+<Canvas of={RadioGroupStories.Overview} />
+
+<ArgTypes of={RadioGroupStories} />
+
+</DocsTab>
+
+</DocsTabs>
