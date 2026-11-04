@@ -49,7 +49,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 'var(--layout-z-index-scrim)',
+                zIndex: 'var(--layer-blanket)',
                 padding: '24px'
             }}
             onClick={(e) => e.target === e.currentTarget && onClose?.()}

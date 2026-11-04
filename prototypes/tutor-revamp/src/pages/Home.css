@@ -18,7 +18,7 @@
 .tr-home__tiles {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--layout-gutter);
+    gap: var(--grid-gutter);
 }
 
 /* Card heads: an h2 at Heading/small, something at the end. */
