@@ -75,6 +75,9 @@ export const CHART_SEQUENCES = {
   SMART: ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'].map((s) => `color.chart.smart.${s}`),
 };
 
+/** The full categorical order, including the two overflow reprises: for the lightness-alternation check only. */
+export const CATEGORICAL_FULL = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => `color.chart.categorical.${i}`);
+
 /** The surfaces a chart is drawn on. */
 const CHART_SURFACES = ['elevation.surface', 'elevation.surface.raised', 'elevation.surface.overlay'];
 
@@ -205,6 +208,22 @@ export function colorChecks({ rows, palette }) {
     }
   }
 
+  // The categorical order alternates light and dark steps so a chart still reads in grayscale and for color-blind
+  // readers: neighbors differ by >= 0.08 OKLCH lightness, and the step direction flips mark to mark, in every mode.
+  const chartAlternation = [];
+  for (const m of MODES) {
+    const Ls = CATEGORICAL_FULL.map((t) => hexToOklch(S[t][m].slice(0, 7))[0]);
+    let prevSign = 0;
+    for (let i = 0; i + 1 < Ls.length; i++) {
+      const dL = Ls[i + 1] - Ls[i];
+      const pair = `${CATEGORICAL_FULL[i].split('.').at(-1)} and ${CATEGORICAL_FULL[i + 1].split('.').at(-1)}`;
+      if (Math.abs(dL) < 0.08) chartAlternation.push(`${pair}, ${m}: dL ${dL.toFixed(3)} < 0.08`);
+      const sign = Math.sign(dL);
+      if (i > 0 && prevSign !== 0 && sign !== 0 && sign === prevSign) chartAlternation.push(`${pair}, ${m}: lightness direction did not flip`);
+      if (sign !== 0) prevSign = sign;
+    }
+  }
+
   // Every chart color is a mark, so it keeps 3:1 (4.5:1 in increased contrast) on every surface a chart sits on.
   const chartContrast = Object.keys(S)
     .filter((n) => n.startsWith('color.chart.'))
@@ -238,6 +257,7 @@ export function colorChecks({ rows, palette }) {
     'collapsed states': collapsedStates,
     'tint vs frame': tintVsFrame,
     'chart color vision': chartCvd,
+    'chart lightness alternation': chartAlternation,
     'chart contrast': chartContrast,
     'chart ramps': chartRamps,
     'teal vs Lagoon': tealVsLagoon,
