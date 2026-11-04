@@ -11,8 +11,8 @@ import './Avatar.scss';
  * Circles are people; squares are teams and agents.
  */
 
-/** 16 to 48 are the Media sizes; 96 and 128 are the profile sizes, set in `Avatar.scss`. */
-export const AVATAR_SIZES = [16, 20, 24, 32, 40, 48, 96, 128];
+/** 16 to 40 are the Media sizes; 96 and 128 are the profile sizes, set in `Avatar.scss`. */
+export const AVATAR_SIZES = [16, 24, 32, 40, 96, 128];
 
 export const AVATAR_SHAPES = ['circle', 'square'];
 
@@ -103,7 +103,7 @@ Avatar.propTypes = {
     initials: PropTypes.string,
     /** The fallback when there is no picture and no initials: a Font Awesome Free name (`robot`), a class list, or a node. Defaults to `user`. */
     icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** 16 to 48 follow the Media sizes; 96 and 128 are for profiles. */
+    /** 16 to 40 follow the Media sizes; 96 and 128 are for profiles. */
     size: PropTypes.oneOf(AVATAR_SIZES),
     /** `circle` for a person, `square` for a team or an agent. */
     shape: PropTypes.oneOf(AVATAR_SHAPES),
