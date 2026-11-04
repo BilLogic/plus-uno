@@ -9,7 +9,7 @@ Rating component with 5 stars, supporting two variants: 1. With "Comments" label
 
 **Source:** `design-system/src/components/forms-and-inputs/Rating.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating.mdx`
 

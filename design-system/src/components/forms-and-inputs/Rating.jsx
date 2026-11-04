@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
 import useFieldId from './useFieldId';
 import './Rating.scss';
 
@@ -95,12 +94,12 @@ const Rating = ({
     return (
         <div className={wrapperClasses} style={style} {...props}>
             {hasLabel && (
-                <Form.Label as="span" id={labelId} className="plus-rating-label">
+                <span id={labelId} className="plus-rating-label">
                     {label}
                     {isRequired && (
                         <span className="plus-rating-required" aria-label="required">*</span>
                     )}
-                </Form.Label>
+                </span>
             )}
             {/*
               * #319. The row is a `radiogroup` and each item is a `radio`, not a
