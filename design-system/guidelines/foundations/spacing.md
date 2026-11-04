@@ -1,118 +1,69 @@
 ---
-summary: The PLUS Design System uses semantic spacing tokens organized by component hierarchy
+summary: Spacing, size and radius tokens on the four-tier ladder — which tier to read, the fallback rule, and private wiring
 ---
 
 <!-- Tier: 2 -->
 
-# Spacing Tokens
+# Spacing tokens
 
-The PLUS Design System uses semantic spacing tokens organized by component hierarchy.
+Every spacing, size and radius value comes from one ladder of four tiers, most general to most specific: **primitives**, **semantics**, **patterns**, **components**. A token is used bare, by its tier name; hardcoded px never appears. The plan is `scripts/lib/tokens/plan.mjs` (ADR-038); generated output is `design-system/src/tokens/ladder/`, never hand-edited. Old name to new name: `architecture/token-tiers-name-map.md`.
 
-## Spacing Hierarchy
+| Tier | Holds | Code | Density words |
+|---|---|---|---|
+| Primitives | the raw scale, named rem × 100: `--space-100` is 16 | `--space-*`, `--radius-*`, `--stroke-*`, `--size-*` | never |
+| Semantics | steps shared by anything: pad, stack, inline, radius, border, focus ring, grid, screen, content, size roles | `--pad-x-md`, `--stack-sm`, `--inline-lg`, `--radius-md`, `--focus-ring-width`, `--control-md`, `--icon-sm` | never — steps `xs`/`sm`/`md`/`lg` only |
+| Patterns | a layout pattern's own pad, stack, radius and widths: Frame, Page, Section, Card, Table, Blanket, Modal, Popover, Drawer, Focused page | `--card-pad-default`, `--section-pad-x-compact`, `--modal-width-md` | `default` / `compact` / `spacious` |
+| Components | a value exactly one component needs that no shared tier covers | `--button-radius-compact`, `--calendar-day-md`, `--listbox-max-height` | `default` / `compact` / `spacious` |
 
-Match spacing token prefix to your component context:
+Density words (`default`, `compact`, `spacious`) appear only where a `spacing` prop lives: patterns and components. Semantics stay on steps so one step serves every density.
 
-| Context | Token Prefix | Usage |
-|---------|--------------|-------|
-| Elements | `--pad-x-*`, `--pad-y-*`, `--stack-*`, `--inline-*`, `--radius-*` | Buttons, badges, inputs |
-| Cards | `--size-card-*` | Card containers |
-| Sections | `--size-section-*` | Page sections |
-| Modals | `--size-modal-*` | Dialog windows |
-| Tables | `--size-table-*` | Table cells and rows |
+`layers` (z-index) is a separate code-only family: `--layer-*`.
 
-## Element Tokens
+## Fallback rule
 
-For buttons, badges, inputs, and other small components:
+Read the most specific tier that has the value you need:
 
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--pad-x-xs` | 4px | Extra small horizontal padding: labels (Status, Count, Tag) and the trailing side of a pill that ends in a Remove button |
-| `--pad-x-sm` | 8px | Small horizontal padding |
-| `--pad-x-md` | 12px | Medium horizontal padding |
-| `--pad-x-lg` | 16px | Large horizontal padding |
-| `--pad-y-sm` | 2px | Extra small vertical padding |
-| `--pad-y-md` | 6px | Medium vertical padding |
-| `--pad-y-lg` | 8px | Large vertical padding |
-| `--stack-sm` · `--inline-sm` | 4px | Small gap |
-| `--stack-md` · `--inline-md` | 8px | Medium gap |
-| `--stack-lg` · `--inline-lg` | 12px | Large gap |
-| `--radius-sm` | 2px | Small border radius |
-| `--radius-md` | 4px | Medium border radius |
-| `--radius-lg` | 8px | Large border radius |
-| `--radius-h24` · `--radius-h32` · `--radius-h40` | 6 · 8 · 10px | Control height ÷ 4 |
-| `--radius-full` | 9999px | Pill shape |
+1. A component token, if the component has one (`--button-radius-default`).
+2. Otherwise the pattern token of the pattern you are inside (`--card-pad-compact`).
+3. Otherwise a semantics step (`--pad-x-md`, `--stack-sm`).
 
-No semantic step holds a 4px vertical pad or a 10px gap; read `--space-025` and `--space-0625` for those.
+A value belongs to a pattern or component when it would change if that pattern or component changed; a step nothing specific owns is semantics. When no tier holds the value, name the gap and read the primitive (`--space-025` for a 4px vertical pad, `--space-0625` for a 10px gap); adding a step is a design call.
 
-## Card Tokens
-
-For card containers and card content:
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--size-card-pad-x-sm` | 16px | Small card padding |
-| `--size-card-pad-x-md` | 20px | Medium card padding |
-| `--size-card-pad-x-lg` | 24px | Large card padding |
-| `--size-card-gap-sm` | 10px | Gap between card items |
-| `--size-card-gap-md` | 16px | Medium card gap |
-| `--size-card-radius-sm` | 12px | Card border radius |
-
-## Section Tokens
-
-For page sections and large containers:
-
-| Token | Value | Usage |
-|-------|-------|-------|
-| `--size-section-pad-x-lg` | 36px | Section horizontal padding |
-| `--size-section-pad-y-lg` | 36px | Section vertical padding |
-| `--size-section-gap-lg` | 24px | Gap between sections |
-| `--size-section-gap-md` | 16px | Medium section gap |
-
-## Usage Examples
-
-```css
-/* Element (button, badge) */
-.my-button {
-  padding: var(--pad-y-md) var(--pad-x-md);
-  border-radius: var(--radius-md);
-  gap: var(--stack-md);
-}
-
-/* Card */
-.my-card {
-  padding: var(--size-card-pad-x-md);
-  border-radius: var(--size-card-radius-sm);
-  gap: var(--size-card-gap-md);
-}
-
-/* Section */
-.my-section {
-  padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
-  gap: var(--size-section-gap-lg);
-}
-```
-
-## Rules
-
-1. **Match token to context** - Use element tokens for elements, card tokens for cards
-2. **Never hardcode spacing** - Always use CSS variables
-3. **Use semantic sizes** - sm/md/lg based on visual density needed
-4. **Maintain hierarchy** - Larger containers use larger spacing values
-
-
-## Foundation rules
+## Choose by relationship
 
 - Pick the pattern you are in, then the relationship (pad inside a box, stack between rows, inline side by side), then the size.
 - The kind of box sets its pad: an Item by its height, a Container by its size, a Wrapper has none.
-- Controls: buttons and tabs are 32 (24 compact), fields and menu rows are 40 (32 compact). Buttons round 6 (4 compact); every other control rounds to its height ÷ 4.
-- Group first, then space; never hand-space; space never speaks alone.
-- The scale is named rem × 100: `--space-100` is 16.
+- Controls: buttons and tabs are 32 (24 compact); fields and menu rows are 40 (32 compact). Buttons round 6 (4 compact); every other control rounds to its height ÷ 4 (`--radius-h24`, `--radius-h32`, `--radius-h40`).
+- Group first, then space; space between groups never comes from hand-set margins.
 
-## Pattern pad tokens (ADR-038)
+## Private wiring: `--_<name>-*`
 
-Card, Section, Modal and Page are patterns, so their pads live in `spacing / patterns`, keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal|page}-pad[-x|-y]-{default|compact|spacious}`. An element's own pad, stack and radius are the semantics steps (`--pad-x-md`, `--stack-sm`, `--radius-md`); there is no element or role token. Generated from `scripts/lib/tokens/plan.mjs` into `design-system/src/tokens/ladder/`; never hand-edit. The retired `--size-element-*`, `--element-*` and `--layout-*` names are gone; `architecture/token-tiers-name-map.md` lists each beside the name that replaced it.
+A component that resolves a tier token into its own rules does it through a private custom property named `--_<component>-<role>`, set once on the component root and read by that component's rules:
 
-### Retired names still in use
+```scss
+.plus-tag {
+  --_tag-pad-x: var(--pad-x-xs);
+  --_tag-gap: var(--inline-sm);
+
+  padding: 0 var(--_tag-pad-x);
+  gap: var(--_tag-gap);
+
+  &--spacious { --_tag-pad-x: var(--pad-x-sm); }
+}
+```
+
+The leading underscore marks the property as the component's own: no other file reads it and no tier declares it. A variant or density changes the one `--_` line, and the rules below stay put. The value on the right is always a tier token, chosen by the fallback rule.
+
+## Examples
+
+```css
+/* Component radius, pattern pad, semantics gap */
+.my-button { border-radius: var(--button-radius-default); padding: var(--pad-y-md) var(--pad-x-md); }
+.my-card   { padding: var(--card-pad-default); gap: var(--stack-md); }
+.my-row    { display: flex; gap: var(--inline-md); }
+```
+
+## Retired names still in use
 
 <!-- gen:OLD-SIZE-TOKENS -->
 0 files, 0 old-size-token uses. Generated by `npm run generate:old-size-token-list`; edit the component files, not this table.
