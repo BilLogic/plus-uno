@@ -1,3 +1,5 @@
+@use '../../../styles/state' as *;
+
 /*
  * Tabs Component Styles
  *
@@ -10,9 +12,15 @@
  * are the neutral subtle steps. The selected tab is text.selected, carried by
  * the underline (default) or the fill (pill); disabled is text.disabled.
  *
- * Selection and disabled state are read off Base UI's own attributes —
- * `[data-active]` / `[data-disabled]` — rather than a class, since there is no
- * bootstrap `.active`/`.disabled` class here to key off.
+ * Hover, press, selection and disabled all draw through the state mixin
+ * (`design-system/src/styles/_state.scss`): Base UI's Tab sets `aria-selected`
+ * and `aria-disabled` as real attributes, which the mixin's default selectors
+ * already read (`[aria-selected='true']`, `[aria-disabled='true']`,
+ * `[data-disabled]`), so no selector overrides are needed for those. The
+ * exception is the selected tab's OWN hover/press step, a different fill per
+ * appearance — that nests a second `plus-state` call under `&[data-active]`
+ * with `$hovered-selector`/`$pressed-selector`, the mixin's own sanctioned way
+ * to key a state off a compound selector.
  */
 
 .plus-tabs {
@@ -47,7 +55,7 @@
 // Default (underline) appearance: a shared bottom border across the strip,
 // each tab's own bottom border serving as its selected indicator.
 .plus-tabs--default .plus-tabs-list {
-    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
+    border-bottom: var(--border-default) solid var(--ds-border);
     width: fit-content;
 
     &--justified {
@@ -59,7 +67,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--size-element-gap-md, 10px);
+    gap: var(--element-gap-default);
     box-sizing: border-box;
     border: none;
     background-color: transparent;
@@ -70,18 +78,9 @@
     cursor: pointer;
     transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
 
-    &:disabled,
-    &[data-disabled] {
-        color: var(--ds-text-disabled);
-        border-bottom-color: transparent;
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-
-    &:focus-visible {
-        outline: var(--focus-ring-width) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--focus-ring-width));
-    }
+    @include plus-state((
+        disabled: (color: var(--ds-text-disabled)),
+    ));
 
     // Pseudo states for Storybook documentation — forced rather than real, so
     // the states can sit side by side for inspection.
@@ -94,82 +93,84 @@
     }
 
     &.pseudo-focus:not([data-disabled]) {
-        outline: var(--focus-ring-width) solid var(--ds-border-focused);
-        outline-offset: calc(-1 * var(--focus-ring-width));
+        @include plus-ring;
     }
 }
 
 // Sizing
 .plus-tabs--default .plus-tab {
     height: var(--item-height-md, 32px);
-    padding: 0 var(--size-element-pad-x-lg, 16px);
+    padding: 0 var(--space-100);
 }
 
 .plus-tabs--compact .plus-tab {
     height: var(--item-height-sm, 24px);
-    padding: 0 var(--size-element-pad-x-md, 10px);
+    padding: 0 var(--element-pad-x-md);
 }
 
 // Default (underline) appearance
 .plus-tabs--default .plus-tab {
-    margin-bottom: calc(-1 * var(--size-element-stroke-sm, 1px));
-    border-bottom: var(--size-element-stroke-sm, 1px) solid var(--ds-border);
-    border-radius: var(--size-element-radius-md, 4px) var(--size-element-radius-md, 4px) 0 0;
+    margin-bottom: calc(-1 * var(--border-default));
+    border-bottom: var(--border-default) solid var(--ds-border);
+    border-radius: var(--element-radius-md) var(--element-radius-md) 0 0;
 
-    &:hover:not([data-disabled]):not([data-active]) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-        border-bottom-color: var(--ds-border);
+    &:disabled,
+    &[data-disabled] {
+        border-bottom-color: transparent;
     }
 
-    &:active:not([data-disabled]):not([data-active]) {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-        border-bottom-color: var(--ds-border);
-    }
+    @include plus-state((
+        hovered: (
+            background-color: var(--ds-background-neutral-subtle-hovered),
+            border-bottom-color: var(--ds-border),
+        ),
+        pressed: (
+            background-color: var(--ds-background-neutral-subtle-pressed),
+            border-bottom-color: var(--ds-border),
+        ),
+        selected: (
+            color: var(--ds-text-selected),
+            border-bottom-color: var(--ds-border-selected),
+            border-bottom-width: var(--border-selected),
+            margin-bottom: calc(var(--border-default) - var(--border-selected)),
+        ),
+    ), $ring: false);
 
+    // The selected tab's own hover/press: same neutral steps, kept off the
+    // selected bar and ink.
     &[data-active] {
-        color: var(--ds-text-selected);
-        border-bottom-color: var(--ds-border-selected);
-        border-bottom-width: var(--size-element-stroke-md, 2px);
-        margin-bottom: calc(var(--size-element-stroke-sm, 1px) - var(--size-element-stroke-md, 2px));
-
-        &:hover {
-            background-color: var(--ds-background-neutral-subtle-hovered);
-        }
-
-        &:active {
-            background-color: var(--ds-background-neutral-subtle-pressed);
-        }
+        @include plus-state((
+            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        ), $ring: false, $hovered-selector: '&:hover', $pressed-selector: '&:active');
     }
 }
 
 // Pill appearance: the selected tab carries a filled, fully-rounded ground
 // instead of an underline; unselected tabs carry no border at all.
 .plus-tabs--pill .plus-tabs-list {
-    gap: var(--size-element-gap-sm, 4px);
+    gap: var(--element-gap-compact);
 }
 
 .plus-tabs--pill .plus-tab {
-    border-radius: var(--size-element-radius-full, 999px);
+    border-radius: var(--element-radius-full);
 
-    &:hover:not([data-disabled]):not([data-active]) {
-        background-color: var(--ds-background-neutral-subtle-hovered);
-    }
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        selected: (
+            color: var(--ds-text-inverse),
+            background-color: var(--ds-background-selected-bold),
+        ),
+    ), $ring: false);
 
-    &:active:not([data-disabled]):not([data-active]) {
-        background-color: var(--ds-background-neutral-subtle-pressed);
-    }
-
+    // The selected pill's own hover/press: the bold fill steps, not the
+    // neutral ones an unselected pill takes.
     &[data-active] {
-        color: var(--ds-text-inverse);
-        background-color: var(--ds-background-selected-bold);
-
-        &:hover {
-            background-color: var(--ds-background-selected-bold-hovered);
-        }
-
-        &:active {
-            background-color: var(--ds-background-selected-bold-pressed);
-        }
+        @include plus-state((
+            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
+            pressed: (background-color: var(--ds-background-selected-bold-pressed)),
+        ), $ring: false, $hovered-selector: '&:hover', $pressed-selector: '&:active');
     }
 }
 
@@ -185,7 +186,7 @@
     padding-top: var(--size-section-gap-sm, 16px);
 
     &:focus-visible {
-        outline: var(--size-element-stroke-md, 2px) solid var(--ds-border-focused);
-        outline-offset: var(--size-element-stroke-sm, 1px);
+        outline: var(--border-selected) solid var(--ds-border-focused);
+        outline-offset: var(--border-default);
     }
 }

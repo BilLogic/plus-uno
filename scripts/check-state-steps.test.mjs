@@ -219,13 +219,12 @@ test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring o
 
 const TABS = 'components/navigation/Tabs/Tabs.scss';
 const DEFAULT_TAB = '.plus-tabs--default .plus-tab';
-const NOT_TAB = ':not([data-disabled]):not([data-active])';
 
 test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with no fill', () => {
   const hovered = layer('--ds-background-neutral-subtle-hovered');
   const pressed = layer('--ds-background-neutral-subtle-pressed');
-  expectRule(TABS, `${DEFAULT_TAB}:hover${NOT_TAB}`, { 'background-color': hovered });
-  expectRule(TABS, `${DEFAULT_TAB}:active${NOT_TAB}`, { 'background-color': pressed });
+  expectRule(TABS, `${DEFAULT_TAB}:hover`, { 'background-color': hovered });
+  expectRule(TABS, `${DEFAULT_TAB}:active`, { 'background-color': pressed });
   expectNoFill(TABS, '.plus-tab:focus-visible');
   expectRule(TABS, '.plus-tab:focus-visible', { outline: DS_RING });
 
@@ -234,7 +233,7 @@ test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with n
   expectRule(TABS, `${DEFAULT_TAB}[data-active]:active`, { 'background-color': pressed });
 
   // The docs canvas's forced states draw the same steps.
-  expectRule(TABS, `.plus-tab.pseudo-pressed${NOT_TAB}`, { 'background-color': pressed });
+  expectRule(TABS, '.plus-tab.pseudo-pressed:not([data-disabled]):not([data-active])', { 'background-color': pressed });
   expectNoFill(TABS, '.plus-tab.pseudo-focus:not([data-disabled])');
 });
 
