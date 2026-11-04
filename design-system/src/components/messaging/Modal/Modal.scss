@@ -48,7 +48,7 @@
     padding: var(--modal-pad-x-default);
     overflow: hidden;
     /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
-    max-height: var(--layout-max-height-modal);
+    max-height: var(--blanket-max-height-modal);
 }
 
 .plus-modal-width-md {
@@ -61,7 +61,7 @@
 
 /* Fill: at the cap whatever the content, so a settings or editor modal never jumps. */
 .plus-modal-height-fill {
-    height: var(--layout-max-height-modal);
+    height: var(--blanket-max-height-modal);
 }
 
 /* Deprecated sizing props: the old Modal/* tokens, for the callers that still pass them. */
@@ -102,7 +102,7 @@
 .plus-modal-heading {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
     flex: 1;
     min-width: 0;
 }
@@ -129,7 +129,7 @@
 .plus-modal-header-actions {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-sm);
+    gap: var(--inline-sm);
     flex-shrink: 0;
 }
 
@@ -143,7 +143,7 @@
     height: var(--item-height-md);
     padding: 0;
     border: none;
-    border-radius: var(--element-radius-md);
+    border-radius: var(--radius-md);
     background-color: transparent;
     color: var(--ds-icon-subtle);
     font-size: var(--icon-md);
@@ -196,7 +196,7 @@
 .plus-modal-skeleton {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-md);
+    gap: var(--stack-md);
 }
 
 /* Footer actions align right, Modal/inline-sm 8 apart. */
@@ -222,13 +222,13 @@
  * a modal wider than a narrow screen keeps its width and the overlay scrolls.
  */
 .modal.plus-modal-overlay {
-    --bs-modal-zindex: var(--layout-z-index-modal);
-    --bs-modal-margin: var(--overlay-pad-y);
+    --bs-modal-zindex: var(--layer-modal);
+    --bs-modal-margin: var(--blanket-pad-y);
     overflow: auto;
 }
 
 .modal-backdrop.plus-modal-scrim {
-    --bs-backdrop-zindex: var(--layout-z-index-scrim);
+    --bs-backdrop-zindex: var(--layer-blanket);
     --bs-backdrop-bg: var(--ds-blanket);
     --bs-backdrop-opacity: 1;
 }
@@ -242,8 +242,8 @@
     /* Allow the width of our inner div to define the modal width */
     max-width: none !important;
     width: fit-content !important;
-    margin: var(--overlay-pad-y) auto;
-    padding-inline: var(--overlay-pad-x);
+    margin: var(--blanket-pad-y) auto;
+    padding-inline: var(--blanket-pad-x);
 }
 
 .plus-bootstrap-modal-content-reset {

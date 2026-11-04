@@ -44,21 +44,21 @@
     // One height per spacing: the content centers in it, so nothing pads the
     // top and bottom.
     height: var(--height-250);
-    padding: 0 calc(var(--element-pad-x-md) - var(--size-element-border));
+    padding: 0 calc(var(--pad-x-md) - var(--size-element-border));
     font: var(--body-default);
 
     // Several lines (Text area): 80 at least, growing with its rows, and the
     // first line sits where a single-line field's text does.
     &--compact {
         height: var(--item-height-md);
-        border-radius: var(--element-radius-item-md);
+        border-radius: var(--radius-h32);
     }
 
     &--multiline {
         align-items: flex-start;
         height: auto;
         min-height: var(--field-min-height-sm);
-        padding-block: calc(var(--element-pad-y-md) - var(--size-element-border));
+        padding-block: calc(var(--pad-y-md) - var(--size-element-border));
     }
 
     // Tags that wrap (Tag field, a multi Select): one row of tags is 32, and
@@ -125,11 +125,11 @@
 // A button at the box's edge sits 4 from it, as it does from the top and the
 // bottom: it takes back the rest of the side padding.
 .plus-field .plus-field__leading:has(> .plus-btn:first-child) {
-    margin-inline-start: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
+    margin-inline-start: calc(var(--pad-x-xs) - var(--pad-x-md));
 }
 
 .plus-field .plus-field__trailing:has(> .plus-btn:last-child) {
-    margin-inline-end: calc(var(--element-pad-x-xs) - var(--element-pad-x-md));
+    margin-inline-end: calc(var(--pad-x-xs) - var(--pad-x-md));
 }
 
 // A text affix ("$", ".00", "https://") is quieter than the value.

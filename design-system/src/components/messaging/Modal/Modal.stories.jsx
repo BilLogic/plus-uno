@@ -310,7 +310,7 @@ function ModalSizeDemos() {
 function ModalHeightDemos() {
     const frame = {
         ...modalDocsHostStyle,
-        '--layout-max-height-modal': 'var(--size-2000)',
+        '--blanket-max-height-modal': 'var(--size-2000)',
         display: 'flex',
         gap: 'var(--space-100)',
         alignItems: 'flex-start',

@@ -6,7 +6,7 @@
 @use '../../styles/state' as *;
 
 .plus-form-radio-wrapper {
-    --plus-choice-indent: calc(var(--layout-control-radio) + var(--space-050));
+    --plus-choice-indent: calc(var(--radio-control-size) + var(--space-050));
     display: flex;
     flex-direction: column;
     gap: var(--space-025);
@@ -21,10 +21,10 @@
 }
 
 .plus-form-radio {
-    width: var(--layout-control-radio);
-    height: var(--layout-control-radio);
-    min-width: var(--layout-control-radio);
-    min-height: var(--layout-control-radio);
+    width: var(--radio-control-size);
+    height: var(--radio-control-size);
+    min-width: var(--radio-control-size);
+    min-height: var(--radio-control-size);
     padding: 0;
     margin: 0;
     border: var(--stroke-2, 2px) solid var(--ds-border-input);

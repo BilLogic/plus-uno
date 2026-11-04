@@ -10,7 +10,7 @@
 
 .plus-tooltip {
     box-sizing: border-box;
-    padding: var(--popover-pad-y-tooltip) var(--element-pad-x-sm);
+    padding: var(--popover-pad-y-tooltip) var(--pad-x-sm);
     max-width: var(--popover-max-width-tooltip);
     border-radius: var(--popover-radius-tooltip);
     background-color: var(--ds-background-neutral-bold);
@@ -18,5 +18,5 @@
     font: var(--body-small);
     text-align: left;
     box-shadow: var(--ds-shadow-overlay);
-    z-index: var(--layout-z-index-popup);
+    z-index: var(--layer-popup);
 }

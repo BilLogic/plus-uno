@@ -17,7 +17,7 @@
     color: var(--ds-text);
 
     &--page {
-        padding: var(--page-stack-lg) var(--layout-pad-x-screen);
+        padding: var(--page-stack-lg) var(--screen-pad-x);
     }
 
     &--compact {
@@ -77,6 +77,6 @@
         flex-wrap: wrap;
         align-items: center;
         justify-content: center;
-        gap: var(--element-inline-md);
+        gap: var(--inline-md);
     }
 }

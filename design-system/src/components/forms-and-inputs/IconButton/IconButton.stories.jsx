@@ -72,7 +72,7 @@ export const Spacing = {
         await expect(rest.getBoundingClientRect().height).toBe(32);
         await expect(compact.getBoundingClientRect().height).toBe(24);
         await expect(compact.getBoundingClientRect().width).toBe(24);
-        await expect(px(getComputedStyle(compact).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--element-radius-md'));
+        await expect(px(getComputedStyle(compact).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--radius-md'));
     },
 };
 

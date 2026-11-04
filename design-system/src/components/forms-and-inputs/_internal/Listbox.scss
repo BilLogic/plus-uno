@@ -15,7 +15,7 @@
      * modal's overlay and takes its layer, so the dialog never covers it.
      */
     --plus-listbox-max-height: var(--popover-max-height-menu);
-    --plus-listbox-z-index: var(--layout-z-index-popup);
+    --plus-listbox-z-index: var(--layer-popup);
     /*
      * The popup placement rule: content grows a list past its field up to
      * Popover/max-width-menu 320. `min-width` (the field's width) wins over

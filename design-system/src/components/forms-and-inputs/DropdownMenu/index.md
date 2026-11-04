@@ -43,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--layout-z-index-popup` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--space-200`
+`--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--layer-popup` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--space-200`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
 

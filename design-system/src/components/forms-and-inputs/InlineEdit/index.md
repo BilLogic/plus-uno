@@ -38,7 +38,7 @@ The read view and the edit view are drawn at the same size, so opening the edito
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-border-focused` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--element-pad-x-md` · `--height-250` · `--item-height-md` · `--radius-0625` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
+`--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-border-focused` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-0625` · `--size-element-border` · `--size-element-gap-xs` · `--size-element-radius-sm` · `--size-element-stroke-lg`
 
 From `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 

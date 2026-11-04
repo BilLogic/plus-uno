@@ -31,7 +31,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-danger` · `--ds-background-neutral` · `--ds-background-warning` · `--ds-icon-danger` · `--ds-icon-warning` · `--ds-text` · `--ds-text-danger` · `--ds-text-warning` · `--element-inline-md` · `--element-pad-x-md` · `--element-pad-y-md` · `--icon-md` · `--type-weight-medium`
+`--body-default` · `--ds-background-danger` · `--ds-background-neutral` · `--ds-background-warning` · `--ds-icon-danger` · `--ds-icon-warning` · `--ds-text` · `--ds-text-danger` · `--ds-text-warning` · `--icon-md` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Banner/Banner.scss`. Override these through the token layer, never with a literal.
 
