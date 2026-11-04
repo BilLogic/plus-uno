@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as MenuGroupStories from './MenuGroup.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -19,16 +20,179 @@ export const figmaMeta = {
 <Meta of={MenuGroupStories} />
 
 <Title />
+The scrollable list a menu's sections and rows sit in — an always-visible
+list, not a popup's menu, so it hand-rolls the arrow-key behavior a popup
+menu gets from its own mechanics.
 
 <DocsTabs of={MenuGroupStories}>
 
 <DocsTab tab="examples">
 
-A scrollable, titled list of action and navigation rows.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/MenuGroup"
+/>
 
-<Canvas of={MenuGroupStories.ButtonAndLinkItems} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={MenuGroupStories} />
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+1. **`MenuGroup`** is the `role="menu"` container. `density` sets row height;
+   `maxHeight`, `maxWidth` and `minWidth` bound the list.
+2. **`Section`** groups related items under an optional `title`, with
+   `hasSeparator` drawing a divider above it.
+3. **`ButtonItem`**, **`LinkItem`** and **`CustomItem`** are the row kinds —
+   an action, a navigation, or a caller-supplied component — sharing the same
+   `elemBefore`/`elemAfter`/`description` row layout.
+
+<DocsCanvasShell attachSourceBelow description={<>A group of button and link items.</>}>
+    <Canvas of={MenuGroupStories.ButtonAndLinkItems} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>`isSelected` marks the current item; `isDisabled` removes it from the roving tab order.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Selected} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Arrow Down and Arrow Up move focus between items — only the focused item is a tab stop.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.KeyboardNavigation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Custom rows
+
+<DocsCanvasShell description={<>`CustomItem`'s `component` prop renders the row as a caller-supplied element — a `label` wrapping a checkbox, for instance — for a row that is neither a button nor a link.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.CustomRowExample} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Properties
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Component</th>
+            <th>Property</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr><td><code>MenuGroup</code></td><td><code>density</code></td><td><code>regular</code> (default) or <code>compact</code> row height.</td></tr>
+        <tr><td><code>MenuGroup</code></td><td><code>maxHeight</code>, <code>maxWidth</code>, <code>minWidth</code></td><td>CSS length strings bounding the list.</td></tr>
+        <tr><td><code>Section</code></td><td><code>title</code>, <code>hasSeparator</code></td><td>An optional heading and a divider above the section.</td></tr>
+        <tr><td><code>ButtonItem</code> / <code>LinkItem</code> / <code>CustomItem</code></td><td><code>elemBefore</code>, <code>elemAfter</code>, <code>description</code></td><td>The shared row layout: a leading icon, trailing icon, and a second line under the label.</td></tr>
+        <tr><td><code>ButtonItem</code> / <code>LinkItem</code> / <code>CustomItem</code></td><td><code>isSelected</code>, <code>isDisabled</code></td><td>Current-item and disabled state.</td></tr>
+        <tr><td><code>LinkItem</code></td><td><code>href</code></td><td>Required. Disabled links drop <code>href</code> and the tab stop.</td></tr>
+        <tr><td><code>CustomItem</code></td><td><code>component</code></td><td>The element or component the row renders as. Default <code>div</code>.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={MenuGroupStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `MenuGroup` for an always-visible list of actions or destinations — the
+content of a sidebar section, a settings list, a dropdown's body once it's
+open. For the popup mechanics that open and close a menu, see `Popup`;
+`MenuGroup` is the list inside it, not the popup itself.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick the item kind for what the row does.
+
+`ButtonItem` performs an action in place, `LinkItem` navigates to an `href`,
+and `CustomItem` wraps a caller's own component for anything else — a label
+around a checkbox, a row that isn't a button or a link at all.
+
+```jsx
+<MenuGroup>
+    <Section title="Account">
+        <LinkItem href="/settings">Settings</LinkItem>
+        <ButtonItem onClick={signOut}>Sign out</ButtonItem>
+    </Section>
+</MenuGroup>
+```
+
+### `CustomItem`'s wrapper only shows up when `component` isn't a `div`.
+
+With the default `div`, the row itself carries `role="menuitem"`. With a
+different `component`, that role moves to an unstyled wrapper so the inner
+element keeps its own native semantics (a `label`, for instance) while the
+menu still sees an allowed child.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real `menu`, roving tabindex.** `MenuGroup` is `role="menu"`; only the
+  current item is a tab stop, and Arrow Down/Up move it, matching how a
+  native menu's keyboard behavior reads to assistive technology.
+- **Sections are named groups.** A `Section` with a `title` is
+  `role="group"` with `aria-labelledby` pointing at that title.
+- **Disabled items leave the tab order.** `isDisabled` removes a `LinkItem`'s
+  `href` and tab stop, and sets `aria-disabled` on every item kind.
+- **`isSelected` is `aria-current`**, read by assistive technology as the
+  active choice, independent of visual selection styling.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the popup that opens and closes around a menu, use `Popup`.
+- For a horizontal row of destinations instead of a vertical list, use
+  `NavTabs`.
+
+</div>
+
+</div>
 
 </DocsTab>
 

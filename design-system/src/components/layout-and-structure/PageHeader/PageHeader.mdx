@@ -1,6 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas, ArgTypes } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as PageHeaderStories from './PageHeader.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -20,16 +21,131 @@ export const figmaMeta = {
 <Meta of={PageHeaderStories} />
 
 <Title />
+A page's title row, with an optional breadcrumb trail above it, actions to
+its side, and a bottom bar below.
 
 <DocsTabs of={PageHeaderStories}>
 
 <DocsTab tab="examples">
 
-A page's title row, with an optional breadcrumb trail, actions and bottom bar.
+<ResourcesBlock
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/PageHeader"
+/>
 
-<Canvas of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} />
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-<ArgTypes of={PageHeaderStories} />
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A title on its own.</>}>
+    <Canvas of={PageHeaderStories.Basic} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Composition
+
+<DocsCanvasShell description={<>Breadcrumbs above the title, actions beside it, and a bottom bar below — tabs, a filter row, anything that belongs to the page as a whole.</>}>
+    <DsCanvasQuiet of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`disableTitleStyles` renders the title as a plain node, for a caller that styles it itself.</>}>
+    <DsCanvasQuiet of={PageHeaderStories.DisableTitleStyles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PageHeaderStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `PageHeader` once per page, at the top of the Page pattern's body, to
+carry the page's title and the actions that apply to the page as a whole. For
+a heading inside a region of the page, use the
+<a target="_top" href="./?path=/docs/foundations-patterns-section--docs">Section</a>{' '}
+pattern's own header instead — `PageHeader` is reserved for the page level.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### `title` or `children` — not both.
+
+Pass the title through `title`, or through `children` when that reads more
+naturally in the surrounding code; `children` is only used when `title` is
+not given.
+
+```jsx
+<PageHeader
+    title="Session plans"
+    breadcrumbs={<Breadcrumb items={trail} />}
+    actions={<Button text="New plan" />}
+/>
+```
+
+### Reach for `disableTitleStyles` only when the title isn't plain text.
+
+The default renders the title in a `Heading`. Turn styling off when the
+title itself needs to be something other than text that a `Heading` can
+wrap — a custom element already carrying its own heading semantics.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real heading.** The title renders as an `h2` by default, giving the
+  page one clear entry point for assistive technology navigating by
+  heading.
+- **Breadcrumbs keep their own semantics.** `PageHeader` doesn't wrap
+  `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
+  carries its own navigation landmark.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a heading inside a region of the page, use the
+  <a target="_top" href="./?path=/docs/foundations-patterns-section--docs">Section</a> pattern.
+- For the trail shown above the title, use `Breadcrumb`.
+
+</div>
+
+</div>
 
 </DocsTab>
 
