@@ -5,9 +5,8 @@
 
 // `size`: the radio control (dot) width, in px. Unset keeps today's rendering.
 .plus-radio-group {
-    &[data-size="10"] { --radio-control-size: 10px; }
-    &[data-size="12"] { --radio-control-size: 12px; }
-    &[data-size="14"] { --radio-control-size: 14px; }
+    &[data-size="10"] { --radio-control-size: var(--radio-control-size-10); }
+    &[data-size="14"] { --radio-control-size: var(--radio-control-size-14); }
 }
 
 .plus-radio-group-options {

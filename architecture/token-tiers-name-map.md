@@ -1,9 +1,9 @@
 ---
-summary: Token ladder (#1756) — old name to new name, every token across all four tiers
+summary: Token ladder (ADR-038) — old name to new name, every token across all four tiers
 ---
 
 <!-- Tier: 2 -->
-# Token tiers name map (#1756)
+# Token tiers name map (ADR-038)
 
 Generated from `scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER` by `npm run generate:design-tokens` — never hand-edit.
 
@@ -212,6 +212,22 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Calendar | `--layout-calendar-nav` | `--calendar-nav-size` |  |
 | Checkbox | `--layout-control-checkbox` | `--checkbox-control-size` |  |
 | Radio | `--layout-control-radio` | `--radio-control-size` |  |
+| Radio | *(new)* | `--radio-control-size-10` | RadioGroup size 10 |
+| Radio | *(new)* | `--radio-control-size-14` | RadioGroup size 14 |
+| Choice grid | *(new)* | `--choice-grid-control-size-10` | ChoiceGrid size 12 |
+| Choice grid | *(new)* | `--choice-grid-control-size-12` | ChoiceGrid size 14 and 16 |
+| Range | *(new)* | `--range-dot-size-8` | Range size 8 |
+| Range | *(new)* | `--range-dot-size-12` | Range size 12 |
+| Range | *(new)* | `--range-dot-size-16` | Range size 16 |
+| Range | *(new)* | `--range-dot-size-default` | Range with no size |
+| Range | *(new)* | `--range-track-height-4` | Range size 8, and the default |
+| Range | *(new)* | `--range-track-height-6` | Range size 12 |
+| Range | *(new)* | `--range-track-height-8` | Range size 16 |
+| Toggle | *(new)* | `--toggle-track-height-16` | Toggle size 16 |
+| Toggle | *(new)* | `--toggle-track-height-20` | Toggle size 20 |
+| Toggle | *(new)* | `--toggle-track-width-16` | Toggle size 16 |
+| Toggle | *(new)* | `--toggle-track-width-20` | Toggle size 20 |
+| Toggle | *(new)* | `--toggle-pad` | both sizes |
 | Listbox | `--layout-max-width-listbox` | `--listbox-max-width` |  |
 | Listbox | `--layout-min-height-listbox` | `--listbox-min-height` |  |
 | Listbox | `--layout-max-height-listbox` | `--listbox-max-height` |  |

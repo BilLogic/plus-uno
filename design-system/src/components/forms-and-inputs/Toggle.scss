@@ -10,10 +10,10 @@
 @use '../../styles/state' as *;
 
 .plus-toggle-wrapper {
-    --plus-toggle-track-h: 16px;
-    --plus-toggle-track-w: 32px;
-    --plus-toggle-pad: 2px;
-    --plus-toggle-thumb: calc(var(--plus-toggle-track-h) - 2 * var(--plus-toggle-pad));
+    --_toggle-track-h: var(--toggle-track-height-16);
+    --_toggle-track-w: var(--toggle-track-width-16);
+    --_toggle-pad: var(--toggle-pad);
+    --_toggle-thumb: calc(var(--_toggle-track-h) - 2 * var(--_toggle-pad));
 
     display: flex;
     // The row's text style, which the label and the line box both take.
@@ -30,15 +30,15 @@
 }
 
 .plus-toggle-20 {
-    --plus-toggle-track-h: 20px;
-    --plus-toggle-track-w: 40px;
+    --_toggle-track-h: var(--toggle-track-height-20);
+    --_toggle-track-w: var(--toggle-track-width-20);
 }
 
 .plus-toggle {
-    width: var(--plus-toggle-track-w);
-    height: var(--plus-toggle-track-h);
-    min-width: var(--plus-toggle-track-w);
-    min-height: var(--plus-toggle-track-h);
+    width: var(--_toggle-track-w);
+    height: var(--_toggle-track-h);
+    min-width: var(--_toggle-track-w);
+    min-height: var(--_toggle-track-h);
     flex-shrink: 0;
     padding: 0;
     margin: 0;
@@ -84,10 +84,10 @@
 
 .plus-toggle-thumb {
     position: absolute;
-    top: var(--plus-toggle-pad);
-    left: var(--plus-toggle-pad);
-    width: var(--plus-toggle-thumb);
-    height: var(--plus-toggle-thumb);
+    top: var(--_toggle-pad);
+    left: var(--_toggle-pad);
+    width: var(--_toggle-thumb);
+    height: var(--_toggle-thumb);
     border-radius: var(--radius-full, 999px);
     background-color: var(--ds-icon-inverse);
     transition: transform 0.2s ease;
@@ -95,7 +95,7 @@
     pointer-events: none;
 
     .plus-toggle[data-checked] & {
-        transform: translateX(calc(var(--plus-toggle-track-w) - var(--plus-toggle-track-h)));
+        transform: translateX(calc(var(--_toggle-track-w) - var(--_toggle-track-h)));
     }
 
     .plus-toggle[data-disabled] & {

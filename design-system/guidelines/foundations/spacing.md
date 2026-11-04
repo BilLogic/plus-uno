@@ -54,6 +54,8 @@ A component that resolves a tier token into its own rules does it through a priv
 
 The leading underscore marks the property as the component's own: no other file reads it and no tier declares it. A variant or density changes the one `--_` line, and the rules below stay put. The value on the right is always a tier token, chosen by the fallback rule.
 
+`npm run check:no-primitive-reads` holds components and patterns to that: a read of a numbered primitive can fall and never rise.
+
 ## Examples
 
 ```css

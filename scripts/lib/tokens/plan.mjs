@@ -302,6 +302,24 @@ export const TOKEN_LADDER = [
   // ─── Components / Checkbox, Radio ─────────────────────────────────────
   { tier: 'components', group: 'Checkbox', new: '--checkbox-control-size', old: '--layout-control-checkbox', ref: '18px' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size', old: '--layout-control-radio', ref: '12px' },
+  // The `size` prop's px values (Radio group, Choice grid, Range, Toggle) are rows too, so the
+  // components read a named token and never a literal. Each name ends in the px it holds.
+  { tier: 'components', group: 'Radio', new: '--radio-control-size-10', old: null, ref: '10px', note: 'RadioGroup size 10' },
+  { tier: 'components', group: 'Radio', new: '--radio-control-size-14', old: null, ref: '14px', note: 'RadioGroup size 14' },
+  { tier: 'components', group: 'Choice grid', new: '--choice-grid-control-size-10', old: null, ref: '10px', note: 'ChoiceGrid size 12' },
+  { tier: 'components', group: 'Choice grid', new: '--choice-grid-control-size-12', old: null, ref: '12px', note: 'ChoiceGrid size 14 and 16' },
+  { tier: 'components', group: 'Range', new: '--range-dot-size-8', old: null, ref: '8px', note: 'Range size 8' },
+  { tier: 'components', group: 'Range', new: '--range-dot-size-12', old: null, ref: '12px', note: 'Range size 12' },
+  { tier: 'components', group: 'Range', new: '--range-dot-size-16', old: null, ref: '16px', note: 'Range size 16' },
+  { tier: 'components', group: 'Range', new: '--range-dot-size-default', old: null, ref: '20px', note: 'Range with no size' },
+  { tier: 'components', group: 'Range', new: '--range-track-height-4', old: null, ref: '4px', note: 'Range size 8, and the default' },
+  { tier: 'components', group: 'Range', new: '--range-track-height-6', old: null, ref: '6px', note: 'Range size 12' },
+  { tier: 'components', group: 'Range', new: '--range-track-height-8', old: null, ref: '8px', note: 'Range size 16' },
+  { tier: 'components', group: 'Toggle', new: '--toggle-track-height-16', old: null, ref: '16px', note: 'Toggle size 16' },
+  { tier: 'components', group: 'Toggle', new: '--toggle-track-height-20', old: null, ref: '20px', note: 'Toggle size 20' },
+  { tier: 'components', group: 'Toggle', new: '--toggle-track-width-16', old: null, ref: '32px', note: 'Toggle size 16' },
+  { tier: 'components', group: 'Toggle', new: '--toggle-track-width-20', old: null, ref: '40px', note: 'Toggle size 20' },
+  { tier: 'components', group: 'Toggle', new: '--toggle-pad', old: null, ref: 'var(--space-0125)', note: 'both sizes' },
 
   // ─── Components / Listbox ─────────────────────────────────────────────
   { tier: 'components', group: 'Listbox', new: '--listbox-max-width', old: '--layout-max-width-listbox', ref: '320px' },

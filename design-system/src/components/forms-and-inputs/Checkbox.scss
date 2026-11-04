@@ -18,7 +18,7 @@
 .plus-form-checkbox-row {
     display: flex;
     align-items: center;
-    gap: var(--space-050, 8px);
+    gap: var(--space-050);
     // A choice row is 24 at every size (`--item-height-sm`), its label 14/20.
     min-height: var(--item-height-sm);
 }
