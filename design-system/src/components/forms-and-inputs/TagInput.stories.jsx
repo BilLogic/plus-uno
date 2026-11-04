@@ -730,12 +730,12 @@ export const NoTidyingWithoutHandlers = {
 const tidyArgTypes = {
     menu: { control: 'boolean', description: 'Pass onRename, onDelete and onColorChange.', table: { category: 'Behavior' } },
     reorder: { control: 'boolean', description: 'Pass onReorder.', table: { category: 'Behavior' } },
-    size: { control: 'radio', options: ['small', 'medium', 'large'], description: 'Size variant', table: { category: 'Design' } },
+    spacing: { control: 'radio', options: ['default', 'compact'], description: 'Field spacing', table: { category: 'Design' } },
 };
 
 /** The option menu, open on a row. Controls choose which handlers the field gets. */
 export const OptionMenu = {
-    args: { menu: true, reorder: true, size: 'medium' },
+    args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
     render: (args) => <div style={{ ...stack, minHeight: '480px' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
@@ -746,7 +746,7 @@ export const OptionMenu = {
 
 /** Reordering: a row picked up by its handle, with the hint naming the keys. */
 export const Reordering = {
-    args: { menu: true, reorder: true, size: 'medium' },
+    args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
     render: (args) => <div style={{ ...stack, minHeight: '320px' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
@@ -779,7 +779,7 @@ export const Interactive = {
         label: 'Topics',
         caption: '',
         required: false,
-        size: 'medium',
+        spacing: 'default',
         disabled: false,
         readOnly: false,
         validation: 'none',
@@ -789,7 +789,7 @@ export const Interactive = {
         label: { control: 'text', description: 'Names the field.', table: { category: 'Content' } },
         caption: { control: 'text', description: 'Standing help under the field.', table: { category: 'Content' } },
         required: { control: 'boolean', description: 'Shows an asterisk and sets aria-required.', table: { category: 'Content' } },
-        size: { control: 'radio', options: ['small', 'medium', 'large'], description: 'Size variant', table: { category: 'Design' } },
+        spacing: { control: 'radio', options: ['default', 'compact'], description: 'Field spacing', table: { category: 'Design' } },
         disabled: { control: 'boolean', table: { category: 'Behavior' } },
         readOnly: { control: 'boolean', table: { category: 'Behavior' } },
         validation: { control: 'radio', options: ['none', 'invalid'], table: { category: 'Behavior' } },

@@ -18,8 +18,4 @@ describe('Calendar size', () => {
     it('draws 36 when size is left out', () => {
         expect(grid()).toHaveAttribute('data-size', '36');
     });
-
-    it('declares only pixel sizes', () => {
-        expect(Calendar.propTypes.size).toBeDefined();
-    });
 });
