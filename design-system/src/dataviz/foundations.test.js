@@ -41,7 +41,7 @@ const FALLBACK_PATTERN = /var\(--[\w-]+,\s*['"]?-?[\d.]+(px|rem|%|ms|s)?['"]?\)/
 const KNOWN_PRE_EXISTING_FALLBACKS = /var\(--font-(size-title-\w+|line-height-title),/;
 
 /** A bare pixel literal on the properties the foundations rule names: radius, stroke width, font size, padding/spacing. Matches a plain non-zero number — zero needs no token, it draws no line at all. */
-const LITERAL_PROPERTY_PATTERN = /\b(borderRadius|borderWidth|lineWidth|gridLineWidth|stemWidth|fontSize)\s*:\s*(['"]?[1-9])/g;
+const LITERAL_PROPERTY_PATTERN = /\b(borderRadius|borderWidth|lineWidth|gridLineWidth|stemWidth|medianWidth|whiskerWidth|tickWidth|fontSize)\s*:\s*(['"]?[1-9])/g;
 
 describe('data-viz foundations', () => {
     it('carries no old-ladder token names (--element-*, --size-element-*, --layout-*)', () => {

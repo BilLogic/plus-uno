@@ -79,7 +79,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
         tooltip: {
             ...chartTheme.tooltip,
             enabled: true,
-            format: '<b>{x}</b>: {y}%'
+            pointFormat: '<b>{point.category}</b>: {point.y}%'
         },
         series: [
             {

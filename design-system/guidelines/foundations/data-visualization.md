@@ -29,12 +29,17 @@ beyond that.
 The tooltip is a floating layer: the Popup pattern's surface
 (`--ds-surface-overlay`), overlay shadow (`--ds-shadow-overlay`), radius
 (`--popover-radius`) and padding (`--popover-pad`), plus the shared
-`--layer-popup` z-index. Highcharts' native SVG tooltip can only draw its own
-filter-based `shadow` option — it can't take a design-system shadow token — so
-`chartTheme.js` sets `tooltip.useHTML: true` and the styling lives in CSS
-(`chartTheme.css`'s `.highcharts-tooltip` rule), not in JS tooltip options.
-Every chart that sets its own `tooltip` block spreads `chartTheme.tooltip` so
-it inherits this; `foundations.test.js` fails a chart that doesn't.
+`--layer-popup` z-index. `useHTML` alone only moves the tooltip's TEXT into a
+foreignObject — the box Highcharts draws around it is always its own SVG
+`<path>`, and `background`/`border-radius`/`box-shadow` are no-ops there, so
+styling `.highcharts-tooltip` (that path's `<g>`) never painted anything.
+`chartTheme.js` also sets `tooltip.outside: true`, which moves the whole
+tooltip into `.highcharts-tooltip-container` — a real `<div>` — and turns the
+SVG box fully transparent (`backgroundColor: 'transparent'`, `borderWidth: 0`,
+`shadow: false`) so the container's CSS surface (`chartTheme.css`) is the only
+thing a reader sees. Every chart that sets its own `tooltip` block spreads
+`chartTheme.tooltip` so it inherits this; `foundations.test.js` fails a chart
+that doesn't.
 
 ## Mark radius
 
@@ -51,8 +56,8 @@ end. Pies, donuts and areas take no radius at all.
 
 Gridlines, axis lines, series lines, chart-only separators (e.g. the gap
 between stacked bar segments) and markers take one of two component-tier
-tokens, declared in `chartTheme.css` because no stroke-primitive tier exists
-yet in the system for them to alias:
+tokens, declared in `chartTheme.css`, aliasing the same stroke-width
+primitives `--focus-ring-width` reads:
 
 - `--chart-line-width` (2px) — a series line, a box-plot whisker, a marker
   ring, a stacked-segment separator.

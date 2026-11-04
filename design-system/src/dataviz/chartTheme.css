@@ -12,22 +12,22 @@
  */
 :root {
     /*
-     * Chart-only component tokens: no shared primitive aliases these (there is
-     * no stroke-primitive tier in the system yet), so they're declared flat,
-     * the same way `--card-radius` aliases a radius primitive in
-     * `_frame_layers.scss`. Bar/column marks round only the value end at
-     * `--chart-bar-radius` (`--radius-0125`, ~2px) — rounding both ends or a
-     * larger radius distorts length reading, the one thing a bar chart asks
-     * its reader to compare. Declared at `:root`, not `.highcharts-container`
-     * (unlike the `--highcharts-*` overrides below): nothing in this file
-     * consumes these via `var()` — `chartTheme.js`'s `tokenNumber()` reads
-     * them off `document.documentElement` for Highcharts' numeric options,
-     * and a custom property only resolves there if it's declared on an
-     * ancestor of that element, never a descendant like `.highcharts-container`.
+     * Chart-only component tokens, aliasing the same stroke-width primitive
+     * `--focus-ring-width` reads (`_frame_layers.scss`'s `--card-radius`
+     * aliases the equivalent radius primitive). Bar/column marks round only
+     * the value end at `--chart-bar-radius` (`--radius-0125`, ~2px) —
+     * rounding both ends or a larger radius distorts length reading, the one
+     * thing a bar chart asks its reader to compare. Declared at `:root`, not
+     * `.highcharts-container` (unlike the `--highcharts-*` overrides below):
+     * nothing in this file consumes these via `var()` — `chartTheme.js`'s
+     * `tokenNumber()` reads them off `document.documentElement` for
+     * Highcharts' numeric options, and a custom property only resolves there
+     * if it's declared on an ancestor of that element, never a descendant
+     * like `.highcharts-container`.
      */
     --chart-bar-radius: var(--radius-0125);
-    --chart-line-width: 2px;
-    --chart-grid-width: 1px;
+    --chart-line-width: var(--size-border-stroke-stroke-200);
+    --chart-grid-width: var(--size-border-stroke-stroke-100);
 }
 
 .highcharts-container {
