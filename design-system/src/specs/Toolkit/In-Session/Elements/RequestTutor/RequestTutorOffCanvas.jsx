@@ -56,7 +56,7 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
     return (
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--size-element-gap-md)' }}>
             {btn('minus', value <= min, () => onChange(Math.max(min, value - 1)), 'Decrease')}
-            <span className="body1-txt font-weight-semibold" style={{ minWidth: '1.5em', textAlign: 'center', color: 'var(--ds-icon)' }}>
+            <span className="body1-txt font-weight-semibold" style={{ minWidth: '1.5em', textAlign: 'center', color: 'var(--ds-text)' }}>
                 {value}
             </span>
             {btn('plus', value >= max, () => onChange(Math.min(max, value + 1)), 'Increase')}

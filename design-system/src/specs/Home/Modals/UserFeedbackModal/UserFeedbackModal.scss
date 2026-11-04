@@ -194,8 +194,8 @@
 .plus-user-feedback-modal,
 .plus-user-feedback-modal-inline {
     .plus-modal.plus-user-feedback-modal-shell {
-        /* Undo Modal body-only chrome strip — Figma uses surface-container-high + pad-md */
-        background-color: var(--ds-surface-container) !important;
+        /* Undo Modal body-only chrome strip — the modal's own overlay fill + pad-md */
+        background-color: var(--ds-surface-overlay) !important;
         box-shadow: var(--elevation-light-2) !important;
         border-radius: var(--size-modal-radius-md, 6px) !important;
         overflow: hidden;

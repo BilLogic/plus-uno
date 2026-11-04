@@ -7,7 +7,7 @@
     // Let inner Card content stretch so metric tiles can equalize heights
     align-items: stretch;
     justify-content: flex-start;
-    background-color: var(--ds-surface);
+    background-color: var(--ds-surface-raised);
     
     // Responsive: adjust min dimensions on smaller screens
     @media (max-width: 768px) {

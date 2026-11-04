@@ -121,7 +121,7 @@ const TutorsTrainingProgressTable = ({
                             <i className="fas fa-chalkboard-user" />
                         </div>
                         <div className="tutors-training-progress-table__avatar-info">
-                            <span className="body2-txt font-semibold" style={{ color: 'var(--ds-icon)' }}>{tutor.tutorName}</span>
+                            <span className="body2-txt font-semibold" style={{ color: 'var(--ds-text)' }}>{tutor.tutorName}</span>
                             <span className="tutors-training-progress-table__email">{tutor.email}</span>
                         </div>
                     </div>

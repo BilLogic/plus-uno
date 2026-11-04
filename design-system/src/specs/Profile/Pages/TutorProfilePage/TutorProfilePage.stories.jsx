@@ -364,7 +364,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 </span>
                             </Tooltip>
                         </div>
-                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-icon)' }}>
+                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             This information determines your eligibility to tutor with PLUS.
                         </span>
                     </div>
@@ -443,7 +443,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                 </span>
                             </Tooltip>
                         </div>
-                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-icon)' }}>
+                        <span className="body3-txt font-weight-light" style={{ color: 'var(--ds-text)' }}>
                             This information helps us match tutors with students .
                         </span>
                     </div>

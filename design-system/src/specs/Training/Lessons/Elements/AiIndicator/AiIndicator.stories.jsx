@@ -63,7 +63,7 @@ export const InContext = {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '16px',
-                backgroundColor: 'var(--ds-surface)',
+                backgroundColor: 'var(--ds-surface-raised)',
                 borderRadius: '8px'
             }}>
                 <span className="body2-txt">Lesson Title</span>

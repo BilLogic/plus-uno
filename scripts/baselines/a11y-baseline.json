@@ -4,9 +4,9 @@
     "storyFiles": 473,
     "tests": 1816
   },
-  "violatingStories": 25,
+  "violatingStories": 23,
   "rules": {
-    "color-contrast": 21,
+    "color-contrast": 19,
     "scrollable-region-focusable": 2,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
@@ -14,12 +14,6 @@
   },
   "stories": {
     "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Login/Modals/LoginNotificationsModal/LoginNotificationsModal.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Login/Modals/LoginNotificationsModal/LoginNotificationsModal.stories.jsx::Type B": [
       "color-contrast"
     ],
     "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Variants": [
