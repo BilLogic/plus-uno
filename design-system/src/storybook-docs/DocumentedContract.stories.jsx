@@ -135,6 +135,9 @@ function probeValue(name, meta) {
   // `arrayOf(shape({...}))`: it satisfies a required array prop's `.map()`
   // without inventing the shape inside it.
   if (/^PropTypes\.(array|arrayOf\()/.test(t)) return [];
+  // `instanceOf(Date)` is a concrete, fabrication-free type: "now" is a real
+  // Date, not an invented shape.
+  if (t === 'PropTypes.instanceOf(Date)') return new Date();
   return undefined;
 }
 
