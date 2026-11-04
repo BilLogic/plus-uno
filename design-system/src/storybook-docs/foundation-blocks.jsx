@@ -175,7 +175,7 @@ export const DoDont = ({ children }) => (
         style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))',
-            gap: 'var(--layout-gutter)',
+            gap: 'var(--grid-gutter)',
             alignItems: 'stretch',
         }}
     >
@@ -242,7 +242,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: `repeat(${panes.length}, minmax(0, 1fr))`,
-                    gap: 'var(--layout-gutter)',
+                    gap: 'var(--grid-gutter)',
                 }}
             >
                 {panes.map((p) => (

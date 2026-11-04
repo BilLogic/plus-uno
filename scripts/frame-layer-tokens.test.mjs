@@ -25,6 +25,12 @@ const stylesheet = fs.readFileSync(STYLESHEET, 'utf8');
 
 /** A token's resolved value at a mode: `:root` for Medium, the breakpoint block above it otherwise. */
 function atMode(name, mode) {
+  // A ladder name (`deep/`) is an alias of the stylesheet token the modes are declared on: follow it there.
+  const ladder = corpus.get(name);
+  if (ladder?.file.startsWith('deep/')) {
+    const target = ladder.raw.match(/^var\((--[a-z0-9-]+)\)$/)?.[1];
+    if (target) return atMode(target, mode);
+  }
   const base = corpus.get(name);
   assert.ok(base, `${name} is not declared`);
   let value = base.value;
@@ -187,7 +193,7 @@ test('the Drawer pattern tokens alias the same space steps as Modal, and there i
     assert.equal(corpus.get(`--drawer-${leaf}`)?.raw, corpus.get(`--modal-${leaf}`)?.raw, leaf);
   }
   // Modal's own pad moved to the role token `--modal-pad-x-default` (ADR-038,
-  // declared in tokens/deep, outside this file's corpus); Drawer still aliases the same step.
+  // declared in tokens/deep); Drawer still aliases the same step.
   assert.equal(corpus.get('--drawer-pad')?.raw, 'var(--space-100)', 'pad');
   assert.equal(corpus.get('--drawer-radius'), undefined);
 });
@@ -339,8 +345,8 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
  */
 const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
 
-// `--modal-pad-x-default` (ADR-038, tokens/deep, outside this file's corpus) is
-// non-responsive, same 16px the old `--modal-pad` held at every mode.
+// `--modal-pad-x-default` (ADR-038, tokens/deep) is non-responsive, same 16px
+// the old `--modal-pad` held at every mode.
 const MODAL_PAD_PX = 16;
 
 /** The width Modal.scss computes for a span on a screen `width` wide, its tokens read at `mode`. */
@@ -349,8 +355,6 @@ function modalWidth(span, width, mode) {
   assert.ok(block, 'Modal.scss has no .plus-modal block');
   const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-modal-'))].map(([, n, v]) => [n, v.trim()]));
   local['--plus-modal-span'] = String(span);
-  // ADR-038, tokens/deep, outside this file's corpus: inject it like a local.
-  local['--modal-pad-x-default'] = String(MODAL_PAD_PX);
   const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1];
   assert.ok(formula, '.plus-modal declares no width');
   const resolve = (expr, depth = 0) => {

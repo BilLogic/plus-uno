@@ -6,8 +6,8 @@ summary: PLUS lays pages on two 12-column grids with gutter 16 — the screen gr
 
 # Grid
 
-PLUS has **two grids**, both 12 columns (`--layout-columns`) with gutter 16
-(`--layout-gutter`):
+PLUS has **two grids**, both 12 columns (`--grid-columns`) with gutter 16
+(`--grid-gutter`):
 
 - **The screen grid** spans the screen and lives on the Blanket layer only.
   Modals and drawers size from it.
@@ -44,9 +44,9 @@ screen-grid tokens below to size itself.
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-width-screen` | 768 · 1024 · 1440 | The screen each mode is worked at |
-| `--layout-pad-x-screen` | 24 · 24 · 32 | Screen pad, the container pad plus the Page pad |
-| `--layout-width-column-screen` | 45.33 · 66.67 · 88 | One screen-grid column |
+| `--screen-width` | 768 · 1024 · 1440 | The screen each mode is worked at |
+| `--screen-pad-x` | 24 · 24 · 32 | Screen pad, the container pad plus the Page pad |
+| `--grid-width-column-screen` | 45.33 · 66.67 · 88 | One screen-grid column |
 
 The grid is `clamp(720, screen − 2 × 24, 1232)` wide: 720 · 976 · 1232 at the
 three modes. From 1440 the pad is 32, but there the grid is already at its cap
@@ -60,10 +60,10 @@ taken their share. Page content (cards, tables, forms, charts) aligns to it.
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-width-content` | 720 · 744 · 1144 | Content width at each mode's screen |
-| `--layout-width-column` | 45.33 · 47.33 · 80.67 | One content-grid column |
-| `--layout-max-width-content` / `--layout-max-width-reading` | 1232 / 864 | Content cap, centered past it; the reading cap for long-form text |
-| `--layout-min-width-content` | 720 | Content minimum; the Page scrolls sideways under it |
+| `--content-width` | 720 · 744 · 1144 | Content width at each mode's screen |
+| `--grid-width-column` | 45.33 · 47.33 · 80.67 | One content-grid column |
+| `--content-max-width` / `--content-max-width-reading` | 1232 / 864 | Content cap, centered past it; the reading cap for long-form text |
+| `--content-min-width` | 720 | Content minimum; the Page scrolls sideways under it |
 
 At X-Large the content width is
 `1440 − 240 sidebar, from the screen edge − 8 container pad − 2 × 24 Page pad` = 1144.
@@ -73,8 +73,8 @@ content holds its 720 minimum.
 ```css
 /* correct — the content grid from its tokens */
 display: grid;
-grid-template-columns: repeat(var(--layout-columns), minmax(0, 1fr));
-gap: var(--layout-gutter);
+grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
+gap: var(--grid-gutter);
 
 /* a child spans whole columns */
 grid-column: span 4;
@@ -82,14 +82,14 @@ grid-column: span 4;
 
 The per-mode widths step at each breakpoint rather than follow the screen.
 Code that needs the exact width at any screen lays out on the grid itself, as
-above, instead of reading `--layout-width-column`.
+above, instead of reading `--grid-width-column`.
 
 ## Modal widths
 
 A modal spans **6 · 8 · 10 screen-grid columns**, plus the gutters between them,
 plus its own pad of 16 (`--modal-pad-x-default`) on each side:
 
-`width = n × --layout-width-column-screen + (n − 1) × --layout-gutter + 2 × --modal-pad-x-default`
+`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`
 
 | Width | Columns | Medium | Large | X-Large | Token |
 |:---|---:|---:|---:|---:|:---|
@@ -101,7 +101,7 @@ The tokens are rounded to a whole pixel. `Modal.scss` works the same formula
 out continuously from the screen width, so a modal grows with the screen
 between breakpoints, stops growing past a 1280 screen, never shrinks below its
 Medium width and ignores the sidebar. The frame and layer token test pins the
-formula to `--layout-width-column-screen` at 768, 1024 and 1440.
+formula to `--grid-width-column-screen` at 768, 1024 and 1440.
 
 Pass `width="sm" | "md" | "lg"` to `<Modal>`; a fixed pixel width ignores the
 screen grid. The modal itself, its Blanket and its pads: the Modal component
@@ -113,9 +113,9 @@ The `Frame` pattern draws, from the same file:
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--layout-height-topbar` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
-| `--layout-width-sidebar` | 240 | Sidebar width; docked from Large, closed below |
-| `--layout-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-Page row: 8 while the sidebar is closed, 0 once it docks |
+| `--frame-topbar-height` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
+| `--frame-sidebar-width` | 240 | Sidebar width; docked from Large, closed below |
+| `--grid-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-Page row: 8 while the sidebar is closed, 0 once it docks |
 | `--frame-pad` / `--frame-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
 | `--page-pad` | 16 · 16 · 24 | Page pad, the content grid's margin |
 

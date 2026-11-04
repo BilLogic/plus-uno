@@ -403,8 +403,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * is never written with a fallback (`check:ds-fallbacks`), so no comparison
    * either fallback check makes can reach one. What is counted is the legacy
    * set, which is the set the exposure is about.
-   */
+   *
    * (The twentieth is `--blanket-fill`, the ladder's literal copy of `--overlay-scrim`; it leaves with the old name.)
+   */
   it('differs from the normalizer on 20 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .filter((entry) => !entry.file.startsWith('color/'))

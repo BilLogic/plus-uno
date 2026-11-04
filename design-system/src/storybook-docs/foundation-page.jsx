@@ -96,7 +96,7 @@ export const FoundationRelated = ({ items }) => (
             listStyle: 'none',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))',
-            gap: 'var(--layout-gutter)',
+            gap: 'var(--grid-gutter)',
         }}
     >
         {items.map((item) => (
