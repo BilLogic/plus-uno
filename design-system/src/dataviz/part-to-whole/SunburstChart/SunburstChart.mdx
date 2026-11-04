@@ -1,89 +1,151 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SunburstChartStories from './SunburstChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={SunburstChartStories} />
 
 <Title />
+Shows parts nested inside parts as rings around a center: each ring splits the
+arc of its parent. Click an arc to zoom into it.
 
-A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/SunburstChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A sunburst chart displays **hierarchical data as nested rings**, radiating from center outward.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A curriculum split into subjects, then topics. Click a subject to drill into its topics.</>}>
+    <Canvas of={SunburstChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Center** = root/top-level category
-- **Outer rings** = child/nested levels
-- **Arc size** = proportion relative to parent
-- Click to drill down (if interactive)
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Hierarchical part-to-whole</td><td>✅ Ideal</td></tr>
-    <tr><td>Multi-level drill-down</td><td>✅ Ideal</td></tr>
-    <tr><td>Category breakdowns</td><td>✅ Good</td></tr>
-    <tr><td>Flat data</td><td>❌ Use Pie/Donut</td></tr>
-    <tr><td>Many levels (>4)</td><td>❌ Use Treemap</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `SunburstChart` when a total breaks down in levels and the reader needs to
+see both the levels and the sizes: session hours by subject, then by topic;
+SMART competencies, then the skills inside each. It suits exploration, since a
+reader can click a branch to see only its parts.
 
-### PLUS Context
+For a single level of parts, use `PieChart` or `DonutChart`. For a flat split
+with many parts, use `TreemapChart`; tiles are easier to compare than arcs.
+For the shape of a hierarchy with no sizes attached, use `TreegraphChart`. For
+values that must be compared precisely, use `BarChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Curriculum Structure**</td><td>Subject → Unit → Lesson</td></tr>
-    <tr><td>**Competency Framework**</td><td>Domain → Skill → Indicator</td></tr>
-    <tr><td>**Time Breakdown**</td><td>Category → Subcategory → Activity</td></tr>
-    <tr><td>**Content Organization**</td><td>Library → Section → Resource</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Limit to 3-4 levels
-✅ Use color to encode categories
-✅ Enable drill-down interaction
-✅ Show labels for major arcs
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Center', 'The root node, the whole being split. It holds the first level of the hierarchy.'],
+        ['Rings', 'Each further level is a ring around the one before. An arc spans the share of its parent that it holds. The center and two rings each take a third of the radius.'],
+        ['Labels', 'Arcs are labeled with their names.'],
+        ['Drill-down', 'Clicking an arc makes it the new center and shows only its descendants.'],
+        ['Tooltip', 'Hovering an arc shows its name and value.'],
+        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Too many segments (illegible)
-❌ Deep hierarchies (>4 levels)
-❌ Flat data without hierarchy
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={SunburstChartStories.Interactive} />
+`data` is a flat array of `{ id, parent, name, value }`. The root has
+`parent: ''`; every other node names its parent's `id`. Give `value` to the
+leaves; a parent's size is the sum of its children.
 
+```jsx
+<SunburstChart
+    data={[
+        { id: 'all', parent: '', name: 'Session hours' },
+        { id: 'math', parent: 'all', name: 'Math' },
+        { id: 'reading', parent: 'all', name: 'Reading' },
+        { id: 'fractions', parent: 'math', name: 'Fractions', value: 120 },
+        { id: 'algebra', parent: 'math', name: 'Algebra', value: 90 },
+        { id: 'fluency', parent: 'reading', name: 'Fluency', value: 70 },
+        { id: 'comprehension', parent: 'reading', name: 'Comprehension', value: 110 },
+    ]}
+/>
+```
+
+The chart sizes three levels: the root and two rings beneath it. Keep the
+hierarchy to that depth.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color comes from the theme.** The chart sets no colors of its own, so arcs draw from the theme's categorical order. Do not rely on color to say which branch an arc belongs to; its position under its parent says that.
+- **Position and labels carry the structure; arc length carries the size.** The chart reads without hue, but outer arcs are short and their labels crowd. The tooltip is the reliable place for an exact value.
+- **Keep it shallow and short.** More than a handful of parts per level makes outer arcs too thin to read or click.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the arcs. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`SunburstChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Session hours could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No session hours yet" description="Hours appear after a session is logged." />
+    : <SunburstChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SunburstChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For a single level of parts, use `PieChart` or `DonutChart`.
-- For the same hierarchy laid out rectangularly, use `TreemapChart` — easier to compare, harder to see depth.
-- For a hierarchy with no size attached, use `TreegraphChart`.
+- For a flat split with many parts, use `TreemapChart`.
+- For a hierarchy with no sizes attached, use `TreegraphChart`.
+- For values that must be compared precisely, use `BarChart`.
 
 </div>
 
 </div>
+
+

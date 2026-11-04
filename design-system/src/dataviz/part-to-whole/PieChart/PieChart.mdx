@@ -1,90 +1,150 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PieChartStories from './PieChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={PieChartStories} />
 
 <Title />
+Shows how one total splits into a few parts, each part a slice of a circle
+labeled with its share.
 
-A pie chart displays **parts of a whole** as slices of a circle. Best for showing simple proportions.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/PieChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A pie chart displays **parts of a whole** as slices of a circle.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A five-slice pie, each slice labeled with its name and percentage, with a legend below.</>}>
+    <Canvas of={PieChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Whole circle** = 100% of total
-- **Each slice** = proportion of total
-- **Slice angle** = percentage (360° = 100%)
-- Compare slice sizes to understand proportions
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Simple part-to-whole</td><td>✅ Ideal</td></tr>
-    <tr><td>2-5 categories</td><td>✅ Ideal</td></tr>
-    <tr><td>Showing single dominant share</td><td>✅ Good</td></tr>
-    <tr><td>Comparing multiple charts</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Many categories (>5)</td><td>❌ Use Treemap</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `PieChart` when the question is "how is this total divided?" and the answer
+has two to five parts: sessions per subject this term, students by grade band,
+resource types in the library. It works best when one share dominates or when
+the split is close to a simple fraction like a half or a quarter.
 
-### PLUS Context
+For parts that need a headline number in the middle, such as a completion
+rate, use `DonutChart`. For more than five parts, or when readers need to
+compare parts closely, use `BarChart`. For the same split across several
+groups, use `StackedBarChart` rather than a row of pies. For parts nested
+inside parts, use `SunburstChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Subject Distribution**</td><td>Time spent per subject</td></tr>
-    <tr><td>**User Segments**</td><td>Student types breakdown</td></tr>
-    <tr><td>**Content Mix**</td><td>Resource types in library</td></tr>
-    <tr><td>**Engagement Sources**</td><td>How users found the platform</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Limit to 5 or fewer slices
-✅ Order slices by size (largest first)
-✅ Sort slices from most to least; the theme colors them in categorical order
-✅ Group past six slices into "Other"
-✅ Label slices with percentages
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Slices', <>One per item in <C>data</C>. The angle is the item's share of the total. Clicking a slice selects it.</>],
+        ['Data labels', 'Each slice is labeled with its name and percentage, to one decimal place.'],
+        ['Legend', <>Names each slice. Shown by default; turn it off with <C>showLegend</C> when the data labels are enough.</>],
+        ['Tooltip', 'Hovering a slice shows its percentage of the total.'],
+        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Comparing multiple pie charts
-❌ 3D effects (distorts perception)
-❌ Many small slices
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={PieChartStories.Interactive} />
+`data` is an array of `{ name, y }`, one object per slice. `y` is the raw value;
+the chart works out each percentage from the total, so the values do not need
+to add up to 100.
 
+```jsx
+<PieChart
+    data={[
+        { name: 'Math', y: 420 },
+        { name: 'Reading', y: 310 },
+        { name: 'Science', y: 180 },
+        { name: 'Other', y: 90 },
+    ]}
+/>
+```
+
+An item may carry its own `color`; leave it out and the chart assigns one.
+Slices draw in the order given, so sort `data` from most to least before you
+pass it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned by position.** Each slice without a `color` takes the categorical order, slot 1 for the first item, slot 2 for the second, and so on. Even a single slice gets slot 1, not the brand color.
+- **Keep it to five slices or fewer.** Slots 7 and 8 exist for overflow only, and thin slices become unreadable. Group the smallest into "Other".
+- **Angle carries the value, and angle is hard to compare.** The data labels give each slice its name and percentage, so the chart still reads without hue. Do not turn the labels into the only place a value appears for close shares; use `BarChart` when readers must rank parts that are near each other.
+- **No 3D.** Tilting the circle distorts the angles the reader is judging.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the slices. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`PieChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Sessions could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="The split appears after a session is logged." />
+    : <PieChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PieChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For a center that can carry a total, use `DonutChart`.
-- For more than about five slices, use `BarChart` or `TreemapChart`.
+- For a center that can carry a total or a rate, use `DonutChart`.
+- For more than five parts, or parts that must be compared closely, use `BarChart`.
+- For the same split across several groups, use `StackedBarChart`.
 - For parts nested inside parts, use `SunburstChart`.
 
 </div>
 
 </div>
+
+

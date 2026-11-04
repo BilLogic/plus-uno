@@ -1,86 +1,143 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PyramidChartStories from './PyramidChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={PyramidChartStories} />
 
 <Title />
+Stacks levels into a triangle, the largest at the base and the smallest at the
+tip, each band labeled with its name and value.
 
-Shows **hierarchical quantities** from largest at bottom to smallest at top.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/PyramidChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **hierarchical quantities** from largest at bottom to smallest at top.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A five-level acquisition pyramid, each band labeled with its name and count.</>}>
+    <Canvas of={PyramidChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Width** = relative size/quantity
-- **Position** = hierarchical level
-- Bottom = largest, Top = smallest
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Sales funnel stages</td><td>✅ Ideal</td></tr>
-    <tr><td>Population pyramids</td><td>✅ Ideal</td></tr>
-    <tr><td>Maslow's hierarchy</td><td>✅ Good</td></tr>
-    <tr><td>Equal portions</td><td>❌ Use Pie Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `PyramidChart` for a short series of levels where each is smaller than the
+one beneath it and the shape itself tells the story: students referred, then
+enrolled, then attending weekly, then meeting their goal; tutors in training,
+then certified, then leading sessions.
 
-### PLUS Context
+For stages that narrow from top to bottom, use `FunnelChart`. For levels with
+no built-in order, or values that must be compared precisely, use `BarChart`.
+For parts of one total with no levels, use `PieChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Student Funnel**</td><td>Prospects → Enrolled</td></tr>
-    <tr><td>**Learning Stages**</td><td>Awareness → Mastery</td></tr>
-    <tr><td>**Support Escalation**</td><td>Self-help → Expert</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the pyramid chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Bands', <>One per item in <C>data</C>, stacked into a triangle. The first item sits at the base; band size follows <C>value</C>.</>],
+        ['Data labels', 'Each band is labeled beside the pyramid with its name and value, joined by a connector line.'],
+        ['Legend', 'None. The data labels name every band.'],
+        ['Tooltip', 'Hovering a band shows its value.'],
+        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={PyramidChartStories.Interactive} />
+`data` is an array of `{ name, value }`, one object per band. List it from the
+base up, largest first.
 
+```jsx
+<PyramidChart
+    data={[
+        { name: 'Referred', value: 1200 },
+        { name: 'Enrolled', value: 840 },
+        { name: 'Attending weekly', value: 510 },
+        { name: 'Met their goal', value: 230 },
+    ]}
+/>
+```
+
+Values print with thousands separators and no decimals.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned by position.** The chart sets no colors of its own and takes no per-item `color`, so bands draw from the theme's categorical order, base first.
+- **Labels carry the value.** Every band is labeled with its name and number, so the chart reads without hue. Band size is hard to judge by eye, since a band's width changes along its height; read the labels, not the shape, for exact figures.
+- **Keep it short.** Four to six levels keep the bands tall enough for their labels.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the bands. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`PyramidChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No students yet" description="Levels appear after the first referral." />
+    : <PyramidChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PyramidChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For stages that shrink because each is a subset, use `FunnelChart`.
-- For a population split by age and sex, use `BarChart` mirrored on a shared axis.
-- For ranked levels with no implied containment, use `BarChart`.
+- For stages that narrow from top to bottom, use `FunnelChart`.
+- For levels with no built-in order, or values compared precisely, use `BarChart`.
+- For parts of one total with no levels, use `PieChart`.
 
 </div>
 
 </div>
+
+
