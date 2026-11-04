@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
+import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import './Flag.scss';
 
@@ -29,6 +30,7 @@ export const Flag = ({
     children, // Description
     actions,
     bold = false,
+    defaultExpanded = false,
     dismissible = true,
     show = true,
     onDismiss,
@@ -62,6 +64,10 @@ export const Flag = ({
      * or `delay` wins.
      */
     const closesItself = autohide ?? !isUrgent;
+
+    // A bold flag collapses to its title and expands to the description and actions.
+    const [expanded, setExpanded] = useState(defaultExpanded);
+    const showDetails = !bold || expanded;
 
     // Only the latest onDismiss fires; changing it mid-countdown does not
     // restart the timer, matching the previous react-bootstrap Toast timing.
@@ -104,12 +110,12 @@ export const Flag = ({
                     <strong className="plus-flag-title">{title}</strong>
                     {timestamp && <small className="plus-flag-timestamp">{timestamp}</small>}
                 </div>
-                {children && (
+                {showDetails && children && (
                     <div className={`plus-flag-body ${bodyClass}`}>
                         {children}
                     </div>
                 )}
-                {actions && actions.length > 0 && (
+                {showDetails && actions && actions.length > 0 && (
                     <div className="plus-flag-actions">
                         {actions.map((action) => {
                             const ActionTag = action.href ? 'a' : 'button';
@@ -129,6 +135,16 @@ export const Flag = ({
                     </div>
                 )}
             </div>
+            {bold && (
+                <IconButton
+                    icon={expanded ? 'chevron-up' : 'chevron-down'}
+                    label={expanded ? 'Collapse' : 'Expand'}
+                    appearance="subtle"
+                    className="plus-flag-expand"
+                    aria-expanded={expanded}
+                    onClick={() => setExpanded((open) => !open)}
+                />
+            )}
             {/* The shared CloseButton, default tone on the flag's surface, or
                 inverse on a bold one. A message is dismissed, not closed. */}
             {dismissible && <CloseButton label="Dismiss flag" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
@@ -151,8 +167,10 @@ Flag.propTypes = {
         target: PropTypes.string,
         onClick: PropTypes.func,
     })),
-    /** Expand to the appearance's bold fill. */
+    /** The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions. */
     bold: PropTypes.bool,
+    /** Whether a bold flag starts expanded. */
+    defaultExpanded: PropTypes.bool,
     dismissible: PropTypes.bool,
     show: PropTypes.bool,
     onDismiss: PropTypes.func,

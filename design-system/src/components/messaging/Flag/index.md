@@ -23,6 +23,7 @@ The Popover family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 | `children` | node | — | An optional description under the title. |
 | `actions` | arrayOf (required) | — | Link-button actions under the description, in the order given. Avoid more than two. |
 | `bold` | bool | `false` | Expand to the appearance\'s bold fill |
+| `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `dismissible` | bool | `true` | — |
 | `show` | bool | `true` | — |
 | `onDismiss` | func | — | — |

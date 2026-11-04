@@ -65,7 +65,7 @@ The four layers are built from existing components. These are the main propertie
 </tbody>
 </DocsTable>
 
-Figma names the Flag appearances <code>info</code>, <code>success</code>, <code>warning</code> and <code>error</code>. In code, <code>error</code> is <code>danger</code>.
+Code names the Flag appearances as Figma does, with <code>information</code> where Figma's variant is shortened.
 
 </div>
 
@@ -124,7 +124,7 @@ A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mount
     <DsCanvasQuiet of={PopoverFamilyStories.Flags} />
 </DocsCanvasShell>
 
-Success and info close after 8 seconds. Warning and error stay until dismissed. A Flag sits on layer 600.
+Normal, information and success close after 8 seconds. Warning and error stay until dismissed. A Flag sits on layer 600.
 
 </div>
 
@@ -238,7 +238,7 @@ The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns
 - A Popup is not a dialog. Focus does not move into it, and anything focusable inside it is reached by continuing to Tab.
 - An outside click and Escape close a Popup.
 - A hover-only Tooltip leaves out the keyboard. Open it on hover and focus.
-- A Flag is announced without taking focus. Success and info are polite, and warning and error interrupt a screen reader.
+- A Flag is announced without taking focus. Normal, information and success are polite, and warning and error interrupt a screen reader.
 
 </div>
 

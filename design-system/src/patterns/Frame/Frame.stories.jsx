@@ -457,7 +457,7 @@ const WithModal = (args) => {
             </Frame>
             <Modal
                 show={open}
-                width="sm"
+                width="6-col"
                 title="Settings"
                 body="Opening this closed the floating sidebar."
                 primaryButton={{ text: 'Done', onClick: close }}

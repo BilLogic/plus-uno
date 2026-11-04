@@ -141,6 +141,11 @@
 
     // --- BOLD: the appearance's bold fill, with inverse text and icon ---
     &.plus-flag--bold {
+        .plus-flag-expand {
+            flex-shrink: 0;
+            color: var(--ds-text-inverse);
+        }
+
         .plus-flag-title,
         .plus-flag-body,
         .plus-flag-timestamp,
@@ -188,6 +193,10 @@
                 // @contrast: non-text
                 color: var(--ds-icon-warning-inverse);
             }
+        }
+
+        .plus-flag-expand {
+            color: var(--ds-text-warning-inverse);
         }
 
         .plus-close-btn.plus-close-btn--inverse {

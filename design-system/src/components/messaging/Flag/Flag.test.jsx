@@ -110,6 +110,31 @@ describe('Flag actions and dismiss', () => {
     });
 });
 
+describe('Flag expand on bold', () => {
+    it('starts a bold flag collapsed and expands to the description and actions', () => {
+        render(<Flag appearance="error" bold title="T" autohide={false} actions={[{ text: 'Retry' }]}>Details here.</Flag>);
+        const toggle = screen.getByRole('button', { name: 'Expand' });
+        expect(toggle).toHaveAttribute('aria-expanded', 'false');
+        expect(screen.queryByText('Details here.')).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Retry' })).not.toBeInTheDocument();
+        fireEvent.click(toggle);
+        expect(screen.getByRole('button', { name: 'Collapse' })).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByText('Details here.')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    });
+
+    it('can start expanded', () => {
+        render(<Flag appearance="error" bold defaultExpanded title="T" autohide={false}>Details here.</Flag>);
+        expect(screen.getByText('Details here.')).toBeInTheDocument();
+    });
+
+    it('has no toggle on a flag that is not bold', () => {
+        render(<Flag title="T" autohide={false}>Details here.</Flag>);
+        expect(screen.queryByRole('button', { name: 'Expand' })).not.toBeInTheDocument();
+        expect(screen.getByText('Details here.')).toBeInTheDocument();
+    });
+});
+
 describe('FlagGroup', () => {
     it('sits bottom-start by default', () => {
         render(<FlagGroup data-testid="flags"><span>flag</span></FlagGroup>);
