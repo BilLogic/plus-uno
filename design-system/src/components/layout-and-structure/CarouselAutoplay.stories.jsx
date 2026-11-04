@@ -23,8 +23,7 @@ import Carousel from './Carousel/Carousel';
  *
  * WHAT THIS DOES NOT ASSERT. That the slides stop moving. Proving a negative
  * about a timer means waiting for one, and a test that waits is a test that goes
- * flaky. The pause is `interval={null}`, which is react-bootstrap's own
- * documented way of not advancing — the assertion is on the control being there,
+ * flaky. The assertion is on the control being there,
  * named, and toggling.
  */
 

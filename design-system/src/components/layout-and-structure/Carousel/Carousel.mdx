@@ -158,6 +158,10 @@ on. `fade` is accepted and ignored — the transition is always a slide.
   else. Setting an `interval` renders a play/pause button, named for what
   pressing it will do and reachable by keyboard. It appears only when
   there is autoplay to pause.
+- **Reduced motion turns autoplay off.** When a person has asked for reduced
+  motion, an `interval` does nothing and the pause control is not drawn. The
+  slide transition is instant, and the arrows, dots and arrow keys still move
+  between slides.
 - **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
   so a page of carousels contributes a flat run of `h5`s to the outline.
 

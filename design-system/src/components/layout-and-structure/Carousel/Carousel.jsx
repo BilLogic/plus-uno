@@ -3,13 +3,32 @@ import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Carousel.scss';
 
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+// Reads the person's motion preference and follows it if it changes.
+const usePrefersReducedMotion = () => {
+    const [reduced, setReduced] = useState(() => (
+        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+            && window.matchMedia(REDUCED_MOTION_QUERY).matches
+    ));
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return undefined;
+        const query = window.matchMedia(REDUCED_MOTION_QUERY);
+        const onChange = (event) => setReduced(event.matches);
+        setReduced(query.matches);
+        query.addEventListener('change', onChange);
+        return () => query.removeEventListener('change', onChange);
+    }, []);
+    return reduced;
+};
+
 const normalizeIndex = (index, length) => ((index % length) + length) % length;
 
 /**
  * Carousel Component
  * Rotates through a set of slides, with controls, indicators, captions, and
- * a pausable autoplay. Hand-rolled: ADS has no equivalent, and there is no
- * Base UI part for it.
+ * a pausable autoplay that stays off under reduced motion. Hand-built: Base UI
+ * has no carousel part.
  */
 const Carousel = ({
     id,
@@ -69,7 +88,10 @@ const Carousel = ({
      * button on a carousel that never advances is a control that lies about
      * what the component does.
      */
-    const autoplays = typeof interval === 'number' && interval > 0;
+    // Reduced motion is a request not to move on its own: autoplay stays off,
+    // so there is nothing to pause and no control is drawn.
+    const prefersReducedMotion = usePrefersReducedMotion();
+    const autoplays = typeof interval === 'number' && interval > 0 && !prefersReducedMotion;
     const [manuallyPaused, setManuallyPaused] = useState(false);
     const [hovered, setHovered] = useState(false);
     const effectivelyPaused = manuallyPaused || (pause === 'hover' && hovered);
