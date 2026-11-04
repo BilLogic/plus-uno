@@ -124,3 +124,22 @@ test('stripComments leaves import specifiers intact', () => {
   assert.equal(stripComments("export { default as A } from '@/components/A';").trim(), "export { default as A } from '@/components/A';");
   assert.equal(stripComments("from 'https://esm.sh/a'; // gone").trim(), "from 'https://esm.sh/a';");
 });
+
+test('a component exported beside its constants is still an export', () => {
+  const root = fixture({
+    'index.js': [
+      "export { default as AiIcon, AI_ICON_NAMES, AI_ICON_SIZES } from './AiIcon';",
+      "export { default as Suggestion, SUGGESTION_TYPES } from './Suggestion';",
+      'export {',
+      '  default as Panel,',
+      '  PanelBody,',
+      "} from './Panel';",
+    ].join('\n'),
+  });
+
+  assert.deepEqual(extractExports(path.join(root, 'index.js'), { repoRoot: root }), [
+    'AiIcon',
+    'Panel',
+    'Suggestion',
+  ]);
+});

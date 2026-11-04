@@ -99,15 +99,18 @@ export function extractExports(indexPath, { repoRoot, boundary, onUnresolved, se
   const content = stripComments(fs.readFileSync(indexPath, 'utf8'));
   const names = [];
 
-  // `[^}]` rather than `.`: `.` stops at a newline, so a reformatted
-  // `export {\n  default as X,\n}` was invisible and would have shrunk the
-  // existence law without touching a single export. Excluding `}` keeps the
-  // gap inside one brace pair, which `[\s\S]*?` would not. The optional comma
-  // is the other half of that reformat — a printer that wraps the list adds a
-  // trailing one.
-  const named = /export\s+\{[^}]*?as\s+([a-zA-Z0-9]+)\s*,?\s*\}/g;
+  // One brace pair at a time, then every `as` alias inside it. The list is not
+  // always a lone `default as X`: a component exported beside its constants
+  // (`default as AiIcon, AI_ICON_NAMES`) or its parts (`default as Panel,
+  // PanelBody`) has the alias first, and a matcher that wanted `as X` to be
+  // the last specifier dropped forty components, Button among them, from the
+  // existence law. `[^}]` rather than `.` keeps a reformatted multi-line list
+  // inside its own pair.
+  const named = /export\s+\{([^}]*)\}/g;
   let m;
-  while ((m = named.exec(content)) !== null) names.push(m[1]);
+  while ((m = named.exec(content)) !== null) {
+    for (const alias of m[1].matchAll(/\bas\s+([a-zA-Z0-9_$]+)/g)) names.push(alias[1]);
+  }
 
   const root = boundary && path.dirname(indexPath).startsWith(boundary) ? boundary : path.dirname(indexPath);
   const star = /export\s+\*\s+from\s+['"]([^'"]+)['"]/g;
