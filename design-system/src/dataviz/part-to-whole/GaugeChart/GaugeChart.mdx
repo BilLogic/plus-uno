@@ -1,90 +1,140 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as GaugeChartStories from './GaugeChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={GaugeChartStories} />
 
 <Title />
+Shows one value on a half-circle dial between a minimum and a maximum, with the
+number and a label under the arc.
 
-A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/GaugeChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Three gauges in a row: one in the default brand color, two colored by status.</>}>
+    <Canvas of={GaugeChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Needle/fill position** indicates current value
-- **Scale** shows the range (min to max)
-- **Center text** displays the exact value
-- Color zones can indicate performance thresholds
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Single KPI display</td><td>✅ Ideal</td></tr>
-    <tr><td>Progress toward goal</td><td>✅ Ideal</td></tr>
-    <tr><td>Performance dashboards</td><td>✅ Good</td></tr>
-    <tr><td>Multiple values</td><td>❌ Use Bar/Donut</td></tr>
-    <tr><td>Trend over time</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `GaugeChart` for one key figure that sits on a known scale: a course
+completion rate, the share of sessions a tutor attended, an average student
+satisfaction score out of 100. One or two gauges on a dashboard draw the eye to
+the number that matters most.
 
-### PLUS Context
+Use it sparingly. For several of these figures at once, use `BarChart`; a row
+of dials is harder to scan than a column of bars. For a value against a
+target that must be read precisely, use `BulletChart`. For a completion share
+with room for a label in the middle, use `DonutChart`. For the same figure over
+time, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Completion Rate**</td><td>Course/module completion %</td></tr>
-    <tr><td>**Session Goals**</td><td>Sessions completed vs target</td></tr>
-    <tr><td>**Student Progress**</td><td>Learning objectives achieved</td></tr>
-    <tr><td>**Platform Health**</td><td>System uptime, response time</td></tr>
-    <tr><td>**Tutor Metrics**</td><td>Student satisfaction score</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Use sparingly for key metrics only
-✅ Include clear min/max labels
-✅ When the value is a status, color it with the status chart tokens (`chartPalette.STATUS`) and say the status in the label
-✅ Show exact value in center
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Track', <>The full half-circle arc behind the fill, in <C>--ds-background-neutral</C>. It spans <C>min</C> to <C>max</C>, 0 to 100 by default.</>],
+        ['Fill', <>Grows from the left end to <C>value</C>. Its color is <C>color</C>, or the brand chart color when <C>color</C> is not set.</>],
+        ['Scale labels', <>Only the two ends are labeled, with <C>min</C> and <C>max</C>. There are no tick marks.</>],
+        ['Value and label', <>The value in bold under the arc, and <C>label</C> beneath it in subtle text.</>],
+        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 300.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Too many gauges on one dashboard
-❌ Comparing multiple gauges (use bar charts)
-❌ Complex scales or many tick marks
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={GaugeChartStories.Interactive} />
+`value` is a single number. `min` and `max` set the scale; `label` says what
+the number is.
 
+```jsx
+<GaugeChart value={82} min={0} max={100} label="Sessions attended (%)" />
+```
+
+The value shows as given, with no unit added. Put the unit in `label`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **One color, brand by default.** The fill is `--ds-chart-brand` unless you pass `color`. The fill does not change color as the value moves; it stays the color you set.
+- **Status needs words, not just hue.** When the value is a status, pass a status chart color (`STATUS.success`, `STATUS.warning`, `STATUS.danger` from the palette) and say the status in `label` or the surrounding text. Color alone will not reach every reader.
+- **Arc length carries the value, and the number confirms it.** The value is always printed under the arc, so the gauge reads without hue.
+- **Keep the scale honest.** A `min` above zero makes a small value look large; set it only when the scale truly starts there.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, a per-point label, and keyboard navigation to the value. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`GaugeChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={300} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Attendance could not load.</SectionMessage>
+    : value == null ? <EmptyState size="compact" header="No sessions yet" description="Attendance appears after a session is logged." />
+    : <GaugeChart value={value} label="Sessions attended (%)" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={GaugeChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
 - For one value against a target read precisely, use `BulletChart`.
+- For a completion share with a label in the middle, use `DonutChart`.
+- For several of these values at once, use `BarChart`.
 - For the same value tracked over time, use `LineChart`.
-- For several gauges at once, use `BarChart` — a row of dials is harder to scan than a column of bars.
 
 </div>
 
 </div>
+
+

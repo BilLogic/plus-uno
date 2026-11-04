@@ -1,87 +1,144 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ParliamentChartStories from './ParliamentChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={ParliamentChartStories} />
 
 <Title />
+Shows a count as rows of dots in a half circle, one dot per unit, grouped and
+colored by the part each unit belongs to.
 
-Shows **proportions using distinct markers** (dots) in a semi-circle.
-Commonly used for parliament seat distributions but useful for any grouped count.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/part-to-whole/ParliamentChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-Shows **proportions using distinct markers** (dots) in a semi-circle.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Five groups of seats, sorted from most to least, with each group's count in the legend.</>}>
+    <Canvas of={ParliamentChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Each dot** = one unit (e.g., one seat, one person)
-- **Color** = group/party
-- **Arrangement** = semi-circle layout
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Seat allocations</td><td>✅ Ideal</td></tr>
-    <tr><td>Voting results</td><td>✅ Ideal</td></tr>
-    <tr><td>Grouped unit counts</td><td>✅ Good</td></tr>
-    <tr><td>Exact value comparison</td><td>❌ Use Bar Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `ParliamentChart` when the total is a modest count of real units and
+seeing each one matters: the students in a tutoring cohort by grade, the seats
+on a student council, the tutors at a school by certification level. A dot
+per person keeps the numbers human.
 
-### PLUS Context
+For a split where the units do not matter, use `PieChart` or
+`StackedBarChart`. For counts that must be compared precisely, use `BarChart`.
+For groups within groups, use `SunburstChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Class Composition**</td><td>Students by major</td></tr>
-    <tr><td>**Survey Respondents**</td><td>Users by type</td></tr>
-    <tr><td>**Resource Allocation**</td><td>Licenses by department</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the parliament chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Dots', <>One per unit. Each item in <C>data</C> contributes <C>value</C> dots, laid out together in the arc.</>],
+        ['Group labels', 'Each group is labeled on the chart with its name.'],
+        ['Legend', 'Names each group with its count beside it, in subtle text. Always shown.'],
+        ['Tooltip', 'Hovering a dot shows its group’s count.'],
+        ['Height', <><C>height</C> sets the chart's height in pixels; the default is 400.</>],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={ParliamentChartStories.Interactive} />
+`data` is an array of `{ name, value }`, one object per group. `value` is a
+whole count of units.
 
+```jsx
+<ParliamentChart
+    data={[
+        { name: 'Grade 8', value: 22 },
+        { name: 'Grade 7', value: 17 },
+        { name: 'Grade 6', value: 11 },
+    ]}
+/>
+```
+
+An item may carry its own `color`; leave it out and the chart assigns one.
+Groups draw in the order given, so sort `data` from most to least before you
+pass it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned by position.** Each group without a `color` takes the categorical order: slot 1 for the first item, slot 2 for the second. Sort first so the order of the colors matches the order of the sizes.
+- **Color is what tells groups apart in the arc.** Dots are the same shape and size, so adjacent groups differ only by hue. The group labels and the legend counts are the non-color encoding; keep both. Past six groups, adjacent hues get hard to tell apart, so group the smallest into "Other".
+- **Keep the total modest.** A few dozen to a few hundred dots; past that, dots shrink until they stop reading as units.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation through the groups. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`ParliamentChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>The cohort could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No students yet" description="Students appear once they join the cohort." />
+    : <ParliamentChart data={data} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ParliamentChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For the same split with no seat metaphor, use `PieChart` or `StackedBarChart`.
+- For the same split with no unit metaphor, use `PieChart` or `StackedBarChart`.
 - For counts that must be compared precisely, use `BarChart`.
 - For groups within groups, use `SunburstChart`.
 
 </div>
 
 </div>
+
+
