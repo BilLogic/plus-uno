@@ -1,7 +1,6 @@
 /**
  * Topbar pattern (Patterns/Topbar): start · middle · end in a 32 row.
- * Mirrors the Figma `_Topbar`. Every length is a Layout, Surface container,
- * Item or Element token.
+ * Every length is a Layout, Frame, Item or Element token.
  */
 
 .plus-topbar {
@@ -27,7 +26,7 @@
 }
 
 // Docked, the start area is the sidebar's width, so the breadcrumb starts where
-// the surface does.
+// the page does.
 .plus-topbar--docked .plus-topbar__start {
     width: var(--layout-width-sidebar);
 }

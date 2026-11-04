@@ -52,9 +52,8 @@ const useWide = (ref) => {
 };
 
 /**
- * Frame pattern: the app frame. Mirrors the Figma
- * `Pattern/Surface container`: a 32 topbar over a row holding the sidebar and
- * the surface.
+ * Frame pattern: the app frame, a 32 topbar over a row holding the sidebar
+ * and the page.
  *
  * - The frame owns the sidebar state; the Topbar in the `topbar` slot draws the
  *   one toggle from it (through `SidebarControlContext`). Without a `topbar`,
@@ -71,12 +70,12 @@ const useWide = (ref) => {
  *   sidebar hands focus to the toggle when it closes, since its trigger left
  *   with the sidebar.
  * - Clicking the toggle docks a closed or peeking sidebar, at any width, and
- *   closes a docked one. Docked below 1024, the surface is narrower than the
- *   content minimum (720), so the surface scrolls sideways.
- * - A `footer` is a third row under the surface, `--surface-container-stack`
- *   below it and padded on the left like the surface row, so it lines up with
- *   the surface. The surface takes what the topbar and the footer leave.
- * - The surface pads `--surface-pad` (16 · 16 · 24) and caps its content at
+ *   closes a docked one. Docked below 1024, the page is narrower than the
+ *   content minimum (720), so the page scrolls sideways.
+ * - A `footer` is a third row under the page, `--surface-container-stack`
+ *   below it and padded on the left like the page row, so it lines up with
+ *   the page. The page takes what the topbar and the footer leave.
+ * - The page pads `--surface-pad` (16 · 16 · 24) and caps its content at
  *   `--layout-max-width-content` (1232), centered, on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
  */
@@ -271,9 +270,9 @@ Frame.propTypes = {
     /** Element for the content box, e.g. `main` */
     contentAs: PropTypes.elementType,
     contentClassName: PropTypes.string,
-    /** Render children straight into the surface, with no content box or grid (full-bleed views) */
+    /** Render children straight into the page, with no content box or grid (full-bleed views) */
     surfaceDirect: PropTypes.bool,
-    /** A row under the surface, 8 below it, padded on the left like the surface row (a focused page's actions) */
+    /** A row under the page, 8 below it, padded on the left like the page row (a focused page's actions) */
     footer: PropTypes.node,
     className: PropTypes.string,
     style: PropTypes.object,

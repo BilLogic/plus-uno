@@ -2,7 +2,7 @@
 // Shells own the frame (tokens for bg/radius/elevation/border/spacing);
 // consumers fill the slots.
 
-export { default as Surface, SURFACE_LEVELS } from './Surface';
+export { default as Page, PAGE_LEVELS } from './Page';
 export { default as Frame } from './Frame';
 export { useSidebarControl } from './Frame/SidebarControl';
 export { default as Topbar } from './Topbar';

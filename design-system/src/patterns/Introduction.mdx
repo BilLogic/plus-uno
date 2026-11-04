@@ -5,8 +5,8 @@ import { DocsTable, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 <Meta title="Foundations/Patterns/Introduction" />
 
 export const patterns = [
-    ['Page templates', 'A page template holds the surface container with its content slot.', 'Start here for any new page.', 'PageLayout', 'foundations-patterns-page-templates'],
-    ['Surface container', 'The page frame: a Topbar above a row holding the sidebar and the Surface. Its parts are Topbar, Sidebar and Surface.', 'Every page in the app sits inside one.', 'Frame', 'foundations-patterns-frame'],
+    ['Page templates', 'A page template holds Frame with its content slot.', 'Start here for any new page.', 'PageLayout', 'foundations-patterns-page-templates'],
+    ['Frame', 'The page frame: a Topbar above a row holding the sidebar and the Page. Its parts are Topbar, Sidebar and Page.', 'Every page in the app sits inside one.', 'Frame', 'foundations-patterns-frame'],
     ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'foundations-patterns-section'],
     ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'foundations-patterns-card'],
     ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'foundations-patterns-table'],
@@ -17,7 +17,7 @@ export const patterns = [
 ];
 
 <Title>Patterns</Title>
-A pattern is a page-level shell with its layout rules built in. It sets the fill, radius, padding, elevation and width for one layer of the page, and leaves the content to slots. A page starts from a page template. The surface container holds the Topbar and the sidebar, the Surface pads the content and gives it the 12-column grid, and Sections, Cards and Tables fill it. Modal and Popover sit above the page.
+A pattern is a page-level shell with its layout rules built in. It sets the fill, radius, padding, elevation and width for one layer of the page, and leaves the content to slots. A page starts from a page template. Frame holds the Topbar and the sidebar, Page pads the content and gives it the 12-column grid, and Sections, Cards and Tables fill it. Modal and Popover sit above the page.
 
 The examples on every pattern page follow the **Color mode** switch in the toolbar, so check each one in light, dark and increased contrast.
 
@@ -83,12 +83,12 @@ Each layer has one fill and one elevation. A state such as hover or selected is 
     </thead>
     <tbody>
         <tr>
-            <td>Surface container</td>
+            <td>Frame</td>
             <td><code>--ds-surface-sunken</code></td>
             <td>none</td>
         </tr>
         <tr>
-            <td>Surface (the page)</td>
+            <td>Page</td>
             <td><code>--ds-surface</code></td>
             <td>none; an edge ring in <code>--ds-border-surface</code></td>
         </tr>
@@ -123,9 +123,9 @@ Each layer has one fill and one elevation. A state such as hover or selected is 
 
 1. **Start a page from its template.** The template frames the page. Section groups content under one heading, Card groups one object's content, Table holds records and Modal interrupts for a step that must happen first.
 2. **Swap slots, never restyle the pattern.** Content goes in through slots such as content, body, footer, header, actions, tabs, filters, bulk actions, image, cells, items and side. Leave fill, radius, border, padding and elevation as the pattern sets them, because they come from tokens.
-3. **Add content straight into the slot.** Drop content into the slot itself and replace its placeholder. Do not detach the pattern. Inside a surface, Sections group whatever you place, and their spacing comes from the Surface and Section stack tokens, so add padding only where the content itself needs it.
+3. **Add content straight into the slot.** Drop content into the slot itself and replace its placeholder. Do not detach the pattern. Inside a Page, Sections group whatever you place, and their spacing comes from the Page and Section stack tokens, so add padding only where the content itself needs it.
 4. **Draw states as overlays.** Hover, pressed and selected take their own token steps: <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code>, then <code>--ds-background-selected</code> and <code>-hovered</code>. Focus is the focus ring in <code>--ds-border-focused</code>, never a fill.
-5. **Keep filled versions as local components.** A spec that fills a surface container keeps its own component built from the pattern, so usage traces back to the pattern.
+5. **Keep filled versions as local components.** A spec that fills Frame keeps its own component built from the pattern, so usage traces back to the pattern.
 6. **Note every optical nudge.** Spacing tokens set the structure. Where the eye needs a nudge, such as an icon beside text, an all-caps label or a round shape, nudge for optical balance and note it where you make it. Never leave it as an unexplained hard-coded value.
 
 </div>
