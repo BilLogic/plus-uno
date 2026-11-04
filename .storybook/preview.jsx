@@ -342,6 +342,7 @@ const preview = {
           ],
           "Data visualizations",
           [
+            "Overview",
             "Color",
             "Comparison",
             "Correlation",
