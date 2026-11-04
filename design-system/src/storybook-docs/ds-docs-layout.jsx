@@ -77,7 +77,7 @@ export function DocsSource({ of: ofStory, code, language = 'jsx' }) {
 export function DocsStories({ title, includePrimary = true }) {
     return (
         <div className="sb-ds-docs-stories not-prose">
-            <Stories title={title || ''} includePrimary={includePrimary} />
+            <Stories title={title} includePrimary={includePrimary} />
         </div>
     );
 }

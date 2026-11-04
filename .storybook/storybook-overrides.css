@@ -1223,13 +1223,12 @@ html[data-color-mode="dark"] .docs-story {
     border-radius: var(--card-radius-sm);
     border: 1px solid var(--ds-border);
     box-shadow: none;
-    background: var(--ds-surface);
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable-head th {
-    font-weight: 600 !important;
+    font-weight: var(--type-weight-semibold) !important;
     color: var(--ds-text);
-    background: var(--ds-surface-container);
+    background: color-mix(in srgb, var(--ds-surface-sunken) 40%, transparent);
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable td,
@@ -1240,6 +1239,10 @@ html[data-color-mode="dark"] .docs-story {
 
 .sbdocs .sb-ds-docs-props .docblock-argstable code {
     color: var(--ds-text);
+}
+
+.sbdocs .sb-ds-docs-props .docblock-argstable {
+    background: var(--ds-surface);
 }
 
 .sbdocs .sb-ds-docs-source pre {
