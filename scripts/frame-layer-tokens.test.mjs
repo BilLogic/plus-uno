@@ -26,12 +26,11 @@ const stylesheet = fs.readFileSync(STYLESHEET, 'utf8');
 /** A token's resolved value at a mode: `:root` for Medium, the breakpoint block above it otherwise. */
 function atMode(name, mode) {
   // A ladder name (`deep/`) is an alias of the stylesheet token the modes are declared on: follow it there.
-  const ladder = corpus.get(name);
-  if (ladder?.file.startsWith('deep/')) {
-    const target = ladder.raw.match(/^var\((--[a-z0-9-]+)\)$/)?.[1];
+  const base = corpus.get(name);
+  if (base?.file.startsWith('deep/')) {
+    const target = base.raw.match(/^var\((--[a-z0-9-]+)\)$/)?.[1];
     if (target) return atMode(target, mode);
   }
-  const base = corpus.get(name);
   assert.ok(base, `${name} is not declared`);
   let value = base.value;
   for (const [key, width] of Object.entries(LAYOUT_MODES)) {
