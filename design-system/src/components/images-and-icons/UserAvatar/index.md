@@ -42,7 +42,7 @@ From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`.
 
 ## Related
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Tile`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Tile`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

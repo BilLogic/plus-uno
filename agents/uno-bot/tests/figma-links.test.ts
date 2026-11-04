@@ -340,10 +340,11 @@ describe("only registry components", () => {
     // 72: Panel gained its own component and figmaMeta (+1 net).
     // 73: Link is a new component with its own figmaMeta (+1).
     // 74: Menu group gained its own component and figmaMeta (+1 net).
-    // 65: Card, Divider, Collapse, Jumbotron, List group, Media object,
+    // 75: Image is a new component with its own figmaMeta (+1).
+    // 66: Card, Divider, Collapse, Jumbotron, List group, Media object,
     // Scrollspy, Nav pills and Navbar were retired and their registry rows
     // went with them (-9 net).
-    assert.equal(names.length, 65);
+    assert.equal(names.length, 66);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
