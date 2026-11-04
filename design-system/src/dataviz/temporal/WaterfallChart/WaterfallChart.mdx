@@ -1,81 +1,143 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as WaterfallChartStories from './WaterfallChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={WaterfallChartStories} />
 
 <Title />
+Shows how a starting value becomes an ending one through a sequence of gains
+and losses, each step floating where the last one left off.
 
-A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/WaterfallChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>A starting value, two gains, two losses and the final total, with the start and total in the brand chart color.</>}>
+    <Canvas of={WaterfallChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **First bar** = starting value
-- **Success bars** (`--ds-chart-success`) = positive additions
-- **Danger bars** (`--ds-chart-danger`) = deductions/losses
-- **Final bar** = ending total (sum)
-- Each bar floats from previous endpoint
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Financial statements (P&L)</td><td>✅ Ideal</td></tr>
-    <tr><td>Progress/cumulative changes</td><td>✅ Ideal</td></tr>
-    <tr><td>Variance analysis</td><td>✅ Good</td></tr>
-    <tr><td>Unordered comparisons</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Part-to-whole</td><td>❌ Use Stacked Bar</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `WaterfallChart` to explain a change between two totals: enrolled students
+at the start of term, plus new sign-ups, minus withdrawals, to the current
+count; a tutoring budget, minus each cost, to what remains; a base score, plus
+bonuses, minus penalties, to the final score.
 
-### PLUS Context
+The steps must happen in order and add up. For totals without the steps between
+them, use `BarChart`. For a continuous running value, use `LineChart` or
+`AreaChart`. For a breakdown of one total with no sequence, use `TreemapChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Budget Tracking**</td><td>Starting budget → changes → remaining</td></tr>
-    <tr><td>**Score Progression**</td><td>Base score + bonus - penalties = final</td></tr>
-    <tr><td>**Enrollment Changes**</td><td>Start → additions → dropouts → current</td></tr>
-    <tr><td>**Progress Tracking**</td><td>Initial → completed → added → total</td></tr>
-  </tbody>
-</table>
+Keep it to about ten steps. Past that the floating bars get thin and the
+running total hard to follow.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Keep the signed value label on every bar, so the direction never rests on color alone
-✅ Include summary bars (totals)
-✅ Label each step clearly
-✅ Show intermediate totals if needed
+## Anatomy
 
-**Avoid:**
-❌ Non-sequential data
-❌ Too many intermediate steps (>10)
-❌ Missing color legend
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Step bars', 'One per change. Each starts where the previous one ended; a gain rises, a loss drops.'],
+        ['Total bars', <>A point with <C>isSum: true</C> draws the running total from zero; <C>isIntermediateSum: true</C> draws a subtotal since the last one.</>],
+        ['Connectors', 'Thin lines joining the end of each bar to the start of the next, drawn in the grid color as chrome.'],
+        ['Value labels', 'Every bar carries its value as a whole number.'],
+        ['Category axis', <>Names each step from <C>categories</C>.</>],
+        ['Value axis', <><C>yAxisLabel</C> titles it; it defaults to <C>"Value"</C>.</>],
+        ['Tooltip', 'Shows the hovered bar’s value. There is no legend.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={WaterfallChartStories.Interactive} />
+## Data shape
 
+`categories` names each step. `data` holds one entry per category, in the same
+order: a number for a change (negative for a loss), or an object
+`{ y, isSum, isIntermediateSum, color }`. A total needs no `y`; the chart
+computes it.
+
+```jsx
+<WaterfallChart
+    yAxisLabel="Enrolled students"
+    categories={['Start of term', 'New sign-ups', 'Transfers in', 'Withdrawals', 'Graduated', 'Current']}
+    data={[
+        { y: 420, color: 'var(--ds-chart-brand)' },
+        85,
+        12,
+        -30,
+        -18,
+        { isSum: true, color: 'var(--ds-chart-brand)' },
+    ]}
+/>
+```
+
+`height` defaults to 400.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Gains and losses are status colors.** A gain takes `--ds-chart-success` and a loss `--ds-chart-danger`. Bars are outlined in `--ds-border-inverse` and connectors take the grid border.
+- **Give the start and totals their own color.** They are amounts, not gains or losses. Pass `color` on those points, as the Overview story does with `--ds-chart-brand`; without it they take a status color they do not mean.
+- **Labels and direction carry the meaning, not only color.** Every bar shows its value and a loss drops below the previous bar's end. A loss's label carries a minus sign; a gain's carries no plus sign, so direction is the only cue besides color that a step is positive.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`WaterfallChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Enrollment changes could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No changes yet" description="Sign-ups and withdrawals appear here as they happen." />
+    : <WaterfallChart categories={categories} data={data} yAxisLabel="Enrolled students" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={WaterfallChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -83,8 +145,11 @@ A waterfall chart shows how a value changes through **sequential additions and s
 
 - For the totals without the steps between them, use `BarChart`.
 - For a continuous running value, use `LineChart` or `AreaChart`.
-- For a breakdown of the end total, use `TreemapChart`.
+- For a breakdown of one total with no sequence, use `TreemapChart`.
+- For causes ranked by size with a cumulative line, use `ParetoChart`.
 
 </div>
 
 </div>
+
+

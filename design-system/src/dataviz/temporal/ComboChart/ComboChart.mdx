@@ -1,89 +1,151 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ComboChartStories from './ComboChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={ComboChartStories} />
 
 <Title />
+Combines columns and lines on one time axis, so a volume and a rate measured in
+different units can be read together.
 
-A combo chart helps compare and communicate key patterns in the underlying data.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/ComboChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A combo chart helps compare and communicate key patterns in the underlying data.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Monthly volume as columns on the left axis and a percentage rate as a line on the right axis.</>}>
+    <Canvas of={ComboChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- Start with the primary axis and labels to understand the scale
-- Compare shapes, lengths, or positions to identify differences
-- Use legend and annotations to interpret series or categories
-- Look for outliers, clusters, or trend changes
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Communicating key comparisons</td><td>✅ Ideal</td></tr>
-    <tr><td>Highlighting notable patterns</td><td>✅ Ideal</td></tr>
-    <tr><td>Showing supporting context</td><td>✅ Good</td></tr>
-    <tr><td>Displaying exact raw tables</td><td>❌ Use data table</td></tr>
-    <tr><td>Dense exploratory analysis</td><td>❌ Use interactive analysis view</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `ComboChart` when a count and a rate belong together: sessions held each
+week as columns with the attendance rate as a line, or tutors active per month
+with the average session rating. The columns carry the volume, the line the
+ratio.
 
-### PLUS Context
+When every series shares one unit, use `LineChart` or `BarChart`: a second axis
+tells the reader the two scales cannot be compared directly, and invites them
+to read a crossing as meaningful when it is only a choice of scale. For a
+ranked breakdown with a cumulative line, use `ParetoChart`. For a value against
+a target, use `BulletChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Learner Progress**</td><td>Compare progress metrics across cohorts</td></tr>
-    <tr><td>**Content Performance**</td><td>Highlight top and low performing modules</td></tr>
-    <tr><td>**Engagement Signals**</td><td>Surface usage patterns by period</td></tr>
-    <tr><td>**Program Outcomes**</td><td>Track outcomes across programs or terms</td></tr>
-  </tbody>
-</table>
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### How to Use
+## Anatomy
 
-**Best Practices:**
-✅ Align the combo chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Columns', <>One per <C>barData</C> series per category, measured on the primary axis. Only the value end is rounded.</>],
+        ['Lines', <>One per <C>lineData</C> series, with a marker on every point.</>],
+        ['Category axis', <>Labels each period from <C>categories</C>.</>],
+        ['Primary axis', <>On the left. <C>primaryAxisLabel</C> titles it.</>],
+        ['Secondary axis', <>On the right. <C>secondaryAxisLabel</C> titles it. A line plots against it only when its series sets <C>yAxis: 1</C>.</>],
+        ['Legend', 'Names every column and line series. Always shown.'],
+        ['Tooltip', 'Shared: hovering a period lists every series’ value for it.'],
+    ]}
+/>
 
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
+</div>
 
----
+<div className="sb-ds-doc-section">
 
-### Interactive playground
+## Data shape
 
-<DocsInteractivePlayground of={ComboChartStories.Interactive} />
+`categories` is an array of period labels. `barData` and `lineData` are each an
+array of `{ name, data }`, with one number per category. All three are
+required; pass an empty array for a side you do not need. Give each line series
+`yAxis: 1` to put it on the secondary axis; leave it out and the line shares
+the columns' scale.
 
+```jsx
+<ComboChart
+    primaryAxisLabel="Sessions held"
+    secondaryAxisLabel="Attendance (%)"
+    categories={['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5']}
+    barData={[{ name: 'Sessions', data: [120, 134, 128, 142, 150] }]}
+    lineData={[{ name: 'Attendance', data: [86, 88, 84, 90, 92], yAxis: 1 }]}
+/>
+```
+
+A series may carry its own `color`; leave it out and the chart assigns one.
+`height` defaults to 300.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color follows series order across both kinds.** Column series take the categorical colors from slot 1; line series continue from the next free slot. A single column series takes slot 1, not the brand chart color.
+- **Shape separates the kinds.** Columns encode by length, lines by position, so a column series and a line series stay distinct without color. Two lines, or two column series, are told apart by color alone.
+- **Make the axis pairing explicit.** Nothing on the chart ties a series to its axis except the axis titles. Name the unit in both `primaryAxisLabel` and `secondaryAxisLabel`, and in the series names.
+- **Known gap.** The line markers' ring and the secondary axis title take Highcharts' built-in default colors, and the marker fill is white, rather than chart tokens, so they do not follow the color mode.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Series colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`ComboChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={300} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Attendance could not load.</SectionMessage>
+    : categories.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Sessions and attendance appear once a week is logged." />
+    : <ComboChart categories={categories} barData={barData} lineData={lineData} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ComboChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For series that share one axis and one unit, use `LineChart` or `BarChart` — a second axis is a claim that the two cannot be compared directly.
-- For a value against a target, use `BulletChart`.
+- For series that share one axis and one unit, use `LineChart` or `BarChart`.
 - For a ranked breakdown with a cumulative line, use `ParetoChart`.
+- For a value against a target, use `BulletChart`.
 
 </div>
 
 </div>
+
+

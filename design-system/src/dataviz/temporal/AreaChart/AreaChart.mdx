@@ -1,89 +1,153 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AreaChartStories from './AreaChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={AreaChartStories} />
 
 <Title />
+Shows a quantity over time with the space below the line filled in, so volume
+reads at a glance. Stacked, it shows how parts build a total.
 
-An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/temporal/AreaChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>The same two series as overlapping areas, then stacked into one total.</>}>
+    <Canvas of={AreaChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Line** shows the trend over time
-- **Filled area** emphasizes cumulative magnitude
-- **Stacked areas** show how parts contribute to total
-- Height at any point = total value at that time
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Emphasizing volume/magnitude</td><td>✅ Ideal</td></tr>
-    <tr><td>Stacked part-to-whole over time</td><td>✅ Ideal</td></tr>
-    <tr><td>Simple trend lines</td><td>❌ Use Line Chart</td></tr>
-    <tr><td>Precise value reading</td><td>❌ Use Bar Chart</td></tr>
-    <tr><td>Many overlapping series</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `AreaChart` when the amount over time is the point: tutoring hours logged
+across a semester, sessions per week split by subject, enrolled students
+stacked by grade. Stack the series (`stacking="normal"`) to show parts adding
+up to a total, or as shares of 100% (`stacking="percent"`).
 
-### PLUS Context
+For a trend where the area under the line means nothing, use `LineChart`.
+For precise comparison between periods, use `BarChart`. For composition with
+no meaningful zero baseline, use `StreamgraphChart`. For a band between a low
+and a high, use `AreaRangeChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Cumulative Learning**</td><td>Total hours studied over semester</td></tr>
-    <tr><td>**Enrollment Growth**</td><td>Student count over time (stacked by grade)</td></tr>
-    <tr><td>**Session Volume**</td><td>Daily sessions by type (stacked)</td></tr>
-    <tr><td>**Progress Tracking**</td><td>Cumulative assignments completed</td></tr>
-  </tbody>
-</table>
+Unstacked areas overlap and hide each other. Keep those to two or three series,
+or stack them.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Use transparency for overlapping areas
-✅ Order stacked areas logically (largest at bottom)
-✅ Include X-axis time labels
-✅ Use consistent time intervals
+## Anatomy
 
-**Avoid:**
-❌ Too many overlapping unstacked areas
-❌ Vastly different scales in same chart
-❌ Missing axis labels
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Areas', <>One per series, filled from the line down to the baseline or to the series below it. <C>stacking</C> sets how they combine.</>],
+        ['Markers', 'Hidden at rest; a small circle appears on the hovered point.'],
+        ['Time axis', <>Labels each period from the first series' <C>categories</C>. <C>xAxisLabel</C> titles it.</>],
+        ['Value axis', <><C>yAxisLabel</C> titles it.</>],
+        ['Legend', 'Names each series. Always shown.'],
+        ['Tooltip', 'Shared: hovering a period lists every series’ value for it.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={AreaChartStories.Interactive} />
+## Data shape
 
+`data` is an array of series, each `{ name, data }`, where `data` holds one
+number per period. Put the period labels on the first series as `categories`.
+`stacking` is `'normal'`, `'percent'` or `null` (the default, overlapping).
+
+```jsx
+<AreaChart
+    xAxisLabel="Week"
+    yAxisLabel="Sessions"
+    stacking="normal"
+    data={[
+        { name: 'Math', data: [40, 46, 52, 55], categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4'] },
+        { name: 'Reading', data: [30, 32, 35, 41] },
+        { name: 'Science', data: [12, 15, 18, 20] },
+    ]}
+/>
+```
+
+A series may carry its own `color`; leave it out and the chart assigns one.
+`height` defaults to 300.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is assigned for you.** One series takes `--ds-chart-brand`. Two or more take the categorical order, slot 1 first, never skipping a slot. Past six series, group the smallest into "Other".
+- **Height carries the value, but only the bottom layer reads off the axis.** In a stacked chart every upper layer floats on the ones below it, so its own size is hard to judge. Put the series that matters most at the bottom, and use the shared tooltip for exact values.
+- **Color is the only thing separating areas.** Every layer is a plain fill with no pattern, so keep the series count low enough that the legend can name each one.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`AreaChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={300} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Sessions could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No sessions yet" description="Sessions appear here once they are logged." />
+    : <AreaChart data={data} stacking="normal" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AreaChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For a single series where the total under the line means nothing, use `LineChart`.
+- For a trend where the total under the line means nothing, use `LineChart`.
 - For composition over time with no meaningful zero baseline, use `StreamgraphChart`.
-- For a band between two series rather than a fill to zero, use `AreaRangeChart`.
+- For a band between a low and a high rather than a fill to zero, use `AreaRangeChart`.
+- For parts of a total in a few separate periods, use `StackedBarChart`.
 
 </div>
 
 </div>
+
+
