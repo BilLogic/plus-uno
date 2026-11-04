@@ -11,7 +11,6 @@ import './Tooltip.scss';
  * @param {React.ReactNode} props.text - Tooltip body
  * @param {'top'|'bottom'|'left'|'right'} [props.placement='top']
  * @param {string|string[]} [props.trigger=['hover','focus']] - an empty array disables the tooltip, for a caller that only wants one when its trigger is truncated
- * @param {'small'|'default'|'large'} [props.size='default'] - kept so no call site breaks; every size draws the one tooltip
  * @param {React.ReactElement} props.children - Single trigger element
  * @param {string} [props.id]
  * @param {string} [props.className]
@@ -23,7 +22,6 @@ const Tooltip = ({
     text,
     placement = 'top',
     trigger = ['hover', 'focus'],
-    size = 'default',
     children,
     id,
     className = '',
@@ -61,8 +59,7 @@ const Tooltip = ({
                     <BaseTooltip.Popup
                         id={id}
                         role="tooltip"
-                        className={`plus-tooltip plus-tooltip-${size} ${className}`}
-                        data-tooltip-size={size}
+                        className={`plus-tooltip ${className}`}
                     >
                         {text}
                     </BaseTooltip.Popup>
@@ -79,7 +76,6 @@ Tooltip.propTypes = {
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
     ]),
-    size: PropTypes.oneOf(['small', 'default', 'large']),
     children: PropTypes.node.isRequired,
     id: PropTypes.string,
     className: PropTypes.string,

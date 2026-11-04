@@ -18,7 +18,7 @@
 | `children` | node | — | — |
 | `alignment` | enum | `'left'` | Horizontal alignment of the tab strip |
 | `appearance` | enum | `'default'` | Underline indicator (default), or a pill-shaped selected fill. |
-| `size` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
+| `spacing` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
 | `defaultActiveKey` | string or number | — | — |
@@ -31,7 +31,7 @@
 
 **`appearance`** — `default` · `pill`
 
-**`size`** — `default` · `compact`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 

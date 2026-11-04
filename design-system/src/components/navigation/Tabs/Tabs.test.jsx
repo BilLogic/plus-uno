@@ -4,7 +4,7 @@
  * Base UI owns the WAI-ARIA tabs pattern itself (roving tabindex, arrow-key
  * navigation, the `aria-controls`/`aria-labelledby` pairing) — these tests
  * cover this wrapper's own contract: the `eventKey`/`activeKey`/`onSelect`
- * vocabulary, the appearance/size/alignment classes, and that arbitrary props
+ * vocabulary, the appearance/spacing/alignment classes, and that arbitrary props
  * still reach the underlying tab.
  */
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
@@ -166,11 +166,18 @@ describe('Tabs — selection', () => {
 });
 
 describe('Tabs — appearance', () => {
-    it('applies the appearance and size classes to the root', () => {
-        const { container } = renderTabs({ appearance: 'pill', size: 'compact' });
+    it('applies the appearance and spacing classes to the root', () => {
+        const { container } = renderTabs({ appearance: 'pill', spacing: 'compact' });
         const root = container.firstChild;
         expect(root).toHaveClass('plus-tabs--pill');
         expect(root).toHaveClass('plus-tabs--compact');
+    });
+
+    it('defaults to default spacing and declares no size prop', () => {
+        const { container } = renderTabs();
+        expect(container.firstChild).toHaveClass('plus-tabs--default');
+        expect(Tabs.propTypes.size).toBeUndefined();
+        expect(Tabs.propTypes.spacing).toBeDefined();
     });
 
     it('applies the alignment class to the tablist', () => {

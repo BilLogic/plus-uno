@@ -57,7 +57,7 @@ const Sidebar = ({
         <PatternSidebar
             className={['plus-sidebar', className].filter(Boolean).join(' ')}
             style={style}
-            header={<Logo style="colored" size="XS" text={true} className="p-0" />}
+            header={<Logo appearance="colored" size={60} wordmark className="p-0" />}
             items={items}
             sections={sections}
             activeId={activeId}

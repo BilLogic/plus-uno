@@ -35,7 +35,7 @@ const SIDEBAR_BOX = {
     backgroundColor: 'var(--ds-surface-sunken)',
 };
 
-const header = <Logo style="colored" size="XS" text={true} className="p-0" />;
+const header = <Logo appearance="colored" size={60} wordmark className="p-0" />;
 
 const home = [{ id: 'home', text: 'Home', icon: 'house' }];
 

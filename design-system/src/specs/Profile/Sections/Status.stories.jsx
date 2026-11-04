@@ -144,7 +144,6 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                     <Tooltip
                         text={<InfoTooltipContent />}
                         placement="right"
-                        size="small"
                         id="tooltip-status-info"
                     >
                         <span

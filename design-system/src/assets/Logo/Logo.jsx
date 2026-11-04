@@ -5,24 +5,23 @@ import './Logo.scss';
 /**
  * Logo Component
  * 
- * PLUS brand logo component with multiple styles, sizes, and optional text wordmark.
+ * PLUS brand logo: three appearances, five pixel sizes, and an optional wordmark.
  * Matches Figma design system specifications.
  */
-const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...props }) => {
-    // Normalize size to lowercase for CSS classes
-    const sizeClass = size.toLowerCase();
+const Logo = ({ appearance = 'colored', size = 132, wordmark = false, className = '', ...props }) => {
+    const sizeClass = String(size);
 
     // Build class names
     const classNames = [
         'plus-logo',
         `plus-logo--${sizeClass}`,
-        `plus-logo--${style}`,
-        text && 'plus-logo--with-text',
+        `plus-logo--${appearance}`,
+        wordmark && 'plus-logo--with-wordmark',
         className
     ].filter(Boolean).join(' ');
 
     // unique ID prefix for this instance to avoid SVG mask/filter collisions
-    const idPrefix = useMemo(() => `logo-${style}-${sizeClass}-${Math.random().toString(36).substr(2, 9)}`, [style, sizeClass]);
+    const idPrefix = useMemo(() => `logo-${appearance}-${sizeClass}-${Math.random().toString(36).substr(2, 9)}`, [appearance, sizeClass]);
 
     // Target dimensions for the container (CSS handles strict sizing, but good for specific overrides if needed)
     // We rely on viewBox scaling for the internal SVG
@@ -32,7 +31,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
     // Filled: 92x92 base
     // Outlined: 102x102 base (stroke adds width)
     const LogoIcon = () => {
-        if (style === 'colored') {
+        if (appearance === 'colored') {
             return (
                 <svg viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg" className="plus-logo-svg">
                     <g clipPath={`url(#${idPrefix}-clip-colored)`}>
@@ -98,7 +97,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
             );
         }
 
-        if (style === 'filled') {
+        if (appearance === 'filled') {
             return (
                 <svg viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg" className="plus-logo-svg">
                     <path d="M82.5547 0C87.7711 0.000152554 91.9998 4.22888 92 9.44531V82.5547C91.9998 87.7711 87.7711 91.9998 82.5547 92H9.44531C4.22888 91.9998 0.000152557 87.7711 0 82.5547V9.44531C0.000155646 4.22888 4.22888 0.000155649 9.44531 0H82.5547ZM70.6875 8.49219C69.9061 8.49242 69.2717 9.12583 69.2715 9.90723V16.9844H61.6074C60.8045 16.9848 60.1533 17.619 60.1533 18.4004V21.2305C60.1533 22.0119 60.8045 22.646 61.6074 22.6465H69.2715V29.7227C69.2715 30.5042 69.906 31.1384 70.6875 31.1387H73.5176C74.2993 31.1387 74.9336 30.5044 74.9336 29.7227V22.6465H81.9707C82.774 22.6465 83.4258 22.0122 83.4258 21.2305V18.4004C83.4258 17.6187 82.774 16.9844 81.9707 16.9844H74.9336V9.90723C74.9334 9.12568 74.2992 8.49219 73.5176 8.49219H70.6875Z" fill="currentColor" />
@@ -119,7 +118,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
     // Base dimensions ~247x92 (roughly M size in legacy logic, but exact Figma path here)
     const LogoText = () => {
         // Use currentColor for flexibility, fallback logic can be in CSS or parent
-        const fillColor = style === 'colored' ? '#3F484A' : 'currentColor';
+        const fillColor = appearance === 'colored' ? '#3F484A' : 'currentColor';
 
         return (
             <svg viewBox="0 0 247 92" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -138,7 +137,7 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
                     <LogoIcon />
                 </div>
             </div>
-            {text && (
+            {wordmark && (
                 <div className="plus-logo__text">
                     <LogoText />
                 </div>
@@ -148,22 +147,16 @@ const Logo = ({ style = 'colored', size = 'M', text = false, className = '', ...
 };
 
 Logo.propTypes = {
-    /** Visual style of the logo */
-    style: PropTypes.oneOf(['colored', 'filled', 'outlined']),
-    /** Size variant */
-    size: PropTypes.oneOf(['XS', 'S', 'M', 'L', 'XL']),
-    /** Whether to show text wordmark */
-    text: PropTypes.bool,
+    /** Colorway of the logo */
+    appearance: PropTypes.oneOf(['colored', 'filled', 'outlined']),
+    /** Frame height in pixels */
+    size: PropTypes.oneOf([60, 96, 132, 192, 224]),
+    /** Show the PLUS wordmark beside the logomark */
+    wordmark: PropTypes.bool,
     /** Additional CSS classes */
     className: PropTypes.string
 };
 
-Logo.defaultProps = {
-    style: 'colored',
-    size: 'M',
-    text: false,
-    className: ''
-};
 
 export default Logo;
 export { Logo };
