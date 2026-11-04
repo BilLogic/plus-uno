@@ -1,89 +1,154 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DumbbellChartStories from './DumbbellChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={DumbbellChartStories} />
 
 <Title />
+Shows two values per category as two dots joined by a line. The line's length
+is the gap between them: a change, a spread or a shortfall.
 
-A dumbbell chart shows the **change or gap between two values** for each category.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/DumbbellChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A dumbbell chart shows the **change or gap between two values** for each category.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Pre-test and post-test scores per student, one dumbbell each.</>}>
+    <Canvas of={DumbbellChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Two dots** = start and end values
-- **Bar connecting** = range/change between them
-- Longer bars = bigger changes/gaps
-- Color can indicate direction (up/down)
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>Before/after comparison</td><td>✅ Ideal</td></tr>
-    <tr><td>Range visualization</td><td>✅ Ideal</td></tr>
-    <tr><td>Gap analysis</td><td>✅ Ideal</td></tr>
-    <tr><td>Single values</td><td>❌ Use Lollipop</td></tr>
-    <tr><td>Time series</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `DumbbellChart` when the gap between two values is the story: pre-test
+against post-test score per student, start against current level per skill,
+first-week against latest attendance per school. Sort by gap size and the
+biggest movers rise to the top.
 
-### PLUS Context
+For one value per category, use `LollipopChart`. For a continuous span with no
+two distinct moments, use `ColumnRangeChart`. For the two values read as
+separate bars, use `BarChart` with two series. For more than two points per
+category, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Score Changes**</td><td>Pre-test vs Post-test scores</td></tr>
-    <tr><td>**Progress Tracking**</td><td>Start vs Current level</td></tr>
-    <tr><td>**Salary Bands**</td><td>Min vs Max pay by role</td></tr>
-    <tr><td>**Goal Tracking**</td><td>Target vs Actual performance</td></tr>
-  </tbody>
-</table>
+The chart is horizontal by default, which suits names. Set `horizontal` to
+`false` for short labels laid out as columns.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Sort by gap size for impact
-✅ Use horizontal for long labels
-✅ Color-code improvements vs declines
-✅ Add value labels at both ends
+## Anatomy
 
-**Avoid:**
-❌ Too many categories (>15)
-❌ Negative value ranges
-❌ Missing context labels
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Low dot', <>Each item's <C>low</C>, in categorical slot 2.</>],
+        ['High dot', <>Each item's <C>high</C>, in categorical slot 1.</>],
+        ['Connector', 'A 2 px line from low to high. Its length is the gap.'],
+        ['Category axis', <>Names each dumbbell, from <C>categories</C>; a missing label falls back to <C>Item 1</C>, <C>Item 2</C>.</>],
+        ['Value axis', <>Titled by <C>yAxisLabel</C>, which defaults to <C>Value</C>.</>],
+        ['Legend', <>One entry, top right, reading <C>lowLabel → highLabel</C>; the defaults are <C>Low</C> and <C>High</C>.</>],
+        ['Tooltip', 'Shared: shows both values for the hovered category.'],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={DumbbellChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of strings. `data` is an array of `{ low, high }`, both
+required, one per category in the same order. `lowLabel` and `highLabel` name the
+two ends. `height` defaults to 400; `horizontal` defaults to `true`.
+
+```jsx
+<DumbbellChart
+    lowLabel="Pre-test"
+    highLabel="Post-test"
+    yAxisLabel="Score"
+    categories={['Maya', 'Jordan', 'Priya', 'Luis']}
+    data={[
+        { low: 45, high: 82 },
+        { low: 65, high: 92 },
+        { low: 58, high: 78 },
+        { low: 80, high: 88 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color tells the two ends apart.** The high dot and the connector take categorical slot 1, the low dot slot 2. The colors are fixed and cannot mark a gain against a loss.
+- **The legend does not name the colors separately.** Its one entry reads "Pre-test → Post-test" in one swatch, so a reader matches dot to end by color alone. Say which end is which in the surrounding text, or rely on the tooltip.
+- **Position carries the values.** Both dots sit on a shared axis, so the gap reads as a length without hue.
+- **Keep `low` and `high` consistent.** Put the same measure in the same field for every row, such as pre-test in `low`. When a row declines, only the order of the two colors shows it, so call declines out in the surrounding text.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`DumbbellChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={400} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Scores could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No scores yet" description="Scores appear after a post-test is logged." />
+    : <DumbbellChart categories={categories} data={data} lowLabel="Pre-test" highLabel="Post-test" />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={DumbbellChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
 ## Related
 
-- For more than two points per category, use `LineChart` or `ColumnRangeChart`.
+- For a single value per category, use `LollipopChart`.
+- For a low-to-high span rather than two moments, use `ColumnRangeChart`.
 - For the two values as separate bars side by side, use `BarChart`.
-- For before-and-after on a whole population, use `HistogramChart`.
+- For more than two points per category, use `LineChart`.
 
 </div>
 
 </div>
+
+

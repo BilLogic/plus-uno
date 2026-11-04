@@ -1,80 +1,137 @@
-import { Meta, Title, Primary } from '@storybook/addon-docs/blocks';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BulletChartStories from './BulletChart.stories.jsx';
-
-import { DocsInteractivePlayground } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RefTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 <Meta of={BulletChartStories} />
 
 <Title />
+Shows a value against its target as a horizontal bar and a tick, over three
+shaded quality bands. One row per metric.
 
-A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/dataviz/comparison/BulletChart"
+/>
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
-### Overview
-A bullet chart displays **actual vs target** performance with qualitative ranges, replacing gauges in dashboards.
+<div className="sb-ds-doc-section">
 
-<Primary />
+## Overview
 
----
+<DocsCanvasShell attachSourceBelow description={<>Three metrics, each a bar against its target tick over the danger, warning and success bands.</>}>
+    <Canvas of={BulletChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
 
-### How to Read
-- **Bar** = actual value
-- **Vertical line** = target value
-- **Background zones** = qualitative ranges (poor/ok/good)
-- Bar reaching target = goal met
+</div>
 
----
 
-### When to Use
+<div className="sb-ds-doc-section">
 
-<table>
-  <thead><tr><th>Use Case</th><th>Recommendation</th></tr></thead>
-  <tbody>
-    <tr><td>KPI vs target</td><td>✅ Ideal</td></tr>
-    <tr><td>Goal progress</td><td>✅ Ideal</td></tr>
-    <tr><td>Multiple metrics dashboard</td><td>✅ Good</td></tr>
-    <tr><td>Single metric</td><td>❌ Use Gauge</td></tr>
-    <tr><td>Time trends</td><td>❌ Use Line Chart</td></tr>
-  </tbody>
-</table>
+## When to use
 
----
+Use `BulletChart` when each number has a goal: session completion rate against
+the weekly target, attendance against the program goal, a SMART competency
+score against its benchmark. Stack several metrics in one chart and the reader
+scans down for the bars that fall short of their ticks.
 
-### PLUS Context
+For values with no target, use `BarChart`. For one headline value against a
+target, shown as a dial, use `GaugeChart`. For progress toward a target over
+time, use `LineChart`.
 
-<table>
-  <thead><tr><th>Scenario</th><th>Example</th></tr></thead>
-  <tbody>
-    <tr><td>**Session Goals**</td><td>Actual sessions vs weekly target</td></tr>
-    <tr><td>**Completion Rate**</td><td>Current % vs goal %</td></tr>
-    <tr><td>**Performance Metrics**</td><td>Score vs benchmark</td></tr>
-    <tr><td>**Revenue Targets**</td><td>Actual vs budget</td></tr>
-  </tbody>
-</table>
+The scale is fixed at 0 to 100, so every metric must be a percentage or a score
+out of 100.
 
----
+</div>
 
-### How to Use
+<div className="sb-ds-doc-section">
 
-**Best Practices:**
-✅ Shade the quality ranges with the danger, warning and success backgrounds, and label them
-✅ Show clear target marker
-✅ Compare multiple bullets vertically
-✅ Include metric labels
+## Anatomy
 
-**Avoid:**
-❌ Inconsistent scales across bullets
-❌ Missing target markers
-❌ Too many range zones (>3)
+<RefTable
+    head={['Part', 'What it does']}
+    rows={[
+        ['Bar', <>One per item in <C>data</C>; its length is <C>y</C>. Always <C>--ds-chart-brand</C>.</>],
+        ['Target', <>A tick across the bar at <C>target</C>, in <C>--ds-chart-gray-boldest</C> so it reads on every band.</>],
+        ['Bands', <>Fixed: 0 to 60 in <C>--ds-background-danger</C>, 60 to 80 in <C>--ds-background-warning</C>, 80 to 100 in <C>--ds-background-success</C>. They are not configurable.</>],
+        ['Category axis', <>Names each row, from <C>categories</C>.</>],
+        ['Value axis', 'Runs from zero to a fixed maximum of 100.'],
+        ['Tooltip', <>Shows the value and its target, as <C>78 (target: 85)</C>.</>],
+    ]}
+/>
 
----
+</div>
 
-### Interactive playground
+<div className="sb-ds-doc-section">
 
-<DocsInteractivePlayground of={BulletChartStories.Interactive} />
+## Data shape
 
+`categories` is an array of row labels. `data` is an array of `{ y, target }`,
+one per category in the same order. `height` defaults to 200; give each row
+roughly 60 to 80 px.
+
+```jsx
+<BulletChart
+    height={250}
+    categories={['Session completion', 'Attendance', 'Reflection rate']}
+    data={[
+        { y: 78, target: 85 },
+        { y: 92, target: 90 },
+        { y: 64, target: 75 },
+    ]}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Color and accessibility
+
+- **Color is fixed.** Every bar takes `--ds-chart-brand`, the target takes `--ds-chart-gray-boldest`, and the bands take the danger, warning and success backgrounds. Nothing is assigned per row.
+- **Position carries the value.** The bar's end and the tick's place on a shared axis say how far each metric is from its goal, without hue.
+- **The bands say "poor, fair, good" by color alone.** Red and green bands are the pair most often confused, and the chart prints no band labels. Say what the bands mean in the surrounding text, and do not rely on them to flag a row.
+- **The bands do not move.** They sit at 60 and 80 for every metric. When a metric's thresholds differ, the bands mislead; put that metric in its own chart or in `BarChart`.
+- **Screen readers and keyboard.** The chart is a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation through the data. The chart takes no title of its own, so name it in the Section or Card header around it.
+- **Contrast.** Chart colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+`BulletChart` draws what it is given and has no empty, loading or error state of its own. The caller chooses what to mount in its place:
+
+- **Loading:** a `Skeleton` the height of the chart.
+- **Empty:** a compact `EmptyState` saying what data belongs here.
+- **Error:** a `SectionMessage` with `appearance="danger"` and a way to retry.
+
+```jsx
+{isLoading ? <Skeleton shape="rect" height={250} />
+    : error ? <SectionMessage appearance="danger" dismissible={false} actions={[{ text: 'Retry', onClick: retry }]}>Goals could not load.</SectionMessage>
+    : data.length === 0 ? <EmptyState size="compact" header="No goals set" description="Progress appears once a target is set." />
+    : <BulletChart categories={categories} data={data} height={250} />}
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BulletChartStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 <div className="sb-ds-doc-section">
 
@@ -83,7 +140,10 @@ A bullet chart displays **actual vs target** performance with qualitative ranges
 - For values with no target to measure against, use `BarChart`.
 - For one value against a target as a dial rather than a bar, use `GaugeChart`.
 - For progress over time toward that target, use `LineChart`.
+- For percentages against a full track with no target, use `SmartBarChart`.
 
 </div>
 
 </div>
+
+
