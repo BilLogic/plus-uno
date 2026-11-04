@@ -263,3 +263,33 @@ test('the rail measurement script is a self-contained expression', () => {
   assert.equal(typeof tocMeasureScript(), 'string');
   assert.doesNotThrow(() => new Function(`return ${tocMeasureScript()}`));
 });
+
+// ---- managerFailures: the sidebar follows the Color mode global ---------------
+import { colorNumbers, managerFailures } from './docs-chrome.mjs';
+
+const MGR_EXPECTED = {
+  light: { mode: 'light-no-preference', sidebar: '#f9f8f7', selected: '#15696e' },
+  dark: { mode: 'dark-no-preference', sidebar: '#141413', selected: '#5cb9c2' },
+};
+const mgrRead = (step, over = {}) => ({
+  step,
+  mode: MGR_EXPECTED[step].mode,
+  sidebar: step === 'light' ? 'rgb(249, 248, 247)' : 'rgb(20, 20, 19)',
+  selected: step === 'light' ? 'rgb(21, 105, 110)' : 'rgb(92, 185, 194)',
+  ...over,
+});
+
+test('colorNumbers reads hex and rgb the same', () => {
+  assert.equal(colorNumbers('#141413'), colorNumbers('rgb(20, 20, 19)'));
+});
+
+test('a sidebar that follows the mode passes', () => {
+  assert.deepEqual(managerFailures([mgrRead('light'), mgrRead('dark')], MGR_EXPECTED), []);
+});
+
+test('a sidebar stuck on light after switching to dark fails', () => {
+  const stuck = mgrRead('dark', { mode: 'light-no-preference', sidebar: 'rgb(249, 248, 247)', selected: 'rgb(21, 105, 110)' });
+  const f = managerFailures([mgrRead('light'), stuck], MGR_EXPECTED);
+  assert.ok(f.some((m) => /theme is "light-no-preference", expected "dark-no-preference"/.test(m)));
+  assert.ok(f.some((m) => /left the sidebar the same color/.test(m)));
+});

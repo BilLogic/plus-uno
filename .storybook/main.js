@@ -5,6 +5,7 @@ import fs from 'fs';
 import tailwindcss from '@tailwindcss/vite';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { resolveManagerThemes } from '../scripts/lib/manager-theme.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,6 +66,12 @@ const config = {
 
     return staticDirs;
   })(),
+
+  // The manager's theme API takes literal colors and the manager cannot read the
+  // page's custom properties, so the color tokens are resolved here, per mode, and
+  // inlined for manager.js (see scripts/lib/manager-theme.mjs).
+  managerHead: (head) => `${head}
+<script>window.__PLUS_MANAGER_THEMES__ = ${JSON.stringify(resolveManagerThemes()).replace(/</g, '\\u003c')};</script>`,
 
   viteFinal: async (config) => {
     // Configure path aliases for component imports
