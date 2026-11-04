@@ -14,7 +14,7 @@ import { Logo } from '@/components';
 export const Mark = ({ color = 'colored', size = 'M', text = false }) => <Logo style={color} size={size} text={text} />;
 
 export const Ground = ({ token, children, caption }) => (
-    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+    <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'var(--card-min-width-sm)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: `var(${token})`, color: 'var(--ds-text-inverse)' }}>{children}</div>
         {caption && <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{caption}</figcaption>}
     </figure>
@@ -84,7 +84,7 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 
 Logos are available in three color options to suit different grounds. Choose by the ground the logo sits on.
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
     <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size="M" text /></Ground>
     <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size="M" text /></Ground>
     <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined" size="M" text /></Ground>
@@ -164,7 +164,7 @@ Do not add unnecessary containers around the logomark.
 
 <DoDont>
 <Do caption="The logomark on its own, with space around it."><Mark color="colored" size="M" /></Do>
-<Dont caption="The logomark nested in an extra container."><span style={{ display: 'inline-block', padding: 'var(--element-pad-x-sm)', borderRadius: 'var(--element-radius-full)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)' }}><Mark color="colored" size="M" /></span></Dont>
+<Dont caption="The logomark nested in an extra container."><span style={{ display: 'inline-block', padding: 'var(--pad-x-sm)', borderRadius: 'var(--radius-full)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)' }}><Mark color="colored" size="M" /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>

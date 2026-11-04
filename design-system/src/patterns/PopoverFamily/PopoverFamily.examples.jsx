@@ -39,7 +39,7 @@ const HeldPopup = ({ title, children }) => {
 export const PopupShortList = () => (
     <Plain>
         <HeldPopup title="Today’s sessions">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <p style={row}>4:30 PM · Algebra I</p>
                 <p style={row}>5:30 PM · Geometry</p>
                 <p style={row}>6:15 PM · Reading lab</p>
@@ -52,7 +52,7 @@ export const PopupShortList = () => (
 export const PopupForm = () => (
     <Plain>
         <HeldPopup title="Add a note">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <TextField label="Student" placeholder="Select a student" spacing="compact" />
                 <TextField label="Note" placeholder="Write a note" spacing="compact" />
                 <div><Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} /></div>

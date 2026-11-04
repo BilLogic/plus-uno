@@ -257,21 +257,21 @@ Students by grade in the tutoring cohort.
 
 <DoDont>
 <Do caption="Biggest at the top, darkest tone on the biggest value.">
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
     {[['Grade 9', 48, '--ds-chart-blue-boldest'], ['Grade 10', 36, '--ds-chart-blue-bolder'], ['Grade 11', 27, '--ds-chart-blue-bold'], ['Grade 12', 15, '--ds-chart-blue-subtle']].map(([label, n, tone]) => (
-        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-small)' }}>
+        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-small)' }}>
             <span>{label}</span>
-            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--element-radius-sm)', background: `var(${tone})` }} />
+            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />
         </li>
     ))}
 </ul>
 </Do>
 <Dont caption="Grades in any order, one tone. The eye has to read every number to find the biggest.">
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
+<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
     {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
-        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--element-inline-md)', font: 'var(--body-small)' }}>
+        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-small)' }}>
             <span>{label}</span>
-            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--element-radius-sm)', background: 'var(--ds-chart-neutral)' }} />
+            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-neutral)' }} />
         </li>
     ))}
 </ul>
@@ -286,14 +286,14 @@ Attendance for one class against a 90% target.
 
 <DoDont>
 <Do caption="A green tick at 90 and a green outline on the track.">
-<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--element-stack-sm)' }}>Algebra 1 · 86% attended</div>
-<div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--element-radius-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-chart-success)' }}>
-    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--element-radius-sm)', background: 'var(--ds-chart-brand)' }} />
+<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Algebra 1 · 86% attended</div>
+<div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-chart-success)' }}>
+    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />
     <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--ds-chart-success-bold)' }} />
 </div>
 </Do>
 <Dont caption="A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.">
-<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--element-stack-sm)' }}>Algebra 1 · 86% attended · Target 90%</div>
+<div style={{ font: 'var(--body-small)', marginBlockEnd: 'var(--stack-sm)' }}>Algebra 1 · 86% attended · Target 90%</div>
 <div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--ds-chart-success)' }}>
     <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--ds-chart-brand)' }} />
 </div>
@@ -314,13 +314,13 @@ Take the text color from the same role as the ground. Gray text on a bold ground
 
 <DoDont>
 <Do caption="Danger text on the subtle danger ground.">
-<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
     <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
     <div style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
 </div>
 </Do>
 <Dont caption="Gray text on the bold danger ground. The role is right and the pair is wrong.">
-<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
+<div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
     <strong style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
     <div style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
 </div>
@@ -335,10 +335,10 @@ A filled field looks selected or disabled. The focus ring is the one signal for 
 
 <DoDont>
 <Do caption="The field keeps its fill and gains the focus ring, color/border/focused.">
-<div style={{ padding: 'var(--element-pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)', boxShadow: '0 0 0 var(--stroke-2) var(--ds-border-focused)' }}>Placeholder</div>
+<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)', boxShadow: '0 0 0 var(--stroke-2) var(--ds-border-focused)' }}>Placeholder</div>
 </Do>
 <Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
-<div style={{ padding: 'var(--element-pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--element-radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Algebra I review</div>
+<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Algebra I review</div>
 </Dont>
 </DoDont>
 
@@ -350,13 +350,13 @@ A single series is drawn in the brand chart color. Reaching for the categorical 
 
 <DoDont>
 <Do caption="Five weeks of one measure, all in color/chart/brand.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--element-inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--element-radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--ds-chart-brand)' }} />)}
 </div>
 </Do>
 <Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--element-inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--element-radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
+<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--ds-chart-categorical-${i + 1})` }} />)}
 </div>
 </Dont>
 </DoDont>
@@ -379,10 +379,10 @@ The Reschedule button after the session has ended.
 
 <DoDont>
 <Do caption="Disabled takes color/text/disabled on color/background/disabled.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
 </Do>
 <Dont caption="Opacity on the primary button. It still looks clickable and the gray is not the system one.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--item-height-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
 </Dont>
 </DoDont>
 
@@ -469,10 +469,10 @@ Pick the role for the job. A failed payment is danger; an accent has no meaning,
 
 <DoDont>
 <Do caption="color/text/inverse on a bold danger fill.">
-<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
 </Do>
 <Dont caption="color/text/default on a bold fill loses contrast.">
-<span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-item-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
+<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-h24)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
 </Dont>
 </DoDont>
 
@@ -484,12 +484,12 @@ Selection uses the selected tokens and another cue such as a check mark. The foc
 
 <DoDont>
 <Do caption="Selected tokens plus a check mark.">
-<span style={{ display: 'inline-flex', gap: 'var(--element-inline-sm)', alignItems: 'center', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' }}>
+<span style={{ display: 'inline-flex', gap: 'var(--inline-sm)', alignItems: 'center', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' }}>
     <i className="fa-solid fa-check" aria-hidden="true" /> Tuesday 4:00 PM
 </span>
 </Do>
 <Dont caption="The focus ring used to mean selected.">
-<span style={{ display: 'inline-flex', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', boxShadow: '0 0 0 var(--stroke-2) var(--ds-border-focused)' }}>Tuesday 4:00 PM</span>
+<span style={{ display: 'inline-flex', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', boxShadow: '0 0 0 var(--stroke-2) var(--ds-border-focused)' }}>Tuesday 4:00 PM</span>
 </Dont>
 </DoDont>
 

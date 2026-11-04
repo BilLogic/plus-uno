@@ -16,7 +16,7 @@ import * as ElevationStories from './Elevation.stories.jsx';
 <Meta of={ElevationStories} />
 
 export const LevelTiles = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-spacious)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }}>
         {[
             ['sunken', '--ds-surface-sunken', null, 'The frame. No shadow.'],
             ['default', '--ds-surface', null, 'The page and flat content. No shadow.'],
@@ -208,14 +208,14 @@ Surfaces that overlap need a stacking order. A higher layer covers a lower one, 
 <TokenTable
     showFigma={false}
     rows={[
-        { token: '--layout-z-index-card', use: 'Cards and sticky headers.' },
-        { token: '--layout-z-index-navigation', use: 'Sidebars and floating page navigation.' },
-        { token: '--layout-z-index-popup', use: 'Popups and menus.' },
+        { token: '--layer-card', use: 'Cards and sticky headers.' },
+        { token: '--layer-navigation', use: 'Sidebars and floating page navigation.' },
+        { token: '--layer-popup', use: 'Popups and menus.' },
         { token: '--layout-z-index-blanket', use: 'The Blanket under a modal.' },
-        { token: '--layout-z-index-modal', use: 'A modal, over its Blanket.' },
-        { token: '--layout-z-index-flag', use: 'Flags, above a modal.' },
-        { token: '--layout-z-index-spotlight', use: 'Onboarding spotlights.' },
-        { token: '--layout-z-index-tooltip', use: 'Tooltips, above everything.' },
+        { token: '--layer-modal', use: 'A modal, over its Blanket.' },
+        { token: '--layer-flag', use: 'Flags, above a modal.' },
+        { token: '--layer-spotlight', use: 'Onboarding spotlights.' },
+        { token: '--layer-tooltip', use: 'Tooltips, above everything.' },
     ]}
 />
 
@@ -238,7 +238,7 @@ Bottom to top: the Page, a sticky header, a Popup, the Blanket with its Modal, t
 At the top the header has no shadow. Once content scrolls under it, the overflow shadow shows where the content is cut off.
 
 <FoundationExample caption="At the top: no shadow. Scrolled: the overflow shadow.">
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
     <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', font: 'var(--heading-xsmall)' }}>Sessions</div>
     <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface)', boxShadow: 'var(--ds-shadow-overflow)', font: 'var(--heading-xsmall)' }}>Sessions</div>
 </div>
@@ -259,10 +259,10 @@ A tooltip is the one floating layer that is not on the overlay pair. It reads as
 
 <DoDont>
 <Do caption="Dark neutral fill with inverse text. It stays a quiet label.">
-<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-neutral-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-small)' }}>Reschedule this session</span>
+<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-small)' }}>Reschedule this session</span>
 </Do>
 <Dont caption="The overlay pair and a shadow make it look like a menu, so people try to click it.">
-<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)', color: 'var(--ds-text)', font: 'var(--body-small)' }}>Reschedule this session</span>
+<span style={{ display: 'inline-block', padding: 'var(--popover-pad-y-tooltip) var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)', color: 'var(--ds-text)', font: 'var(--body-small)' }}>Reschedule this session</span>
 </Dont>
 </DoDont>
 
@@ -288,14 +288,14 @@ How to lift a surface, and what not to do.
 
 <DoDont>
 <Do caption="One raised card marks the next session.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
     <Kard value="Next session" />
     <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
     <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border)', font: 'var(--body-small)' }}>Past session</div>
 </div>
 </Do>
 <Dont caption="Every card raised: visual noise, and nothing stands out.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
     <Kard value="Next session" /><Kard value="Past session" /><Kard value="Past session" />
 </div>
 </Dont>

@@ -23,8 +23,8 @@ export const Curve = ({ name, points }) => {
     const s = 100;
     const path = `M0 ${s} C${x1 * s} ${s - y1 * s}, ${x2 * s} ${s - y2 * s}, ${s} 0`;
     return (
-        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-sm)' }}>
-            <svg viewBox="-8 -8 116 116" role="img" aria-label={`${name}: cubic-bezier(${points.join(', ')})`} style={{ width: '100%', maxWidth: 'var(--image-xl)', minWidth: 'var(--image-lg)', background: 'var(--ds-surface)', borderRadius: 'var(--element-radius-lg)' }}>
+        <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <svg viewBox="-8 -8 116 116" role="img" aria-label={`${name}: cubic-bezier(${points.join(', ')})`} style={{ width: '100%', maxWidth: 'var(--image-xl)', minWidth: 'var(--image-lg)', background: 'var(--ds-surface)', borderRadius: 'var(--radius-lg)' }}>
                 <line x1="0" y1={s} x2={s} y2="0" stroke="var(--ds-border-bold)" strokeDasharray="4 4" />
                 <path d={path} fill="none" stroke="var(--ds-chart-brand)" strokeWidth="3" />
             </svg>
@@ -36,7 +36,7 @@ export const Curve = ({ name, points }) => {
 };
 
 export const Label = ({ children }) => (
-    <span style={{ display: 'inline-block', padding: 'var(--element-pad-x-md)', borderRadius: 'var(--element-radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)', color: 'var(--ds-text)' }}>{children}</span>
+    <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-neutral)', font: 'var(--body-small)', color: 'var(--ds-text)' }}>{children}</span>
 );
 
 <Meta title="Foundations/Motion" tags={['!dev']} />
@@ -122,7 +122,7 @@ Entering elements ease out, exiting elements ease in, and elements that scale or
 />
 
 <FoundationExample caption="Each box plots progress over time; the dashed line is linear, for comparison.">
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--image-xl), 1fr))', gap: 'var(--layout-gutter)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--image-xl), 1fr))', gap: 'var(--grid-gutter)' }}>
     {CURVES.map(([name, points]) => <Curve key={name} name={name} points={points} />)}
 </div>
 </FoundationExample>

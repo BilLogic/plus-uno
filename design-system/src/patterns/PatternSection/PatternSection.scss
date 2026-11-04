@@ -37,7 +37,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
 }
 
 .plus-pattern-section-heading,
@@ -45,7 +45,7 @@
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
     min-width: 0;
 }
 
@@ -83,7 +83,7 @@
 .plus-pattern-section-actions {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     flex-shrink: 0;
 }
 
@@ -91,7 +91,7 @@
 .plus-pattern-section-tabs {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     min-width: 0;
 }
 
@@ -103,7 +103,7 @@
 .plus-pattern-section-skeleton {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 /* Body */
@@ -127,11 +127,11 @@
 .plus-pattern-section-content--split {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--layout-gutter);
+    gap: var(--grid-gutter);
 }
 
 .plus-pattern-section-main {
-    flex: 2 1 var(--layout-gutter);
+    flex: 2 1 var(--grid-gutter);
     min-width: min(100%, var(--section-min-width-main));
 }
 
@@ -157,7 +157,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    column-gap: var(--element-inline-lg);
+    column-gap: var(--inline-lg);
     row-gap: var(--section-stack-sm);
     min-height: var(--item-height-md);
     min-width: 0;
@@ -167,7 +167,7 @@
     display: flex;
     flex: 1 1 auto;
     align-items: center;
-    gap: var(--element-inline-md);
+    gap: var(--inline-md);
     min-width: min(100%, var(--width-3000));
 }
 
@@ -179,7 +179,7 @@
 .plus-section-toolbar__slot {
     display: flex;
     align-items: center;
-    gap: var(--element-inline-sm);
+    gap: var(--inline-sm);
     flex-shrink: 0;
 }
 
@@ -196,7 +196,7 @@
 
 .plus-section-toolbar--selected {
     padding: 0 var(--table-pad-x-cell);
-    border-radius: var(--element-radius-lg);
+    border-radius: var(--radius-lg);
     background-color: var(--ds-background-selected);
 }
 

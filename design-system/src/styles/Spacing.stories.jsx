@@ -30,19 +30,19 @@ const SessionDate = ({ id }) => <TextField id={`${id}-date`} label="Session date
 
 /** Item, Container and Wrapper: the kind of box decides its pad. */
 export const ThreeKinds = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--layout-gutter)' }}>
-        <div style={col('var(--element-stack-md)')}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
+        <div style={col('var(--stack-md)')}>
             <span><Button text="Save changes" appearance="primary" /></span>
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Item</span>
             <span style={tag}>A minimum height, and pad-x larger than pad-y: 32 = 20 line + 2 × 6, pad-x 12. Button, Text field, Tag, a menu or table row.</span>
         </div>
-        <div style={col('var(--element-stack-md)')}>
+        <div style={col('var(--stack-md)')}>
             <PatternCard title="Container" description="Card/pad-md, 20 on every side." />
             <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Container</span>
             <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popover, Flag, Section message.</span>
         </div>
-        <div style={col('var(--element-stack-md)')}>
-            <span style={row('var(--element-inline-md)')}>
+        <div style={col('var(--stack-md)')}>
+            <span style={row('var(--inline-md)')}>
                 <Button text="Cancel" />
                 <Button text="Save" appearance="primary" />
             </span>
@@ -55,15 +55,15 @@ export const ThreeKinds = () => (
 /** Items pad by their height: compact 24, default 32, label 20. */
 export const ItemHeights = () => (
     <div style={row('var(--page-stack-md)')}>
-        <div style={col('var(--element-stack-md)')}>
+        <div style={col('var(--stack-md)')}>
             <span><Button text="Compact" spacing="compact" /></span>
             <span style={tag}>24 · pad-y 2, pad-x 8 · table rows and inline toolbars</span>
         </div>
-        <div style={col('var(--element-stack-md)')}>
+        <div style={col('var(--stack-md)')}>
             <span><Button text="Default" /></span>
             <span style={tag}>32 · pad-y 6, pad-x 12 · buttons, tabs, menu rows, fields</span>
         </div>
-        <div style={col('var(--element-stack-md)')}>
+        <div style={col('var(--stack-md)')}>
             <span><Tag text="Grade 7" /></span>
             <span style={tag}>Label 20 · pad-x 4 · Tag, Status, Count</span>
         </div>
@@ -123,8 +123,8 @@ export const Rhythm = () => (
     <DoDont>
         <Do caption={<>Sections 24 apart (<C>--page-stack-md</C>), heading to cards 16 (<C>--section-stack-md</C>), cards 16 apart on the gutter.</>}>
             <div style={col('var(--page-stack-md)')}>
-                <MiniSection title="This week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
-                <MiniSection title="Next week" gap="var(--section-stack-md)" cardGap="var(--layout-gutter)" />
+                <MiniSection title="This week" gap="var(--section-stack-md)" cardGap="var(--grid-gutter)" />
+                <MiniSection title="Next week" gap="var(--section-stack-md)" cardGap="var(--grid-gutter)" />
             </div>
         </Do>
         <Dont caption="16 everywhere. Sections, headings and cards sit the same distance apart, so nothing groups.">

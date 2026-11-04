@@ -12,20 +12,20 @@
 .plus-pattern-blanket {
     position: fixed;
     inset: 0;
-    z-index: var(--layout-z-index-scrim);
+    z-index: var(--layer-blanket);
     display: flex;
     /* Safe: a layer bigger than the screen starts at the pad and the blanket scrolls, rather than spilling past the top or left edge. */
     align-items: safe center;
     justify-content: safe center;
     box-sizing: border-box;
-    padding: var(--overlay-pad-y) var(--overlay-pad-x);
+    padding: var(--blanket-pad-y) var(--blanket-pad-x);
     background-color: var(--ds-blanket);
     /* A layer wider than a narrow screen keeps its width and the blanket scrolls. */
     overflow: auto;
 
     > * {
         position: relative;
-        z-index: var(--layout-z-index-modal);
+        z-index: var(--layer-modal);
     }
 }
 
@@ -59,7 +59,7 @@
     width: var(--plus-overlay-screen, 100%);
     max-width: 100%;
     height: var(--plus-overlay-screen-height, auto);
-    --plus-overlay-max-height: calc(var(--plus-overlay-screen-height, 100dvh) - 2 * var(--overlay-pad-y));
+    --plus-overlay-max-height: calc(var(--plus-overlay-screen-height, 100dvh) - 2 * var(--blanket-pad-y));
 
     > * {
         z-index: auto;

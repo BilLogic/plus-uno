@@ -156,10 +156,10 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--layout-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
-        <tr><td><code>--layout-pad-x-screen</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
-        <tr><td><code>--layout-min-width-screen</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
-        <tr><td><code>--layout-max-width-screen</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
+        <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
+        <tr><td><code>--screen-pad-x</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
+        <tr><td><code>--screen-min-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
+        <tr><td><code>--screen-max-width</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -170,10 +170,10 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--layout-columns</code></td><td>12</td><td>12</td><td>12</td><td>The column count at every width.</td></tr>
-        <tr><td><code>--layout-gutter</code></td><td>16</td><td>16</td><td>16</td><td>The gap between columns, in every grid.</td></tr>
-        <tr><td><code>--layout-width-column</code></td><td>45.33</td><td>47.33</td><td>80.67</td><td>One column of the content grid.</td></tr>
-        <tr><td><code>--layout-width-column-screen</code></td><td>45.33</td><td>66.67</td><td>88</td><td>One column of the screen grid.</td></tr>
+        <tr><td><code>--grid-columns</code></td><td>12</td><td>12</td><td>12</td><td>The column count at every width.</td></tr>
+        <tr><td><code>--grid-gutter</code></td><td>16</td><td>16</td><td>16</td><td>The gap between columns, in every grid.</td></tr>
+        <tr><td><code>--grid-width-column</code></td><td>45.33</td><td>47.33</td><td>80.67</td><td>One column of the content grid.</td></tr>
+        <tr><td><code>--grid-width-column-screen</code></td><td>45.33</td><td>66.67</td><td>88</td><td>One column of the screen grid.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -184,10 +184,10 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--layout-max-width-content</code></td><td>1232</td><td>1232</td><td>1232</td><td>The content cap.</td></tr>
-        <tr><td><code>--layout-max-width-reading</code></td><td>864</td><td>864</td><td>864</td><td>The reading cap.</td></tr>
-        <tr><td><code>--layout-min-width-content</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the page scrolls sideways and the topbar stays.</td></tr>
-        <tr><td><code>--layout-width-content</code></td><td>720</td><td>744</td><td>1144</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1528 screen.</td></tr>
+        <tr><td><code>--content-max-width</code></td><td>1232</td><td>1232</td><td>1232</td><td>The content cap.</td></tr>
+        <tr><td><code>--content-max-width-reading</code></td><td>864</td><td>864</td><td>864</td><td>The reading cap.</td></tr>
+        <tr><td><code>--content-min-width</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the page scrolls sideways and the topbar stays.</td></tr>
+        <tr><td><code>--content-width</code></td><td>720</td><td>744</td><td>1144</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1528 screen.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -198,10 +198,10 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--layout-height-topbar</code></td><td>32</td><td>The topbar row.</td></tr>
-        <tr><td><code>--layout-width-sidebar</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
+        <tr><td><code>--frame-topbar-height</code></td><td>32</td><td>The topbar row.</td></tr>
+        <tr><td><code>--frame-sidebar-width</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
         <tr><td><code>--frame-pad</code> · <code>--frame-stack</code></td><td>8 · 8</td><td>The frame's pad on top, right and bottom, and the gap between its rows.</td></tr>
-        <tr><td><code>--layout-pad-left-container</code></td><td>8 · 0 from 1024</td><td>The left pad of the page row: 8 while the sidebar floats, 0 once it docks.</td></tr>
+        <tr><td><code>--grid-pad-left-container</code></td><td>8 · 0 from 1024</td><td>The left pad of the page row: 8 while the sidebar floats, 0 once it docks.</td></tr>
         <tr><td><code>--page-pad</code></td><td>16 · 16 · 24</td><td>The page pad at Medium, Large and X-Large. The grid margin is the same token.</td></tr>
         <tr><td><code>--page-radius</code></td><td>16</td><td>The page corners.</td></tr>
     </tbody>
@@ -219,7 +219,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><td><code>--focused-page-stack-md</code> · <code>--focused-page-stack-lg</code></td><td>16 · 24</td><td>Larger gaps between the rows.</td></tr>
         <tr><td><code>--focused-page-inline-md</code></td><td>12</td><td>Between Back, the title and Close.</td></tr>
         <tr><td><code>--focused-page-inline-sm</code></td><td>8</td><td>Between the footer actions.</td></tr>
-        <tr><td><code>--layout-max-width-reading</code> · <code>--layout-min-width-content</code></td><td>864 · 720</td><td>The content column and the actions column.</td></tr>
+        <tr><td><code>--content-max-width-reading</code> · <code>--content-min-width</code></td><td>864 · 720</td><td>The content column and the actions column.</td></tr>
         <tr><td><code>--ds-page-sunken</code> · <code>--ds-page</code> · <code>--ds-text</code></td><td>color</td><td>The frame, the page and the title. They follow Light, Dark and increased contrast.</td></tr>
     </tbody>
 </DocsTable>
@@ -240,7 +240,7 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
     <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
 </DocsCanvasShell>
 
-<DocsCanvasShell attachSourceBelow={false} description={<><strong>content=reading</strong>. The content is capped at <code>--layout-max-width-reading</code> 864 and centered.</>}>
+<DocsCanvasShell attachSourceBelow={false} description={<><strong>content=reading</strong>. The content is capped at <code>--content-max-width-reading</code> 864 and centered.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
 </DocsCanvasShell>
 
@@ -250,7 +250,7 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
 
 ### Layout modes
 
-The mode is set once, on the template. The frame width follows it through `--layout-width-screen`, and everything inside moves with it. The sidebar docks from Large, the page row's left pad drops to 0, the page pad grows to 24 at X-Large, and the content lands at 720, 744 and 1144.
+The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page row's left pad drops to 0, the page pad grows to 24 at X-Large, and the content lands at 720, 744 and 1144.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />

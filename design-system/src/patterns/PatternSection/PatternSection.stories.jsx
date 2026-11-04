@@ -127,7 +127,7 @@ function LayoutsDemo() {
             <div>
                 <DemoLabel>layout=single</DemoLabel>
                 <PatternSection title="Section title" description={description} actions={<Actions />}>
-                    <div style={{ display: 'flex', gap: 'var(--layout-gutter)', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
                         <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
                         <StatCard title="Attendance" body="94% across 38 students" />
                         <StatCard title="Notes due" body="3 sessions without notes" />
@@ -367,7 +367,7 @@ export const SplitLayout = {
     ),
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
-        const gutter = tokenLength(canvasElement, '--layout-gutter');
+        const gutter = tokenLength(canvasElement, '--grid-gutter');
         const box = (probe, part) => canvasElement.querySelector(`[data-probe="${probe}"] .plus-pattern-section-${part}`).getBoundingClientRect();
         const W = 960;
         const span = (n) => (n * (W - 11 * gutter)) / 12 + (n - 1) * gutter;
@@ -394,6 +394,6 @@ export const Spacing = {
         await expect(q('.plus-pattern-section-tabs').top - q('.plus-pattern-section-title-row').bottom, 'title row to tabs')
             .toBeCloseTo(tokenLength(canvasElement, '--section-stack-sm'), 0);
         await expect(q('.plus-pattern-section-description').top - q('.plus-pattern-section-title').bottom, 'title to description')
-            .toBeCloseTo(tokenLength(canvasElement, '--element-stack-sm'), 0);
+            .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
     },
 };

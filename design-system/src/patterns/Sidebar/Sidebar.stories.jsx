@@ -29,7 +29,7 @@ import { DemoLabel } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /** The 240 sidebar's content box: its width less the 8 it pads either side. */
 const SIDEBAR_BOX = {
-    width: 'calc(var(--layout-width-sidebar) - 2 * var(--frame-pad))',
+    width: 'calc(var(--frame-sidebar-width) - 2 * var(--frame-pad))',
     boxSizing: 'content-box',
     padding: 'var(--frame-pad)',
     backgroundColor: 'var(--ds-surface-sunken)',
@@ -115,8 +115,8 @@ export const GroupLabels = {
             await expect(style.font, 'Heading/xxsmall').toBe(probe(canvasElement, 'font', 'var(--heading-xxsmall)'));
             await expect(style.fontSize, '12').toBe(probe(canvasElement, 'fontSize', 'var(--font-size-075)'));
             await expect(style.fontWeight, 'semibold').toBe(probe(canvasElement, 'fontWeight', 'var(--type-weight-semibold)'));
-            await expect(px(style.paddingTop), 'pad-y').toBeCloseTo(tokenLength(canvasElement, '--element-pad-y-md'), 0);
-            await expect(px(style.paddingLeft), 'pad-x').toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md'), 0);
+            await expect(px(style.paddingTop), 'pad-y').toBeCloseTo(tokenLength(canvasElement, '--pad-y-md'), 0);
+            await expect(px(style.paddingLeft), 'pad-x').toBeCloseTo(tokenLength(canvasElement, '--pad-x-md'), 0);
         }
         await expect(canvas.getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
     },
@@ -394,7 +394,7 @@ const OpenTabsSidebar = ({ boxHeight, records = [], label = 'Main' }) => {
                 />
             </Box>
             {records.length ? (
-                <div role="group" aria-label="Records" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+                <div role="group" aria-label="Records" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                     {records.map(([parent, record]) => (
                         <Button
                             key={`${parent}:${record.id}`}
@@ -457,7 +457,7 @@ export const OpenTabs = {
             await expect(row.getBoundingClientRect().height, 'tab row 32').toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
         }
         await expect(selected.getBoundingClientRect().left - parentRow.getBoundingClientRect().left, 'the surface sits past the 28 thread column')
-            .toBeCloseTo(tokenLength(canvasElement, '--element-pad-x-md') + tokenLength(canvasElement, '--icon-md'), 0);
+            .toBeCloseTo(tokenLength(canvasElement, '--pad-x-md') + tokenLength(canvasElement, '--icon-md'), 0);
     },
 };
 
@@ -614,7 +614,7 @@ export const Thread = {
         const parentRow = canvas.getByRole('button', { name: /^Sessions$/ });
         const parentIcon = parentRow.querySelector('.plus-sidebar-tab__icon').getBoundingClientRect();
         const parentLabel = parentRow.querySelector('.plus-sidebar-tab__label').getBoundingClientRect();
-        const column = tokenLength(canvasElement, '--element-pad-x-md') + tokenLength(canvasElement, '--icon-md');
+        const column = tokenLength(canvasElement, '--pad-x-md') + tokenLength(canvasElement, '--icon-md');
         const check = async () => {
             const rows = [...canvasElement.querySelectorAll('.plus-pattern-sidebar__tabs > li')];
             const last = rows[rows.length - 1];
@@ -632,12 +632,12 @@ export const Thread = {
                     await expect(box.top + px(line.top), 'the thread hangs from the parent row, through the gap above the first tab')
                         .toBeCloseTo(parentRow.getBoundingClientRect().bottom, 0);
                     await expect(box.top - parentRow.getBoundingClientRect().bottom, 'the 4 gap above the first tab')
-                        .toBeCloseTo(tokenLength(canvasElement, '--element-stack-sm'), 0);
+                        .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
                 }
                 if (li === last) {
                     await expect(box.top + px(line.top) + px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.top + box.height / 2, 0);
                     await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
-                    await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--element-radius-item-sm'), 0);
+                    await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--radius-h24'), 0);
                     await expect(box.left + px(line.left) + px(line.width), 'the stub stops short of a focused surface\'s ring')
                         .toBeCloseTo(box.left + column - 2 * tokenLength(canvasElement, '--size-element-stroke-lg'), 0);
                 } else {
@@ -703,7 +703,7 @@ const PERSIST_KEY = 'story:persistence';
 const PersistenceDemo = () => {
     const [load, setLoad] = useState(0);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--element-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             <div><Button spacing="compact" text="Reload" onClick={() => setLoad((n) => n + 1)} /></div>
             <OpenTabsHarness
                 key={load}

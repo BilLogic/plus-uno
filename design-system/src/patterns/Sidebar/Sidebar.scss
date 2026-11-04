@@ -2,14 +2,14 @@
  * Sidebar pattern (Patterns/Sidebar): the header stays put and the body
  * scrolls. Mirrors the Figma `_Sidebar` and `_Sidebar section`. Every length is
  * an Item, Element or Layout token; the width is the frame's
- * (`--layout-width-sidebar`, set by the Frame).
+ * (`--frame-sidebar-width`, set by the Frame).
  */
 
 .plus-pattern-sidebar {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
     width: 100%;
     height: 100%;
     min-width: 0;
@@ -22,15 +22,15 @@
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    gap: var(--element-inline-md);
-    padding: var(--element-pad-y-md) var(--element-pad-x-sm);
+    gap: var(--inline-md);
+    padding: var(--pad-y-md) var(--pad-x-sm);
 }
 
 .plus-pattern-sidebar__body {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -39,7 +39,7 @@
 .plus-pattern-sidebar__list {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -52,13 +52,13 @@
 .plus-pattern-sidebar__section {
     display: flex;
     flex-direction: column;
-    gap: var(--element-stack-sm);
+    gap: var(--stack-sm);
 }
 
 // 12 semibold, padded 6 / 12: a group's name, not a heading. The type style is
 // Heading/xxsmall, as Atlassian's menu section heading is; the element is not.
 .plus-pattern-sidebar__section-label {
-    padding: var(--element-pad-y-md) var(--element-pad-x-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -68,9 +68,9 @@
 
 .plus-pattern-sidebar__divider {
     flex-shrink: 0;
-    margin: var(--element-stack-sm) var(--element-pad-x-md);
+    margin: var(--stack-sm) var(--pad-x-md);
     height: var(--border-default);
-    border-radius: var(--element-radius-sm);
+    border-radius: var(--radius-sm);
     background-color: var(--ds-border);
 }
 
@@ -92,20 +92,20 @@
 
     // Room for the chevron at rest, so the label and elemAfter stop before it.
     .plus-sidebar-tab {
-        padding-right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + var(--element-inline-sm));
+        padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + var(--inline-sm));
     }
 
     // "Close all" shows left of the chevron while the pointer is anywhere on
     // the parent (the chevron included) or anything in it has focus.
     .plus-sidebar-tab__actions {
-        right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + var(--element-inline-sm));
+        right: calc(var(--pad-x-xs) + var(--item-height-sm) + var(--inline-sm));
     }
 
     &:hover,
     &:focus-within {
         > .plus-sidebar-tab-item > .plus-sidebar-tab {
             // The chevron, a gap, and "Close all" (a small button, under 80).
-            padding-right: calc(var(--element-pad-x-xs) + var(--item-height-sm) + 2 * var(--element-inline-sm) + var(--width-500));
+            padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + 2 * var(--inline-sm) + var(--width-500));
         }
 
         .plus-sidebar-tab__after {
@@ -125,7 +125,7 @@
 .plus-pattern-sidebar__chevron {
     position: absolute;
     top: 0;
-    right: var(--element-pad-x-xs);
+    right: var(--pad-x-xs);
     bottom: 0;
     display: flex;
     align-items: center;
@@ -139,7 +139,7 @@
 // keeps the 4 row gap of every other list.
 .plus-pattern-sidebar__tabs {
     // The same 4 gap between the parent and its first tab as between rows.
-    margin-top: var(--element-stack-sm);
+    margin-top: var(--stack-sm);
 
     &[hidden] {
         display: none;
@@ -148,12 +148,12 @@
     // The thread hangs from the parent: the first row's line runs up through
     // the gap above it to the parent row's bottom edge.
     > li:first-child::before {
-        top: calc(-1 * var(--element-stack-sm));
+        top: calc(-1 * var(--stack-sm));
     }
 
     > li {
         position: relative;
-        padding-left: calc(var(--element-pad-x-md) + var(--icon-md));
+        padding-left: calc(var(--pad-x-md) + var(--icon-md));
 
         // The thread: a line under the parent icon's center (12 + 8 = 20). A
         // middle row's runs on through the 4 gap, so the line reads unbroken.
@@ -162,8 +162,8 @@
             content: '';
             position: absolute;
             top: 0;
-            bottom: calc(-1 * var(--element-stack-sm));
-            left: calc(var(--element-pad-x-md) + var(--icon-md) / 2);
+            bottom: calc(-1 * var(--stack-sm));
+            left: calc(var(--pad-x-md) + var(--icon-md) / 2);
             box-sizing: border-box;
             border-left: var(--size-element-stroke-sm) solid var(--ds-border);
             pointer-events: none;
@@ -172,8 +172,8 @@
 
     // The surface: pad-x 8, radius 8 (the SidebarTab's own Element/radius-item-md).
     .plus-sidebar-tab {
-        padding-left: var(--element-pad-x-sm);
-        padding-right: var(--element-pad-x-sm);
+        padding-left: var(--pad-x-sm);
+        padding-right: var(--pad-x-sm);
     }
 
     // The last row, "Show N more" when it shows: the line stops at the row's
@@ -185,7 +185,7 @@
         bottom: 50%;
         width: calc(var(--icon-md) / 2 - 2 * var(--size-element-stroke-lg));
         border-bottom: var(--size-element-stroke-sm) solid var(--ds-border);
-        border-bottom-left-radius: var(--element-radius-item-sm);
+        border-bottom-left-radius: var(--radius-h24);
     }
 }
 

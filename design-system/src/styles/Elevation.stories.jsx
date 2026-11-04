@@ -37,7 +37,7 @@ const code = { font: 'var(--code)', color: 'var(--ds-text-subtle)' };
 /** The four surface levels, each with the shadow it pairs with. */
 export const Overview = () => (
     <ModeCompare>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
             {LEVELS.map((l) => (
                 <div key={l.name} style={tile(l.surface, l.shadow)}>
                     <span style={{ font: 'var(--heading-xsmall)' }}>{l.name}</span>
@@ -53,7 +53,7 @@ export const Overview = () => (
 /** A card at rest, a card lifted while it is dragged, and a well inside a card. */
 export const Cards = () => (
     <ModeCompare>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--layout-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
             <PatternCard title="At rest" description="The raised pair, no border." />
             <PatternCard title="Dragged" description="The overlay pair while it moves." dragging />
             <PatternCard title="With a well" description="A recessed strip inside the card.">
@@ -102,7 +102,7 @@ export const AlwaysPair = () => (
             <div style={ground}>
                 <div style={{ ...tile('--ds-surface-overlay', '--ds-shadow-overlay'), minHeight: 0, padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popover-radius-menu-md)' }}>
                     {['Rename', 'Duplicate', 'Move to…'].map((t) => (
-                        <span key={t} style={{ font: 'var(--body-default)', padding: 'var(--element-pad-y-md) var(--element-pad-x-md)' }}>{t}</span>
+                        <span key={t} style={{ font: 'var(--body-default)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}>{t}</span>
                     ))}
                 </div>
             </div>
@@ -111,7 +111,7 @@ export const AlwaysPair = () => (
             <div style={ground}>
                 <div style={{ ...tile('--ds-surface', '--ds-shadow-overlay'), minHeight: 0, padding: 'var(--popover-pad-menu)', borderRadius: 'var(--popover-radius-menu-md)' }}>
                     {['Rename', 'Duplicate', 'Move to…'].map((t) => (
-                        <span key={t} style={{ font: 'var(--body-default)', padding: 'var(--element-pad-y-md) var(--element-pad-x-md)' }}>{t}</span>
+                        <span key={t} style={{ font: 'var(--body-default)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}>{t}</span>
                     ))}
                 </div>
             </div>
