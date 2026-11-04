@@ -218,12 +218,13 @@ export const CustomItem = ({ component: Component = 'div', elemBefore, elemAfter
     // background over the wrapper's otherwise.
     if (Component !== 'div') {
         return (
-            <div role="menuitem" data-testid={testId}>
+            <div role="menuitem">
                 <Component
                     ref={(node) => roving?.register(node)}
                     aria-disabled={isDisabled || undefined}
                     aria-current={isSelected || undefined}
                     onKeyDown={onKeyDown}
+                    data-testid={testId}
                     className={rowClassName}
                     {...props}
                 >
