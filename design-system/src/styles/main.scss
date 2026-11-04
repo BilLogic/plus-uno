@@ -56,6 +56,13 @@
   @include meta.load-css("../tokens/deep/roles");
   @include meta.load-css("../tokens/deep/motion");
   @include meta.load-css("../tokens/deep/legacy-size-aliases");
+  // The four-tier ladder (#1756): also generated from plan.mjs's TOKEN_LADDER,
+  // additive new names beside the old ones they alias. Regenerate, never
+  // edit: `npm run generate:design-tokens`.
+  @include meta.load-css("../tokens/deep/semantics");
+  @include meta.load-css("../tokens/deep/patterns");
+  @include meta.load-css("../tokens/deep/components");
+  @include meta.load-css("../tokens/deep/layers");
 }
 
 @layer components {

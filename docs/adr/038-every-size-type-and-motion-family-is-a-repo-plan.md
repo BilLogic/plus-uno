@@ -20,3 +20,16 @@ verified: 2026-11-03 (#1704)
 **Deleted.** `scripts/sync-figma-tokens.js`, the Figma-to-code sync script: it wrote to `new tokens/`, a path the generator it fed never read, and resolved only one alias level. It was dead, not merely broken — nothing in CI or `npm run regenerate` called it. `npm run sync:tokens` is gone with it; every doc that pointed at either is updated to say the export is a manual step until the primitive generator's own follow-up flips it.
 
 **Consequences.** `check:design-tokens` fails on drift between `tokens/deep/` and the plan. `check:old-size-tokens` and `check:old-size-token-list` fail on a rise or a stale regenerate. Neither check requires a component to move — #1698's scope line holds: this ticket does not migrate a single caller, and every family PR owns its own rows on the ratchet it inherits. — uno (agent), Nov 2026, recording the decision Bill settled in the grill round for #1704
+
+## Addendum: the four-tier ladder (#1756, 2026-11-04)
+
+Bill, 2026-11-04: "clean up both token on figma and in code and fully align the two." `plan.mjs` grows one more export, `TOKEN_LADDER`, that extends this ADR's "Figma downstream of code" decision from role/motion tokens to the whole spacing, size and radius surface, organized as one plan with four tiers, most general to most specific:
+
+- **Primitives** (`spacing / primitives`) — `--space-*` / `--radius-*` / `--stroke-*` / `--size-*`, unchanged; still generated from the Figma JSON export by `generate-all-tokens.js`, for the same risk-reduction reason this ADR already gave for not re-deriving them.
+- **Semantics** (`spacing / semantics`) — Pad, Stack, Inline and Radius replace the Element layer as the safety net, on steps only (`xs`/`sm`/`md`/`lg`), no density words; plus Border, Focus, Grid, Screen, Content (dissolved out of `spacing / layout`), and the Size dimension roles.
+- **Patterns** (`spacing / patterns`) — Frame (with Topbar and Sidebar), Page, Section, Card, Table, Blanket (renamed from Overlay), Modal, Popover, Drawer, Focused page. Density (`default`/`compact`/`spacious`) lives only where a `spacing` prop lives: here and in Components.
+- **Components** (`spacing / components`) — a value exactly one component needs that no shared tier covers: Button radius, Calendar day sizes, Checkbox/Radio control sizes, Listbox limits, Join row and Option menu widths, Tile radii.
+
+`layers` becomes its own non-spacing, code-only family (`--layer-*`), carrying the z-index scale this ADR's generator already wrote as `CODE_ONLY_LAYERS`. `design-system/figma/variables-payload.json` is the one combined Figma variables payload for every tier, superseding `tokens/deep/figma-spec.json`; `architecture/token-tiers-name-map.md` is the full old-to-new name list.
+
+This ticket (#1756, PR1 of its sequence) is additive only, the same cycle this ADR's six `LEGACY_ALIASES` already used: every new-tier name is generated as `var(--old-name)` beside the untouched old declaration, so no caller moves and no pixel changes. Caller migration by area (components, then patterns/styles, then specs, then prototypes/src) is PR2+; deleting the old declarations and zeroing `check:old-size-tokens` is the final PR in the sequence, the same shape this ADR's own "rest of the old names are a ratchet, not a guess" section already describes.

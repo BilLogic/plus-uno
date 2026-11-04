@@ -6,9 +6,13 @@
  * WHAT IT WRITES. `design-system/src/tokens/deep/`: `_roles.scss` (container
  * and element role tokens, keyed to density), `_motion.scss` (duration and
  * easing roles, reduced-motion handled once), `_legacy-size-aliases.scss`
- * (the old names the role tokens make redundant, for one cycle) and
- * `figma-spec.json` (the Figma variables payload — written, never pushed;
- * pushing it is a separate, one-writer-queue step, out of scope here).
+ * (the old names the role tokens make redundant, for one cycle), and the
+ * four-tier ladder (#1756) — `_semantics.scss`, `_patterns.scss`,
+ * `_components.scss`, `_layers.scss` — generated from `TOKEN_LADDER` in
+ * `scripts/lib/tokens/plan.mjs`. `design-system/figma/variables-payload.json`
+ * is the combined Figma variables payload for all of the above — written,
+ * never pushed; pushing it is a separate, one-writer-queue step, out of scope
+ * here.
  *
  * Primitives (`--space-*`, `--radius-*`) are NOT written here: they already
  * exist, already on PLUS ×16 numbering, and nothing reads this generator for
