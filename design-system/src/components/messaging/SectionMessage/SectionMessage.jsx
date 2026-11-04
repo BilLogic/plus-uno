@@ -120,7 +120,7 @@ const SectionMessage = ({
             {dismissible && (
                 <div className="plus-section-message-dismiss">
                     {strut}
-                    <CloseButton label="Dismiss" onClick={handleClose} />
+                    <CloseButton label="Dismiss message" onClick={handleClose} />
                 </div>
             )}
         </div>

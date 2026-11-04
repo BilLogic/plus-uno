@@ -100,13 +100,13 @@ describe('Flag actions and dismiss', () => {
     it('labels the dismiss control "Dismiss" and calls onDismiss', () => {
         const onDismiss = vi.fn();
         render(<Flag title="T" autohide={false} onDismiss={onDismiss} />);
-        fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+        fireEvent.click(screen.getByRole('button', { name: 'Dismiss flag' }));
         expect(onDismiss).toHaveBeenCalledTimes(1);
     });
 
     it('has no dismiss control when dismissible is false', () => {
         render(<Flag title="T" autohide={false} dismissible={false} />);
-        expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Dismiss flag' })).not.toBeInTheDocument();
     });
 });
 

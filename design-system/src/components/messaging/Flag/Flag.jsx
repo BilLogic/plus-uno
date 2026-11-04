@@ -131,7 +131,7 @@ export const Flag = ({
             </div>
             {/* The shared CloseButton, default tone on the flag's surface, or
                 inverse on a bold one. A message is dismissed, not closed. */}
-            {dismissible && <CloseButton label="Dismiss" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
+            {dismissible && <CloseButton label="Dismiss flag" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
         </div>
     );
 };

@@ -66,11 +66,11 @@ announced at all, so anything rendered on mount has to read correctly as plain
 content too.
 
 Every close control in the group has a hard-coded label: `Close alert` on
-`Alert`, `Dismiss` on `Flag`, `Close modal` on `Modal`. None of them can be
+`Alert`, `Dismiss flag` on `Flag`, `Close modal` on `Modal`. None of them can be
 renamed, so several dismissible messages on one screen expose several
 identically named buttons. `CloseButton`, the shared 24×24 dismiss control that
 `Alert` and `Flag` use, takes `what` for a "Dismiss {what}" name; `Alert` passes
-its established label instead, and `Flag` is named "Dismiss".
+its established label instead, and `Flag` is named "Dismiss flag".
 
 ## Related
 

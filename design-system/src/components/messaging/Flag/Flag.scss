@@ -76,7 +76,7 @@
     // colors, so on the flag the glyph and its steps take the flag's own
     // partners and flip with the surface in every mode; the ring is its own.
     // Remove this override when CloseButton moves to the new color tokens.
-    .plus-close-btn {
+    .plus-close-btn:not(.plus-close-btn--inverse) {
         flex-shrink: 0;
         color: var(--ds-icon-subtle);
 
@@ -102,7 +102,7 @@
         border: 0;
         background: none;
         font: var(--body-default);
-        font-weight: 600;
+        font-weight: var(--type-weight-medium);
         color: var(--ds-text);
         text-decoration: underline;
         cursor: pointer;
@@ -185,6 +185,15 @@
 
         .plus-flag-icon {
             @include icon-glyph {
+                // @contrast: non-text
+                color: var(--ds-icon-warning-inverse);
+            }
+        }
+
+        .plus-close-btn.plus-close-btn--inverse {
+            color: var(--ds-text-warning-inverse);
+
+            .fa-solid {
                 // @contrast: non-text
                 color: var(--ds-icon-warning-inverse);
             }

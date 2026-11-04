@@ -12,7 +12,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: 'The flag takes `appearance` (normal, information, warning, error, success), optional `actions` and `bold` in place of the Bootstrap `style`; `onClose` is `onDismiss`, the dismiss button is named "Dismiss", and `FlagContainer` is `FlagGroup`.' },
+            { date: '2026-11-04', kind: 'changed', summary: 'The flag takes `appearance` (normal, information, warning, error, success), optional `actions` and `bold` in place of the Bootstrap `style`; `onClose` is `onDismiss`, the dismiss button is named "Dismiss flag", and `FlagContainer` is `FlagGroup`.' },
             { date: '2026-10-25', kind: 'changed', summary: 'The flag moved to the new color tokens: the overlay surface and shadow, whose 1px ring replaces the border, with the role icon colors (information is blue) and color.text and color.text.subtle for the words.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The flag became the Popover family\'s Flag: one surface 400 wide, padded 16, with the appearance shown in a 16 icon, the title in heading.xsmall and the × in CloseButton\'s default tone. Success and information close after 8 seconds; warning and error stay. `FlagGroup` sits bottom-left by default, fixed 8 from the screen edge, with flags 16 apart.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton in its inverse tone on every header color: a fixed 24×24 box with a 16px × and a visible focus ring.' },
@@ -219,7 +219,7 @@ Dismiss.play = async ({ canvasElement }) => {
 
     for (const style of FLAG_STYLE_LIST) {
         const flag = canvas.getByTestId(`dismiss-${style}`);
-        const button = within(flag).getByRole('button', { name: 'Dismiss' });
+        const button = within(flag).getByRole('button', { name: 'Dismiss flag' });
         const ground = getComputedStyle(flag).backgroundColor;
 
         // The × closes the row, one inline-lg gap after the content.
@@ -241,7 +241,7 @@ Dismiss.play = async ({ canvasElement }) => {
 
     // Dismissal: the button, found by its name, calls onDismiss.
     const warning = canvas.getByTestId('dismiss-warning');
-    await userEvent.click(within(warning).getByRole('button', { name: 'Dismiss' }));
+    await userEvent.click(within(warning).getByRole('button', { name: 'Dismiss flag' }));
     await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
     await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
 };
