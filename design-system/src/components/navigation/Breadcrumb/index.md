@@ -32,6 +32,6 @@ From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Overr
 
 ## Related
 
-Same group: `Link` · `MenuGroup` · `NavTabs` · `Pagination` · `Sidebar` · `SidebarTab`
+Same group: `Link` · `MenuGroup` · `NavTabs` · `Pagination` · `Sidebar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

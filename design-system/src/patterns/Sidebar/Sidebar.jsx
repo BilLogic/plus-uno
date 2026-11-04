@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { CountTag, SidebarTab, Button, IconButton } from '@/components';
+import { CountTag, Button, IconButton } from '@/components';
+import SidebarTab from './SidebarTab';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
 import './Sidebar.scss';
 

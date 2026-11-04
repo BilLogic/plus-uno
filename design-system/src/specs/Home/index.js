@@ -80,7 +80,7 @@ const createButton = ({ btnText = 'Button', icon } = {}) => {
 export function createHome() {
     // --- Configuration ---
 
-    // TopBar Config (formerly Navbar)
+    // TopBar Config
     const topBarConfig = {
         brand: {
             name: 'PLUS',

@@ -25,7 +25,6 @@
     "component:NavTabs design-system/src/specs/Home/Sections/HomepageJumbotron/HomepageJumbotron.jsx": 2,
     "component:NavTabs design-system/src/storybook-docs/web-app-source-snippets.js": 1,
     "component:NavTabs prototypes/in-session-ux/StudentInsightsModal.jsx": 2,
-    "component:Navbar design-system/src/components/_internal/layout/DashboardLayout.jsx": 2,
     "component:Toast design-system/src/components/messaging/Flag/Flag.jsx": 1,
     "component:Toast design-system/src/specs/Training/Lessons/Elements/Toast/Toast.stories.jsx": 3,
     "component:ToastContainer design-system/src/components/messaging/Flag/Flag.jsx": 1,

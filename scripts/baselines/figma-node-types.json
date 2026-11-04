@@ -1,4 +1,4 @@
 {
   "why": "The floor under design-system/figma/node-types.json's recorded node count. It may rise as `npm run audit:figma-registry` records more mappings, and never falls except by a hand edit that explains the deletion. Re-measure and raise it with `npm run check:figma-node-types -- --update`. Lowered from 85 to 68: Card, Divider, Collapse, Jumbotron, List group, Media object, Scrollspy, Nav pills and Navbar were retired out of Storybook and their 17 node mappings deleted.",
-  "minRecorded": 68
+  "minRecorded": 75
 }

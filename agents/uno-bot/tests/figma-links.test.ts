@@ -348,8 +348,9 @@ describe("only registry components", () => {
     // 77: Spotlight is a new component with its own figmaMeta (+1).
     // 68: Card, Divider, Collapse, Jumbotron, List group, Media object,
     // Scrollspy, Nav pills and Navbar were retired and their registry rows
-    // went with them (-9 net).
-    assert.equal(names.length, 68);
+    // went with them (-9 net). 67: SidebarTab folded into patterns/Sidebar
+    // as a pattern-internal part, and its registry row went with it (-1 net).
+    assert.equal(names.length, 67);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
