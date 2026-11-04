@@ -105,8 +105,8 @@ const DonutChartSVG = ({
                 {percentage > 0 && (
                     <path 
                         d={completedPath} 
-                        fill="var(--ds-chart-yellow-bold)" 
-                        opacity="0.8"
+                        fill="var(--ds-chart-yellow-bold)"
+                        opacity="var(--ds-opacity-disabled)"
                     />
                 )}
             </svg>
