@@ -228,12 +228,12 @@ TwoGridsWithoutIds.play = async ({ canvasElement }) => {
     const radios = canvas.getAllByRole('radio', { name: 'Row 1 Column 1' });
     await expect(radios).toHaveLength(2);
     await expect(radios[0].id).not.toBe(radios[1].id);
-    await expect(radios[0].name).not.toBe(radios[1].name);
+    await expect(radios[0].nextElementSibling.name).not.toBe(radios[1].nextElementSibling.name);
 
     await userEvent.click(radios[0]);
     await userEvent.click(radios[1]);
-    await expect(radios[0].checked).toBe(true);
-    await expect(radios[1].checked).toBe(true);
+    await expect(radios[0].nextElementSibling.checked).toBe(true);
+    await expect(radios[1].nextElementSibling.checked).toBe(true);
 };
 
 /** Read-only: the answers show, and clicking a cell does not change them. */
@@ -257,7 +257,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     const cell = canvas.getByRole('checkbox', { name: 'Row 1 Column 2' });
     await expect(cell.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(cell);
-    await expect(cell.checked).toBe(false);
+    await expect(cell.nextElementSibling.checked).toBe(false);
 };
 
 export const Interactive = (args) => {
@@ -302,4 +302,44 @@ Interactive.args = {
     rowCount: singleRow.length,
     columnCount: columns.length,
     isDisabled: false,
+};
+
+/** A radio row shares one real Base UI group, so the arrow keys roam the whole row, same as the native `name`-grouped inputs it replaces. */
+export const Keyboard = () => {
+    const [radioValues, setRadioValues] = useState({ 'row-1': 'col-1' });
+
+    return (
+        <div style={{ maxWidth: '800px' }}>
+            <ChoiceGrid
+                id="choice-grid-keyboard"
+                name="choice-grid-keyboard"
+                type="radio"
+                rows={singleRow}
+                columns={overviewColumns}
+                values={radioValues}
+                onChange={(rowId, columnId) => {
+                    setRadioValues({ ...radioValues, [rowId]: columnId });
+                }}
+            />
+        </div>
+    );
+};
+Keyboard.parameters = { docs: { disable: true } };
+Keyboard.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const radios = canvas.getAllByRole('radio');
+
+    radios[0].focus();
+    await expect(radios[0]).toHaveFocus();
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(radios[1]).toHaveFocus();
+    await expect(radios[1]).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(radios[2]).toHaveFocus();
+    await expect(radios[2]).toHaveAttribute('aria-checked', 'true');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    await expect(radios[1]).toHaveFocus();
 };

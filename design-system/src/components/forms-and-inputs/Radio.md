@@ -3,7 +3,7 @@
 
 # Radio
 
-Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
+Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and the description caption. Base UI's Radio has no standalone `checked` prop — selection lives on a `RadioGroup` ancestor. `RadioGroup` renders one real, shared Base UI `RadioGroup` around all of its options and passes each one `grouped`, so the group gets Base UI's native roving-tabindex keyboard nav across options for free, same as `ChoiceGrid`'s radio-type rows. A `Radio` used on its own (no `grouped`, the default) — a lone question, a `ChoiceGrid` cell, or sibling Radios sharing a bare `name` the way the "Group" story composes them — owns a private, single-item group instead, so it stays independently controllable exactly like the native input it replaces. That private group keeps its own `role="radiogroup"` (axe rejects `aria-readonly`/ `aria-required` on a role-less `div`) but drops the `aria-labelledby` it would otherwise inherit from an ambient Fieldset legend it has no business naming itself after.
 
 **Import:** `import { Radio } from '@/components';`
 
@@ -29,6 +29,7 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
 | `isRequired` | bool | `false` | Require an answer natively |
 | `description` | node | — | — |
 | `appearance` | enum | `'plain'` | — |
+| `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
@@ -45,7 +46,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-opacity-disabled` · `--ds-text` · `--item-height-sm` · `--layout-control-radio` · `--size-element-gap-sm` · `--size-element-radius-full`
+`--body-default` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-surface` · `--ds-text` · `--element-pad-default` · `--item-height-sm` · `--layout-control-radio` · `--plus-choice-indent` · `--radius-025` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stroke-1` · `--stroke-2` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Radio.scss`. Override these through the token layer, never with a literal.
 

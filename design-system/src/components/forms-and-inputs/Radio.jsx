@@ -1,13 +1,32 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form } from 'react-bootstrap';
+import { Radio as BaseRadio } from '@base-ui/react/radio';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import useFieldId from './useFieldId';
-import { choiceInputProps, choiceClasses, ChoiceDescription } from './choiceItem';
+import { choiceClasses } from './choiceItem';
+import FieldFrame, { FieldLabel, FieldCaption, toneProps, fieldDescription } from './_internal/FieldFrame';
 import './Radio.scss';
 
 /**
  * Radio — single option within a named radio group.
  * Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage.
+ *
+ * Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and
+ * the description caption. Base UI's Radio has no standalone `checked`
+ * prop — selection lives on a `RadioGroup` ancestor.
+ *
+ * `RadioGroup` renders one real, shared Base UI `RadioGroup` around all of
+ * its options and passes each one `grouped`, so the group gets Base UI's
+ * native roving-tabindex keyboard nav across options for free, same as
+ * `ChoiceGrid`'s radio-type rows. A `Radio` used on its own (no `grouped`,
+ * the default) — a lone question, a `ChoiceGrid` cell, or sibling Radios
+ * sharing a bare `name` the way the "Group" story composes them — owns a
+ * private, single-item group instead, so it stays independently
+ * controllable exactly like the native input it replaces. That private
+ * group keeps its own `role="radiogroup"` (axe rejects `aria-readonly`/
+ * `aria-required` on a role-less `div`) but drops the `aria-labelledby` it
+ * would otherwise inherit from an ambient Fieldset legend it has no
+ * business naming itself after.
  */
 const Radio = ({
     id,
@@ -30,6 +49,8 @@ const Radio = ({
     description,
     /** `card` draws the option as a bordered tile. */
     appearance = 'plain',
+    /** Set by `RadioGroup`: renders bare inside its ambient Base UI RadioGroup instead of a private one. Not for direct use. */
+    grouped = false,
     onChange,
     onFocus,
     onBlur,
@@ -39,62 +60,70 @@ const Radio = ({
     testId,
     ...props
 }) => {
-    const isControlled = isChecked !== undefined;
-    /**
-     * One id for this option's input and the `for` `Form.Check` puts on its
-     * label (#222).
-     *
-     * The line here used to be `id={id || name}`, the defect #206 fixed on
-     * eight other components — `name` is a form key, not an id, and nothing on
-     * the page carries it as one. It is worse on a radio: radios in a group
-     * share a `name` by definition, so a group written without explicit ids
-     * gave *every* option the same id and every label resolved to whichever
-     * one the browser reached first.
-     *
-     * `Radio` is one option, not the group, so the id can come straight from
-     * `useFieldId` — `useId` runs per instance and each option in the group
-     * gets its own value. Components that render the whole group derive one
-     * base and suffix it per option instead; see `optionIdBase` in
-     * `RadioGroup`.
-     *
-     * A caller who passes `id` gets exactly that id back.
-     */
     const fieldId = useFieldId(id);
+    const isControlled = isChecked !== undefined;
+    const tone = isInvalid ? 'invalid' : undefined;
+    const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
-    const { descriptionId, inputProps } = choiceInputProps({
-        fieldId, description, readOnly: isReadOnly, onChange, onClick, describedBy,
+    const { messageId, describedBy: computedDescribedBy } = fieldDescription({
+        fieldId, message: description, describedBy,
     });
+
+    const handleValueChange = () => {
+        onChange?.({ target: { name, value, checked: true } });
+    };
 
     const wrapperClasses = [
         'plus-form-radio-wrapper',
-        isDisabled ? 'plus-form-radio-disabled' : '',
+        isRequired ? 'plus-form-radio-required' : '',
         isInvalid ? 'plus-form-radio-invalid' : '',
-        choiceClasses({ appearance, readOnly: isReadOnly, description }),
-        className
+        choiceClasses({ appearance, readOnly: isReadOnly }),
+        className,
     ].filter(Boolean).join(' ');
 
+    const groupValueProps = isControlled
+        ? { value: isChecked ? value : undefined }
+        : { defaultValue: defaultChecked ? value : undefined };
+
+    const radioControl = (
+        <BaseRadio.Root
+            id={fieldId}
+            value={value}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            onClick={onClick}
+            className="plus-form-radio"
+            aria-describedby={computedDescribedBy}
+            data-testid={testId}
+            {...control}
+            {...inputRest}
+        >
+            <BaseRadio.Indicator keepMounted className="plus-form-radio-indicator" />
+        </BaseRadio.Root>
+    );
+
     return (
-        <div className={wrapperClasses} style={style}>
-            <Form.Check
-                type="radio"
-                id={fieldId}
-                name={name}
-                value={value}
-                checked={isControlled ? isChecked : undefined}
-                defaultChecked={!isControlled ? defaultChecked : undefined}
-                disabled={isDisabled}
-                required={isRequired || undefined}
-                aria-invalid={isInvalid || undefined}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                label={label}
-                className="plus-form-radio"
-                {...inputRest}
-                {...inputProps}
-                data-testid={testId}
-            />
-            <ChoiceDescription id={descriptionId}>{description}</ChoiceDescription>
-        </div>
+        <FieldFrame disabled={isDisabled} invalid={isInvalid} className={wrapperClasses} style={style}>
+            <div className="plus-form-radio-row">
+                {grouped ? radioControl : (
+                    <BaseRadioGroup
+                        name={name}
+                        disabled={isDisabled}
+                        readOnly={isReadOnly}
+                        required={isRequired}
+                        onValueChange={handleValueChange}
+                        aria-labelledby={undefined}
+                        {...groupValueProps}
+                    >
+                        {radioControl}
+                    </BaseRadioGroup>
+                )}
+                <FieldLabel htmlFor={fieldId} required={isRequired} name={name} className="plus-form-radio-label">
+                    {label}
+                </FieldLabel>
+            </div>
+            <FieldCaption messageId={messageId} message={description} tone={tone ?? 'help'} />
+        </FieldFrame>
     );
 };
 
@@ -111,6 +140,8 @@ Radio.propTypes = {
     isRequired: PropTypes.bool,
     description: PropTypes.node,
     appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Set by `RadioGroup`. Not for direct use. */
+    grouped: PropTypes.bool,
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     onBlur: PropTypes.func,
@@ -122,6 +153,3 @@ Radio.propTypes = {
 };
 
 export default Radio;
-
-
-

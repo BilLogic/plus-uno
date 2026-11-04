@@ -249,7 +249,7 @@ test("CloseButton's exported inverse grounds match the @grounds on its inverse t
     path.dirname(fileURLToPath(import.meta.url)),
     '../../design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss',
   );
-  const tokens = groundsOfSelector(fs.readFileSync(scss, 'utf8'), '.plus-close-btn.plus-close-btn--inverse.btn');
+  const tokens = groundsOfSelector(fs.readFileSync(scss, 'utf8'), '.plus-close-btn.plus-close-btn--inverse');
   assert.deepEqual(tokens, INVERSE_GROUNDS);
   assert.ok(INVERSE_GROUNDS.includes('--color-warning'));
 });

@@ -98,13 +98,13 @@
     white-space: nowrap;
 
     // A button in a slot is 32 in the 40 field and 24 in the 32 field.
-    .plus-btn.btn {
+    .plus-btn {
         height: var(--item-height-md);
     }
 
     // Steppers and icon-only buttons are square.
-    .plus-btn.btn.plus-field-stepper,
-    .plus-btn.btn.plus-btn--icon-only {
+    .plus-btn.plus-field-stepper,
+    .plus-btn.plus-btn--icon-only {
         width: var(--item-height-md);
         padding: 0;
     }
@@ -112,12 +112,12 @@
 
 .plus-field--compact .plus-field__leading,
 .plus-field--compact .plus-field__trailing {
-    .plus-btn.btn {
+    .plus-btn {
         height: var(--item-height-sm);
     }
 
-    .plus-btn.btn.plus-field-stepper,
-    .plus-btn.btn.plus-btn--icon-only {
+    .plus-btn.plus-field-stepper,
+    .plus-btn.plus-btn--icon-only {
         width: var(--item-height-sm);
     }
 }

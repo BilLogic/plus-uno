@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 66,
-    "uses": 219,
+    "names": 65,
+    "uses": 215,
     "bare": 5
   },
   "tokens": {
@@ -270,10 +270,6 @@
     },
     "--table-row-radius": {
       "uses": 5,
-      "bare": 0
-    },
-    "--value-percent": {
-      "uses": 4,
       "bare": 0
     }
   }

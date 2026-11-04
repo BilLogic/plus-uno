@@ -9,7 +9,7 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive, Keyboard
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGrid.mdx`
 

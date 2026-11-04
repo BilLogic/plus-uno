@@ -13,6 +13,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     parameters: {
         changelog: [
+            { date: '2026-11-03', kind: 'changed', summary: 'Moves onto Base UI Checkbox, through FieldFrame for the label and description. Keyboard, ARIA and visuals are unchanged; props are unchanged.' },
             { date: '2026-11-03', kind: 'changed', summary: 'Props follow Atlassian: `isChecked`, `isIndeterminate`, `isInvalid`, `isDisabled`, `isRequired`. One size, a 24 row with a 14/20 label. `isInvalid` marks the unselected box only.' },
             { date: '2026-10-25', kind: 'changed', summary: 'Colors move to the new tokens: the input fill and border at rest, a Lagoon checked fill (`background.selected.bold`) that steps to its opaque hovered step on hover, the disabled fill, edge and mark, and the focus ring in `border.focused`.' },
         ],
@@ -152,11 +153,11 @@ export const SelectAll = () => {
 SelectAll.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const all = canvas.getByRole('checkbox', { name: 'All days' });
-    await expect(all.indeterminate).toBe(true);
+    await expect(all.getAttribute('aria-checked')).toBe('mixed');
     await userEvent.click(canvas.getByRole('checkbox', { name: 'tue' }));
     await userEvent.click(canvas.getByRole('checkbox', { name: 'wed' }));
-    await waitFor(() => expect(all.indeterminate).toBe(false));
-    await expect(all.checked).toBe(true);
+    await waitFor(() => expect(all.getAttribute('aria-checked')).not.toBe('mixed'));
+    await expect(all.getAttribute('aria-checked')).toBe('true');
 };
 
 /** Checkbox group: Checkboxes inside a Fieldset with a legend, picking any number. */
@@ -238,14 +239,14 @@ ReadOnly.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const on = canvas.getByRole('checkbox', { name: 'Background check complete' });
     await expect(on.getAttribute('aria-readonly')).toBe('true');
-    await expect(on.disabled).toBe(false);
+    await expect(on.getAttribute('aria-disabled')).not.toBe('true');
     await userEvent.click(on);
-    await expect(on.checked).toBe(true);
+    await expect(on.getAttribute('aria-checked')).toBe('true');
 
     const off = canvas.getByRole('checkbox', { name: 'Training complete' });
     off.focus();
     await userEvent.keyboard(' ');
-    await expect(off.checked).toBe(false);
+    await expect(off.getAttribute('aria-checked')).toBe('false');
 };
 
 /** A description under the label, and the card appearance. */
@@ -279,6 +280,22 @@ KeyboardFocus.play = async ({ canvasElement }) => {
     });
 };
 
+/** Keyboard: Space toggles the box; Enter does not (it would submit a form instead). */
+export const Keyboard = () => <Checkbox id="checkbox-keyboard" label="Receive updates" />;
+Keyboard.parameters = { docs: { disable: true } };
+Keyboard.play = async ({ canvasElement }) => {
+    const box = within(canvasElement).getByRole('checkbox', { name: 'Receive updates' });
+    await expect(box.getAttribute('role')).toBe('checkbox');
+    await expect(box.getAttribute('aria-checked')).toBe('false');
+    box.focus();
+    await userEvent.keyboard(' ');
+    await expect(box.getAttribute('aria-checked')).toBe('true');
+    await userEvent.keyboard('{Enter}');
+    await expect(box.getAttribute('aria-checked'), 'Enter does not toggle a checkbox').toBe('true');
+    await userEvent.keyboard(' ');
+    await expect(box.getAttribute('aria-checked')).toBe('false');
+};
+
 /**
  * Hover on a checked box keeps its check and steps its Lagoon fill and edge to
  * the opaque hovered step; an unchecked box takes the input's hovered fill and
@@ -297,20 +314,21 @@ HoverStep.play = async ({ canvasElement }) => {
     const box = canvas.getByRole('checkbox', { name: 'Checked' });
     const off = canvas.getByRole('checkbox', { name: 'Unchecked' });
     const disabled = canvas.getByRole('checkbox', { name: 'Disabled' });
-    const check = () => getComputedStyle(box, '::before');
-    const resting = { transform: check().transform };
+    const mark = (el) => el.querySelector('.plus-form-checkbox-indicator');
+    const resting = { transform: getComputedStyle(mark(box)).transform };
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         await expect(getComputedStyle(box).backgroundColor, `${mode}: checked fill`).toBe(token('--ds-background-selected-bold'));
         await expect(getComputedStyle(box).borderTopColor, `${mode}: checked edge`).toBe(token('--ds-border-selected'));
-        await expect(check().backgroundColor, `${mode}: the check`).toBe(token('--ds-icon-inverse'));
+        await expect(getComputedStyle(mark(box)).backgroundColor, `${mode}: the check`).toBe(token('--ds-icon-inverse'));
         await expect(getComputedStyle(off).backgroundColor, `${mode}: unchecked fill`).toBe(token('--ds-background-input'));
         await expect(getComputedStyle(off).borderTopColor, `${mode}: unchecked border`).toBe(token('--ds-border-input'));
         await expect(getComputedStyle(disabled).backgroundColor, `${mode}: disabled fill`).toBe(token('--ds-background-disabled'));
         await expect(getComputedStyle(disabled).borderTopColor, `${mode}: disabled edge`).toBe(token('--ds-border-disabled'));
-        await expect(getComputedStyle(disabled, '::before').backgroundColor, `${mode}: disabled check`).toBe(token('--ds-icon-disabled'));
+        await expect(getComputedStyle(mark(disabled)).backgroundColor, `${mode}: disabled check`).toBe(token('--ds-icon-disabled'));
         const hovered = withForcedPseudo(box, ':hover', () => {
             const { backgroundColor, borderTopColor } = getComputedStyle(box);
-            return { backgroundColor, borderTopColor, transform: check().transform, color: check().backgroundColor };
+            const markStyle = getComputedStyle(mark(box));
+            return { backgroundColor, borderTopColor, transform: markStyle.transform, color: markStyle.backgroundColor };
         });
         await expect(hovered.backgroundColor, `${mode}: the hovered step`).toBe(token('--ds-background-selected-bold-hovered'));
         await expect(hovered.borderTopColor, `${mode}: the hovered edge`).toBe(token('--ds-background-selected-bold-hovered'));

@@ -28,147 +28,103 @@
     }
 }
 
+.plus-form-range-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .plus-form-range-label {
-    margin-bottom: var(--size-element-gap-xs, 4px);
+    margin-bottom: var(--space-025, 4px);
     color: var(--ds-text);
     font: var(--body-default);
 }
 
-// `showLabel={false}` hides the label, it does not delete it (#213). Absolute
-// positioning takes it out of flow, so the slider sits where it did before.
-.plus-form-range-label-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-}
-
 .plus-form-range {
     width: 100%;
-    // The control is 32 (`--item-height-md`); the track draws inside it,
-    // centered, so the thumb has room and the hit area is the row.
+}
+
+// The control is 32 (`--item-height-md`); the track draws inside it,
+// centered, so the thumb has room and the hit area is the row.
+.plus-form-range-control {
+    display: flex;
+    align-items: center;
+    width: 100%;
     height: var(--item-height-md);
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    -webkit-appearance: none;
-    appearance: none;
+    cursor: pointer;
+    touch-action: none;
+
+    &[data-disabled] {
+        cursor: not-allowed;
+    }
+}
+
+// The full span, dimmed. The indicator fills the answered portion over it,
+// and the thumb (`position: absolute`, from Base UI) sits relative to this.
+.plus-form-range-track {
+    position: relative;
+    width: 100%;
+    height: var(--plus-range-track-height, 4px);
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-neutral);
+
+    [data-disabled] & {
+        background-color: var(--ds-background-disabled);
+    }
+}
+
+// The filled portion, from the start to the thumb. Base UI positions and
+// sizes this inline as the value changes.
+.plus-form-range-indicator {
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-selected-bold);
+
+    [data-disabled] & {
+        background-color: var(--ds-background-disabled);
+    }
+}
+
+// The thumb, 20 across by default (`size` scales dot and track together),
+// centered on the track.
+.plus-form-range-thumb {
+    width: var(--plus-range-dot-size, 20px);
+    height: var(--plus-range-dot-size, 20px);
+    border-radius: var(--radius-full, 9999px);
+    background-color: var(--ds-background-selected-bold);
+    box-shadow: var(--ds-shadow-raised);
     cursor: pointer;
 
-    // The track fills from the left to the thumb. `--value-percent` is set by
-    // the component as the value changes.
-    &::-webkit-slider-runnable-track {
-        width: 100%;
-        height: var(--plus-range-track-height, 4px);
-        background: linear-gradient(
-            to right,
-            var(--ds-background-selected-bold) 0%,
-            var(--ds-background-selected-bold) var(--value-percent, 0%),
-            var(--ds-background-neutral) var(--value-percent, 0%),
-            var(--ds-background-neutral) 100%
-        );
-        border-radius: var(--size-element-radius-full, 50%);
-        border: none;
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
+            disabled: (background-color: var(--ds-icon-disabled), box-shadow: none, cursor: not-allowed),
+        ),
+        $hovered-selector: '&:hover:not([data-disabled])',
+        $disabled-selector: '&[data-disabled]'
+    );
+
+    // Dragging reads the same as hover: the thumb is actively being held.
+    // Keyboard focus is the state mixin's own 2px ring on `border.focused`,
+    // added by the call above (`$ring: true`, its default) — the same ring
+    // Checkbox and Radio draw.
+    &[data-dragging] {
+        background-color: var(--ds-background-selected-bold-hovered);
     }
 
-    &::-moz-range-track {
-        width: 100%;
-        height: var(--plus-range-track-height, 4px);
-        background: linear-gradient(
-            to right,
-            var(--ds-background-selected-bold) 0%,
-            var(--ds-background-selected-bold) var(--value-percent, 0%),
-            var(--ds-background-neutral) var(--value-percent, 0%),
-            var(--ds-background-neutral) 100%
-        );
-        border-radius: var(--size-element-radius-full, 50%);
-        border: none;
-    }
-
-    // The thumb, 20 across by default (`size` scales dot and track together),
-    // centered on the track.
-    &::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        width: var(--plus-range-dot-size, 20px);
-        height: var(--plus-range-dot-size, 20px);
-        background: var(--ds-background-selected-bold);
-        border-radius: var(--size-element-radius-full, 50%);
-        border: none;
+    // The real, focusable, `role="slider"` element — Base UI's hidden native
+    // `input[type="range"]` — is the accessible and interactive control
+    // itself (unlike Checkbox and Radio, there is no separate span). Base UI
+    // sizes it inline at 100% of this small thumb box, so `!important`
+    // overrides that inline `width`/`height` to the full 32 control height
+    // instead: a bigger hit and focus target than the visible dot, the same
+    // row the native `<input type="range">` used to be before Base UI.
+    input[type="range"] {
+        width: var(--item-height-md) !important;
+        height: var(--item-height-md) !important;
+        top: 50%;
+        left: 50%;
+        margin: 0;
         cursor: pointer;
-        margin-top: calc((var(--plus-range-track-height, 4px) - var(--plus-range-dot-size, 20px)) / 2);
-        box-shadow: var(--ds-shadow-raised);
-        position: relative;
-        z-index: 2;
+        transform: translate(-50%, -50%);
     }
-
-    &::-moz-range-thumb {
-        width: var(--plus-range-dot-size, 20px);
-        height: var(--plus-range-dot-size, 20px);
-        background: var(--ds-background-selected-bold);
-        border-radius: var(--size-element-radius-full, 50%);
-        border: none;
-        cursor: pointer;
-        box-shadow: var(--ds-shadow-raised);
-        position: relative;
-        z-index: 2;
-    }
-
-    // Hovered and pressed read on the thumb, not on the track the mixin's
-    // selectors default to, so each state is its own call with the compound
-    // vendor-prefixed selector in place of the default. The declarations
-    // still flow through the one named-token map.
-    @include plus-state(
-        $states: (hovered: (background: var(--ds-background-selected-bold-hovered))),
-        $ring: false,
-        $hovered-selector: '&:hover:not(:disabled)::-webkit-slider-thumb, &:hover:not(:disabled)::-moz-range-thumb'
-    );
-
-    @include plus-state(
-        $states: (pressed: (background: var(--ds-background-selected-bold-pressed))),
-        $ring: false,
-        $pressed-selector: '&:active:not(:disabled)::-webkit-slider-thumb, &:active:not(:disabled)::-moz-range-thumb'
-    );
-
-    // Keyboard focus is the 2px ring on `border.focused`, 2px off the thumb.
-    // A pointer focus draws none.
-    &:focus {
-        @include plus-ring-reset;
-    }
-
-    &:focus-visible {
-        &::-webkit-slider-thumb {
-            @include plus-ring();
-        }
-
-        &::-moz-range-thumb {
-            @include plus-ring();
-        }
-    }
-
-    // Disabled takes the disabled fill on the whole slider, thumb included —
-    // the track and the thumb each read a different disabled role, so each is
-    // its own call.
-    @include plus-state(
-        $states: (disabled: (cursor: not-allowed)),
-        $ring: false,
-        $disabled-selector: '&:disabled'
-    );
-
-    @include plus-state(
-        $states: (disabled: (background: var(--ds-background-disabled))),
-        $ring: false,
-        $disabled-selector: '&:disabled::-webkit-slider-runnable-track, &:disabled::-moz-range-track'
-    );
-
-    @include plus-state(
-        $states: (disabled: (background: var(--ds-icon-disabled), box-shadow: none, cursor: not-allowed)),
-        $ring: false,
-        $disabled-selector: '&:disabled::-webkit-slider-thumb, &:disabled::-moz-range-thumb'
-    );
 }
