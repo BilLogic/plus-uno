@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-icon-inverse` · `--plus-spinner-size` · `--size-spinner-lg` · `--size-spinner-md` · `--size-spinner-sm`
+`--ds-icon-inverse` · `--plus-spinner-size` · `--spinner-size-lg` · `--spinner-size-md` · `--spinner-size-sm`
 
 From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these through the token layer, never with a literal.
 
