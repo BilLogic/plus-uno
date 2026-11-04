@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
+import HomeHero from '@/specs/Home/Sections/HomeHero';
 import DataVisualizationTrainingProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationTrainingProgress';
 import { MetricsCard, RecommendedLessons } from '@/specs/Home/Cards';
 import { IconButton } from '@/components';
@@ -100,7 +100,7 @@ const TutorHomePageSkillsOverviewDifferentLayout = ({
             <div className="plus-tutor-home-content-different-layout">
                 {/* Jumbotron Section */}
                 <div className="plus-tutor-home-jumbotron-section-different">
-                    <HomepageJumbotron
+                    <HomeHero
                         activeTab="sign-up"
                         tutorName={tutorName}
                         onSignUp={() => console.log('Sign up clicked')}

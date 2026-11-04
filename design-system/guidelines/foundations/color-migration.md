@@ -395,7 +395,7 @@ legacy with Button until Cynthia's Button refresh moves both.
 | `specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection.scss` | 2 | `--color-outline` · `--color-outline-variant` | take |
 | `specs/Admin/Tutor/Elements/AdminDateRangeFilter/AdminDateRangeFilter.stories.jsx` | 2 | `--color-outline-variant` · `--elevation-light-1` | take |
 | `specs/Admin/Tutor/Pages/TutorTrainingProgressPage/TutorTrainingProgressPage.scss` | 2 | `--color-primary-text` · `--color-secondary-text` | take |
-| `specs/Home/Sections/HomepageJumbotron/HomepageJumbotron.scss` | 2 | `--color-secondary-border` · `--color-secondary-text` | take |
+| `specs/Home/Sections/HomeHero/HomeHero.scss` | 2 | `--color-secondary-border` · `--color-secondary-text` | take |
 | `specs/Login/Elements/InstitutionForm/InstitutionForm.jsx` | 2 | `--color-primary` | take |
 | `specs/Login/Elements/LoginButtons/LoginButtons.jsx` | 2 | `--color-disabled-opacity` | take |
 | `specs/Login/Elements/shared/login-field.scss` | 2 | `--color-danger` · `--color-primary-text` | take |

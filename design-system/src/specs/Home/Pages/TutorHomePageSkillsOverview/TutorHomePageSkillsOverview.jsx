@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { PageLayout } from '@/specs/Universal/Pages';
-import HomepageJumbotron from '@/specs/Home/Sections/HomepageJumbotron';
+import HomeHero from '@/specs/Home/Sections/HomeHero';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
 import { MetricsCard, RecommendedLessons, BadgeCard } from '@/specs/Home/Cards';
 import { IconButton } from '@/components';
@@ -100,7 +100,7 @@ const TutorHomePageSkillsOverview = ({
             <div className="plus-tutor-home-content">
                 {/* Jumbotron and Badge Card - Aligned Horizontally */}
                 <div className="plus-tutor-home-jumbotron-section">
-                    <HomepageJumbotron
+                    <HomeHero
                         activeTab="sign-up"
                         tutorName={tutorName}
                         onSignUp={() => console.log('Sign up clicked')}
