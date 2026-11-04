@@ -1,18 +1,17 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
 import { Button } from '@/components'; // Assuming generic Button component exists
 
 const OnboardingModuleCard = ({ title, duration, state = 'default', stage = 'not started' }) => {
     return (
-        <Card className="flex-shrink-0" style={{ width: '280px' }}>
+        <div className="card flex-shrink-0" style={{ width: '280px' }}>
             <div className="h-100 bg-light" style={{ height: '140px' }}>
                 {/* Placeholder for Image */}
                 <div className="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
                     Image Placeholder
                 </div>
             </div>
-            <Card.Body className="d-flex flex-column gap-2">
-                <Card.Title className="h6 m-0 text-truncate">{title}</Card.Title>
+            <div className="card-body d-flex flex-column gap-2">
+                <h3 className="card-title h6 m-0 text-truncate">{title}</h3>
                 <div className="d-flex align-items-center gap-2 text-muted small">
                     <i className="far fa-clock"></i>
                     <span>{duration}</span>
@@ -24,8 +23,8 @@ const OnboardingModuleCard = ({ title, duration, state = 'default', stage = 'not
                         <Button appearance="primary" spacing="compact" text="Start" />
                     )}
                 </div>
-            </Card.Body>
-        </Card>
+            </div>
+        </div>
     );
 };
 

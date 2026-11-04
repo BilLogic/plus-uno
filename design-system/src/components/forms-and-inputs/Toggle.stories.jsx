@@ -96,6 +96,19 @@ export const States = () => (
     </div>
 );
 
+/** Loading: a change is being saved. A spinner shows, input is ignored and `aria-busy` is set. */
+export const Loading = () => (
+    <Toggle id="toggle-loading" label="Saving the setting" defaultChecked isLoading />
+);
+Loading.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const control = canvas.getByRole('switch', { name: 'Saving the setting' });
+    await expect(control.getAttribute('aria-busy')).toBe('true');
+    await expect(canvas.getByRole('status')).toBeTruthy();
+    await userEvent.click(control);
+    await expect(control.getAttribute('aria-checked')).toBe('true');
+};
+
 /** Short and long labels. */
 export const Content = () => (
     <div style={stack}>

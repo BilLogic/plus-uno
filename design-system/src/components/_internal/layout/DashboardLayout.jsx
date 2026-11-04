@@ -1,5 +1,4 @@
 import React from 'react';
-import { Container, Row, Col, Nav, Image } from 'react-bootstrap';
 import { Button } from '@/components/forms-and-inputs/Button';
 import { Topbar } from '@/patterns';
 
@@ -11,14 +10,14 @@ const DashboardLayout = ({ children }) => {
                 <div className="mb-4 px-2">
                     <h5 className="m-0 text-primary fw-bold">PLUS</h5>
                 </div>
-                <Nav className="flex-column gap-2">
-                    <Nav.Link href="#" active className="d-flex align-items-center gap-2">
+                <nav className="nav flex-column gap-2">
+                    <a href="#" className="nav-link active d-flex align-items-center gap-2" aria-current="page">
                         <i className="fas fa-home"></i> Home
-                    </Nav.Link>
-                    <Nav.Link href="#" className="d-flex align-items-center gap-2">
+                    </a>
+                    <a href="#" className="nav-link d-flex align-items-center gap-2">
                         <i className="fas fa-users"></i> Group Admin
-                    </Nav.Link>
-                </Nav>
+                    </a>
+                </nav>
             </div>
 
             {/* Main Content Area */}

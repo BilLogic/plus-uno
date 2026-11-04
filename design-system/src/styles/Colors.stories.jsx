@@ -2,7 +2,6 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Button, TextField } from '@/components';
 import { ModeCompare, Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
-import { Dropdown, Form, Modal } from 'react-bootstrap';
 import { expect } from 'storybook/test';
 import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
 import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
@@ -332,8 +331,8 @@ export const FocusIsARing = () => (
  *   - FromToolbar: the toolbar globals, through the real decorator, put the
  *     right three attributes on <html>, and `applyColorModes` resolves
  *     `data-bs-theme` from the OS under auto.
- *   - BootstrapBridge: react-bootstrap's Modal, Dropdown and form
- *     controls paint the `--ds-*` roles in light and dark, and every `*-rgb`
+ *   - BootstrapBridge: Bootstrap's modal, dropdown and form
+ *     markup paints the `--ds-*` roles in light and dark, and every `*-rgb`
  *     triplet the bridge writes is its role's color in all four modes.
  * Each restores the attributes and the emulation when it is done, so the a11y
  * check and later story files see the page as the toolbar left it.
@@ -606,7 +605,7 @@ FromToolbar.play = async () => {
 /* --------------------------------------------------------- bootstrap bridge */
 
 /**
- * react-bootstrap as Bootstrap ships it, with no PLUS styling: the generated
+ * Bootstrap's own markup, with no PLUS styling: the generated
  * bridge points Bootstrap's root `--bs-*` variables at the `--ds-*` roles, so
  * these follow the color and contrast modes from the toolbar.
  */
@@ -624,45 +623,52 @@ export const BootstrapBridge = () => (
         }}
     >
         <div className="modal position-static d-block" style={{ height: 'auto' }}>
-            <Modal.Dialog className="m-0">
-                <Modal.Header closeButton>
-                    <Modal.Title as="h2" className="fs-5">Modal</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>The dialog surface, body text and border.</Modal.Body>
-            </Modal.Dialog>
+            <div className="modal-dialog m-0">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h2 className="modal-title fs-5">Modal</h2>
+                    </div>
+                    <div className="modal-body">The dialog surface, body text and border.</div>
+                </div>
+            </div>
         </div>
-        <Dropdown.Menu show className="position-static">
-            <Dropdown.ItemText>Dropdown</Dropdown.ItemText>
-            <Dropdown.Item href="#">An item</Dropdown.Item>
-            {/* The `active` class without react-bootstrap's `active` prop, which adds an aria-selected a link may not carry. */}
-            <Dropdown.Item href="#" className="active" aria-current="true">The active item</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item href="#">Another item</Dropdown.Item>
-        </Dropdown.Menu>
-        <Form>
-            <Form.Group className="mb-3" controlId="bridge-text">
-                <Form.Label>Text input</Form.Label>
-                <Form.Control placeholder="Placeholder" />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="bridge-select">
-                <Form.Label>Select</Form.Label>
-                <Form.Select defaultValue="one">
+        <div className="dropdown-menu show position-static">
+            <span className="dropdown-item-text">Dropdown</span>
+            <a className="dropdown-item" href="#">An item</a>
+            <a className="dropdown-item active" href="#" aria-current="true">The active item</a>
+            <hr className="dropdown-divider" />
+            <a className="dropdown-item" href="#">Another item</a>
+        </div>
+        <form>
+            <div className="mb-3">
+                <label className="form-label" htmlFor="bridge-text">Text input</label>
+                <input className="form-control" id="bridge-text" placeholder="Placeholder" />
+            </div>
+            <div className="mb-3">
+                <label className="form-label" htmlFor="bridge-select">Select</label>
+                <select className="form-select" id="bridge-select" defaultValue="one">
                     <option value="one">One</option>
                     <option value="two">Two</option>
-                </Form.Select>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="bridge-invalid">
-                <Form.Label>Invalid input</Form.Label>
-                <Form.Control isInvalid defaultValue="Wrong" />
-                <Form.Control.Feedback type="invalid">The danger text role.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="bridge-disabled">
-                <Form.Label>Disabled input</Form.Label>
-                <Form.Control disabled defaultValue="Disabled" />
-            </Form.Group>
-            <Form.Check id="bridge-check" label="Checkbox" defaultChecked />
-            <Form.Check id="bridge-switch" type="switch" label="Switch" defaultChecked />
-        </Form>
+                </select>
+            </div>
+            <div className="mb-3">
+                <label className="form-label" htmlFor="bridge-invalid">Invalid input</label>
+                <input className="form-control is-invalid" id="bridge-invalid" defaultValue="Wrong" />
+                <div className="invalid-feedback">The danger text role.</div>
+            </div>
+            <div className="mb-3">
+                <label className="form-label" htmlFor="bridge-disabled">Disabled input</label>
+                <input className="form-control" id="bridge-disabled" disabled defaultValue="Disabled" />
+            </div>
+            <div className="form-check">
+                <input className="form-check-input" type="checkbox" id="bridge-check" defaultChecked />
+                <label className="form-check-label" htmlFor="bridge-check">Checkbox</label>
+            </div>
+            <div className="form-check form-switch">
+                <input className="form-check-input" type="checkbox" role="switch" id="bridge-switch" defaultChecked />
+                <label className="form-check-label" htmlFor="bridge-switch">Switch</label>
+            </div>
+        </form>
     </div>
 );
 

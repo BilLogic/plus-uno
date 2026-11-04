@@ -38,7 +38,7 @@ authored half (#166), counted rather than assumed.
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✕ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✕ | ✅ |
 | [TimePicker](TimePicker/index.md) | 14 | ✅ | ✕ | ✅ |
-| [Toggle](Toggle.md) | 16 | ✅ | ✕ | ✅ |
+| [Toggle](Toggle.md) | 17 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✕ | ✅ |
 

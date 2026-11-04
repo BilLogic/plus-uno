@@ -1,5 +1,4 @@
 import React from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
 import { Button, Navigation } from '@/components';
 import { Topbar, PatternSection } from '@/patterns';
 
@@ -20,28 +19,28 @@ const App = () => {
                     ]}
                 />
                 <main className="flex-grow-1" style={{ padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)' }}>
-                    <Container fluid>
-                        <Row className="mb-4">
-                            <Col>
+                    <div className="container-fluid">
+                        <div className="row mb-4">
+                            <div className="col">
                                 <PatternSection
                                     level="page"
                                     title="Welcome to PLUS Design System"
                                     description="This is the React implementation of the PLUS Design System."
                                     actions={<Button text="Get started" appearance="primary" />}
                                 />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col">
                                 <div className="p-4 bg-white rounded shadow-sm">
                                     <h4>Migration Complete</h4>
                                     <p>All core components have been migrated to React.</p>
                                     <Button appearance="primary" className="mr-2">View Storybook</Button>
                                     <Button>Documentation</Button>
                                 </div>
-                            </Col>
-                        </Row>
-                    </Container>
+                            </div>
+                        </div>
+                    </div>
                 </main>
             </div>
         </div>
