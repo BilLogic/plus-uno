@@ -103,8 +103,9 @@ KeyboardOff.play = async ({ canvasElement }) => {
  * pause control, which exists only for autoplay, is not drawn. The slides
  * still move on a press.
  */
+const realMatchMedia = window.matchMedia;
+
 const withReducedMotion = (Story) => {
-    const original = window.matchMedia;
     window.matchMedia = (query) => ({
         matches: query.includes('prefers-reduced-motion'),
         media: query,
@@ -113,7 +114,7 @@ const withReducedMotion = (Story) => {
         addListener: () => {},
         removeListener: () => {},
     });
-    React.useEffect(() => () => { window.matchMedia = original; }, [original]);
+    React.useEffect(() => () => { window.matchMedia = realMatchMedia; }, []);
     return <Story />;
 };
 
