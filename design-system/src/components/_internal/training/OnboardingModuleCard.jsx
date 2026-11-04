@@ -11,7 +11,7 @@ const OnboardingModuleCard = ({ title, duration, state = 'default', stage = 'not
                 </div>
             </div>
             <div className="card-body d-flex flex-column gap-2">
-                <h3 className="card-title h6 m-0 text-truncate">{title}</h3>
+                <div className="card-title h6 m-0 text-truncate">{title}</div>
                 <div className="d-flex align-items-center gap-2 text-muted small">
                     <i className="far fa-clock"></i>
                     <span>{duration}</span>

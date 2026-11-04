@@ -29,7 +29,7 @@ const { Switch } = BaseUISwitch;
  * @param {boolean} [props.defaultChecked]
  * @param {16|20} [props.size=16] - Track height in pixels. 16 is the default for pages with many toggles; 20 calls attention to one setting.
  * @param {boolean} [props.isDisabled=false]
- * @param {boolean} [props.isLoading=false] - A change is being saved: a spinner shows beside the track, the toggle ignores input, and `aria-busy` is set. Keeps its place in the tab order.
+ * @param {boolean} [props.isLoading=false] - A change is being saved: a spinner shows beside the track, the toggle ignores changes, and `aria-busy` is set. Keeps its place in the tab order.
  * @param {boolean} [props.isReadOnly=false] - Shown, focusable and announced read-only; the state does not change
  * @param {(event: React.ChangeEvent) => void} [props.onChange]
  * @param {(event: React.FocusEvent) => void} [props.onFocus]
@@ -68,8 +68,7 @@ const Toggle = ({
         // track; a bare track (`aria-label` only) keeps its own height.
         label ? 'plus-toggle-row' : '',
         isDisabled ? 'plus-toggle-disabled' : '',
-        isLoading ? 'plus-toggle-loading' : '',
-        choiceClasses({ readOnly: isReadOnly || isLoading }),
+        choiceClasses({ readOnly: isReadOnly }),
         className,
     ].filter(Boolean).join(' ');
 
@@ -86,7 +85,9 @@ const Toggle = ({
                 checked={isControlled ? isChecked : undefined}
                 defaultChecked={!isControlled ? defaultChecked : undefined}
                 disabled={isDisabled}
+                // Loading blocks the change the way read-only does, without announcing the toggle as read-only.
                 readOnly={isReadOnly || isLoading}
+                aria-readonly={isReadOnly || undefined}
                 aria-busy={isLoading || undefined}
                 onCheckedChange={handleCheckedChange}
                 onFocus={onFocus}

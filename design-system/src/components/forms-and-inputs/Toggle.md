@@ -25,7 +25,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 | `defaultChecked` | bool | — | — |
 | `size` | enum | `16` | Track height in pixels |
 | `isDisabled` | bool | `false` | Disable the toggle |
-| `isLoading` | bool | `false` | — |
+| `isLoading` | bool | `false` | A change is being saved: shows a spinner and ignores input |
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |

@@ -41,6 +41,11 @@ export default {
             description: 'Disable the toggle',
             table: { category: 'Behavior' },
         },
+        isLoading: {
+            control: 'boolean',
+            description: 'A change is being saved: shows a spinner and ignores input',
+            table: { category: 'Behavior' },
+        },
         isReadOnly: {
             control: 'boolean',
             description: 'Shown and announced, not changeable',

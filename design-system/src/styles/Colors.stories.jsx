@@ -627,6 +627,7 @@ export const BootstrapBridge = () => (
                 <div className="modal-content">
                     <div className="modal-header">
                         <h2 className="modal-title fs-5">Modal</h2>
+                        <button type="button" className="btn-close" aria-label="Close" />
                     </div>
                     <div className="modal-body">The dialog surface, body text and border.</div>
                 </div>
