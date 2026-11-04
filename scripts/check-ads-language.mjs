@@ -16,7 +16,7 @@
  * `_Avoid_:` glossary lines are allowlisted: they record the old words on
  * purpose, as history or as what not to say. `tokens/_elevation.scss` and
  * `tokens/_color_roles.scss` are also allowlisted: they are the legacy
- * `--surface-*`/`--color-surface*` alias chain itself (#268's shadow-or-
+ * `--surface-*`/`--color-surface*` alias chain itself (the shadow-or-
  * lightness decision is still open), not a component using it.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
@@ -76,10 +76,10 @@ export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
 /**
  * Files that record the old words on purpose: history, decisions, or — for the
  * two legacy token files below — the alias chain that keeps `--surface-*` and
- * `--color-surface*`/`--color-on-surface*` resolvable while #268's shadow-or-
+ * `--color-surface*`/`--color-on-surface*` resolvable while the shadow-or-
  * lightness decision is still open (`_elevation.scss` "THE ROLE LAYER"). The
  * surface-to-zero sweep (#1755) moved every component off these names; their
- * own definitions are not a component, so they stay for as long as the shadow-or-lightness decision is open.
+ * own definitions are not a component, so they stay while that decision is open.
  */
 const ALLOWED_PATHS = [
   /^docs\/knowledge\/archive\//,
