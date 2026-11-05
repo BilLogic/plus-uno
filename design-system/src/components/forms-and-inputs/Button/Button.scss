@@ -4,7 +4,7 @@
 @use "../../../styles/state" as *;
 
 /*
- * Button styles. Six appearances (default, primary, subtle, warning, danger,
+ * Button styles. Seven appearances (default, primary, subtle, warning, danger,
  * discovery, ai), two spacings (default 32, compact 24), and the selected,
  * disabled and loading states, all on named `--ds-*` tokens. Each appearance
  * takes its hovered and pressed fills from the named tokens, laid straight on

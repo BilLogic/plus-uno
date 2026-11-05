@@ -75,8 +75,11 @@ export const Button = ({
 }) => {
     const disabled = isDisabled || isLoading;
     const iconOnly = !text && !children;
-    // The AI appearance always carries the sparkle, so it reads as AI before its label does.
-    const leadingIcon = appearance === 'ai' && !iconBefore ? <AiIcon name="generate" /> : iconBefore;
+    // The AI appearance always carries the sparkle and takes no other leading icon, so it reads as AI before its label does.
+    if (appearance === 'ai' && iconOnly && process.env.NODE_ENV !== 'production') {
+        console.warn('Button: the ai appearance needs a text label beside the sparkle.');
+    }
+    const leadingIcon = appearance === 'ai' ? <AiIcon name="generate" /> : iconBefore;
 
     const btnClasses = classNames(
         'plus-btn',

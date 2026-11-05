@@ -23,13 +23,13 @@ describe('Button', () => {
         },
     );
 
-    it('draws the sparkle before an AI label, and leaves a given icon alone', () => {
+    it('draws the sparkle before an AI label and ignores any other leading icon', () => {
         const { container, rerender } = render(<Button appearance="ai" text="Generate summary" />);
         expect(screen.getByRole('button', { name: 'Generate summary' })).toBeInTheDocument();
         expect(container.querySelector('.plus-btn-visual--before svg')).not.toBeNull();
         rerender(<Button appearance="ai" text="Ask" iconBefore="wand-magic-sparkles" />);
-        expect(container.querySelector('.plus-btn-visual--before i.fa-wand-magic-sparkles')).not.toBeNull();
-        expect(container.querySelector('.plus-btn-visual--before svg')).toBeNull();
+        expect(container.querySelector('.plus-btn-visual--before i')).toBeNull();
+        expect(container.querySelector('.plus-btn-visual--before svg')).not.toBeNull();
     });
 
     it('draws compact spacing', () => {
