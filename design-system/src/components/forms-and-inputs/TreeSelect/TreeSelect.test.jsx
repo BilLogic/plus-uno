@@ -116,4 +116,60 @@ describe('TreeSelect', () => {
         const tree = await open(user);
         expect(within(tree).getAllByRole('treeitem')[0]).toHaveClass('plus-option-row--compact');
     });
+
+    // ADR-037 exception: Base UI ships no tree, so TreeSelect keeps its own
+    // keyboard handler. These tests are what holds it.
+    describe('keyboard', () => {
+        const active = (trigger) => document.getElementById(trigger.getAttribute('aria-activedescendant'))
+            ?? document.activeElement;
+        const activeName = (trigger) => active(trigger)?.textContent;
+
+        it('opens on ArrowDown and walks the visible rows with Up, Down, Home and End', async () => {
+            const user = userEvent.setup();
+            render(<Harness initial="" />);
+            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            trigger.focus();
+            await user.keyboard('{ArrowDown}');
+            expect(screen.getByRole('tree')).toBeInTheDocument();
+            await user.keyboard('{ArrowDown}');
+            expect(activeName(trigger)).toBe('Science');
+            await user.keyboard('{Home}');
+            expect(activeName(trigger)).toBe('Mathematics');
+            await user.keyboard('{End}');
+            expect(activeName(trigger)).toBe('Science');
+            await user.keyboard('{ArrowUp}');
+            expect(activeName(trigger)).toBe('Mathematics');
+        });
+
+        it('ArrowRight opens a branch then steps in; ArrowLeft closes it then steps out', async () => {
+            const user = userEvent.setup();
+            render(<Harness initial="" />);
+            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            await user.click(trigger);
+            const branch = screen.getByRole('treeitem', { name: /Mathematics/ });
+            branch.focus();
+            await user.keyboard('{ArrowRight}');
+            expect(branch).toHaveAttribute('aria-expanded', 'true');
+            await user.keyboard('{ArrowRight}');
+            expect(activeName(trigger)).toBe('Algebra');
+            await user.keyboard('{ArrowLeft}');
+            expect(activeName(trigger)).toBe('Mathematics');
+            await user.keyboard('{ArrowLeft}');
+            expect(branch).toHaveAttribute('aria-expanded', 'false');
+        });
+
+        it('Enter picks the row, and Escape closes and returns focus to the field', async () => {
+            const user = userEvent.setup();
+            render(<Harness initial="" />);
+            const trigger = screen.getByRole('combobox', { name: 'Subject' });
+            await user.click(trigger);
+            screen.getByRole('treeitem', { name: /Science/ }).focus();
+            await user.keyboard('{Enter}');
+            expect(trigger).toHaveValue('Science');
+            await user.click(trigger);
+            await user.keyboard('{Escape}');
+            expect(screen.queryByRole('tree')).toBeNull();
+            expect(trigger).toHaveFocus();
+        });
+    });
 });

@@ -17,4 +17,13 @@ verified: 2026-11-03
 
 **What would reopen it.** Base UI dropping a part an existing component relies on, or a breaking major that costs more to follow than to replace; a component needing patches to Base UI's behavior (the sign the wrapper is the wrong shape); or a migration cost that outweighs the one-library benefit for components that are stable and rarely touched.
 
+## Amendment (2026-11-05): field-anchored listboxes keep their own keyboard
+
+Select, Cascader and TreeSelect keep a hand-written keyboard handler. Each is a documented exception, not a drift.
+
+- **Cascader and TreeSelect.** Base UI ships no tree and no multi-column listbox. Its `menu` submenus and a combobox per column would each drop the single focus-in-the-field model and the shared `Listbox` row anatomy, and would need patching, which is the reopen signal above. Each keeps its own handler (`handleTriggerKeyDown` plus `handleMenuKeyDown` / `handleTreeKeyDown`), held by a `keyboard` block in `Cascader.test.jsx` and `TreeSelect.test.jsx`: open, walk, expand and collapse, commit, Escape returning focus.
+- **Select.** The keyboard lives in the internal `Listbox` it shares with TagInput, which adds windowed rows with `aria-setsize`, a Create row, a Select all header, paged `loadOptions` and `commitOnClose` staging. Base UI Combobox expresses none of those, so a move is a rewrite of the shared `Listbox` and both consumers, not a swap inside Select. That is its own ticket; until it lands Select keeps `Listbox`'s handler, guarded by `MenuKeyboardNavigation.stories.jsx` and `SelectCommit.stories.jsx`.
+
+New field-anchored popups still start on Base UI; this amendment covers these three only.
+
 — Claude (agent), Nov 2026, on Bill's approval to make Base UI the default behavior layer
