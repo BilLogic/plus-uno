@@ -125,7 +125,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/iconography.md`](design-system/guidelines/foundations/iconography.md) | This design system uses FontAwesome Free icons via the string shorthand |
 | [`design-system/guidelines/foundations/illustrations.md`](design-system/guidelines/foundations/illustrations.md) | The PLUS characters, their sizes, and when an illustration earns its place |
 | [`design-system/guidelines/foundations/logos.md`](design-system/guidelines/foundations/logos.md) | The PLUS mark, its sizes, color options and clear space |
-| [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Duration, easing, patterns and reduced motion |
+| [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Motion tokens (three durations, three easings), patterns and reduced motion |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
 | [`design-system/guidelines/foundations/radius.md`](design-system/guidelines/foundations/radius.md) | Corner radius: height ÷ 4 for controls, 6 and 4 for buttons, and container tokens |
 | [`design-system/guidelines/foundations/spacing.md`](design-system/guidelines/foundations/spacing.md) | Spacing, size and radius tokens on the four-tier ladder — which tier to read, the fallback rule, and private wiring |
