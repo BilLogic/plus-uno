@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import AiIcon from '../../images-and-icons/AiIcon';
 import './Button.scss';
 
 /** A bare `#` or empty `href` names no real destination; Enter still needs one to fire a click on an anchor. */
 const isTrivialHref = (href) => !href || href.trim() === '#';
 
-export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'];
+export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'];
 export const BUTTON_SPACINGS = ['default', 'compact'];
 
 /** The icon slots and the label, in order. */
@@ -74,6 +75,11 @@ export const Button = ({
 }) => {
     const disabled = isDisabled || isLoading;
     const iconOnly = !text && !children;
+    // The AI appearance always carries the sparkle and takes no other leading icon, so it reads as AI before its label does.
+    if (appearance === 'ai' && iconOnly && process.env.NODE_ENV !== 'production') {
+        console.warn('Button: the ai appearance needs a text label beside the sparkle.');
+    }
+    const leadingIcon = appearance === 'ai' ? <AiIcon name="generate" /> : iconBefore;
 
     const btnClasses = classNames(
         'plus-btn',
@@ -136,7 +142,7 @@ export const Button = ({
             aria-busy={isLoading || undefined}
             aria-pressed={isSelected}
         >
-            <ButtonContent text={text} iconBefore={iconBefore} iconAfter={iconAfter}>
+            <ButtonContent text={text} iconBefore={leadingIcon} iconAfter={iconAfter}>
                 {children}
             </ButtonContent>
         </Tag>

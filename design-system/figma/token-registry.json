@@ -1074,6 +1074,9 @@
       "color/interaction/inverse/pressed": "var(--ds-interaction-inverse-pressed)",
       "color/border/focused/inverse": "var(--ds-border-focused-inverse)",
       "color/border/surface": "var(--ds-border-surface)",
+      "color/ai/background/bold/default": "var(--ds-ai-background-bold)",
+      "color/ai/background/bold/hovered": "var(--ds-ai-background-bold-hovered)",
+      "color/ai/background/bold/pressed": "var(--ds-ai-background-bold-pressed)",
       "color/background/smart/mastering-content/default": "var(--ds-background-smart-mastering-content)",
       "color/background/smart/mastering-content/hovered": "var(--ds-background-smart-mastering-content-hovered)",
       "color/background/smart/mastering-content/pressed": "var(--ds-background-smart-mastering-content-pressed)",
@@ -1137,11 +1140,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1470,
+    "scssTokenCount": 1473,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1016,
-      "resolved": 932,
+      "total": 1019,
+      "resolved": 935,
       "percent": 92,
       "unresolved": [
         {
