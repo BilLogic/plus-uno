@@ -205,13 +205,6 @@
           }
         },
         {
-          "name": "Grid/pad-left-container",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--grid-pad-left-container)"
-          }
-        },
-        {
           "name": "Screen/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -354,6 +347,27 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--page-pad-y-spacious)"
+          }
+        },
+        {
+          "name": "Panel/min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-min-width)"
+          }
+        },
+        {
+          "name": "Panel/width-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-width-default)"
+          }
+        },
+        {
+          "name": "Panel/max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-max-width)"
           }
         },
         {

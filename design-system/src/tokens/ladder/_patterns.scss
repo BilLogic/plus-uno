@@ -20,6 +20,11 @@
     --page-pad-y-default: var(--space-150);
     --page-pad-y-spacious: var(--space-200);
 
+    /* Panel */
+    --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */
+    --panel-width-default: var(--width-2500); /* the width a Panel opens at (400) */
+    --panel-max-width: var(--size-4000); /* the widest the splitter allows (640) */
+
     /* Section */
     --section-pad-x-compact: var(--space-100);
     --section-pad-x-default: var(--space-150);

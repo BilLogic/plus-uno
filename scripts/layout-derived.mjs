@@ -1,23 +1,25 @@
 /**
- * The derived rows of the Layout collection, computed from the frame rules in
- * the Layout Grid Lab rather than typed in.
+ * The derived rows of the Layout collection, computed from the Frame rules
+ * rather than typed in.
  *
  * Figma has no expressions, so `Layout/width-content`, `Layout/width-column`,
- * `Layout/width-column-screen`, `Layout/width-modal-*` and
- * `Layout/pad-left-container` are plain numbers per mode. They were filled by running this arithmetic at each mode's screen
+ * `Layout/width-column-screen` and `Layout/width-modal-*` are plain numbers
+ * per mode. They were filled by running this arithmetic at each mode's screen
  * width, and the token test checks the export against it, so a mode value that
  * drifts from the rules is caught instead of shipped.
  *
  * The rules, at a screen `width`:
- * - The surface container pads 8 on every side. The sidebar docks from 1024
- *   and is 240 from the screen edge; below 1024 it floats and the surface
- *   starts at the container pad.
- * - The surface pads 16 below 1440 and 24 from 1440.
- * - Content is the surface's inner width, capped at 1232 and never under 720.
+ * - The Frame has no seams: the Page runs to the window edges. The Sidebar
+ *   docks from 1024 and is 240 from the screen edge; below 1024 it is an
+ *   overlay and takes no room.
+ * - The Page pads 24 at every width.
+ * - Content is the Page's inner width, capped at 1232 and never under 720:
+ *   the width, less the docked Sidebar, less two Page pads.
  * - The grid is 12 columns with gutter 16.
- * - The screen side pad is the container pad plus the surface pad, so the
- *   SCREEN grid (the page grid with the sidebar closed) starts there. It is
- *   12 columns with gutter 16, centered, and capped at 1232 like content.
+ * - The screen grid (Modals and Drawers, the Page grid with the Sidebar
+ *   closed) has its own pad, 24 · 24 · 32, so it does not move when the Page
+ *   pad does. It is 12 columns with gutter 16, centered, and capped at 1232
+ *   like content.
  * - A modal spans 6 · 8 · 10 columns of the screen grid plus its own 16 pad
  *   on each side, rounded to a whole pixel.
  *
@@ -29,12 +31,12 @@
 /** The spacing / layout modes, by their Figma names, and the screen width each is worked at. */
 export const LAYOUT_MODES = { 'Medium (768px)': 768, 'Large (1024px)': 1024, 'X-Large (1440px)': 1440 };
 
-const CONTAINER_PAD = 8;
 const SIDEBAR = 240;
 const DOCK_FROM = 1024;
-const PAGE_PAD = 16;
-const WIDE_PAGE_PAD = 24;
-const WIDE_PAD_FROM = 1440;
+const PAGE_PAD = 24;
+const SCREEN_PAD = 24;
+const WIDE_SCREEN_PAD = 32;
+const WIDE_SCREEN_PAD_FROM = 1440;
 const MAX_CONTENT = 1232;
 const MIN_CONTENT = 720;
 const COLUMNS = 12;
@@ -49,23 +51,19 @@ const span = (n, col) => n * col + (n - 1) * GUTTER;
 /**
  * @param {number} width the screen width a mode stands for
  * @returns {{ 'width-screen': number, 'pad-x-screen': number,
- *   'pad-left-container': number, 'width-content': number,
- *   'width-column': number, 'width-column-screen': number,
- *   'width-modal-sm': number, 'width-modal-md': number,
- *   'width-modal-lg': number }}
+ *   'width-content': number, 'width-column': number,
+ *   'width-column-screen': number, 'width-modal-sm': number,
+ *   'width-modal-md': number, 'width-modal-lg': number }}
  */
 export function deriveLayout(width) {
   const docked = width >= DOCK_FROM;
-  const pagePad = width >= WIDE_PAD_FROM ? WIDE_PAGE_PAD : PAGE_PAD;
-  const pageX = docked ? SIDEBAR : CONTAINER_PAD;
-  const content = clamp(width - pageX - CONTAINER_PAD - 2 * pagePad);
-  const padXScreen = CONTAINER_PAD + pagePad;
+  const content = clamp(width - (docked ? SIDEBAR : 0) - 2 * PAGE_PAD);
+  const padXScreen = width >= WIDE_SCREEN_PAD_FROM ? WIDE_SCREEN_PAD : SCREEN_PAD;
   const screenColumn = column(clamp(width - 2 * padXScreen));
   const modal = (n) => Math.round(span(n, screenColumn) + 2 * MODAL_PAD);
   return {
     'width-screen': width,
     'pad-x-screen': padXScreen,
-    'pad-left-container': docked ? 0 : CONTAINER_PAD,
     'width-content': content,
     'width-column': column(content),
     'width-column-screen': screenColumn,

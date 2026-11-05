@@ -13,15 +13,12 @@
 
 :root {
     /* Page */
-    --page-pad: var(--space-100);
+    --page-pad: var(--space-150);
     --page-stack-sm: var(--space-100);
     --page-stack-md: var(--space-150);
     --page-stack-lg: var(--space-250);
-    --page-radius: var(--radius-100);
+    --page-radius: var(--radius-050);
 
-    /* Frame */
-    --frame-pad: var(--space-050);
-    --frame-stack: var(--space-050);
     /* Section */
     --section-stack-sm: var(--space-050);
     --section-stack-md: var(--space-100);
@@ -100,10 +97,4 @@
 
     /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
     --popover-offset: var(--space-025); /* gap from a popover to its trigger */
-}
-
-@media (min-width: 1440px) {
-    :root {
-        --page-pad: var(--space-150);
-    }
 }

@@ -88,37 +88,6 @@
       }
     },
     {
-      "id": "VariableID:19378:46211",
-      "name": "Sidebar/pad-left-container",
-      "variableCollectionId": "VariableCollectionId:19378:46207",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "GAP"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--layout-pad-left-container)"
-      },
-      "valuesByMode": {
-        "19378:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:203"
-        },
-        "19378:2": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:198"
-        },
-        "19378:3": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:198"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:1": 8,
-        "19378:2": 0,
-        "19378:3": 0
-      }
-    },
-    {
       "id": "VariableID:19378:46212",
       "name": "Grid/gutter",
       "variableCollectionId": "VariableCollectionId:19378:46207",
@@ -162,13 +131,13 @@
       },
       "valuesByMode": {
         "19378:1": 45.33333206176758,
-        "19378:2": 47.33333206176758,
-        "19378:3": 80.66666412353516
+        "19378:2": 46.66666793823242,
+        "19378:3": 81.33333587646484
       },
       "resolvedValuesByMode": {
         "19378:1": 45.33333206176758,
-        "19378:2": 47.33333206176758,
-        "19378:3": 80.66666412353516
+        "19378:2": 46.66666793823242,
+        "19378:3": 81.33333587646484
       }
     },
     {
@@ -277,13 +246,13 @@
       },
       "valuesByMode": {
         "19378:1": 720,
-        "19378:2": 744,
-        "19378:3": 1144
+        "19378:2": 736,
+        "19378:3": 1152
       },
       "resolvedValuesByMode": {
         "19378:1": 720,
-        "19378:2": 744,
-        "19378:3": 1144
+        "19378:2": 736,
+        "19378:3": 1152
       }
     },
     {
@@ -459,11 +428,11 @@
       "valuesByMode": {
         "19378:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:207"
+          "id": "VariableID:19364:209"
         },
         "19378:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:207"
+          "id": "VariableID:19364:209"
         },
         "19378:3": {
           "type": "VARIABLE_ALIAS",
@@ -471,8 +440,8 @@
         }
       },
       "resolvedValuesByMode": {
-        "19378:1": 16,
-        "19378:2": 16,
+        "19378:1": 24,
+        "19378:2": 24,
         "19378:3": 24
       }
     },
@@ -583,21 +552,21 @@
       "valuesByMode": {
         "19378:1": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:222"
+          "id": "VariableID:19364:218"
         },
         "19378:2": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:222"
+          "id": "VariableID:19364:218"
         },
         "19378:3": {
           "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:222"
+          "id": "VariableID:19364:218"
         }
       },
       "resolvedValuesByMode": {
-        "19378:1": 16,
-        "19378:2": 16,
-        "19378:3": 16
+        "19378:1": 8,
+        "19378:2": 8,
+        "19378:3": 8
       }
     },
     {

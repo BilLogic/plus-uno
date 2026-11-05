@@ -4,48 +4,6 @@
   },
   "variables": [
     {
-      "id": "VariableID:19378:46227",
-      "name": "Frame/pad",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "GAP"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--frame-pad)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:203"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 8
-      }
-    },
-    {
-      "id": "VariableID:19378:46228",
-      "name": "Frame/stack",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "GAP"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--frame-stack)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:203"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 8
-      }
-    },
-    {
       "id": "VariableID:19378:46229",
       "name": "Section/stack-sm",
       "variableCollectionId": "VariableCollectionId:19378:46226",

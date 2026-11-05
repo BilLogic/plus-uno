@@ -51,7 +51,6 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Grid | `--layout-columns` | `--grid-columns` |  |
 | Grid | `--layout-width-column` | `--grid-width-column` |  |
 | Grid | `--layout-width-column-screen` | `--grid-width-column-screen` |  |
-| Grid | `--layout-pad-left-container` | `--grid-pad-left-container` |  |
 | Screen | `--layout-width-screen` | `--screen-width` |  |
 | Screen | `--layout-min-width-screen` | `--screen-min-width` |  |
 | Screen | `--layout-max-width-screen` | `--screen-max-width` |  |
@@ -92,8 +91,6 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 
 | Group | Old | New | Note |
 |---|---|---|---|
-| Frame | `--frame-pad` | `--frame-pad` (reclassified, unchanged) |  |
-| Frame | `--frame-stack` | `--frame-stack` (reclassified, unchanged) |  |
 | Frame | `--layout-height-topbar` | `--frame-topbar-height` |  |
 | Frame | `--layout-width-sidebar` | `--frame-sidebar-width` |  |
 | Frame | `--layout-sidebar-width` | `--frame-sidebar-width-nav` | fixed SideNav width (164), distinct from the responsive sidebar above |
@@ -108,6 +105,9 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Page | `--page-stack-md` | `--page-stack-md` (reclassified, unchanged) |  |
 | Page | `--page-stack-lg` | `--page-stack-lg` (reclassified, unchanged) |  |
 | Page | `--page-radius` | `--page-radius` (reclassified, unchanged) |  |
+| Panel | *(new)* | `--panel-min-width` | the narrowest the splitter allows (320) |
+| Panel | *(new)* | `--panel-width-default` | the width a Panel opens at (400) |
+| Panel | *(new)* | `--panel-max-width` | the widest the splitter allows (640) |
 | Section | *(new)* | `--section-pad-x-compact` |  |
 | Section | *(new)* | `--section-pad-x-default` |  |
 | Section | *(new)* | `--section-pad-x-spacious` |  |

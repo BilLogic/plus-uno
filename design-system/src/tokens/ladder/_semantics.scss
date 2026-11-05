@@ -44,7 +44,6 @@
     --grid-columns: 12;
     --grid-width-column: 45.33px;
     --grid-width-column-screen: 45.33px;
-    --grid-pad-left-container: var(--space-050);
 
     /* Screen */
     --screen-width: 768px;
@@ -66,24 +65,23 @@
 
 @media (min-width: 1024px) {
     :root {
-        --grid-width-column: 47.33px;
+        --grid-width-column: 46.67px;
         --grid-width-column-screen: 66.67px;
-        --grid-pad-left-container: var(--space-0);
         --screen-width: 1024px;
         --screen-min-width: 1024px;
         --screen-max-width: 1439px;
-        --content-width: 744px;
+        --content-width: 736px;
     }
 }
 
 @media (min-width: 1440px) {
     :root {
-        --grid-width-column: 80.67px;
+        --grid-width-column: 81.33px;
         --grid-width-column-screen: 88px;
         --screen-width: 1440px;
         --screen-min-width: 1440px;
         --screen-max-width: none;
         --screen-pad-x: var(--space-200);
-        --content-width: 1144px;
+        --content-width: 1152px;
     }
 }
