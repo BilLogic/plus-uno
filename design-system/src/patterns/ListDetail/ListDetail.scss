@@ -1,0 +1,47 @@
+/**
+ * List and detail (Patterns/List and detail)
+ * Rides the Page's 12-column grid: the list spans 7, the detail Section 5,
+ * a gutter apart. Below the split floor one of them fills the row.
+ */
+
+.plus-list-detail {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+    align-items: start;
+    min-width: 0;
+}
+
+.plus-list-detail--split .plus-list-detail__list {
+    grid-column: span 7;
+}
+
+.plus-list-detail--split .plus-list-detail__detail {
+    grid-column: span 5;
+}
+
+.plus-list-detail--list .plus-list-detail__list,
+.plus-list-detail--detail .plus-list-detail__detail {
+    grid-column: 1 / -1;
+}
+
+/* No record open at the split: the list takes the row. */
+.plus-list-detail--split:not(:has(.plus-list-detail__detail)) .plus-list-detail__list {
+    grid-column: 1 / -1;
+}
+
+.plus-list-detail__list,
+.plus-list-detail__detail {
+    min-width: 0;
+}
+
+.plus-list-detail__detail {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--section-stack-sm);
+}
+
+.plus-list-detail__back {
+    align-self: flex-start;
+}

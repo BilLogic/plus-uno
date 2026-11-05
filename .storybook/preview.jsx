@@ -215,6 +215,7 @@ const preview = {
               "Topbar",
               "Sidebar",
               "Section",
+              "List and detail",
               "Card",
               "Table",
               "Blanket",

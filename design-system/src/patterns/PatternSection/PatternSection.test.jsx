@@ -19,6 +19,15 @@ describe('PatternSection', () => {
         expect(cls).not.toMatch(/plus-pattern-section-bg-/);
     });
 
+    describe('fill', () => {
+        it('takes a subtle fill on request, and none otherwise', () => {
+            const { container, rerender } = render(<PatternSection title="Flag" fill="subtle">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-fill-subtle');
+            rerender(<PatternSection title="Flag">Body</PatternSection>);
+            expect(section(container).className).not.toMatch(/plus-pattern-section-fill-/);
+        });
+    });
+
     describe('header types', () => {
         it('infers `tabs` from the tabs slot and puts the tabs row under the title row', () => {
             const { container } = render(

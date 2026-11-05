@@ -24,6 +24,13 @@
     gap: var(--section-stack-lg);
 }
 
+/* Subtle fill: the sunken surface, padded and rounded, for a section beside a list. */
+.plus-pattern-section-fill-subtle {
+    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    border-radius: var(--card-radius);
+    background-color: var(--ds-surface-sunken);
+}
+
 /* `_Section header`: the title row, then the tabs or toolbar row when there is one */
 .plus-pattern-section-header {
     display: flex;
