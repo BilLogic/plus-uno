@@ -274,9 +274,9 @@ const Frame = ({
     // once that modal closes, focus goes to the toggle.
     const focusToggleOnClose = useRef(false);
     // Whether a modal (or drawer) is open: the overlay Panel then lets go of focus so the modal can hold it.
-    const [overlayRaised, setOverlayRaised] = useState(() => openOverlayCount() > 0);
+    const [modalOpen, setModalOpen] = useState(() => openOverlayCount() > 0);
     useEffect(() => subscribeOverlays((event) => {
-        setOverlayRaised(event.count > 0);
+        setModalOpen(event.count > 0);
         // The first overlay of a stack starts afresh; a confirm on top keeps the mark.
         if (event.type === 'open' && event.count === 1) focusToggleOnClose.current = false;
         const raisedNow = stateRef.current === 'peeking' || stateRef.current === 'overlay';
@@ -340,28 +340,54 @@ const Frame = ({
 
     // An overlay Panel is modal; docked or peeking it is not.
     const panelModal = panelShown && panelOverlay && !panelPeekShown;
+    const wasPanelShownRef = useRef(panelShown);
     const panelModalRef = useRef(panelModal);
     panelModalRef.current = panelModal;
+    // Only an overlay or a peek is dismissed; a docked Panel closes from its own controls.
+    const panelDismissible = panelModal || panelPeekShown;
 
     /**
      * Base UI reports each attempt to dismiss the Panel's dialog; the Frame
      * keeps the rules. Only an overlay or a peek is dismissed, by a press on
      * the Blanket or the Topbar or by Escape. A press inside an open modal, in
      * a popup drawn outside the Frame, or on a trigger that controls the Panel
-     * (which toggles it itself) leaves it open, and so does Escape while a
-     * modal is open, since that Escape is the modal's.
+     * (which toggles it itself) leaves it open. So does Escape while a modal
+     * is open, since that Escape is the modal's, and an Escape a control in
+     * the Panel (a menu, a field) already handled.
      */
+    const panelKeepsOpen = (next, details) => {
+        if (next || !panelDismissible) return true;
+        if (!PANEL_DISMISS_REASONS.has(details?.reason) || openOverlayCount() > 0) return true;
+        const event = details.event;
+        if (details.reason === 'escape-key') return Boolean(event?.defaultPrevented);
+        const target = event?.target;
+        if (!frameRef.current?.contains(target) || panelRef.current?.contains(target)) return true;
+        return Boolean(target.closest?.(`[aria-controls="${panelId}"]`));
+    };
     const handlePanelOpenChange = (next, details) => {
-        if (next || !(panelModal || panelPeekShown)) return;
-        if (!PANEL_DISMISS_REASONS.has(details?.reason) || openOverlayCount() > 0) return;
-        if (details.reason === 'outside-press') {
-            const target = details.event?.target;
-            if (!frameRef.current?.contains(target) || panelRef.current?.contains(target)) return;
-            if (target.closest?.(`[aria-controls="${panelId}"]`)) return;
+        if (panelKeepsOpen(next, details)) {
+            // An attempt the Frame ignores leaves the event alone, so an Escape
+            // still reaches the Sidebar's peek and anything else listening.
+            details?.cancel?.();
+            details?.allowPropagation?.();
+            return;
         }
         if (panelPeekShown) setPanelPeeking(false);
         else setPanelOpen(false);
     };
+
+    // A Panel that turns into an overlay while open (the Sidebar opened by
+    // hand, a narrower window) takes focus in, as opening it would have.
+    const wasPanelModal = useRef(panelModal);
+    useEffect(() => {
+        const doc = frameRef.current?.ownerDocument ?? document;
+        if (panelModal && !wasPanelModal.current && wasPanelShownRef.current
+            && !panelRef.current?.contains(doc.activeElement)) {
+            panelRef.current?.focus();
+        }
+        wasPanelModal.current = panelModal;
+        wasPanelShownRef.current = panelShown;
+    }, [panelModal, panelShown]);
 
     // Opening moves focus in: an overlay always (to its first control), a
     // docked Panel only when what had focus left the page (a Sidebar that
@@ -524,8 +550,8 @@ const Frame = ({
                     open={panelShown || panelPeekShown}
                     onOpenChange={handlePanelOpenChange}
                     // Modal only as an overlay, and only while no modal (or drawer) is over it.
-                    modal={panelModal && !overlayRaised ? 'trap-focus' : false}
-                    disablePointerDismissal={!(panelModal || panelPeekShown)}
+                    modal={panelModal && !modalOpen ? 'trap-focus' : false}
+                    disablePointerDismissal={!panelDismissible}
                 >
                     <Dialog.Portal container={rowRef} className="plus-frame__panel-host">
                         {renderPanel()}

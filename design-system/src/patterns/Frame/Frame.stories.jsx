@@ -657,9 +657,37 @@ const ChatPanel = ({ onSettings }) => {
             <PanelHeader title="AI chat" actions={<PanelCloseAction onClick={() => panel?.setOpen(false)} />} />
             <PanelBody>
                 Ask about this page.
+                <AskField />
                 {onSettings ? <div><Button text="Chat settings" onClick={onSettings} /></div> : null}
             </PanelBody>
         </PanelContainer>
+    );
+};
+
+/** A field in the Panel that keeps its own Escape: with text in it, Escape clears the text and nothing else. */
+const AskField = () => {
+    const [value, setValue] = useState('');
+    return (
+        <input
+            aria-label="Ask"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
+                if (e.key !== 'Escape' || !value) return;
+                e.preventDefault();
+                setValue('');
+            }}
+        />
+    );
+};
+
+/** A Sidebar whose own button opens the Panel, so opening it can collapse the Sidebar that held focus. */
+const ChatSidebar = () => {
+    const panel = usePanelControl();
+    return (
+        <nav aria-label="Main">
+            <Button text="Ask AI" onClick={() => panel?.setOpen(true)} />
+        </nav>
     );
 };
 
@@ -667,14 +695,12 @@ const ChatPanel = ({ onSettings }) => {
 const TopbarChatTrigger = () => {
     const panel = usePanelControl();
     return (
-        <button
-            type="button"
+        <Button
+            text="Chat"
             aria-controls={panel?.panelId}
             aria-expanded={panel?.open}
             onClick={() => panel?.setOpen(!panel.open)}
-        >
-            Chat
-        </button>
+        />
     );
 };
 
@@ -852,6 +878,9 @@ export const SidebarByHandWinsAt1300 = {
         await expect(p.panel(), 'the same Panel, not remounted').toBe(panel);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
         await expectBlanket(p);
+        // Now an overlay, it is modal: focus moves in and the Page goes inert.
+        await waitFor(() => expect(panel.contains(canvasElement.ownerDocument.activeElement), 'focus moves into the Panel').toBe(true));
+        await expect(p.surface.inert).toBe(true);
     }),
 };
 
@@ -961,6 +990,57 @@ export const DockedPanelIsNotModalAt1440 = {
         await userEvent.click(p.content);
         await new Promise((resolve) => { setTimeout(resolve, 100); });
         await expect(p.panel(), 'a docked Panel stays open').toBe(panel);
+    }),
+};
+
+/** 1100: a field in the Panel keeps its own Escape; the next Escape closes the Panel. */
+export const PanelFieldKeepsEscapeAt1100 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1100, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const field = within(p.panel()).getByRole('textbox', { name: 'Ask' });
+        await userEvent.click(field);
+        await userEvent.type(field, 'hello');
+        await userEvent.keyboard('{Escape}');
+        await expect(field, 'Escape cleared the field').toHaveValue('');
+        await expect(p.panel(), 'and left the Panel open').not.toBeNull();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.panel(), 'the next Escape closes it').toBeNull());
+    }),
+};
+
+/** 1200: a docked Panel does not take Escape, so Escape still closes a Sidebar peek. */
+export const DockedPanelLeavesEscapeAt1200 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1200, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses beside the docked Panel').toBeNull());
+        await peekSidebar(p);
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.sidebar(), 'Escape closes the peek').toBeNull());
+        await expect(p.panel(), 'the docked Panel stays open').not.toBeNull();
+    }),
+};
+
+/** 1200: opened from the Sidebar it collapses, the docked Panel takes focus; closed, focus goes to the toggle, since its opener left. */
+export const DockedPanelTakesLostFocusAt1200 = {
+    render: (args) => <WithPanel {...args} sidebar={<ChatSidebar />} />,
+    play: async ({ canvasElement }) => atViewport(1200, async () => {
+        const p = panelParts(canvasElement);
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        p.canvas.getByRole('button', { name: 'Ask AI' }).focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(p.panel()).not.toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses').toBeNull());
+        await expect(getComputedStyle(p.panel()).position, 'docked').not.toBe('absolute');
+        await waitFor(() => expect(doc.activeElement, 'focus moves into the Panel').toBe(p.panel()));
+        await expect(p.surface.inert, 'docked, nothing goes inert').toBe(false);
+        await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel()).toBeNull());
+        await waitFor(() => expect(doc.activeElement, 'focus goes to the toggle').toBe(p.toggle));
     }),
 };
 
