@@ -1,0 +1,21 @@
+name: Netlify production deploy
+
+# Production on Netlify does not publish on merges (see netlify.toml
+# [context.production]). It publishes only when Bill calls a release: run this
+# workflow by hand from the Actions tab (or `gh workflow run netlify-production-deploy.yml`).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger production build
+        env:
+          HOOK: ${{ secrets.NETLIFY_PRODUCTION_HOOK }}
+        run: |
+          test -n "$HOOK" || { echo "NETLIFY_PRODUCTION_HOOK secret is missing"; exit 1; }
+          curl -fsS -X POST -d '{}' "$HOOK?trigger_title=release"

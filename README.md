@@ -123,10 +123,10 @@ The component library lives in `design-system/src/`: **56 UI components (form el
 
 | Environment | URL | Trigger |
 |-------------|-----|---------|
-| **Production** | [plus-uno.netlify.app](https://plus-uno.netlify.app) | Once a day at 06:00 ET when `main` has new commits, or by hand (Actions › Netlify daily production deploy) |
+| **Production** | [plus-uno.netlify.app](https://plus-uno.netlify.app) | On a release only: run Actions › Netlify production deploy by hand |
 | **Deploy Preview** | `deploy-preview-{PR#}--plus-uno.netlify.app` | Open a PR against `main` |
 
-Hosted on Netlify. Build: `npm run build:all` (Vite + Storybook). Deploy previews are automatic on every PR and cost no credits. Each production deploy costs 15 credits, so a merge to `main` does not publish: `netlify.toml` skips production builds unless the daily-production build hook started them.
+Hosted on Netlify. Build: `npm run build:all` (Vite + Storybook). Deploy previews are automatic on every PR and cost no credits. Each production deploy costs 15 credits, so a merge to `main` does not publish: `netlify.toml` skips production builds unless the production build hook started them. Review work on the deploy preview until a release is called.
 
 ## Tech Stack
 
