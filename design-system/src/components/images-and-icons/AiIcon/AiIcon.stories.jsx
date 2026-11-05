@@ -118,7 +118,7 @@ CloseUp.play = async ({ canvasElement }) => {
 
 /* ------------------------------------------------------------ accessibility */
 
-export const Labelled = () => (
+export const Labeled = () => (
     <div style={{ display: 'flex', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
         <AiIcon name="summarize" label="Summarize" data-testid="named" />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
@@ -129,7 +129,7 @@ export const Labelled = () => (
 );
 
 /** With a `label` the icon is an image with that name; beside visible text it is hidden. */
-Labelled.play = async ({ canvasElement }) => {
+Labeled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByRole('img', { name: 'Summarize' })).toBeInTheDocument();
     const decorative = canvas.getByTestId('decorative');

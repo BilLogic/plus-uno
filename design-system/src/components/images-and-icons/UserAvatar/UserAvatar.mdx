@@ -1,0 +1,130 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as UserAvatarStories from './UserAvatar.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={UserAvatarStories} />
+
+<Title />
+The signed-in user: an initial pill, the name, a role tag for a lead tutor and an optional notification counter.
+
+<DocsTabs of={UserAvatarStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/UserAvatar"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>A regular tutor with a counter.</>}>
+    <Canvas of={UserAvatarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Spacing
+
+<DocsCanvasShell description={<>`compact` is 32 high for the topbar. `default` is padded for table rows.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Spacing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`type="lead tutor"` adds a Lead status tag. Regular tutor and admin show none.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Types} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>`counter` shows the notification count beside the name.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Counter} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={UserAvatarStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `UserAvatar` for the current user's identity in the topbar or in a row that names a person. For a person who is not the signed-in user, or a picture-only avatar, use `Avatar`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pick `spacing` by where it sits.
+
+`compact` fits the 32 topbar. `default` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
+
+```jsx
+<UserAvatar spacing={topbar ? 'compact' : 'default'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
+```
+
+### Pass `onClick` to make it clickable.
+
+Without it the avatar is static. With it, the avatar shows the clickable look. The avatar renders a plain `div` with no role or keyboard handling, so when the click opens a menu or navigates, wrap it in a button or link that carries the focus and key behavior.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The initial is decorative.** The pill is hidden from assistive technology; the name carries the meaning.
+- **The role is text.** The Lead tag is a Status tag with visible text, not color alone.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a picture or initials alone, use `Avatar`.
+- For several people, use `AvatarGroup`.
+- For the role tag, see `StatusTag`.
+
+</div>
+
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -14,7 +14,7 @@
     flex-wrap: wrap;
     align-items: center;
     justify-content: center;
-    // The popup sits Popover/offset 4 from its trigger.
+    // The popup sits offset 4 (`--popover-offset`) from its trigger.
     gap: var(--popover-offset);
     padding: var(--size-spacing-medium-space-400);
 
@@ -25,8 +25,8 @@
 
 // ===== MAIN CONTAINER =====
 // The Popup family's Popup (Figma Pattern/Popup): one surface, no overlay
-// backdrop and no arrow. Pad Popover/pad 16, radius Popover/radius 12, and a fixed width
-// tier, Popover/width-sm · md · lg (320 · 400 · 480). The title and body stack
+// backdrop and no arrow. Pad 16 (`--popover-pad`), radius 12 (`--popover-radius`), and a fixed width
+// tier, width-sm · md · lg (320 · 400 · 480, `--popover-width-*`). The title and body stack
 // Element/stack-md 8 apart on the popup's own fill.
 .plus-popup {
     display: flex;

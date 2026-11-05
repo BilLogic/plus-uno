@@ -5,7 +5,7 @@ import { popupMountOf } from '@/lib/popoverPlacement';
 import { isOverlayRaisedOver, isPressInRaisedOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
-/** The width tiers, Popover/width-sm · md · lg: 320 · 400 · 480. */
+/** The width tiers, popup width-sm · md · lg (`--popover-width-*`): 320 · 400 · 480. */
 const WIDTHS = ['sm', 'md', 'lg'];
 
 /** Every placement this component accepts, ADS-shaped (side + optional `-start`/`-end`). */
